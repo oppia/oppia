@@ -553,7 +553,7 @@ class NormalizedRectangle2D(BaseObject):
 
 
 class ImageRegion(BaseObject):
-    """Image Region class."""
+    """A region of an image, including its shape and coordinates."""
 
     description = 'A region of an image.'
     
@@ -566,14 +566,14 @@ class ImageRegion(BaseObject):
             'name': 'regionType',
             'schema': UnicodeString.SCHEMA
         }, {
-            'name': 'regionArea',
+            'name': 'area',
             'schema': NormalizedRectangle2D.SCHEMA
         }]
     }
 
 
 class ImageWithRegions(BaseObject):
-    """Image With Regions class."""
+    """An image overlaid with labeled regions."""
 
     description = 'An image overlaid with regions.'
     edit_html_filename = 'image_with_regions_editor'
@@ -585,7 +585,7 @@ class ImageWithRegions(BaseObject):
             'name': 'imagePath',
             'schema': Filepath.SCHEMA
         }, {
-            'name': 'imageRegions',
+            'name': 'labeledRegions',
             'schema': {
                 'type': 'list',
                 'items': {
@@ -603,12 +603,25 @@ class ImageWithRegions(BaseObject):
     }
 
 
-class ListOfRegion(BaseObject):
-    """List of Region class."""
+class ClickOnImage(BaseObject):
+    """A click on an image and the clicked regions."""
 
-    description = "A list of regions by index."
+    description = "Position of a click and a list of regions clicked."
 
     SCHEMA = {
-        'type': 'list',
-        'items': UnicodeString.SCHEMA
+        'type': 'dict',
+        'properties': [{
+            'name': 'clickPosition',
+            'schema': {
+                'type': 'list',
+                'items': Real.SCHEMA,
+                'len': 2
+            }
+        }, {
+            'name': 'clickedRegions',
+            'schema': {
+                'type': 'list',
+                'items': UnicodeString.SCHEMA
+            } 
+        }]
     }

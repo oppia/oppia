@@ -1,9 +1,15 @@
+<style>
+  .numeric-input-container {
+    margin-top: -25px;
+  }
+</style>
+
 <script type="text/ng-template" id="interaction/NumericInput">
-  <div class="row">
+  <div class="row numeric-input-container">
     <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <ng-form name="numericInputForm">
-          <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer">
+          <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
           </schema-based-editor>
         </ng-form>
       </div>

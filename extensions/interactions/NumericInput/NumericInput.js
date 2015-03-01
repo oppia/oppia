@@ -26,8 +26,9 @@ oppia.directive('oppiaInteractiveNumericInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/NumericInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = 0;
+      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
+        $scope.answer = '';
+        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
         $scope.NUMERIC_INPUT_FORM_SCHEMA = {
           type: 'float',
@@ -35,7 +36,9 @@ oppia.directive('oppiaInteractiveNumericInput', [
         };
 
         $scope.submitAnswer = function(answer) {
-          $scope.$parent.$parent.submitAnswer(Number(answer), 'submit');
+          if (answer) {
+            $scope.$parent.$parent.submitAnswer(Number(answer), 'submit');
+          }
         };
       }]
     };

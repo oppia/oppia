@@ -127,8 +127,6 @@ class AdminPage(base.BaseHandler):
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
-            'object_editors_js': jinja2.utils.Markup(
-                editor.OBJECT_EDITORS_JS.value),
             'one_off_job_specs': one_off_job_specs,
             'recent_job_data': recent_job_data,
             'rte_components_html': jinja2.utils.Markup(

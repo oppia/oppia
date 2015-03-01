@@ -1,0 +1,414 @@
+author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: Continue
+language_code: en
+objective: check all the interactions work
+param_changes: []
+param_specs:
+  a:
+    obj_type: UnicodeString
+  b:
+    obj_type: UnicodeString
+  c:
+    obj_type: UnicodeString
+schema_version: 4
+skill_tags: []
+states:
+  Code REPL:
+    content:
+    - type: text
+      value: Write a program the prints 12.<br>
+    interaction:
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '[Type your code here.]'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: '12'
+            name: OutputEquals
+            rule_type: atomic
+            subject: answer
+          dest: Music notes input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Code REPL
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: CodeRepl
+    param_changes: []
+  Continue:
+    content:
+    - type: text
+      value: "Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}\
+        \ should be 1.</div><div><div>{{c}} should be 2.</div></div><div><span>{{b}}\
+        \ should be 0.5.</span><br></div><div>{{a*b}} should be 0.5.</div><div><span>{{-a*b}}\
+        \ should be -0.5.</span><br></div><div><span>{{a \_ * b \_}} should be 0.5.</span></div><div>{{abs(-a*b)}}\
+        \ should be 0.5.</div><div>{{if a + a == c then 'yes' else 'no'}} should be\
+        \ 'yes'</div><div><div><span>{{if a == c then 'yes' else 'no'}} should be\
+        \ 'no'</span><br></div><div><span>{{floor(a*b)}} should be 0.</span></div></div><div><div><span>{{log(2,\
+        \ 10)}} should be around 0.3.</span><br></div><div><div><span>{{pow(2, 10)}}\
+        \ should be 1024.</span></div><div><span>{{3 &lt; 4}} should be true.</span></div><div><span>{{3\
+        \ &gt; 4}} should be false.</span></div><div><span>{{4 &lt;= 4}} should be\
+        \ true.</span></div><div><span>{{4 &gt;= 3}} should be true.</span></div><div><span>&lt;\
+        \ should be an unescaped 'less-than' sign.</span></div><div><span>&gt; should\
+        \ be an unescaped 'greater-than' sign.</span></div></div></div>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Multiple choice input
+          feedback: []
+          param_changes: []
+      id: Continue
+    param_changes:
+    - customization_args:
+        parse_with_jinja: false
+        value: '1'
+      generator_id: Copier
+      name: a
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a}}'
+      generator_id: Copier
+      name: b
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+b}}'
+      generator_id: Copier
+      name: c
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{b/c}}'
+      generator_id: Copier
+      name: b
+  Multiple choice input:
+    content:
+    - type: text
+      value: Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
+        should be 1.</div><div><span>{{b}} should be 3.</span><br></div><div><div>{{c}}
+        should be 2.</div></div><div><span>{{a*b}} should be 3.</span></div></div>
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-image filepath-with-value="&amp;quot;A.png&amp;quot;"></oppia-noninteractive-image><br>
+          - Option B<br>
+          - <span class=""></span><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Text input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Multiple choice input
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: MultipleChoiceInput
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+c}}'
+      generator_id: Copier
+      name: b
+  Music notes input:
+    content:
+    - type: text
+      value: Enter two E4 notes (bottom line).<br>
+    interaction:
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: E4
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: E4
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: World map
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Music notes input
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: MusicNotesInput
+    param_changes: []
+  Network Graph:
+    content:
+    - type: text
+      value: Do the following step by step:<br><br>1. Delete Node labelled B<span
+        class=""></span><div>2. Add Node labelled Z</div><div>3. Add Edge of weight
+        150 connecting A to Z</div><div>4. Delete Edge between A and F</div>
+    interaction:
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: true
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: true
+        canEditEdgeWeight:
+          value: true
+        canEditVertexLabel:
+          value: true
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges:
+            - dst: 2
+              src: 0
+              weight: 1000
+            isDirected: false
+            isLabeled: true
+            isWeighted: true
+            vertices:
+            - label: A
+              x: 212
+              y: 45
+            - label: B
+              x: 379
+              y: 44
+            - label: F
+              x: 215
+              y: 155.5
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              g:
+                edges:
+                - dst: 1
+                  src: 0
+                  weight: 150
+                isDirected: false
+                isLabeled: true
+                isWeighted: true
+                vertices:
+                - label: A
+                  x: 128.328125
+                  y: 65.25
+                - label: Z
+                  x: 189.0
+                  y: 66.0
+                - label: F
+                  x: 155.0
+                  y: 125.0
+            name: IsIsomorphicTo
+            rule_type: atomic
+            subject: answer
+          dest: Code REPL
+          feedback:
+          - Correct
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Network Graph
+          feedback:
+          - Incorrect
+          param_changes: []
+      id: GraphInput
+    param_changes: []
+  Numeric input:
+    content:
+    - type: text
+      value: Enter a number larger than 6.<br>
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 6.0
+            name: IsGreaterThan
+            rule_type: atomic
+            subject: answer
+          dest: Set input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Numeric input
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: NumericInput
+    param_changes: []
+  Set input:
+    content:
+    - type: text
+      value: Enter the set {abc, xyz}<br>
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x:
+              - abc
+              - xyz
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Network Graph
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Set input
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: SetInput
+    param_changes: []
+  Text Area Input:
+    content:
+    - type: text
+      value: Please type hello.
+    interaction:
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 10
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: hello
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Numeric input
+          feedback:
+          - Correct
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Text Area Input
+          feedback:
+          - Wrong
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  Text input:
+    content:
+    - type: text
+      value: Enter the string rrrrr<br>
+    interaction:
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: rrrrr
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Text Area Input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Text input
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  World map:
+    content:
+    - type: text
+      value: Click on the USA.<br>
+    interaction:
+      customization_args:
+        latitude:
+          value: 0
+        longitude:
+          value: 0
+        zoom:
+          value: 0
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              d: 30.0
+              p:
+              - 40.0
+              - -105.0
+            name: Within
+            rule_type: atomic
+            subject: answer
+          dest: END
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: World map
+          feedback:
+          - Wrong.
+          param_changes: []
+      id: InteractiveMap
+    param_changes: []

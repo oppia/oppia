@@ -1,0 +1,24 @@
+<script type="text/ng-template" id="modals/embedExploration">
+  <div class="modal-header">
+    <h3>Embed this exploration</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      To embed this exploration in another webpage, copy the following HTML into the source code of the webpage:
+    </p>
+
+    <pre>
+&lt;oppia oppia-id="<[explorationId]>" src="<[serverName]>"&gt;&lt;/oppia&gt;
+
+&lt;script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"&gt;&lt;/script&gt;</pre>
+
+    <p>
+      The last line only needs to be included once in the embedding webpage, even if you are embedding multiple explorations. For more details, as well as instructions on how to embed a particular version of an exploration, please see the <a href="https://code.google.com/p/oppia/wiki/EmbeddingYourExploration">documentation</a>.
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="close()">Close</button>
+  </div>
+</script>

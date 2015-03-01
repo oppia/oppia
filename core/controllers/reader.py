@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import copy
 
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_domain
@@ -139,7 +140,13 @@ class ExplorationPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
+            'can_edit': (
+                bool(self.username) and
+                self.username not in config_domain.BANNED_USERNAMES.value and
+                rights_manager.Actor(self.user_id).can_edit(exploration_id)
+            ),
             'dependencies_html': jinja2.utils.Markup(
                 dependencies_html),
             'exploration_title': exploration.title,
@@ -182,11 +189,19 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        intro_card_color = (
+            feconf.CATEGORIES_TO_COLORS[exploration.category] if
+            exploration.category in feconf.CATEGORIES_TO_COLORS else
+            feconf.DEFAULT_COLOR)
+
         self.values.update({
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(exploration_id)),
             'exploration': exploration.to_player_dict(),
+            'intro_card_image_url': (
+                '/images/gallery/exploration_background_%s_large.png' %
+                intro_card_color),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_random_string(24),
             'version': exploration.version,

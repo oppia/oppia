@@ -25,7 +25,7 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
-    'ui.sortable', 'infinite-scroll'
+    'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -35,8 +35,10 @@ var oppia = angular.module(
 // Set default headers for POST and PUT requests.
 // Add an interceptor to convert requests to strings and to log and show
 // warnings for error responses.
-oppia.config(['$interpolateProvider', '$httpProvider',
-    function($interpolateProvider, $httpProvider) {
+// Disable ng-animate for carousel: see
+//     https://github.com/angular-ui/bootstrap/issues/1565
+oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
+    function($interpolateProvider, $httpProvider, $animateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
@@ -69,6 +71,8 @@ oppia.config(['$interpolateProvider', '$httpProvider',
       };
     }
   ]);
+
+  $animateProvider.classNameFilter(/carousel/);
 }]);
 
 oppia.config(['$provide', function($provide) {
@@ -261,62 +265,22 @@ oppia.factory('validatorsService', [
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
 oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
+      if (_nextLabelToFocusOn) {
+        return;
+      }
+
+      _nextLabelToFocusOn = name;
       $timeout(function() {
-        $rootScope.$broadcast('focusOn', name);
+        $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
+        _nextLabelToFocusOn = null;
       });
     }
   };
 }]);
 
-// Service for caching RTE component definitions.
-oppia.factory('rteComponentRepositoryService', [
-    '$http', '$log', '$q', function($http, $log, $q) {
-  var _cachedRteComponentRepository = null;
-
-  return {
-    // Returns a promise, caching the results.
-    getRteComponentRepository: function() {
-      if (_cachedRteComponentRepository) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(_cachedRteComponentRepository));
-        return deferred.promise;
-      } else {
-        return $http.get('/rich_text_component_repository/data').then(function(response) {
-          _cachedRteComponentRepository = response.data.repository;
-          return angular.copy(_cachedRteComponentRepository);
-        });
-      }
-    }
-  };
-}]);
-
-oppia.factory('interactionRepositoryService', [
-    '$http', '$log', '$q', function($http, $log, $q) {
-  var _cachedInteractionRepository = null;
-
-  return {
-    // Returns a promise, caching the results.
-    getInteractionRepository: function() {
-      if (_cachedInteractionRepository) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(_cachedInteractionRepository));
-        return deferred.promise;
-      } else {
-        return $http.get('/interaction_repository/data').then(function(response) {
-          _cachedInteractionRepository = response.data.repository;
-          return angular.copy(_cachedInteractionRepository);
-        });
-      }
-    },
-    // This is used in the ExplorationEditor in order to prevent a second
-    // RPC to the backend.
-    setInteractionRepository: function(interactionRepository) {
-      _cachedInteractionRepository = interactionRepository;
-    }
-  };
-}]);
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {

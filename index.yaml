@@ -76,6 +76,11 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: SearchRankerRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer

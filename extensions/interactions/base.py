@@ -46,6 +46,15 @@ import jinja_utils
 import schema_utils
 import utils
 
+# Indicates that the learner view of the interaction should be displayed in the
+# context of the conversation.
+DISPLAY_MODE_INLINE = 'inline'
+# Indicates that the learner view of the interaction should be displayed as a
+# separate object from the conversation.
+DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
+
+ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
+
 
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
@@ -87,10 +96,19 @@ class BaseInteraction(object):
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
     # The category the interaction falls under in the repository. Overridden in
-    # subclasses.
+    # subclasses; a value of '' means that this should be displayed as a
+    # top-level interaction.
     category = ''
     # A description of the interaction. Overridden in subclasses.
     description = ''
+    # Describes how the interaction should be displayed -- either within the
+    # conversation ('inline'), or as a separate object ('supplemental'). In the
+    # latter case, the interaction instance is reused if two adjacent states
+    # have the same interaction id.
+    display_mode = ''
+    # Whether this interaction should be considered terminal, i.e. it ends
+    # the exploration. Defaults to False.
+    is_terminal = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -165,6 +183,16 @@ class BaseInteraction(object):
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
+    @property
+    def validator_html(self):
+        """The HTML code containing validators for the interaction's
+        customization_args and handlers.
+        """
+        return (
+            '<script>%s</script>\n' %
+            utils.get_file_contents(os.path.join(
+                feconf.INTERACTIONS_DIR, self.id, 'validator.js')))
+
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are
         provided.
@@ -174,12 +202,14 @@ class BaseInteraction(object):
             'name': self.name,
             'category': self.category,
             'description': self.description,
-            'customization_args': [{
+            'display_mode': self.display_mode,
+            'is_terminal': self.is_terminal,
+            'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
-            } for ca_spec in self.customization_arg_specs]
+            } for ca_spec in self.customization_arg_specs],
         }
 
         # Add information about the handlers.

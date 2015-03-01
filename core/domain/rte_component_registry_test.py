@@ -44,8 +44,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         """Check whether a string is alphanumeric."""
         return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
 
-    def _validate_customization_arg_specs(self, customization_args):
-        for ca_spec in customization_args:
+    def _validate_customization_arg_specs(self, customization_arg_specs):
+        for ca_spec in customization_arg_specs:
             self.assertEqual(set(ca_spec.keys()), set([
                 'name', 'description', 'schema', 'default_value']))
 

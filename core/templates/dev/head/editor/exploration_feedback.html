@@ -1,71 +1,53 @@
 <div ng-controller="ExplorationFeedback">
-  <div ng-if="threads === null">
-    <h2>Feedback Threads</h2>
-    <div class="oppia-align-center">
-      Loading
-      <span class="oppia-loading-dot-one">.</span>
-      <span class="oppia-loading-dot-two">.</span>
-      <span class="oppia-loading-dot-three">.</span>
-    </div>
-  </div>
-
-  <div ng-if="threads !== null">
+  <md-card class="oppia-editor-card">
     <div ng-if="!currentThreadId">
-      <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4">
-          <h2>Feedback Threads</h2>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4">
-          {% if user_email %}
-            <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()" style="margin-top: 10px;">
-              Start new thread
-            </button>
-          {% endif %}
-        </div>
+      <div class="pull-right">
+        {% if user_email %}
+          <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()" style="margin-top: 10px;">
+            Start new thread
+          </button>
+        {% endif %}
       </div>
 
-      <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-8">
-          <div ng-if="threads.length === 0">
-            <em>No feedback has been given for this exploration yet.</em>
-          </div>
-          <table class="table">
-            <tr ng-if="threads.length > 0">
-              <th class="col-lg-1 col-md-1 col-sm-1">
-                Status
-              </th>
-              <th class="col-lg-4 col-md-4 col-sm-4">
-                Subject
-              </th>
-              <th class="col-lg-2 col-md-2 col-sm-2">
-                Original author
-              </th>
-              <th class="col-lg-3 col-md-3 col-sm-3">
-                Last updated
-              </th>
-              <th class="col-lg-2 col-md-2 col-sm-2">
-              </th>
-            </tr>
-            <tr ng-repeat="t in threads|orderBy:'-last_updated'" ng-click="setCurrentThread(t.thread_id)" class="oppia-feedback-tab-row">
-              <td class="col-lg-1 col-md-1 col-sm-1">
-                <span ng-class="getLabelClass(t.status)"><[getHumanReadableStatus(t.status)]></span>
-              </td>
-              <td class="col-lg-4 col-md-4 col-sm-4">
-                <div><[t.subject]></div>
-                <div><[t.summary]></div>
-              </td>
-              <td class="col-lg-2 col-md-2 col-sm-2">
-                <span ng-if="t.original_author_username"><[t.original_author_username]></span>
-              </td>
-              <td class="col-lg-3 col-md-3 col-sm-3">
-                <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
-              </td>
-              <td class="col-lg-2 col-md-2 col-sm-2">
-              </td>
-            </tr>
-          </table>
-        </div>
+      <div style="clear: both;"></div>
+      <br>
+
+      <div ng-if="threads.length === 0">
+        <em>No feedback has been given for this exploration yet.</em>
       </div>
+      <table class="table">
+        <tr ng-if="threads.length > 0">
+          <th class="col-lg-1 col-md-1 col-sm-1">
+            Status
+          </th>
+          <th class="col-lg-6 col-md-6 col-sm-6">
+            Subject
+          </th>
+          <th class="col-lg-3 col-md-3 col-sm-3">
+            Original author
+          </th>
+          <th class="col-lg-2 col-md-2 col-sm-2">
+            Last updated
+          </th>
+        </tr>
+        <tr ng-repeat="t in threads|orderBy:'-last_updated'" ng-click="setCurrentThread(t.thread_id)" class="oppia-feedback-tab-row">
+          <td class="col-lg-1 col-md-1 col-sm-1">
+            <span ng-class="getLabelClass(t.status)"><[getHumanReadableStatus(t.status)]></span>
+          </td>
+          <td class="col-lg-6 col-md-6 col-sm-6">
+            <div><[t.subject]></div>
+            <div><[t.summary]></div>
+          </td>
+          <td class="col-lg-3 col-md-3 col-sm-3">
+            <span ng-if="t.original_author_username"><[t.original_author_username]></span>
+          </td>
+          <td class="col-lg-2 col-md-2 col-sm-2">
+            <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
+          </td>
+          <td class="col-lg-2 col-md-2 col-sm-2">
+          </td>
+        </tr>
+      </table>
 
       {% if not user_email %}
         <em>To create a new feedback thread, please log in.</em>
@@ -168,21 +150,21 @@
         {% endif %}
       </div>
     </div>
+  </md-card>
+</div>
+
+<script type="text/ng-template" id="modals/editorFeedbackCreateThread">
+  <div class="modal-header">
+    <h3>Start New Feedback Thread</h3>
   </div>
 
-  <script type="text/ng-template" id="modals/editorFeedbackCreateThread">
-    <div class="modal-header">
-      <h3>Start New Feedback Thread</h3>
-    </div>
+  <div class="modal-body">
+    <p>Thread subject: <input type="text" ng-model="newThreadSubject"></p>
+    <p>Message text <textarea ng-model="newThreadText" rows="6"></textarea></p>
+  </div>
 
-    <div class="modal-body">
-      <p>Thread subject: <input type="text" ng-model="newThreadSubject"></p>
-      <p>Message text <textarea ng-model="newThreadText" rows="6"></textarea></p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    </div>
-  </script>
-</div>
+  <div class="modal-footer">
+    <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</script>

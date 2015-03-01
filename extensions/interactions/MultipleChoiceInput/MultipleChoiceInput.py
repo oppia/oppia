@@ -21,9 +21,10 @@ class MultipleChoiceInput(base.BaseInteraction):
     """Interaction for multiple choice input."""
 
     name = 'Multiple Choice'
-    category = 'Basic Input'
+    category = ''
     description = (
         'Allows learners to select one of a list of multiple-choice options.')
+    display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     _handlers = [{
         'name': 'submit', 'obj_type': 'NonnegativeInt'

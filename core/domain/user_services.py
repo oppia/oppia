@@ -35,13 +35,19 @@ class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None):
+            last_started_state_editor_tutorial=None,
+            profile_picture_data_url=None, user_bio='',
+            preferred_language_codes=None):
         self.user_id = user_id
         self.email = email
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
+        self.profile_picture_data_url = profile_picture_data_url
+        self.user_bio = user_bio
+        self.preferred_language_codes = (
+            preferred_language_codes if preferred_language_codes else [])
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
@@ -134,6 +140,19 @@ def get_user_id_from_username(username):
         return user_model.id
 
 
+def get_user_settings_from_username(username):
+    """Gets the user settings for a given username.
+
+    Returns None if the user is not found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_normalized_username(
+        UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
 def get_users_settings(user_ids):
     """Gets domain objects representing the settings for the given user_ids.
 
@@ -155,6 +174,9 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
+                profile_picture_data_url=model.profile_picture_data_url,
+                user_bio=model.user_bio,
+                preferred_language_codes=model.preferred_language_codes
             ))
         else:
             result.append(None)
@@ -180,7 +202,10 @@ def _save_user_settings(user_settings):
         normalized_username=user_settings.normalized_username,
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
-            user_settings.last_started_state_editor_tutorial)
+            user_settings.last_started_state_editor_tutorial),
+        profile_picture_data_url=user_settings.profile_picture_data_url,
+        user_bio=user_settings.user_bio,
+        preferred_language_codes=user_settings.preferred_language_codes,
     ).put()
 
 
@@ -195,7 +220,9 @@ def _create_user(user_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % user_id)
 
-    user_settings = UserSettings(user_id, email)
+    user_settings = UserSettings(
+        user_id, email,
+        preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     return user_settings
 
@@ -238,6 +265,24 @@ def record_agreement_to_terms(user_id):
     """Records that the user has agreed to the license terms."""
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
+    _save_user_settings(user_settings)
+
+
+def update_profile_picture_data_url(user_id, profile_picture_data_url):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.profile_picture_data_url = profile_picture_data_url
+    _save_user_settings(user_settings)
+
+
+def update_user_bio(user_id, user_bio):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_preferred_language_codes(user_id, preferred_language_codes):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_language_codes = preferred_language_codes
     _save_user_settings(user_settings)
 
 

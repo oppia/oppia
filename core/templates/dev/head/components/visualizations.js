@@ -58,7 +58,7 @@ oppia.directive('barChart', [function() {
 }]);
 
 // The maximum number of nodes to show in a row of the state graph.
-oppia.constant('MAX_NODES_PER_ROW', 5);
+oppia.constant('MAX_NODES_PER_ROW', 4);
 // The following variable must be at least 3. It represents the maximum length,
 // in characters, for the name of each node label in the state graph.
 oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
@@ -89,7 +89,7 @@ oppia.factory('stateGraphArranger', [
     //   - reachableFromEnd: whether there is a path from this node to the END node.
     //   - id: a unique id for the node.
     //   - label: the full label of the node.
-    computeLayout: function(nodes, links, initStateId, finalStateId) {
+    computeLayout: function(nodes, links, initStateId, finalStateIds) {
       // In this implementation, nodes are snapped to a grid. We first compute
       // two additional internal variables for each node:
       //   - depth: its depth in the graph.
@@ -237,9 +237,11 @@ oppia.factory('stateGraphArranger', [
         nodeData[nodeId].label = nodes[nodeId];
       }
 
-      // Mark nodes that are reachable from the END state via backward links.
-      queue = [finalStateId];
-      nodeData[finalStateId].reachableFromEnd = true;
+      // Mark nodes that are reachable from any end state via backward links.
+      queue = finalStateIds;
+      for (var i = 0; i < finalStateIds.length; i++) {
+        nodeData[finalStateIds[i]].reachableFromEnd = true;
+      }
       while (queue.length > 0) {
         var currNodeId = queue[0];
         queue.shift();
@@ -276,7 +278,8 @@ oppia.directive('stateGraphViz', [
       //              corresponding linkPropertyMatching is undefined,
       //              link style defaults to the gray arrow.
       //  - 'initStateId': The initial state id
-      //  - 'finalStateId': The end state id
+      //  - 'finalStateIds': The list of ids corresponding to terminal states (i.e.,
+      //             those whose interactions are terminal, or 'END').
       graphData: '&',
       // Object whose keys are ids of nodes to display a warning tooltip over
       highlightStates: '=',
@@ -304,13 +307,13 @@ oppia.directive('stateGraphViz', [
       linkPropertyMapping: '='
     },
     templateUrl: 'visualizations/stateGraphViz',
-    controller: ['$scope', '$element', function($scope, $element) {
+    controller: ['$scope', '$element', '$timeout', function($scope, $element, $timeout) {
       var _redrawGraph = function() {
         if ($scope.graphData()) {
           $scope.graphLoaded = false;
           $scope.drawGraph(
             $scope.graphData().nodes, $scope.graphData().links,
-            $scope.graphData().initStateId, $scope.graphData().finalStateId
+            $scope.graphData().initStateId, $scope.graphData().finalStateIds
           );
 
           // Wait for the graph to finish loading before showing it again.
@@ -319,6 +322,10 @@ oppia.directive('stateGraphViz', [
           });
         }
       };
+
+      $scope.$on('redrawGraph', function() {
+        _redrawGraph();
+      });
 
       $scope.$watch('graphData()', _redrawGraph, true);
       $scope.$watch('currentStateId()', _redrawGraph);
@@ -382,10 +389,10 @@ oppia.directive('stateGraphViz', [
         return Math.max($scope.GRAPH_HEIGHT, 300);
       };
 
-      $scope.drawGraph = function(nodes, links, initStateId, finalStateId) {
-        $scope.finalStateId = finalStateId;
+      $scope.drawGraph = function(nodes, links, initStateId, finalStateIds) {
+        $scope.finalStateIds = finalStateIds;
         var nodeData = stateGraphArranger.computeLayout(
-          nodes, links, initStateId, finalStateId);
+          nodes, links, initStateId, angular.copy(finalStateIds));
 
         var maxDepth = 0;
         for (var nodeId in nodeData) {
@@ -459,8 +466,8 @@ oppia.directive('stateGraphViz', [
             dxperp /= norm;
             dyperp /= norm;
 
-            var midx = sourcex + dx/2 + dxperp*(sourceHeight/2),
-                midy = sourcey + dy/2 + dyperp*(targetHeight/2),
+            var midx = sourcex + dx/2 + dxperp*(sourceHeight/4),
+                midy = sourcey + dy/2 + dyperp*(targetHeight/4),
                 startx = sourcex + startCutoff*dx,
                 starty = sourcey + startCutoff*dy,
                 endx = targetx - endCutoff*dx,
@@ -484,7 +491,7 @@ oppia.directive('stateGraphViz', [
         var _getNodeStrokeWidth = function(nodeId) {
           return nodeId == $scope.currentStateId() ? '4' :
                  (nodeId == initStateId || nodeId == $scope.initStateId2 ||
-                 nodeId == finalStateId) ? '2' : '1';
+                 nodeId == 'END') ? '2' : '1';
         };
 
         var _getNodeFillOpacity = function(nodeId) {
@@ -516,7 +523,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.onNodeDeletionClick = function(nodeId) {
-          if (nodeId != initStateId && nodeId != finalStateId) {
+          if (nodeId != initStateId && nodeId !== 'END') {
             $scope.onDeleteFunction(nodeId);
           }
         };
@@ -530,7 +537,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.canNavigateToNode = function(nodeId) {
-          return nodeId != finalStateId && nodeId != $scope.currentStateId();
+          return nodeId !== 'END' && nodeId != $scope.currentStateId();
         };
 
         $scope.getTruncatedLabel = function(nodeLabel) {
@@ -561,19 +568,21 @@ oppia.directive('stateGraphViz', [
             }
           }
 
-          nodeData[nodeId].isInitNode = (nodeId == initStateId);
-          nodeData[nodeId].isEndNode = (nodeId == finalStateId);
-          nodeData[nodeId].isBadNode = (
-            nodeId != initStateId && nodeId != finalStateId &&
-            !(nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd));
-          nodeData[nodeId].isNormalNode = (
-            nodeId != initStateId && nodeId != finalStateId &&
-            nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd);
+          var currentNodeIsTerminal = (
+            $scope.finalStateIds.indexOf(nodeId) !== -1);
 
-          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != finalStateId);
+          nodeData[nodeId].nodeClass = (
+            nodeId === 'END'                     ? 'end-node' :
+            nodeId === $scope.currentStateId()   ? 'current-node' :
+            nodeId === initStateId               ? 'init-node' :
+            currentNodeIsTerminal                ? 'terminal-node' :
+            !(nodeData[nodeId].reachable &&
+              nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
+                                                   'normal-node');
+
+          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId !== 'END');
           $scope.nodeList.push(nodeData[nodeId]);
         }
-
 
         // The translation applied when the graph is first loaded.
         var originalTranslationAmounts = [0, 0];
@@ -583,7 +592,7 @@ oppia.directive('stateGraphViz', [
         if ($scope.allowPanning) {
           // Without the timeout, $element.find fails to find the required rect in the
           // state graph modal dialog.
-          setTimeout(function() {
+          $timeout(function() {
             var dimensions = _getElementDimensions();
 
             d3.select($element.find('rect.pannable-rect')[0]).call(
@@ -611,11 +620,11 @@ oppia.directive('stateGraphViz', [
               $scope.innerTransformStr = 'translate(' + d3.event.translate + ')';
               $scope.$apply();
             }));
-          });
+          }, 10);
         }
 
         if ($scope.centerAtCurrentState) {
-          setTimeout(function() {
+          $timeout(function() {
             var dimensions = _getElementDimensions();
 
             // Center the graph at the node representing the current state.
@@ -646,7 +655,7 @@ oppia.directive('stateGraphViz', [
 
             $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
             $scope.$apply();
-          });
+          }, 20);
         }
       };
     }]

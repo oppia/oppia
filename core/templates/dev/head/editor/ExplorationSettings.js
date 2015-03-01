@@ -23,12 +23,12 @@ oppia.controller('ExplorationSettings', [
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
-    'explorationWarningsService', 'warningsData', 'explorationStatesService', function(
+    'warningsData', 'explorationStatesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
-      explorationWarningsService, warningsData, explorationStatesService) {
+      warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -157,7 +157,7 @@ oppia.controller('ExplorationSettings', [
     warningsData.clear();
     $modal.open({
       templateUrl: 'modals/transferExplorationOwnership',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
           $scope.transfer = $modalInstance.close;
 
@@ -176,7 +176,7 @@ oppia.controller('ExplorationSettings', [
     warningsData.clear();
     $modal.open({
       templateUrl: 'modals/nominateExploration',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.close = function() {
           $modalInstance.dismiss('cancel');
@@ -191,7 +191,7 @@ oppia.controller('ExplorationSettings', [
 
     $modal.open({
       templateUrl: 'modals/deleteExploration',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.reallyDelete = $modalInstance.close;
 
@@ -225,37 +225,5 @@ oppia.controller('ExplorationSettings', [
 
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.isExplorationLockedForEditing();
-  };
-
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.publish = $modalInstance.close;
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
-  $scope.getPublishExplorationButtonTooltip = function() {
-    if (explorationWarningsService.countWarnings() > 0) {
-      return 'Please resolve the warnings before publishing.';
-    } else if ($scope.isExplorationLockedForEditing()) {
-      return 'Please save your changes before publishing.';
-    } else {
-      return 'Click this button to publish your exploration to the gallery.';
-    }
-  };
-
-  $scope.countWarnings = function() {
-    return explorationWarningsService.countWarnings();
   };
 }]);

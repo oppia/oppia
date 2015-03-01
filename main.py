@@ -167,14 +167,6 @@ urls = [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
-    get_redirect_route(
-        r'/interaction_repository/data',
-        resources.InteractionRepositoryHandler,
-        'interaction_repository_handler'),
-    get_redirect_route(
-        r'/rich_text_component_repository/data',
-        resources.RteComponentRepositoryHandler,
-        'rte_component_repository_handler'),
 
     get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
@@ -193,24 +185,30 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
-        galleries.GalleryLoginRedirector, 'gallery_redirect'),
-    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
+    get_redirect_route(
+        r'/explorationsummarieshandler/data',
+        galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
-    get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
-        r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
+        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_URL,
-        profile.EditorPrerequisitesPage, 'editor_prerequisites_page'),
+        r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
-        profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+        r'/preferenceshandler/data', profile.PreferencesHandler,
+        'preferences_handler'),
+    get_redirect_route(
+        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
+        'profle_picture_handler'),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler,
+        'signup_handler'),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL,
         profile.UsernameCheckHandler, 'username_check_handler'),
@@ -323,6 +321,9 @@ urls = [
 
     get_redirect_route(
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
+
+    get_redirect_route(
+        r'/logout', base.LogoutPage, 'logout_page_handler'),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),

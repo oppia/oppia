@@ -19,10 +19,12 @@
  */
 
 oppia.controller('ExplorationHistory', [
-    '$scope', '$http', '$location', '$log', '$modal', 'explorationData', 'versionsTreeService',
-    'compareVersionsService', 'graphDataService', function(
-    $scope, $http, $location, $log, $modal, explorationData, versionsTreeService,
-    compareVersionsService, graphDataService) {
+    '$scope', '$http', '$rootScope', '$location', '$log', '$modal',
+    'explorationData', 'versionsTreeService', 'compareVersionsService',
+    'graphDataService', function(
+    $scope, $http, $rootScope, $location, $log, $modal,
+    explorationData, versionsTreeService, compareVersionsService,
+    graphDataService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl =
       '/createhandler/snapshots/' + $scope.explorationId;
@@ -53,6 +55,7 @@ oppia.controller('ExplorationHistory', [
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
+    $rootScope.loadingMessage = 'Loading';
     explorationData.getData().then(function(data) {
       var currentVersion = data.version;
       /**
@@ -88,6 +91,8 @@ oppia.controller('ExplorationHistory', [
           };
           $scope.snapshotOrderArray.push(explorationSnapshots[i].version_number);
         }
+
+        $rootScope.loadingMessage = '';
       });
     });
   };
@@ -149,7 +154,7 @@ oppia.controller('ExplorationHistory', [
         $scope.diffGraphNodeColors = {};
 
         nodesData = response.nodes;
-        nodesData[response.finalStateId] = {
+        nodesData[response.endStateId] = {
           'newestStateName': END_DEST,
           'originalStateName': END_DEST,
           'stateProperty': STATE_PROPERTY_UNCHANGED
@@ -198,7 +203,7 @@ oppia.controller('ExplorationHistory', [
           'nodes': diffGraphNodes,
           'links': response.links,
           'initStateId': response.v2InitStateId,
-          'finalStateId': response.finalStateId
+          'finalStateIds': [response.endStateId]
         };
 
         // Generate the legend graph
@@ -219,11 +224,11 @@ oppia.controller('ExplorationHistory', [
             }
             _lastUsedStateType = stateProperty;
             if (!$scope.legendGraph.hasOwnProperty('initStateId')) {
-              $scope.legendGraph['initStateId'] = stateProperty;
+              $scope.legendGraph.initStateId = stateProperty;
             }
           }
         }
-        $scope.legendGraph['finalStateId'] = _lastUsedStateType;
+        $scope.legendGraph.finalStateIds = [_lastUsedStateType];
       });
     }
   };
@@ -293,7 +298,7 @@ oppia.controller('ExplorationHistory', [
   $scope.showStateDiffModal = function(stateName, oldStateName, stateProperty) {
     $modal.open({
       templateUrl: 'modals/stateDiff',
-      backdrop: 'static',
+      backdrop: true,
       windowClass: 'state-diff-modal',
       resolve: {
         stateName: function() {
@@ -378,7 +383,7 @@ oppia.controller('ExplorationHistory', [
   $scope.showRevertExplorationModal = function(version) {
     $modal.open({
       templateUrl: 'modals/revertExploration',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {
         version: function() {
           return version;

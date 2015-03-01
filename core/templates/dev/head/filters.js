@@ -86,6 +86,18 @@ oppia.filter('truncateAtFirstInput', [function() {
   };
 }]);
 
+// Filter that returns true iff a ruleSpec has a self-loop and no feedback.
+oppia.filter('isRuleSpecConfusing', [function() {
+  return function(ruleSpec, currentStateName) {
+    return (
+      ruleSpec.dest === currentStateName &&
+      !ruleSpec.feedback.some(function(feedbackItem) {
+        return feedbackItem.trim().length > 0;
+      })
+    );
+  };
+}]);
+
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 // Note that this returns an HTML string to accommodate the case of multiple-choice
 // input and image-click input.
@@ -117,7 +129,7 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
         varType = varType.substring(1);
       }
 
-      var replacementText;
+      var replacementText = '[INVALID]';
       // Special case for MultipleChoiceInput and ImageClickInput
       if (choices) {
         for (var i = 0; i < choices.length; i++) {
@@ -147,7 +159,7 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);
     }
-    return 'the answer ' + finalRule;
+    return 'Answer ' + finalRule;
   };
 }]);
 

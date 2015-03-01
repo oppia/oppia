@@ -182,6 +182,7 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
+      general.waitForSystem();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -252,6 +253,60 @@ var AutocompleteMultiDropdownEditor = function(elem) {
         // corresponds to the field for new input.
         actualSelection.pop();
         expect(actualSelection).toEqual(expectedCurrentSelection);
+      });
+    }
+  };
+};
+
+var MultiSelectEditor = function(elem) {
+  return {
+    setValues: function(texts) {
+      // Open the dropdown menu.
+      elem.element(by.css('.dropdown-toggle')).click();
+
+      // Clear all existing choices.
+      elem.element(by.css('.dropdown-menu'))
+          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+        return selectedElem;
+      }).then(function(selectedElements) {
+        for (var i = selectedElements.length - 1; i >= 0; i--) {
+          selectedElements[i].click();
+        }
+
+        // Now select the new choices.
+        var selectedIndexes = [];
+        elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
+          return choiceElem.getText().then(function(choiceText) {
+            return texts.indexOf(choiceText) !== -1;
+          });
+        }).then(function(filteredElements) {
+          if (filteredElements.length !== texts.length) {
+            throw 'Could not select all elements. Values requested: ' + texts + '. ' +
+              'Found ' + filteredElements.length + ' matching elements.';
+          }
+
+          for (var i = 0; i < filteredElements.length; i++) {
+            filteredElements[i].click();
+          }
+
+          // Close the dropdown menu at the end.
+          elem.element(by.css('.dropdown-toggle')).click();
+        });
+      });
+    },
+    expectCurrentSelectionToBe: function(expectedCurrentSelection) {
+      // Open the dropdown menu.
+      elem.element(by.css('.dropdown-toggle')).click();
+
+      // Find the selected elements.
+      elem.element(by.css('.dropdown-menu'))
+          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+        return selectedElem.getText();
+      }).then(function(actualSelection) {
+        expect(actualSelection).toEqual(expectedCurrentSelection);
+
+        // Close the dropdown menu at the end.
+        elem.element(by.css('.dropdown-toggle')).click();
       });
     }
   };
@@ -573,6 +628,7 @@ exports.RichTextEditor = RichTextEditor;
 exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
+exports.MultiSelectEditor = MultiSelectEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;

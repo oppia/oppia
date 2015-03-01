@@ -21,10 +21,11 @@ class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
     name = 'Music Notes'
-    category = 'Custom'
+    category = ''
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
     _handlers = [{
         'name': 'submit', 'obj_type': 'MusicPhrase'}]

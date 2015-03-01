@@ -18,6 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
+
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
 oppia.factory('stopwatchProviderService', ['$log', function($log) {
@@ -54,7 +57,7 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   var _paramDict = {};
 
   return {
-    // TODO(sll): Forbid use of 'answer', 'choices', 'stateSticky' as possible keys.
+    // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
     init: function(initParamSpecs) {
       // initParamSpecs is a dict mapping the parameter names used in the
       // exploration to their default values.
@@ -116,14 +119,17 @@ oppia.factory('answerClassificationService', [
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', '$filter', 'messengerService',
+    '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
+    'INTERACTION_SPECS',
     function(
-      $http, $rootScope, $modal, $filter, messengerService,
+      $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper, answerClassificationService, stateTransitionService) {
+      oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
+      INTERACTION_SPECS) {
   var _END_DEST = 'END';
+  var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
 
   // Note that both of these do not get set for the Karma unit tests.
   var _explorationId = null;
@@ -143,6 +149,8 @@ oppia.factory('oppiaPlayerService', [
       break;
     }
   }
+
+  var _introCardImageUrl = null;
 
   // The following line is needed for image displaying to work, since the image
   // URLs refer to $rootScope.explorationId.
@@ -170,9 +178,10 @@ oppia.factory('oppiaPlayerService', [
 
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
-  var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs) {
+  var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
     var el = $(
       '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
+
     for (var caSpecName in interactionCustomizationArgSpecs) {
       var caSpecValue = interactionCustomizationArgSpecs[caSpecName].value;
       // TODO(sll): Evaluate any values here that correspond to expressions.
@@ -180,17 +189,11 @@ oppia.factory('oppiaPlayerService', [
         $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
         oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
     }
-    return ($('<div>').append(el)).html();
-  };
 
-  var _getReaderResponseHtml = function(interactionId, answer, isSticky, choices) {
-    var el = $(
-      '<oppia-response-' + $filter('camelCaseToHyphens')(interactionId) + '>');
-    el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
-    el.attr('state-sticky', oppiaHtmlEscaper.objToEscapedJson(isSticky));
-    if (choices) {
-      el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(choices));
+    if (labelForFocusTarget) {
+      el.attr('label-for-focus-target', labelForFocusTarget);
     }
+
     return ($('<div>').append(el)).html();
   };
 
@@ -200,19 +203,12 @@ oppia.factory('oppiaPlayerService', [
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
       handler, successCallback) {
     var oldStateName = _currentStateName;
-    var oldStateData = _exploration.states[oldStateName];
-    // NB: This may be undefined if newStateName === END_DEST.
-    var newStateData = _exploration.states[newStateName];
-    // TODO(sll): If the new interaction is the same as the old interaction,
-    // and the new interaction is sticky, do not render the reader response.
-    // The interaction in the frontend should take care of this.
-    // TODO(sll): This special-casing is not great; we should make the
-    // interface for updating the frontend more generic so that all the updates
-    // happen in the same place. Perhaps in the non-sticky case we should call
-    // a frontend method named appendFeedback() or similar.
-    var isSticky = (
-      newStateName && newStateData.interaction.sticky &&
-      newStateData.interaction.id === oldStateData.interaction.id);
+    var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
+
+    var refreshInteraction = (
+      oldStateName !== newStateName ||
+      INTERACTION_SPECS[oldStateInteractionId].display_mode ===
+        _INTERACTION_DISPLAY_MODE_INLINE);
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -236,31 +232,27 @@ oppia.factory('oppiaPlayerService', [
     _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
-    // TODO(sll): Get rid of this special case for multiple choice.
-    var oldInteractionChoices = null;
-    if (_exploration.states[oldStateName].interaction.customization_args.choices) {
-      oldInteractionChoices = _exploration.states[oldStateName].interaction.customization_args.choices.value;
-    }
-
-    var readerResponseHtml = _getReaderResponseHtml(
-      _exploration.states[oldStateName].interaction.id, answer, isSticky,
-      oldInteractionChoices);
+    // NB: This may be undefined if newStateName === END_DEST.
+    var newStateData = _exploration.states[newStateName];
     if (newStateData) {
       learnerParamsService.init(newParams);
     }
 
+    // NB: This may be undefined if newStateName === END_DEST.
+    var newInteractionId = newStateData ? newStateData.interaction.id : undefined;
+
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, newQuestionHtml, readerResponseHtml,
-      newFeedbackHtml);
+      newStateName, refreshInteraction, newFeedbackHtml,
+      newQuestionHtml, newInteractionId);
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
     stopwatch.resetStopwatch();
     _updateStatus(newParams, initStateName);
     $rootScope.$broadcast('playerStateChange');
-    callback(initStateName, initHtml, _viewerHasEditingRights);
+    callback(initStateName, initHtml, _viewerHasEditingRights, _introCardImageUrl);
   };
 
   // This should only be called when _exploration is non-null.
@@ -329,11 +321,16 @@ oppia.factory('oppiaPlayerService', [
 
       if (_editorPreviewMode) {
         if (_exploration) {
+          _introCardImageUrl = (
+            '/images/gallery/exploration_background_' +
+            (GLOBALS.CATEGORIES_TO_COLORS[_exploration.category] || 'teal') +
+            '_large.png');
           _loadInitialState(successCallback);
         }
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
+          _introCardImageUrl = data.intro_card_image_url;
           version = data.version,
           _isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
@@ -354,10 +351,20 @@ oppia.factory('oppiaPlayerService', [
     getCurrentStateName: function() {
       return _currentStateName;
     },
-    getInteractionHtml: function(stateName) {
+    getInteractionHtml: function(stateName, labelForFocusTarget) {
       return _getInteractionHtml(
         _exploration.states[stateName].interaction.id,
-        _exploration.states[stateName].interaction.customization_args);
+        _exploration.states[stateName].interaction.customization_args,
+        labelForFocusTarget);
+    },
+    isInteractionInline: function(stateName) {
+      return INTERACTION_SPECS[
+        _exploration.states[stateName].interaction.id
+      ].display_mode === _INTERACTION_DISPLAY_MODE_INLINE;
+    },
+    isStateTerminal: function(stateName) {
+      return !stateName || INTERACTION_SPECS[
+        _exploration.states[stateName].interaction.id].is_terminal;
     },
     getRandomSuffix: function() {
       // This is a bit of a hack. When a refresh to a $scope variable happens,
@@ -377,6 +384,24 @@ oppia.factory('oppiaPlayerService', [
     },
     isInPreviewMode: function() {
       return !!_editorPreviewMode;
+    },
+    getAnswerAsHtml: function(answer) {
+      var currentInteraction = _exploration.states[_currentStateName].interaction;
+      var currentInteractionId = currentInteraction.id;
+
+      // TODO(sll): Get rid of this special case for multiple choice.
+      var currentInteractionChoices = null;
+      if (currentInteraction.customization_args.choices) {
+        currentInteractionChoices = currentInteraction.customization_args.choices.value;
+      }
+
+      var el = $(
+        '<oppia-response-' + $filter('camelCaseToHyphens')(currentInteractionId) + '>');
+      el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+      if (currentInteractionChoices) {
+        el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(currentInteractionChoices));
+      }
+      return ($('<div>').append(el)).html();
     },
     submitAnswer: function(answer, handler, successCallback) {
       if (answerIsBeingProcessed) {
@@ -438,65 +463,98 @@ oppia.factory('oppiaPlayerService', [
         state_name: stateHistory[stateHistory.length - 1],
         version: version
       });
+    },
+    // If the feedback is exploration-scoped, 'stateName' should be null.
+    openPlayerFeedbackModal: function(stateName) {
+      var modalConfig = {
+        templateUrl: 'modals/playerFeedback',
+        backdrop: true,
+        resolve: {
+          stateName: function() {
+            return stateName;
+          }
+        },
+        controller: ['$scope', '$modalInstance', 'oppiaPlayerService', 'stateName', function(
+            $scope, $modalInstance, oppiaPlayerService, stateName) {
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+
+          $scope.isSubmitterAnonymized = false;
+          $scope.stateName = stateName;
+          $scope.subject = '';
+          $scope.feedback = '';
+
+          $scope.submit = function(subject, feedback, isSubmitterAnonymized) {
+            $modalInstance.close({
+              subject: subject,
+              feedback: feedback,
+              isSubmitterAnonymized: isSubmitterAnonymized
+            });
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+        }]
+      };
+
+      $modal.open(modalConfig).result.then(function(result) {
+        if (result.feedback) {
+          $http.post('/explorehandler/give_feedback/' + _explorationId, {
+            subject: result.subject,
+            feedback: result.feedback,
+            include_author: !result.isSubmitterAnonymized && _isLoggedIn,
+            state_name: stateName
+          });
+
+          $modal.open({
+            templateUrl: 'modals/playerFeedbackConfirmation',
+            backdrop: true,
+            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+            }]
+          });
+        }
+      });
+    },
+    // Returns a promise for the user profile picture, or the default image if
+    // user is not logged in or has not uploaded a profile picture, or the
+    // player is in preview mode.
+    getUserProfileImage: function() {
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/user_mint_48px.png';
+      var deferred = $q.defer();
+      if (_isLoggedIn && !_editorPreviewMode) {
+        $http.get('/preferenceshandler/profile_picture').success(function(data) {
+          var profilePictureDataUrl = data.profile_picture_data_url;
+          if (profilePictureDataUrl) {
+            deferred.resolve(profilePictureDataUrl);
+          } else {
+            deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          }
+        });
+      } else {
+        deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+      }
+      return deferred.promise;
     }
   };
 }]);
 
 
 oppia.controller('LearnerLocalNav', [
-    '$scope', '$http', '$modal', 'oppiaPlayerService',
-    function($scope, $http, $modal, oppiaPlayerService) {
+    '$scope', '$http', '$modal',
+    'oppiaPlayerService', 'embedExplorationButtonService',
+    function(
+      $scope, $http, $modal,
+      oppiaPlayerService, embedExplorationButtonService) {
   var _END_DEST = 'END';
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
+  $scope.serverName = window.location.protocol + '//' + window.location.host;
+  $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
   $scope.showFeedbackModal = function() {
-    $modal.open({
-      templateUrl: 'modals/playerFeedback',
-      backdrop: 'static',
-      resolve: {},
-      controller: ['$scope', '$modalInstance', 'oppiaPlayerService', function(
-          $scope, $modalInstance, oppiaPlayerService) {
-        $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
-        $scope.currentStateName = oppiaPlayerService.getCurrentStateName();
-
-        $scope.isSubmitterAnonymized = false;
-        $scope.relatedTo = $scope.currentStateName === _END_DEST ? 'exploration' : 'state';
-        $scope.subject = '';
-        $scope.feedback = '';
-
-        $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
-          $modalInstance.close({
-            subject: subject,
-            feedback: feedback,
-            isStateRelated: relatedTo === 'state',
-            isSubmitterAnonymized: isSubmitterAnonymized
-          });
-        };
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-        };
-      }]
-    }).result.then(function(result) {
-      if (result.feedback) {
-        $http.post('/explorehandler/give_feedback/' + $scope.explorationId, {
-          subject: result.subject,
-          feedback: result.feedback,
-          include_author: !result.isSubmitterAnonymized && oppiaPlayerService.isLoggedIn(),
-          state_name: result.isStateRelated ? oppiaPlayerService.getCurrentStateName() : null
-        });
-
-        $modal.open({
-          templateUrl: 'modals/playerFeedbackConfirmation',
-          backdrop: 'static',
-          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-            };
-          }]
-        });
-      }
-    });
+    oppiaPlayerService.openPlayerFeedbackModal(null);
   };
 }]);

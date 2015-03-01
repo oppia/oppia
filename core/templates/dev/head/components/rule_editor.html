@@ -1,130 +1,176 @@
-<div>
-  <div ng-if="!ruleEditorIsOpen" class="protractor-test-edit-rule"
-       ng-class="{'oppia-editable-section': isEditable}">
+<div style="height: 100%;">
+  <div ng-if="!ruleEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this rule, or change its destination' : '']>">
+    <div class="oppia-readonly-rule-tile oppia-pre-avatar-user protractor-test-edit-rule" ng-class="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
+        </div>
 
-    <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
-    </div>
+        <div>
+          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
 
-    <h3 style="margin-bottom: 10px;" ng-if="heading"><[heading]> <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit Rule"></span></h3>
-    <div>
-      <div class="row oppia-readonly-rule-container">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-rule-sort-handle" ng-if="!isDefaultRule() && numRules() && numRules() > 2">
-            <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
-          </div>
+          <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
+            <span ng-if="!answerChoices">
+              [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
+            </span>
+            <span ng-if="answerChoices">
+              [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
+            </span>
+          </span>
+          <span ng-if="rule.description === 'Default'">
+            [<em>No other rules apply...</em>]
+          </span>
+        </div>
 
-          <div class="container-fluid">
-            <div class="row oppia-readonly-rule-tile well well-sm">
-              <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
-                <span>
-                  <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
-                    <span ng-if="!answerChoices">
-                      If <[rule | parameterizeRuleDescription: answerChoices]> ...
-                    </span>
-                    <span ng-if="answerChoices">
-                      If <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
-                    </span>
-                  </span>
-                  <span ng-if="rule.description === 'Default'">
-                    If no other rules apply...
-                  </span>
-                </span>
+        <br>
 
-                <ul ng-if="isRuleConfusing() || rule.feedback.length > 0">
-                  <li>
-                    <span ng-if="isRuleConfusing()">
-                      <span class="glyphicon glyphicon-warning-sign"></span>
-                      <span class="oppia-rule-warning-text">
-                        Please provide a feedback message.
-                      </span>
-                    </span>
-                    <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
-                      <span angular-html-bind="rule.feedback[0]"></span>
-                      <span ng-if="rule.feedback.length > 1">(+ <[rule.feedback.length - 1]> variation<span ng-if="rule.feedback.length > 2">s</span>)</span>
-                    </span>
-                  </li>
-                </ul>
-              </div>
+        <div style="position: relative;">
+          <img src="/images/oppia_favicon_black_48px.png" style="position: absolute; left: -46px; top: -1px; height: 24px; width: 24px;">
+          <span ng-if="isRuleConfusing()">
+            <span class="oppia-rule-warning-text">
+              <span class="glyphicon glyphicon-warning-sign"></span>
+              Please give Oppia something useful to say here.
+            </span>
+          </span>
+          <span ng-if="!isRuleConfusing() && rule.feedback.length === 0" style="color: #888">
+            [<em>says nothing...</em>]
+          </span>
+          <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
+            <span angular-html-bind="rule.feedback[0]"></span>
+            <span ng-if="rule.feedback.length > 1">
+              <em>
+                (or <span ng-if="rule.feedback.length > 2">one of </span> <[rule.feedback.length - 1]> other variation<span ng-if="rule.feedback.length > 2">s</span>)
+              </em>
+            </span>
+          </span>
+        </div>
 
-              <div class="col-lg-4 col-md-4 col-sm-4">
-                Destination: <br>
-                <span ng-if="rule.dest !== getActiveStateName()">
-                  <span class="glyphicon glyphicon-arrow-right"></span>
-                  <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
-                    <[rule.dest]>
-                  </a>
-                  <span ng-if="rule.dest === 'END'">END</span>
-                </span>
-                <span>
-                  <span ng-if="rule.dest === getActiveStateName()">⟳ <[rule.dest]></span>
-                </span>
-              </div>
-            </div>
-          </div>
+        <br>
+
+        <div style="padding-bottom: 20px;" ng-if="rule.dest !== getActiveStateName()">
+          Destination:
+          <span style="position: relative;">
+            <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
+              <[rule.dest]>
+            </a>
+          </span>
+          <span ng-if="rule.dest === 'END'">
+            END
+          </span>
         </div>
       </div>
     </div>
   </div>
 
-  <div ng-if="isEditable && ruleEditorIsOpen" class="oppia-rule-editable-view">
-    <div class="oppia-rule-bubble">
-      <span ng-if="rule.description !== 'Default'">
-        <form class="form-inline" role="form">
-          Answer
-          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()">
-          </rule-type-selector>
+  <div ng-if="isEditable && ruleEditorIsOpen">
+    <form role="form" class="form-inline" name="editRuleForm">
+      <rule-details-editor rule="rule">
+      </rule-details-editor>
+    </form>
 
-          <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">
-            <span ng-if="item.type == 'select'" style="color: black;">
-              <select class="form-control" ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices">
-              </select>
-            </span>
-
-            <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-              <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="rule.definition.inputs[item.varName]" style="color: black;"></object-editor>
-            </span>
-            <span ng-if="item.type == 'noneditable'">
-              <[item.text]>
-            </span>
-          </span>
-        </form>
-      </span>
-
-      <span ng-if="rule.description === 'Default'">
-        If no other rules apply...
-      </span>
-    </div>
-
-    <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule()}">
-      <div class="oppia-feedback-bubble protractor-test-feedback-bubble">
-        <span ng-if="rule.feedback.length > 0">
-          Feedback
-          <span ng-if="rule.feedback.length > 1">
-            (<em>one variation is chosen at random</em>):
-          </span>
-        </span>
-        <span ng-if="rule.feedback.length == 0">
-          <em>No feedback specified.</em>
-        </span>
-
-        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
-        </schema-based-editor>
-      </div>
-
-      <div class="oppia-dest-bubble protractor-test-dest-bubble">
-        <div class="oppia-align-center">
-          <strong>Destination:</strong><br />
-          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9\.]+$" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
-          </select2-dropdown>
-          <span ng-if="rule.dest == stateName"> ⟳ </span><br />
-        </div>
-      </div>
-    </div>
+    <br>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
-      <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule() && !isTmpRule()" ng-click="deleteThisRule()">Delete Rule</button>
+      <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="rule.description !== 'Default'" ng-click="deleteThisRule()">Delete Rule</button>
+
+      <div class="pull-right">
+        <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
+        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description || editRuleForm.$invalid || isRuleEmpty(rule)" ng-click="saveThisRule()">Save Rule</button>
+      </div>
+
+      <div style="clear: both;"></div>
     </div>
   </div>
 </div>
+
+<script type="text/ng-template" id="rules/ruleDetailsEditor">
+  <div style="position: relative;">
+    <div>
+      <strong>Rule</strong>
+    </div>
+    <span ng-if="rule.description !== 'Default' || canAddDefaultRule()">
+      <rule-description-editor current-rule-description="rule.description"
+                               current-rule-definition="rule.definition"
+                               can-add-default-rule="canAddDefaultRule()">
+      </rule-description-editor>
+    </span>
+
+    <span ng-if="rule.description === 'Default' && !canAddDefaultRule()">
+      No other rules apply...
+    </span>
+  </div>
+
+  <br>
+
+  <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
+    <div>
+      <strong>Feedback</strong>
+    </div>
+    <span ng-if="rule.feedback.length > 1">
+      (<em>Oppia picks one of these at random</em>):
+    </span>
+    <span ng-if="rule.feedback.length == 0">
+      <em>No feedback specified.</em>
+    </span>
+
+    <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="rule.feedback">
+    </schema-based-editor>
+  </div>
+
+  <br>
+
+  <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
+    <div>
+      <strong>Destination</strong>
+    </div>
+    <div class="form-group" style="font-size: 1.1em;">
+      <span ng-if="!reloadingDestinations">
+        <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="width: 200px;">
+        </select>
+      </span>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/addState">
+  <div class="modal-header">
+    <h3>Add New State</h3>
+  </div>
+
+  <div class="modal-body">
+    <form role="form" class="form-inline">
+      <div class="form-group">
+        <input type="text" class="form-control protractor-test-add-state-input" ng-model="newStateName" placeholder="New State Name" focus-on="newStateNameInput">
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-add-state-submit"
+            ng-click="submit(newStateName)"
+            ng-disabled="!isNewStateNameValid(newStateName)">
+      Add State
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="rules/ruleDescriptionEditor">
+  <form class="form-inline" role="form">
+    <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="currentRuleDescription" on-selection-change="onSelectNewRuleType()" can-add-default-rule="canAddDefaultRule()">
+    </rule-type-selector>
+
+    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">
+      <span ng-if="item.type == 'select'" style="color: black;">
+        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
+        </select>
+      </span>
+
+      <span ng-if="item.type != 'select' && item.type != 'noneditable'">
+        <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="currentRuleDefinition.inputs[item.varName]" style="color: black;"></object-editor>
+      </span>
+      <span ng-if="item.type == 'noneditable'">
+        <[item.text]>
+      </span>
+    </span>
+  </form>
+</script>

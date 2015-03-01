@@ -1,39 +1,35 @@
 <div ng-controller="StateEditor">
-  <md-card class="oppia-state-card">
-    <div class="oppia-state-editor-body">
-      <div class="oppia-editor" ng-show="!!stateName">
-        {% include 'editor/state_editor_parameters.html' %}
-        <div>
-          {% include 'editor/state_editor_content.html' %}
-        </div>
-        <div ng-controller="StateInteraction">
-          {% include 'editor/state_editor_interaction.html' %}
-          <hr>
-          <div>
-            {% include 'editor/state_editor_rules.html' %}
+  <!--
+    The 'height' styling keeps the scrollbar from juddering during the
+    fade-out/fade-in animation.
+  -->
+  <div style="min-height: 1000px;">
+    <div class="oppia-editor-cards-container">
+      <div style="font-size: 16px; margin-top: 35px;">
+        {% include 'editor/sidebar_state_name.html' %}
+      </div>
+
+      <md-card class="oppia-editor-card-with-avatar">
+        <div class="oppia-editor-card-body" ng-show="!!stateName">
+          <div id="tutorialStateContent" class="oppia-editor-card-section" style="padding-top: 40px; padding-bottom: 40px;">
+            {% include 'editor/state_editor_content.html' %}
+          </div>
+          <div style="background: rgba(5,140,166,0.1); border-top: 1px solid #eee; padding-top: 5px; padding-bottom: 25px;">
+            <div class="oppia-editor-card-section">
+              {% include 'editor/state_editor_interaction.html' %}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </md-card>
+      </md-card>
 
-  <md-card class="oppia-state-card oppia-state-next-card" ng-if="nextStateName" ng-click="navigateToState(nextStateName)">
-    <div class="row">
-      <div class="pull-right">
-        <div class="oppia-state-editor-header">
-          <div class="oppia-state-name-container">
-            <strong><[nextStateName]></strong>
-          </div>
+      <md-card class="oppia-editor-card-with-avatar" ng-hide="isCurrentStateTerminal">
+        <div class="oppia-editor-card-body">
+          {% include 'editor/state_editor_rules.html' %}
+          {% include 'editor/state_editor_active_rule.html' %}
         </div>
-      </div>
+      </md-card>
     </div>
+  </div>
 
-    <div class="oppia-state-editor-body">
-      <div class="oppia-editor">
-        <div>
-          <[nextStateContent|truncate]>
-        </div>
-      </div>
-    </div>
-  </md-card>
+  {% include 'attribution_guide.html' %}
 </div>

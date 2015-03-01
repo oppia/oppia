@@ -21,8 +21,9 @@ class SetInput(base.BaseInteraction):
     """Interaction for input of an unordered set of strings."""
 
     name = 'Set'
-    category = 'Basic Input'
+    category = 'Mathematics'
     description = 'Allows learners to enter an unordered set of strings.'
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
     _handlers = [{
         'name': 'submit', 'obj_type': 'SetOfUnicodeString'}]

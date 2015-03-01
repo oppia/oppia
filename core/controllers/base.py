@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import base64
+import Cookie
 import datetime
 import hmac
 import json
@@ -30,7 +31,9 @@ import urllib
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import obj_services
 from core.domain import rights_manager
+from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -42,19 +45,22 @@ import utils
 import jinja2
 import webapp2
 
+from google.appengine.api import users
+
 
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
-    'oppia_csrf_secret', 'UnicodeString', 'Text used to encrypt CSRF tokens.',
-    DEFAULT_CSRF_SECRET)
-FULL_SITE_URL = config_domain.ConfigProperty(
-    'full_site_url', 'UnicodeString',
-    'The full site URL, without a trailing slash',
-    default_value='https://FULL.SITE/URL')
+    'oppia_csrf_secret', {'type': 'unicode'},
+    'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_head_tag_hook', 'UnicodeString',
+    'before_end_head_tag_hook', {'type': 'unicode'},
     'Code to insert just before the closing </head> tag in all pages.', '')
+
+OBJECT_EDITORS_JS = config_domain.ComputedProperty(
+    'object_editors_js', {'type': 'unicode'},
+    'JavaScript code for the object editors',
+    obj_services.get_all_object_editor_js_templates)
 
 
 def require_user(handler):
@@ -87,30 +93,52 @@ def require_moderator(handler):
     return test_is_moderator
 
 
-def require_registered_as_editor(handler):
-    """Decorator that checks if the user has registered as an editor."""
+def require_fully_signed_up(handler):
+    """Decorator that checks if the user is logged in and has completed the
+    signup process. If any of these checks fail, an UnauthorizedUserException
+    is raised.
+    """
+
     def test_registered_as_editor(self, **kwargs):
         """Check that the user has registered as an editor."""
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if self.username in config_domain.BANNED_USERNAMES.value:
+        if (not self.user_id
+                or self.username in config_domain.BANNED_USERNAMES.value
+                or not user_services.has_user_registered_as_editor(
+                    self.user_id)):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-
-        redirect_url = feconf.EDITOR_PREREQUISITES_URL
-
-        if not user_services.has_user_registered_as_editor(self.user_id):
-            redirect_url = utils.set_url_query_parameter(
-                redirect_url, 'return_url', self.request.uri)
-            self.redirect(redirect_url)
-            return
 
         return handler(self, **kwargs)
 
     return test_registered_as_editor
+
+
+def _clear_login_cookies(response_headers):
+    ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
+
+    # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
+    # for https:// . We just unset both below.
+    cookie = Cookie.SimpleCookie()
+    for cookie_name in ['ACSID', 'SACSID']:
+        cookie = Cookie.SimpleCookie()
+        cookie[cookie_name] = ''
+        cookie[cookie_name]['expires'] = ONE_DAY_AGO_IN_SECS
+        response_headers.add_header(*cookie.output().split(': ', 1))
+
+
+class LogoutPage(webapp2.RequestHandler):
+
+    def get(self):
+        """Logs the user out, and returns them to a specified page or the home
+        page.
+        """
+        url_to_redirect_to = self.request.get('return_url') or '/'
+        _clear_login_cookies(self.response.headers)
+
+        if feconf.DEV_MODE:
+            self.redirect(users.create_logout_url(url_to_redirect_to))
+        else:
+            self.redirect(url_to_redirect_to)
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -126,6 +154,9 @@ class BaseHandler(webapp2.RequestHandler):
     # TODO(sll): A weakness of the current approach is that the source and
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
+    # Whether to redirect requests corresponding to a logged-in user who has
+    # not completed signup in to the signup page.
+    REDIRECT_UNFINISHED_SIGNUPS = True
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -143,19 +174,29 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
-
+        self.username = None
         self.user_has_started_state_editor_tutorial = False
+        self.partially_logged_in = False
+        self.values['profile_picture_data_url'] = None
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
-            self.username = user_settings.username
 
-            self.values['user_email'] = user_settings.email
-            self.values['username'] = self.username
-            if user_settings.last_started_state_editor_tutorial:
-                self.user_has_started_state_editor_tutorial = True
+            if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
+                _clear_login_cookies(self.response.headers)
+                self.partially_logged_in = True
+                self.user_id = None
+            else:
+                self.username = user_settings.username
+                self.last_agreed_to_terms = user_settings.last_agreed_to_terms
+                self.values['user_email'] = user_settings.email
+                self.values['username'] = self.username
+                self.values['profile_picture_data_url'] = (
+                    user_settings.profile_picture_data_url)
+                if user_settings.last_started_state_editor_tutorial:
+                    self.user_has_started_state_editor_tutorial = True
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
@@ -181,6 +222,12 @@ class BaseHandler(webapp2.RequestHandler):
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
             self.redirect('https://oppiatestserver.appspot.com', True)
+            return
+
+        # In DEV_MODE, clearing cookies does not log out the user, so we
+        # force-clear them by redirecting to the logout URL.
+        if feconf.DEV_MODE and self.partially_logged_in:
+            self.redirect(users.create_logout_url(self.request.uri))
             return
 
         if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
@@ -245,11 +292,13 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_COUNT.inc()
 
     def render_template(
-            self, filename, values=None, iframe_restriction='DENY'):
+            self, filename, values=None, iframe_restriction='DENY',
+            redirect_url_on_logout=None):
         if values is None:
             values = self.values
 
         values.update({
+            'RTE_COMPONENT_SPECS': rte_component_registry.Registry.get_all_specs(),
             'DEV_MODE': feconf.DEV_MODE,
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'EXPLORATION_STATUS_PRIVATE': (
@@ -260,16 +309,21 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.EXPLORATION_STATUS_PUBLICIZED),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'FULL_SITE_URL': FULL_SITE_URL.value,
             'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
+            'user_is_logged_in': bool(self.username),
+            # TODO(sll): Consider including the obj_editor html directly as part of the
+            # base HTML template?
+            'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
         })
 
+        if redirect_url_on_logout is None:
+            redirect_url_on_logout = self.request.uri
         if self.user_id:
-            redirect_url = self.request.uri
             values['logout_url'] = (
-                current_user_services.create_logout_url(redirect_url))
+                current_user_services.create_logout_url(
+                    redirect_url_on_logout))
         else:
             values['login_url'] = (
                 current_user_services.create_login_url(self.request.uri))

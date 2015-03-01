@@ -53,19 +53,6 @@ if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   rm gae-download.zip
 fi
 
-# webtest is used for tests.
-echo Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
-  echo Installing webtest framework
-  curl --silent http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -o webtest-download.zip
-  unzip webtest-download.zip -d $TOOLS_DIR
-  rm webtest-download.zip
-  # Move WebTest-1.4.2 to tmp directory first to get around case insensitivity
-  # on Windows.
-  mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/tmp-webtest-1.4.2
-  mv $TOOLS_DIR/tmp-webtest-1.4.2 $TOOLS_DIR/webtest-1.4.2
-fi
-
 # Install third party dependencies.
 bash scripts/install_third_party.sh
 
@@ -102,11 +89,20 @@ else
   echo ""
 fi
 
+# Argument passed to dev_appserver.py to indicate whether or not to
+# clear the datastore.
+CLEAR_DATASTORE_ARG="--clear_datastore=true"
+for arg in "$@"; do
+  if [ "$arg" == "--save_datastore" ]; then
+    CLEAR_DATASTORE_ARG=""
+  fi
+done
+
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
 echo Starting GAE development server
 # To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
-python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
+python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
 echo Done!

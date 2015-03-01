@@ -43,18 +43,16 @@ var createExploration = function(name, category) {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
-  editor.runFromSettingsTab(function() {
-    element(by.css('.protractor-test-publish-exploration')).click();
-    protractor.getInstance().waitForAngular();
-    general.waitForSystem();
-    element(by.css('.protractor-test-confirm-publish')).click();
-  });
+  element(by.css('.protractor-test-publish-exploration')).click();
+  protractor.getInstance().waitForAngular();
+  general.waitForSystem();
+  element(by.css('.protractor-test-confirm-publish')).click();
 };
 
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(name, category, objective, language) {
   createExploration(name, category);
-  editor.RuleEditor('default').setDestination('END');
+  editor.addRule('TextInput', null, 'END', 'Default');
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);

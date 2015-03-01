@@ -22,14 +22,15 @@ oppia.controller('ExplorationPreview', [
     '$scope', 'learnerParamsService', 'explorationData',
     'explorationStatesService', 'explorationInitStateNameService',
     'explorationParamSpecsService', 'explorationTitleService',
-    'oppiaPlayerService',
+    'explorationCategoryService', 'oppiaPlayerService',
     function($scope, learnerParamsService, explorationData,
              explorationStatesService, explorationInitStateNameService,
              explorationParamSpecsService, explorationTitleService,
-             oppiaPlayerService) {
+             explorationCategoryService, oppiaPlayerService) {
   $scope.isExplorationPopulated = false;
   explorationData.getData().then(function() {
     oppiaPlayerService.populateExploration({
+      category: explorationCategoryService.savedMemento,
       init_state_name: explorationInitStateNameService.savedMemento,
       // TODO(sll): are these actually editable?
       param_changes: explorationData.data.param_changes,

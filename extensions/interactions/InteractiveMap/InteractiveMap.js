@@ -71,7 +71,6 @@ oppia.directive('oppiaResponseInteractiveMap', [
       templateUrl: 'response/InteractiveMap',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-        $scope.stateSticky = oppiaHtmlEscaper.escapedJsonToObj($attrs.stateSticky);
 
         var latLongPair = $scope.answer[0] + ',' + $scope.answer[1];
         $scope.staticMapUrl =

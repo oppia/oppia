@@ -23,6 +23,9 @@
 // when these forms first come into view.
 
 
+// The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('RTE_COMPONENT_SPECS', window.GLOBALS ? GLOBALS.RTE_COMPONENT_SPECS : {});
+
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
   var paramSpecs = {};
@@ -256,7 +259,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
         return $modal.open({
           templateUrl: 'modals/editParamName',
-          backdrop: 'static',
+          backdrop: true,
           resolve: {
             allowedParameterNames: function() {
               return $scope.allowedParameterNames();
@@ -469,11 +472,26 @@ oppia.factory('schemaDefaultValueService', [function() {
   };
 }]);
 
+oppia.factory('schemaUndefinedLastElementService', [function() {
+  return {
+    // Returns true if the input value, taken as the last element in a list,
+    // should be considered as 'undefined' and therefore deleted.
+    getUndefinedValue: function(schema) {
+      if (schema.type === 'unicode' || schema.type === 'html') {
+        return '';
+      } else {
+        return undefined;
+      }
+    }
+  };
+}]);
+
+
 
 // Directive for the rich text editor component.
 oppia.directive('richTextEditor', [
-  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'rteComponentRepositoryService',
-  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, rteComponentRepositoryService) {
+  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
     return {
       restrict: 'E',
       scope: {
@@ -570,28 +588,30 @@ oppia.directive('richTextEditor', [
         $scope.openRteCustomizationModal = function(componentDefn, attrsCustomizationArgsDict) {
           $modal.open({
             templateUrl: 'modals/customizeRteComponent',
-            backdrop: 'static',
+            backdrop: true,
             resolve: {
-              componentDefn: function() {
-                return componentDefn;
+              customizationArgSpecs: function() {
+                return componentDefn.customization_arg_specs;
               },
               attrsCustomizationArgsDict: function() {
                 return attrsCustomizationArgsDict;
               }
             },
             controller: [
-              '$scope', '$modalInstance', 'componentDefn', 'attrsCustomizationArgsDict',
-              function($scope, $modalInstance, componentDefn, attrsCustomizationArgsDict) {
-                $scope.componentDefn = componentDefn;
+              '$scope', '$modalInstance', 'customizationArgSpecs', 'attrsCustomizationArgsDict',
+              function($scope, $modalInstance, customizationArgSpecs, attrsCustomizationArgsDict) {
+                $scope.customizationArgSpecs = customizationArgSpecs;
 
-                $scope.customizationArgsList = angular.copy(componentDefn.customization_args);
-                for (var i = 0; i < $scope.customizationArgsList.length; i++) {
-                  var caName = $scope.customizationArgsList[i].name;
-                  if (attrsCustomizationArgsDict.hasOwnProperty(caName)) {
-                    $scope.customizationArgsList[i].value = attrsCustomizationArgsDict[caName];
-                  } else {
-                    $scope.customizationArgsList[i].value = $scope.customizationArgsList[i].default_value;
-                  }
+                $scope.tmpCustomizationArgs = [];
+                for (var i = 0; i < customizationArgSpecs.length; i++) {
+                  var caName = customizationArgSpecs[i].name;
+                  $scope.tmpCustomizationArgs.push({
+                    name: caName,
+                    value: (
+                      attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                      attrsCustomizationArgsDict[caName] :
+                      customizationArgSpecs[i].default_value)
+                  });
                 }
 
                 $scope.cancel = function() {
@@ -602,20 +622,17 @@ oppia.directive('richTextEditor', [
                   $scope.$broadcast('externalSave');
 
                   var customizationArgsDict = {};
-                  for (var i = 0; i < $scope.customizationArgsList.length; i++) {
-                    var caName = $scope.customizationArgsList[i].name;
-                    customizationArgsDict[caName] = $scope.customizationArgsList[i].value;
+                  for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                    var caName = $scope.tmpCustomizationArgs[i].name;
+                    customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
                   }
 
-                  $modalInstance.close({
-                    customizationArgsDict: customizationArgsDict,
-                    componentDefn: $scope.componentDefn
-                  });
+                  $modalInstance.close(customizationArgsDict);
                 };
               }
             ]
-          }).result.then(function(result) {
-            var el = $scope._createRteElement(result.componentDefn, result.customizationArgsDict);
+          }).result.then(function(customizationArgsDict) {
+            var el = $scope._createRteElement(componentDefn, customizationArgsDict);
             var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
             insertionPoint.parentNode.replaceChild(el, insertionPoint);
             $(rteNode).wysiwyg('save');
@@ -659,25 +676,26 @@ oppia.directive('richTextEditor', [
         $scope.hasFullyLoaded = false;
 
         $scope.init = function() {
-          rteComponentRepositoryService.getRteComponentRepository().then(function(rteComponents) {
-            $scope._RICH_TEXT_COMPONENTS = [];
-            if (!$scope.disallowOppiaRteComponents) {
-              var componentIds = Object.keys(rteComponents);
-              componentIds.sort().forEach(function(componentId) {
-                rteComponents[componentId].backendName = rteComponents[componentId].backend_name;
-                rteComponents[componentId].name = rteComponents[componentId].frontend_name;
-                rteComponents[componentId].iconDataUrl = rteComponents[componentId].icon_data_url;
-                $scope._RICH_TEXT_COMPONENTS.push(rteComponents[componentId]);
-              });
-            }
+          $scope._RICH_TEXT_COMPONENTS = [];
+          if (!$scope.disallowOppiaRteComponents) {
+            var componentIds = Object.keys(RTE_COMPONENT_SPECS);
+            componentIds.sort().forEach(function(componentId) {
+              RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
+              RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
+              RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+              $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+            });
+          }
 
-            $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
+          $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
 
-            var sizeClass = (
-              $scope.size == 'small' ? ' wysiwyg-content-small' :
-              $scope.size == 'large' ? ' wysiwyg-content-large' :
-              '');
+          var sizeClass = (
+            $scope.size == 'small' ? ' wysiwyg-content-small' :
+            $scope.size == 'large' ? ' wysiwyg-content-large' :
+            '');
 
+          // This is needed for tests, otherwise $(rteNode).wysiwyg is undefined.
+          $timeout(function() {
             $(rteNode).wysiwyg({
               autoGrow: true,
               autoSave: true,
@@ -789,7 +807,13 @@ oppia.filter('isFloat', [function() {
     // point.
     var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
 
-    viewValue = input.toString();
+    var viewValue = '';
+    try {
+      var viewValue = input.toString();
+    } catch(e) {
+      return undefined;
+    }
+
     if (viewValue !== '' && viewValue !== '-' && FLOAT_REGEXP.test(viewValue)) {
       return parseFloat(viewValue.replace(',', '.'));
     }
@@ -885,7 +909,7 @@ oppia.directive('requireIsValidExpression',
 
 // Prevents timeouts due to recursion in nested directives. See:
 //
-//   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
+//   https://stackoverflow.com/questions/14430655/recursion-in-angular-directives
 oppia.factory('recursionHelper', ['$compile', function($compile){
   return {
     /**
@@ -938,7 +962,9 @@ oppia.directive('schemaBasedEditor', [function() {
       isDisabled: '&',
       localValue: '=',
       allowExpressions: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
@@ -1019,7 +1045,9 @@ oppia.directive('schemaBasedIntEditor', [function() {
       isDisabled: '&',
       allowExpressions: '&',
       validators: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
@@ -1058,11 +1086,38 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       isDisabled: '&',
       allowExpressions: '&',
       validators: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
-    controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+    controller: [
+        '$scope', '$filter', '$timeout', 'parameterSpecsService',
+        function($scope, $filter, $timeout, parameterSpecsService) {
+      $scope.hasLoaded = false;
+      $scope.isInputInFocus = false;
+      $scope.hasFocusedAtLeastOnce = false;
+
+      $scope.validate = function(localValue) {
+        return $filter('isFloat')(localValue) !== undefined;
+      };
+
+      $scope.onFocus = function() {
+        $scope.isInputInFocus = true;
+        $scope.hasFocusedAtLeastOnce = true;
+        if ($scope.onInputFocus) {
+          $scope.onInputFocus();
+        }
+      };
+
+      $scope.onBlur = function() {
+        $scope.isInputInFocus = false;
+        if ($scope.onInputBlur) {
+          $scope.onInputBlur();
+        }
+      };
+
       // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
       $scope.getMinValue = function() {
         for (var i = 0; i < $scope.validators().length; i++) {
@@ -1070,7 +1125,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].min_value;
           }
         }
-      }
+      };
 
       $scope.getMaxValue = function() {
         for (var i = 0; i < $scope.validators().length; i++) {
@@ -1078,7 +1133,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].max_value;
           }
         }
-      }
+      };
 
       $scope.onKeypress = function(evt) {
         if (evt.keyCode === 13) {
@@ -1103,6 +1158,12 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           $scope.localValue = $scope.expressionMode ? $scope.paramNames[0] : 0.0;
         };
       }
+
+      // This prevents the red 'invalid input' warning message from flashing
+      // at the outset.
+      $timeout(function() {
+        $scope.hasLoaded = true;
+      });
     }]
   };
 }]);
@@ -1115,7 +1176,9 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       validators: '&',
       uiConfig: '&',
       allowExpressions: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -1229,7 +1292,10 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
 
 oppia.directive('schemaBasedListEditor', [
     'schemaDefaultValueService', 'recursionHelper', 'focusService',
-    function(schemaDefaultValueService, recursionHelper, focusService) {
+    'schemaUndefinedLastElementService',
+    function(
+      schemaDefaultValueService, recursionHelper, focusService,
+      schemaUndefinedLastElementService) {
   return {
     scope: {
       localValue: '=',
@@ -1259,11 +1325,26 @@ oppia.directive('schemaBasedListEditor', [
         // will assume (for now) that nested lists won't be used -- if they are,
         // this will need to be changed.
         return index === 0 ? baseFocusLabel : baseFocusLabel + index.toString();
-      }
+      };
 
+      $scope.isAddItemButtonPresent = true;
       $scope.addElementText = 'Add element';
       if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
         $scope.addElementText = $scope.uiConfig().add_element_text;
+      }
+
+      // Only hide the 'add item' button in the case of single-line unicode input.
+      $scope.isOneLineInput = true;
+      if ($scope.itemSchema().type !== 'unicode' || $scope.itemSchema().hasOwnProperty('choices')) {
+        $scope.isOneLineInput = false;
+      } else if ($scope.itemSchema().ui_config) {
+        if ($scope.itemSchema().ui_config.coding_mode) {
+          $scope.isOneLineInput = false;
+        } else if (
+            $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
+            $scope.itemSchema().ui_config.rows > 2) {
+          $scope.isOneLineInput = false;
+        }
       }
 
       $scope.minListLength = null;
@@ -1285,15 +1366,53 @@ oppia.directive('schemaBasedListEditor', [
 
       if ($scope.len === undefined) {
         $scope.addElement = function() {
+          if ($scope.isOneLineInput) {
+            $scope.hideAddItemButton();
+          }
+
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
 
+        var _deleteLastElementIfUndefined = function() {
+          var lastValueIndex = $scope.localValue.length - 1;
+          var valueToConsiderUndefined = (
+            schemaUndefinedLastElementService.getUndefinedValue($scope.itemSchema()));
+          if ($scope.localValue[lastValueIndex] === valueToConsiderUndefined) {
+            $scope.deleteElement(lastValueIndex);
+          }
+        };
+
+        $scope.lastElementOnBlur = function() {
+          _deleteLastElementIfUndefined();
+          $scope.showAddItemButton();
+        };
+
+        $scope.showAddItemButton = function() {
+          $scope.isAddItemButtonPresent = true;
+        };
+
+        $scope.hideAddItemButton = function() {
+          $scope.isAddItemButtonPresent = false;
+        };
+
+        
         $scope._onChildFormSubmit = function(evt) {
-          if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
-              !!$scope.localValue[$scope.localValue.length - 1]) {
-            $scope.addElement();
+          if (!$scope.isAddItemButtonPresent) {
+            /** 
+             * If form submission happens on last element of the set (i.e the add item button is absent)
+             * then automatically add the element to the list.
+             */
+            if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
+                !!$scope.localValue[$scope.localValue.length - 1]) {
+              $scope.addElement();
+            }
+          } else {
+            /** 
+             * If form submission happens on existing element remove focus from it
+             */
+             document.activeElement.blur();
           }
           evt.stopPropagation();
         };

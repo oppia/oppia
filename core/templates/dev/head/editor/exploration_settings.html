@@ -1,486 +1,450 @@
 <div ng-controller="ExplorationSettings">
-  <div class="row">
-    <div class="col-lg-8 col-md-8 col-sm-8">
-      <h2>Settings</h2>
-
-      <h3>General</h3>
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div ng-if="editabilityService.isEditable()">
-            <div role="form" class="form-horizontal">
-              <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
-                <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
-                </div>
-              </div>
-              <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
-                <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
-                  <span class="help-block" style="font-size: smaller">
-                    What does this exploration help people to do?
-                  </span>
-                </div>
-              </div>
-              <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
-                <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <input id="explorationCategory" type="text" class="form-control protractor-test-exploration-category-input" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">Language</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
-                  </select>
-                  <span class="help-block" style="font-size: smaller">
-                    <em>
-                      Don't see the language you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
-                    </em>
-                  </span>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames">
-                  </select>
-                </div>
+  <md-card class="oppia-editor-card">
+    <h3>General</h3>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <div ng-if="editabilityService.isEditable()">
+          <div role="form" class="form-horizontal">
+            <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
+              <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
               </div>
             </div>
-          </div>
-
-          <div ng-if="!editabilityService.isEditable()">
-            <div class="row">
-              <div class="col-lg-2 col-md-2 col-sm-2">
-                <label for="explorationTitle">
-                  Title
-                </label>
-              </div>
+            <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
+              <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <span id="explorationTitle" type="text">
-                  <[explorationTitleService.displayed]>
+                <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
+                <span class="help-block" style="font-size: smaller">
+                  What does this exploration help people to do?
                 </span>
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-lg-2 col-md-2 col-sm-2">
-                <label for="explorationObjective">
-                  Goal
-                </label>
-              </div>
+            <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
+              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <span id="explorationObjective" type="text">
-                  <[explorationObjectiveService.displayed]>
+                <input id="explorationCategory" type="text" class="form-control protractor-test-exploration-category-input" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">Language</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
+                </select>
+                <span class="help-block" style="font-size: smaller">
+                  <em>
+                    Don't see the language you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
+                  </em>
                 </span>
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-lg-2 col-md-2 col-sm-2">
-                <label for="explorationCategory">
-                  Category
-                </label>
-              </div>
+            <div class="form-group">
+              <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <span id="explorationCategory" type="text">
-                  <[explorationCategoryService.displayed]>
-                </span>
+                <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames track by name">
+                </select>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div class="row">
-              <div class="col-lg-2 col-md-2 col-sm-2">
-                <label for="explorationLanguageCode">Language</label>
-              </div>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <[explorationLanguageCodeService.getCurrentLanguageDescription()]>
-              </div>
+        <div ng-if="!editabilityService.isEditable()">
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <label for="explorationTitle">
+                Title
+              </label>
             </div>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <span id="explorationTitle" type="text">
+                <[explorationTitleService.displayed]>
+              </span>
+            </div>
+          </div>
 
-            <div class="row">
-              <div class="col-lg-2 col-md-2 col-sm-2">
-                <label for="explorationInitStateName">First State</label>
-              </div>
-              <div class="col-lg-10 col-md-10 col-sm-10">
-                <[explorationInitStateNameService.displayed]>
-              </div>
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <label for="explorationObjective">
+                Goal
+              </label>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <span id="explorationObjective" type="text">
+                <[explorationObjectiveService.displayed]>
+              </span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <label for="explorationCategory">
+                Category
+              </label>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <span id="explorationCategory" type="text">
+                <[explorationCategoryService.displayed]>
+              </span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <label for="explorationLanguageCode">Language</label>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <[explorationLanguageCodeService.getCurrentLanguageDescription()]>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <label for="explorationInitStateName">First State</label>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <[explorationInitStateNameService.displayed]>
             </div>
           </div>
         </div>
       </div>
-
-      <div ng-if="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
-        <hr>
-
-        <div class="row">
-          <div class="col-lg-5 col-md-5 col-sm-5">
-            <h3>Roles</h3>
-            <div ng-show="explorationRightsService.ownerNames.length > 0">
-              <strong>Managers</strong>
-              <ul>
-                <li ng-repeat="ownerName in explorationRightsService.ownerNames track by $index">
-                  <[ownerName]>
-                </li>
-              </ul>
-            </div>
-
-            <div ng-show="explorationRightsService.editorNames.length > 0">
-              <strong>Collaborators</strong>
-              <ul>
-                <li ng-repeat="editorName in explorationRightsService.editorNames track by $index">
-                  <[editorName]>
-                </li>
-              </ul>
-            </div>
-
-            <div ng-show="explorationRightsService.viewerNames.length > 0">
-              <strong>Playtesters</strong>
-              <ul>
-                <li ng-repeat="viewerName in explorationRightsService.viewerNames track by $index">
-                  <[viewerName]>
-                </li>
-              </ul>
-            </div>
-
-
-            {% if can_modify_roles %}
-              <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
-                <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
-                  Edit Roles
-                </button>
-              </div>
-
-              <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
-                <strong>Add or Change Role</strong>
-                <div class="form-group">
-                  <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
-                    <label for="newMemberUsername">Username of invited user</label>
-                    <div>
-                      <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
-                    </div>
-                    <br>
-                    <label for="newMemberRole">Role of invited user</label>
-                    <div>
-                      <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
-                      </select>
-                      <span class="help-block">
-                        Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
-                      </span>
-                    </div>
-
-                    <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
-                    <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                      ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
-                      Cancel
-                    </button>
-                  </form>
-                </div>
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="col-lg-7 col-md-7 col-sm-7">
-            <h3>Permissions</h3>
-            <div class="pull-right">
-              <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
-                Toggle visibility
-              </button>
-            </div>
-
-            <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
-              This exploration is <strong>private</strong>. Anyone with the link can access it.
-            </p>
-            <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
-              This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
-              access it.
-            </p>
-            <p ng-if="explorationRightsService.isPublic()">
-              This exploration is <strong>public</strong>: anyone can access it.
-            </p>
-            <p ng-if="explorationRightsService.isPublicized()">
-              This exploration is <strong>public</strong>: anyone can access it.
-            </p>
-
-            <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
-              <em>Link to share:</em>
-              <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
-            </p>
-
-            <p ng-if="explorationRightsService.isPrivate()">
-              It is <strong>not shown</strong> in the gallery.
-            </p>
-            <p ng-if="explorationRightsService.isPublic()">
-              It is <strong>shown</strong> in the gallery.
-            </p>
-            <p ng-if="explorationRightsService.isPublicized()">
-              It is <strong>featured</strong> in the gallery.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
-        <hr>
-
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <h3>Permissions</h3>
-            <div>
-              This exploration is <strong>public</strong> and <strong>community-editable</strong>.
-              <p ng-if="explorationRightsService.isPublic()">
-                It is <strong>shown</strong> in the gallery.
-              </p>
-              <p ng-if="explorationRightsService.isPublicized()">
-                It is <strong>featured</strong> in the gallery.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div ng-if="explorationRightsService.isCloned()">
-        <hr>
-
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <h3>Status</h3>
-            <div>
-              This exploration was <strong>cloned</strong> from another exploration.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div ng-if="editabilityService.isEditable()">
-        <hr>
-
-        <div class="row">
-          <div class="col-lg-6 col-md-6 col-sm-6">
-            <h3>Controls</h3>
-
-            {% if can_publish %}
-              <p ng-hide="!explorationRightsService.isPrivate()">
-                <button type="button" class="btn btn-default protractor-test-publish-exploration"
-                        ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
-                        ng-click="showPublishExplorationModal()"
-                        ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-                  Publish in Gallery
-                </button>
-                <div ng-if="countWarnings()">
-                  <[getPublishExplorationButtonTooltip()]>
-                </div>
-              </p>
-            {% endif %}
-
-            {% if can_release_ownership %}
-              <p ng-hide="explorationRightsService.isCommunityOwned()">
-                <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Transfer ownership to the community
-                </button>
-                <span ng-if="isExplorationLockedForEditing()">
-                  <br>
-                  Please save your changes first.
-                </span>
-              </p>
-            {% endif %}
-
-            {% if can_delete %}
-              <p>
-                <button type="button" ng-if="explorationRightsService.isPrivate()"
-                        class="btn btn-danger" ng-click="deleteExploration('')"
-                        title="Delete this exploration">
-                  Delete Exploration
-                </button>
-              </p>
-            {% endif %}
-
-            <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-              <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
-                Nominate for Featured Status
-              </button>
-            </span>
-          </div>
-
-          <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
-            <h3>Admin Controls</h3>
-
-            {% if can_publicize %}
-              <p ng-show="explorationRightsService.isPublic()">
-                <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Mark "featured"
-                  <span ng-if="currentUserIsAdmin">(as admin)</span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-                </button>
-              </p>
-            {% endif %}
-
-            {% if can_unpublicize %}
-              <p ng-show="explorationRightsService.isPublicized()">
-                <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Remove "featured" status
-                  <span ng-if="currentUserIsAdmin">(as admin)</span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-                </button>
-              </p>
-            {% endif %}
-
-            {% if can_unpublish %}
-              <p ng-show="explorationRightsService.isPublic()">
-                <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Unpublish
-                  <span ng-if="currentUserIsAdmin">(as admin)</span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-                </button>
-              </p>
-            {% endif %}
-
-            <p ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
-              <button type="button" class="btn btn-danger"
-                      ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
-                Delete Exploration
-                <span ng-if="currentUserIsAdmin">(as admin)</span>
-                <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <hr>
-
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <h3>Parameters</h3>
-        </div>
-
-        <div class="col-lg-6 col-md-6 col-sm-6">
-          <h5>Parameters used in this exploration</h5>
-          <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
-            <em>No parameters used.</em>
-          </div>
-          <ol>
-            <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento">
-              <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
-            </li>
-          </ol>
-        </div>
-
-        <div class="col-lg-6 col-md-6 col-sm-6">
-          <h5>
-            Parameters initialized at start of exploration
-            <img class="oppia-help" src="/images/help.png"
-                 tooltip="This allows you to initialize the values of a learner's parameters before the learner begins the exploration."
-                 tooltip-placement="right">
-          </h5>
-
-          <param-change-editor param-changes="explorationParamChanges"
-                               save-param-changes="saveExplorationParamChanges"
-                               is-editable="editabilityService.isEditable()">
-          </param-change-editor>
-        </div>
-      </div>
-
-      {% if SHOW_SKIN_CHOOSER %}
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <h3>Skin chooser</h3>
-          </div>
-        </div>
-
-        <div class="form-horizontal">
-          <div class="form-group">
-            <label for="defaultSkinId" class="col-lg-2 col-md-2 col-sm-2">Default skin</label>
-            <div class="col-lg-4 col-md-4 col-sm-4">
-              <select class="form-control" ng-model="$parent.defaultSkinId" ng-options="skinId as skinId for skinId in allSkinIds">
-              </select>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-
     </div>
+  </md-card>
+
+  <md-card class="oppia-editor-card">
+    <div ng-if="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-5">
+          <h3>Roles</h3>
+          <div ng-show="explorationRightsService.ownerNames.length > 0">
+            <strong>Managers</strong>
+            <ul>
+              <li ng-repeat="ownerName in explorationRightsService.ownerNames track by $index">
+                <[ownerName]>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-show="explorationRightsService.editorNames.length > 0">
+            <strong>Collaborators</strong>
+            <ul>
+              <li ng-repeat="editorName in explorationRightsService.editorNames track by $index">
+                <[editorName]>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-show="explorationRightsService.viewerNames.length > 0">
+            <strong>Playtesters</strong>
+            <ul>
+              <li ng-repeat="viewerName in explorationRightsService.viewerNames track by $index">
+                <[viewerName]>
+              </li>
+            </ul>
+          </div>
+
+
+          {% if can_modify_roles %}
+            <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
+              <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
+                Edit Roles
+              </button>
+            </div>
+
+            <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+              <strong>Add or Change Role</strong>
+              <div class="form-group">
+                <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
+                  <label for="newMemberUsername">Username of invited user</label>
+                  <div>
+                    <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
+                  </div>
+                  <br>
+                  <label for="newMemberRole">Role of invited user</label>
+                  <div>
+                    <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
+                    </select>
+                    <span class="help-block">
+                      Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
+                    </span>
+                  </div>
+
+                  <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+                  <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
+                    ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="col-lg-7 col-md-7 col-sm-7">
+          <h3>Permissions</h3>
+          <div class="pull-right">
+            <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
+              Toggle visibility
+            </button>
+          </div>
+
+          <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
+            This exploration is <strong>private</strong>. Anyone with the link can access it.
+          </p>
+          <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
+            This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
+            access it.
+          </p>
+          <p ng-if="explorationRightsService.isPublic()">
+            This exploration is <strong>public</strong>: anyone can access it.
+          </p>
+          <p ng-if="explorationRightsService.isPublicized()">
+            This exploration is <strong>public</strong>: anyone can access it.
+          </p>
+
+          <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
+            <em>Link to share:</em>
+            <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
+          </p>
+
+          <p ng-if="explorationRightsService.isPrivate()">
+            It is <strong>not shown</strong> in the gallery.
+          </p>
+          <p ng-if="explorationRightsService.isPublic()">
+            It is <strong>shown</strong> in the gallery.
+          </p>
+          <p ng-if="explorationRightsService.isPublicized()">
+            It is <strong>featured</strong> in the gallery.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
+      <h3>Permissions</h3>
+      <div>
+        This exploration is <strong>public</strong> and <strong>community-editable</strong>.
+        <p ng-if="explorationRightsService.isPublic()">
+          It is <strong>shown</strong> in the gallery.
+        </p>
+        <p ng-if="explorationRightsService.isPublicized()">
+          It is <strong>featured</strong> in the gallery.
+        </p>
+      </div>
+    </div>
+
+    <div ng-if="explorationRightsService.isCloned()">
+      <h3>Status</h3>
+      <div>
+        This exploration was <strong>cloned</strong> from another exploration.
+      </div>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-6">
+        <h3>Controls</h3>
+
+        {% if can_release_ownership %}
+          <p ng-hide="explorationRightsService.isCommunityOwned()">
+            <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+              Transfer ownership to the community
+            </button>
+            <span ng-if="isExplorationLockedForEditing()">
+              <br>
+              Please save your changes first.
+            </span>
+          </p>
+        {% endif %}
+
+        {% if can_delete %}
+          <p>
+            <button type="button" ng-if="explorationRightsService.isPrivate()"
+                    class="btn btn-danger" ng-click="deleteExploration('')"
+                    title="Delete this exploration">
+              Delete Exploration
+            </button>
+          </p>
+        {% endif %}
+
+        <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
+          <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
+            Nominate for Featured Status
+          </button>
+        </span>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
+        <h3>Admin Controls</h3>
+
+        {% if can_publicize %}
+          <p ng-show="explorationRightsService.isPublic()">
+            <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+              Mark "featured"
+              <span ng-if="currentUserIsAdmin">(as admin)</span>
+              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+            </button>
+          </p>
+        {% endif %}
+
+        {% if can_unpublicize %}
+          <p ng-show="explorationRightsService.isPublicized()">
+            <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+              Remove "featured" status
+              <span ng-if="currentUserIsAdmin">(as admin)</span>
+              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+            </button>
+          </p>
+        {% endif %}
+
+        {% if can_unpublish %}
+          <p ng-show="explorationRightsService.isPublic()">
+            <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
+              Unpublish
+              <span ng-if="currentUserIsAdmin">(as admin)</span>
+              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+            </button>
+          </p>
+        {% endif %}
+
+        <p ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
+          <button type="button" class="btn btn-danger"
+                  ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+            Delete Exploration
+            <span ng-if="currentUserIsAdmin">(as admin)</span>
+            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+          </button>
+        </p>
+      </div>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-editor-card">
+    <h3>Parameters</h3>
+
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-6">
+        <h5>Parameters used in this exploration</h5>
+        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
+          <em>No parameters used.</em>
+        </div>
+        <ol>
+          <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento">
+            <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
+          </li>
+        </ol>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6">
+        <h5>
+          Parameters initialized at start of exploration
+          <img class="oppia-help" src="/images/help.png"
+               tooltip="This allows you to initialize the values of a learner's parameters before the learner begins the exploration."
+               tooltip-placement="right">
+        </h5>
+
+        <param-change-editor param-changes="explorationParamChanges"
+                             save-param-changes="saveExplorationParamChanges"
+                             is-editable="editabilityService.isEditable()">
+        </param-change-editor>
+      </div>
+    </div>
+  </md-card>
+
+  {% if SHOW_SKIN_CHOOSER %}
+    <md-card class="oppia-editor-card">
+      <h3>Skin chooser</h3>
+
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="defaultSkinId" class="col-lg-2 col-md-2 col-sm-2">Default skin</label>
+          <div class="col-lg-4 col-md-4 col-sm-4">
+            <select class="form-control" ng-model="$parent.defaultSkinId" ng-options="skinId as skinId for skinId in allSkinIds">
+            </select>
+          </div>
+        </div>
+      </div>
+    </md-card>
+  {% endif %}
+</div>
+
+
+<script type="text/ng-template" id="modals/transferExplorationOwnership">
+  <div class="modal-header">
+    <h3>Transfer Ownership to the Community</h3>
   </div>
 
-  <script type="text/ng-template" id="modals/transferExplorationOwnership">
-    <div class="modal-header">
-      <h3>Transfer Ownership to the Community</h3>
-    </div>
+  <div class="modal-body">
+    <p>
+      You are about to transfer ownership of this exploration to the
+      community! This will allow anyone to freely edit and improve
+      the exploration. Your previous contributions will still be visible
+      in the version history logs, and you will still be able to view and
+      edit the exploration.
+    </p>
 
-    <div class="modal-body">
-      <p>
-        You are about to transfer ownership of this exploration to the
-        community! This will allow anyone to freely edit and improve
-        the exploration. Your previous contributions will still be visible
-        in the version history logs, and you will still be able to view and
-        edit the exploration.
-      </p>
+    <p>
+      Please note that after the ownership of an exploration is transferred
+      to the community, it will no longer have an explicit list of managers,
+      so this action is <strong>not reversible</strong>.
+    </p>
 
-      <p>
-        Please note that after the ownership of an exploration is transferred
-        to the community, it will no longer have an explicit list of managers,
-        so this action is <strong>not reversible</strong>.
-      </p>
+    <p>
+      Would you like to transfer ownership of this exploration to the
+      community?
+    </p>
+  </div>
 
-      <p>
-        Would you like to transfer ownership of this exploration to the
-        community?
-      </p>
-    </div>
+  <div class="modal-footer">
+    <button class="btn btn-success" ng-click="transfer()">Transfer Ownership</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
 
-    <div class="modal-footer">
-      <button class="btn btn-success" ng-click="transfer()">Transfer Ownership</button>
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    </div>
-  </script>
+<script type="text/ng-template" id="modals/deleteExploration">
+  <div class="modal-header">
+    <h3>Delete Exploration</h3>
+  </div>
 
-  <script type="text/ng-template" id="modals/deleteExploration">
-    <div class="modal-header">
-      <h3>Delete Exploration</h3>
-    </div>
+  <div class="modal-body">
+    <p>Really delete this exploration? <strong>This action cannot be reversed.</strong></p>
+  </div>
 
-    <div class="modal-body">
-      <p>Really delete this exploration? <strong>This action cannot be reversed.</strong></p>
-    </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+  </div>
+</script>
 
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
-      <button class="btn btn-default" ng-click="cancel()">Close</button>
-    </div>
-  </script>
+<script type="text/ng-template" id="modals/nominateExploration">
+  <div class="modal-header">
+    <h3>Nominate for featured status</h3>
+  </div>
 
-  <script type="text/ng-template" id="modals/nominateExploration">
-    <div class="modal-header">
-      <h3>Nominate for featured status</h3>
-    </div>
+  <div class="modal-body">
+    <p>
+      Congratulations, you are about to nominate this exploration for featured status in the gallery!
+    </p>
 
-    <div class="modal-body">
-      <p>
-        Congratulations, you are about to nominate this exploration for featured status in the gallery!
-      </p>
+    <p>
+      Currently, the decision to feature an exploration is based on moderator review.
+      When you submit an exploration for review, a moderator will play through
+      it, look at its structure, and decide whether it fits the
+      <a href="/about#publication-criteria">criteria for featured status</a>.
+      If not, the moderator will make a series of specific suggestions on how
+      to make the exploration satisfy the criteria, and work with the editor(s)
+      to get it featured.
+    </p>
 
-      <p>
-        Currently, the decision to feature an exploration is based on moderator review.
-        When you submit an exploration for review, a moderator will play through
-        it, look at its structure, and decide whether it fits the
-        <a href="/site_guidelines#/publication-criteria">criteria for featured status</a>.
-        If not, the moderator will make a series of specific suggestions on how
-        to make the exploration satisfy the criteria, and work with the editor(s)
-        to get it featured.
-      </p>
+    <p>
+      <strong>To kick off the review process</strong>, please make a post to the
+      <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
+      include a link to the exploration.
+    </p>
+  </div>
 
-      <p>
-        <strong>To kick off the review process</strong>, please make a post to the
-        <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
-        include a link to the exploration.
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="close()">Close</button>
-      <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
-    </div>
-  </script>
-</div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="close()">Close</button>
+    <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
+  </div>
+</script>

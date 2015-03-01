@@ -49,7 +49,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 50000,
+  allScriptsTimeout: 30000,
 
   // ----- What tests to run -----
   //
@@ -128,6 +128,10 @@ exports.config = {
         takeScreenShotsOnlyForFailedSpecs: true
       }));
     }
+
+    // Set a wide enough window size for the navbar in the gallery to display
+    // fully.
+    browser.driver.manage().window().setSize(1100, 1000);
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -162,7 +166,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 400000
+    defaultTimeoutInterval: 600000
   },
 
   // ----- Options to be passed to mocha -----

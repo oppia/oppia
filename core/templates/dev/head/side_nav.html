@@ -3,45 +3,38 @@
     <div class="oppia-sidebar-logo-container">
     </div>
   </div>
-  {% if nav_mode in ['explore', 'create'] %}
-    <ul>
-      {% if username %}
-        <li {% if nav_mode == 'home' %}class="active"{% endif %}>
-          <a href="/dashboard">
-            <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
-            Dashboard
-            <span ng-if="numUnseenNotifications > 0">
-              (<[numUnseenNotifications]>)
-            </span>
-          </a>
-        </li>
-      {% endif %}
 
-      {% if SHOW_FORUM_PAGE %}
-        <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-          <a href="/forum">
-            <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
-            Forum
-          </a>
-        </li>
-      {% endif %}
+  <ul>
+    <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+      <a href="/about">
+        <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
+        About
+      </a>
+    </li>
 
-      <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-        <a href="/about">
-          <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
-          About
+    {% if SHOW_FORUM_PAGE %}
+      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+        <a href="/forum">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_forum_black_48dp.png"
+               style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+          Forum
         </a>
       </li>
-    </ul>
-  {% else %}
-    <ul>
-      <li>
-        <!-- TODO(sll): Replace this with actual content. -->
-        <a href="#">
-          <span class="glyphicon glyphicon-remove oppia-sidebar-menu-icon"></span>
-          Nothing here yet!
-        </a>
-      </li>
-    </ul>
-  {% endif %}
+    {% endif %}
+
+    <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+      <a href="http://oppiablog.blogspot.com" target="_blank">
+        <img src="/images/blogger.png"
+               style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+        Blog
+      </a>
+    </li>
+
+    <li>
+      <a href="https://docs.google.com/a/google.com/forms/d/1iTFNLp4YLAWEe1hAxoz14l3agFiFMUTvMJveHpfD1zs/viewform" target="_blank">
+        <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
+        Site Feedback
+      </a>
+    </li>
+  </ul>
 </nav>

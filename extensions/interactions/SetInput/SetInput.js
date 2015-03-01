@@ -36,20 +36,7 @@ oppia.directive('oppiaInteractiveSetInput', [
           }
         };
 
-        $scope.answer = [''];
-
-        $scope.addElement = function(newElement) {
-          if (newElement !== 0 && !newElement) {
-            return;
-          }
-          $scope.answer.push(newElement);
-          $scope.newElement = '';
-          $scope.$parent.$parent.adjustPageHeight(false);
-        };
-
-        $scope.deleteElement = function(index) {
-          $scope.answer.splice(index, 1);
-        };
+        $scope.answer = [];
 
         var hasDuplicates = function(answer) {
           for (var i = 0; i < answer.length; i++) {
@@ -64,7 +51,7 @@ oppia.directive('oppiaInteractiveSetInput', [
 
         $scope.submitAnswer = function(answer) {
           if (hasDuplicates(answer)) {
-            $scope.errorMessage = 'Oops, it looks like your list has duplicates!';
+            $scope.errorMessage = 'Oops, it looks like your set has duplicates!';
           } else {
             $scope.errorMessage = '';
             $scope.$parent.$parent.submitAnswer(answer, 'submit');

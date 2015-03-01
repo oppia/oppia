@@ -1,23 +1,16 @@
 <div ng-controller="ExplorationGraph">
-  <div id="tutorialExplorationGraph">
+  <h3>Overview</h3>
+
+  <div>
     <div class="oppia-graph-viz-container protractor-test-exploration-graph">
       <div state-graph-viz graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true" style="height: 100%;" is-editable="isEditable()">
       </div>
     </div>
   </div>
 
-  <div ng-show="isEditable()" class="oppia-add-state-container">
-    <form role="form" class="form-inline" ng-submit="addState(newStateName, onClickStateInMinimap)">
-      <div class="form-group">
-        <input type="text" class="form-control protractor-test-add-state-input" ng-model="newStateName" placeholder="New State Name" focus-on="newStateNameSubmittedFromStateEditor">
-      </div>
-      <button type="submit" class="btn btn-default protractor-test-add-state-submit" ng-class="{'btn-success': !!newStateName}">Create</button>
-    </form>
-  </div>
-
   <script type="text/ng-template" id="modals/stateGraph">
     <div class="modal-header">
-      <h3>Exploration Map</h3>
+      <h3>Exploration Overview</h3>
     </div>
 
     <div class="modal-body" style="overflow-y: hidden; padding-bottom: 0;">
@@ -28,16 +21,6 @@
     <div class="modal-footer" style="margin-top: 0; text-align: inherit;">
       <span class="pull-right">
         <button class="btn btn-default" ng-click="cancel()">Close</button>
-      </span>
-
-      <span ng-show="isEditable">
-        <form role="form" class="form-inline" ng-submit="addStateFromModal($parent.$parent.newStateName)">
-          <div class="form-group">
-            <input type="text" class="form-control" ng-model="$parent.$parent.newStateName" placeholder="New State Name" focus-on="newStateNameSubmittedFromModal">
-          </div>
-          <button type="submit" class="btn btn-default" ng-class="{'btn-success': !!$parent.$parent.newStateName}" ng-disabled="!isNewStateNameValid($parent.$parent.newStateName)">Create
-         </button>
-        </form>
       </span>
     </div>
   </script>

@@ -59,7 +59,7 @@ NEW_STATE_TEMPLATE = {
     'interaction': {
         'customization_args': {
             'rows': {'value': 1},
-            'placeholder': {'value': 'Type your answer here.'}
+            'placeholder': {'value': ''}
         },
         'handlers': [{
             'name': 'submit',
@@ -74,7 +74,6 @@ NEW_STATE_TEMPLATE = {
             }],
         }],
         'id': 'TextInput',
-        'sticky': False
     },
     'param_changes': [],
     'unresolved_answers': {},
@@ -91,23 +90,16 @@ def get_value_generators_js():
     return value_generators_js
 
 VALUE_GENERATORS_JS = config_domain.ComputedProperty(
-    'value_generators_js', 'UnicodeString',
+    'value_generators_js', {'type': 'unicode'},
     'JavaScript code for the value generators', get_value_generators_js)
 
-OBJECT_EDITORS_JS = config_domain.ComputedProperty(
-    'object_editors_js', 'UnicodeString',
-    'JavaScript code for the object editors',
-    obj_services.get_all_object_editor_js_templates)
-
-EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
-    'editor_page_announcement', 'Html',
-    'A persistent announcement to display on top of all editor pages.',
-    default_value='')
+MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
+    'https://moderator/request/forum/url')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', 'UnicodeString',
+    'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
     'in the gallery',
-    default_value='https://moderator/request/forum/url')
+    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -152,14 +144,6 @@ def require_editor(handler):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
 
-        redirect_url = feconf.EDITOR_PREREQUISITES_URL
-
-        if not user_services.has_user_registered_as_editor(self.user_id):
-            redirect_url = utils.set_url_query_parameter(
-                redirect_url, 'return_url', self.request.uri)
-            self.redirect(redirect_url)
-            return
-
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
@@ -200,28 +184,17 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
-        if exploration is None:
-            raise self.PageNotFoundException
-
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
-            raise self.PageNotFoundException
+        if (exploration is None or
+                not rights_manager.Actor(self.user_id).can_view(
+                    exploration_id)):
+            self.redirect('/')
+            return
 
         can_edit = (
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(exploration_id))
 
-        if (can_edit and not
-                user_services.has_user_registered_as_editor(self.user_id)):
-            redirect_url = utils.set_url_query_parameter(
-                feconf.EDITOR_PREREQUISITES_URL, 'return_url',
-                self.request.uri)
-            self.redirect(redirect_url)
-            return
-
-        # TODO(sll): Consider including the obj_generator html in a ng-template
-        # to remove the need for an additional RPC?
-        object_editors_js = OBJECT_EDITORS_JS.value
         value_generators_js = VALUE_GENERATORS_JS.value
 
         interaction_ids = (
@@ -238,14 +211,16 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
+        interaction_validators_html = (
+            interaction_registry.Registry.get_validators_html(
+                interaction_ids))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
 
         self.values.update({
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
-            'announcement': jinja2.utils.Markup(
-                EDITOR_PAGE_ANNOUNCEMENT.value),
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(exploration_id),
             'can_edit': can_edit,
@@ -264,9 +239,10 @@ class ExplorationPage(EditorHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
+            'interaction_validators_html': jinja2.utils.Markup(
+                interaction_validators_html),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
-            'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'skin_js_urls': [
                 skins_services.Registry.get_skin_js_url(skin_id)
@@ -274,6 +250,8 @@ class ExplorationPage(EditorHandler):
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            # This is needed for the exploration preview.
+            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
@@ -320,11 +298,6 @@ class ExplorationHandler(EditorHandler):
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
-            'ALL_INTERACTIONS': {
-                interaction.id: interaction.to_dict()
-                for interaction
-                in interaction_registry.Registry.get_all_interactions()
-            },
         }
 
         if feconf.SHOW_SKIN_CHOOSER:
@@ -456,9 +429,12 @@ class ExplorationRightsHandler(EditorHandler):
 
                 rights_manager.publish_exploration(
                     self.user_id, exploration_id)
+                exp_services.index_explorations_given_ids([exploration_id])
             else:
                 rights_manager.unpublish_exploration(
                     self.user_id, exploration_id)
+                exp_services.delete_documents_from_search_index([
+                    exploration_id])
 
         elif is_publicized is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)

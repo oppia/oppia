@@ -21,6 +21,7 @@
 
 var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('./forms.js');
+var general = require('./general.js');
 
 var restartExploration = function() {
   element(by.css('.protractor-test-restart-exploration')).click();
@@ -69,21 +70,20 @@ var submitAnswer = function(interactionName, answerData) {
   interactions.getInteraction(interactionName).submitAnswer(
     element.all(by.css('.protractor-test-conversation-input')).last(),
     answerData);
+  general.waitForSystem();
 };
 
 
 var expectExplorationToBeOver = function() {
   expect(
-    element.all(by.css('.protractor-test-conversation-finished')).last().
-      isDisplayed()
-  ).toBe(true);
+    element.all(by.css('.protractor-test-conversation-content')).last().getText()
+  ).toEqual('Congratulations, you have finished this exploration!');
 };
 
 var expectExplorationToNotBeOver = function() {
   expect(
-    element.all(by.css('.protractor-test-conversation-finished')).last().
-      isDisplayed()
-  ).toBe(false);
+    element.all(by.css('.protractor-test-conversation-content')).last().getText()
+  ).not.toEqual('Congratulations, you have finished this exploration!');
 };
 
 exports.restartExploration = restartExploration;

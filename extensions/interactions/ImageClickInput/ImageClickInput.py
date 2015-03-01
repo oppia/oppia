@@ -22,12 +22,13 @@ from extensions.interactions import base
 class ImageClickInput(base.BaseInteraction):
     """Interaction allowing multiple-choice selection on an image."""
 
-    name = 'Image'
-    category = 'Custom'
+    name = 'Image Region Select'
+    category = ''
     description = 'Allows learners to click on regions of an image.'
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
     _handlers = [{
-        'name': 'submit', 'obj_type': 'ListOfRegion'
+        'name': 'submit', 'obj_type': 'ClickOnImage'
     }]
 
     _customization_arg_specs = [{
@@ -39,6 +40,13 @@ class ImageClickInput(base.BaseInteraction):
         },
         'default_value': {
             'imagePath': '',
-            'imageRegions': []
+            'labeledRegions': []
         },
+    }, {
+        'name': 'highlightRegionsOnHover',
+        'description': 'Highlight regions when the learner hovers over them',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': False
     }]

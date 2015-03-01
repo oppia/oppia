@@ -42,6 +42,20 @@ oppia.directive('oppiaNoninteractiveLink', [
           return;
         }
         $scope.url = untrustedUrl;
+
+        $scope.showUrlInTooltip = false;
+        $scope.text = $scope.url;
+        if ($attrs.textWithValue) {
+          // This is done for backward-compatibility; some old explorations
+          // have content parts that don't include a 'text' attribute on
+          // their links.
+          $scope.text = oppiaHtmlEscaper.escapedJsonToObj($attrs.textWithValue);
+          // Note that this second 'if' condition is needed because a link may
+          // have an empty 'text' value.
+          if ($scope.text) {
+            $scope.showUrlInTooltip = true;
+          }
+        }
       }]
     };
   }

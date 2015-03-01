@@ -25,10 +25,11 @@ oppia.directive('oppiaInteractiveTextInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/TextInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
         $scope.answer = '';
+        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
         $scope.schema = {
           type: 'unicode',

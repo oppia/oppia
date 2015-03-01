@@ -103,31 +103,3 @@ class StaticFileHandler(base.BaseHandler):
                 self.response.write(f.read())
         except Exception:
             self.response.set_status(404)
-
-
-class InteractionRepositoryHandler(base.BaseHandler):
-    """Populates the interaction repository."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.render_json({
-            'repository': {
-                interaction.id: interaction.to_dict()
-                for interaction in
-                interaction_registry.Registry.get_all_interactions()
-            }
-        })
-
-
-class RteComponentRepositoryHandler(base.BaseHandler):
-    """Populates the RTE component repository."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.render_json({
-            'repository': {
-                rte_component.id: rte_component.to_dict()
-                for rte_component in
-                rte_component_registry.Registry.get_all_rte_components()
-            }
-        })

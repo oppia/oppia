@@ -227,14 +227,28 @@ def _get_exploration_summary_dicts_from_models(exp_summary_models):
     return result
 
 
-def get_exploration_summaries_matching_query(query_string):
-    """Returns a dict with all exploration summary domain objects matching the
-    given search query string."""
-    exp_ids, unused_cursor = search_explorations(query_string)
+def get_exploration_summaries_matching_ids(exp_ids):
+    """Given a list of exploration ids, return a list with the corresponding
+    summary domain objects (or None if the corresponding summary does not
+    exist).
+    """
+    return [
+        (get_exploration_summary_from_model(model) if model else None)
+        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
+
+
+def get_exploration_summaries_matching_query(query_string, cursor=None):
+    """Returns a list with all exploration summary domain objects matching the
+    given search query string, as well as a search cursor for future fetches.
+    """
+    exp_ids, search_cursor = search_explorations(query_string, cursor=cursor)
     summary_models = [
         model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
         if model is not None]
-    return _get_exploration_summary_dicts_from_models(summary_models)
+    summaries = [
+        get_exploration_summary_from_model(summary_model)
+        for summary_model in summary_models]
+    return (summaries, search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -349,9 +363,6 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
-                elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_STICKY):
-                    state.update_interaction_sticky(change.new_value)
                 elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     state.update_interaction_handlers(change.new_value)
@@ -575,7 +586,7 @@ def _save_exploration(
         committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
-    _handle_exp_change_event(exploration.id)
+    index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
 
@@ -610,10 +621,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
-    _handle_exp_change_event(exploration.id)
     exploration.version += 1
-
-    # create summary of exploration
     create_exploration_summary(exploration.id)
 
 
@@ -656,8 +664,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     #delete the exploration from search.
-    search_services.delete_documents_from_index([exploration_id],
-                                                SEARCH_INDEX_EXPLORATIONS)
+    delete_documents_from_search_index([exploration_id])
 
     # delete summary of exploration
     delete_exploration_summary(exploration_id, force_deletion=force_deletion)
@@ -964,11 +971,13 @@ def load_demo(exploration_id):
     rights_manager.release_ownership(
         feconf.ADMIN_COMMITTER_ID, exploration_id)
 
+    index_explorations_given_ids([exploration_id])
+
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
 def get_next_page_of_all_commits(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of commits to all explorations in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
@@ -989,7 +998,8 @@ def get_next_page_of_all_commits(
 
 
 def get_next_page_of_all_non_private_commits(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None, max_age=None):
+        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None,
+        max_age=None):
     """Returns a page of non-private commits in reverse time order. If max_age
     is given, it should be a datetime.timedelta instance.
 
@@ -1026,6 +1036,26 @@ def _should_index(exp):
     return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
 
 
+def _get_search_rank(exp_id):
+    """Returns an integer determining the document's rank in search.
+
+    Featured explorations get a ranking bump, and so do explorations that
+    have been more recently updated.
+    """
+    # TODO(sll): Improve this calculation.
+    exploration = get_exploration_by_id(exp_id)
+    rights = rights_manager.get_exploration_rights(exp_id)
+    rank = (
+        3000 if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
+        else 0)
+
+    _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
+    time_delta_days = (exploration.last_updated - _BEGINNING_OF_TIME).days
+    rank += int(time_delta_days)
+
+    return rank
+
+
 def _exp_to_search_dict(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
     doc = {
@@ -1037,26 +1067,19 @@ def _exp_to_search_dict(exp):
         'blurb': exp.blurb,
         'objective': exp.objective,
         'author_notes': exp.author_notes,
+        'rank': _get_search_rank(exp.id),
     }
     doc.update(_exp_rights_to_search_dict(rights))
-
-    #TODO(frederik): Calculate an exploration's 'rank' based on statistics.
-    # By default, a document's rank is the time it was indexed, so the most
-    # recently changed explorations would rank higher.
-
     return doc
-
-
-def index_explorations_given_domain_objects(exp_objects):
-    search_docs = [_exp_to_search_dict(exp) for exp in exp_objects
-                   if _should_index(exp)]
-    search_services.add_documents_to_index(search_docs, SEARCH_INDEX_EXPLORATIONS)
 
 
 def index_explorations_given_ids(exp_ids):
     # We pass 'strict=False' so as not to index deleted explorations.
     exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
-    index_explorations_given_domain_objects(exploration_models.values())
+    search_services.add_documents_to_index([
+        _exp_to_search_dict(exp) for exp in exploration_models.values()
+        if _should_index(exp)
+    ], SEARCH_INDEX_EXPLORATIONS)
 
 
 def patch_exploration_search_document(exp_id, update):
@@ -1072,16 +1095,20 @@ def patch_exploration_search_document(exp_id, update):
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
     if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
-        search_services.delete_documents_from_index(
-            [exp_id], SEARCH_INDEX_EXPLORATIONS)
+        delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(
             rights.id, _exp_rights_to_search_dict(rights))
 
 
+def delete_documents_from_search_index(exploration_ids):
+    search_services.delete_documents_from_index(
+        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
+
+
 def search_explorations(
-    query, sort=None, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
-    """Searcher through the exploration
+    query, sort=None, limit=feconf.GALLERY_PAGE_SIZE, cursor=None):
+    """Searches through the available explorations.
 
     args:
       - query_string: the query string to search for.
@@ -1104,9 +1131,3 @@ def search_explorations(
     """
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
-
-# Temporary event handlers
-
-def _handle_exp_change_event(exp_id):
-    """Indexes the changed exploration."""
-    index_explorations_given_ids([exp_id])

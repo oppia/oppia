@@ -21,8 +21,9 @@ class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 
     name = 'Text'
-    category = 'Basic Input'
+    category = ''
     description = 'Allows learners to enter arbitrary text strings.'
+    display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     _handlers = [{
         'name': 'submit', 'obj_type': 'NormalizedString'}]
@@ -40,7 +41,7 @@ class TextInput(base.BaseInteraction):
         'schema': {
             'type': 'unicode',
         },
-        'default_value': 'Type your answer here.'
+        'default_value': ''
     }, {
         'name': 'rows',
         'description': (

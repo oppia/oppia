@@ -92,7 +92,7 @@ class BaseRichTextComponent(object):
         """
         return {
             'backend_name': self.name,
-            'customization_args': [{
+            'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,

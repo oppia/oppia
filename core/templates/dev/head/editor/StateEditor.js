@@ -20,10 +20,10 @@
 
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
-  'editabilityService', 'explorationStatesService', 'routerService',
+  'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   function(
     $scope, $rootScope, editorContextService, changeListService,
-    editabilityService, explorationStatesService, routerService) {
+    editabilityService, explorationStatesService, INTERACTION_SPECS) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -32,8 +32,15 @@ oppia.controller('StateEditor', [
     }
   };
 
+  $scope.isCurrentStateTerminal = false;
+
   $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
+  });
+
+  $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+    $scope.isCurrentStateTerminal = INTERACTION_SPECS[
+      newInteractionId].is_terminal;
   });
 
   $scope.initStateEditor = function() {
@@ -41,33 +48,17 @@ oppia.controller('StateEditor', [
 
     var stateData = explorationStatesService.getState($scope.stateName);
     $scope.content = stateData.content;
-    $scope.stateParamChanges = stateData.param_changes || [];
 
     // This should only be non-null when the content editor is open.
     $scope.contentMemento = null;
 
-    $scope.nextStateName = null;
-    $scope.nextStateContent = null;
-
-    for (var i = 0; i < stateData.interaction.handlers.length; i++) {
-      if ($scope.nextStateName) {
-        break;
-      }
-
-      var handler = stateData.interaction.handlers[i];
-      for (var j = 0; j < handler.rule_specs.length; j++) {
-        if (handler.rule_specs[j].dest !== 'END' && handler.rule_specs[j].dest !== $scope.stateName) {
-          $scope.nextStateName = handler.rule_specs[j].dest;
-          $scope.nextStateContent = explorationStatesService.getState(
-            $scope.nextStateName).content[0].value;
-          break;
-        }
-      }
-    }
-
     if ($scope.stateName && stateData) {
       $rootScope.$broadcast('stateEditorInitialized', stateData);
+      $scope.isCurrentStateTerminal = INTERACTION_SPECS[
+        stateData.interaction.id].is_terminal;
     }
+
+    $rootScope.loadingMessage = '';
   };
 
   $scope.openStateContentEditor = function() {
@@ -100,24 +91,5 @@ oppia.controller('StateEditor', [
        editorContextService.getActiveStateName());
      $scope.content = angular.copy(_stateData.content);
      $scope.contentMemento = null;
-  };
-
-  $scope.saveStateParamChanges = function(newValue, oldValue) {
-    if (!angular.equals(newValue, oldValue)) {
-      changeListService.editStateProperty(
-        editorContextService.getActiveStateName(), 'param_changes',
-        newValue, oldValue);
-
-      var _stateData = explorationStatesService.getState(
-        editorContextService.getActiveStateName());
-      _stateData.param_changes = angular.copy(newValue);
-      explorationStatesService.setState(
-        editorContextService.getActiveStateName(), _stateData);
-    }
-  };
-
-  $scope.navigateToState = function(stateName) {
-    routerService.navigateToMainTab(stateName);
-    $scope.initStateEditor();
   };
 }]);

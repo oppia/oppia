@@ -21,8 +21,9 @@ class CodeRepl(base.BaseInteraction):
     """Interaction that allows programs to be input."""
 
     name = 'Code'
-    category = 'Custom'
+    category = ''
     description = 'Allows learners to enter code and get it evaluated.'
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['jsrepl', 'codemirror']
     _handlers = [{
         'name': 'submit', 'obj_type': 'CodeEvaluation'}]
@@ -48,7 +49,7 @@ class CodeRepl(base.BaseInteraction):
                 'coding_mode': 'none',
             },
         },
-        'default_value': '[Type your code here.]'
+        'default_value': '# Type your code here.'
     }, {
         'name': 'preCode',
         'description': 'Code to prepend to the reader\'s submission.',

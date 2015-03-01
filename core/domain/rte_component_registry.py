@@ -85,3 +85,11 @@ class Registry(object):
         """Returns the HTML bodies for all custom RTE components."""
         return ' \n'.join([
             component.html_body for component in cls.get_all_rte_components()])
+
+    @classmethod
+    def get_all_specs(cls):
+        """Returns a dict containing the full specs of each RTE component."""
+        return {
+            component.id: component.to_dict()
+            for component in cls.get_all_rte_components()
+        }

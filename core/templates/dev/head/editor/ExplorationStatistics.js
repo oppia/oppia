@@ -50,14 +50,14 @@ oppia.controller('ExplorationStatistics', [
   $scope.refreshExplorationStatistics = function(version) {
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId
       + '/' + version;
-    $http.get($scope.explorationStatisticsUrl).then(function(response) {      
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {
       var versionString;
       if (version == 'all' || version == 'none') {
         versionString = '';
       } else {
         versionString = '?v=' + version;
       }
-      var explorationDataUrl = '/createhandler/data/' 
+      var explorationDataUrl = '/createhandler/data/'
        + explorationData.explorationId + versionString;
 
       $http.get(explorationDataUrl).then(function(response) {
@@ -127,7 +127,7 @@ oppia.controller('ExplorationStatistics', [
     ).then(function(response) {
       $modal.open({
         templateUrl: 'modals/stateStats',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           stateName: function() {
             return stateName;

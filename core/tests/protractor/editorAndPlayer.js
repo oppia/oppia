@@ -35,7 +35,7 @@ describe('State editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
     editor.setInteraction('Continue', 'click here');
-    editor.RuleEditor('default').setDestination('END');
+    editor.addRule('Continue', null, 'END', 'Default');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -63,7 +63,7 @@ describe('State editor', function() {
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    editor.RuleEditor('default').setDestination('END');
+    editor.addRule('MultipleChoiceInput', null, 'END', 'Default');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -83,13 +83,11 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', 'IsInclusivelyBetween', 3, 6);
-    editor.RuleEditor(0).setDestination('END');
-    editor.RuleEditor(0).setFeedback(0, function(richTextEditor) {
+    editor.addRule('NumericInput', function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
-    });
-    editor.RuleEditor('default').
-      setFeedback(0, forms.toRichText('out of bounds'));
+    }, 'END', 'IsInclusivelyBetween', 3, 6);
+    editor.addRule(
+      'NumericInput', forms.toRichText('out of bounds'), null, 'Default');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -115,8 +113,8 @@ describe('Full exploration editor', function() {
     editor.setStateName('state 1');
     editor.setContent(forms.toRichText('this is state 1'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', 'Equals', 21);
-    editor.RuleEditor(0).setDestination('state 2');
+    editor.addRule('NumericInput', null, 'END', 'Equals', 21);
+    editor.RuleEditor(0).createNewStateAndSetDestination('state 2');
 
     editor.moveToState('state 2');
     editor.setContent(forms.toRichText(
@@ -124,9 +122,8 @@ describe('Full exploration editor', function() {
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addRule('MultipleChoiceInput', 'Equals', 'return');
-    editor.RuleEditor(0).setDestination('state 1');
-    editor.RuleEditor('default').setDestination('END');
+    editor.addRule('MultipleChoiceInput', null, 'state 1', 'Equals', 'return');
+    editor.addRule('MultipleChoiceInput', null, 'END', 'Default');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -158,7 +155,8 @@ describe('Full exploration editor', function() {
       // Check discarding of changes
       editor.setStateName('state1');
       editor.expectStateNamesToBe(['state1', 'END']);
-      editor.createState('state2');
+      editor.addRule('TextInput', null, 'END', 'Default');
+      editor.RuleEditor('default').createNewStateAndSetDestination('state2');
       editor.expectStateNamesToBe(['state1', 'state2', 'END']);
       editor.discardChanges();
       editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);
@@ -166,11 +164,12 @@ describe('Full exploration editor', function() {
       editor.expectStateNamesToBe(['first', 'END']);
 
       // Check deletion of states and changing the first state
-      editor.createState('second');
+      editor.addRule('TextInput', null, 'END', 'Default');
+      editor.RuleEditor('default').createNewStateAndSetDestination('second');
+      editor.moveToState('second');
       editor.expectStateNamesToBe(['first', 'second', 'END']);
       editor.expectCurrentStateToBe('second');
-      // TODO (Jacob) remove the '' when issue 443 is fixed
-      editor.expectAvailableFirstStatesToBe(['', 'first', 'second']);
+      editor.expectAvailableFirstStatesToBe(['first', 'second']);
       editor.setFirstState('second');
       editor.moveToState('first');
       editor.deleteState('first');
@@ -202,14 +201,13 @@ describe('Full exploration editor', function() {
       editor.expectInteractionToMatch('NumericInput');
 
       // Check deletion of rules
-      editor.RuleEditor('default').
-        setFeedback(0, forms.toRichText('Farewell'));
+      editor.addRule('NumericInput', forms.toRichText('Farewell'), null, 'Default');
       editor.RuleEditor('default').
         expectAvailableDestinationsToBe(['second', 'END']);
       editor.RuleEditor('default').setDestination('END');
       editor.RuleEditor('default').
         expectAvailableDestinationsToBe(['second', 'END']);
-      editor.addRule('NumericInput', 'IsGreaterThan', 2);
+      editor.addRule('NumericInput', null, 'END', 'IsGreaterThan', 2);
       editor.RuleEditor(0).delete();
 
       // Check editor preview tab
@@ -357,7 +355,7 @@ describe('Interactions', function() {
     users.createUser('user21@example.com', 'user21');
     users.login('user21@example.com');
     workflow.createExploration('interactions', 'history');
-    editor.RuleEditor('default').setFeedback(0, forms.toRichText('no'));
+    editor.addRule('TextInput', forms.toRichText('no'), null, 'Default');
 
     for (var interactionName in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionName];
@@ -366,7 +364,7 @@ describe('Interactions', function() {
         editor.setInteraction.apply(
           null, [interactionName].concat(test.interactionArguments));
         editor.addRule.apply(
-          null, [interactionName].concat(test.ruleArguments));
+          null, [interactionName, null, 'END'].concat(test.ruleArguments));
         editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
 
         editor.navigateToPreviewTab();
@@ -412,17 +410,18 @@ describe('Exploration history', function() {
       {'label': 'END', 'color': COLOR_UNCHANGED}
     ], [0, 0, 0]);
 
-    // Check adding state, renaming state, editing text and interactions
-    editor.createState('second');
-    editor.setContent(forms.toRichText('this is state 2'));
-    editor.setInteraction('Continue');
-    editor.RuleEditor('default').setDestination('END');
+    // Check renaming state, editing text, editing interactions and adding state
     editor.moveToState('First State');
     editor.setStateName('first');
     editor.setContent(forms.toRichText('enter 6 to continue'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', 'Equals', 6);
-    editor.RuleEditor(0).setDestination('second');
+    editor.addRule('NumericInput', null, 'END', 'Equals', 6);
+    editor.RuleEditor(0).createNewStateAndSetDestination('second');
+    editor.moveToState('second');
+    editor.setContent(forms.toRichText('this is state 2'));
+    editor.setInteraction('Continue');
+    editor.addRule('Continue', null, 'END', 'Default');
+    editor.moveToState('first');
     editor.saveChanges();
 
     var VERSION_1_STATE_1_CONTENTS = {
@@ -449,9 +448,8 @@ describe('Exploration history', function() {
       21: {text: '      feedback: []', highlighted: false},
       22: {text: '      param_changes: []', highlighted: false},
       23: {text: '  id: NumericInput', highlighted: true},
-      24: {text: '  sticky: false', highlighted: false},
-      25: {text: 'param_changes: []', highlighted: false},
-      26: {text: ' ', highlighted: false}
+      24: {text: 'param_changes: []', highlighted: false},
+      25: {text: ' ', highlighted: false}
     };
     var VERSION_2_STATE_1_CONTENTS = {
       1: {text: 'content:', highlighted: false},
@@ -464,7 +462,7 @@ describe('Exploration history', function() {
       8: {text: 'interaction:', highlighted: true},
       9: {text: '  customization_args:', highlighted: true},
       10: {text: '    placeholder:', highlighted: true},
-      11: {text: '      value: Type your answer here.', highlighted: true},
+      11: {text: '      value: \'\'', highlighted: true},
       12: {text: '    rows:', highlighted: true},
       13: {text: '      value: 1', highlighted: true},
       14: {text: '  handlers:', highlighted: true},
@@ -476,9 +474,8 @@ describe('Exploration history', function() {
       20: {text: '      feedback: []', highlighted: false},
       21: {text: '      param_changes: []', highlighted: false},
       22: {text: '  id: TextInput', highlighted: true},
-      23: {text: '  sticky: false', highlighted: false},
-      24: {text: 'param_changes: []', highlighted: false},
-      25: {text: ' ', highlighted: false}
+      23: {text: 'param_changes: []', highlighted: false},
+      24: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
@@ -494,10 +491,10 @@ describe('Exploration history', function() {
       '    - definition:\n' +
       '        rule_type: default\n' +
       '      dest: END\n' +
-      '      feedback: []\n' +
+      '      feedback:\n' +
+      '      - \'\'\n' +
       '      param_changes: []\n' +
       '  id: Continue\n' +
-      '  sticky: false\n' +
       'param_changes: []\n ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([
@@ -532,6 +529,7 @@ describe('Exploration history', function() {
       .toBe(' ', STATE_2_STRING);
 
     // Check renaming a state
+    editor.moveToState('first');
     editor.setStateName('third');
     editor.saveChanges();
     editor.expectGraphComparisonOf(3, 4).toBe([
@@ -540,12 +538,12 @@ describe('Exploration history', function() {
     ], [1, 0, 0]);
 
     // Check re-inserting a deleted state
-    editor.createState('second');
+    editor.moveToState('third');
+    editor.RuleEditor(0).createNewStateAndSetDestination('second');
+    editor.moveToState('second');
     editor.setContent(forms.toRichText('this is state 2'));
     editor.setInteraction('Continue');
-    editor.RuleEditor('default').setDestination('END');
-    editor.moveToState('third');
-    editor.RuleEditor(0).setDestination('second');
+    editor.addRule('Continue', null, 'END', 'Default');
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 5).toBe([
@@ -561,7 +559,7 @@ describe('Exploration history', function() {
     player.submitAnswer('NumericInput', 6);
     player.expectExplorationToNotBeOver();
     player.expectContentToMatch(forms.toRichText('this is state 2'));
-    player.expectInteractionToMatch('Continue', '');
+    player.expectInteractionToMatch('Continue', 'CONTINUE');
     player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
 

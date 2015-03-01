@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import datetime
 import os
 import re
 import unittest
@@ -58,7 +59,6 @@ class TestBase(unittest.TestCase):
 
     maxDiff = 2500
 
-    DEFAULT_USERNAME = 'defaultusername'
     # This is the value that gets returned by default when
     # app_identity.get_application_id() is called during tests.
     EXPECTED_TEST_APP_ID = 'testbed-test'
@@ -89,6 +89,11 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
+
+    def signup_superadmin_user(self):
+        """Signs up a superadmin user. Should be called at the end of setUp().
+        """
+        self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
 
     def log_line(self, line):
         """Print the line with a prefix that can be identified by the
@@ -198,17 +203,14 @@ class TestBase(unittest.TestCase):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
 
-    def register_editor(self, email, username=None):
-        """Register a user with the given username as an editor."""
-        if username is None:
-            username = self.DEFAULT_USERNAME
-
+    def signup(self, email, username):
+        """Complete the signup process for the user with the given username."""
         self.login(email)
 
-        response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-
-        response = self.testapp.post(feconf.EDITOR_PREREQUISITES_DATA_URL, {
+        response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
             'csrf_token': csrf_token,
             'payload': json.dumps({
                 'username': username,
@@ -223,7 +225,7 @@ class TestBase(unittest.TestCase):
         """Set the ADMIN_EMAILS property."""
         self._stash_current_user_env()
 
-        self.login('superadmin@example.com', is_super_admin=True)
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -240,7 +242,7 @@ class TestBase(unittest.TestCase):
         """Set the MODERATOR_EMAILS property."""
         self._stash_current_user_env()
 
-        self.login('superadmin@example.com', is_super_admin=True)
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -298,7 +300,6 @@ class TestBase(unittest.TestCase):
             exploration_id, state_name, answer, params, handler_name,
             exploration_version)
 
-
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a
@@ -314,9 +315,9 @@ class TestBase(unittest.TestCase):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
-        means that you can only use them once after construction, otherwise, the
-        generator will immediately raise StopIteration, and contextlib will raise
-        a RuntimeError.
+        means that you can only use them once after construction, otherwise,
+        the generator will immediately raise StopIteration, and contextlib will
+        raise a RuntimeError.
         """
         original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
@@ -367,6 +368,8 @@ class AppEngineTestBase(TestBase):
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
+        self.signup_superadmin_user()
+
     def tearDown(self):
         self.logout()
         self._delete_all_models()
@@ -394,7 +397,8 @@ class AppEngineTestBase(TestBase):
 
             https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
         """
-        queue_names = [queue_name] if queue_name else self._get_all_queue_names()
+        queue_names = (
+            [queue_name] if queue_name else self._get_all_queue_names())
 
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
         for q in queue_names:
@@ -432,16 +436,17 @@ else:
 
 class FunctionWrapper(object):
     """A utility for making function wrappers. Create a subclass and override
-       any or both of the pre_call_hook and post_call_hook methods. See these methods
-       for more info."""
+       any or both of the pre_call_hook and post_call_hook methods. See these
+       methods for more info."""
 
     def __init__(self, f):
         """Creates a new FunctionWrapper instance.
 
         args:
-          - f: a callable, or data descriptor. If it's a descriptor, its __get__
-            should return a bound method. For example, f can be a function, a
-            method, a static or class method, but not a @property."""
+          - f: a callable, or data descriptor. If it's a descriptor, its
+            __get__ should return a bound method. For example, f can be a
+            function, a method, a static or class method, but not a @property.
+        """
         self._f = f
         self._instance = None
 
@@ -460,9 +465,9 @@ class FunctionWrapper(object):
         return result
 
     def __get__(self, instance, owner):
-        # We have to implement __get__ because otherwise, we don't have a chance
-        # to bind to the instance self._f was bound to. See the following SO answer:
-        # http://stackoverflow.com/a/22555978/675311
+        # We have to implement __get__ because otherwise, we don't have a
+        # chance to bind to the instance self._f was bound to. See the
+        # following SO answer: https://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 
@@ -493,8 +498,9 @@ class CallCounter(FunctionWrapper):
 
 
 class FailingFunction(FunctionWrapper):
-    """A function wrapper that makes a function fail, raising a given exception.
-       It can be set to succeed after a given number of calls."""
+    """A function wrapper that makes a function fail, raising a given
+    exception. It can be set to succeed after a given number of calls.
+    """
 
     INFINITY = 'infinity'
 
@@ -504,16 +510,16 @@ class FailingFunction(FunctionWrapper):
         args:
           - f: see FunctionWrapper.
           - exception: the exception to be raised.
-          - num_tries_before_success: the number of times to raise an exception,
-            before a call succeeds. If this is 0, all calls will succeed, if it
-            is FailingFunction.INFINITY, all calls will fail.
+          - num_tries_before_success: the number of times to raise an
+            exception, before a call succeeds. If this is 0, all calls will
+            succeed, if it is FailingFunction.INFINITY, all calls will fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
-        self._always_fail = self._num_tries_before_success == FailingFunction.INFINITY
+        self._always_fail = (
+            self._num_tries_before_success == FailingFunction.INFINITY)
         self._times_called = 0
-
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
@@ -523,6 +529,7 @@ class FailingFunction(FunctionWrapper):
 
     def pre_call_hook(self, args):
         self._times_called += 1
-        call_should_fail = not self._num_tries_before_success < self._times_called
+        call_should_fail = (
+            self._num_tries_before_success >= self._times_called)
         if call_should_fail or self._always_fail:
             raise self._exception

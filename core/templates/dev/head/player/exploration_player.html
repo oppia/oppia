@@ -8,6 +8,7 @@
   {{ super() }}
   {% if exploration_version %}
     <script type="text/javascript">
+      GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
     </script>
   {% endif %}
@@ -25,40 +26,68 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
-      ng-controller="LearnerLocalNav">
-    <!-- TODO(sll): Implement this, and change the title and color accordingly after doing so. -->
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
     <li class="dropdown">
-      <a href="#" title="Share (not yet implemented)" class="dropdown-toggle" data-toggle="dropdown">
-        <span class="glyphicon glyphicon-share" style="color: #666"></span>
+      <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-share"></span>
       </a>
+      <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
+        <li>
+          <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
+          <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
+             onclick="javascript:window.open(this.href,
+                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
+             tooltip="Google+" tooltip-placement="left">
+            <img src="https://www.gstatic.com/images/icons/gplus-64.png"
+                 alt="Share on Google+"/>
+          </a>
+        </li>
+        <li>
+          <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
+            <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
+          </a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="#" title="Give feedback" ng-click="showFeedbackModal()">
+      <a href="" tooltip="Feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
-    <li>
-      <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-    </li>
+    {% if can_edit %}
+      <li>
+        <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </a>
+      </li>
+    {% endif %}
   </ul>
 {% endblock local_top_nav_options %}
 
 {% block content %}
   {{ skin_tag }}
   <br><br><br>
+  {% if not iframed %}
+    {% include 'attribution_guide.html' %}
+  {% endif %}
 
   <script type="text/ng-template" id="modals/playerFeedback">
     <div class="modal-header">
-      <h3>Give Feedback to the Exploration Editor</h3>
+      <h3>
+        <span ng-if="!stateName">
+          Give Feedback on this Exploration
+        </span>
+        <span ng-if="stateName">
+          Give Feedback on this Card
+        </span>
+      </h3>
     </div>
 
     <div class="modal-body">
       <p>
         <em>
-          This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
+          The feedback you write here will be sent to the editors of this exploration.
+          To give general feedback about Oppia, please use the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a> instead. Thanks in advance!
         </em>
       </p>
 
@@ -69,21 +98,6 @@
         </div>
         <label for="feedback">Feedback</label>
         <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-        <!-- Note that, for this to use the correct $scope.relatedTo, it must be an ng-show and not an ng-if. -->
-        <div ng-show="currentStateName !== 'END'">
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
-              This feedback relates to the current question.
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
-              This feedback relates to the exploration as a whole.
-            </label>
-          </div>
-        </div>
         <div ng-show="isLoggedIn">
           <hr>
           <div class="checkbox">
@@ -98,7 +112,7 @@
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
+      <button class="btn btn-success" ng-click="submit(subject, feedback, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
     </div>
   </script>
 
@@ -120,11 +134,14 @@
       <button class="btn btn-default" ng-click="cancel()">Close</button>
     </div>
   </script>
+
+  {% include 'components/exploration_embed_button.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_skins_js_file(skin_js_url) }}

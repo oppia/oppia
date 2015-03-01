@@ -12,6 +12,8 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.CATEGORIES_TO_COLORS = JSON.parse('{{CATEGORIES_TO_COLORS|js_string}}');
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
@@ -28,7 +30,7 @@
 
   <style>
     html, body {
-      background-color: #eeedee;
+      background-color: #eee;
     }
   </style>
 
@@ -36,11 +38,15 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="EditorNavbarBreadcrumb">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak" ng-controller="EditorNavbarBreadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span ng-if="navbarTitle">
-        <[navbarTitle]> (edit)
+        <[navbarTitle]>
+        <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
+        <span>
+          <[getCurrentTabName()]>
+        </span>
       </span>
       <span ng-if="!navbarTitle">
         Loading...
@@ -50,12 +56,12 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation" style="margin-left: 20px;">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
-      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator">
+      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
         <span class="oppia-exploration-warnings-count">
           <[countWarnings()]>
         </span>
@@ -64,28 +70,37 @@
         <span class="oppia-exploration-warnings-header">Warnings</span>
         <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
           <hr class="oppia-exploration-warnings-separator">
-          <[warning]>
+          <span ng-if="warning.type === 'critical'">
+            <strong><[warning.message]></strong>
+          </span>
+          <span ng-if="warning.type !== 'critical'">
+            <[warning.message]>
+          </span>
         </li>
       </ul>
     </li>
 
-    <li ng-class="{'active': getTabStatuses().active === 'preview'}" id="tutorialPreviewTab">
-      <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
-        <span class="glyphicon glyphicon-play"></span>
-      </a>
-    </li>
-
-    <li ng-class="{'active': getTabStatuses().active === 'stats'}">
-      <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
-        <span class="glyphicon glyphicon-stats"></span>
-      </a>
-    </li>
+    {% if username %}
+      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
+        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
+          <span class="glyphicon glyphicon-play"></span>
+        </a>
+      </li>
+    {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
         <span class="glyphicon glyphicon-cog"></span>
       </a>
     </li>
+
+    {% if username %}
+      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+      </li>
+    {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()" class="protractor-test-history-tab">
@@ -99,42 +114,45 @@
       </a>
     </li>
 
-    <li class="dropdown">
-      <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </a>
-      <ul class="dropdown-menu">
-        <li class="dropdown">
-          <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
-        </li>
-        <li class="dropdown">
-          <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
-            Planning Your Exploration
-          </a>
-        </li>
-        <li class="dropdown">
-          <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
-            Exploration Design Tips
-          </a>
-        </li>
-      </ul>
-      <div ng-if="postTutorialHelpPopoverIsShown" class="popover left oppia-post-tutorial-popover">
-        <div class="arrow"></div>
-        <div class="popover-content">If you need help in the future, click here!</div>
-      </div>
-    </li>
+    {% if username %}
+      <li class="dropdown">
+        <a href="#" tooltip="Help" tooltip-placement="bottom"
+           ng-click="openEditorTutorial()">
+          <span class="glyphicon glyphicon-question-sign"></span>
+        </a>
+        <div ng-if="postTutorialHelpPopoverIsShown" class="popover bottom oppia-post-tutorial-popover">
+          <div class="arrow"></div>
+          <div class="popover-content">If you need help in the future, click here!</div>
+        </div>
+      </li>
+    {% endif %}
   </ul>
 
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="ExplorationPublishButton">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="ExplorationSaveAndPublishButtons">
+    <li ng-if="isPrivate()">
+      <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+           title="<[getPublishExplorationButtonTooltip()]>">
+        <button type="button" class="btn btn-default protractor-test-publish-exploration"
+                ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
+                ng-click="showPublishExplorationModal()"
+                ng-disabled="isExplorationLockedForEditing() || countWarnings()">
+          Publish to Gallery
+        </button>
+      </div>
+    </li>
+
     <li ng-if="isEditableOutsideTutorialMode()">
-      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
-        <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+           title="<[getSaveButtonTooltip()]>">
+        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
-            Publish Draft
+            <span ng-if="!isPublic()">Save Draft</span>
+            <span ng-if="isPublic()">Publish Changes</span>
             <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span ng-if="isSaveInProgress">
-            Publishing...
+            <span ng-if="!isPublic()">Saving...</span>
+            <span ng-if="isPublic()">Publishing...</span>
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
@@ -150,12 +168,6 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  {% if announcement %}
-    <div class="oppia-align-center oppia-warning">
-      {{ announcement }}
-    </div>
-  {% endif %}
-
   <div ng-controller="ExplorationEditor" ng-cloak>
     <script type="text/ng-template" id="modals/publishExploration">
       <div class="modal-header">
@@ -167,7 +179,7 @@
           Congratulations, you are about to publish an exploration!
         </p>
         <p>
-          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/site_guidelines#/publication-criteria" target="_blank">why?</a>):
+          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/about#publication-criteria" target="_blank">why?</a>):
           <ul>
             <li>It should help its intended audience learn something new.</li>
             <li>It should convey more than a single isolated factoid.</li>
@@ -176,15 +188,10 @@
           </ul>
         </p>
         <p>
-          You can read more about these criteria on the <a href="/site_guidelines#/publication-criteria" target="_blank">exploration publishing criteria</a> page.
-        </p>
-
-        <p>
-          If your exploration meets all these criteria, please feel free to publish
-          it so that others can playtest and improve it! Good explorations can subsequently be
-          moved to the gallery. (You can find more information
-          <a href="/site_guidelines#/how-to-use" target="_blank">here</a>
-          about how this works.)
+          You can read more about these criteria on the
+          <a href="/about#publication-criteria" target="_blank">About page</a>.
+          If your exploration meets them all, please feel free to publish it so that others
+          can learn from and improve it!
         </p>
       </div>
 
@@ -265,7 +272,7 @@
       </div>
     </script>
 
-    <div class="container-fluid">
+    <div class="container-fluid" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
@@ -282,35 +289,15 @@
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
             <div class="oppia-editor-sidebar hidden-xs">
-              <div class="oppia-editor-sidebar-section-header">
-                Current State
+              <div>
+                {% include 'editor/exploration_graph.html' %}
               </div>
-              <div class="oppia-editor-sidebar-section-body">
-                {% include 'editor/sidebar_state_name.html' %}
+              <div>
+                {% include 'editor/state_statistics.html' %}
               </div>
-              <accordion close-others="true">
-                <accordion-group is-open="true">
-                  <accordion-heading>
-                    Map<span class="caret"></span>
-                  </accordion-heading>
-                  {% include 'editor/exploration_graph.html' %}
-                </accordion-group>
-                <accordion-group>
-                  <accordion-heading>Statistics<span class="caret"></span></accordion-heading>
-                  {% include 'editor/state_statistics.html' %}
-                </accordion-group>
-                <accordion-group>
-                  <accordion-heading>License information<span class="caret"></span></accordion-heading>
-                  <div role="contentinfo">
-                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
-                      <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                    </a>
-                    <span style="font-size: 0.8em">
-                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                    </span>
-                  </div>
-                </accordion-group>
-              </accordion>
+              <div>
+                {% include 'editor/sidebar_state_parameter_changes.html' %}
+              </div>
             </div>
           </div>
         </div>
@@ -342,17 +329,17 @@
   <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
   <svg width="0" height="0">
     <defs>
-      <marker id="arrowhead" viewBox="-5 -5 18 18" refX="10" refY="6"
-              markerWidth="6" markerHeight="9" orient="auto">
-        <path d="M -5 0 L 12 6 L -5 12 z" fill="grey"></path>
+      <marker id="arrowhead" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="grey"></path>
       </marker>
-      <marker id="arrowhead-green" viewBox="-5 -5 18 18" refX="10" refY="6"
-              markerWidth="6" markerHeight="9" orient="auto">
-        <path d="M -5 0 L 12 6 L -5 12 z" fill="#1F7D1F"></path>
+      <marker id="arrowhead-green" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="#1F7D1F"></path>
       </marker>
-      <marker id="arrowhead-red" viewBox="-5 -5 18 18" refX="10" refY="6"
-              markerWidth="6" markerHeight="9" orient="auto">
-        <path d="M -5 0 L 12 6 L -5 12 z" fill="#B22222"></path>
+      <marker id="arrowhead-red" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="#B22222"></path>
       </marker>
       <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
         <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>
@@ -369,6 +356,7 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
+  {% include 'components/exploration_embed_button.html' %}
   {% include 'components/visualizations.html' %}
 
 {% endblock content %}
@@ -377,14 +365,13 @@
   {{ super() }}
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script>
-    {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationEditor.js') }}
+    {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
-    {{ include_js_file('components/objectEditor.js') }}
-    {{ object_editors_js }}
     {{ include_js_file('editor/RouterServices.js') }}
     {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
@@ -392,7 +379,9 @@
     {{ include_js_file('editor/HistoryServices.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/SidebarStateName.js') }}
+    {{ include_js_file('editor/SidebarStateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
+    {{ include_js_file('editor/StateRules.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/StateInteraction.js') }}
@@ -400,6 +389,7 @@
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
+
     {% for skin_js_url in skin_js_urls %}
       {{ include_skins_js_file(skin_js_url) }}
     {% endfor %}
@@ -407,4 +397,5 @@
 
   {{ skin_templates }}
   {{ interaction_templates }}
+  {{ interaction_validators_html }}
 {% endblock footer_js %}

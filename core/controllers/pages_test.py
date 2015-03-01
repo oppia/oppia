@@ -26,4 +26,5 @@ class NoninteractivePagesTest(test_utils.GenericTestBase):
         response = self.testapp.get('/about')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('What is Oppia?', 'About this site', 'License')
+        response.mustcontain(
+            'Exploration Publishing Criteria', 'Contact', 'License')

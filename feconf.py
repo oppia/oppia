@@ -54,8 +54,17 @@ DEFAULT_QUERY_LIMIT = 1000
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
-# The default number of items to show on a page in a paged view.
-DEFAULT_PAGE_SIZE = 50
+# The default number of exploration tiles to load at a time in the gallery
+# page.
+GALLERY_PAGE_SIZE = 10
+
+# The default number of commits to show on a page in the exploration history
+# tab.
+COMMIT_LIST_PAGE_SIZE = 50
+
+# The default number of items to show on a page in the exploration feedback
+# tab.
+FEEDBACK_TAB_PAGE_SIZE = 20
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First State'
@@ -78,13 +87,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'png': ['png'],
     'gif': ['gif']
 }
-
-DEFAULT_EDITOR_PREREQUISITES_AGREEMENT = """
-I understand and agree that any contributions I make to this site will be
-licensed under CC-BY-SA v4.0, with a waiver of the attribution requirement. I
-will not contribute material to the site (including images and files that are
-part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
-"""
 
 # Static file url to path mapping
 PATH_MAP = {
@@ -113,7 +115,7 @@ XSSI_PREFIX = ')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
+AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
 INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
     'pow', 'round', 'then']
@@ -163,6 +165,9 @@ ALLOWED_INTERACTIONS = {
     'Continue': {
         'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
     },
+    'EndConversation': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'EndConversation')
+    },
     'GraphInput': {
         'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
     },
@@ -205,7 +210,7 @@ DEMO_EXPLORATIONS = [
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('counting.yaml', 'Three Balls', 'Mathematics'),
+    ('three_balls', 'Three Balls', 'Mathematics'),
     ('cities.yaml', 'World Cities', 'Geography'),
     ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
     ('hola.yaml', u'¡Hola!', 'Languages'),
@@ -214,16 +219,17 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
-    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
+    ('test_interactions', 'Test of expressions and interactions', 'Test'),
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
+    ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
+    ('solar_system', 'The Solar System', 'Physics'),
+    ('about_oppia.yaml', 'About Oppia', 'Welcome'),
 ]
 
 # TODO(sll): Add all other URLs here.
 CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
-EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
-EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
@@ -235,7 +241,6 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_LOGIN_REDIRECT_URL = '/gallery_login_redirect'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -243,6 +248,8 @@ PLAYTEST_QUEUE_URL = '/playtest'
 PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SIGNUP_URL = '/signup'
+SIGNUP_DATA_URL = '/signuphandler/data'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
@@ -285,6 +292,52 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # The name for the default handler of an interaction.
 SUBMIT_HANDLER_NAME = 'submit'
+
+# Default color
+COLOR_TEAL = 'teal'
+# Social sciences
+COLOR_SALMON = 'salmon'
+# Art
+COLOR_SUNNYSIDE = 'sunnyside'
+# Mathematics and computing
+COLOR_SHARKFIN = 'sharkfin'
+# Science
+COLOR_GUNMETAL = 'gunmetal'
+DEFAULT_COLOR = COLOR_TEAL
+
+# List of supported default categories. For now, each category has
+# a specific color associated with it.
+CATEGORIES_TO_COLORS = {
+    'Architecture': COLOR_SUNNYSIDE,
+    'Art': COLOR_SUNNYSIDE,
+    'Biology': COLOR_GUNMETAL,
+    'Business': COLOR_SALMON,
+    'Chemistry': COLOR_GUNMETAL,
+    'Computing': COLOR_SHARKFIN,
+    'Economics': COLOR_SALMON,
+    'Education': COLOR_TEAL,
+    'Engineering': COLOR_GUNMETAL,
+    'Environment': COLOR_GUNMETAL,
+    'Geography': COLOR_SALMON,
+    'Government': COLOR_SALMON,
+    'Hobbies': COLOR_TEAL,
+    'Languages': COLOR_SUNNYSIDE,
+    'Law': COLOR_SALMON,
+    'Life Skills': COLOR_TEAL,
+    'Mathematics': COLOR_SHARKFIN,
+    'Medicine': COLOR_GUNMETAL,
+    'Music': COLOR_SUNNYSIDE,
+    'Philosophy': COLOR_SALMON,
+    'Physics': COLOR_GUNMETAL,
+    'Programming': COLOR_SHARKFIN,
+    'Psychology': COLOR_SALMON,
+    'Puzzles': COLOR_TEAL,
+    'Reading': COLOR_TEAL,
+    'Religion': COLOR_SALMON,
+    'Sport': COLOR_SUNNYSIDE,
+    'Statistics': COLOR_SHARKFIN,
+    'Welcome': COLOR_TEAL,
+}
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

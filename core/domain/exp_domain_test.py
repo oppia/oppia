@@ -51,6 +51,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.category = 'Category'
 
+        # Note: If '/' ever becomes a valid state name, ensure that the rule
+        # editor frontend tenplate is fixed -- it currently uses '/' as a
+        # sentinel for an invalid state name.
+        bad_state = exp_domain.State.create_default_state('/')
+        exploration.states = {'/': bad_state}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid character / in a state name'):
+            exploration.validate()
+
         new_state = exp_domain.State.create_default_state('ABC')
 
         # The 'states' property must be a non-empty dict of states.
@@ -174,7 +183,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
             'interaction': {
                 'customization_args': {
                     'placeholder': {
-                        'value': 'Type your answer here.'
+                        'value': ''
                     },
                     'rows': {
                         'value': 1
@@ -193,7 +202,6 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     }]
                 }],
                 'id': u'TextInput',
-                'sticky': False,
             },
             'param_changes': [],
         }
@@ -224,7 +232,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -236,7 +244,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   New state:
     content:
@@ -245,7 +252,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -257,7 +264,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -402,7 +408,7 @@ states:
     widget:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -423,7 +429,7 @@ states:
     widget:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -457,7 +463,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -469,7 +475,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   New state:
     content:
@@ -478,7 +483,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -490,7 +495,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
 """)
 
@@ -541,7 +545,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 'interaction': {
                     'customization_args': {
                         'placeholder': {
-                            'value': 'Type your answer here.'
+                            'value': ''
                         },
                         'rows': {
                             'value': 1
@@ -560,7 +564,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         }],
                     }],
                     'id': 'TextInput',
-                    'sticky': False,
                 },
                 'param_changes': [],
             }
