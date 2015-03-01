@@ -31,6 +31,7 @@ import urllib
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import user_services
@@ -55,6 +56,11 @@ CSRF_SECRET = config_domain.ConfigProperty(
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     'before_end_head_tag_hook', {'type': 'unicode'},
     'Code to insert just before the closing </head> tag in all pages.', '')
+
+OBJECT_EDITORS_JS = config_domain.ComputedProperty(
+    'object_editors_js', {'type': 'unicode'},
+    'JavaScript code for the object editors',
+    obj_services.get_all_object_editor_js_templates)
 
 
 def require_user(handler):
@@ -307,6 +313,9 @@ class BaseHandler(webapp2.RequestHandler):
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'user_is_logged_in': bool(self.username),
+            # TODO(sll): Consider including the obj_editor html directly as part of the
+            # base HTML template?
+            'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
         })
 
         if redirect_url_on_logout is None:

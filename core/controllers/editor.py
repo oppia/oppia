@@ -93,11 +93,6 @@ VALUE_GENERATORS_JS = config_domain.ComputedProperty(
     'value_generators_js', {'type': 'unicode'},
     'JavaScript code for the value generators', get_value_generators_js)
 
-OBJECT_EDITORS_JS = config_domain.ComputedProperty(
-    'object_editors_js', {'type': 'unicode'},
-    'JavaScript code for the object editors',
-    obj_services.get_all_object_editor_js_templates)
-
 MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
     'https://moderator/request/forum/url')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
@@ -200,9 +195,6 @@ class ExplorationPage(EditorHandler):
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(exploration_id))
 
-        # TODO(sll): Consider including the obj_generator html in a ng-template
-        # to remove the need for an additional RPC?
-        object_editors_js = OBJECT_EDITORS_JS.value
         value_generators_js = VALUE_GENERATORS_JS.value
 
         interaction_ids = (
@@ -251,7 +243,6 @@ class ExplorationPage(EditorHandler):
                 interaction_validators_html),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
-            'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'skin_js_urls': [
                 skins_services.Registry.get_skin_js_url(skin_id)
