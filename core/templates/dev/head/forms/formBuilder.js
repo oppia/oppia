@@ -779,6 +779,155 @@ oppia.directive('richTextEditor', [
 ]);
 
 
+// Add RTE extensions to textAngular toolbar options.
+oppia.config(['$provide', function($provide) {
+  $provide.decorator('taOptions', [
+      'taRegisterTool', '$delegate', '$modal', '$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+      function(taRegisterTool, taOptions, $modal, $filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
+
+    var _RICH_TEXT_COMPONENTS = [];
+
+    var createRteElement = function(componentDefn, customizationArgsDict) {
+      var el = $('<img/>');
+      el.attr('src', componentDefn.iconDataUrl);
+      el.addClass('oppia-noninteractive-' + componentDefn.name);
+
+      for (var attrName in customizationArgsDict) {
+        el.attr(
+          $filter('camelCaseToHyphens')(attrName) + '-with-value',
+          oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+      }
+
+      var domNode = el.get(0);
+      return domNode;
+    };
+
+    // Replace <img> tags with <oppia-noninteractive> tags.
+    var convertRteToHtml = function(rte) {
+      var elt = $('<div>' + rte + '</div>');
+
+      _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+          var jQueryElt = $('<' + this.className + '/>');
+          for (var i = 0; i < this.attributes.length; i++) {
+            var attr = this.attributes[i];
+            if (attr.name !== 'class' && attr.name !== 'src') {
+              jQueryElt.attr(attr.name, attr.value);
+            }
+          }
+          return jQueryElt.get(0);
+        });
+      });
+
+      return elt.html();
+    };
+
+    var componentIds = Object.keys(RTE_COMPONENT_SPECS);
+    componentIds.sort().forEach(function(componentId) {
+      RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
+      RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
+      RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+      _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+    });
+
+    _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+      taRegisterTool(componentDefn.name, {
+        buttontext: componentDefn.name,
+        action: function() {
+          var textAngular = this;
+          $modal.open({
+            templateUrl: 'modals/customizeRteComponent',  
+            backdrop: 'static',
+            resolve: {
+              customizationArgSpecs: function() {
+                return componentDefn.customization_arg_specs;
+              }
+            },
+            controller: ['$scope', '$modalInstance', 'customizationArgSpecs',
+                         function($scope, $modalInstance, customizationArgSpecs) {
+              var attrsCustomizationArgsDict = {};
+
+              $scope.customizationArgSpecs = customizationArgSpecs;
+              console.log($scope.customizationArgSpecs);
+
+              $scope.tmpCustomizationArgs = [];
+              for (var i = 0; i < customizationArgSpecs.length; i++) {
+                var caName = customizationArgSpecs[i].name;
+                $scope.tmpCustomizationArgs.push({
+                  name: caName,
+                  value: (
+                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                    attrsCustomizationArgsDict[caName] :
+                    customizationArgSpecs[i].default_value)
+                });
+              }
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+
+              $scope.save = function(customizationArgs) {
+                $scope.$broadcast('externalSave');
+
+                var customizationArgsDict = {};
+                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                  var caName = $scope.tmpCustomizationArgs[i].name;
+                  customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
+                }
+
+                $modalInstance.close(customizationArgsDict);
+              };
+            }]
+          }).result.then(function(customizationArgsDict) {
+            var innerElt = createRteElement(componentDefn, customizationArgsDict);
+            var container = document.createElement('div');
+            container.appendChild(innerElt);
+            var el = convertRteToHtml(container.innerHTML, _RICH_TEXT_COMPONENTS);
+            textAngular.$editor().wrapSelection('insertHtml', el);
+          });
+        }
+      });
+
+      taOptions.toolbar[3].push(componentDefn.name);
+    });
+
+    return taOptions;
+  }]);
+}]);
+
+oppia.directive('textAngularRte', ['taApplyCustomRenderers', function(taApplyCustomRenderers) {
+  return {
+    restrict: 'E',
+    scope: {
+      htmlContent: '=',
+    },
+    template: '<div text-angular="" ng-model="tempContent">',
+    controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs){
+      $scope._replaceWithPlaceholder = function(raw){
+        var converted;
+        var openingTag = /<iframe/g;
+        var closingTag = /><\/iframe>/g;
+        var srcAttr = /src="[^\s]*"/g;
+        converted = raw.replace(openingTag, '<img');
+        converted = converted.replace(closingTag, '/>');
+        converted = converted.replace(srcAttr, 'src=""');
+        return converted;
+      };
+
+      $scope.init = function(){
+        $scope.tempContent = $scope._replaceWithPlaceholder($scope.htmlContent);
+      };
+
+      $scope.init();
+      $scope.$watch(function(){return $scope.tempContent}, function(newVal, oldVal){
+        $scope.htmlContent = taApplyCustomRenderers(newVal);
+      });
+    }],
+  };
+}]);
+
+
+
 // The names of these filters must correspond to the names of the backend
 // validators (with underscores converted to camelcase).
 // WARNING: These filters do not validate the arguments supplied with the
