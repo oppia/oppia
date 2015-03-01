@@ -99,10 +99,10 @@
                   </div>
 
                   <div class="navbar-header pull-right">
-                    <ul class="nav navbar-nav oppia-navbar-nav" style="margin: 0px;">
+                    <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                       {% if username %}
                         <li class="dropdown pull-right">
-                          <a class="dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                          <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                             <div class="oppia-navbar-profile-picture-container">
                               {% if profile_picture_data_url %}
                                 <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
@@ -130,7 +130,7 @@
                               {% endif %}
                             </div>
                           </a>
-                          <ul class="dropdown-menu ng-cloak" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                          <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                             <li>
                               <a href="/dashboard">
                                 Dashboard
