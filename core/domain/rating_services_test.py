@@ -18,6 +18,8 @@
 
 __author__ = 'Jacob Davis'
 
+import datetime
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rating_services
@@ -65,6 +67,27 @@ class RatingServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             rating_services.get_overall_ratings(self.EXP_ID),
             {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
+
+    def test_time_of_ratings_recorded(self):
+        """Check that the time a rating is given is recorded correctly."""
+
+        TIME_ALLOWED_FOR_COMPUTATION = datetime.timedelta(seconds=10)
+
+        self.exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.EXP_ID, self.exploration)
+
+        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 1)
+        first_rating_time = rating_services.get_when_rated(
+            self.USER_ID_1, self.EXP_ID)
+        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 3)
+        second_rating_time = rating_services.get_when_rated(
+            self.USER_ID_1, self.EXP_ID)
+
+        self.assertLess(first_rating_time, second_rating_time)
+        self.assertLess(
+            second_rating_time,
+            datetime.datetime.utcnow() + TIME_ALLOWED_FOR_COMPUTATION)
 
     def test_rating_assignations_do_not_conflict(self):
         """Check that ratings of different explorations are independant."""
@@ -114,7 +137,8 @@ class RatingServicesTests(test_utils.GenericTestBase):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 7)
 
         with self.assertRaisesRegexp(
-                ValueError, 'Expected a rating 1-5, received: 2'):
+                ValueError,
+                'Expected the rating to be an integer, received: 2'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, '2')
 
         with self.assertRaisesRegexp(
@@ -125,3 +149,4 @@ class RatingServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
                 Exception, 'Invalid exploration id invalid_id'):
             rating_services.assign_rating(self.USER_ID_1, 'invalid_id', '3')
+

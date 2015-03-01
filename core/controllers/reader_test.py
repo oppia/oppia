@@ -298,31 +298,33 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
 class RatingsIntegrationTests(test_utils.GenericTestBase):
     """Integration tests of ratings recording and display."""
 
-    def test_assign_and_read_ratings(self):
-        """Test the PUT and GET methods for ratings."""
-
-        # Load demo exploration
-        EXP_ID = '0'
+    def setUp(self):
+        super(RatingsIntegrationTests, self).setUp()
+        self.EXP_ID = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
+    def test_assign_and_read_ratings(self):
+        """Test the PUT and GET methods for ratings."""
+
+        self.signup('user@example.com', 'user')
         self.login('user@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % EXP_ID))
+            self.testapp.get('/explore/%s' % self.EXP_ID))
 
         # User checks rating
-        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user'], None)
         self.assertEqual(
             ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
         # User rates and checks rating
         self.put_json(
-            '/explorehandler/rating/%s' % EXP_ID, {
+            '/explorehandler/rating/%s' % self.EXP_ID, {
                 'rating': 2
             }, csrf_token
         )
-        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user'], 2)
         self.assertEqual(
             ratings['overall'], {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
@@ -330,25 +332,33 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         # User re-rates and checks rating
         self.login('user@example.com')
         self.put_json(
-            '/explorehandler/rating/%s' % EXP_ID, {
+            '/explorehandler/rating/%s' % self.EXP_ID, {
                 'rating': 5
             }, csrf_token
         )
-        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user'], 5)
         self.assertEqual(
             ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
 
         self.logout()
 
-        # Non-logged in users can view ratings but cannot submit them
-        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+    def test_non_logged_in_users_cannot_rate(self):
+        """Check non logged-in users can view but not submit ratings."""
+
+        self.signup('user@example.com', 'user')
+        self.login('user@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        self.logout()
+
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user'], None)
         self.assertEqual(
-            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
+            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
         with self.assertRaisesRegexp(Exception, 'Bad response: 401'):
             self.put_json(
-                '/explorehandler/rating/%s' % EXP_ID, {
+                '/explorehandler/rating/%s' % self.EXP_ID, {
                     'rating': 1
                 }, csrf_token
             )
@@ -356,16 +366,14 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
     def test_ratings_by_different_users(self):
         """Check that ratings by different users do not interfere."""
 
-        # Load demo exploration
-        EXP_ID = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        self.signup('a@example.com', 'b')
+        self.signup('b@example.com', 'a')
 
         self.login('a@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % EXP_ID))
+            self.testapp.get('/explore/%s' % self.EXP_ID))
         self.put_json(
-            '/explorehandler/rating/%s' % EXP_ID, {
+            '/explorehandler/rating/%s' % self.EXP_ID, {
                 'rating': 4
             }, csrf_token
         )
@@ -373,15 +381,15 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.login('b@example.com')
         csrf_token = self.get_csrf_token_from_response(
-            self.testapp.get('/explore/%s' % EXP_ID))
-        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user'], None)
         self.put_json(
-            '/explorehandler/rating/%s' % EXP_ID, {
+            '/explorehandler/rating/%s' % self.EXP_ID, {
                 'rating': 4
             }, csrf_token
         )
-        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user'], 4)
         self.assertEqual(
             ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})

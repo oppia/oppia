@@ -16,6 +16,7 @@
 
 """Stores various configuration options and constants for Oppia."""
 
+import copy
 import os
 
 # Whether to unconditionally log info messages.
@@ -119,6 +120,13 @@ AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
 INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
     'pow', 'round', 'then']
+
+# These are here rather than in rating_services.py to avoid import
+# circularities with exp_services.
+# TODO (Jacob) Refactor exp_services to remove this problem.
+_EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+def get_empty_ratings():
+    return copy.deepcopy(_EMPTY_RATINGS)
 
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'

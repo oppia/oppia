@@ -95,7 +95,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
 
     Instances of this class have keys of the form
-    [user id].[exploration id]
+    [USER_ID].[EXPLORATION_ID]
     """
 
     # The user id
@@ -104,21 +104,24 @@ class ExplorationUserDataModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True)
 
     # The rating (1-5) the user assigned to the exploration
-    rating = ndb.IntegerProperty(default=None, indexed=False)
+    rating = ndb.IntegerProperty(default=None, indexed=True)
+
+    # When the most recent rating was awarded, or None if not rated
+    when_rated = ndb.DateTimeProperty(default=None, indexed=False)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
-        return user_id + '.' + exploration_id
+        return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
     def create(cls, user_id, exploration_id):
-        """Creates a new ExplorationUserDataModel entry and returns it"""
+        """Creates a new ExplorationUserDataModel entry and returns it."""
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(id=instance_id)
 
     @classmethod
     def get(cls, user_id, exploration_id):
-        """Gets the ExplorationUserDataModel for the given ids"""
+        """Gets the ExplorationUserDataModel for the given ids."""
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)

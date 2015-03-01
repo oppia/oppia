@@ -26,6 +26,7 @@ from core.domain import exp_jobs
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
+import feconf
 (job_models, exp_models,) = models.Registry.import_models([
    models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
@@ -180,7 +181,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exploration.objective,
                     exploration.language_code,
                     exploration.skill_tags,
-                    {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+                    feconf.get_empty_ratings(),
                     spec['status'],
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
