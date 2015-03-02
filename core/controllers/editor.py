@@ -90,23 +90,16 @@ def get_value_generators_js():
     return value_generators_js
 
 VALUE_GENERATORS_JS = config_domain.ComputedProperty(
-    'value_generators_js', 'UnicodeString',
+    'value_generators_js', {'type': 'unicode'},
     'JavaScript code for the value generators', get_value_generators_js)
 
-OBJECT_EDITORS_JS = config_domain.ComputedProperty(
-    'object_editors_js', 'UnicodeString',
-    'JavaScript code for the object editors',
-    obj_services.get_all_object_editor_js_templates)
-
-EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
-    'editor_page_announcement', 'Html',
-    'A persistent announcement to display on top of all editor pages.',
-    default_value='')
+MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
+    'https://moderator/request/forum/url')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', 'UnicodeString',
+    'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
     'in the gallery',
-    default_value='https://moderator/request/forum/url')
+    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -202,9 +195,6 @@ class ExplorationPage(EditorHandler):
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(exploration_id))
 
-        # TODO(sll): Consider including the obj_generator html in a ng-template
-        # to remove the need for an additional RPC?
-        object_editors_js = OBJECT_EDITORS_JS.value
         value_generators_js = VALUE_GENERATORS_JS.value
 
         interaction_ids = (
@@ -221,6 +211,9 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
+        interaction_validators_html = (
+            interaction_registry.Registry.get_validators_html(
+                interaction_ids))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
@@ -228,8 +221,6 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
-            'announcement': jinja2.utils.Markup(
-                EDITOR_PAGE_ANNOUNCEMENT.value),
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(exploration_id),
             'can_edit': can_edit,
@@ -248,9 +239,10 @@ class ExplorationPage(EditorHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
+            'interaction_validators_html': jinja2.utils.Markup(
+                interaction_validators_html),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
-            'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'skin_js_urls': [
                 skins_services.Registry.get_skin_js_url(skin_id)
@@ -258,6 +250,8 @@ class ExplorationPage(EditorHandler):
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            # This is needed for the exploration preview.
+            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,

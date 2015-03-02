@@ -39,18 +39,33 @@ import jinja2
 EXPLORATION_ID_KEY = 'explorationId'
 
 ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
-    'allow_yaml_file_upload', 'Boolean',
+    'allow_yaml_file_upload', {'type': 'bool'},
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
 
-CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
-    'contribute_gallery_page_announcement', 'Html',
-    'An announcement to display on top of the contribute gallery page.',
-    default_value='')
-
-BANNER_ALT_TEXT = config_domain.ConfigProperty(
-    'banner_alt_text', 'UnicodeString',
-    'The alt text for the site banner image', default_value='')
+CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
+    'carousel_slides_config', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'topic',
+                'description': 'Topic of the exploration',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'exploration_id',
+                'description': 'The exploration ID',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'image_filename',
+                'description': (
+                    'Filename of the carousel image (in /images/splash)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Configuration for slides in the gallery carousel.',
+    default_value=[])
 
 
 class GalleryPage(base.BaseHandler):
@@ -66,12 +81,12 @@ class GalleryPage(base.BaseHandler):
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_CREATE_MODE_URL)),
+            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': [{
                 'code': lc['code'],
                 'name': utils.get_short_language_description(
                     lc['description']),
             } for lc in feconf.ALL_LANGUAGE_CODES],
-            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
         self.render_template('galleries/gallery.html')
 
@@ -81,11 +96,8 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        # TODO(sll): Implement paging.
-
-        # TODO(sll): Precompute and cache gallery categories. Or have a fixed
-        # list of categories and 'Other', and gradually classify the
-        # explorations in 'Other'.
+        # TODO(sll): Figure out what to do about explorations in categories
+        # other than those explicitly listed.
 
         language_codes_to_short_descs = {
             lc['code']: utils.get_short_language_description(lc['description'])
@@ -94,16 +106,15 @@ class GalleryHandler(base.BaseHandler):
 
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
-        if query_string:
-            # The user is performing a search.
-            exp_summaries_dict, search_cursor = (
-                exp_services.get_exploration_summaries_matching_query(
-                    query_string, cursor=search_cursor))
-        else:
-            # Get non-private exploration summaries
-            search_cursor = None
-            exp_summaries_dict = (
-                exp_services.get_non_private_exploration_summaries())
+        exp_summaries_list, search_cursor = (
+            exp_services.get_exploration_summaries_matching_query(
+                query_string, cursor=search_cursor))
+
+        def _get_intro_card_color(category):
+            return (
+                feconf.CATEGORIES_TO_COLORS[category] if
+                category in feconf.CATEGORIES_TO_COLORS else
+                feconf.DEFAULT_COLOR)
 
         # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
         # individual lookups. Note that this will depend on user_id.
@@ -117,10 +128,13 @@ class GalleryHandler(base.BaseHandler):
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
             'community_owned': exp_summary.community_owned,
+            'thumbnail_image_url': (
+                '/images/gallery/exploration_background_%s_small.png' %
+                _get_intro_card_color(exp_summary.category)),
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
                 user_id=self.user_id)
-        } for exp_summary in exp_summaries_dict.values()]
+        } for exp_summary in exp_summaries_list]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -128,31 +142,13 @@ class GalleryHandler(base.BaseHandler):
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
-        public_explorations_list = []
-        featured_explorations_list = []
-
-        for e_dict in explorations_list:
-            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
-                public_explorations_list.append(e_dict)
-            elif (e_dict['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLICIZED):
-                featured_explorations_list.append(e_dict)
-
-        public_explorations_list = sorted(
-            public_explorations_list, key=lambda x: x['last_updated'],
-            reverse=True)
-        publicized_explorations_list = sorted(
-            featured_explorations_list, key=lambda x: x['last_updated'],
-            reverse=True)
-
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
         self.values.update({
-            'featured': publicized_explorations_list,
-            'public': public_explorations_list,
+            'explorations_list': explorations_list,
             'preferred_language_codes': preferred_language_codes,
             'search_cursor': search_cursor,
         })

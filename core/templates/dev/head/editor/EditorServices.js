@@ -932,10 +932,17 @@ oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', fun
 }]);
 
 
+oppia.constant('WARNING_TYPES', {
+  // These must be fixed before the exploration can be saved.
+  CRITICAL: 'critical',
+  // These must be fixed before publishing an exploration to the gallery.
+  ERROR: 'error'
+});
+
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
-    'graphDataService', 'explorationStatesService', 'explorationObjectiveService', 'INTERACTION_SPECS',
-    function(graphDataService, explorationStatesService, explorationObjectiveService, INTERACTION_SPECS) {
+    '$filter', 'graphDataService', 'explorationStatesService', 'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
+    function($filter, graphDataService, explorationStatesService, explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES) {
   var _warningsList = [];
 
   // Given a list of initial node ids, a object with keys node ids, and values
@@ -982,35 +989,6 @@ oppia.factory('explorationWarningsService', [
     });
   };
 
-  // Returns a list of states which have rules that have no feedback and that
-  // point back to the same state.
-  var _getStatesWithInsufficientFeedback = function() {
-    var problematicStates = [];
-    var _states = explorationStatesService.getStates();
-    for (var stateName in _states) {
-      if (INTERACTION_SPECS[_states[stateName].interaction.id].is_terminal) {
-        continue;
-      }
-
-      var handlers = _states[stateName].interaction.handlers;
-      var isProblematic = handlers.some(function(handler) {
-        return handler.rule_specs.some(function(ruleSpec) {
-          return (
-            ruleSpec.dest === stateName &&
-            !ruleSpec.feedback.some(function(feedbackItem) {
-              return feedbackItem.length > 0;
-            })
-          );
-        });
-      });
-
-      if (isProblematic) {
-        problematicStates.push(stateName);
-      }
-    }
-    return problematicStates;
-  };
-
   var _updateWarningsList = function() {
     _warningsList = [];
 
@@ -1027,31 +1005,49 @@ oppia.factory('explorationWarningsService', [
       }
 
       if (unreachableStateNames.length) {
-        _warningsList.push(
-          'The following state(s) are unreachable: ' +
-          unreachableStateNames.join(', ') + '.');
+        _warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'The following state(s) are unreachable: ' +
+            unreachableStateNames.join(', ') + '.')          
+        });
       } else {
         // Only perform this check if all states are reachable.
         var deadEndStates = _getUnreachableNodeNames(
           _graphData.finalStateIds, _graphData.nodes,
           _getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
-          _warningsList.push(
-            'Please make sure there\'s a path to END from each of: ' +
-            deadEndStates.join(', ') + '.');
+          _warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please make sure there\'s a path to END from each of: ' +
+              deadEndStates.join(', ') + '.')
+          });            
         }
       }
     }
 
-    var statesWithInsufficientFeedback = _getStatesWithInsufficientFeedback();
-    if (statesWithInsufficientFeedback.length) {
-      _warningsList.push(
-        'Please give Oppia more detail about what to say in these states: ' +
-        statesWithInsufficientFeedback.join(', ') + '.');
+    var _states = explorationStatesService.getStates();
+    for (var stateName in _states) {
+      var validatorName = 'oppiaInteractive' + _states[stateName].interaction.id + 'Validator';
+      var interactionWarnings = $filter(validatorName)(
+        stateName,
+        _states[stateName].interaction.customization_args,
+        _states[stateName].interaction.handlers[0].rule_specs);
+
+      for (var i = 0; i < interactionWarnings.length; i++) {
+        _warningsList.push({
+          type: interactionWarnings[i].type,
+          message: 'In \'' + stateName + '\', ' + interactionWarnings[i].message
+        });
+      }
     }
 
     if (!explorationObjectiveService.displayed) {
-      _warningsList.push('Please specify an objective (in the Settings tab).');
+      _warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'Please specify an objective (in the Settings tab).'
+      });
     }
   };
 
@@ -1060,10 +1056,15 @@ oppia.factory('explorationWarningsService', [
       return _warningsList.length;
     },
     getWarnings: function() {
-      return angular.copy(_warningsList);
+      return _warningsList;
     },
     updateWarnings: function() {
       _updateWarningsList();
+    },
+    hasCriticalWarnings: function() {
+      return _warningsList.some(function(warning) {
+        return warning.type === WARNING_TYPES.CRITICAL;
+      });
     }
   };
 }]);

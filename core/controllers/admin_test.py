@@ -69,7 +69,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 
-        ANNOUNCEMENT_TEXT = self.UNICODE_TEST_STRING
+        TEST_STRING = self.UNICODE_TEST_STRING
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -78,13 +78,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': ''
-        }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
+            'value': editor.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
+        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.EDITOR_PAGE_ANNOUNCEMENT.name: ANNOUNCEMENT_TEXT
+                editor.MODERATOR_REQUEST_FORUM_URL.name: TEST_STRING
             }
         }
         self.post_json('/adminhandler', payload, csrf_token)
@@ -92,8 +92,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': ANNOUNCEMENT_TEXT
-        }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
+            'value': TEST_STRING
+        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         self.logout()
 

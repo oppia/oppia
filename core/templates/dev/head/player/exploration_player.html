@@ -28,7 +28,7 @@
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
     <li class="dropdown">
-      <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle" data-toggle="dropdown">
+      <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
       </a>
       <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
@@ -37,20 +37,20 @@
           <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
              onclick="javascript:window.open(this.href,
                       '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
-             tooltip="Share on Google+" tooltip-placement="right">
+             tooltip="Google+" tooltip-placement="left">
             <img src="https://www.gstatic.com/images/icons/gplus-64.png"
                  alt="Share on Google+"/>
           </a>
         </li>
         <li>
-          <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="right">
+          <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
           </a>
         </li>
       </ul>
     </li>
     <li>
-      <a href="" tooltip="Give feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
+      <a href="" tooltip="Feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>

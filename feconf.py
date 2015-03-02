@@ -88,13 +88,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'gif': ['gif']
 }
 
-DEFAULT_EDITOR_PREREQUISITES_AGREEMENT = """
-I understand and agree that any contributions I make to this site will be
-licensed under CC-BY-SA v4.0, with a waiver of the attribution requirement. I
-will not contribute material to the site (including images and files that are
-part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
-"""
-
 # Static file url to path mapping
 PATH_MAP = {
     '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
@@ -226,7 +219,7 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
+    ('test_interactions', 'Test of expressions and interactions', 'Test'),
     ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
@@ -299,6 +292,52 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # The name for the default handler of an interaction.
 SUBMIT_HANDLER_NAME = 'submit'
+
+# Default color
+COLOR_TEAL = 'teal'
+# Social sciences
+COLOR_SALMON = 'salmon'
+# Art
+COLOR_SUNNYSIDE = 'sunnyside'
+# Mathematics and computing
+COLOR_SHARKFIN = 'sharkfin'
+# Science
+COLOR_GUNMETAL = 'gunmetal'
+DEFAULT_COLOR = COLOR_TEAL
+
+# List of supported default categories. For now, each category has
+# a specific color associated with it.
+CATEGORIES_TO_COLORS = {
+    'Architecture': COLOR_SUNNYSIDE,
+    'Art': COLOR_SUNNYSIDE,
+    'Biology': COLOR_GUNMETAL,
+    'Business': COLOR_SALMON,
+    'Chemistry': COLOR_GUNMETAL,
+    'Computing': COLOR_SHARKFIN,
+    'Economics': COLOR_SALMON,
+    'Education': COLOR_TEAL,
+    'Engineering': COLOR_GUNMETAL,
+    'Environment': COLOR_GUNMETAL,
+    'Geography': COLOR_SALMON,
+    'Government': COLOR_SALMON,
+    'Hobbies': COLOR_TEAL,
+    'Languages': COLOR_SUNNYSIDE,
+    'Law': COLOR_SALMON,
+    'Life Skills': COLOR_TEAL,
+    'Mathematics': COLOR_SHARKFIN,
+    'Medicine': COLOR_GUNMETAL,
+    'Music': COLOR_SUNNYSIDE,
+    'Philosophy': COLOR_SALMON,
+    'Physics': COLOR_GUNMETAL,
+    'Programming': COLOR_SHARKFIN,
+    'Psychology': COLOR_SALMON,
+    'Puzzles': COLOR_TEAL,
+    'Reading': COLOR_TEAL,
+    'Religion': COLOR_SALMON,
+    'Sport': COLOR_SUNNYSIDE,
+    'Statistics': COLOR_SHARKFIN,
+    'Welcome': COLOR_TEAL,
+}
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

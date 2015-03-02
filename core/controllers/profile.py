@@ -24,13 +24,6 @@ import feconf
 import utils
 
 
-EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
-    'editor_prerequisites_agreement', 'Html',
-    'The agreement that editors are asked to accept before making any '
-    'contributions.',
-    default_value=feconf.DEFAULT_EDITOR_PREREQUISITES_AGREEMENT)
-
-
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.

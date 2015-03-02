@@ -123,76 +123,44 @@ oppia.controller('Gallery', [
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
 
-  $scope.CAROUSEL_INTERVAL = 3000;
+  $scope.CAROUSEL_INTERVAL = 3500;
+
+  // TODO(sll): Replace the following with
+  // $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG;
 
   $scope.CAROUSEL_SLIDES = [{
-    explorationId: '14',
-    explorationSubject: 'astronomy',
-    imageUrl: '/images/splash-image-0.jpg'
+    topic: 'astronomy',
+    exploration_id: '13',
+    image_filename: 'astronomy.jpg'
   }, {
-    explorationId: '9',
-    explorationSubject: 'music',
-    imageUrl: '/images/splash-image-1.jpg'
+    topic: 'music',
+    exploration_id: '9',
+    image_filename: 'music.jpg'
   }, {
-    explorationId: '1',
-    explorationSubject: 'programming',
-    imageUrl: '/images/splash-image-2.jpg'
+    topic: 'programming',
+    exploration_id: '1',
+    image_filename: 'programming.jpg'
+  }, {
+    topic: 'algorithms',
+    exploration_id: '2',
+    image_filename: 'algorithms.jpg'
+  }, {
+    topic: 'physics',
+    exploration_id: 'TBD',
+    image_filename: 'physics.jpg'
+  }, {
+    topic: 'languages',
+    exploration_id: 'TBD',
+    image_filename: 'languages.jpg'
+  }, {
+    topic: 'logic',
+    exploration_id: 'TBD',
+    image_filename: 'logic.jpg'
+  }, {
+    topic: 'math',
+    exploration_id: '4',
+    image_filename: 'math.jpg'
   }];
-
-  // Default color.
-  var _COLOR_TEAL = 'teal';
-  // Social sciences.
-  var _COLOR_SALMON = 'salmon';
-  // Art.
-  var _COLOR_SUNNYSIDE = 'sunnyside';
-  // Mathematics and computing.
-  var _COLOR_SHARKFIN = 'sharkfin';
-  // Science.
-  var _COLOR_GUNMETAL = 'gunmetal';
-
-  var CATEGORY_TO_DEFAULT_COLOR = {
-    'Architecture': _COLOR_SUNNYSIDE,
-    'Art': _COLOR_SUNNYSIDE,
-    'Biology': _COLOR_GUNMETAL,
-    'Business': _COLOR_SALMON,
-    'Chemistry': _COLOR_GUNMETAL,
-    'Computing': _COLOR_SHARKFIN,
-    'Economics': _COLOR_SALMON,
-    'Education': _COLOR_TEAL,
-    'Engineering': _COLOR_GUNMETAL,
-    'Environment': _COLOR_GUNMETAL,
-    'Geography': _COLOR_SALMON,
-    'Government': _COLOR_SALMON,
-    'Hobbies': _COLOR_TEAL,
-    'Languages': _COLOR_SUNNYSIDE,
-    'Law': _COLOR_SALMON,
-    'Life Skills': _COLOR_TEAL,
-    'Mathematics': _COLOR_SHARKFIN,
-    'Medicine': _COLOR_GUNMETAL,
-    'Music': _COLOR_SUNNYSIDE,
-    'Philosophy': _COLOR_SALMON,
-    'Physics': _COLOR_GUNMETAL,
-    'Programming': _COLOR_SHARKFIN,
-    'Psychology': _COLOR_SALMON,
-    'Puzzles': _COLOR_TEAL,
-    'Reading': _COLOR_TEAL,
-    'Religion': _COLOR_SALMON,
-    'Sport': _COLOR_SUNNYSIDE,
-    'Statistics': _COLOR_SHARKFIN,
-    'Welcome': _COLOR_TEAL
-  };
-
-  // TODO(sll): Modify this once explorations can specify their own images.
-  $scope.getImageSrcUrl = function(exploration) {
-    return '/images/gallery/default.png';
-  };
-
-  // TODO(sll): Modify this once explorations can specify their own images.
-  $scope.getImageContainerClass = function(exploration) {
-    var color = CATEGORY_TO_DEFAULT_COLOR.hasOwnProperty(exploration.category) ?
-      CATEGORY_TO_DEFAULT_COLOR[exploration.category] : _COLOR_TEAL;
-    return 'oppia-gallery-tile-image-translucent oppia-gallery-tile-image-' + color;
-  };
 
   $scope.getFormattedObjective = function(objective) {
     objective = objective.trim();
@@ -211,7 +179,7 @@ oppia.controller('Gallery', [
 
   $scope.currentUserIsModerator = false;
 
-  $scope.inSplashMode = true;
+  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
   $scope.$on('hasChangedSearchQuery', function() {
     if ($scope.inSplashMode) {
       $('.oppia-gallery-container').fadeOut(function() {
@@ -230,7 +198,7 @@ oppia.controller('Gallery', [
   // Called when the page loads, and after every search query.
   var _refreshGalleryData = function(data, hasPageFinishedLoading) {
     $scope.searchIsLoading = false;
-    $scope.allExplorationsInOrder = data.featured.concat(data['public']);
+    $scope.allExplorationsInOrder = data.explorations_list;
     $scope.finishedLoadingPage = hasPageFinishedLoading;
     $rootScope.loadingMessage = '';
   };
@@ -242,7 +210,7 @@ oppia.controller('Gallery', [
 
       searchService.loadMoreData(function(data, hasPageFinishedLoading) {
         $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
-          data.featured).concat(data['public']);
+          data.explorations_list);
         $scope.finishedLoadingPage = hasPageFinishedLoading;
         $scope.pageLoaderIsBusy = false;
       });
@@ -257,11 +225,9 @@ oppia.controller('Gallery', [
   $http.get(GALLERY_DATA_URL).success(function(data) {
     $scope.currentUserIsModerator = Boolean(data.is_moderator);
 
+    // Note that this will cause an initial search query to be sent.
     $rootScope.$broadcast(
       'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-    // TODO(sll): Page the initial load as well.
-    _refreshGalleryData(data, true);
 
     if (data.username) {
       if (urlService.getUrlParams().mode === 'create') {
@@ -380,8 +346,18 @@ oppia.controller('SearchBar', [
 
   $scope.$on('preferredLanguageCodesLoaded', function(evt, preferredLanguageCodesList) {
     for (var i = 0; i < preferredLanguageCodesList.length; i++) {
-      $scope.toggleSelection('languageCodes', preferredLanguageCodesList[i]);
+      var selections = $scope.selectionDetails.languageCodes.selections;
+      var languageCode = preferredLanguageCodesList[i];
+      if (!selections.hasOwnProperty(languageCode)) {
+        selections[languageCode] = true;
+      } else {
+        selections[languageCode] = !selections[languageCode];
+      }
     }
+
+    _updateSelectionDetails('languageCodes');
+    _onSearchQueryChangeExec();
+
     _searchBarFullyLoaded = true;
   });
 

@@ -35,9 +35,11 @@ ONE_OFF_JOB_MANAGERS = [
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
-ALL_CONTINUOUS_COMPUTATION_MANAGERS = [stats_jobs.StatisticsAggregator,
-                                       user_jobs.DashboardRecentUpdatesAggregator
-                                       ]
+ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
+    exp_jobs.SearchRanker,
+    stats_jobs.StatisticsAggregator,
+    user_jobs.DashboardRecentUpdatesAggregator]
+
 
 class ContinuousComputationEventDispatcher(object):
     """Dispatches events to the relevant ContinuousComputation classes."""

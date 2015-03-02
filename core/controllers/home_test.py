@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the home page (i.e. the splash page and user dashboard)."""
+"""Tests for the user dashboard."""
 
 __author__ = 'Sean Lip'
 

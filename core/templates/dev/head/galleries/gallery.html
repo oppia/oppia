@@ -110,6 +110,7 @@
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
+    GLOBALS.CAROUSEL_SLIDES_CONFIG = JSON.parse('{{CAROUSEL_SLIDES_CONFIG|js_string}}');
   </script>
 
   <style>
@@ -127,10 +128,10 @@
       </div>
       <carousel interval="CAROUSEL_INTERVAL">
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
-          <div class="oppia-gallery-banner" style="background-image: url(<[slide.imageUrl]>);">
+          <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
             <div class="oppia-gallery-banner-tagline">
-              Your personal tutor for <a ng-href="/explore/<[slide.explorationId]>" class="oppia-gallery-banner-link">
-              <[slide.explorationSubject]>
+              Your personal tutor for <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
+              <[slide.topic]>
             </a>
             </div>
           </div>
@@ -189,10 +190,9 @@
               <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
                 <div class="oppia-gallery-tile-contents">
                   <span class="oppia-gallery-tile-image-container"
-                        ng-class="getImageContainerClass(exploration)"
                         style="position: absolute;">
                     <!-- TODO(sll): Make the default image higher-res. -->
-                    <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>">
+                    <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
                   </span>
 
                   <div class="oppia-gallery-tile-details">
@@ -200,7 +200,7 @@
                       <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
                         <[exploration.title]>
                       </span>
-                      <span ng-if="exploration.objective">
+                      <span ng-if="exploration.objective" class="hidden-xs">
                         <span style="font-weight: bold;">&middot;</span>
                         <span style="color: #888" class="protractor-test-exploration-objective">
                           <[getFormattedObjective(exploration.objective)]>

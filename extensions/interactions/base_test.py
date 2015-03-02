@@ -159,9 +159,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(interaction_dir))
 
             # In this directory there should only be a config .py file, an
-            # html file, a JS file, (optionally) a directory named 'static',
-            # (optionally) a JS test file, (optionally) a stats_response.html
-            # file and (optionally) a protractor.js file.
+            # html file, a JS file, a validator.js file, (optionally) a
+            # directory named 'static', (optionally) a JS test file,
+            # (optionally) a stats_response.html file and (optionally)
+            # a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
@@ -196,7 +197,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 3, len(dir_contents),
+                optional_dirs_and_files_count + 4, len(dir_contents),
                 dir_contents
             )
 
@@ -204,6 +205,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
             js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
+            validator_js_file = os.path.join(interaction_dir, 'validator.js')
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -211,6 +213,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
+            validator_js_file_content = utils.get_file_contents(
+                validator_js_file)
+
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
             self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
@@ -224,6 +229,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
+            self.assertIn(
+                'oppiaInteractive%sValidator' % interaction_id,
+                validator_js_file_content)
+            self.assertNotIn('<script>', validator_js_file_content)
+            self.assertNotIn('</script>', validator_js_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)

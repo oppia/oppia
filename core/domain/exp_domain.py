@@ -980,10 +980,6 @@ class Exploration(object):
 
         if strict:
             warnings_list = []
-            try:
-                self._verify_no_self_loops()
-            except utils.ValidationError as e:
-                warnings_list.append(unicode(e))
 
             try:
                 self._verify_all_states_reachable()
@@ -1011,34 +1007,6 @@ class Exploration(object):
                 raise utils.ValidationError(
                     'Please fix the following issues before saving this '
                     'exploration: %s' % warning_str)
-
-    def _verify_no_self_loops(self):
-        """Verify that there are no feedback-less self-loops."""
-        for (state_name, state) in self.states.iteritems():
-            if not _is_interaction_terminal(state.interaction.id):
-                for handler in state.interaction.handlers:
-                    for rule in handler.rule_specs:
-                        # Check that there are no feedback-less self-loops.
-                        # NB: Sometimes it makes sense for a self-loop to not
-                        # have feedback, such as unreachable rules in a
-                        # ruleset for multiple-choice questions. This should
-                        # be handled in the frontend so that a valid dict with
-                        # feedback for every self-loop is always saved to the
-                        # backend.
-                        if (rule.dest == state_name and not rule.feedback):
-                            if rule.is_default:
-                                error_msg = (
-                                    'Please give Oppia something to say for '
-                                    'the default rule in state "%s", '
-                                    'otherwise the learner is likely to '
-                                    'get frustrated.' % state_name)
-                            else:
-                                error_msg = (
-                                    'Please add feedback for any rules in '
-                                    'state "%s" which loop back to that '
-                                    'state, otherwise the learner is likely '
-                                    'to get frustrated.' % state_name)
-                            raise utils.ValidationError(error_msg)
 
     def _verify_all_states_reachable(self):
         """Verifies that all states are reachable from the initial state."""

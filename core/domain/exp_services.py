@@ -228,16 +228,17 @@ def get_exploration_summaries_matching_ids(exp_ids):
 
 
 def get_exploration_summaries_matching_query(query_string, cursor=None):
-    """Returns a dict with all exploration summary domain objects matching the
+    """Returns a list with all exploration summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
     """
     exp_ids, search_cursor = search_explorations(query_string, cursor=cursor)
     summary_models = [
         model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
         if model is not None]
-    return (
-        _get_exploration_summary_dicts_from_models(summary_models),
-        search_cursor)
+    summaries = [
+        get_exploration_summary_from_model(summary_model)
+        for summary_model in summary_models]
+    return (summaries, search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -1017,6 +1018,26 @@ def _should_index(exp):
     return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
 
 
+def _get_search_rank(exp_id):
+    """Returns an integer determining the document's rank in search.
+
+    Featured explorations get a ranking bump, and so do explorations that
+    have been more recently updated.
+    """
+    # TODO(sll): Improve this calculation.
+    exploration = get_exploration_by_id(exp_id)
+    rights = rights_manager.get_exploration_rights(exp_id)
+    rank = (
+        3000 if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
+        else 0)
+
+    _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
+    time_delta_days = (exploration.last_updated - _BEGINNING_OF_TIME).days
+    rank += int(time_delta_days)
+
+    return rank
+
+
 def _exp_to_search_dict(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
     doc = {
@@ -1028,13 +1049,9 @@ def _exp_to_search_dict(exp):
         'blurb': exp.blurb,
         'objective': exp.objective,
         'author_notes': exp.author_notes,
+        'rank': _get_search_rank(exp.id),
     }
     doc.update(_exp_rights_to_search_dict(rights))
-
-    # TODO(frederik): Calculate an exploration's 'rank' based on statistics.
-    # By default, a document's rank is the time it was indexed, so the most
-    # recently changed explorations would rank higher.
-
     return doc
 
 

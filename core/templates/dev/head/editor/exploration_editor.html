@@ -12,6 +12,7 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.CATEGORIES_TO_COLORS = JSON.parse('{{CATEGORIES_TO_COLORS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
@@ -60,7 +61,7 @@
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
-      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()">
+      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
         <span class="oppia-exploration-warnings-count">
           <[countWarnings()]>
         </span>
@@ -69,13 +70,18 @@
         <span class="oppia-exploration-warnings-header">Warnings</span>
         <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
           <hr class="oppia-exploration-warnings-separator">
-          <[warning]>
+          <span ng-if="warning.type === 'critical'">
+            <strong><[warning.message]></strong>
+          </span>
+          <span ng-if="warning.type !== 'critical'">
+            <[warning.message]>
+          </span>
         </li>
       </ul>
     </li>
 
     {% if username %}
-      <li ng-class="{'active': getTabStatuses().active === 'preview'}">
+      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
         <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
           <span class="glyphicon glyphicon-play"></span>
         </a>
@@ -136,8 +142,9 @@
     </li>
 
     <li ng-if="isEditableOutsideTutorialMode()">
-      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
-        <button class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+           title="<[getSaveButtonTooltip()]>">
+        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="!isPublic()">Save Draft</span>
             <span ng-if="isPublic()">Publish Changes</span>
@@ -161,12 +168,6 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  {% if announcement %}
-    <div class="oppia-align-center oppia-warning">
-      {{ announcement }}
-    </div>
-  {% endif %}
-
   <div ng-controller="ExplorationEditor" ng-cloak>
     <script type="text/ng-template" id="modals/publishExploration">
       <div class="modal-header">
@@ -371,8 +372,6 @@
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
-    {{ include_js_file('components/objectEditor.js') }}
-    {{ object_editors_js }}
     {{ include_js_file('editor/RouterServices.js') }}
     {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
@@ -390,6 +389,7 @@
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
+
     {% for skin_js_url in skin_js_urls %}
       {{ include_skins_js_file(skin_js_url) }}
     {% endfor %}
@@ -397,4 +397,5 @@
 
   {{ skin_templates }}
   {{ interaction_templates }}
+  {{ interaction_validators_html }}
 {% endblock footer_js %}

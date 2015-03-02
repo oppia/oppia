@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the splash page and user dashboard."""
+"""Controllers for the user dashboard and for notifications."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
@@ -24,18 +24,6 @@ from core.domain import user_jobs
 from core.domain import user_services
 import feconf
 import utils
-
-
-SPLASH_PAGE_EXPLORATION_ID = config_domain.ConfigProperty(
-    'splash_page_exploration_id', 'UnicodeString',
-    ('The id for the exploration on the splash page '
-     '(a blank value indicates that no exploration should be displayed)'),
-    default_value='')
-SPLASH_PAGE_EXPLORATION_VERSION = config_domain.ConfigProperty(
-    'splash_page_exploration_version', 'UnicodeString',
-    ('The version number for the exploration on the splash page '
-     '(a blank value indicates that the latest version should be used)'),
-    default_value='')
 
 
 class DashboardPage(base.BaseHandler):
