@@ -102,12 +102,15 @@ class DashboardHandler(base.BaseHandler):
         self.values.update({
             'explorations': {
                 exp_summary.id: {
+                    'id': exp_summary.id,
                     'title': exp_summary.title,
                     'category': exp_summary.category,
                     'objective': exp_summary.objective,
                     'language_code': exp_summary.language_code,
                     'last_updated': utils.get_time_in_millisecs(
                         exp_summary.exploration_model_last_updated),
+                    'created_on': utils.get_time_in_millisecs(
+                        exp_summary.exploration_model_created_on),
                     'status': exp_summary.status,
                     'community_owned': exp_summary.community_owned,
                     'is_editable': True,

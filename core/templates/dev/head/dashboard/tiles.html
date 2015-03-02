@@ -1,8 +1,9 @@
 <md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
-  <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+  <a href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
     <div class="oppia-dashboard-tile-metadata-parent">
       <div class="oppia-dashboard-tile-metadata">
         Created: <[getLocaleAbbreviatedDatetimeString(exploration.created_on)]>
+        Status: <[exploration.status]>
       </div>
     </div>
     <div class="oppia-gallery-tile-contents">
@@ -16,10 +17,19 @@
           <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
             <[exploration.title]>
           </span>
-          <span ng-if="exploration.objective">
+          <span ng-switch on="!!exploration.objective">
+            <span style="font-weight: bold;">&middot;</span>
+            <span ng-switch-when="true" style="color: #888" class="protractor-test-exploration-objective">
+              <[getFormattedObjective(exploration.objective)]>
+            </span>
+            <span ng-switch-default style="color: #888" class="protractor-test-exploration-objective">
+              <i>No objective specified.</i>
+            <span>
+          </span>
+          <span ng-if="!exploration.objective">
             <span style="font-weight: bold;">&middot;</span>
             <span style="color: #888" class="protractor-test-exploration-objective">
-              <[getFormattedObjective(exploration.objective)]>
+              No objective specified.
             </span>
           </span>
         </div>

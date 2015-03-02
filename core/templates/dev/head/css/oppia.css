@@ -1056,18 +1056,19 @@ oppia-parameter {
 }
 
 .oppia-dashboard-tile-metadata-parent {
-  padding-top: 25px;
   float: right;
+  padding-top: 25px;
   width: 25%;
 }
 
 .oppia-dashboard-tile-metadata {
-  height: 70px;
-  padding-left: 20px;
   border-left-color: #DADADA;
   border-left-style: ridge;
   border-left-width: thin;
+  height: 70px;
+  padding-left: 20px;
   padding-right: 30px;
+  padding-top: 10px;
 }
 
 md-card.oppia-dashboard-tile {

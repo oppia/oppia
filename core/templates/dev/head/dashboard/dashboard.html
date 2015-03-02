@@ -100,37 +100,15 @@
     <div ng-if="activeTab === 'myExplorations'">
       <h2>My Explorations</h2>
 
-      <div ng-if="!isEmpty(privateExplorations)">
-        <h4>Private explorations</h4>
-          <ul class="oppia-dashboard-tiles">
-            <li ng-repeat="exploration in privateExplorations">
-              {% include 'dashboard/tiles.html' %}
-            </li>
-          </ul>
-        </h4>
-      </div>
-
-      <div ng-if="!isEmpty(publicExplorationIds)">
-        <hr>
-        <h4>Public explorations</h4>
+      <div ng-if="!isEmpty(explorationsList)">
         <ul class="oppia-dashboard-tiles">
-          <li ng-repeat="exploration in publicExplorations">
+          <li ng-repeat="exploration in explorationsList">
             {% include 'dashboard/tiles.html' %}
           </li>
         </ul>
       </div>
 
-      <div ng-if="!isEmpty(featuredExplorationIds)">
-        <hr>
-        <h4>Featured explorations</h4>
-        <ul class="oppia-dashboard-tiles">
-          <li ng-repeat="exploration in featuredExplorations">
-            {% include 'dashboard/tiles.html' %}
-          </li>
-        </ul>
-      </div>
-
-      <div ng-if="isEmpty(privateExplorations) && isEmpty(publicExplorations) && isEmpty(featuredExplorations)">
+      <div ng-if="isEmpty(explorationsList)">
         <p>
           <em>You currently aren't managing or collaborating on any explorations.</em>
         </p>

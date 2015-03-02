@@ -32,10 +32,6 @@ oppia.controller('Dashboard', [
     $scope.activeTab = tabName;
   });
 
-  var EXPLORATION_STATUS_PRIVATE = 'private';
-  var EXPLORATION_STATUS_PUBLIC = 'public';
-  var EXPLORATION_STATUS_FEATURED = 'publicized';
-
   // Default color.
   var _COLOR_TEAL = 'teal';
   // Social sciences.
@@ -84,6 +80,11 @@ oppia.controller('Dashboard', [
       '/create/' + activityId + (updateType === 'feedback_thread' ? '#/feedback': ''));
   };
 
+  $scope.getFormattedObjective = function(objective) {
+    objective = objective.trim();
+    return objective.charAt(0).toUpperCase() + objective.slice(1);
+  };
+
   $scope.getImageSrcUrl = function(exploration) {
     return '/images/gallery/default.png';
   };
@@ -113,23 +114,7 @@ oppia.controller('Dashboard', [
     $scope.lastSeenMsec = data.last_seen_msec || 0.0;
     $scope.currentUsername = data.username;
 
-    $scope.privateExplorations = [];
-    $scope.publicExplorations = [];
-    $scope.featuredExplorations = [];
-    $scope.explorations = data.explorations;
-
-    for (var expId in $scope.explorations) {
-      var status = $scope.explorations[expId].status;
-      if (status == EXPLORATION_STATUS_PRIVATE) {
-        $scope.privateExplorations.push($scope.explorations[expId]);
-      } else if (status == EXPLORATION_STATUS_PUBLIC) {
-        $scope.publicExplorations.push($scope.explorations[expId]);
-      } else if (status == EXPLORATION_STATUS_FEATURED) {
-        $scope.featuredExplorations.push($scope.explorations[expId]);
-      } else {
-        throw ('Error: Invalid exploration status ' + status);
-      }
-    }
+    $scope.explorationsList = data.explorations;
 
     $rootScope.loadingMessage = '';
   });
