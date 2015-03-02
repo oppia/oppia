@@ -7,9 +7,9 @@
       </div>
     </div>
     <div class="oppia-gallery-tile-contents">
-      <span class="oppia-gallery-tile-image-container" ng-class="getImageContainerClass(exploration)" style="position: absolute;">
+      <span class="oppia-gallery-tile-image-container" style="position: absolute;">
         <!-- TODO(sll): Make the default image higher-res. -->
-        <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>">
+        <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
       </span>
 
       <div class="oppia-gallery-tile-details">

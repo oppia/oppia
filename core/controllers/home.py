@@ -87,6 +87,12 @@ class DashboardHandler(base.BaseHandler):
             exp_services.get_at_least_editable_exploration_summaries(
                 self.user_id))
 
+        def _get_intro_card_color(category):
+            return (
+                feconf.CATEGORIES_TO_COLORS[category] if
+                category in feconf.CATEGORIES_TO_COLORS else
+                feconf.DEFAULT_COLOR)
+
         self.values.update({
             'explorations': {
                 exp_summary.id: {
@@ -102,6 +108,9 @@ class DashboardHandler(base.BaseHandler):
                     'status': exp_summary.status,
                     'community_owned': exp_summary.community_owned,
                     'is_editable': True,
+                    'thumbnail_image_url': (
+                        '/images/gallery/exploration_background_%s_small.png' %
+                        _get_intro_card_color(exp_summary.category)),
                 } for exp_summary in editable_exp_summaries.values()
             },
             # This may be None if no job has ever run for this user.

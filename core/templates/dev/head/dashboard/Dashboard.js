@@ -85,16 +85,6 @@ oppia.controller('Dashboard', [
     return objective.charAt(0).toUpperCase() + objective.slice(1);
   };
 
-  $scope.getImageSrcUrl = function(exploration) {
-    return '/images/gallery/default.png';
-  };
-
-  $scope.getImageContainerClass = function(exploration) {
-    var color = CATEGORY_TO_DEFAULT_COLOR.hasOwnProperty(exploration.category) ?
-      CATEGORY_TO_DEFAULT_COLOR[exploration.category] : _COLOR_TEAL;
-    return 'oppia-gallery-tile-image-translucent oppia-gallery-tile-image-' + color;
-  };
-
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
