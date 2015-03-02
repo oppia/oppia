@@ -27,6 +27,7 @@ var forms = require('./forms.js');
 // 'editingInstructions' is  a function that is sent an editor for the
 // objectType which it can then act on, for example by adding elements to a list.
 var editConfigProperty = function(propertyName, objectType, editingInstructions) {
+  general.waitForSystem();
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(by.css('.protractor-test-config-property')).
       map(function(configProperty) {

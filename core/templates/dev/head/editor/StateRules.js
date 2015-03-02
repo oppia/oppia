@@ -61,7 +61,10 @@ oppia.factory('rulesService', [
 
   var _refreshHandlerSpecs = function() {
     if (!stateInteractionIdService.savedMemento) {
-      $log.error('ERROR: Interaction id not specified.');
+      // This can happen for a newly-created state, where the user has not set
+      // an interaction id.
+      _interactionHandlerSpecs = null;
+      return;
     }
 
     _interactionHandlerSpecs = INTERACTION_SPECS[
@@ -198,10 +201,10 @@ oppia.factory('rulesService', [
 
 
 oppia.controller('StateRules', [
-    '$scope', '$log', '$rootScope', '$modal', 'stateInteractionIdService', 'editorContextService',
+    '$scope', '$rootScope', '$modal', 'stateInteractionIdService', 'editorContextService',
     'warningsData', 'rulesService',
     function(
-      $scope, $log, $rootScope, $modal, stateInteractionIdService, editorContextService,
+      $scope, $rootScope, $modal, stateInteractionIdService, editorContextService,
       warningsData, rulesService) {
 
   $scope.getAnswerChoices = function() {
@@ -310,6 +313,7 @@ oppia.controller('StateRules', [
         $scope.answerChoices = rulesService.getAnswerChoices();
 
         $scope.addNewRule = function() {
+          $scope.$broadcast('saveRuleDetails');
           $modalInstance.close($scope.tmpRule);
         };
 
@@ -363,8 +367,8 @@ oppia.controller('StateRules', [
 
 
 oppia.controller('StateEditorActiveRule', [
-    '$scope', '$rootScope', 'rulesService', 'editorContextService',
-    function($scope, $rootScope, rulesService, editorContextService) {
+    '$scope', '$rootScope', 'rulesService', 'editorContextService', 'stateInteractionIdService',
+    function($scope, $rootScope, rulesService, editorContextService, stateInteractionIdService) {
 
   $scope.interactionHandlers = rulesService.getInteractionHandlers();
   $scope.ruleIsShown = false;
@@ -373,7 +377,7 @@ oppia.controller('StateEditorActiveRule', [
     $scope.activeRule = rulesService.getActiveRule();
     $scope.currentStateName = editorContextService.getActiveStateName();
 
-    $scope.ruleIsShown = (
+    $scope.ruleIsShown = stateInteractionIdService.savedMemento && (
       $scope.activeRule.definition.rule_type !== 'default' ||
       $scope.activeRule.dest !== editorContextService.getActiveStateName() ||
       $scope.activeRule.feedback.length > 0);

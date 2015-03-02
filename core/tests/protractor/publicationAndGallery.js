@@ -64,6 +64,7 @@ describe('Gallery view', function() {
 
     users.login('celebrimbor@example.com');
     workflow.createExploration('Vilya', 'rings');
+    editor.setInteraction('EndConversation');
     editor.setObjective('preserve the works of the elves');
     editor.saveChanges();
 

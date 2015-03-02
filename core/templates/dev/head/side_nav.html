@@ -22,19 +22,14 @@
       </li>
     {% endif %}
 
-    <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-      <a href="http://oppiablog.blogspot.com" target="_blank">
-        <img src="/images/blogger.png"
-               style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
-        Blog
-      </a>
-    </li>
-
-    <li>
-      <a href="https://docs.google.com/a/google.com/forms/d/1iTFNLp4YLAWEe1hAxoz14l3agFiFMUTvMJveHpfD1zs/viewform" target="_blank">
-        <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
-        Site Feedback
-      </a>
-    </li>
+    {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
+      <li>
+        <a href="{{additional_link['link']}}" target="_blank">
+          <img src="/images/sidebar/{{additional_link['icon_filename']}}"
+                 style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+          {{additional_link['name']}}
+        </a>
+      </li>
+    {% endfor %}
   </ul>
 </nav>

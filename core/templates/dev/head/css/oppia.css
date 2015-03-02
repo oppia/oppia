@@ -625,6 +625,14 @@ md-card.oppia-gallery-tile {
   color: #333;
   font-weight: bold;
 }
+@media (max-width: 365px) {
+  .oppia-gallery-tile-image-container {
+    display: none;
+  }
+  .oppia-gallery-tile-details {
+    padding-left: 0;
+  }
+}
 
 .oppia-gallery-tile-second-row {
   font-size: 90%;
@@ -1059,6 +1067,48 @@ oppia-parameter {
   background: #ffe279;
 }
 
+.oppia-dashboard-status-green {
+  color: #65e065;
+  text-transform: capitalize;
+}
+
+.oppia-dashboard-status-grey {
+  color: #888;
+  text-transform: capitalize;
+}
+
+.oppia-dashboard-tile-metadata-parent {
+  float: right;
+  padding-top: 25px;
+  width: 25%;
+}
+
+.oppia-dashboard-tile-metadata {
+  border-left-color: #DADADA;
+  border-left-style: ridge;
+  border-left-width: thin;
+  color: #888;
+  height: 70px;
+  padding-left: 20px;
+  padding-right: 30px;
+  padding-top: 5px;
+}
+
+md-card.oppia-dashboard-tile {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  color: #888;
+  height: 120px;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 80%;
+}
+
+ul.oppia-dashboard-tiles {
+  list-style-type: none;
+}
+
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
@@ -1198,8 +1248,11 @@ oppia-parameter {
   background: linear-gradient(to bottom, rgba(255,255,255,.9), rgba(255,255,255,1));
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.3em;
-  height: 120px;
   margin-top: -120px;
+  min-height: 120px;
+  padding-bottom: 45px;
+  padding-left: 10px;
+  padding-right: 10px;
   padding-top: 45px;
   position: relative;
   text-align: center;
@@ -1255,7 +1308,7 @@ div#ng-curtain {
 
 .oppia-top-of-page-padding {
   /* This ensures that content is not tucked behind the fixed navbar. */
-  padding-top: 50px;
+  padding-top: 100px;
 }
 .oppia-navbar-menu {
   margin-left: 10px;
@@ -1284,8 +1337,34 @@ div#ng-curtain {
   margin-left: 6px;
   margin-top: 9px;
 }
+.oppia-navbar-profile-dropdown-toggle {
+  height: 56px;
+  color: #fff;
+}
+.oppia-navbar-profile > li > a:hover,
+.oppia-navbar-profile > li > a:focus,
+.oppia-navbar-profile .open > a,
+.oppia-navbar-profile .open > a:hover,
+.oppia-navbar-profile .open > a:focus {
+  background-color: #fff;
+  color: #05a69a;
+}
+.oppia-navbar-profile-dropdown {
+  border: 0px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
+}
+.oppia-navbar-profile-dropdown > li > a {
+  color: #05a69a;
+}
+.oppia-navbar-profile-dropdown > li > a:hover,
+.oppia-navbar-profile-dropdown > li > a:focus {
+  background-color: #eee;
+  color: #888;
+}
 .oppia-navbar-profile-picture-container {
-  margin-top: -7px;
+  margin-left: -5px;
   text-align: right;
 }
 .oppia-navbar-profile-picture {
@@ -1529,4 +1608,9 @@ div#ng-curtain {
 .oppia-about-right-menu ul {
   list-style-type: none;
   padding-left: 20px;
+}
+
+/* Hide the 'Skip' icon on the editor tutorial. */
+.skipBtn .glyphicon-ban-circle {
+  display: none;
 }

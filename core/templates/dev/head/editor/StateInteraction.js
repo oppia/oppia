@@ -85,6 +85,10 @@ oppia.controller('StateInteraction', [
   };
 
   var _getInteractionPreviewTag = function(interactionCustomizationArgs) {
+    if (!stateInteractionIdService.savedMemento) {
+      return '';
+    }
+
     var el = $(
       '<oppia-interactive-' +
       $filter('camelCaseToHyphens')(stateInteractionIdService.savedMemento) + '/>');

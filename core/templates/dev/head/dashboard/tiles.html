@@ -1,0 +1,48 @@
+<md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
+  <a ng-href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+    <div class="oppia-dashboard-tile-metadata-parent">
+      <div class="oppia-dashboard-tile-metadata">
+        Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
+        <br>
+        <br>
+        Status: <span ng-class="{'oppia-dashboard-status-green': exploration.status !== 'private', 'oppia-dashboard-status-grey': exploration.status === 'private'}"><[exploration.status]></span>
+      </div>
+    </div>
+    <div class="oppia-gallery-tile-contents">
+      <span class="oppia-gallery-tile-image-container" style="position: absolute;">
+        <!-- TODO(sll): Make the default image higher-res. -->
+        <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
+      </span>
+
+      <div class="oppia-gallery-tile-details">
+        <div class="oppia-gallery-tile-first-row">
+          <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+            <[exploration.title]>
+          </span>
+          <span style="font-weight: bold;">&middot;</span>
+          <span style="color: #888" class="protractor-test-exploration-objective">
+            <span ng-if="exploration.objective">
+              <[getFormattedObjective(exploration.objective)]>
+            </span>
+            <span ng-if="!exploration.objective">
+              <em>No objective specified.</em>
+            </span>
+          </span>
+        </div>
+
+        <div class="oppia-gallery-tile-second-row">
+          <span ng-if="exploration.status === 'publicized'" style="color: #888">
+            Featured
+            <span class="glyphicon glyphicon-star"></span>
+            <span style="font-weight: bold;">&middot;</span>
+          </span>
+          <span style="color: #888">
+            <strong><[exploration.category]></strong>
+            <span style="font-weight: bold;">&middot;</span>
+            Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+          </span>
+        </div>
+      </div>
+    </div>
+  </a>
+</md-card>

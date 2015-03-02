@@ -829,20 +829,23 @@ oppia.factory('computeGraphService', ['INTERACTION_SPECS', function(INTERACTION_
     var links = [];
     var finalStateIds = [END_DEST];
     for (var stateName in states) {
-      if (INTERACTION_SPECS[states[stateName].interaction.id].is_terminal) {
+      if (states[stateName].interaction.id &&
+          INTERACTION_SPECS[states[stateName].interaction.id].is_terminal) {
         finalStateIds.push(stateName);
       }
 
       nodes[stateName] = stateName;
 
-      var handlers = states[stateName].interaction.handlers;
-      for (var h = 0; h < handlers.length; h++) {
-        var ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          links.push({
-            source: stateName,
-            target: ruleSpecs[i].dest,
-          });
+      if (states[stateName].interaction.id) {
+        var handlers = states[stateName].interaction.handlers;
+        for (var h = 0; h < handlers.length; h++) {
+          var ruleSpecs = handlers[h].rule_specs;
+          for (i = 0; i < ruleSpecs.length; i++) {
+            links.push({
+              source: stateName,
+              target: ruleSpecs[i].dest,
+            });
+          }
         }
       }
     }
@@ -945,6 +948,19 @@ oppia.factory('explorationWarningsService', [
     function($filter, graphDataService, explorationStatesService, explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES) {
   var _warningsList = [];
 
+  var _getStatesWithoutInteractionIds = function() {
+    var statesWithoutInteractionIds = [];
+
+    var _states = explorationStatesService.getStates();
+    for (var stateName in _states) {
+      if (!_states[stateName].interaction.id) {
+        statesWithoutInteractionIds.push(stateName);
+      }
+    }
+
+    return statesWithoutInteractionIds;
+  };
+
   // Given a list of initial node ids, a object with keys node ids, and values
   // node names, and a list of edges (each of which is an object with keys
   // 'source' and 'target', and values equal to the respective node names),
@@ -994,6 +1010,17 @@ oppia.factory('explorationWarningsService', [
 
     graphDataService.recompute();
     var _graphData = graphDataService.getGraphData();
+
+    var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
+    if (statesWithoutInteractionIds.length) {
+      _warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: (
+          'Please add interactions for these states: ' +
+          statesWithoutInteractionIds.join(', ') + '.')
+      });
+    }
+
     if (_graphData) {
       var unreachableStateNames = _getUnreachableNodeNames(
         [_graphData.initStateId], _graphData.nodes, _graphData.links);
@@ -1029,17 +1056,19 @@ oppia.factory('explorationWarningsService', [
 
     var _states = explorationStatesService.getStates();
     for (var stateName in _states) {
-      var validatorName = 'oppiaInteractive' + _states[stateName].interaction.id + 'Validator';
-      var interactionWarnings = $filter(validatorName)(
-        stateName,
-        _states[stateName].interaction.customization_args,
-        _states[stateName].interaction.handlers[0].rule_specs);
+      if (_states[stateName].interaction.id) {
+        var validatorName = 'oppiaInteractive' + _states[stateName].interaction.id + 'Validator';
+        var interactionWarnings = $filter(validatorName)(
+          stateName,
+          _states[stateName].interaction.customization_args,
+          _states[stateName].interaction.handlers[0].rule_specs);
 
-      for (var i = 0; i < interactionWarnings.length; i++) {
-        _warningsList.push({
-          type: interactionWarnings[i].type,
-          message: 'In \'' + stateName + '\', ' + interactionWarnings[i].message
-        });
+        for (var i = 0; i < interactionWarnings.length; i++) {
+          _warningsList.push({
+            type: interactionWarnings[i].type,
+            message: 'In \'' + stateName + '\', ' + interactionWarnings[i].message
+          });
+        }
       }
     }
 

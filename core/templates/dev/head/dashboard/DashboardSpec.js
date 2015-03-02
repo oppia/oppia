@@ -23,22 +23,25 @@ describe('Dashboard controller', function() {
 
   describe('Dashboard', function() {
     var scope, ctrl, $httpBackend;
+    var explorationsList = {
+      'private_exp_id': {
+        id: 'private_exp_id',
+        category: 'Private category',
+        status: 'private',
+        title: 'Private exploration'
+      },  
+      'featured_exp_id': {
+        id: 'featured_exp_id',
+        category: 'Featured category',
+        status: 'publicized',
+        title: 'Featured exploration'
+      }   
+    }   
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/dashboardhandler/data').respond({
-        explorations: {
-          'private_exp_id': {
-            category: 'Private category',
-            status: 'private',
-            title: 'Private exploration'
-          },
-          'featured_exp_id': {
-            category: 'Featured category',
-            status: 'publicized',
-            title: 'Featured exploration'
-          }
-        }
+        explorations: explorationsList
       });
       scope = $rootScope.$new();
       ctrl = $controller('Dashboard', {
@@ -51,11 +54,9 @@ describe('Dashboard controller', function() {
       });
     }));
 
-    it('should classify explorations correctly', function() {
+    it('should have the correct set of explorations', function() {
       $httpBackend.flush();
-      expect(scope.privateExplorationIds).toEqual(['private_exp_id']);
-      expect(scope.publicExplorationIds).toEqual([]);
-      expect(scope.featuredExplorationIds).toEqual(['featured_exp_id']);
+      expect(scope.explorationsList).toEqual(explorationsList);
     });
   });
 });

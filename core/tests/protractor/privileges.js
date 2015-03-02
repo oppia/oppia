@@ -42,6 +42,7 @@ describe('Permissions for private explorations', function() {
       users.login('bob@example.com');
       general.openEditor(explorationId);
       editor.setContent(forms.toRichText('I love you'));
+      editor.setInteraction('TextInput');
       editor.saveChanges();
       users.logout();
 

@@ -22,7 +22,6 @@ import imghdr
 import logging
 
 from core.controllers import base
-from core.controllers import reader
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -31,7 +30,6 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import interaction_registry
 from core.domain import obj_services
-from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import skins_services
@@ -56,25 +54,7 @@ NEW_STATE_TEMPLATE = {
         'type': 'text',
         'value': ''
     }],
-    'interaction': {
-        'customization_args': {
-            'rows': {'value': 1},
-            'placeholder': {'value': ''}
-        },
-        'handlers': [{
-            'name': 'submit',
-            'rule_specs': [{
-                'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                'definition': {
-                    'rule_type': 'default'
-                },
-                'feedback': [],
-                'param_changes': [],
-                'description': 'Default',
-            }],
-        }],
-        'id': 'TextInput',
-    },
+    'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
     'unresolved_answers': {},
 }
@@ -474,13 +454,13 @@ class ExplorationRightsHandler(EditorHandler):
 
 
 class ResolvedAnswersHandler(EditorHandler):
-    """Allows readers' answers for a state to be marked as resolved."""
+    """Allows learners' answers for a state to be marked as resolved."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
     def put(self, exploration_id, state_name):
-        """Marks readers' answers as resolved."""
+        """Marks learners' answers as resolved."""
         resolved_answers = self.payload.get('resolved_answers')
 
         if not isinstance(resolved_answers, list):
@@ -641,12 +621,13 @@ class ExplorationStatsVersionsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        self.render_json({'versions': stats_services.get_versions_for_exploration_stats(
-            exploration_id)})
+        self.render_json({
+            'versions': stats_services.get_versions_for_exploration_stats(
+                exploration_id)})
 
 
 class StateRulesStatsHandler(EditorHandler):
-    """Returns detailed reader answer statistics for a state."""
+    """Returns detailed learner answer statistics for a state."""
 
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""

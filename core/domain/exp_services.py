@@ -592,7 +592,7 @@ def _create_exploration(
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
-    exploration.validate()
+    exploration.validate(allow_null_interaction=True)
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
     model = exp_models.ExplorationModel(
         id=exploration.id,

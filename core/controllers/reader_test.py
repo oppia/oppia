@@ -37,11 +37,9 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
-        exploration.states[exploration.init_state_name].interaction.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration(self.EDITOR_ID, exploration)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.EDITOR_ID, title=self.UNICODE_TEST_STRING,
+            category=self.UNICODE_TEST_STRING)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(

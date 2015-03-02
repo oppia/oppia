@@ -130,6 +130,8 @@ oppia.factory('oppiaPlayerService', [
       INTERACTION_SPECS) {
   var _END_DEST = 'END';
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
+  var _NULL_INTERACTION_HTML = (
+    '<span style="color: red;"><strong>Error</strong>: No interaction specified.</span>');
 
   // Note that both of these do not get set for the Karma unit tests.
   var _explorationId = null;
@@ -179,6 +181,10 @@ oppia.factory('oppiaPlayerService', [
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
   var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
+    if (!interactionId) {
+      return _NULL_INTERACTION_HTML;
+    }
+
     var el = $(
       '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
 
@@ -358,9 +364,11 @@ oppia.factory('oppiaPlayerService', [
         labelForFocusTarget);
     },
     isInteractionInline: function(stateName) {
-      return INTERACTION_SPECS[
-        _exploration.states[stateName].interaction.id
-      ].display_mode === _INTERACTION_DISPLAY_MODE_INLINE;
+      var interactionId = _exploration.states[stateName].interaction.id;
+      return (
+        interactionId &&
+        INTERACTION_SPECS[interactionId].display_mode ===
+          _INTERACTION_DISPLAY_MODE_INLINE);
     },
     isStateTerminal: function(stateName) {
       return !stateName || INTERACTION_SPECS[

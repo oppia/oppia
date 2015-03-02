@@ -31,7 +31,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', ['$filter', 'WARNING_TY
 
     if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
       warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
+        type: WARNING_TYPES.ERROR,
         message: 'please specify at least one image region to click on.'
       });
     }

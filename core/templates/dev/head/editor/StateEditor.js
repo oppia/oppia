@@ -33,14 +33,17 @@ oppia.controller('StateEditor', [
   };
 
   $scope.isCurrentStateTerminal = false;
+  $scope.isInteractionIdSet = false;
 
   $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-    $scope.isCurrentStateTerminal = INTERACTION_SPECS[
-      newInteractionId].is_terminal;
+    $scope.isInteractionIdSet = Boolean(newInteractionId);
+    $scope.isCurrentStateTerminal = (
+      $scope.isInteractionIdSet && INTERACTION_SPECS[
+        newInteractionId].is_terminal);
   });
 
   $scope.initStateEditor = function() {
@@ -54,8 +57,10 @@ oppia.controller('StateEditor', [
 
     if ($scope.stateName && stateData) {
       $rootScope.$broadcast('stateEditorInitialized', stateData);
-      $scope.isCurrentStateTerminal = INTERACTION_SPECS[
-        stateData.interaction.id].is_terminal;
+      $scope.isInteractionIdSet = Boolean(stateData.interaction.id);
+      $scope.isCurrentStateTerminal = (
+        $scope.isInteractionIdSet &&
+        INTERACTION_SPECS[stateData.interaction.id].is_terminal);
     }
 
     $rootScope.loadingMessage = '';

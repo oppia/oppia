@@ -124,43 +124,7 @@ oppia.controller('Gallery', [
              CATEGORY_LIST, searchService) {
 
   $scope.CAROUSEL_INTERVAL = 3500;
-
-  // TODO(sll): Replace the following with
-  // $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG;
-
-  $scope.CAROUSEL_SLIDES = [{
-    topic: 'astronomy',
-    exploration_id: '13',
-    image_filename: 'astronomy.jpg'
-  }, {
-    topic: 'music',
-    exploration_id: '9',
-    image_filename: 'music.jpg'
-  }, {
-    topic: 'programming',
-    exploration_id: '1',
-    image_filename: 'programming.jpg'
-  }, {
-    topic: 'algorithms',
-    exploration_id: '2',
-    image_filename: 'algorithms.jpg'
-  }, {
-    topic: 'physics',
-    exploration_id: 'TBD',
-    image_filename: 'physics.jpg'
-  }, {
-    topic: 'languages',
-    exploration_id: 'TBD',
-    image_filename: 'languages.jpg'
-  }, {
-    topic: 'logic',
-    exploration_id: 'TBD',
-    image_filename: 'logic.jpg'
-  }, {
-    topic: 'math',
-    exploration_id: '4',
-    image_filename: 'math.jpg'
-  }];
+  $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG;
 
   $scope.getFormattedObjective = function(objective) {
     objective = objective.trim();
@@ -179,7 +143,7 @@ oppia.controller('Gallery', [
 
   $scope.currentUserIsModerator = false;
 
-  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
+  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES && $scope.CAROUSEL_SLIDES.length > 0);
   $scope.$on('hasChangedSearchQuery', function() {
     if ($scope.inSplashMode) {
       $('.oppia-gallery-container').fadeOut(function() {
