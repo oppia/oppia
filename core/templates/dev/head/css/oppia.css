@@ -1567,3 +1567,8 @@ div#ng-curtain {
   list-style-type: none;
   padding-left: 20px;
 }
+
+/* Hide the 'Skip' icon on the editor tutorial. */
+.glyphicon-ban-circle {
+  display: none;
+}
