@@ -143,7 +143,7 @@ oppia.controller('Gallery', [
 
   $scope.currentUserIsModerator = false;
 
-  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
+  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES && $scope.CAROUSEL_SLIDES.length > 0);
   $scope.$on('hasChangedSearchQuery', function() {
     if ($scope.inSplashMode) {
       $('.oppia-gallery-container').fadeOut(function() {
