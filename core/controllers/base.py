@@ -62,6 +62,34 @@ OBJECT_EDITORS_JS = config_domain.ComputedProperty(
     'JavaScript code for the object editors',
     obj_services.get_all_object_editor_js_templates)
 
+SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
+    'sidebar_menu_additional_links', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'name',
+                'description': 'Text of the menu item',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'link',
+                'description': 'The link to open in a new tab',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'icon_filename',
+                'description': (
+                    'Filename of the menu icon (in /images/sidebar)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Additional links to show in the sidebar menu.',
+    default_value=[{
+        'name': 'Site Feedback',
+        'link': 'http://site/feedback/url',
+        'icon_filename': 'comment.png',
+    }])
+
 
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
@@ -316,6 +344,7 @@ class BaseHandler(webapp2.RequestHandler):
             # TODO(sll): Consider including the obj_editor html directly as part of the
             # base HTML template?
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
+            'SIDEBAR_MENU_ADDITIONAL_LINKS': SIDEBAR_MENU_ADDITIONAL_LINKS.value,
         })
 
         if redirect_url_on_logout is None:

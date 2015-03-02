@@ -65,7 +65,11 @@ CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
         }
     },
     'Configuration for slides in the gallery carousel.',
-    default_value=[])
+    default_value=[{
+        'topic': 'anything',
+        'exploration_id': '0',
+        'image_filename': 'default.jpg',
+    }])
 
 
 class GalleryPage(base.BaseHandler):
