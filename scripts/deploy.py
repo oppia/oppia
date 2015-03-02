@@ -121,11 +121,17 @@ def preprocess_release():
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
+
         if not os.path.exists(src_dir):
             raise Exception(
                 'Could not find source dir %s. Please check your deploy_data '
                 'folder.' % src_dir)
-        shutil.copytree(src_dir, dst_dir)
+        common.ensure_directory_exists(dst_dir)
+
+        for filename in os.listdir(src_dir):
+            src = os.path.join(src_dir, filename)
+            dst = os.path.join(dst_dir, filename)
+            shutil.copyfile(src, dst)
 
 
 # Check that the current directory is correct.
