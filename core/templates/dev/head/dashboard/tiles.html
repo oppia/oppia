@@ -20,12 +20,14 @@
             <[exploration.title]>
           </span>
           <span style="font-weight: bold;">&middot;</span>
-          <span ng-if="exploration.objective" style="color: #888" class="protractor-test-exploration-objective">
-            <[getFormattedObjective(exploration.objective)]>
+          <span style="color: #888" class="protractor-test-exploration-objective">
+            <span ng-if="exploration.objective">
+              <[getFormattedObjective(exploration.objective)]>
+            </span>
+            <span ng-if="!exploration.objective">
+              <em>No objective specified.</em>
+            </span>
           </span>
-          <span ng-if="!exploration.objective" style="color: #888" class="protractor-test-exploration-objective">
-            <em>No objective specified.</em>
-          <span>
         </div>
 
         <div class="oppia-gallery-tile-second-row">
