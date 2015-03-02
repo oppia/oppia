@@ -1,9 +1,11 @@
 <md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
-  <a href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+  <a ng-href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
     <div class="oppia-dashboard-tile-metadata-parent">
       <div class="oppia-dashboard-tile-metadata">
-        Created: <[getLocaleAbbreviatedDatetimeString(exploration.created_on)]>
-        Status: <[exploration.status]>
+        Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
+        <br>
+        <br>
+        Status: <span ng-class="{'oppia-dashboard-status-green': exploration.status !== 'private', 'oppia-dashboard-status-grey': exploration.status === 'private'}"><[exploration.status]></span>
       </div>
     </div>
     <div class="oppia-gallery-tile-contents">
@@ -17,21 +19,13 @@
           <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
             <[exploration.title]>
           </span>
-          <span ng-switch on="!!exploration.objective">
-            <span style="font-weight: bold;">&middot;</span>
-            <span ng-switch-when="true" style="color: #888" class="protractor-test-exploration-objective">
-              <[getFormattedObjective(exploration.objective)]>
-            </span>
-            <span ng-switch-default style="color: #888" class="protractor-test-exploration-objective">
-              <i>No objective specified.</i>
-            <span>
+          <span style="font-weight: bold;">&middot;</span>
+          <span ng-if="exploration.objective" style="color: #888" class="protractor-test-exploration-objective">
+            <[getFormattedObjective(exploration.objective)]>
           </span>
-          <span ng-if="!exploration.objective">
-            <span style="font-weight: bold;">&middot;</span>
-            <span style="color: #888" class="protractor-test-exploration-objective">
-              No objective specified.
-            </span>
-          </span>
+          <span ng-if="!exploration.objective" style="color: #888" class="protractor-test-exploration-objective">
+            <em>No objective specified.</em>
+          <span>
         </div>
 
         <div class="oppia-gallery-tile-second-row">

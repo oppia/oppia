@@ -32,49 +32,6 @@ oppia.controller('Dashboard', [
     $scope.activeTab = tabName;
   });
 
-  // Default color.
-  var _COLOR_TEAL = 'teal';
-  // Social sciences.
-  var _COLOR_SALMON = 'salmon';
-  // Art.
-  var _COLOR_SUNNYSIDE = 'sunnyside';
-  // Mathematics and computing.
-  var _COLOR_SHARKFIN = 'sharkfin';
-  // Science.
-  var _COLOR_GUNMETAL = 'gunmetal';
-
-  var CATEGORY_TO_DEFAULT_COLOR = {
-    'Architecture': _COLOR_SUNNYSIDE,
-    'Art': _COLOR_SUNNYSIDE,
-    'Biology': _COLOR_GUNMETAL,
-    'Business': _COLOR_SALMON,
-    'Chemistry': _COLOR_GUNMETAL,
-    'Computing': _COLOR_SHARKFIN,
-    'Economics': _COLOR_SALMON,
-    'Education': _COLOR_TEAL,
-    'Engineering': _COLOR_GUNMETAL,
-    'Environment': _COLOR_GUNMETAL,
-    'Geography': _COLOR_SALMON,
-    'Government': _COLOR_SALMON,
-    'Hobbies': _COLOR_TEAL,
-    'Languages': _COLOR_SUNNYSIDE,
-    'Law': _COLOR_SALMON,
-    'Life Skills': _COLOR_TEAL,
-    'Mathematics': _COLOR_SHARKFIN,
-    'Medicine': _COLOR_GUNMETAL,
-    'Music': _COLOR_SUNNYSIDE,
-    'Philosophy': _COLOR_SALMON,
-    'Physics': _COLOR_GUNMETAL,
-    'Programming': _COLOR_SHARKFIN,
-    'Psychology': _COLOR_SALMON,
-    'Puzzles': _COLOR_TEAL,
-    'Reading': _COLOR_TEAL,
-    'Religion': _COLOR_SALMON,
-    'Sport': _COLOR_SUNNYSIDE,
-    'Statistics': _COLOR_SHARKFIN,
-    'Welcome': _COLOR_TEAL
-  };
-
   $scope.navigateToItem = function(activityId, updateType) {
     window.location.href = (
       '/create/' + activityId + (updateType === 'feedback_thread' ? '#/feedback': ''));

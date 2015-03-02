@@ -1067,6 +1067,16 @@ oppia-parameter {
   background: #ffe279;
 }
 
+.oppia-dashboard-status-green {
+  color: #65e065;
+  text-transform: capitalize;
+}
+
+.oppia-dashboard-status-grey {
+  color: #888;
+  text-transform: capitalize;
+}
+
 .oppia-dashboard-tile-metadata-parent {
   float: right;
   padding-top: 25px;
@@ -1077,10 +1087,11 @@ oppia-parameter {
   border-left-color: #DADADA;
   border-left-style: ridge;
   border-left-width: thin;
+  color: #888;
   height: 70px;
   padding-left: 20px;
   padding-right: 30px;
-  padding-top: 10px;
+  padding-top: 5px;
 }
 
 md-card.oppia-dashboard-tile {
@@ -1091,7 +1102,7 @@ md-card.oppia-dashboard-tile {
   margin: 0;
   padding: 0;
   position: relative;
-  width: 70%;
+  width: 80%;
 }
 
 ul.oppia-dashboard-tiles {
