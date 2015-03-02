@@ -1569,6 +1569,6 @@ div#ng-curtain {
 }
 
 /* Hide the 'Skip' icon on the editor tutorial. */
-.glyphicon-ban-circle {
+.skipBtn .glyphicon-ban-circle {
   display: none;
 }
