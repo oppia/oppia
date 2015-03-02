@@ -354,11 +354,19 @@ param_changes: []
 
         # Create a simple exploration
         EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'The title for ZIP download handler test!',
-            'This is just a test category')
+        self.save_new_valid_exploration(
+            EXP_ID, self.OWNER_ID,
+            title='The title for ZIP download handler test!',
+            category='This is just a test category',
+            objective='')
+
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration.states[exploration.init_state_name].interaction.handlers[
+            0].rule_specs[0].dest = exploration.init_state_name
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
         exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
@@ -419,11 +427,16 @@ param_changes: []
 
         # Create a simple exploration
         EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'The title for states download handler test!',
-            'This is just a test category')
+        self.save_new_valid_exploration(
+            EXP_ID, self.OWNER_ID,
+            title='The title for states download handler test!',
+            category='This is just a test category')
+
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
         exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
@@ -699,11 +712,15 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         # Owner creates exploration
         self.login(self.OWNER_EMAIL)
         EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title for rights handler test!',
-            'My category')
+        self.save_new_valid_exploration(
+            EXP_ID, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
@@ -756,6 +773,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,
@@ -793,6 +815,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 5'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 5',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,

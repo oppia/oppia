@@ -52,6 +52,7 @@ var publishExploration = function() {
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(name, category, objective, language) {
   createExploration(name, category);
+  editor.setInteraction('TextInput');
   editor.addRule('TextInput', null, 'END', 'Default');
   editor.setObjective(objective);
   if (language) {

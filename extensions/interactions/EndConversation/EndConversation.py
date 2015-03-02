@@ -38,7 +38,10 @@ class EndConversation(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'recommendedExplorationIds',
-        'description': 'IDs of explorations to recommend to the learner.',
+        'description': (
+            'IDs of explorations to recommend to the learner. (The ID of an '
+            'exploration is the string of characters appearing after '
+            '\'/explore/\' in the URL bar.)'),
         'schema': {
             'type': 'list',
             'items': {

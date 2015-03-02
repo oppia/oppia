@@ -420,7 +420,7 @@ class InteractionInstance(object):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
-    _DEFAULT_INTERACTION_ID = 'TextInput'
+    _DEFAULT_INTERACTION_ID = None
 
     def _get_full_customization_args(self):
         """Populates the customization_args dict of the interaction with
@@ -440,14 +440,19 @@ class InteractionInstance(object):
     def to_dict(self):
         return {
             'id': self.id,
-            'customization_args': self._get_full_customization_args(),
+            'customization_args': (
+                {} if self.id is None
+                else self._get_full_customization_args()),
             'handlers': [handler.to_dict() for handler in self.handlers],
         }
 
     @classmethod
     def _get_obj_type(cls, interaction_id):
-        return interaction_registry.Registry.get_interaction_by_id(
-            interaction_id)._handlers[0]['obj_type']
+        if interaction_id is None:
+            return None
+        else:
+            return interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)._handlers[0]['obj_type']
 
     @classmethod
     def from_dict(cls, interaction_dict):
@@ -539,6 +544,23 @@ class InteractionInstance(object):
 class State(object):
     """Domain object for a state."""
 
+    NULL_INTERACTION_DICT = {
+        'id': None,
+        'customization_args': {},
+        'handlers': [{
+            'name': 'submit',
+            'rule_specs': [{
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'definition': {
+                    'rule_type': 'default',
+                },
+                'feedback': [],
+                'param_changes': [],
+                'description': 'Default',
+            }],
+        }],
+    }
+
     def __init__(self, content, param_changes, interaction):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
@@ -552,7 +574,7 @@ class State(object):
             interaction.id, interaction.customization_args,
             interaction.handlers)
 
-    def validate(self):
+    def validate(self, allow_null_interaction):
         if not isinstance(self.content, list):
             raise utils.ValidationError(
                 'Expected state content to be a list, received %s'
@@ -570,7 +592,12 @@ class State(object):
         for param_change in self.param_changes:
             param_change.validate()
 
-        self.interaction.validate()
+        if not allow_null_interaction:
+            if self.interaction.id is None:
+                raise utils.ValidationError(
+                    'This state does not have any interaction specified.')
+            else:
+                self.interaction.validate()
 
     def update_content(self, content_list):
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -584,7 +611,9 @@ class State(object):
     def update_interaction_id(self, interaction_id):
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.handlers (except for
-        # the default rule).
+        # the default rule). This is somewhat mitigated because the client
+        # updates interaction_handlers directly after this, but we should fix
+        # it.
 
     def update_interaction_customization_args(self, customization_args):
         self.interaction.customization_args = customization_args
@@ -825,7 +854,7 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Invalid state name: %s' % feconf.END_DEST)
 
-    def validate(self, strict=False):
+    def validate(self, strict=False, allow_null_interaction=False):
         """Validates the exploration before it is committed to storage.
 
         If strict is True, performs advanced validation.
@@ -892,7 +921,8 @@ class Exploration(object):
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
             self._require_valid_state_name(state_name)
-            self.states[state_name].validate()
+            self.states[state_name].validate(
+                allow_null_interaction=allow_null_interaction)
 
         if not self.init_state_name:
             raise utils.ValidationError(
@@ -1214,16 +1244,19 @@ class Exploration(object):
 
         for handler in state_dict['interaction']['handlers']:
             for rule_spec in handler['rule_specs']:
+                if state_dict['interaction']['id'] is None:
+                    rule_spec['description'] = 'Default'
+                else:
+                    interaction = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            state_dict['interaction']['id']))
 
-                interaction = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        state_dict['interaction']['id']))
-
-                rule_spec['description'] = rule_domain.get_rule_description(
-                    rule_spec['definition'],
-                    self.param_specs,
-                    interaction.get_handler_by_name(handler['name']).obj_type
-                )
+                    rule_spec['description'] = (
+                        rule_domain.get_rule_description(
+                            rule_spec['definition'],
+                            self.param_specs,
+                            interaction.get_handler_by_name(
+                                handler['name']).obj_type))
 
         return state_dict
 

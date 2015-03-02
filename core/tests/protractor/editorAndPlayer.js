@@ -155,15 +155,20 @@ describe('Full exploration editor', function() {
       // Check discarding of changes
       editor.setStateName('state1');
       editor.expectStateNamesToBe(['state1', 'END']);
+      editor.setInteraction('TextInput');
       editor.addRule('TextInput', null, 'END', 'Default');
       editor.RuleEditor('default').createNewStateAndSetDestination('state2');
       editor.expectStateNamesToBe(['state1', 'state2', 'END']);
+      editor.moveToState('state2');
+      editor.setInteraction('EndConversation');
+
       editor.discardChanges();
       editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);
       editor.setStateName('first');
       editor.expectStateNamesToBe(['first', 'END']);
 
       // Check deletion of states and changing the first state
+      editor.setInteraction('TextInput');
       editor.addRule('TextInput', null, 'END', 'Default');
       editor.RuleEditor('default').createNewStateAndSetDestination('second');
       editor.moveToState('second');
@@ -257,6 +262,7 @@ describe('rich-text components', function() {
       }]);
       richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
     })
+    editor.setInteraction('TextInput');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -307,6 +313,7 @@ describe('rich-text components', function() {
         collapsibleEditor.addRteComponent('Math', 'xyz');
       });
     });
+    editor.setInteraction('TextInput');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -355,6 +362,7 @@ describe('Interactions', function() {
     users.createUser('user21@example.com', 'user21');
     users.login('user21@example.com');
     workflow.createExploration('interactions', 'history');
+    editor.setInteraction('TextInput');
     editor.addRule('TextInput', forms.toRichText('no'), null, 'Default');
 
     for (var interactionName in interactions.INTERACTIONS) {
@@ -460,22 +468,18 @@ describe('Exploration history', function() {
       6: {text: '    started, check out the Help link in the navigation', highlighted: true},
       7: {text: '    bar.', highlighted: true},
       8: {text: 'interaction:', highlighted: true},
-      9: {text: '  customization_args:', highlighted: true},
-      10: {text: '    placeholder:', highlighted: true},
-      11: {text: '      value: \'\'', highlighted: true},
-      12: {text: '    rows:', highlighted: true},
-      13: {text: '      value: 1', highlighted: true},
-      14: {text: '  handlers:', highlighted: true},
-      15: {text: '  - name: submit', highlighted: true},
-      16: {text: '    rule_specs:', highlighted: true},
-      17: {text: '    - definition:', highlighted: false},
-      18: {text: '        rule_type: default', highlighted: false},
-      19: {text: '      dest: First State', highlighted: true},
-      20: {text: '      feedback: []', highlighted: false},
-      21: {text: '      param_changes: []', highlighted: false},
-      22: {text: '  id: TextInput', highlighted: true},
-      23: {text: 'param_changes: []', highlighted: false},
-      24: {text: ' ', highlighted: false}
+      9: {text: '  customization_args: {}', highlighted: true},
+      10: {text: '  handlers:', highlighted: true},
+      11: {text: '  - name: submit', highlighted: true},
+      12: {text: '    rule_specs:', highlighted: true},
+      13: {text: '    - definition:', highlighted: false},
+      14: {text: '        rule_type: default', highlighted: false},
+      15: {text: '      dest: First State', highlighted: true},
+      16: {text: '      feedback: []', highlighted: false},
+      17: {text: '      param_changes: []', highlighted: false},
+      18: {text: '  id: null', highlighted: true},
+      19: {text: 'param_changes: []', highlighted: false},
+      20: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
@@ -491,11 +495,11 @@ describe('Exploration history', function() {
       '    - definition:\n' +
       '        rule_type: default\n' +
       '      dest: END\n' +
-      '      feedback:\n' +
-      '      - \'\'\n' +
+      '      feedback: []\n' +
       '      param_changes: []\n' +
       '  id: Continue\n' +
-      'param_changes: []\n ';
+      'param_changes: []\n' +
+      ' ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([
       {'label': 'first (was: First ...', 'color': COLOR_CHANGED},

@@ -142,22 +142,12 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
-        $scope.removeNullFeedback = function() {
-          // Remove null feedback.
-          var nonemptyFeedback = [];
-          for (var i = 0; i < $scope.rule.feedback.length; i++) {
-            if ($scope.rule.feedback[i]) {
-              nonemptyFeedback.push($scope.rule.feedback[i]);
-            }
-          }
-          $scope.rule.feedback = nonemptyFeedback;
-        };
 
         $scope.saveThisRule = function() {
+          $scope.$broadcast('saveRuleDetails');
           // TODO(sll): Add more validation prior to saving.
           $scope.ruleEditorIsOpen = false;
 
-          $scope.removeNullFeedback();
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
           $scope.ruleFeedbackMemento = null;
@@ -166,7 +156,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.saveRule();
         };
         $scope.cancelThisEdit = function() {
-          $scope.removeNullFeedback();
           $scope.ruleEditorIsOpen = false;
           $scope.rule.description = angular.copy($scope.ruleDescriptionMemento);
           $scope.rule.definition = angular.copy($scope.ruleDefinitionMemento);
@@ -253,6 +242,17 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
         // We use a slash because this character is forbidden in a state name.
         var _PLACEHOLDER_RULE_DEST = '/';
 
+        $scope.$on('saveRuleDetails', function() {
+          // Remove null feedback.
+          var nonemptyFeedback = [];
+          for (var i = 0; i < $scope.rule.feedback.length; i++) {
+            if ($scope.rule.feedback[i]) {
+              nonemptyFeedback.push($scope.rule.feedback[i]);
+            }
+          }
+          $scope.rule.feedback = nonemptyFeedback;
+        });
+
         $scope.createNewDestIfNecessary = function() {
           if ($scope.rule.dest === _PLACEHOLDER_RULE_DEST) {
             $modal.open({
@@ -327,7 +327,7 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
             text: _currentStateName + ' ⟳'
           }, {
             id: _PLACEHOLDER_RULE_DEST,
-            text: 'Create New...'
+            text: 'Create New State...'
           }];
 
           var stateNames = Object.keys(explorationStatesService.getStates()).sort();

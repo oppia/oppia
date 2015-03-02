@@ -62,12 +62,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         ModifiedRecentUpdatesAggregator]
 
-    def _save_new_default_exploration(
-            self, user_id, exp_id, exp_title, category):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exp_id, exp_title, category)
-        exp_services.save_new_exploration(user_id, exploration)
-
     def _get_expected_exploration_created_dict(
             self, user_id, exp_id, exp_title, last_updated_ms):
         return {
@@ -88,8 +82,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             EXP_TITLE = 'Title'
             USER_ID = 'user_id'
 
-            self._save_new_default_exploration(
-                USER_ID, EXP_ID, EXP_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             expected_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 
@@ -114,8 +108,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             USER_ID = 'user_id'
             ANOTHER_USER_ID = 'another_user_id'
 
-            self._save_new_default_exploration(
-                USER_ID, EXP_ID, EXP_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             # Another user makes a commit; this, too, shows up in the
             # original user's dashboard.
             exp_services.update_exploration(
@@ -149,8 +143,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             EXP_TITLE = 'Title'
             USER_ID = 'user_id'
 
-            self._save_new_default_exploration(
-                USER_ID, EXP_ID, EXP_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             last_updated_ms_before_deletion = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
             exp_services.delete_exploration(USER_ID, EXP_ID)
@@ -193,8 +187,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
             # User creates an exploration.
-            self._save_new_default_exploration(
-                self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_1_ID, self.EDITOR_ID, title=EXP_1_TITLE,
+                category='Category')
             exp1_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_1_ID).last_updated)
 
@@ -207,8 +202,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
-            self._save_new_default_exploration(
-                self.EDITOR_ID, EXP_2_ID, EXP_2_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_2_ID, self.EDITOR_ID, title=EXP_2_TITLE,
+                category='Category')
             exp2_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_2_ID).last_updated)
 
@@ -258,8 +254,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
             # User A creates an exploration.
-            self._save_new_default_exploration(
-                user_a_id, EXP_ID, EXP_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
             exp_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 
@@ -324,8 +320,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
             # User A creates an exploration.
-            self._save_new_default_exploration(
-                user_a_id, EXP_ID, EXP_TITLE, 'Category')
+            self.save_new_valid_exploration(
+                EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
             exp_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 

@@ -194,9 +194,8 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             }])
 
     def test_no_improvement_flag_hit(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
-        exp_services.save_new_exploration('fake@user.com', exp)
+        self.save_new_valid_exploration('eid', 'fake@user.com')
+        exp = exp_services.get_exploration_by_id('eid')
 
         not_default_rule_spec = exp_domain.RuleSpec({
             'rule_type': rule_domain.ATOMIC_RULE_TYPE,
@@ -270,19 +269,28 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             }])
 
     def test_two_state_default_hit(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
-        exp_services.save_new_exploration('fake@user.com', exp)
+        self.save_new_default_exploration('eid', 'fake@user.com')
+        exp = exp_services.get_exploration_by_id('eid')
 
         FIRST_STATE_NAME = exp.init_state_name
         SECOND_STATE_NAME = 'State 2'
         exp_services.update_exploration('fake@user.com', 'eid', [{
+            'cmd': 'edit_state_property',
+            'state_name': FIRST_STATE_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }, {
             'cmd': 'add_state',
             'state_name': SECOND_STATE_NAME,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': SECOND_STATE_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
         }], 'Add new state')
 
         # Hit the default rule of state 1 once, and the default rule of state 2
-        # twice.
+        # twice. Note that both rules are self-loops.
         event_services.StartExplorationEventHandler.record(
             'eid', 1, FIRST_STATE_NAME, 'session_id', {},
             feconf.PLAY_TYPE_NORMAL)

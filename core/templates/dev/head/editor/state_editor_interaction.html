@@ -11,7 +11,12 @@
       <div style="margin-bottom: 20px; margin-top: 10px;">
         <span class="dropdown protractor-test-select-interaction-id" ng-show"editabilityService.isEditable()">
           <a id="tutorialStateInteraction" role="button" data-toggle="dropdown" class="btn btn-default">
-            <[interactionRepository[interactionId].name]>
+            <span ng-if="interactionId">
+              <[interactionRepository[interactionId].name]>
+            </span>
+            <span ng-if="!interactionId">
+              Select a type of interaction...
+            </span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu">
@@ -41,14 +46,14 @@
           </ul>
         </span>
 
-        <span ng-if="editabilityService.isEditable() && doesCurrentInteractionHaveCustomizations()">
+        <span ng-if="interactionId && editabilityService.isEditable() && doesCurrentInteractionHaveCustomizations()">
           <a href="" ng-click="openInteractionCustomizerModal()" style="margin-left: 8px;" class="protractor-test-edit-interaction">
             Customize
           </a>
         </span>
       </div>
 
-      <div>
+      <div ng-if="interactionId">
         <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview oppia-pre-avatar-user" style="pointer-events: none;">
         </div>
       </div>

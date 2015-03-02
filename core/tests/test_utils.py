@@ -281,6 +281,8 @@ class TestBase(unittest.TestCase):
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title, category)
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'TextInput')
         exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
         exploration.objective = objective

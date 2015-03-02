@@ -292,7 +292,7 @@ var addRule = function(interactionName, feedbackInstructions, dest, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
-  var _OPTION_CREATE_NEW = 'Create New...';
+  var _OPTION_CREATE_NEW = 'Create New State...';
 
   if (ruleNum === 'default') {
     element(by.css('.protractor-test-default-rule-tab')).isPresent().then(function(isVisible) {

@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import param_domain
 from core.tests import test_utils
 import feconf
@@ -61,6 +62,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         new_state = exp_domain.State.create_default_state('ABC')
+        new_state.update_interaction_id('TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -100,6 +102,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state_name: exp_domain.State.create_default_state(
                 exploration.init_state_name)
         }
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'TextInput')
 
         exploration.validate()
 
@@ -134,8 +138,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_objective_validation(self):
         """Test that objectives are validated only in 'strict' mode."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', 'Title', 'Category')
+        self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='Title', category='Category',
+            objective='')
+        exploration = exp_services.get_exploration_by_id('exp_id')
         exploration.validate()
 
         with self.assertRaisesRegexp(
@@ -181,14 +187,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                 'value': u''
             }],
             'interaction': {
-                'customization_args': {
-                    'placeholder': {
-                        'value': ''
-                    },
-                    'rows': {
-                        'value': 1
-                    }
-                },
+                'customization_args': {},
                 'handlers': [{
                     'name': u'submit',
                     'rule_specs': [{
@@ -201,7 +200,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
 
                     }]
                 }],
-                'id': u'TextInput',
+                'id': None,
             },
             'param_changes': [],
         }
@@ -230,11 +229,7 @@ states:
         to the learner playing your exploration.<br><br>If you need more help getting
         started, check out the Help link in the navigation bar.
     interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
+      customization_args: {}
       handlers:
       - name: submit
         rule_specs:
@@ -243,18 +238,14 @@ states:
           dest: %s
           feedback: []
           param_changes: []
-      id: TextInput
+      id: null
     param_changes: []
   New state:
     content:
     - type: text
       value: ''
     interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
+      customization_args: {}
       handlers:
       - name: submit
         rule_specs:
@@ -263,7 +254,7 @@ states:
           dest: New state
           feedback: []
           param_changes: []
-      id: TextInput
+      id: null
     param_changes: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -543,14 +534,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'value': content_str,
                 }],
                 'interaction': {
-                    'customization_args': {
-                        'placeholder': {
-                            'value': ''
-                        },
-                        'rows': {
-                            'value': 1
-                        },
-                    },
+                    'customization_args': {},
                     'handlers': [{
                         'name': 'submit',
                         'rule_specs': [{
@@ -563,7 +547,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                             'param_changes': [],
                         }],
                     }],
-                    'id': 'TextInput',
+                    'id': None,
                 },
                 'param_changes': [],
             }

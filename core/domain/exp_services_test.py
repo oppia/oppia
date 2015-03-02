@@ -281,7 +281,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.save_new_exploration(self.OWNER_ID, exploration)
 
     def test_save_and_retrieve_exploration(self):
-        exploration = self.save_new_default_exploration(
+        exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
         exploration.param_specs = {
             'theParameter': param_domain.ParamSpec('Int')}
@@ -296,7 +296,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
 
     def test_save_and_retrieve_exploration_summary(self):
-        exploration = self.save_new_default_exploration(
+        exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
         exploration.param_specs = {
             'theParameter': param_domain.ParamSpec('Int')}
@@ -477,10 +477,12 @@ states:
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID, objective='The objective')
+        exploration.states[exploration.init_state_name].interaction.handlers[
+            0].rule_specs[0].dest = exploration.init_state_name
         exploration.add_states(['New state'])
-        exploration.objective = 'The objective'
+        exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
@@ -492,10 +494,12 @@ states:
 
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID, objective='The objective')
+        exploration.states[exploration.init_state_name].interaction.handlers[
+            0].rule_specs[0].dest = exploration.init_state_name
         exploration.add_states(['New state'])
-        exploration.objective = 'The objective'
+        exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
@@ -514,12 +518,14 @@ states:
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID, objective='The objective')
         self.assertEqual(exploration.version, 1)
 
+        exploration.states[exploration.init_state_name].interaction.handlers[
+            0].rule_specs[0].dest = exploration.init_state_name
         exploration.add_states(['New state'])
-        exploration.objective = 'The objective'
+        exploration.states['New state'].update_interaction_id('TextInput')
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
@@ -625,10 +631,12 @@ param_changes: []
 
     def test_export_to_dict(self):
         """Test the export_to_dict() method."""
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID, objective='The objective')
+        exploration.states[exploration.init_state_name].interaction.handlers[
+            0].rule_specs[0].dest = exploration.init_state_name
         exploration.add_states(['New state'])
-        exploration.objective = 'The objective'
+        exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
@@ -637,11 +645,14 @@ param_changes: []
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
-        exploration = self.save_new_default_exploration(
+        exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
         self.assertEqual(exploration.version, 1)
 
+        exploration.states[exploration.init_state_name].interaction.handlers[
+            0].rule_specs[0].dest = exploration.init_state_name
         exploration.add_states(['New state'])
+        exploration.states['New state'].update_interaction_id('TextInput')
         exploration.objective = 'The objective'
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
@@ -681,7 +692,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def setUp(self):
         super(UpdateStateTests, self).setUp()
-        exploration = self.save_new_default_exploration(
+        exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
 
         self.init_state_name = exploration.init_state_name
@@ -820,6 +831,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # We create a second state to use as a rule destination
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['State 2'])
+        exploration.states['State 2'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1185,6 +1197,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['New state'])
+        exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(
             'committer_id_2', exploration, 'Added new state', [])
 
@@ -1248,6 +1261,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # In version 3, a new state is added.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['New state'])
+        exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(
             'committer_id_v3', exploration, 'Added new state', [])
 
@@ -1705,10 +1719,7 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
             mock_record)
 
         with record_event_swap:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.EXP_ID, 'title', 'category'
-            )
-            exp_services.save_new_exploration(self.OWNER_ID, exploration)
+            self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
             exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
 
         self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID])
