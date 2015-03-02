@@ -1418,6 +1418,12 @@ class ExplorationSummary(object):
                  community_owned, owner_ids, editor_ids,
                  viewer_ids, version, exploration_model_created_on,
                  exploration_model_last_updated):
+        """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
+        values are nonnegative integers representing frequency counts. Note
+        that the keys need to be strings in order for this dict to be
+        JSON-serializable.
+        """
+
         self.id = exploration_id
         self.title = title
         self.category = category

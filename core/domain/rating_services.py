@@ -60,7 +60,7 @@ def assign_rating(user_id, exploration_id, new_rating):
             exp_user_data_model = user_models.ExplorationUserDataModel.create(
                 user_id, exploration_id)
         exp_user_data_model.rating = new_rating
-        exp_user_data_model.when_rated = datetime.datetime.utcnow()
+        exp_user_data_model.rated_on = datetime.datetime.utcnow()
         exp_user_data_model.put()
         return old_rating
     old_rating = transaction_services.run_in_transaction(_update_user_rating)
@@ -85,6 +85,7 @@ def get_user_specific_rating(user_id, exploration_id):
         user_id, exploration_id)
     return exp_user_data_model.rating if exp_user_data_model else None
 
+
 def get_when_rated(user_id, exploration_id):
     """Returns the date-time the exploration was lasted rated by this user, or
     None if no such rating has been awarded.
@@ -94,7 +95,8 @@ def get_when_rated(user_id, exploration_id):
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    return exp_user_data_model.when_rated if exp_user_data_model else None
+    return exp_user_data_model.rated_on if exp_user_data_model else None
+
 
 def get_overall_ratings(exploration_id):
     exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)

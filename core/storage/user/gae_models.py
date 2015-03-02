@@ -107,7 +107,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     rating = ndb.IntegerProperty(default=None, indexed=True)
 
     # When the most recent rating was awarded, or None if not rated
-    when_rated = ndb.DateTimeProperty(default=None, indexed=False)
+    rated_on = ndb.DateTimeProperty(default=None, indexed=False)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):

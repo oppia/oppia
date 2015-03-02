@@ -356,18 +356,17 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(ratings['user'], None)
         self.assertEqual(
             ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
-        with self.assertRaisesRegexp(Exception, 'Bad response: 401'):
-            self.put_json(
-                '/explorehandler/rating/%s' % self.EXP_ID, {
-                    'rating': 1
-                }, csrf_token
-            )
+        self.put_json(
+            '/explorehandler/rating/%s' % self.EXP_ID, {
+                'rating': 1
+            }, csrf_token, expected_status_int=401, expect_errors=True
+        )
 
     def test_ratings_by_different_users(self):
         """Check that ratings by different users do not interfere."""
 
-        self.signup('a@example.com', 'b')
-        self.signup('b@example.com', 'a')
+        self.signup('a@example.com', 'a')
+        self.signup('b@example.com', 'b')
 
         self.login('a@example.com')
         csrf_token = self.get_csrf_token_from_response(
