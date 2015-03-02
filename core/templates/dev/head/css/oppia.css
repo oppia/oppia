@@ -1067,6 +1067,48 @@ oppia-parameter {
   background: #ffe279;
 }
 
+.oppia-dashboard-status-green {
+  color: #65e065;
+  text-transform: capitalize;
+}
+
+.oppia-dashboard-status-grey {
+  color: #888;
+  text-transform: capitalize;
+}
+
+.oppia-dashboard-tile-metadata-parent {
+  float: right;
+  padding-top: 25px;
+  width: 25%;
+}
+
+.oppia-dashboard-tile-metadata {
+  border-left-color: #DADADA;
+  border-left-style: ridge;
+  border-left-width: thin;
+  color: #888;
+  height: 70px;
+  padding-left: 20px;
+  padding-right: 30px;
+  padding-top: 5px;
+}
+
+md-card.oppia-dashboard-tile {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  color: #888;
+  height: 120px;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 80%;
+}
+
+ul.oppia-dashboard-tiles {
+  list-style-type: none;
+}
+
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
