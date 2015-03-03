@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the user dashboard."""
+"""Tests for the user timeline and 'my explorations' pages."""
 
 __author__ = 'Sean Lip'
 
@@ -32,38 +32,40 @@ class HomePageTest(test_utils.GenericTestBase):
             'Your personal tutor',
             'Oppia - Gallery', 'About', 'Login',
             # No navbar tabs should be highlighted.
-            no=['class="active"', 'Logout', 'Dashboard'])
+            no=['class="active"', 'Logout', 'Timeline'])
 
-    def test_dashboard_redirects_for_logged_out_users(self):
-        """Test the logged-out view of the dashboard."""
-        response = self.testapp.get('/dashboard')
+    def test_timeline_redirects_for_logged_out_users(self):
+        """Test the logged-out view of the timeline."""
+        response = self.testapp.get('/timeline')
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
-        self.assertIn('dashboard', response.headers['location'])
+        self.assertIn('timeline', response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.testapp.get('/dashboard')
+        response = self.testapp.get('/timeline')
         # This should redirect the user to complete signup.
         self.assertEqual(response.status_int, 302)
         self.logout()
 
-    def test_logged_in_dashboard(self):
-        """Test the logged-in view of the dashboard."""
+    def test_logged_in_timeline(self):
+        """Test the logged-in view of the timeline."""
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/dashboard')
+        response = self.testapp.get('/timeline')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Dashboard', 'Logout',
+            'Timeline', 'Logout',
             self.get_expected_logout_url('/'),
             no=['Login', 'Your personal tutor',
                 self.get_expected_login_url('/')])
         self.logout()
 
 
-class DashboardHandlerTest(test_utils.GenericTestBase):
+class MyExplorationsHandlerTest(test_utils.GenericTestBase):
+
+    MY_EXPLORATIONS_DATA_URL = '/myexplorationshandler/data'
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR_USERNAME = 'collaborator'
@@ -72,7 +74,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
     EXP_TITLE = 'Exploration title'
 
     def setUp(self):
-        super(DashboardHandlerTest, self).setUp()
+        super(MyExplorationsHandlerTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -84,41 +86,38 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def test_no_explorations(self):
         self.login(self.OWNER_EMAIL)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(response['explorations'], {})
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(response['explorations_list'], [])
         self.logout()
 
-    def test_managers_can_see_explorations_on_dashboard(self):
+    def test_managers_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         self.set_admins([self.OWNER_EMAIL])
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(len(response['explorations']), 1)
-        self.assertIn(self.EXP_ID, response['explorations'])
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['status'],
+            response['explorations_list'][0]['status'],
             rights_manager.EXPLORATION_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(len(response['explorations']), 1)
-        self.assertIn(self.EXP_ID, response['explorations'])
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['status'],
+            response['explorations_list'][0]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(len(response['explorations']), 1)
-        self.assertIn(self.EXP_ID, response['explorations'])
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['status'],
+            response['explorations_list'][0]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLICIZED)
         self.logout()
 
-    def test_collaborators_can_see_explorations_on_dashboard(self):
+    def test_collaborators_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role(
@@ -127,32 +126,29 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_EMAIL])
 
         self.login(self.COLLABORATOR_EMAIL)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(len(response['explorations']), 1)
-        self.assertIn(self.EXP_ID, response['explorations'])
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['status'],
+            response['explorations_list'][0]['status'],
             rights_manager.EXPLORATION_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(len(response['explorations']), 1)
-        self.assertIn(self.EXP_ID, response['explorations'])
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['status'],
+            response['explorations_list'][0]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(len(response['explorations']), 1)
-        self.assertIn(self.EXP_ID, response['explorations'])
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['status'],
+            response['explorations_list'][0]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLICIZED)
 
         self.logout()
 
-    def test_viewer_cannot_see_explorations_on_dashboard(self):
+    def test_viewer_cannot_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role(
@@ -161,17 +157,27 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_EMAIL])
 
         self.login(self.VIEWER_EMAIL)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(response['explorations'], {})
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(response['explorations_list'], [])
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(response['explorations'], {})
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(response['explorations_list'], [])
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json('/dashboardhandler/data')
-        self.assertEqual(response['explorations'], {})
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(response['explorations_list'], [])
         self.logout()
+
+
+class TimelineHandlerTest(test_utils.GenericTestBase):
+
+    TIMELINE_DATA_URL = '/timelinehandler/data'
+
+    def setUp(self):
+        super(TimelineHandlerTest, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def _get_recent_updates_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
@@ -204,7 +210,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
                 'get_recent_updates',
                 self._get_recent_updates_mock_by_viewer):
             self.login(self.VIEWER_EMAIL)
-            response = self.get_json('/dashboardhandler/data')
+            response = self.get_json(self.TIMELINE_DATA_URL)
             self.assertEqual(len(response['recent_updates']), 1)
             self.assertEqual(
                 response['recent_updates'][0]['author_username'],
@@ -216,7 +222,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
                 'get_recent_updates',
                 self._get_recent_updates_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)
-            response = self.get_json('/dashboardhandler/data')
+            response = self.get_json(self.TIMELINE_DATA_URL)
             self.assertEqual(len(response['recent_updates']), 1)
             self.assertEqual(
                 response['recent_updates'][0]['author_username'], '')

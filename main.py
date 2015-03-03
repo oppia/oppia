@@ -140,10 +140,15 @@ urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     get_redirect_route(
-        r'/dashboard', home.DashboardPage, 'dashboard_page'),
+        r'/timeline', home.TimelinePage, 'timeline_page'),
     get_redirect_route(
-        r'/dashboardhandler/data', home.DashboardHandler,
-        'dashboard_handler'),
+        r'/timelinehandler/data', home.TimelineHandler,
+        'timeline_handler'),
+    get_redirect_route(
+        r'/my_explorations', home.MyExplorationsPage, 'my_explorations_page'),
+    get_redirect_route(
+        r'/myexplorationshandler/data', home.MyExplorationsHandler,
+        'my_explorations_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
