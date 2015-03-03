@@ -148,6 +148,16 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
           replacementText += inputs[varName][i].readableNoteName;
         }
         replacementText += ']';
+      } else if (varType === 'CoordTwoDim') {
+        var latitude = inputs[varName][0];
+        var longitude = inputs[varName][1];
+        replacementText = '(';
+        replacementText += (
+          inputs[varName][0] >= 0.0 ? latitude + '°N' : -latitude + '°S');
+        replacementText += ', ';
+        replacementText += (
+          inputs[varName][1] >= 0.0 ? longitude + '°E' : -longitude + '°W');
+        replacementText += ')';
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + inputs[varName] + '"';
       } else if (varType === 'Graph') {

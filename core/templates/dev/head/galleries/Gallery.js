@@ -124,7 +124,7 @@ oppia.controller('Gallery', [
              CATEGORY_LIST, searchService) {
 
   $scope.CAROUSEL_INTERVAL = 3500;
-  $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG;
+  $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
 
   // Preload images, otherwise they will only start showing up some time after
   // the carousel slide comes into view. See:
@@ -152,7 +152,7 @@ oppia.controller('Gallery', [
 
   $scope.currentUserIsModerator = false;
 
-  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES && $scope.CAROUSEL_SLIDES.length > 0);
+  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
   $scope.$on('hasChangedSearchQuery', function() {
     if ($scope.inSplashMode) {
       $('.oppia-gallery-container').fadeOut(function() {

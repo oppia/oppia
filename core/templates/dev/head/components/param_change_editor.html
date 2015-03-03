@@ -7,7 +7,7 @@
         </span>
 
         <div ng-if="activeItem === $index">
-          <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
+          <div novalidate class="oppia-form" name="newParameterForm">
             Change
             <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose or type new" new-choice-regex="^[A-Za-z]+$" width="180px">
             </select2-dropdown>
@@ -22,11 +22,11 @@
             </value-generator-editor>
             <br>
 
-            <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
+            <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1" ng-click="commitParamChange(activeItem)">
             <div style="color: red;" aria-live="assertive" ng-if="INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
               The name '<[tmpParamChange.name]>' is reserved. Please choose another name.
             </div>
-          </form>
+          </div>
         </div>
       </div>
 
