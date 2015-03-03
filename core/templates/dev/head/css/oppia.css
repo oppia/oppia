@@ -327,10 +327,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding-top: 17px;
 }
 
-.oppia-navbar-nav {
-  margin-left: 20px;
-}
-
 .oppia-navbar-breadcrumb {
   color: #fff;
   cursor: default;
@@ -518,7 +514,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   font-size: 15px;
   height: 34px;
   padding: 3px 12px 4px 12px;
-  margin-right: 20px;
+  margin-right: 5px;
 }
 
 @media (max-width: 1050px) {
@@ -670,7 +666,7 @@ md-card.oppia-gallery-tile {
 .oppia-page-title {
   color: #222;
   font-size: 30px;
-  margin: 0 0 20px 0;
+  margin: 0 0 30px 0;
 }
 
 .oppia-content {
@@ -1107,11 +1103,12 @@ md-card.oppia-dashboard-tile {
   margin: 0;
   padding: 0;
   position: relative;
-  width: 80%;
 }
 
 ul.oppia-dashboard-tiles {
   list-style-type: none;
+  margin-top: 30px;
+  padding-left: 0px;
 }
 
 .oppia-large-modal-window .modal-dialog {
@@ -1369,7 +1366,7 @@ div#ng-curtain {
   color: #888;
 }
 .oppia-navbar-profile-picture-container {
-  margin-left: -5px;
+  margin-left: 10px;
   text-align: right;
 }
 .oppia-navbar-profile-picture {
@@ -1570,22 +1567,36 @@ div#ng-curtain {
   top: 0;
 }
 
-
-.oppia-about-cards-container {
+.oppia-page-cards-container {
   margin: auto;
   max-width: 660px;
   position: relative;
 }
-.oppia-about-card {
+.oppia-page-card {
   background: rgb(255,255,255);
+  font-size: 1.2em;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 30px;
   margin-top: 30px;
-  padding: 20px 40px;
+  padding: 30px 55px;
 }
-.oppia-about-card li {
+.oppia-page-card li {
   margin-bottom: 10px;
 }
+
+.oppia-dashboard-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 60px;
+  margin-bottom: 30px;
+}
+
+.oppia-timeline-card {
+  padding: 15px 40px;
+}
+
 .oppia-about-anchor {
   display: block;
   position: relative;

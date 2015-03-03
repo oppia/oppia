@@ -77,7 +77,7 @@ oppia.controller('Signup', [
     var admin = /admin/i;
 
     if (!username) {
-      $scope.warningText = 'Please choose a non-empty username.';
+      $scope.warningText = 'Please enter a username.';
     } else if (username.indexOf(' ') !== -1) {
       $scope.warningText = 'Please ensure that your username has no spaces.';
     } else if (username.length > 50) {
