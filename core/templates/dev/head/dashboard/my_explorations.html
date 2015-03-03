@@ -36,14 +36,14 @@
 {% block content %}
   <div class="oppia-dashboard-container" ng-controller="MyExplorations">
 
-    <h2>My Explorations</h2>
+    <h2 class="oppia-page-heading">My Explorations</h2>
 
     <div ng-if="explorationsList.length > 0">
       <ul class="oppia-dashboard-tiles">
         <li ng-repeat="exploration in explorationsList">
           <md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
             <a ng-href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
-              <div class="oppia-dashboard-tile-metadata-parent">
+              <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                 <div class="oppia-dashboard-tile-metadata">
                   Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
                   <br>
@@ -62,8 +62,8 @@
                     <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
                       <[exploration.title]>
                     </span>
-                    <span style="font-weight: bold;">&middot;</span>
-                    <span style="color: #888" class="protractor-test-exploration-objective">
+                    <span style="font-weight: bold;" class="hidden-xs">&middot;</span>
+                    <span style="color: #888" class="protractor-test-exploration-objective hidden-xs">
                       <span ng-if="exploration.objective">
                         <[getFormattedObjective(exploration.objective)]>
                       </span>
@@ -84,6 +84,10 @@
                       <span style="font-weight: bold;">&middot;</span>
                       Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                     </span>
+                  </div>
+
+                  <div class="visible-xs oppia-gallery-tile-second-row">
+                    <span style="color: #888;">Status: </span><span ng-class="{'oppia-dashboard-status-green': exploration.status !== 'private', 'oppia-dashboard-status-grey': exploration.status === 'private'}"><[exploration.status]></span>
                   </div>
                 </div>
               </div>
