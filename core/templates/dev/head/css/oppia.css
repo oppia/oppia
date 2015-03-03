@@ -347,7 +347,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  background: rgb(10, 48, 106);
   color: #fff;
 }
 
@@ -384,7 +383,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav > li > a:focus,
 .navbar-default .navbar-nav .open > a:hover,
 .navbar-default .navbar-nav .open > a:focus,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
@@ -627,6 +625,12 @@ md-card.oppia-gallery-tile {
   }
   .oppia-gallery-tile-details {
     padding-left: 0;
+  }
+}
+@media (max-width: 800px) {
+  .oppia-gallery-tiles-introduction {
+    margin-left: 20px;
+    margin-right: 20px;
   }
 }
 
@@ -1230,6 +1234,11 @@ ul.oppia-dashboard-tiles {
   width: 100%;
   z-index: 100;
 }
+@media(max-width: 368px) {
+  .oppia-gallery-banner-content {
+    top: 125px;
+  }
+}
 
 .oppia-gallery-banner-tagline {
   color: #fff;
@@ -1629,4 +1638,10 @@ div#ng-curtain {
 /* Hide the 'Skip' icon on the editor tutorial. */
 .skipBtn .glyphicon-ban-circle {
   display: none;
+}
+
+@media(max-width: 800px) {
+  .oppia-page-heading {
+    margin-left: 30px;
+  }
 }
