@@ -168,6 +168,9 @@ MATERIAL_DESIGN_ICONS_CONTENT_URL = (
 MATERIAL_DESIGN_ICONS_NAVIGATION_URL = (
     'https://raw.githubusercontent.com/google/material-design-icons/%s/navigation/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
+MATERIAL_DESIGN_ICONS_SOCIAL_URL = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/social/drawable-xxxhdpi'
+    % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR,
     'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
@@ -175,6 +178,7 @@ MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
 MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
     'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png']
+MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png']
 
 # Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'
@@ -230,6 +234,9 @@ download_files(
 download_files(
     MATERIAL_DESIGN_ICONS_NAVIGATION_URL, MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_NAVIGATION_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_SOCIAL_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_SOCIAL_FILES)
 download_files(
     NG_INFINITE_SCROLL_URL, NG_INFINITE_SCROLL_DST, NG_INFINITE_SCROLL_FILES)
 
