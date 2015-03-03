@@ -1625,7 +1625,3 @@ div#ng-curtain {
 .skipBtn .glyphicon-ban-circle {
   display: none;
 }
-
-.skipBtn {
-  content: 'Testing';
-}
