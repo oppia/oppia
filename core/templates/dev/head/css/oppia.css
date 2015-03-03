@@ -644,12 +644,17 @@ md-card.oppia-gallery-tile {
   position: absolute;
   right: 1px;
   top: -9px;
+  border-color:transparent;
+  background-color: transparent;
+
 }
 .oppia-gallery-edit-btn:hover {
-  background: #47a447;
-  border-color: #4cae4c;
-  color: white;
+  background: transparent;
+  border-color: transparent;
+  color: green;
 }
+
+
 
 .carousel-indicators {
   margin-bottom: 120px;
