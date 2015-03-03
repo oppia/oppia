@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.constant('DEFAULT_DASHBOARD_TAB_NAME', 'timeline');
+oppia.constant('DEFAULT_DASHBOARD_TAB_NAME', 'myExplorations');
 
 
 oppia.controller('Dashboard', [
