@@ -347,7 +347,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  background: rgb(10, 48, 106);
   color: #fff;
 }
 
@@ -384,7 +383,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav > li > a:focus,
 .navbar-default .navbar-nav .open > a:hover,
 .navbar-default .navbar-nav .open > a:focus,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
