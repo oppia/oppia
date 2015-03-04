@@ -691,10 +691,6 @@ md-card.oppia-gallery-tile {
   border: 2px solid #FA787E;
 }
 
-.oppia-form input.ng-valid.ng-dirty {
-  border: 2px solid #78FA89;
-}
-
 .oppia-gallery-frame {
   border-radius: 20px;
   margin: 10px;
@@ -892,9 +888,9 @@ md-card.oppia-gallery-tile {
 .oppia-graph-viz-container {
   border-radius: 4px;
   border: 1px solid #ccc;
-  height: 250px;
-  margin-top: 5px;
+  height: 300px;
   overflow-y: hidden;
+  position: relative;
 }
 
 /* Styles for the statistics page. */
@@ -907,8 +903,6 @@ md-card.oppia-gallery-tile {
 .oppia-add-rule-button {
   background-color: rgba(5,140,166,0.9);
   border: 0;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
   border-radius: 0;
   color: white;
   font-size: 14px;
@@ -917,7 +911,9 @@ md-card.oppia-gallery-tile {
   width: 100%;
 }
 
-.oppia-add-rule-button:hover, .oppia-add-rule-button:active {
+.oppia-add-rule-button:hover, 
+.oppia-add-rule-button:active,
+.oppia-add-rule-button:focus {
   background-color: rgba(5,140,166,1);
   color: white;
   opacity: 1;
@@ -928,10 +924,11 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-graph-resize-button {
-  margin-top: -1px;
+  border: 0px;
   padding: 9px 10px 6px 10px;
   position: absolute;
-  right: 5px;
+  right: 2px;
+  top: 2px;
 }
 
 .nav-pills > li > a.oppia-rule-tab {
@@ -1040,6 +1037,12 @@ oppia-parameter {
   text-align: center;
   vertical-align: baseline;
   white-space: nowrap;
+}
+
+.oppia-param-arrow-button {
+  border: 0px;
+  font-size: 14px;
+  padding: 0px;
 }
 
 .oppia-tutorial-tooltip {
@@ -1435,14 +1438,11 @@ div#ng-curtain {
 
 
 .oppia-editor-sidebar {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  height: 100%;
-  max-width: 25%;
   padding: 7px 5px 0 5px;
-  position: fixed;
-  right: 0;
-  top: 50px;
-  width: 400px;
+  position: absolute;
+  right: 15px;
+  top: 28px;
+  width: 350px;
 }
 .oppia-editor-sidebar accordion .panel {
   border-radius: 0;

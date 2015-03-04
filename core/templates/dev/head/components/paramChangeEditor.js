@@ -42,7 +42,6 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
 
       $scope.DEFAULT_CUSTOMIZATION_ARGS = {
         'Copier': {
-          value: '[New parameter value]',
           parse_with_jinja: true
         },
         'RandomSelector': {
@@ -66,8 +65,8 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
         'RandomSelector': ['list_of_values'],
       };
       $scope.PREAMBLE_TEXT = {
-        'Copier': 'by setting it to',
-        'RandomSelector': 'by picking, at random, one of'
+        'Copier': 'set to',
+        'RandomSelector': 'pick, at random, one of'
       };
       $scope.HUMAN_READABLE_ARGS_RENDERERS = {
         'Copier': function(customization_args) {
