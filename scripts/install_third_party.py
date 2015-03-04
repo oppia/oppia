@@ -159,6 +159,9 @@ UI_BOOTSTRAP_FILES = [
     for suffix in ['js', 'min.js']]
 
 MATERIAL_DESIGN_ICONS_REV = '1.0.1'
+MATERIAL_DESIGN_ICONS_ACTION_URL = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/action/drawable-xxxhdpi'
+    % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_COMMUNICATION_URL = (
     'https://raw.githubusercontent.com/google/material-design-icons/%s/communication/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
@@ -174,6 +177,7 @@ MATERIAL_DESIGN_ICONS_SOCIAL_URL = (
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR,
     'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
+MATERIAL_DESIGN_ICON_ACTION_FILES = ['ic_group_work_black_48dp.png']
 MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
 MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
@@ -225,6 +229,9 @@ download_files(JQUERYUI_URL, JQUERYUI_DST, JQUERYUI_FILES)
 download_files(ANGULAR_URL, ANGULAR_DST, ANGULAR_FILES)
 download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_ACTION_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_ACTION_FILES)
 download_files(
     MATERIAL_DESIGN_ICONS_COMMUNICATION_URL, MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_COMMUNICATION_FILES)

@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-import feconf
 import test_utils
 
 

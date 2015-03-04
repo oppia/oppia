@@ -18,7 +18,6 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.controllers import pages
-from core.domain import config_domain
 from core.domain import user_services
 import feconf
 import utils

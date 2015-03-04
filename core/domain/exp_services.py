@@ -117,9 +117,9 @@ def get_exploration_summary_by_id(exploration_id):
 
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
-    """Returns a dict of domain objects representing explorations with the given
-    ids as keys. If an exp_id is not present it is not included in the return
-    dict.
+    """Returns a dict of domain objects representing explorations with the
+    given ids as keys. If an exp_id is not present it is not included in the
+    return dict.
     """
     exp_ids = set(exp_ids)
     result = {}

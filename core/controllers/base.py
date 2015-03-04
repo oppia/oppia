@@ -326,7 +326,8 @@ class BaseHandler(webapp2.RequestHandler):
             values = self.values
 
         values.update({
-            'RTE_COMPONENT_SPECS': rte_component_registry.Registry.get_all_specs(),
+            'RTE_COMPONENT_SPECS': (
+                rte_component_registry.Registry.get_all_specs()),
             'DEV_MODE': feconf.DEV_MODE,
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'EXPLORATION_STATUS_PRIVATE': (
@@ -341,10 +342,11 @@ class BaseHandler(webapp2.RequestHandler):
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'user_is_logged_in': bool(self.username),
-            # TODO(sll): Consider including the obj_editor html directly as part of the
-            # base HTML template?
+            # TODO(sll): Consider including the obj_editor html directly as
+            # part of the base HTML template?
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
-            'SIDEBAR_MENU_ADDITIONAL_LINKS': SIDEBAR_MENU_ADDITIONAL_LINKS.value,
+            'SIDEBAR_MENU_ADDITIONAL_LINKS': (
+                SIDEBAR_MENU_ADDITIONAL_LINKS.value),
         })
 
         if redirect_url_on_logout is None:

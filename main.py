@@ -152,7 +152,10 @@ urls = [
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
-        r'/site_guidelines', pages.AboutPage, 'redirect_to_about_page'),
+        r'/participate', pages.ParticipatePage, 'participate_page'),
+    get_redirect_route(
+        r'/site_guidelines', pages.ParticipatePage,
+        'redirect_to_participate_page'),
     get_redirect_route(
         r'/contact', pages.AboutPage, 'redirect_to_about_page'),
 

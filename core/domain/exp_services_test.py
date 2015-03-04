@@ -268,7 +268,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with delete_docs_swap:
             exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
 
-
     def test_create_new_exploration_error_cases(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, '', '')
@@ -1919,7 +1918,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             for prop in simple_props:
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))
-
 
     def test_get_private_at_least_viewable_exploration_summaries(self):
 

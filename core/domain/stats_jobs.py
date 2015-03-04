@@ -16,7 +16,6 @@
 
 import ast
 import collections
-import logging
 
 from core import jobs
 from core.platform import models
