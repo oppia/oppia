@@ -42,6 +42,7 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
 
       $scope.DEFAULT_CUSTOMIZATION_ARGS = {
         'Copier': {
+          value: '',
           parse_with_jinja: true
         },
         'RandomSelector': {
