@@ -195,7 +195,9 @@ oppia.directive('conversationSkin', [function() {
                 messengerService.EXPLORATION_COMPLETED, null);
             }
 
-            if (newStateName && refreshInteraction) {
+            if (!newStateName) {
+              $scope.inputTemplate = '';
+            } else if (newStateName && refreshInteraction) {
               // The previous interaction should be replaced.
               _labelForNextFocusTarget = Math.random().toString(36).slice(2);
               $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
