@@ -8,15 +8,6 @@
   <div ng-if="hasTabLoaded">
     <md-card class="oppia-editor-card">
       <div ng-if="hasExplorationBeenVisited">
-        <div class="pull-right" ng-if="versions.length > 0">
-          Show stats for version:
-          <select class="oppia-select"
-                  ng-change="onSelectExplorationVersion(currentVersion)"
-                  ng-model="currentVersion"
-                  ng-options="version for version in versions">
-          </select>
-        </div>
-
         <div class="oppia-statistics-display">
           <h3>Exploration Completion Rate</h3>
           <bar-chart data="chartData"

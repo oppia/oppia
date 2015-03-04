@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import logging
 
 from core import jobs
 from core.platform import models
@@ -172,7 +173,10 @@ class StatisticsMRJobManager(
     def map(item):
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
             if isinstance(item, stats_models.StateCounterModel):
-                (exploration_id, state_name) = item.id.split('.')
+                first_dot_index = item.id.find('.')
+                exploration_id = item.id[:first_dot_index]
+                state_name = item.id[first_dot_index + 1:]
+
                 value = {
                     'type': StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING,
                     'exploration_id': exploration_id,
@@ -187,9 +191,10 @@ class StatisticsMRJobManager(
                     value)
                 yield ('%s:%s' % (exploration_id, _ALL_VERSIONS_STRING), value)
             else:
-                version = item.exploration_version
-                if version is None:
-                    version = _NO_SPECIFIED_VERSION_STRING
+                version = _NO_SPECIFIED_VERSION_STRING
+                if version is not None:
+                    version = str(item.exploration_version)
+
                 value = {
                     'type': StatisticsMRJobManager._TYPE_EVENT_STRING,
                     'event_type': item.event_type,
@@ -198,9 +203,8 @@ class StatisticsMRJobManager(
                     'created_on': utils.get_time_in_millisecs(item.created_on),
                     'exploration_id': item.exploration_id,
                     'version': version}
-                yield (
-                    '%s:%s' % (item.exploration_id, item.exploration_version),
-                    value)
+
+                yield ('%s:%s' % (item.exploration_id, version), value)
                 yield (
                     '%s:%s' % (item.exploration_id, _ALL_VERSIONS_STRING),
                     value)
@@ -250,9 +254,18 @@ class StatisticsMRJobManager(
         for state_name in exploration.states:
             state_session_ids[state_name] = set([])
 
-        # Iterate and process each event for this exploration.
+        # Iterate over and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
+
+            # Convert the state name to unicode, if necessary.
+            # Note: sometimes, item.state_name is None for
+            # StateHitEventLogEntryModel.
+            # TODO(sll): Track down the reason for this, and fix it.
+            if (value['state_name'] is not None and
+                    not isinstance(value['state_name'], unicode)):
+                value['state_name'] = value['state_name'].decode('utf-8')
+
             if (value['type'] ==
                     StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING):
                 if value['state_name'] == exploration.init_state_name:
