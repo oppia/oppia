@@ -8,7 +8,7 @@
   <div ng-if="hasTabLoaded">
     <md-card class="oppia-editor-card">
       <div ng-if="hasExplorationBeenVisited">
-        <div class="pull-right">
+        <div class="pull-right" ng-if="versions.length > 0">
           Show stats for version:
           <select class="oppia-select"
                   ng-change="onSelectExplorationVersion(currentVersion)"
@@ -17,19 +17,21 @@
           </select>
         </div>
 
-        <h3>Exploration Completion Rate</h3>
-        <bar-chart data="chartData"
-                   options="COMPLETION_RATE_CHART_OPTIONS">
-        </bar-chart>
+        <div class="oppia-statistics-display">
+          <h3>Exploration Completion Rate</h3>
+          <bar-chart data="chartData"
+                     options="COMPLETION_RATE_CHART_OPTIONS">
+          </bar-chart>
 
-        <h3>Common learner paths</h3>
-        <div style="font-size: smaller" ng-if="lastUpdated">
-          <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
-        </div>
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-              <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+          <h3>Common learner paths</h3>
+          <div style="font-size: smaller" ng-if="lastUpdated">
+            <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+                </div>
               </div>
             </div>
           </div>

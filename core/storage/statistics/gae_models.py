@@ -141,7 +141,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Event schema documentation
     --------------------------
-    V1: 
+    V1:
         event_type: 'leave' (there are no 'maybe leave' events in V0)
         exploration_id: id of exploration currently being played
         exploration_version: version of exploration
@@ -150,10 +150,10 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         created_on date
         event_schema_version: 1
         session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter name
-          to value
-        client_time_spent_in_secs: time spent in this state before the event was
-          triggered
+        params: current parameter values, in the form of a map of parameter
+            name to value
+        client_time_spent_in_secs: time spent in this state before the event
+            was triggered
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -193,9 +193,13 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
         """Creates a new leave exploration event."""
+        # TODO(sll): Some events currently do not have an entity id that was
+        # set using this method; it was randomly set instead due tg an error.
+        # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
         leave_event_entity = cls(
+            id=entity_id,
             event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
             exploration_id=exp_id,
             exploration_version=exp_version,
@@ -209,10 +213,10 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student starting the exploration.
- 
+
     Event schema documentation
     --------------------------
-    V1: 
+    V1:
         event_type: 'start'
         exploration_id: id of exploration currently being played
         exploration_version: version of exploration
@@ -222,8 +226,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         created_on date
         event_schema_version: 1
         session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter name
-          to value
+        params: current parameter values, in the form of a map of parameter
+            name to value
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -263,9 +267,13 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     def create(cls, exp_id, exp_version, state_name, session_id,
                params, play_type, version=1):
         """Creates a new start exploration event."""
-        entity_id = cls.get_new_event_entity_id(exp_id,
-                                                session_id)
+        # TODO(sll): Some events currently do not have an entity id that was
+        # set using this method; it was randomly set instead due tg an error.
+        # Might need to migrate them.
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
         start_event_entity = cls(
+            id=entity_id,
             event_type=feconf.EVENT_TYPE_START_EXPLORATION,
             exploration_id=exp_id,
             exploration_version=exp_version,
@@ -324,11 +332,16 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
                               session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id, params, play_type):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id, params,
+            play_type):
         """Creates a new leave exploration event."""
-        entity_id = cls.get_new_event_entity_id(
-            exp_id, session_id)
+        # TODO(sll): Some events currently do not have an entity id that was
+        # set using this method; it was randomly set instead due tg an error.
+        # Might need to migrate them.
+        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         state_event_entity = cls(
+            id=entity_id,
             event_type=feconf.EVENT_TYPE_STATE_HIT,
             exploration_id=exp_id,
             exploration_version=exp_version,
@@ -337,7 +350,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         state_event_entity.put()
-         
+
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
@@ -433,4 +446,3 @@ def resolve_answers(
         else:
             del answer_log.answers[answer]
     answer_log.put()
-
