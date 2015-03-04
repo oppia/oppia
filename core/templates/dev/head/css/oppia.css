@@ -800,11 +800,11 @@ md-card.oppia-gallery-tile {
   width: 24px;
 }
 .oppia-pre-avatar-oppia::before {
-  background-image: url('/images/oppia_favicon_black_48px.png');
+  background-image: url('/images/general/oppia_black_48px.png');
   top: 2px;
 }
 .oppia-pre-avatar-user::before {
-  background-image: url('/images/user_mint_48px.png');
+  background-image: url('/images/general/user_mint_48px.png');
   top: 8px;
 }
 
@@ -911,7 +911,7 @@ md-card.oppia-gallery-tile {
   width: 100%;
 }
 
-.oppia-add-rule-button:hover, 
+.oppia-add-rule-button:hover,
 .oppia-add-rule-button:active,
 .oppia-add-rule-button:focus {
   background-color: rgba(5,140,166,1);
