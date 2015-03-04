@@ -29,7 +29,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import skins_services

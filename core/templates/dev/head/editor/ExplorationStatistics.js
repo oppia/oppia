@@ -30,7 +30,8 @@ oppia.controller('ExplorationStatistics', [
     legendPosition: 'right',
     width: 500
   };
-  $scope.EXPLORATION_STATS_VERSION_ALL = 'all';
+  var _EXPLORATION_STATS_VERSION_ALL = 'all';
+  $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
@@ -38,11 +39,11 @@ oppia.controller('ExplorationStatistics', [
 
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
-    $scope.refreshExplorationStatistics($scope.EXPLORATION_STATS_VERSION_ALL);
+    $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
     $scope.explorationVersionUrl = '/createhandler/statisticsversion/' + explorationData.explorationId;
     $http.get($scope.explorationVersionUrl).then(function(response) {
       $scope.versions = response.data.versions;
-      $scope.currentVersion = $scope.EXPLORATION_STATS_VERSION_ALL;
+      $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
     });
   });
 
@@ -106,10 +107,12 @@ oppia.controller('ExplorationStatistics', [
       });
 
       $scope.hasTabLoaded = true;
+      $('.oppia-statistics-display').fadeIn();
     });
   };
 
   $scope.onSelectExplorationVersion = function(version) {
+    $('.oppia-statistics-display').fadeOut();
     $scope.refreshExplorationStatistics(version);
   };
 

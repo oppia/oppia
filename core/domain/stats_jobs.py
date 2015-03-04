@@ -156,6 +156,7 @@ class StatisticsMRJobManager(
 
     _TYPE_STATE_COUNTER_STRING = 'counter'
     _TYPE_EVENT_STRING = 'event'
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return StatisticsAggregator
@@ -181,7 +182,9 @@ class StatisticsMRJobManager(
                     'subsequent_entries_count': item.subsequent_entries_count,
                     'resolved_answer_count': item.resolved_answer_count,
                     'active_answer_count': item.active_answer_count}
-                yield ('%s:%s' % (exploration_id, _NO_SPECIFIED_VERSION_STRING), value)
+                yield (
+                    '%s:%s' % (exploration_id, _NO_SPECIFIED_VERSION_STRING),
+                    value)
                 yield ('%s:%s' % (exploration_id, _ALL_VERSIONS_STRING), value)
             else:
                 version = item.exploration_version
@@ -195,9 +198,12 @@ class StatisticsMRJobManager(
                     'created_on': utils.get_time_in_millisecs(item.created_on),
                     'exploration_id': item.exploration_id,
                     'version': version}
-                yield ('%s:%s' % (item.exploration_id, item.exploration_version),
-                       value)
-                yield ('%s:%s' % (item.exploration_id, _ALL_VERSIONS_STRING), value)
+                yield (
+                    '%s:%s' % (item.exploration_id, item.exploration_version),
+                    value)
+                yield (
+                    '%s:%s' % (item.exploration_id, _ALL_VERSIONS_STRING),
+                    value)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -205,7 +211,8 @@ class StatisticsMRJobManager(
         exploration = None
         (exp_id, version) = key.split(':')
         try:
-            if version not in [_NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
+            if version not in [
+                    _NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
                 exploration = exp_services.get_exploration_by_id(
                     exp_id, version=version)
             else:
@@ -243,15 +250,15 @@ class StatisticsMRJobManager(
         for state_name in exploration.states:
             state_session_ids[state_name] = set([])
 
-
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['type'] == StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING:
+            if (value['type'] ==
+                    StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING):
                 if value['state_name'] == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
                 if value['state_name'] == feconf.END_DEST:
-                    old_models_complete_count = value['first_entry_count'] 
+                    old_models_complete_count = value['first_entry_count']
                 else:
                     state_hit_counts[state_name]['no_answer_count'] += (
                         value['first_entry_count']
