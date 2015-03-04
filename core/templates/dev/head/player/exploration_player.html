@@ -31,7 +31,7 @@
       <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
       </a>
-      <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
+      <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
         <li>
           <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
           <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
