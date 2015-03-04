@@ -103,7 +103,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       rule: '=',
-      saveRule: '=',
+      saveRule: '&',
       deleteRule: '&',
       isEditable: '='
     },
@@ -167,7 +167,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDestMemento = null;
         };
         $scope.deleteThisRule = function() {
-          $scope.cancelThisEdit();
           $scope.deleteRule();
         };
 

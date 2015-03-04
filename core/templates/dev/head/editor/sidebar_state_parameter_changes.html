@@ -1,7 +1,12 @@
-<div ng-controller="StateParamChangesEditor">
-  <h3 ng-if="editabilityService.isEditable() || stateParamChanges.length > 0">Parameter Changes</h3>
-  <param-change-editor param-changes="stateParamChanges"
-	  save-param-changes="saveStateParamChanges"
-	  is-editable="editabilityService.isEditable()">
-  </param-change-editor>
+<div ng-controller="StateParamChangesEditor" style="margin-top: 35px;">
+  <span style="font-size: 16px;">
+    <strong ng-if="editabilityService.isEditable() || stateParamChanges.length > 0">State Parameter Changes (Advanced)</strong>
+  </span>
+  <span class="glyphicon glyphicon-info-sign" tooltip="These are applied at the beginning of the state." tooltip-placement="bottom" style="font-size: 12px; padding-left: 18px;"></span>
+  <md-card style="background-color: white; margin: 20px 0px; padding: 10px 10px;">
+    <param-change-editor param-changes="stateParamChanges"
+    save-param-changes="saveStateParamChanges"
+    is-editable="editabilityService.isEditable()">
+    </param-change-editor>
+  </md-card>
 </div>

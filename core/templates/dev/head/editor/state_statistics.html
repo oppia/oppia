@@ -1,31 +1,33 @@
 <div ng-controller="StateStatistics">
   <div ng-if="unresolvedAnswersList.length">
-    <h3>Unhandled answers</h3>
+    <h3 style="margin-top: 35px;">Unhandled Answers</h3>
 
-    <table style="width: 100%;" class="table table-striped">
-      <tr ng-repeat="item in unresolvedAnswersList | orderBy:'-count' | limitTo:10">
-        <td style="width: 65%;">
-          <div ng-show="item.count === 0">
-            <del><[item.answer]></del>
-          </div>
-          <div ng-show="item.count > 0" custom-popover popover-text="<[item.answer]>" popover-placement="top" popover-label="<[item.answer | truncate:40]>">
-          </div>
-        </td>
+    <md-card style="background-color: white; margin: 20px 0px; padding: 0px;">
+      <table style="width: 100%;" class="table">
+        <tr ng-repeat="item in unresolvedAnswersList | orderBy:'-count' | limitTo:10">
+          <td style="width: 65%;">
+            <div ng-show="item.count === 0">
+              <del><[item.answer]></del>
+            </div>
+            <div ng-show="item.count > 0" custom-popover popover-text="<[item.answer]>" popover-placement="top" popover-label="<[item.answer | truncate:40]>">
+            </div>
+          </td>
 
-        <td style="width: 25%;">
-          <span ng-show="item.count > 0">
-            <[item.count]> time<span ng-show="item.count != 1">s</span>
-          </span>
-        </td>
+          <td style="width: 25%;">
+            <span ng-show="item.count > 0">
+              <[item.count]> time<span ng-show="item.count != 1">s</span>
+            </span>
+          </td>
 
-        <td style="width: 10%;">
-          <span ng-if="item.count > 0 && editabilityService.isEditable()">
-            <button class="btn btn-default btn-xs oppia-small-delete-button" ng-click="deleteUnresolvedAnswer(item.answer)">
-              <span class="glyphicon glyphicon-remove"></span>
-            </button>
-          </span>
-        </td>
-      </tr>
-    </table>
+          <td style="width: 10%;">
+            <span ng-if="item.count > 0 && editabilityService.isEditable()">
+              <button class="btn btn-default btn-xs oppia-small-delete-button" ng-click="deleteUnresolvedAnswer(item.answer)">
+                <span class="glyphicon glyphicon-remove"></span>
+              </button>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </md-card>
   </div>
 </div>

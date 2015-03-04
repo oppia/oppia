@@ -22,14 +22,16 @@
         </div>
       </md-card>
 
-      <md-card class="oppia-editor-card-with-avatar" ng-hide="!isInteractionIdSet || isCurrentStateTerminal">
-        <div class="oppia-editor-card-body">
-          {% include 'editor/state_editor_rules.html' %}
-          {% include 'editor/state_editor_active_rule.html' %}
+      <div ng-hide="!isInteractionIdSet || isCurrentStateTerminal">
+        <div style="font-size: 16px; margin-top: 35px;">
+          <strong>Rules</strong>
         </div>
-      </md-card>
+        {% include 'editor/state_editor_rules.html' %}
+      </div>
+
+      <div>
+        {% include 'editor/state_statistics.html' %}
+      </div>
     </div>
   </div>
-
-  {% include 'attribution_guide.html' %}
 </div>
