@@ -346,6 +346,8 @@ oppia.controller('StateRules', [
     });
   };
 
+  $scope.isDraggingOccurring = false;
+
   $scope.RULE_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
@@ -354,10 +356,12 @@ oppia.controller('StateRules', [
     tolerance: 'pointer',
     start: function(e, ui) {
       $rootScope.$broadcast('externalSave');
+      $scope.isDraggingOccurring = true;
       $scope.$apply();
       ui.placeholder.height(ui.item.height());
     },
     stop: function(e, ui) {
+      $scope.isDraggingOccurring = false;
       $scope.$apply();
       rulesService.save($scope.interactionHandlers);
       $scope.changeActiveRuleIndex(ui.item.index());
