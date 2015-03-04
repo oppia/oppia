@@ -1,10 +1,4 @@
-<div ng-controller="StateRules" style="background: #f5f5f5;">
-  <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue' || !isDefaultRuleTabShown())" class="oppia-add-rule-button-container">
-    <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
-      + Add Rule
-    </button>
-  </div>
-
+<div ng-controller="StateRules" style="background: #f5f5f5;" id="tutorialStateActiveRule">
   <div ng-repeat="(handlerName, handler) in interactionHandlers">
     <div>
       <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
@@ -22,6 +16,15 @@
               <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
             </div>
           </a>
+
+          <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown">
+            <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
+              <div class="oppia-rule-body-container">
+                <rule-editor rule="rule" save-rule="saveActiveRule(rule)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
+                </rule-editor>
+              </div>
+            </div>
+          </div>
         </li>
 
         <li ng-if="isDefaultRuleTabShown()"
@@ -31,9 +34,24 @@
               None of the other rules apply...
             </span>
           </a>
+
+          <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown">
+            <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
+              <div class="oppia-rule-body-container">
+                <rule-editor rule="handler[handler.length - 1]" save-rule="saveActiveRule(handler[handler.length - 1])" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
+                </rule-editor>
+              </div>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
+  </div>
+
+  <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue' || !isDefaultRuleTabShown())" class="oppia-add-rule-button-container">
+    <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
+      + Add Rule
+    </button>
   </div>
 </div>
 

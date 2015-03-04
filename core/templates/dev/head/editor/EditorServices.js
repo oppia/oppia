@@ -1036,7 +1036,7 @@ oppia.factory('explorationWarningsService', [
           type: WARNING_TYPES.ERROR,
           message: (
             'The following state(s) are unreachable: ' +
-            unreachableStateNames.join(', ') + '.')          
+            unreachableStateNames.join(', ') + '.')
         });
       } else {
         // Only perform this check if all states are reachable.
@@ -1049,7 +1049,7 @@ oppia.factory('explorationWarningsService', [
             message: (
               'Please make sure there\'s a path to END from each of: ' +
               deadEndStates.join(', ') + '.')
-          });            
+          });
         }
       }
     }
