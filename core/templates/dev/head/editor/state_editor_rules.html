@@ -1,4 +1,4 @@
-<div ng-controller="StateRules" style="background: #f5f5f5;" id="tutorialStateActiveRule">
+<div ng-controller="StateRules" style="background: #f5f5f5;">
   <div ng-repeat="(handlerName, handler) in interactionHandlers">
     <div>
       <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
@@ -17,7 +17,8 @@
             </div>
           </a>
 
-          <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown">
+          <!-- Note that the use of ids for the tutorial here only works because at most one rule editor is visible at a time. -->
+          <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown" id="tutorialStateActiveRule">
             <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
               <div class="oppia-rule-body-container">
                 <rule-editor rule="rule" save-rule="saveActiveRule(rule)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
@@ -35,7 +36,7 @@
             </span>
           </a>
 
-          <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown">
+          <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown" id="tutorialStateActiveRule">
             <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
               <div class="oppia-rule-body-container">
                 <rule-editor rule="handler[handler.length - 1]" save-rule="saveActiveRule(handler[handler.length - 1])" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
