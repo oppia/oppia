@@ -230,15 +230,45 @@ def get_exploration_summaries_matching_ids(exp_ids):
 def get_exploration_summaries_matching_query(query_string, cursor=None):
     """Returns a list with all exploration summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
+
+    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
+    at least that many, otherwise it returns all remaining results. (If this
+    behaviour does not occur, an error will be logged.) The method also returns
+    a search cursor.
     """
-    exp_ids, search_cursor = search_explorations(query_string, cursor=cursor)
-    summary_models = [
-        model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
-        if model is not None]
-    summaries = [
+    MAX_ITERATIONS = 10
+    summary_models = []
+
+    for i in range(MAX_ITERATIONS):
+        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+
+        exp_ids, search_cursor = search_explorations(
+            query_string, remaining_to_fetch, cursor=cursor)
+
+        invalid_exp_ids = []
+        for ind, model in enumerate(
+                exp_models.ExpSummaryModel.get_multi(exp_ids)):
+            if model is not None:
+                summary_models.append(model)
+            else:
+                invalid_exp_ids.append(exp_ids[ind])
+
+        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+                search_cursor is None):
+            break
+        else:
+            logging.error(
+                'Search index contains stale exploration ids: %s' %
+                ', '.join(invalid_exp_ids))
+
+    logging.error(
+        'Could not fulfill search request for query string %s; at least %s '
+        'retries were needed.' % (query_string, MAX_ITERATIONS))
+
+    return ([
         get_exploration_summary_from_model(summary_model)
-        for summary_model in summary_models]
-    return (summaries, search_cursor)
+        for summary_model in summary_models
+    ], search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -1088,8 +1118,7 @@ def delete_documents_from_search_index(exploration_ids):
         exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
-def search_explorations(
-    query, sort=None, limit=feconf.GALLERY_PAGE_SIZE, cursor=None):
+def search_explorations(query, limit, sort=None, cursor=None):
     """Searches through the available explorations.
 
     args:

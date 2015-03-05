@@ -177,7 +177,7 @@ oppia.controller('Gallery', [
   };
 
   $scope.pageLoaderIsBusy = false;
-  $scope.showMoreExplorations = function(data) {
+  $scope.showMoreExplorations = function() {
     if (!$rootScope.loadingMessage) {
       $scope.pageLoaderIsBusy = true;
 
