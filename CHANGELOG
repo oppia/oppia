@@ -3,8 +3,8 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
-v2.0.0 (5 Mar 2015)
--------------------
+v2.0.0.rc.1 (5 Mar 2015)
+------------------------
 Frontend (general):
 * Add a sidebar to all pages as a primary navigation mechanism.
 * Restyle top navbar as an area for breadcrumbs and secondary navigation, and to be more responsive.
