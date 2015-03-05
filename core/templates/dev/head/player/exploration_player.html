@@ -136,6 +136,7 @@
   </script>
 
   {% include 'components/exploration_embed_button.html' %}
+  {% include 'components/ratings.html' %}
 {% endblock %}
 
 {% block footer_js %}
@@ -144,6 +145,7 @@
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
+    {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 

@@ -342,6 +342,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
+          $rootScope.$broadcast('playerServiceInitialized')
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
@@ -560,6 +561,11 @@ oppia.controller('LearnerLocalNav', [
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
+
+  $scope.$on('playerServiceInitialized', function() {
+    $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+  });
+
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
   $scope.showFeedbackModal = function() {

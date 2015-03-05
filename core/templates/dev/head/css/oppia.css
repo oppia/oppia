@@ -418,6 +418,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   display: block;
 }
 
+.oppia-rate-dropdown-menu {
+  min-width: 90px;
+  width: 110px;
+  text-align: center;
+}
+
 .oppia-share-dropdown-menu {
   min-width: 30px;
   width: 46px;

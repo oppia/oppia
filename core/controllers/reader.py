@@ -419,8 +419,9 @@ class RatingHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({
-            'overall': rating_services.get_overall_ratings(exploration_id),
-            'user': rating_services.get_user_specific_rating(
+            'overall_rating':
+                rating_services.get_overall_ratings(exploration_id),
+            'user_rating': rating_services.get_user_specific_rating(
                 self.user_id, exploration_id) if self.user_id else None
         })
         self.render_json(self.values)
@@ -429,6 +430,6 @@ class RatingHandler(base.BaseHandler):
     def put(self, exploration_id):
         """Handles PUT requests."""
         rating_services.assign_rating(
-            self.user_id, exploration_id, self.payload.get('rating'))
+            self.user_id, exploration_id, self.payload.get('user_rating'))
         self.render_json({})
 

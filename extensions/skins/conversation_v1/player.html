@@ -17,9 +17,12 @@
           <md-card class="conversation-skin-card">
             <div dropdown class="dropdown conversation-skin-card-dropdown" ng-if="state.stateName && !isInPreviewMode">
               <img dropdown-toggle src="/third_party/static/material-design-icons-1.0.1/ic_more_vert_black_48dp.png" class="dropdown-toggle conversation-skin-card-dropdown-toggle">
-              <ul class="dropdown-menu dropdown-menu-right">
+              <ul class="dropdown-menu dropdown-menu-right" style="text-align:center">
                 <li>
                   <a href="" ng-click="openCardFeedbackModal(state.stateName)">Give Feedback</a>
+                </li>
+                <li ng-if="isLoggedIn">
+                  Rate <ratings rating-type="'user'" exploration-id="explorationId"></ratings>
                 </li>
               </ul>
             </div>
@@ -31,6 +34,9 @@
                 </td>
                 <td class="conversation-skin-oppia-output conversation-skin-oppia-content">
                   <div class="protractor-test-conversation-content" angular-html-bind="state.content"></div>
+                  <p ng-if="finished && $index === allResponseStates.length - 1 && !isInPreviewMode && isLoggedIn">
+                    Rate this exploration: <ratings rating-type="'user'" exploration-id="explorationId"></ratings>
+                  </p>
                 </td>
               </tr>
             </table>

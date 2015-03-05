@@ -125,6 +125,7 @@ oppia.directive('conversationSkin', [function() {
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights, introCardImageUrl) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
           $scope.introCardImageUrl = introCardImageUrl;
           oppiaPlayerService.getUserProfileImage().then(function(result) {
             // $scope.profilePicture contains a dataURI representation of the
