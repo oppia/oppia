@@ -70,7 +70,8 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
         #   exp_services -> event_services -> jobs_registry ->
         #   exp_jobs -> exp_services.
         from core.domain import exp_services
-        exp_services.index_explorations_given_ids([item.id])
+        if not item.deleted:
+            exp_services.index_explorations_given_ids([item.id])
 
 
 class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):

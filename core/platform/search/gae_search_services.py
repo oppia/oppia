@@ -154,7 +154,8 @@ def _validate_list(key, value):
                 ' type %s.' % (i, key, type(element)))
 
 
-def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
+def delete_documents_from_index(
+        doc_ids, index, retries=DEFAULT_NUM_RETRIES):
     """Deletes documents from an index.
 
     Args:
@@ -196,6 +197,26 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
                     return
 
         raise SearchFailureError(e)
+
+
+def clear_index(index_name):
+    """Clears an index completely.
+
+    WARNING: This does all the clearing in-request, and may therefore fail if
+    there are too many entries in the index.
+
+    Args:
+      - index: the name of the index to delete the document from, a string.
+    """
+    index = gae_search.Index(index_name)
+
+    while True:
+        doc_ids = [
+            document.doc_id for document in index.get_range(ids_only=True)]
+        if not doc_ids:
+            break
+
+        index.delete(doc_ids)
 
 
 def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,

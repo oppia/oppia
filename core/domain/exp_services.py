@@ -1021,7 +1021,8 @@ def get_next_page_of_all_non_private_commits(
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
-        raise ValueError("max_age must be a datetime.timedelta instance. or None.")
+        raise ValueError(
+            "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
@@ -1083,6 +1084,13 @@ def _exp_to_search_dict(exp):
     }
     doc.update(_exp_rights_to_search_dict(rights))
     return doc
+
+
+def clear_search_index():
+    """WARNING: This runs in-request, and may therefore fail if there are too
+    many entries in the index.
+    """
+    search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
 
 
 def index_explorations_given_ids(exp_ids):
