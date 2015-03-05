@@ -160,7 +160,10 @@ class LogoutPage(webapp2.RequestHandler):
         """Logs the user out, and returns them to a specified page or the home
         page.
         """
-        url_to_redirect_to = self.request.get('return_url') or '/'
+        # The str conversion is needed, otherwise an InvalidResponseError
+        # asking for the 'Location' header value to be str instead of
+        # 'unicode' will result.
+        url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
 
         if feconf.DEV_MODE:

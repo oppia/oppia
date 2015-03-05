@@ -104,6 +104,9 @@ class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
     def map(item):
         from core.domain import exp_services
 
+        if item.deleted:
+            return
+
         exp = exp_services.get_exploration_from_model(item)
 
         change_list = []
@@ -130,10 +133,16 @@ class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
 
         if change_list:
             yield (item.id, 'started')
-            exp_services.update_exploration(
-                feconf.MIGRATION_BOT_USERNAME, item.id, change_list,
-                'Convert distances in rules for world map to kilometers.')
-            yield (item.id, 'completed')
+            try:
+                exp_services.update_exploration(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, change_list,
+                    'Convert distances in rules for world map to kilometers.')
+                yield (item.id, 'completed')
+            except utils.ValidationError as e:
+                if 'An objective must be specified' in str(e):
+                    yield ('ERROR-OBJECTIVE', item.id)
+                else:
+                    raise
 
     @staticmethod
     def reduce(key, values):
