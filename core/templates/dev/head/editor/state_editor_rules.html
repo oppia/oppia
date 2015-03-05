@@ -15,7 +15,12 @@
               </span>
               <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex === $index}">
                 <div style="overflow: hidden; padding-left: 26px; text-overflow: ellipsis; white-space: nowrap; width: 520px;">
-                  <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
+                  <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput'">
+                    <[rule | parameterizeRuleDescription: answerChoices]>...
+                  </span>
+                  <span ng-if="getCurrentInteractionId() === 'MultipleChoiceInput'">
+                    <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
+                  </span>
                 </div>
               </a>
 

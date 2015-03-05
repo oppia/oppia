@@ -207,6 +207,7 @@ oppia.controller('StateRules', [
     function(
       $scope, $rootScope, $modal, stateInteractionIdService, editorContextService,
       warningsData, rulesService) {
+  $scope.answerChoices = null;
 
   $scope.getAnswerChoices = function() {
     return rulesService.getAnswerChoices();
@@ -228,6 +229,7 @@ oppia.controller('StateRules', [
     rulesService.init(data);
     $scope.interactionHandlers = rulesService.getInteractionHandlers();
     $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+    $scope.answerChoices = $scope.getAnswerChoices();
     $rootScope.$broadcast('activeRuleChanged');
   });
 
@@ -235,6 +237,7 @@ oppia.controller('StateRules', [
     rulesService.onInteractionIdChanged(newInteractionId, function() {
       $scope.interactionHandlers = rulesService.getInteractionHandlers();
       $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+      $scope.answerChoices = $scope.getAnswerChoices();
       $rootScope.$broadcast('activeRuleChanged');
     });
   });
@@ -256,6 +259,7 @@ oppia.controller('StateRules', [
   // TODO(sll): Remove the need for this watcher, or make it less ad hoc.
   $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
     rulesService.updateAnswerChoices(newAnswerChoices);
+    $scope.answerChoices = $scope.getAnswerChoices();
   });
 
   $scope.isDefaultRuleTabShown = function() {

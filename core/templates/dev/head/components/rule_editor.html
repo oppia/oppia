@@ -9,10 +9,10 @@
           <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
 
           <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
-            <span ng-if="!answerChoices">
-              [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
+            <span ng-if="currentInteractionId !== 'MultipleChoiceInput'">
+              [<em><[rule | parameterizeRuleDescription: answerChoices]>...</em>]
             </span>
-            <span ng-if="answerChoices">
+            <span ng-if="currentInteractionId === 'MultipleChoiceInput'">
               [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
             </span>
           </span>

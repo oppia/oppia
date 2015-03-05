@@ -110,15 +110,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     templateUrl: 'inline/rule_editor',
     controller: [
       '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
-      'validatorsService', 'rulesService', 'explorationStatesService',
+      'validatorsService', 'rulesService', 'explorationStatesService', 'stateInteractionIdService',
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
-          validatorsService, rulesService, explorationStatesService) {
+          validatorsService, rulesService, explorationStatesService, stateInteractionIdService) {
         $scope.editRuleForm = {};
 
-        $scope.getAnswerChoices = function() {
-          return rulesService.getAnswerChoices();
-        };
+        $scope.answerChoices = rulesService.getAnswerChoices();
+        $scope.currentInteractionId = stateInteractionIdService.savedMemento;
 
         $scope.ruleDestMemento = null;
         $scope.ruleDescriptionMemento = null;
@@ -398,18 +397,24 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
 
           var _answerChoices = rulesService.getAnswerChoices();
 
-          if (_answerChoices && _answerChoices.length) {
-            // This rule is for a multiple-choice interaction.
-            // TODO(sll): Remove the need for this special case for multiple-choice
-            // input.
-            $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
-              return {
-                val: choice.label,
-                id: choice.val
-              };
-            });
-
-            result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+          if (_answerChoices) {
+            // This rule is for a multiple-choice or image-click interaction.
+            // TODO(sll): Remove the need for this special case.
+            if (_answerChoices.length > 0) {
+              $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+                return {
+                  val: choice.label,
+                  id: choice.val
+                };
+              });
+              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+              if (!$scope.currentRuleDefinition.inputs[finalInputArray[i + 1]]) {
+                $scope.currentRuleDefinition.inputs[finalInputArray[i + 1]] = $scope.ruleDescriptionChoices[0].id;
+              }
+            } else {
+              $scope.ruleDescriptionChoices = [];
+              result.push({'type': 'noneditable', 'text': ' [Error: No choices available] '});
+            }
           } else {
             result.push({
               'type': finalInputArray[i+2],

@@ -967,7 +967,7 @@ md-card.oppia-gallery-tile {
   padding-top: 9px;
 }
 
-.oppia-readonly-rule-tile img {
+.oppia-readonly-rule-tile img, .oppia-rule-tab img {
   max-height: 50px;
 }
 
