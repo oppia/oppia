@@ -1537,11 +1537,11 @@ class SearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
     def test_demo_explorations_are_added_to_search_index(self):
-        results, cursor = exp_services.search_explorations('Welcome')
+        results, cursor = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
 
         exp_services.load_demo('0')
-        results, cursor = exp_services.search_explorations('Welcome')
+        results, cursor = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, ['0'])
 
     def test_index_explorations_given_ids(self):
@@ -1693,9 +1693,9 @@ class SearchTests(ExplorationServicesUnitTests):
 
         with self.swap(search_services, 'search', mock_search):
             result, cursor = exp_services.search_explorations(
-                query=expected_query_string,
+                expected_query_string,
+                expected_limit,
                 sort=expected_sort,
-                limit=expected_limit,
                 cursor=expected_cursor,
             )
 

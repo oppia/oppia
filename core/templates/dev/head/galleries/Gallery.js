@@ -137,7 +137,10 @@ oppia.controller('Gallery', [
 
   $scope.getFormattedObjective = function(objective) {
     objective = objective.trim();
-    return objective.charAt(0).toUpperCase() + objective.slice(1);
+    if (objective.length > 120) {
+      objective = objective.substring(0, 120) + '...';
+    }
+    return objective;
   };
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
@@ -177,7 +180,7 @@ oppia.controller('Gallery', [
   };
 
   $scope.pageLoaderIsBusy = false;
-  $scope.showMoreExplorations = function(data) {
+  $scope.showMoreExplorations = function() {
     if (!$rootScope.loadingMessage) {
       $scope.pageLoaderIsBusy = true;
 
