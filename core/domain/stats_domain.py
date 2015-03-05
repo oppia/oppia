@@ -20,7 +20,6 @@ __author__ = 'Sean Lip'
 
 import copy
 import operator
-import re
 
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])

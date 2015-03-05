@@ -18,13 +18,14 @@
 
 __author__ = 'Frederik Creemers'
 
-import re
+import copy
 
 from core import jobs
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 transaction_services = models.Registry.import_transaction_services()
+import feconf
 import utils
 
 
@@ -69,7 +70,8 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
         #   exp_services -> event_services -> jobs_registry ->
         #   exp_jobs -> exp_services.
         from core.domain import exp_services
-        exp_services.index_explorations_given_ids([item.id])
+        if not item.deleted:
+            exp_services.index_explorations_given_ids([item.id])
 
 
 class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
@@ -93,7 +95,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ParameterDiscoveryJobManager(jobs.BaseMapReduceJobManager):
+class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -103,52 +105,45 @@ class ParameterDiscoveryJobManager(jobs.BaseMapReduceJobManager):
     def map(item):
         from core.domain import exp_services
 
-        def _get_nontrivial_expression_pairs(label, string):
-            """Returns a list of non-trivial expressions (each bounded by
-            {{...}}).
-            """
-            PARAM_REGEX = re.compile('{{[^}]*}}')
-            expressions = PARAM_REGEX.findall(unicode(string))
-            nontrivial_expressions = []
-            for expression in expressions:
-                if any([(c not in (
-                        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                        '0123456789<>{}')) for c in expression]):
-                    nontrivial_expressions.append(
-                        '%s (%s)' % (expression, label))
-            return nontrivial_expressions
+        if item.deleted:
+            return
 
-        output = []
         exp = exp_services.get_exploration_from_model(item)
-        for pc in exp.param_changes:
-            for _, val in pc.customization_args.iteritems():
-                output += _get_nontrivial_expression_pairs(
-                    'Exploration param change: ', unicode(val))
 
+        change_list = []
         for state_name, state in exp.states.iteritems():
-            content = state.content
-            for content_item in content:
-                output += _get_nontrivial_expression_pairs(
-                    'Content, %s' % state_name, content_item.value)
-            for pc in state.param_changes:
-                for _, val in pc.customization_args.iteritems():
-                    output += _get_nontrivial_expression_pairs(
-                        'Param change, %s' % state_name, unicode(val))
+            if state.interaction.id == 'InteractiveMap':
+                old_value = {}
+                for handler in state.interaction.handlers:
+                    handler_dict = handler.to_dict()
+                    old_value[handler_dict['name']] = (
+                        handler_dict['rule_specs'])
 
-            for _, val in state.interaction.customization_args.iteritems():
-                output += _get_nontrivial_expression_pairs(
-                    'Interaction_cust_args, %s' % state_name, unicode(val))
+                new_value = copy.deepcopy(old_value)
+                for handler in new_value['submit']:
+                    if handler['definition']['rule_type'] != 'default':
+                        handler['definition']['inputs']['d'] *= 110
 
-            for handler in state.interaction.handlers:
-                for rule_spec in handler.rule_specs:
-                    for feedback_item in rule_spec.feedback:
-                        output += _get_nontrivial_expression_pairs(
-                            'Rule feedback, %s' % state_name,
-                            unicode(feedback_item))
+                change_list.append({
+                    'cmd': 'edit_state_property',
+                    'property_name': 'widget_handlers',
+                    'state_name': state_name,
+                    'old_value': old_value,
+                    'new_value': new_value,
+                })
 
-        if output:
-            output_strs = [s.encode('utf-8') for s in output]
-            yield (item.id, '<br>'.join(output_strs))
+        if change_list:
+            yield (item.id, 'started')
+            try:
+                exp_services.update_exploration(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, change_list,
+                    'Convert distances in rules for world map to kilometers.')
+                yield (item.id, 'completed')
+            except utils.ValidationError as e:
+                if 'An objective must be specified' in str(e):
+                    yield ('ERROR-OBJECTIVE', item.id)
+                else:
+                    raise
 
     @staticmethod
     def reduce(key, values):

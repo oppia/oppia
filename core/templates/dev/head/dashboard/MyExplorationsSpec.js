@@ -13,38 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the controller of the user dashboard.
+ * @fileoverview Unit tests for the controller of the page showing the
+ * user's explorations.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-describe('Dashboard controller', function() {
+describe('MyExplorations controller', function() {
   beforeEach(module('oppia'));
 
-  describe('Dashboard', function() {
+  describe('MyExplorations', function() {
     var scope, ctrl, $httpBackend;
-    var explorationsList = {
-      'private_exp_id': {
-        id: 'private_exp_id',
-        category: 'Private category',
-        status: 'private',
-        title: 'Private exploration'
-      },  
-      'featured_exp_id': {
-        id: 'featured_exp_id',
-        category: 'Featured category',
-        status: 'publicized',
-        title: 'Featured exploration'
-      }   
-    }   
+    var explorationsList = [{
+      id: 'private_exp_id',
+      category: 'Private category',
+      status: 'private',
+      title: 'Private exploration'
+    }, {
+      id: 'featured_exp_id',
+      category: 'Featured category',
+      status: 'publicized',
+      title: 'Featured exploration'
+    }];
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/dashboardhandler/data').respond({
-        explorations: explorationsList
+      $httpBackend.expectGET('/myexplorationshandler/data').respond({
+        explorations_list: explorationsList
       });
       scope = $rootScope.$new();
-      ctrl = $controller('Dashboard', {
+      ctrl = $controller('MyExplorations', {
         $scope: scope,
         warningsData: null,
         createExplorationButtonService: {

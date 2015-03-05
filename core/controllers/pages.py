@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for simple, mostly-static pages (like About, Contact, etc.)."""
+"""Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
@@ -57,6 +57,22 @@ class AboutPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
         self.render_template('pages/about.html')
+
+
+class ParticipatePage(base.BaseHandler):
+    """Page with information about participating in Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
+            'MODERATOR_REQUEST_FORUM_URL': (
+                editor.MODERATOR_REQUEST_FORUM_URL.value),
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'SITE_NAME': SITE_NAME.value,
+            'nav_mode': feconf.NAV_MODE_PARTICIPATE,
+        })
+        self.render_template('pages/participate.html')
 
 
 class ForumPage(base.BaseHandler):

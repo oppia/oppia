@@ -145,6 +145,10 @@ DEFAULT_LANGUAGE_CODE = 'en'
 # Whether to include a page with the Oppia discussion forum.
 SHOW_FORUM_PAGE = True
 
+# User id and username for exploration migration bot.
+MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
+MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
@@ -173,8 +177,8 @@ ALLOWED_INTERACTIONS = {
     'Continue': {
         'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
     },
-    'EndConversation': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'EndConversation')
+    'EndExploration': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'EndExploration')
     },
     'GraphInput': {
         'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
@@ -267,6 +271,7 @@ NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
 NAV_MODE_HOME = 'home'
+NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 
 # Event types.

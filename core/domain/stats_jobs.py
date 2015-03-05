@@ -156,6 +156,7 @@ class StatisticsMRJobManager(
 
     _TYPE_STATE_COUNTER_STRING = 'counter'
     _TYPE_EVENT_STRING = 'event'
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return StatisticsAggregator
@@ -171,7 +172,10 @@ class StatisticsMRJobManager(
     def map(item):
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
             if isinstance(item, stats_models.StateCounterModel):
-                (exploration_id, state_name) = item.id.split('.')
+                first_dot_index = item.id.find('.')
+                exploration_id = item.id[:first_dot_index]
+                state_name = item.id[first_dot_index + 1:]
+
                 value = {
                     'type': StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING,
                     'exploration_id': exploration_id,
@@ -181,12 +185,15 @@ class StatisticsMRJobManager(
                     'subsequent_entries_count': item.subsequent_entries_count,
                     'resolved_answer_count': item.resolved_answer_count,
                     'active_answer_count': item.active_answer_count}
-                yield ('%s:%s' % (exploration_id, _NO_SPECIFIED_VERSION_STRING), value)
+                yield (
+                    '%s:%s' % (exploration_id, _NO_SPECIFIED_VERSION_STRING),
+                    value)
                 yield ('%s:%s' % (exploration_id, _ALL_VERSIONS_STRING), value)
             else:
-                version = item.exploration_version
-                if version is None:
-                    version = _NO_SPECIFIED_VERSION_STRING
+                version = _NO_SPECIFIED_VERSION_STRING
+                if version is not None:
+                    version = str(item.exploration_version)
+
                 value = {
                     'type': StatisticsMRJobManager._TYPE_EVENT_STRING,
                     'event_type': item.event_type,
@@ -195,9 +202,11 @@ class StatisticsMRJobManager(
                     'created_on': utils.get_time_in_millisecs(item.created_on),
                     'exploration_id': item.exploration_id,
                     'version': version}
-                yield ('%s:%s' % (item.exploration_id, item.exploration_version),
-                       value)
-                yield ('%s:%s' % (item.exploration_id, _ALL_VERSIONS_STRING), value)
+
+                yield ('%s:%s' % (item.exploration_id, version), value)
+                yield (
+                    '%s:%s' % (item.exploration_id, _ALL_VERSIONS_STRING),
+                    value)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -205,7 +214,8 @@ class StatisticsMRJobManager(
         exploration = None
         (exp_id, version) = key.split(':')
         try:
-            if version not in [_NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
+            if version not in [
+                    _NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
                 exploration = exp_services.get_exploration_by_id(
                     exp_id, version=version)
             else:
@@ -243,15 +253,24 @@ class StatisticsMRJobManager(
         for state_name in exploration.states:
             state_session_ids[state_name] = set([])
 
-
-        # Iterate and process each event for this exploration.
+        # Iterate over and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['type'] == StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING:
+
+            # Convert the state name to unicode, if necessary.
+            # Note: sometimes, item.state_name is None for
+            # StateHitEventLogEntryModel.
+            # TODO(sll): Track down the reason for this, and fix it.
+            if (value['state_name'] is not None and
+                    not isinstance(value['state_name'], unicode)):
+                value['state_name'] = value['state_name'].decode('utf-8')
+
+            if (value['type'] ==
+                    StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING):
                 if value['state_name'] == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
                 if value['state_name'] == feconf.END_DEST:
-                    old_models_complete_count = value['first_entry_count'] 
+                    old_models_complete_count = value['first_entry_count']
                 else:
                     state_hit_counts[state_name]['no_answer_count'] += (
                         value['first_entry_count']

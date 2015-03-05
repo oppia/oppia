@@ -3,6 +3,121 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v2.0.0 (5 Mar 2015)
+-------------------
+Frontend (general):
+* Add a sidebar to all pages as a primary navigation mechanism.
+* Restyle top navbar as an area for breadcrumbs and secondary navigation, and to be more responsive.
+* Revamp the general color scheme.
+* Use Material Design elements, e.g. cards.
+* Add avatars representing Oppia and the user.
+* Remove the footer, and make the licensing text less obtrusive.
+* Combine the Splash and Gallery pages into a single page.
+* Make it explicit that users are signing into Oppia with G+.
+* Use a user icon instead of username in the top-right corner.
+* Split the Dashboard page into two different pages: My Explorations and Updates.
+* Split the About page into two different pages: About and Participation Playbook.
+* Remove the noscript tag so that the G+ crawler can generate the correct snippet.
+* Allow clicking outside a modal to dismiss it.
+
+Splash/gallery page:
+* Add paged searching and infinite scrolling functionality.
+* Add a carousel.
+* Add thumbnail images to exploration cards in the gallery.
+* Add basic ranking functionality.
+
+Learner page:
+* Add an introductory card with the thumbnail image.
+* Show the 'edit' button in the navbar only for users who have exploration editing rights.
+* Add a feedback menu to the top right of each card in the learner view.
+* Add 'share on G+' functionality.
+* Make the scrolling behavior more gentle.
+* Set focus on the learner input field on its appearance, when appropriate.
+* Show the learner's answer immediately after they submit it.
+
+Editor page:
+* Update the tutorial.
+* Move the 'create new state' functionality into the rule destination dropdown.
+* Move the 'unresolved answers' section to the bottom of the page, below the rules.
+* Move state parameter changes to the right column.
+* Require the user to explicitly select an interaction for each state.
+* Hide the default rule if it has not yet been set.
+* Make the interaction selection menu into a two-tier dropdown.
+* Make the arrows in the state graph a bit thinner.
+* Change the colors of the graph nodes.
+* Add validation for rules and interaction customizations.
+* When the user changes the currently-active state, apply fading-out/fading-in to the state cards to make the transition less abrupt.
+
+About page:
+* Update the text.
+* Remove tabs, and add a menu on the right.
+
+Profile page:
+* Allow users to choose a preferred language for explorations shown in the gallery.
+* Allow users to upload a profile picture and to add a bio.
+
+Sign-in flow:
+* Redirect to sign-in flow if the user is logged in but has not chosen a username.
+* Allow users to leave the sign-in page midway through sign-in, logging them out if they do so.
+* Fix issue 136: logging out of Oppia no longer logs you out of all Google accounts.
+
+Admin page:
+* Remove unneeded config properties.
+* Add config properties for the splash page carousel and for additional links in the sidebar menu.
+* Add functionality for clearing the search index.
+
+Interactions:
+* Deprecate the 'reuse this interaction' setting in the editor. This is now determined by the individual widget's display mode ('inline' or 'supplemental').
+* Load interactions concurrently with the base page.
+* Rename 'interactive widgets' to 'interactions'.
+* Add new interactions: EndExploration, ImageClickInput.
+* CodeRepl: fix a bug where the error message was being overwritten; update UI to use Material Design.
+* Continue: update UI to use Material Design.
+* GraphInput: restrict the drawable region, and remove the large left margin in the response area.
+* InteractiveMap: use spherical distance formula for calculating map distances (issue 487).
+* InteractiveMap: fix display of rule descriptions.
+* LogicProof: add new excluded middle rule.
+* MusicNotesInput: rearrange buttons to make the interaction more intuitive.
+* NumericInput: update UI to use Material Design.
+* TextInput: update UI to use Material Design.
+
+RTE extensions:
+* Rename 'noninteractive widgets' to 'RTE extensions'.
+* Load RTE extensions concurrently with the base page.
+* Image: add drag-and-drop upload functionality.
+* Link: allow text to be specified that is different from the link URL.
+* Video: do not show related videos at the end.
+
+Forms:
+* Make the list, int and nonnegative-int editors use schema-based forms.
+* Restyle the 'list of strings editor', and hide the 'Add Element' button when the user is editing a field.
+* Improve error messages for float input.
+* Make the float editors display inline.
+* Fix issue 488: do not show a warning for float input when the input field is still in focus.
+
+Infrastructure:
+* Deprecate intro.js dependency.
+* Add new dependencies: material-design-icons, ngImgCrop, ng-joyride.
+* Upgrade angular version to 1.3.13 to fix a bug in ngAnimate.
+* Fix an error in the encoding of filenames when an exploration is downloaded as a zip file.
+* Use curl instead of wget, to make the installation process easier for Mac users.
+* Add a flag in the start.sh script to save existing contents of the datastore.
+* Fix broken installation of webtest.
+* Make paths to third-party python libraries work on Windows.
+* Limit backend test parallelization to a maximum batch size of 24.
+* Update the deployment script to include splash and sidebar folders.
+* Add an experimental_deploy script that does not run tests and should only be used for experimental purposes.
+
+Protractor tests:
+* Add protractor tests for the history tab.
+* Add a utility function for scrolling to elements on the page that are not currently in view.
+* Switch protractor utilities to use classes prefixed by 'protractor-test-', where possible.
+* Add functionality to display screenshots from failed tests.
+
+Demo explorations:
+* Add the following demo explorations: 'About Oppia', 'The Solar System' and 'Protractor Test'.
+
+
 v1.2.12 (13 Dec 2014)
 ---------------------
 Editor improvements:

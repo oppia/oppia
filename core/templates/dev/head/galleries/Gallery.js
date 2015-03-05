@@ -124,10 +124,22 @@ oppia.controller('Gallery', [
              CATEGORY_LIST, searchService) {
 
   $scope.CAROUSEL_INTERVAL = 3500;
-  $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG;
+  $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
+
+  // Preload images, otherwise they will only start showing up some time after
+  // the carousel slide comes into view. See:
+  //
+  //     http://stackoverflow.com/questions/1373142/preloading-css-background-images
+  for (var i = 0; i < $scope.CAROUSEL_SLIDES.length; i++) {
+    var pic = new Image();
+    pic.src = '/images/splash/' + $scope.CAROUSEL_SLIDES[i].image_filename;
+  }
 
   $scope.getFormattedObjective = function(objective) {
     objective = objective.trim();
+    if (objective.length > 120) {
+      objective = objective.substring(0, 120) + '...';
+    }
     return objective.charAt(0).toUpperCase() + objective.slice(1);
   };
 
@@ -143,7 +155,7 @@ oppia.controller('Gallery', [
 
   $scope.currentUserIsModerator = false;
 
-  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES && $scope.CAROUSEL_SLIDES.length > 0);
+  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
   $scope.$on('hasChangedSearchQuery', function() {
     if ($scope.inSplashMode) {
       $('.oppia-gallery-container').fadeOut(function() {
@@ -168,7 +180,7 @@ oppia.controller('Gallery', [
   };
 
   $scope.pageLoaderIsBusy = false;
-  $scope.showMoreExplorations = function(data) {
+  $scope.showMoreExplorations = function() {
     if (!$rootScope.loadingMessage) {
       $scope.pageLoaderIsBusy = true;
 

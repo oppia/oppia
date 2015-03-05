@@ -25,22 +25,19 @@ oppia.directive('randomSelector', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
-      $scope.UNICODE_STRING_LIST_INIT_ARGS = {
-        'objType': 'UnicodeString',
-        'addItemText': 'Add New Choice'
+      $scope.SCHEMA = {
+        'type': 'list',
+        'items': {
+          'type': 'unicode',
+        },
+        'ui_config': {
+          'add_element_text': 'Add New Choice'
+        }
       };
 
-      $scope.$watch('$parent.objType', function(newValue, oldValue) {
-        $scope.objType = $scope.$parent.objType;
-      }, true);
-
-      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
-        $scope.customizationArgs = $scope.$parent.customizationArgs;
-      }, true);
-
-      $scope.$watch('customizationArgs', function(newValue, oldValue) {
-        $scope.$parent.customizationArgs = $scope.customizationArgs;
-      }, true);
+      if (!$scope.$parent.customizationArgs.list_of_values) {
+        $scope.$parent.customizationArgs.list_of_values = [];
+      }
     }
   };
 });

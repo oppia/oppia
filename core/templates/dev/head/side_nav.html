@@ -12,10 +12,18 @@
       </a>
     </li>
 
+    <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
+      <a href="/participate">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png"
+               style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+        Participation Playbook
+      </a>
+    </li>
+
     {% if SHOW_FORUM_PAGE %}
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_forum_black_48dp.png"
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png"
                style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
           Forum
         </a>

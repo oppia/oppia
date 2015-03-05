@@ -162,18 +162,18 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
                        ModifiedStatisticsAggregator.get_statistics):
-            self.assertEquals(stats_services.get_state_improvements('eid', 1), [{
-                'type': 'default',
-                'rank': 3,
-                'state_name': exp.init_state_name
-            }])
+            self.assertEquals(
+                stats_services.get_state_improvements('eid', 1), [{
+                    'type': 'default',
+                    'rank': 3,
+                    'state_name': exp.init_state_name
+                }])
 
     def test_single_default_rule_hit(self):
         exp = exp_domain.Exploration.create_default_exploration(
             'eid', 'A title', 'A category')
         exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
-
 
         event_services.StartExplorationEventHandler.record(
             'eid', 1, state_name, 'session_id', {}, feconf.PLAY_TYPE_NORMAL)
@@ -187,11 +187,12 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
                        ModifiedStatisticsAggregator.get_statistics):
-            self.assertEquals(stats_services.get_state_improvements('eid', 1), [{
-                'type': 'default',
-                'rank': 1,
-                'state_name': exp.init_state_name
-            }])
+            self.assertEquals(
+                stats_services.get_state_improvements('eid', 1), [{
+                    'type': 'default',
+                    'rank': 1,
+                    'state_name': exp.init_state_name
+                }])
 
     def test_no_improvement_flag_hit(self):
         self.save_new_valid_exploration('eid', 'fake@user.com')
@@ -245,11 +246,12 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
                        ModifiedStatisticsAggregator.get_statistics):
-            self.assertEquals(stats_services.get_state_improvements('eid', 1), [{
-                'rank': 2,
-                'type': 'incomplete',
-                'state_name': state_name
-            }])
+            self.assertEquals(
+                stats_services.get_state_improvements('eid', 1), [{
+                    'rank': 2,
+                    'type': 'incomplete',
+                    'state_name': state_name
+                }])
 
         # Now hit the default two more times. The result should be classified
         # as default.
@@ -262,11 +264,12 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 self.DEFAULT_RULESPEC, '1')
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
                        ModifiedStatisticsAggregator.get_statistics):
-            self.assertEquals(stats_services.get_state_improvements('eid', 1), [{
-                'rank': 3,
-                'type': 'default',
-                'state_name': state_name
-            }])
+            self.assertEquals(
+                stats_services.get_state_improvements('eid', 1), [{
+                    'rank': 3,
+                    'type': 'default',
+                    'state_name': state_name
+                }])
 
     def test_two_state_default_hit(self):
         self.save_new_default_exploration('eid', 'fake@user.com')

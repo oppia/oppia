@@ -29,7 +29,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs.IndexAllExplorationsJobManager,
     exp_jobs.ExpSummariesCreationOneOffJob,
     exp_jobs.ExplorationValidityJobManager,
-    exp_jobs.ParameterDiscoveryJobManager]
+    exp_jobs.InteractionMigrationJobManager]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

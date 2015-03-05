@@ -150,7 +150,9 @@ var setInteraction = function(interactionName) {
     }
 
     // Click a neutral element on the page to reset the dropdown menu.
-    element(by.css('.protractor-test-editor-neutral-element')).click();
+    var neutralElem = element(by.css('.protractor-test-editor-neutral-element'));
+    general.scrollElementIntoView(neutralElem);
+    neutralElem.click();
 
     if (customizationArgs.length > 1) {
       element(by.css('.protractor-test-edit-interaction')).click();

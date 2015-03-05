@@ -17,7 +17,7 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveEndConversationValidator', [function() {
+oppia.filter('oppiaInteractiveEndExplorationValidator', [function() {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
     var warningsList = [];

@@ -17,8 +17,8 @@
 from extensions.interactions import base
 
 
-class EndConversation(base.BaseInteraction):
-    """Interaction that allows the conversation to end.
+class EndExploration(base.BaseInteraction):
+    """Interaction that allows the exploration to end.
 
     This interaction is unusual in that there is no way for the learner to
     submit an answer, so the exploration effectively terminates at the state

@@ -41,8 +41,16 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', ['$filter', 'WARNING_TY
     var seenRegionStrings = [];
     for (var i = 0; i < customizationArgs.imageAndRegions.value.labeledRegions.length; i++) {
       var regionLabel = customizationArgs.imageAndRegions.value.labeledRegions[i].label;
+
       if (regionLabel.trim().length === 0) {
         areAnyRegionStringsEmpty = true;
+      }
+      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
+      if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'the image region strings should consist of characters from [A-Za-z0-9].'
+        });
       }
       if (seenRegionStrings.indexOf(regionLabel) !== -1) {
         areAnyRegionStringsDuplicated = true;

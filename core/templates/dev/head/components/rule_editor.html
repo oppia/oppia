@@ -9,10 +9,10 @@
           <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
 
           <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
-            <span ng-if="!answerChoices">
-              [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
+            <span ng-if="currentInteractionId !== 'MultipleChoiceInput'">
+              [<em><[rule | parameterizeRuleDescription: answerChoices]>...</em>]
             </span>
-            <span ng-if="answerChoices">
+            <span ng-if="currentInteractionId === 'MultipleChoiceInput'">
               [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
             </span>
           </span>
@@ -24,7 +24,7 @@
         <br>
 
         <div style="position: relative;">
-          <img src="/images/oppia_favicon_black_48px.png" style="position: absolute; left: -46px; top: -1px; height: 24px; width: 24px;">
+          <img src="/images/general/oppia_black_48px.png" style="position: absolute; left: -46px; top: -1px; height: 24px; width: 24px;">
           <span ng-if="isRuleConfusing()">
             <span class="oppia-rule-warning-text">
               <span class="glyphicon glyphicon-warning-sign"></span>
@@ -48,8 +48,8 @@
 
         <div style="padding-bottom: 20px;" ng-if="rule.dest !== getActiveStateName()">
           Destination:
-          <span style="position: relative;">
-            <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
+          <span class="oppia-rule-dest-link" style="position: relative;">
+            <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'">
               <[rule.dest]>
             </a>
           </span>

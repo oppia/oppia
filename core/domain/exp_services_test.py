@@ -268,7 +268,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with delete_docs_swap:
             exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
 
-
     def test_create_new_exploration_error_cases(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, '', '')
@@ -1538,11 +1537,11 @@ class SearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
     def test_demo_explorations_are_added_to_search_index(self):
-        results, cursor = exp_services.search_explorations('Welcome')
+        results, cursor = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
 
         exp_services.load_demo('0')
-        results, cursor = exp_services.search_explorations('Welcome')
+        results, cursor = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, ['0'])
 
     def test_index_explorations_given_ids(self):
@@ -1694,9 +1693,9 @@ class SearchTests(ExplorationServicesUnitTests):
 
         with self.swap(search_services, 'search', mock_search):
             result, cursor = exp_services.search_explorations(
-                query=expected_query_string,
+                expected_query_string,
+                expected_limit,
                 sort=expected_sort,
-                limit=expected_limit,
                 cursor=expected_cursor,
             )
 
@@ -1922,7 +1921,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             for prop in simple_props:
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))
-
 
     def test_get_private_at_least_viewable_exploration_summaries(self):
 
