@@ -30,7 +30,7 @@ states:
             subject: answer
           dest: END
           feedback:
-          - Thank you for exploring the S
+          - Thank you for exploring the Solar System!
           param_changes: []
         - definition:
             inputs:
