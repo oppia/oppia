@@ -14,18 +14,18 @@
 
 
 /**
- * Directive for the EndConversation 'interaction'.
+ * Directive for the EndExploration 'interaction'.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaInteractiveEndConversation', [
+oppia.directive('oppiaInteractiveEndExploration', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interaction/EndConversation',
+      templateUrl: 'interaction/EndExploration',
       controller: ['$scope', '$http', '$attrs', 'urlService', function($scope, $http, $attrs, urlService) {
         $scope.isIframed = urlService.isIframed();
 
@@ -49,12 +49,12 @@ oppia.directive('oppiaInteractiveEndConversation', [
   }
 ]);
 
-oppia.directive('oppiaResponseEndConversation', [
+oppia.directive('oppiaResponseEndExploration', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/EndConversation',
+      templateUrl: 'response/EndExploration',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
 
       }]

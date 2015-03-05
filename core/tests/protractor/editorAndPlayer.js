@@ -160,7 +160,7 @@ describe('Full exploration editor', function() {
       editor.RuleEditor('default').createNewStateAndSetDestination('state2');
       editor.expectStateNamesToBe(['state1', 'state2', 'END']);
       editor.moveToState('state2');
-      editor.setInteraction('EndConversation');
+      editor.setInteraction('EndExploration');
 
       editor.discardChanges();
       editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);

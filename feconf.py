@@ -169,8 +169,8 @@ ALLOWED_INTERACTIONS = {
     'Continue': {
         'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
     },
-    'EndConversation': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'EndConversation')
+    'EndExploration': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'EndExploration')
     },
     'GraphInput': {
         'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
