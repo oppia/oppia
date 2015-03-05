@@ -140,7 +140,7 @@ oppia.controller('Gallery', [
     if (objective.length > 120) {
       objective = objective.substring(0, 120) + '...';
     }
-    return objective;
+    return objective.charAt(0).toUpperCase() + objective.slice(1);
   };
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {

@@ -75,6 +75,7 @@ oppia.controller('Signup', [
   $scope.updateWarningText = function(username) {
     var alphanumeric = /^[A-Za-z0-9]+$/;
     var admin = /admin/i;
+    var oppia = /oppia/i;
 
     if (!username) {
       $scope.warningText = 'Please enter a username.';
@@ -86,6 +87,8 @@ oppia.controller('Signup', [
       $scope.warningText = 'Usernames can only have alphanumeric characters.';
     } else if (admin.test(username)) {
       $scope.warningText = 'User names with \'admin\' are reserved.';
+    } else if (oppia.test(username)) {
+      $scope.warningText = 'This user name is not available.';
     } else {
       $scope.warningText = '';
     }

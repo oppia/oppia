@@ -137,6 +137,10 @@ DEFAULT_LANGUAGE_CODE = 'en'
 # Whether to include a page with the Oppia discussion forum.
 SHOW_FORUM_PAGE = True
 
+# User id and username for exploration migration bot.
+MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
+MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
