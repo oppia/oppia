@@ -314,7 +314,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
-            ratings['overall_rating'],
+            ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
         # User rates and checks rating
@@ -326,7 +326,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 2)
         self.assertEqual(
-            ratings['overall_rating'],
+            ratings['overall_ratings'],
             {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
 
         # User re-rates and checks rating
@@ -339,7 +339,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 5)
         self.assertEqual(
-            ratings['overall_rating'],
+            ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
 
         self.logout()
@@ -356,7 +356,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
-            ratings['overall_rating'],
+            ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
@@ -393,6 +393,6 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 4)
         self.assertEqual(
-            ratings['overall_rating'],
+            ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
         self.logout()

@@ -342,7 +342,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
-          $rootScope.$broadcast('playerServiceInitialized')
+          $rootScope.$broadcast('playerServiceInitialized');
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');

@@ -418,12 +418,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   display: block;
 }
 
-.oppia-rate-dropdown-menu {
-  min-width: 90px;
-  width: 110px;
-  text-align: center;
-}
-
 .oppia-share-dropdown-menu {
   min-width: 30px;
   width: 46px;
@@ -642,6 +636,10 @@ md-card.oppia-gallery-tile {
 
 .oppia-gallery-tile-second-row {
   font-size: 90%;
+}
+.oppia-gallery-tile-ratings {
+  color: black;
+  letter-spacing: 5px;
 }
 
 .oppia-gallery-edit-btn {

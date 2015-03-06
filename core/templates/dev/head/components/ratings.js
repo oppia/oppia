@@ -38,15 +38,15 @@ oppia.directive('ratingStars', [function($http) {
     },
     templateUrl: 'ratings/display',
     controller: ['$scope', function($scope) {
-        var POSSILE_RATINGS = [1, 2, 3, 4, 5]
-      $scope.stars = POSSILE_RATINGS.map(function(starValue) {
+      var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
+      $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
         return {
           style: 'glyphicon-star-empty',
           value: starValue
         };
       });
 
-      $scope.computeAverageRating = function(ratingFrequencies) {
+      var computeAverageRating = function(ratingFrequencies) {
         var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1; // TODO RESET! Sean, yell at me if I forget.
         totalValue = 0.0;
         totalNumber = 0;
@@ -58,44 +58,44 @@ oppia.directive('ratingStars', [function($http) {
           totalValue / totalNumber : undefined;
       };
 
-      $scope.displayValue = function(ratingValue) {
+      var displayValue = function(ratingValue) {
         for (var i = 0; i < $scope.stars.length; i++) {
-          $scope.stars[i].style = ratingValue === undefined ?
-            'glyphicon-star-empty' :
+          $scope.stars[i].style =
+            ratingValue === undefined ? 'glyphicon-star-empty' :
             ratingValue < $scope.stars[i].value  - 0.5 ?
             'glyphicon-star-empty' :
-            'glyphicon-star'
+            'glyphicon-star';
         }
       };
 
-      $scope.loadRating = function() {
+      var loadRating = function() {
         $scope.rating = $scope.ratingValue ? $scope.ratingValue :
-          $scope.computeAverageRating($scope.ratingFrequencies);
-        $scope.displayValue($scope.rating);
+          computeAverageRating($scope.ratingFrequencies);
+        displayValue($scope.rating);
       };
-      $scope.loadRating();
+      loadRating();
       $scope.$watch('ratingValue', function() {
-        $scope.loadRating();
+        loadRating();
       });
       $scope.$watch('ratingFrequencies', function() {
-        $scope.loadRating();
+        loadRating();
       });
 
       $scope.clickStar = function(starValue) {
         if ($scope.isEditable) {
           $scope.rating = starValue;
-          $scope.displayValue(starValue);
+          displayValue(starValue);
           $scope.onEdit(starValue);
         }
       };
       $scope.enterStar = function(starValue) {
-        if($scope.isEditable) {
-          $scope.displayValue(starValue);
+        if ($scope.isEditable) {
+          displayValue(starValue);
         }
       };
       $scope.leaveStar = function(starValue) {
-        if($scope.isEditable) {
-          $scope.displayValue($scope.rating);
+        if ($scope.isEditable) {
+          displayValue($scope.rating);
         }
       };
     }]
@@ -114,7 +114,7 @@ oppia.directive('ratings', ['$http', function($http) {
     controller: ['$scope', function($scope) {
       $scope.ratingsUrl = '/explorehandler/rating/' + $scope.explorationId;
       $http.get($scope.ratingsUrl).success(function(data) {
-        $scope.overallRating = data.overall_rating;
+        $scope.overallRatings = data.overall_ratings;
         $scope.userRating = data.user_rating;
       });
 

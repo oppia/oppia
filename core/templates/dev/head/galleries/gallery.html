@@ -209,6 +209,9 @@
                     </div>
 
                     <div class="oppia-gallery-tile-second-row">
+                      <span class="oppia-gallery-tile-ratings">
+                        <rating-stars rating-frequencies="exploration.ratings" is-editable="false"></rating-stars>
+                      </span>
                       <span ng-if="exploration.status === 'publicized'" style="color: #888">
                         Featured
                         <span class="glyphicon glyphicon-star"></span>
@@ -219,9 +222,6 @@
                         <span style="font-weight: bold;">&middot;</span>
                         Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                       </span>
-                        <span class="pull-right" style="color: black">
-                          <rating-stars rating-frequencies="exploration.ratings" is-editable="false"></rating-stars>
-                        </span>
                     </div>
                   </div>
                 </div>

@@ -1,10 +1,10 @@
 <script type="text/ng-template" id="ratings/display">
-  <span ng-repeat="star in stars" class="glyphicon <[star.style]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)" ng-mouseleave="leaveStar(star.value)"></span>
+  <span ng-if="rating || isEditable" ng-repeat="star in stars" class="glyphicon <[star.style]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)" ng-mouseleave="leaveStar(star.value)"></span>
 </script>
 
 <script type="text/ng-template" id="ratings/control">
   <span ng-if="ratingType === 'overall'">
-    <rating-stars rating-frequencies="overallRating" is-editable="false"></rating-stars>
+    <rating-stars rating-frequencies="overallRatings" is-editable="false"></rating-stars>
   </span>
   <span ng-if="ratingType === 'user'">
     <rating-stars rating-value="userRating" is-editable="true" on-edit="submitUserRating"></rating-stars>
