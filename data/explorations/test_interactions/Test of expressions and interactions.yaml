@@ -394,7 +394,7 @@ states:
         rule_specs:
         - definition:
             inputs:
-              d: 30.0
+              d: 3300.0
               p:
               - 40.0
               - -105.0

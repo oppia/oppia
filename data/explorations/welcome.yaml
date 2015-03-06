@@ -60,7 +60,7 @@ states:
         rule_specs:
         - definition:
             inputs:
-              d: 1.0
+              d: 110.0
               p:
               - 60.1708
               - 24.9375
@@ -73,7 +73,7 @@ states:
           param_changes: []
         - definition:
             inputs:
-              d: 10.0
+              d: 1100.0
               p:
               - 60.1708
               - 24.9375
