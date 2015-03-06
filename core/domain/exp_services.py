@@ -263,9 +263,11 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    logging.error(
-        'Could not fulfill search request for query string %s; at least %s '
-        'retries were needed.' % (query_string, MAX_ITERATIONS))
+    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+            and search_cursor is not None):
+        logging.error(
+            'Could not fulfill search request for query string %s; at least '
+            '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
     return ([
         get_exploration_summary_from_model(summary_model)
