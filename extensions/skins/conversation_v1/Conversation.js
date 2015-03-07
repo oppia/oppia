@@ -29,9 +29,11 @@ oppia.directive('conversationSkin', [function() {
     controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$modal', 'warningsData',
         'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
+        'ratingService',
         function(
           $scope, $timeout, $rootScope, $window, $modal, warningsData,
-          messengerService, oppiaPlayerService, urlService, focusService) {
+          messengerService, oppiaPlayerService, urlService, focusService,
+          ratingService) {
 
       var hasInteractedAtLeastOnce = false;
       var _labelForNextFocusTarget = null;
@@ -164,6 +166,15 @@ oppia.directive('conversationSkin', [function() {
             });
           }, 1000);
         });
+
+        ratingService.init(function(userRating) {
+          $scope.userRating = userRating;
+        });
+      };
+
+      $scope.submitUserRating = function(ratingValue) {
+        $scope.userRating = ratingValue;
+        ratingService.submitUserRating(ratingValue);
       };
 
       $scope.initializePage();

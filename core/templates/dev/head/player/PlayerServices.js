@@ -551,6 +551,25 @@ oppia.factory('oppiaPlayerService', [
 }]);
 
 
+oppia.factory('ratingService', [
+    '$http', 'oppiaPlayerService', function($http, oppiaPlayerService) {
+  var explorationId = oppiaPlayerService.getExplorationId();
+  var ratingsUrl = '/explorehandler/rating/' + explorationId;
+  return {
+    init: function(successCallback) {
+      $http.get(ratingsUrl).success(function(data) {
+        successCallback(data.user_rating);
+      });
+    },
+    submitUserRating: function(ratingValue) {
+      $http.put(ratingsUrl, {
+        user_rating: ratingValue
+      });
+    }
+  };
+}]);
+
+
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal',
     'oppiaPlayerService', 'embedExplorationButtonService',

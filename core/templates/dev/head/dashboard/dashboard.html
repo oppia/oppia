@@ -117,12 +117,14 @@
   </div>
 
   {% include 'components/exploration_creation_button.html' %}
+  {% include 'components/ratings.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('components/explorationCreationButton.js') }}
+    {{ include_js_file('components/ratings.js') }}
     {{ include_js_file('/dashboard/Dashboard.js') }}
   </script>
 {% endblock footer_js %}

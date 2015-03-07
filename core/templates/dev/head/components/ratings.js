@@ -18,7 +18,7 @@
  * @author Jacob Davis
  */
 
-oppia.directive('ratingStars', [function($http) {
+oppia.directive('ratingFromValue', [function($http) {
   return {
     // This will display a star-rating based on the given data. Exactly one of
     // 'ratingValue' and 'ratingFrequencies' should be specified.
@@ -32,11 +32,10 @@ oppia.directive('ratingStars', [function($http) {
     restrict: 'E',
     scope: {
       ratingValue: '=',
-      ratingFrequencies: '=',
       isEditable: '=',
       onEdit: '='
     },
-    templateUrl: 'ratings/display',
+    templateUrl: 'rating/fromValue',
     controller: ['$scope', function($scope) {
       var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
@@ -45,18 +44,6 @@ oppia.directive('ratingStars', [function($http) {
           value: starValue
         };
       });
-
-      var computeAverageRating = function(ratingFrequencies) {
-        var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1; // TODO RESET! Sean, yell at me if I forget.
-        totalValue = 0.0;
-        totalNumber = 0;
-        for (var value in ratingFrequencies) {
-          totalValue += value * ratingFrequencies[value];
-          totalNumber += ratingFrequencies[value];
-        }
-        return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS ?
-          totalValue / totalNumber : undefined;
-      };
 
       var displayValue = function(ratingValue) {
         for (var i = 0; i < $scope.stars.length; i++) {
@@ -68,22 +55,14 @@ oppia.directive('ratingStars', [function($http) {
         }
       };
 
-      var loadRating = function() {
-        $scope.rating = $scope.ratingValue ? $scope.ratingValue :
-          computeAverageRating($scope.ratingFrequencies);
-        displayValue($scope.rating);
-      };
-      loadRating();
+      displayValue($scope.ratingValue);
       $scope.$watch('ratingValue', function() {
-        loadRating();
-      });
-      $scope.$watch('ratingFrequencies', function() {
-        loadRating();
+        displayValue($scope.ratingValue);
       });
 
       $scope.clickStar = function(starValue) {
         if ($scope.isEditable) {
-          $scope.rating = starValue;
+          $scope.ratingValue = starValue;
           displayValue(starValue);
           $scope.onEdit(starValue);
         }
@@ -95,7 +74,7 @@ oppia.directive('ratingStars', [function($http) {
       };
       $scope.leaveStar = function(starValue) {
         if ($scope.isEditable) {
-          displayValue($scope.rating);
+          displayValue($scope.ratingValue);
         }
       };
     }]
@@ -103,26 +82,29 @@ oppia.directive('ratingStars', [function($http) {
 }]);
 
 
-oppia.directive('ratings', ['$http', function($http) {
+oppia.directive('ratingFromFrequencies', [function() {
   return {
-    scope: {
-      explorationId: '=',
-      ratingType: '='
-    },
     restrict: 'E',
-    templateUrl: 'ratings/control',
+    scope: {
+      ratingFrequencies: '=',
+      isEditable: '=',
+      onEdit: '='
+    },
+    templateUrl: 'rating/fromFrequencies',
     controller: ['$scope', function($scope) {
-      $scope.ratingsUrl = '/explorehandler/rating/' + $scope.explorationId;
-      $http.get($scope.ratingsUrl).success(function(data) {
-        $scope.overallRatings = data.overall_ratings;
-        $scope.userRating = data.user_rating;
-      });
-
-      $scope.submitUserRating = function(value) {
-        $http.put($scope.ratingsUrl, {
-          user_rating: value
-        });
+      var computeAverageRating = function(ratingFrequencies) {
+        var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
+        totalValue = 0.0;
+        totalNumber = 0;
+        for (var value in ratingFrequencies) {
+          totalValue += value * ratingFrequencies[value];
+          totalNumber += ratingFrequencies[value];
+        }
+        return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS ?
+          totalValue / totalNumber : undefined;
       };
+
+      $scope.ratingValue = computeAverageRating($scope.ratingFrequencies);
     }]
   };
 }]);
