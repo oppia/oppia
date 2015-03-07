@@ -40,19 +40,25 @@ JOB_FAILED_MESSAGE = 'failed (as expected)'
 
 class DummyJobManager(jobs.BaseDeferredJobManager):
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         return 'output'
 
 
 class AnotherDummyJobManager(jobs.BaseDeferredJobManager):
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         return 'output'
+
+
+class DummyJobManagerWithParams(jobs.BaseDeferredJobManager):
+    @classmethod
+    def _run(cls, additional_job_params):
+        return additional_job_params['correct']
 
 
 class DummyFailingJobManager(jobs.BaseDeferredJobManager):
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         raise Exception(JOB_FAILED_MESSAGE)
 
 
@@ -129,6 +135,26 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(DummyJobManager.is_active(job_id))
         self.assertTrue(DummyJobManager.has_finished(job_id))
+
+    def test_deferred_job_with_additional_params(self):
+        """Test the enqueueing of a job with additional parameters."""
+        ADDITIONAL_PARAMS_1 = {'random': 3, 'correct': 60}
+        ADDITIONAL_PARAMS_2 = {'random': 20, 'correct': 25}
+
+        job_id_1 = DummyJobManagerWithParams.create_new()
+        DummyJobManagerWithParams.enqueue(
+            job_id_1, additional_job_params=ADDITIONAL_PARAMS_1)
+        job_id_2 = DummyJobManagerWithParams.create_new()
+        DummyJobManagerWithParams.enqueue(
+            job_id_2, additional_job_params=ADDITIONAL_PARAMS_2)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+        self.process_and_flush_pending_tasks()
+
+        self.assertTrue(DummyJobManagerWithParams.has_finished(job_id_1))
+        self.assertEqual(DummyJobManagerWithParams.get_output(job_id_1), 60)
+        self.assertTrue(DummyJobManagerWithParams.has_finished(job_id_2))
+        self.assertEqual(DummyJobManagerWithParams.get_output(job_id_2), 25)
 
     def test_job_failure(self):
         job_id = DummyFailingJobManager.create_new()
@@ -364,7 +390,7 @@ class TestAdditionJobManager(TestDeferredJobManager):
     The result is stored in a SumModel entity with id SUM_MODEL_ID.
     """
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         total = sum([
             numbers_model.number for numbers_model in NumbersModel.query()])
         SumModel(id=SUM_MODEL_ID, total=total).put()
@@ -375,7 +401,7 @@ class FailingAdditionJobManager(TestDeferredJobManager):
     IS_VALID_JOB_CLASS = True
 
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         total = sum([
             numbers_model.number for numbers_model in NumbersModel.query()])
         SumModel(id=SUM_MODEL_ID, total=total).put()

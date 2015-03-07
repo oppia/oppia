@@ -323,7 +323,7 @@ class BaseJobManager(object):
 class BaseDeferredJobManager(BaseJobManager):
 
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         """Function that performs the main business logic of the job.
 
         Needs to be implemented by subclasses.
@@ -331,7 +331,7 @@ class BaseDeferredJobManager(BaseJobManager):
         raise NotImplementedError
 
     @classmethod
-    def _run_job(cls, job_id):
+    def _run_job(cls, job_id, additional_job_params):
         """Starts the job."""
         logging.info(
             'Job %s started at %s' %
@@ -339,7 +339,7 @@ class BaseDeferredJobManager(BaseJobManager):
         cls.register_start(job_id)
 
         try:
-            result = cls._run()
+            result = cls._run(additional_job_params)
         except Exception as e:
             logging.error(traceback.format_exc())
             logging.error(
@@ -359,8 +359,15 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, unused_additional_job_params):
-        taskqueue_services.defer(cls._run_job, job_id)
+    def _real_enqueue(cls, job_id, additional_job_params):
+        """Puts the job in the task queue.
+
+        Args:
+        - job_id: str, the id of the job.
+        - additional_job_params: dict of additional params to pass into the
+            job's _run() method.
+        """
+        taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
