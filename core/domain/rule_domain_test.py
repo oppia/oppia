@@ -105,3 +105,21 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                 clses.append(clazz)
 
         self.assertTrue(at_least_one_rule_found)
+
+
+class RuleFunctionUnitTests(test_utils.GenericTestBase):
+    """Test for functions involving rules."""
+
+    def test_get_description_strings_for_obj_type(self):
+        rule_descriptions = rule_domain.get_description_strings_for_obj_type(
+            'UnicodeString')
+        self.assertEqual(rule_descriptions, {
+            'CaseSensitiveEquals': (
+                'is equal to {{x|UnicodeString}}, taking case into account'),
+            'Contains': 'contains {{x|UnicodeString}}',
+            'Equals': 'is equal to {{x|UnicodeString}}',
+            'MatchesBase64EncodedFile': (
+                'has same content as the file located at '
+                '{{filepath|UnicodeString}}'),
+            'StartsWith': 'starts with {{x|UnicodeString}}',
+        })

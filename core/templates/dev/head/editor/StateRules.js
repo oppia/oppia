@@ -103,7 +103,6 @@ oppia.factory('rulesService', [
       // Stores rules as key-value pairs. For each pair, the key is the
       // corresponding handler name and the value has several keys:
       // - 'definition' (the rule definition)
-      // - 'description' (the rule description string)
       // - 'dest' (the destination for this rule)
       // - 'feedback' (list of feedback given for this rule)
       // - 'param_changes' (parameter changes associated with this rule)
@@ -218,7 +217,6 @@ oppia.controller('StateRules', [
     $rootScope.$broadcast('externalSave');
     rulesService.changeActiveRuleIndex(newIndex);
     $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
-    $rootScope.$broadcast('activeRuleChanged');
   };
 
   $scope.getCurrentInteractionId = function() {
@@ -230,22 +228,21 @@ oppia.controller('StateRules', [
     $scope.interactionHandlers = rulesService.getInteractionHandlers();
     $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
     $scope.answerChoices = $scope.getAnswerChoices();
-    $rootScope.$broadcast('activeRuleChanged');
+    $rootScope.$broadcast('externalSave');
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+    $rootScope.$broadcast('externalSave');
     rulesService.onInteractionIdChanged(newInteractionId, function() {
       $scope.interactionHandlers = rulesService.getInteractionHandlers();
       $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
       $scope.answerChoices = $scope.getAnswerChoices();
-      $rootScope.$broadcast('activeRuleChanged');
     });
   });
 
   $scope.$on('ruleDeleted', function(evt) {
     $scope.interactionHandlers = rulesService.getInteractionHandlers();
     $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
-    $rootScope.$broadcast('activeRuleChanged');
   });
 
   $scope.$on('ruleSaved', function(evt) {
@@ -287,13 +284,14 @@ oppia.controller('StateRules', [
         $scope.canAddDefaultRule = canAddDefaultRule;
 
         $scope.tmpRule = {
-          description: ($scope.canAddDefaultRule ? 'Default' : null),
-          definition: {
+          definition: ($scope.canAddDefaultRule ? {
+            rule_type: 'default'
+          } : {
             rule_type: 'atomic',
             name: null,
             inputs: {},
             subject: 'answer'
-          },
+          }),
           dest: editorContextService.getActiveStateName(),
           feedback: [''],
           param_changes: []
@@ -332,7 +330,7 @@ oppia.controller('StateRules', [
 
       var numRules = $scope.interactionHandlers['submit'].length;
 
-      if (tmpRule.description === 'Default') {
+      if (tmpRule.definition.rule_type === 'default') {
         if ($scope.isDefaultRuleTabShown()) {
           warningsData.addWarning('Tried to add a duplicate default rule');
           return;
@@ -369,7 +367,7 @@ oppia.controller('StateRules', [
       $scope.$apply();
       rulesService.save($scope.interactionHandlers);
       $scope.changeActiveRuleIndex(ui.item.index());
-      $rootScope.$broadcast('activeRuleChanged');
+      $rootScope.$broadcast('externalSave');
     }
   };
 

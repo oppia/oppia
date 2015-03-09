@@ -541,7 +541,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                             'definition': {
                                 'rule_type': 'default',
                             },
-                            'description': 'Default',
                             'dest': dest_name,
                             'feedback': [],
                             'param_changes': [],

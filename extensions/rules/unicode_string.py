@@ -56,8 +56,9 @@ class Contains(base.UnicodeStringRule):
 
 
 class MatchesBase64EncodedFile(base.UnicodeStringRule):
-    description = """has same content as the file located at
-    {{filepath|UnicodeString}}"""
+    description = (
+        'has same content as the file located at '
+        '{{filepath|UnicodeString}}')
     is_generic = False
 
     def _evaluate(self, subject):

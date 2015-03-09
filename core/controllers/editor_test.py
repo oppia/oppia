@@ -96,8 +96,8 @@ class EditorTest(BaseEditorControllerTest):
         exp_services.load_demo('0')
         exploration = exp_services.get_exploration_by_id('0')
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
-        new_state_dict = exploration.export_state_to_frontend_dict(
-            feconf.DEFAULT_INIT_STATE_NAME)
+        new_state_dict = exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].to_dict()
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
