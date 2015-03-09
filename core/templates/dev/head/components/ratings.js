@@ -86,7 +86,7 @@ oppia.directive('ratingFromFrequencies', [function() {
   return {
     restrict: 'E',
     scope: {
-      ratingFrequencies: '=',
+      ratingFrequencies: '&',
       isEditable: '=',
       onEdit: '='
     },
@@ -104,7 +104,7 @@ oppia.directive('ratingFromFrequencies', [function() {
           totalValue / totalNumber : undefined;
       };
 
-      $scope.ratingValue = computeAverageRating($scope.ratingFrequencies);
+      $scope.ratingValue = computeAverageRating($scope.ratingFrequencies());
     }]
   };
 }]);
