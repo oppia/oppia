@@ -34,6 +34,7 @@ oppia.controller('StateEditor', [
 
   $scope.isCurrentStateTerminal = false;
   $scope.isInteractionIdSet = false;
+  $scope.isInteractionShown = false;
 
   $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
@@ -63,6 +64,10 @@ oppia.controller('StateEditor', [
         INTERACTION_SPECS[stateData.interaction.id].is_terminal);
     }
 
+    if ($scope.content[0].value) {
+      $scope.isInteractionShown = true;
+    }
+
     $rootScope.loadingMessage = '';
   };
 
@@ -71,10 +76,6 @@ oppia.controller('StateEditor', [
       $scope.contentMemento = angular.copy($scope.content);
     }
   };
-
-  $scope.$on('externalSave', function() {
-    $scope.saveTextContent();
-  });
 
   $scope.saveTextContent = function() {
     if ($scope.contentMemento !== null && !angular.equals($scope.contentMemento, $scope.content)) {
@@ -89,6 +90,17 @@ oppia.controller('StateEditor', [
         editorContextService.getActiveStateName(), _stateData);
     }
     $scope.contentMemento = null;
+  };
+
+  $scope.$on('externalSave', function() {
+    $scope.saveTextContent();
+  });
+
+  $scope.onSaveContentButtonClicked = function() {
+    $scope.saveTextContent();
+    // Show the interaction when the text content is saved, even if no content
+    // is entered.
+    $scope.isInteractionShown = true;
   };
 
   $scope.cancelEdit = function() {
