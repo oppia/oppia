@@ -34,11 +34,11 @@
 
 <script type="text/ng-template" id="modals/customizeInteraction">
   <div class="modal-header">
-    <h3 ng-if="!stateInteractionIdService.savedMemento">
+    <h3 ng-if="!stateInteractionIdService.displayed">
       Choose Interaction
     </h3>
 
-    <h3 ng-if="stateInteractionIdService.savedMemento">
+    <h3 ng-if="stateInteractionIdService.displayed">
       Customize Interaction
     </h3>
   </div>
@@ -81,6 +81,6 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()" ng-disabled="form.schemaForm.$invalid">Save Customizations</button>
+    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()" ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">Save Interaction</button>
   </div>
 </script>
