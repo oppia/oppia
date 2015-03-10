@@ -130,7 +130,7 @@ oppia.factory('rulesService', [
             _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
           ]
         };
-        if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+        if (newInteractionId && INTERACTION_SPECS[newInteractionId].is_terminal) {
           _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
         }
       }
