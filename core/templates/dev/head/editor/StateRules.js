@@ -285,7 +285,8 @@ oppia.controller('StateRules', [
 
         $scope.tmpRule = {
           definition: ($scope.canAddDefaultRule ? {
-            rule_type: 'default'
+            rule_type: 'default',
+            subject: 'answer'
           } : {
             rule_type: 'atomic',
             name: null,

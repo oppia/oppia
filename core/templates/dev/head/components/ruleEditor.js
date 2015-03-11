@@ -56,14 +56,14 @@ oppia.directive('ruleTypeSelector', [function() {
       });
 
       if ($scope.canAddDefaultRule()) {
-        choices.unshift({
+        choices.push({
           id: 'Default',
           text: 'When no other rule applies...'
         });
       }
 
       if (!$scope.localValue) {
-        $scope.localValue = choices[0].id;
+        $scope.localValue = choices[choices.length - 1].id;
       }
 
       var select2Node = $element[0].firstChild;
@@ -476,18 +476,22 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
         }
       };
 
-      // Select a default rule name, if one isn't already selected.
-      if ($scope.currentRuleDefinition.name === null) {
-        var ruleNamesToDescriptions = INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions;
-        for (var ruleName in ruleNamesToDescriptions) {
-          if ($scope.currentRuleDefinition.name === null || ruleName < $scope.currentRuleDefinition.name) {
-            $scope.currentRuleDefinition.name = ruleName;
+      $scope.init = function() {
+        // Select a default rule name, if one isn't already selected.
+        if ($scope.currentRuleDefinition.name === null && $scope.currentRuleDefinition.rule_type !== 'default') {
+          var ruleNamesToDescriptions = INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions;
+          for (var ruleName in ruleNamesToDescriptions) {
+            if ($scope.currentRuleDefinition.name === null || ruleName < $scope.currentRuleDefinition.name) {
+              $scope.currentRuleDefinition.name = ruleName;
+            }
           }
+          $scope.onSelectNewRuleType($scope.currentRuleDefinition.name);
         }
-        $scope.onSelectNewRuleType($scope.currentRuleDefinition.name);
-      }
 
-      _computeRuleDescriptionFragments();
+        _computeRuleDescriptionFragments();
+      };
+
+      $scope.init();
     }]
   };
 }]);
