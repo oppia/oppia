@@ -214,6 +214,7 @@ class BaseHandler(webapp2.RequestHandler):
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
+            self.values['user_email'] = user_settings.email
 
             if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
                 _clear_login_cookies(self.response.headers)
@@ -222,7 +223,6 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.username = user_settings.username
                 self.last_agreed_to_terms = user_settings.last_agreed_to_terms
-                self.values['user_email'] = user_settings.email
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
