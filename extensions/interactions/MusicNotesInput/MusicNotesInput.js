@@ -54,7 +54,7 @@ oppia.factory('musicPhrasePlayerService', ['$timeout', function($timeout) {
     playMusicPhrase: function(notes) {
       _playMusicPhrase(notes);
     }
-  }
+  };
 }]);
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
@@ -745,7 +745,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             }
           }
 
-          musicPhrasePlayer.playMusicPhrase(notes);
+          musicPhrasePlayerService.playMusicPhrase(notes);
         }
 
         // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.
