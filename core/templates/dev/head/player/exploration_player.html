@@ -26,6 +26,36 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
+  <!-- Required for Facebook share API -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+  </script>
+  <!-- Required for Twitter share API -->
+  <script>
+    $('.popup').click(function(event) {
+      var width  = 575,
+          height = 400,
+          left   = ($(window).width()  - width)  / 2,
+          top    = ($(window).height() - height) / 2,
+          url    = this.href,
+          opts   = 'status=1' +
+                   ',width='  + width  +
+                   ',height=' + height +
+                   ',top='    + top    +
+                   ',left='   + left;
+
+      window.open(url, 'twitter', opts);
+
+      return false;
+    });
+  </script>
+
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
     <li class="dropdown">
       <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
@@ -33,7 +63,6 @@
       </a>
       <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
         <li>
-          <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
           <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
              onclick="javascript:window.open(this.href,
                       '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
@@ -42,6 +71,19 @@
                  alt="Share on Google+"/>
           </a>
         </li>
+        <li>
+          <a class="fb-share-button"
+             data-href="<[serverName]>/explore/<[explorationId]>"
+             data-layout="icon" tooltip="Facebook" tooltip-placement="left">
+          </a>
+        </li>
+        <li>
+          <a class="twitter popup"
+             href="http://twitter.com/share?url=<[serverName]>/explore/<[explorationId]>&text=Check%20out%20this%20exploration%20in%20Oppia!"
+             target="_blank" data-layout="icon" tooltip="Twitter"
+             tooltip-placement="left">
+            <img src="/images/general/tweet.png" alt="Twitter">
+          </a>
         <li>
           <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
