@@ -785,6 +785,14 @@ oppia.config(['$provide', function($provide) {
       'taRegisterTool', '$delegate', '$modal', '$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
       function(taRegisterTool, taOptions, $modal, $filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
 
+		taOptions.disableSanitizer = true;
+    taOptions.toolbar = [
+      ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'quote'],
+      ['bold', 'italics', 'underline', 'strikeThrough', 'ul', 'ol', 'redo', 'undo', 'clear'],
+      ['justifyLeft', 'justifyCenter', 'justifyRight', 'indent', 'outdent'],
+      ['html', 'insertImage','insertLink', 'insertVideo']
+    ];
+
     var _RICH_TEXT_COMPONENTS = [];
 
     var createRteElement = function(componentDefn, customizationArgsDict) {
@@ -802,26 +810,6 @@ oppia.config(['$provide', function($provide) {
       return domNode;
     };
 
-    // Replace <img> tags with <oppia-noninteractive> tags.
-    var convertRteToHtml = function(rte) {
-      var elt = $('<div>' + rte + '</div>');
-
-      _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-        elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-          var jQueryElt = $('<' + this.className + '/>');
-          for (var i = 0; i < this.attributes.length; i++) {
-            var attr = this.attributes[i];
-            if (attr.name !== 'class' && attr.name !== 'src') {
-              jQueryElt.attr(attr.name, attr.value);
-            }
-          }
-          return jQueryElt.get(0);
-        });
-      });
-
-      return elt.html();
-    };
-
     var componentIds = Object.keys(RTE_COMPONENT_SPECS);
     componentIds.sort().forEach(function(componentId) {
       RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
@@ -835,6 +823,7 @@ oppia.config(['$provide', function($provide) {
         buttontext: componentDefn.name,
         action: function() {
           var textAngular = this;
+          textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>')
           $modal.open({
             templateUrl: 'modals/customizeRteComponent',  
             backdrop: 'static',
@@ -879,11 +868,11 @@ oppia.config(['$provide', function($provide) {
               };
             }]
           }).result.then(function(customizationArgsDict) {
-            var innerElt = createRteElement(componentDefn, customizationArgsDict);
-            var container = document.createElement('div');
-            container.appendChild(innerElt);
-            var el = convertRteToHtml(container.innerHTML, _RICH_TEXT_COMPONENTS);
-            textAngular.$editor().wrapSelection('insertHtml', el);
+            var el = createRteElement(componentDefn, customizationArgsDict);
+            var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+            var parent = insertionPoint.parentNode;
+            parent.replaceChild(el, insertionPoint);
+            textAngular.$editor().updateTaBindtaTextElement();
           });
         }
       });
@@ -895,7 +884,8 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
-oppia.directive('textAngularRte', ['taApplyCustomRenderers', function(taApplyCustomRenderers) {
+oppia.directive('textAngularRte', ['taApplyCustomRenderers', '$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+  function(taApplyCustomRenderers, $filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
   return {
     restrict: 'E',
     scope: {
@@ -903,7 +893,84 @@ oppia.directive('textAngularRte', ['taApplyCustomRenderers', function(taApplyCus
     },
     template: '<div text-angular="" ng-model="tempContent">',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs){
-      $scope._replaceWithPlaceholder = function(raw){
+      var _RICH_TEXT_COMPONENTS = [];
+      var componentIds = Object.keys(RTE_COMPONENT_SPECS);
+      componentIds.sort().forEach(function(componentId) {
+        RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
+        RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
+        RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+        _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+      });
+
+      // Creates a dict.
+      var createCustomizationArgDictFromAttrs = function(attrs) {
+        var customizationArgsDict = {};
+        for (var i = 0; i < attrs.length; i++) {
+          var attr = attrs[i];
+          if (attr.name == 'class' || attr.name == 'src') {
+            continue;
+          }
+          var separatorLocation = attr.name.indexOf('-with-value');
+          if (separatorLocation === -1) {
+            $log.error('RTE Error: invalid customization attribute ' + attr.name);
+            continue;
+          }
+          var argName = attr.name.substring(0, separatorLocation);
+          customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
+        }
+        return customizationArgsDict;
+      };
+
+      // Replace <oppia-noninteractive> tags with <img> tags.
+      var convertHtmlToRte = function(html) {
+        var elt = $('<div>' + html + '</div>');
+
+        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+            return createRteElement(
+            componentDefn, createCustomizationArgDictFromAttrs(this.attributes));
+          });
+        });
+
+        return elt.html();
+      };
+
+      var createRteElement = function(componentDefn, customizationArgsDict) {
+        var el = $('<img/>');
+        el.attr('src', componentDefn.iconDataUrl);
+        el.addClass('oppia-noninteractive-' + componentDefn.name);
+
+        for (var attrName in customizationArgsDict) {
+          el.attr(
+          $filter('camelCaseToHyphens')(attrName) + '-with-value',
+          oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+        }
+
+        var domNode = el.get(0);
+        return domNode;
+      };
+
+      // Replace <img> tags with <oppia-noninteractive> tags.
+      var convertRteToHtml = function(rte) {
+        var elt = $('<div>' + rte + '</div>');
+
+        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+            var jQueryElt = $('<' + this.className + '/>');
+            for (var i = 0; i < this.attributes.length; i++) {
+              var attr = this.attributes[i];
+              if (attr.name !== 'class' && attr.name !== 'src') {
+                jQueryElt.attr(attr.name, attr.value);
+              }
+            }
+            return jQueryElt.get(0);
+          });
+        });
+
+        return elt.html();
+      };
+
+      var replaceWithPlaceholder = function(raw){
         var converted;
         var openingTag = /<iframe/g;
         var closingTag = /><\/iframe>/g;
@@ -915,12 +982,13 @@ oppia.directive('textAngularRte', ['taApplyCustomRenderers', function(taApplyCus
       };
 
       $scope.init = function(){
-        $scope.tempContent = $scope._replaceWithPlaceholder($scope.htmlContent);
+        $scope.tempContent = convertHtmlToRte(replaceWithPlaceholder($scope.htmlContent));
       };
 
       $scope.init();
+
       $scope.$watch(function(){return $scope.tempContent}, function(newVal, oldVal){
-        $scope.htmlContent = taApplyCustomRenderers(newVal);
+        $scope.htmlContent = convertRteToHtml(taApplyCustomRenderers(newVal));
       });
     }],
   };

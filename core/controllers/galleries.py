@@ -97,7 +97,7 @@ class GalleryPage(base.BaseHandler):
                     lc['description']),
             } for lc in feconf.ALL_LANGUAGE_CODES],
         })
-        self.render_template('forms/form_builder_tests.html')
+        self.render_template('galleries/gallery.html')
 
 
 class GalleryHandler(base.BaseHandler):

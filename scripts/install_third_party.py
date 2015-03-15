@@ -289,13 +289,13 @@ JWYSIWYG_ZIP_URL = (
 JWYSIWYG_ZIP_ROOT_NAME = 'jwysiwyg-%s' % JWYSIWYG_REV
 JWYSIWYG_TARGET_ROOT_NAME = 'jwysiwyg-496497'
 
-FONTAWESOME_REV='4.2.0'
+FONTAWESOME_REV='4.3.0'
 FONTAWESOME_ZIP_URL = (
     'http://fortawesome.github.io/Font-Awesome/assets/font-awesome-%s.zip' % FONTAWESOME_REV)
 FONTAWESOME_ZIP_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
 FONTAWESOME_TARGET_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
 
-TEXTANGULAR_REV = '1.2.2'
+TEXTANGULAR_REV = '1.3.7'
 TEXTANGULAR_ZIP_URL = (
     'https://github.com/fraywing/textAngular/archive/v%s.zip' % TEXTANGULAR_REV)
 TEXTANGULAR_ZIP_ROOT_NAME = 'textAngular-%s' % TEXTANGULAR_REV
