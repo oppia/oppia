@@ -134,7 +134,7 @@
     <span ng-form="floatForm">
       <span ng-if="!expressionMode">
         <md-input-group class="long oppia-blue-on-focus md-default-theme" style="display: inline; position: relative;">
-          <input style="display: inline; height: 25px; margin-top: 25px; width: 220px;" type="text" name="floatValue" ng-model="$parent.localValue"
+          <input style="display: inline; height: 25px; width: 220px;" type="text" name="floatValue" ng-model="$parent.localValue"
                  require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
                  focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
                  ng-blur="onBlur()" ng-focus="onFocus()">
