@@ -86,13 +86,11 @@ oppia.directive('ratingFromFrequencies', [function() {
   return {
     restrict: 'E',
     scope: {
-      ratingFrequencies: '&',
-      isEditable: '=',
-      onEdit: '='
+      ratingFrequencies: '&'
     },
     templateUrl: 'rating/fromFrequencies',
     controller: ['$scope', function($scope) {
-      var computeAverageRating = function(ratingFrequencies) {
+      $scope.computeAverageRating = function(ratingFrequencies) {
         var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
         totalValue = 0.0;
         totalNumber = 0;
@@ -104,7 +102,8 @@ oppia.directive('ratingFromFrequencies', [function() {
           totalValue / totalNumber : undefined;
       };
 
-      $scope.ratingValue = computeAverageRating($scope.ratingFrequencies());
+      $scope.ratingValue = $scope.computeAverageRating(
+        $scope.ratingFrequencies());
     }]
   };
 }]);

@@ -173,9 +173,11 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.submitUserRating = function(ratingValue) {
-        $scope.userRating = ratingValue;
         ratingService.submitUserRating(ratingValue);
       };
+      $scope.$on('ratingUpdated', function() {
+        $scope.userRating = ratingService.getUserRating();
+      });
 
       $scope.initializePage();
 

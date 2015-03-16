@@ -21,12 +21,6 @@
                 <li>
                   <a href="" ng-click="openCardFeedbackModal(state.stateName)">Give Feedback</a>
                 </li>
-                <li ng-if="isLoggedIn" style="padding-left: .5cm">
-                  Rate <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating"></rating-from-value>
-                </li>
-                <li ng-if="!isLoggedIn" style="padding-left: .5cm">
-                  Log in to rate
-                </li>
               </ul>
             </div>
 
