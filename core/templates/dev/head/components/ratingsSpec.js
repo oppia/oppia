@@ -41,17 +41,23 @@ describe('Ratings from value directive', function() {
     ctrlScope = elt.isolateScope();
   }));
 
-  it('should display ratings as stars', function() {
+  it('should display the correct number of stars', function() {
     ctrlScope.ratingValue = 4.2;
     scope.$digest();
-    // Note the array here is zero-indexed by ratings are one-indexed
+    // Note the array here is zero-indexed but ratings are one-indexed
+    expect(ctrlScope.stars[0].style).toBe('glyphicon-star');
+    expect(ctrlScope.stars[1].style).toBe('glyphicon-star');
+    expect(ctrlScope.stars[2].style).toBe('glyphicon-star');
     expect(ctrlScope.stars[3].style).toBe('glyphicon-star');
     expect(ctrlScope.stars[4].style).toBe('glyphicon-star-empty');
 
     ctrlScope.ratingValue = 1.7;
     scope.$digest();
+    expect(ctrlScope.stars[0].style).toBe('glyphicon-star');
     expect(ctrlScope.stars[1].style).toBe('glyphicon-star');
     expect(ctrlScope.stars[2].style).toBe('glyphicon-star-empty');
+    expect(ctrlScope.stars[3].style).toBe('glyphicon-star-empty');
+    expect(ctrlScope.stars[4].style).toBe('glyphicon-star-empty');
   });
 });
 
@@ -78,7 +84,8 @@ describe('Ratings from frequencies directive', function() {
     ctrlScope = elt.isolateScope();
   }));
 
-  it('should compute average ratings correctly', function() {
+  it('should not show an average rating if there are too few ratings',
+      function() {
     expect(
       ctrlScope.computeAverageRating({'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
     ).toBe(undefined);
@@ -86,7 +93,9 @@ describe('Ratings from frequencies directive', function() {
     expect(
       ctrlScope.computeAverageRating({'1': 0, '2': 1, '3': 1, '4': 0, '5': 2})
     ).toBe(undefined);
+  });
 
+  it('should compute average ratings correctly', function() {
     expect(
       ctrlScope.computeAverageRating(
         {'1': 6, '2': 3, '3': 8, '4': 12, '5': 11})
