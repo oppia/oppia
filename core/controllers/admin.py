@@ -166,6 +166,8 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, exploration_id))
                 exp_services.delete_demo(unicode(exploration_id))
                 exp_services.load_demo(unicode(exploration_id))
+            elif self.payload.get('action') == 'clear_search_index':
+                exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')

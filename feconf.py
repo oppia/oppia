@@ -70,12 +70,7 @@ FEEDBACK_TAB_PAGE_SIZE = 20
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First State'
 # The default content text for the initial state of an exploration.
-DEFAULT_INIT_STATE_CONTENT_STR = (
-    'Welcome to the Oppia editor!<br><br>'
-    'Anything you type here will be shown to the learner playing '
-    'your exploration.<br><br>'
-    'If you need more help getting started, check out the Help link '
-    'in the navigation bar.')
+DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Name (and description) of the default rule.
 DEFAULT_RULE_NAME = 'Default'
@@ -145,6 +140,10 @@ DEFAULT_LANGUAGE_CODE = 'en'
 # Whether to include a page with the Oppia discussion forum.
 SHOW_FORUM_PAGE = True
 
+# User id and username for exploration migration bot.
+MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
+MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
@@ -173,8 +172,8 @@ ALLOWED_INTERACTIONS = {
     'Continue': {
         'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
     },
-    'EndConversation': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'EndConversation')
+    'EndExploration': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'EndExploration')
     },
     'GraphInput': {
         'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
@@ -267,6 +266,7 @@ NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
 NAV_MODE_HOME = 'home'
+NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 
 # Event types.

@@ -39,6 +39,15 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', ['$filter', 'WARNING_TYP
     var numRuleSpecs = ruleSpecs.length;
 
     for (var i = 0; i < numRuleSpecs - 1; i++) {
+      if (ruleSpecs[i].definition.name === 'Within' || ruleSpecs[i].definition.name === 'NotWithin') {
+        if (ruleSpecs[i].definition.inputs.d < 0) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: 'please ensure that all the rules refer to valid distances.'
+          });
+        }
+      }
+
       if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,

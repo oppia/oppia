@@ -22,23 +22,26 @@ oppia.directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',
     scope: {
-      allRuleTypes: '&',
       localValue: '=',
       onSelectionChange: '&',
       canAddDefaultRule: '&'
     },
     template: '<input type="hidden">',
     controller: [
-        '$scope', '$element', '$rootScope', '$filter',
-        function($scope, $element, $rootScope, $filter) {
+        '$scope', '$element', '$rootScope', '$filter', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        function($scope, $element, $rootScope, $filter, stateInteractionIdService, INTERACTION_SPECS) {
 
       var choices = [];
       var numberOfRuleTypes = 0;
-      for (var ruleType in $scope.allRuleTypes()) {
+
+      var ruleNamesToDescriptions = INTERACTION_SPECS[
+        stateInteractionIdService.savedMemento].rule_descriptions;
+      for (var ruleName in ruleNamesToDescriptions) {
         numberOfRuleTypes++;
         choices.push({
-          id: ruleType,
-          text: 'Answer ' + $filter('replaceInputsWithEllipses')(ruleType)
+          id: ruleName,
+          text: 'Answer ' + $filter('replaceInputsWithEllipses')(
+            ruleNamesToDescriptions[ruleName])
         });
       }
 
@@ -53,14 +56,14 @@ oppia.directive('ruleTypeSelector', [function() {
       });
 
       if ($scope.canAddDefaultRule()) {
-        choices.unshift({
+        choices.push({
           id: 'Default',
           text: 'When no other rule applies...'
         });
       }
 
       if (!$scope.localValue) {
-        $scope.localValue = choices[0].id;
+        $scope.localValue = choices[choices.length - 1].id;
       }
 
       var select2Node = $element[0].firstChild;
@@ -74,7 +77,7 @@ oppia.directive('ruleTypeSelector', [function() {
           if (object.id === 'Default') {
             return 'When no other rule applies';
           } else {
-            return 'Answer ' + $filter('truncateAtFirstInput')(object.id);
+            return $filter('truncateAtFirstEllipsis')(object.text);
           }
         }
       });
@@ -88,7 +91,7 @@ oppia.directive('ruleTypeSelector', [function() {
         // This is needed to actually update the localValue in the containing
         // scope.
         $scope.$apply();
-        $scope.onSelectionChange();
+        $scope.onSelectionChange()(e.val);
         // This is needed to propagate the change and display input fields for
         // parameterizing the rule.
         $scope.$apply();
@@ -103,32 +106,29 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       rule: '=',
-      saveRule: '=',
+      saveRule: '&',
       deleteRule: '&',
       isEditable: '='
     },
     templateUrl: 'inline/rule_editor',
     controller: [
       '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
-      'validatorsService', 'rulesService', 'explorationStatesService',
+      'validatorsService', 'rulesService', 'explorationStatesService', 'stateInteractionIdService',
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
-          validatorsService, rulesService, explorationStatesService) {
+          validatorsService, rulesService, explorationStatesService, stateInteractionIdService) {
         $scope.editRuleForm = {};
 
-        $scope.getAnswerChoices = function() {
-          return rulesService.getAnswerChoices();
-        };
+        $scope.answerChoices = rulesService.getAnswerChoices();
+        $scope.currentInteractionId = stateInteractionIdService.savedMemento;
 
         $scope.ruleDestMemento = null;
-        $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
         $scope.ruleFeedbackMemento = null;
 
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
           if ($scope.isEditable) {
-            $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
             $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
             $scope.ruleFeedbackMemento = angular.copy($scope.rule.feedback);
             $scope.ruleDestMemento = angular.copy($scope.rule.dest);
@@ -140,7 +140,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
-        $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
 
         $scope.saveThisRule = function() {
@@ -148,7 +147,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           // TODO(sll): Add more validation prior to saving.
           $scope.ruleEditorIsOpen = false;
 
-          $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
           $scope.ruleFeedbackMemento = null;
           $scope.ruleDestMemento = null;
@@ -157,17 +155,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
         $scope.cancelThisEdit = function() {
           $scope.ruleEditorIsOpen = false;
-          $scope.rule.description = angular.copy($scope.ruleDescriptionMemento);
           $scope.rule.definition = angular.copy($scope.ruleDefinitionMemento);
           $scope.rule.feedback = angular.copy($scope.ruleFeedbackMemento);
           $scope.rule.dest = angular.copy($scope.ruleDestMemento);
-          $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
           $scope.ruleFeedbackMemento = null;
           $scope.ruleDestMemento = null;
         };
         $scope.deleteThisRule = function() {
-          $scope.cancelThisEdit();
           $scope.deleteRule();
         };
 
@@ -175,6 +170,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           if ($scope.ruleEditorIsOpen) {
             $scope.saveThisRule();
           }
+        });
+
+        $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+          if ($scope.ruleEditorIsOpen) {
+            $scope.saveThisRule();
+          }
+          $scope.$broadcast('updateRuleDescriptionInteractionId');
         });
 
         $scope.getActiveStateName = function() {
@@ -312,7 +314,7 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
         };
 
         $scope.isDefaultRule = function() {
-          return ($scope.rule.description === 'Default');
+          return ($scope.rule.definition.rule_type === 'default');
         };
 
         $scope.destChoices = [];
@@ -351,37 +353,30 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
   return {
     restrict: 'E',
     scope: {
-      currentRuleDescription: '=',
       currentRuleDefinition: '=',
       canAddDefaultRule: '&'
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [
         '$scope', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
-        'rulesService',
-        function($scope, editorContextService, explorationStatesService, routerService, validatorsService, rulesService) {
-      var _generateAllRuleTypes = function() {
-        var _interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
-        for (var i = 0; i < _interactionHandlerSpecs.length; i++) {
-          if (_interactionHandlerSpecs[i].name == 'submit') {
-            $scope.allRuleTypes = {};
-            for (var description in _interactionHandlerSpecs[i].rules) {
-              $scope.allRuleTypes[description] = _interactionHandlerSpecs[i].rules[description].classifier;
-            }
-            return;
-          }
-        }
-      };
+        'rulesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        function($scope, editorContextService, explorationStatesService, routerService, validatorsService,
+                 rulesService, stateInteractionIdService, INTERACTION_SPECS) {
 
+      $scope.currentInteractionId = stateInteractionIdService.savedMemento;
+
+      // This returns the rule description string.
       var _computeRuleDescriptionFragments = function() {
-        if (!$scope.currentRuleDescription) {
+        if (!$scope.currentRuleDefinition.name) {
           $scope.ruleDescriptionFragments = [];
-          return;
+          return '';
         }
 
-        var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+        var ruleDescription = INTERACTION_SPECS[
+          $scope.currentInteractionId].rule_descriptions[$scope.currentRuleDefinition.name];
 
-        var finalInputArray = $scope.currentRuleDescription.split(pattern);
+        var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+        var finalInputArray = ruleDescription.split(PATTERN);
         if (finalInputArray.length % 3 !== 1) {
           $log.error('Could not process rule description.');
         }
@@ -399,18 +394,24 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
 
           var _answerChoices = rulesService.getAnswerChoices();
 
-          if (_answerChoices && _answerChoices.length) {
-            // This rule is for a multiple-choice interaction.
-            // TODO(sll): Remove the need for this special case for multiple-choice
-            // input.
-            $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
-              return {
-                val: choice.label,
-                id: choice.val
-              };
-            });
-
-            result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+          if (_answerChoices) {
+            // This rule is for a multiple-choice or image-click interaction.
+            // TODO(sll): Remove the need for this special case.
+            if (_answerChoices.length > 0) {
+              $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+                return {
+                  val: choice.label,
+                  id: choice.val
+                };
+              });
+              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+              if (!$scope.currentRuleDefinition.inputs[finalInputArray[i + 1]]) {
+                $scope.currentRuleDefinition.inputs[finalInputArray[i + 1]] = $scope.ruleDescriptionChoices[0].id;
+              }
+            } else {
+              $scope.ruleDescriptionChoices = [];
+              result.push({'type': 'noneditable', 'text': ' [Error: No choices available] '});
+            }
           } else {
             result.push({
               'type': finalInputArray[i+2],
@@ -419,24 +420,39 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
           }
         }
         $scope.ruleDescriptionFragments = result;
+        return ruleDescription;
       };
 
-      $scope.onSelectNewRuleType = function() {
-        $scope.currentRuleDefinition.name = $scope.allRuleTypes[$scope.currentRuleDescription];
+      $scope.$on('updateRuleDescriptionInteractionId', function(evt, newInteractionId) {
+        $scope.currentInteractionId = newInteractionId;
+      });
+
+      $scope.onSelectNewRuleType = function(newRuleName) {
+        if (newRuleName === 'Default') {
+          $scope.currentRuleDefinition = {
+            rule_type: 'default',
+            subject: 'answer'
+          };
+          _computeRuleDescriptionFragments();
+          return;
+        }
+
+        $scope.currentRuleDefinition.name = newRuleName;
+        $scope.currentRuleDefinition.rule_type = 'atomic';
         $scope.currentRuleDefinition.inputs = {};
-        _computeRuleDescriptionFragments();
+        $scope.currentRuleDefinition.subject = 'answer';
+        var tmpRuleDescription = _computeRuleDescriptionFragments();
 
         // Finds the parameters and sets them in $scope.currentRuleDefinition.inputs.
-        var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-        var copyOfRule = $scope.currentRuleDescription;
+        var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
         while (true) {
-          if (!copyOfRule.match(pattern)) {
+          if (!tmpRuleDescription.match(PATTERN)) {
             break;
           }
-          var varName = copyOfRule.match(pattern)[1];
+          var varName = tmpRuleDescription.match(PATTERN)[1];
           var varType = null;
-          if (copyOfRule.match(pattern)[2]) {
-            varType = copyOfRule.match(pattern)[2].substring(1);
+          if (tmpRuleDescription.match(PATTERN)[2]) {
+            varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
           }
 
           if (varType == 'Set') {
@@ -456,25 +472,26 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
             $scope.currentRuleDefinition.inputs[varName] = '';
           }
 
-          copyOfRule = copyOfRule.replace(pattern, ' ');
+          tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
         }
       };
 
-      _generateAllRuleTypes();
-      if ($scope.currentRuleDescription === null) {
-        for (var key in $scope.allRuleTypes) {
-          if ($scope.currentRuleDescription === null || key < $scope.currentRuleDescription) {
-            $scope.currentRuleDescription = key;
+      $scope.init = function() {
+        // Select a default rule name, if one isn't already selected.
+        if ($scope.currentRuleDefinition.name === null && $scope.currentRuleDefinition.rule_type !== 'default') {
+          var ruleNamesToDescriptions = INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions;
+          for (var ruleName in ruleNamesToDescriptions) {
+            if ($scope.currentRuleDefinition.name === null || ruleName < $scope.currentRuleDefinition.name) {
+              $scope.currentRuleDefinition.name = ruleName;
+            }
           }
+          $scope.onSelectNewRuleType($scope.currentRuleDefinition.name);
         }
-        $scope.onSelectNewRuleType();
-      }
 
-      _computeRuleDescriptionFragments();
+        _computeRuleDescriptionFragments();
+      };
 
-      $scope.$watch('rulesService.interactionHandlerSpecs', function() {
-        _generateAllRuleTypes();
-      });
+      $scope.init();
     }]
   };
 }]);

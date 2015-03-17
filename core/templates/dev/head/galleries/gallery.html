@@ -139,17 +139,16 @@
       </carousel>
 
       <div class="oppia-gallery-interstitial">
-        <img src="/images/oppia_favicon_black_48px.png" style="width: 28px; height: 28px; margin-right: 5px; margin-top: -2px;">
         <span>
-          I'm a free, open source, community-built tutor for everybody.
-          <div style="display: inline-block;"><a href="/about">Learn more about me.</a></div>
+          Oppia is a personalized learning platform created by and for people like you.
+          <div style="display: inline-block;"><a href="/about">Find out more!</a></div>
         </span>
       </div>
     </div>
 
     <div>
       <div class="oppia-gallery-tiles-container">
-        <div ng-if="allExplorationsInOrder.length === 0">
+        <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
           <em>
             We don't have any explorations matching this query yet.
           </em>
@@ -163,7 +162,7 @@
 
         <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
           <span>
-            Here are some explorations that the Oppia community has created:
+            Dive into an exploration created by the community:
           </span>
         </div>
 
@@ -191,7 +190,6 @@
                 <div class="oppia-gallery-tile-contents">
                   <span class="oppia-gallery-tile-image-container"
                         style="position: absolute;">
-                    <!-- TODO(sll): Make the default image higher-res. -->
                     <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
                   </span>
 
@@ -202,7 +200,7 @@
                       </span>
                       <span ng-if="exploration.objective" class="hidden-xs">
                         <span style="font-weight: bold;">&middot;</span>
-                        <span style="color: #888" class="protractor-test-exploration-objective">
+                        <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
                           <[getFormattedObjective(exploration.objective)]>
                         </span>
                       </span>

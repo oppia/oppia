@@ -40,8 +40,9 @@ function cleanup {
 
   if [ -d "../protractor-screenshots" ]; then
     echo ""
-    echo "You can view screenshots of the failed tests in"
-    echo "../protractor-screenshots/"
+    echo "  Note: If ADD_SCREENSHOT_REPORTER is set to true in"
+    echo "  core/tests/protractor.conf.js, you can view screenshots"
+    echo "  of the failed tests in ../protractor-screenshots/"
     echo ""
   fi
 

@@ -37,7 +37,7 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
         stats_domain.StateRuleAnswerLog.get(
             exploration_id, state_name, feconf.SUBMIT_HANDLER_NAME,
             exp_domain.DEFAULT_RULESPEC_STR
-        ).get_top_answers(10)
+        ).get_top_answers(3)
     }
 
 

@@ -29,7 +29,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import skins_services
@@ -255,29 +254,28 @@ class ExplorationHandler(EditorHandler):
 
         states = {}
         for state_name in exploration.states:
-            state_frontend_dict = exploration.export_state_to_frontend_dict(
-                state_name)
-            state_frontend_dict['unresolved_answers'] = (
+            state_dict = exploration.states[state_name].to_dict()
+            state_dict['unresolved_answers'] = (
                 stats_services.get_top_unresolved_answers_for_default_rule(
                     exploration_id, state_name))
-            states[state_name] = state_frontend_dict
+            states[state_name] = state_dict
 
         editor_dict = {
+            'category': exploration.category,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
-            'category': exploration.category,
-            'objective': exploration.objective,
             'language_code': exploration.language_code,
-            'title': exploration.title,
-            'states': states,
+            'objective': exploration.objective,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
-            'version': exploration.version,
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
+            'states': states,
+            'title': exploration.title,
+            'version': exploration.version,
         }
 
         if feconf.SHOW_SKIN_CHOOSER:

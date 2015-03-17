@@ -160,7 +160,10 @@ class LogoutPage(webapp2.RequestHandler):
         """Logs the user out, and returns them to a specified page or the home
         page.
         """
-        url_to_redirect_to = self.request.get('return_url') or '/'
+        # The str conversion is needed, otherwise an InvalidResponseError
+        # asking for the 'Location' header value to be str instead of
+        # 'unicode' will result.
+        url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
 
         if feconf.DEV_MODE:
@@ -211,6 +214,7 @@ class BaseHandler(webapp2.RequestHandler):
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
+            self.values['user_email'] = user_settings.email
 
             if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
                 _clear_login_cookies(self.response.headers)
@@ -219,7 +223,6 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.username = user_settings.username
                 self.last_agreed_to_terms = user_settings.last_agreed_to_terms
-                self.values['user_email'] = user_settings.email
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -326,7 +329,8 @@ class BaseHandler(webapp2.RequestHandler):
             values = self.values
 
         values.update({
-            'RTE_COMPONENT_SPECS': rte_component_registry.Registry.get_all_specs(),
+            'RTE_COMPONENT_SPECS': (
+                rte_component_registry.Registry.get_all_specs()),
             'DEV_MODE': feconf.DEV_MODE,
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'EXPLORATION_STATUS_PRIVATE': (
@@ -341,10 +345,11 @@ class BaseHandler(webapp2.RequestHandler):
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'user_is_logged_in': bool(self.username),
-            # TODO(sll): Consider including the obj_editor html directly as part of the
-            # base HTML template?
+            # TODO(sll): Consider including the obj_editor html directly as
+            # part of the base HTML template?
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
-            'SIDEBAR_MENU_ADDITIONAL_LINKS': SIDEBAR_MENU_ADDITIONAL_LINKS.value,
+            'SIDEBAR_MENU_ADDITIONAL_LINKS': (
+                SIDEBAR_MENU_ADDITIONAL_LINKS.value),
         })
 
         if redirect_url_on_logout is None:

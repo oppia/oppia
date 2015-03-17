@@ -174,7 +174,7 @@ class EscapingTest(test_utils.GenericTestBase):
             """Handles GET requests."""
             self.values.update({
                 'ADMIN_EMAIL_ADDRESS': ['<[angular_tag]>'],
-                'SITE_NAME': 'x{{51 * 3}}y',
+                'SITE_FORUM_URL': 'x{{51 * 3}}y',
             })
             self.render_template('pages/about.html')
 
@@ -213,7 +213,7 @@ class LogoutPageTest(test_utils.GenericTestBase):
 
     def test_logout_page(self):
         """Tests for logout handler."""
-        exp_services.load_demo('0') 
+        exp_services.load_demo('0')
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'

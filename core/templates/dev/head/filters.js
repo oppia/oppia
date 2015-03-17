@@ -74,9 +74,9 @@ oppia.filter('replaceInputsWithEllipses', [function() {
   };
 }]);
 
-// Filter that truncates a string at the first {{...}}.
-oppia.filter('truncateAtFirstInput', [function() {
-  var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
+// Filter that truncates a string at the first '...'.
+oppia.filter('truncateAtFirstEllipsis', [function() {
+  var pattern = /\.\.\./g;
   return function(input) {
     if (!input) {
       return '';
@@ -101,30 +101,43 @@ oppia.filter('isRuleSpecConfusing', [function() {
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 // Note that this returns an HTML string to accommodate the case of multiple-choice
 // input and image-click input.
-oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
-  return function(input, choices) {
-    if (!input || !(input.description)) {
+oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  return function(rule, interactionId, choices) {
+    if (!rule) {
       return '';
     }
-    var description = input.description;
-    if (description == 'Default') {
-      return description;
+
+    if (rule.definition.rule_type === 'default') {
+      return 'Default';
     }
-    // TODO(sll): Generalize this to allow Boolean combinations of rules.
-    var inputs = input.definition.inputs;
 
-    var finalRule = description;
+    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+      console.error('Cannot find interaction with id ' + interactionId);
+      return '';
+    }
 
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    var description = INTERACTION_SPECS[interactionId].rule_descriptions[
+      rule.definition.name];
+    if (!description) {
+      console.error(
+        'Cannot find description for rule ' + rule.definition.name +
+        ' for interaction ' + interactionId);
+      return '';
+    }
+
+    var inputs = rule.definition.inputs;
+    var finalDescription = description;
+
+    var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     var iter = 0;
     while (true) {
-      if (!description.match(pattern) || iter == 100) {
+      if (!description.match(PATTERN) || iter == 100) {
         break;
       }
       iter++;
 
-      var varName = description.match(pattern)[1];
-      var varType = description.match(pattern)[2];
+      var varName = description.match(PATTERN)[1];
+      var varType = description.match(PATTERN)[2];
       if (varType) {
         varType = varType.substring(1);
       }
@@ -148,6 +161,16 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
           replacementText += inputs[varName][i].readableNoteName;
         }
         replacementText += ']';
+      } else if (varType === 'CoordTwoDim') {
+        var latitude = inputs[varName][0];
+        var longitude = inputs[varName][1];
+        replacementText = '(';
+        replacementText += (
+          inputs[varName][0] >= 0.0 ? latitude + '°N' : -latitude + '°S');
+        replacementText += ', ';
+        replacementText += (
+          inputs[varName][1] >= 0.0 ? longitude + '°E' : -longitude + '°W');
+        replacementText += ')';
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + inputs[varName] + '"';
       } else if (varType === 'Graph') {
@@ -156,10 +179,10 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
         replacementText = inputs[varName];
       }
 
-      description = description.replace(pattern, ' ');
-      finalRule = finalRule.replace(pattern, replacementText);
+      description = description.replace(PATTERN, ' ');
+      finalDescription = finalDescription.replace(PATTERN, replacementText);
     }
-    return 'Answer ' + finalRule;
+    return 'Answer ' + finalDescription;
   };
 }]);
 

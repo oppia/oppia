@@ -17,56 +17,63 @@
   <!-- NOTE: This page should not contain any direct anchors to internal links. If the user visits an internal
   link before completing the signup process, they will be logged out.
   -->
-  <div class="container" ng-controller="Signup">
-    <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8">
-        <br>
-        <h3 class="oppia-page-title">Complete Your Registration</h3>
 
-        <form ng-submit="submitPrerequisitesForm(agreedToTerms, username)">
-          <div ng-show="!hasUsername" role="form" class="form-horizontal">
-            <div class="form-group">
-              <label class="col-lg-2 col-md-2 col-sm-2">Oppia username</label>
-              <div class="col-lg-5 col-md-5 col-sm-5">
-                <div>
-                  <input type="text" ng-model="username" id="username" class="form-control protractor-test-username-input" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false" focus-on="usernameInputField">
-                </div>
-                <span class="help-block" style="font-size: smaller">
-                  Your username will be shown next to your contributions.
-                </span>
-              </div>
-              <div class="col-lg-5 col-md-5 col-sm-5">
-                <span style="color: red;" aria-live="assertive" ng-show="blurredAtLeastOnce">
-                  <[warningText]>
-                </span>
-              </div>
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+
+  <div class="oppia-page-cards-container" ng-controller="Signup">
+    <md-card class="oppia-page-card">
+      <h2 class="oppia-page-title">Complete Your Registration</h2>
+
+      <form ng-submit="submitPrerequisitesForm(agreedToTerms, username)">
+        <div ng-show="!hasUsername" role="form">
+          <div class="form-group">
+            <label>Email</label>
+            <div>
+              <input type="text" class="form-control" ng-readonly="true" value="{{user_email}}" ng-trim="false" style="max-width: 360px;">
+            </div>
+            <br>
+            <label>Oppia username</label>
+            <div>
+              <input type="text" ng-model="username" id="username" class="form-control protractor-test-username-input" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false" focus-on="usernameInputField" style="max-width: 360px;">
+            </div>
+            <span class="help-block" style="font-size: smaller">
+              Your username will be shown next to your contributions.
+            </span>
+            <div style="height: 18px; width: 550px;">
+              <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
+                <[warningText]>
+              </span>
             </div>
           </div>
+        </div>
 
-          <hr>
+        <hr>
 
-          <p style="font-size: 1.2em;">
-            The {{SITE_NAME}} site is an open commons of learning resources, and all material
-            on it is freely reusable and shareable.
-          </p>
+        <p style="font-size: 1em;">
+          The {{SITE_NAME}} site is an open commons of learning resources, and all material
+          on it is freely reusable and shareable.
+        </p>
 
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" ng-model="agreedToTerms" class="protractor-test-agree-to-terms-checkbox">
-              I agree that any contributions I make to {{SITE_NAME}} are licensed under
-              <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0</a>,
-              with a waiver of the attribution (BY) requirement. I further agree that any images and files
-              I upload to the site will also have licensing compatible with these terms.
-              (<a ng-click="showLicenseExplanationModal()">Why CC-BY-SA?</a>)
-            </label>
-          </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="agreedToTerms" class="protractor-test-agree-to-terms-checkbox">
+            I agree that any contributions I make to {{SITE_NAME}} are licensed under
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0</a>,
+            with a waiver of the attribution (BY) requirement. I further agree that any images and files
+            I upload to the site will also have licensing compatible with these terms.
+            (<a ng-click="showLicenseExplanationModal()">Why CC-BY-SA?</a>)
+          </label>
+        </div>
 
-          <br>
+        <br>
 
-          <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms">Submit and start contributing</button>
-        </form>
-      </div>
-    </div>
+        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms">Submit and start contributing</button>
+      </form>
+    </md-card>
   </div>
 
   <script type="text/ng-template" id="modals/licenseExplanation">

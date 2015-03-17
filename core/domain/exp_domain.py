@@ -556,7 +556,6 @@ class State(object):
                 },
                 'feedback': [],
                 'param_changes': [],
-                'description': 'Default',
             }],
         }],
     }
@@ -1238,28 +1237,6 @@ class Exploration(object):
 
         del self.states[state_name]
 
-    def export_state_to_frontend_dict(self, state_name):
-        """Gets a state dict with rule descriptions."""
-        state_dict = self.states[state_name].to_dict()
-
-        for handler in state_dict['interaction']['handlers']:
-            for rule_spec in handler['rule_specs']:
-                if state_dict['interaction']['id'] is None:
-                    rule_spec['description'] = 'Default'
-                else:
-                    interaction = (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            state_dict['interaction']['id']))
-
-                    rule_spec['description'] = (
-                        rule_domain.get_rule_description(
-                            rule_spec['definition'],
-                            self.param_specs,
-                            interaction.get_handler_by_name(
-                                handler['name']).obj_type))
-
-        return state_dict
-
     # The current version of the exploration schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
@@ -1428,13 +1405,13 @@ class Exploration(object):
         learner view."""
         return {
             'init_state_name': self.init_state_name,
-            'title': self.title,
-            'states': {
-                state_name: self.export_state_to_frontend_dict(state_name)
-                for state_name in self.states
-            },
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
+            'states': {
+                state_name: state.to_dict()
+                for (state_name, state) in self.states.iteritems()
+            },
+            'title': self.title,
         }
 
     def get_interaction_ids(self):

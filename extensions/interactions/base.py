@@ -220,6 +220,12 @@ class BaseInteraction(object):
                 {'classifier': rule_cls.__name__}
             ) for rule_cls in handler.rules)
 
+        # Add information about rule descriptions corresponding to the answer
+        # type for this interaction.
+        result['rule_descriptions'] = (
+            rule_domain.get_description_strings_for_obj_type(
+                self.handlers[0].obj_type))
+
         return result
 
     def get_handler_by_name(self, handler_name):

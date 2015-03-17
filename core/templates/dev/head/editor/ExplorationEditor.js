@@ -205,38 +205,19 @@ oppia.controller('ExplorationEditor', [
       }, 1000);
     }
   }, {
-    type: 'element',
-    selector: _ID_TUTORIAL_STATE_INTERACTION,
+    type: 'title',
     heading: 'Interaction',
     text: (
-      'Next, choose how you want the learner to respond by ' +
-      'selecting an interaction type from the drop down menu.<br><br>' +
-      'You can see a preview of the interaction below.'),
-    placement: 'right'
-  }, {
-    type: 'function',
-    fn: function(isGoingForward) {
-      var idToScrollTo = (
-        isGoingForward ? _ID_TUTORIAL_STATE_ACTIVE_RULE :
-        _ID_TUTORIAL_STATE_INTERACTION);
-      $('html, body').animate({
-        scrollTop: angular.element(idToScrollTo).offset().top - 200
-      }, 1000);
-    }
-  }, {
-    type: 'element',
-    selector: _ID_TUTORIAL_STATE_ACTIVE_RULE,
-    heading: 'Rules',
-    text: (
-      'After the learner responds, you can tell Oppia how to reply by ' +
-      'creating a <b>rule</b>.'),
-    placement: 'top'
+      'After telling Oppia what to say, choose how you want the learner to respond by ' +
+      'selecting an <b>interaction type</b>.' +
+      'Then, based on the learner\'s response, you can tell Oppia how to reply by ' +
+      'creating a <b>rule</b>.')
   }, {
     type: 'function',
     fn: function(isGoingForward) {
       var positionToScrollTo = (
         isGoingForward ? 0 :
-        angular.element(_ID_TUTORIAL_STATE_ACTIVE_RULE).offset().top - 80);
+        angular.element(_ID_TUTORIAL_STATE_INTERACTION).offset().top - 200);
       $('html, body').animate({
         scrollTop: positionToScrollTo
       }, 1000);

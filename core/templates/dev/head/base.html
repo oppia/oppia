@@ -30,7 +30,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
-    <link rel="apple-touch-icon" href="/images/logo.png">
+    <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
 
     {% block header_css %}
@@ -89,14 +89,14 @@
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
                     <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
-                      <img src="/images/menu.png">
+                      <img src="/images/general/menu.png">
                     </a>
                     <a class="oppia-navbar-brand-name" href="/gallery">
-                      <img src="/images/logo/288x288_oppia_white.png" class="oppia-logo">
+                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
                     <a style="display: none;">
-                      <img src="/images/logo/288x288_oppia_mint.png" itemprop="image">
+                      <img src="/images/logo/288x128_logo_mint.png" itemprop="image">
                     </a>
                   </div>
 
@@ -109,8 +109,8 @@
                               {% if profile_picture_data_url %}
                                 <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
                               {% else %}
-                                <img ng-if="profileDropdownIsActive" src="/images/user_mint_48px.png" class="oppia-navbar-profile-picture">
-                                <img ng-if="!profileDropdownIsActive" src="/images/user_white_48px.png" class="oppia-navbar-profile-picture">
+                                <img ng-if="profileDropdownIsActive" src="/images/general/user_mint_48px.png" class="oppia-navbar-profile-picture">
+                                <img ng-if="!profileDropdownIsActive" src="/images/general/user_white_48px.png" class="oppia-navbar-profile-picture">
                               {% endif %}
                               <span class="caret" style="margin-top: 10px;"></span>
 
@@ -134,8 +134,13 @@
                           </a>
                           <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                             <li>
-                              <a href="/dashboard">
-                                Dashboard
+                              <a href="/my_explorations">
+                                My Explorations
+                              </a>
+                            </li>
+                            <li>
+                              <a href="/timeline">
+                                Updates
                                 <span ng-if="numUnseenNotifications > 0">
                                   (<[numUnseenNotifications]>)
                                 </span>
@@ -164,7 +169,7 @@
                             </li>
                           </ul>
                         </li>
-                      {% else %}
+                      {% elif not user_email %}
                         <li class="dropdown oppia-clickable-dropdown pull-right">
                           <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
                             Sign in

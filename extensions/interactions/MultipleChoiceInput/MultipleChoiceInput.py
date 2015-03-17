@@ -49,5 +49,5 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'add_element_text': 'Add multiple choice option',
             }
         },
-        'default_value': ['Default choice'],
+        'default_value': ['Sample multiple-choice answer'],
     }]

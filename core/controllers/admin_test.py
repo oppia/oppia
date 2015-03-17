@@ -23,7 +23,7 @@ from core.tests import test_utils
 import feconf
 
 
-SITE_NAME = 'sitename.org'
+SITE_FORUM_URL = 'siteforum.url'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -101,8 +101,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that the correct variables show up on the about page."""
         # Navigate to the about page. The site name is not set.
         response = self.testapp.get('/about')
-        self.assertIn('SITE_NAME', response.body)
-        self.assertNotIn(SITE_NAME, response.body)
+        self.assertIn('https://site/forum/url', response.body)
+        self.assertNotIn(SITE_FORUM_URL, response.body)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -110,15 +110,15 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                pages.SITE_NAME.name: SITE_NAME
+                pages.SITE_FORUM_URL.name: SITE_FORUM_URL
             }
         }, csrf_token)
         self.logout()
 
         # Navigate to the splash page. The site name is set.
         response = self.testapp.get('/about')
-        self.assertNotIn('SITE_NAME', response.body)
-        self.assertIn(SITE_NAME, response.body)
+        self.assertNotIn('https://site/forum/url', response.body)
+        self.assertIn(SITE_FORUM_URL, response.body)
 
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""

@@ -119,9 +119,9 @@ def get_exploration_summary_by_id(exploration_id):
 
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
-    """Returns a dict of domain objects representing explorations with the given
-    ids as keys. If an exp_id is not present it is not included in the return
-    dict.
+    """Returns a dict of domain objects representing explorations with the
+    given ids as keys. If an exp_id is not present it is not included in the
+    return dict.
     """
     exp_ids = set(exp_ids)
     result = {}
@@ -232,15 +232,47 @@ def get_exploration_summaries_matching_ids(exp_ids):
 def get_exploration_summaries_matching_query(query_string, cursor=None):
     """Returns a list with all exploration summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
+
+    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
+    at least that many, otherwise it returns all remaining results. (If this
+    behaviour does not occur, an error will be logged.) The method also returns
+    a search cursor.
     """
-    exp_ids, search_cursor = search_explorations(query_string, cursor=cursor)
-    summary_models = [
-        model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
-        if model is not None]
-    summaries = [
+    MAX_ITERATIONS = 10
+    summary_models = []
+
+    for i in range(MAX_ITERATIONS):
+        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+
+        exp_ids, search_cursor = search_explorations(
+            query_string, remaining_to_fetch, cursor=cursor)
+
+        invalid_exp_ids = []
+        for ind, model in enumerate(
+                exp_models.ExpSummaryModel.get_multi(exp_ids)):
+            if model is not None:
+                summary_models.append(model)
+            else:
+                invalid_exp_ids.append(exp_ids[ind])
+
+        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+                search_cursor is None):
+            break
+        else:
+            logging.error(
+                'Search index contains stale exploration ids: %s' %
+                ', '.join(invalid_exp_ids))
+
+    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+            and search_cursor is not None):
+        logging.error(
+            'Could not fulfill search request for query string %s; at least '
+            '%s retries were needed.' % (query_string, MAX_ITERATIONS))
+
+    return ([
         get_exploration_summary_from_model(summary_model)
-        for summary_model in summary_models]
-    return (summaries, search_cursor)
+        for summary_model in summary_models
+    ], search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -992,7 +1024,8 @@ def get_next_page_of_all_non_private_commits(
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
-        raise ValueError("max_age must be a datetime.timedelta instance. or None.")
+        raise ValueError(
+            "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
@@ -1056,6 +1089,13 @@ def _exp_to_search_dict(exp):
     return doc
 
 
+def clear_search_index():
+    """WARNING: This runs in-request, and may therefore fail if there are too
+    many entries in the index.
+    """
+    search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
+
+
 def index_explorations_given_ids(exp_ids):
     # We pass 'strict=False' so as not to index deleted explorations.
     exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
@@ -1089,8 +1129,7 @@ def delete_documents_from_search_index(exploration_ids):
         exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
-def search_explorations(
-    query, sort=None, limit=feconf.GALLERY_PAGE_SIZE, cursor=None):
+def search_explorations(query, limit, sort=None, cursor=None):
     """Searches through the available explorations.
 
     args:

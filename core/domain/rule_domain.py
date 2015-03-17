@@ -70,6 +70,17 @@ def get_rules_for_obj_type(obj_type):
     return results
 
 
+def get_description_strings_for_obj_type(obj_type):
+   """Returns a dict whose keys are rule names and whose values are the
+   corresponding description strings.
+   """
+   rules = get_rules_for_obj_type(obj_type)
+   return {
+       rule.__name__: rule.description
+       for rule in rules
+   }
+
+
 def is_generic(obj_type, rule_name):
     """Checks whether this rule is labelled generic"""
     rule_list = get_rules_for_obj_type(obj_type)

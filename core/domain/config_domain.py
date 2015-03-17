@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 
-from core.domain import obj_services
 from core.domain import user_services
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])

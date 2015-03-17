@@ -93,18 +93,27 @@ oppia.directive('conversationSkin', [function() {
         $scope.adjustPageHeight(true, function() {
           var oppiaLastContentHeight = $('.conversation-skin-oppia-output:last')
             .offset().top;
-          var scrollAmountInPixels = null;
+          var newScrollTop = null;
           if ($(document).height() - oppiaLastContentHeight - 60 <=
               $(window).height() * 0.4) {
             // The -60 prevents the attribution guide from being scrolled into view.
-            scrollAmountInPixels = $(document).height() - $(window).height() - 60;
+            newScrollTop = $(document).height() - $(window).height() - 60;
             _learnerInputIsInView = true;
           } else {
-            scrollAmountInPixels = oppiaLastContentHeight - $(window).height() * 0.4;
+            newScrollTop = oppiaLastContentHeight - $(window).height() * 0.4;
             _learnerInputIsInView = false;
           }
+
+          // Do not scroll up.
+          // This occurs if Oppia gives no feedback for (e.g.) a supplemental
+          // interaction. This leads to a scroll *up* to Oppia's last output,
+          // which is rather disconcerting.
+          if ($(document).scrollTop() >= newScrollTop) {
+            newScrollTop = $(document).scrollTop();
+          }
+
           $('html, body, iframe').animate({
-            'scrollTop': scrollAmountInPixels
+            'scrollTop': newScrollTop
           }, 1000, 'easeOutQuad').promise().done(postScrollCallback);
         });
       };
@@ -209,7 +218,9 @@ oppia.directive('conversationSkin', [function() {
                 messengerService.EXPLORATION_COMPLETED, null);
             }
 
-            if (newStateName && refreshInteraction) {
+            if (!newStateName) {
+              $scope.inputTemplate = '';
+            } else if (newStateName && refreshInteraction) {
               // The previous interaction should be replaced.
               _labelForNextFocusTarget = Math.random().toString(36).slice(2);
               $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(

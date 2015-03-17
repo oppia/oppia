@@ -25,9 +25,10 @@ IMPORTANT NOTES:
 
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
     where [APP_NAME] is the name of your app as defined in app.yaml. This
-    folder should contain a folder called /images, which in turn should contain:
-    - two files: favicon.ico and logo.png
-    - two folder: /splash and /sidebar, containing images used for the gallery
+    folder should contain a folder called /images, which in turn should
+    contain:
+    - one file: favicon.ico
+    - two folders: /splash and /sidebar, containing images used for the gallery
         carousel and sidebar, respectively.
 
 2.  Before running this script, you must install third-party dependencies by
@@ -96,7 +97,7 @@ def preprocess_release():
     d.write(content)
 
     # Substitute image files for the splash page.
-    SPLASH_PAGE_FILES = ['favicon.ico', 'logo.png']
+    SPLASH_PAGE_FILES = ['favicon.ico']
     DEPLOY_DATA_PATH = os.path.join(
         os.getcwd(), '..', 'deploy_data', APP_NAME)
 

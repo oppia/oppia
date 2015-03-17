@@ -225,9 +225,7 @@ states:
   %s:
     content:
     - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
+      value: ''
     interaction:
       customization_args: {}
       handlers:
@@ -541,7 +539,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                             'definition': {
                                 'rule_type': 'default',
                             },
-                            'description': 'Default',
                             'dest': dest_name,
                             'feedback': [],
                             'param_changes': [],
