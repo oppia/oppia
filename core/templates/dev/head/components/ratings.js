@@ -41,7 +41,8 @@ oppia.directive('ratingFromValue', [function($http) {
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
         return {
           style: 'glyphicon-star-empty',
-          value: starValue
+          value: starValue,
+          color: 'auto'
         };
       });
 
@@ -52,6 +53,10 @@ oppia.directive('ratingFromValue', [function($http) {
             ratingValue < $scope.stars[i].value  - 0.5 ?
             'glyphicon-star-empty' :
             'glyphicon-star';
+          $scope.stars[i].color =
+            !$scope.starsActive || ratingValue < $scope.stars[i].value - 0.5 ?
+            'auto' :
+            '#DBEA00';
         }
       };
 
@@ -60,22 +65,32 @@ oppia.directive('ratingFromValue', [function($http) {
         displayValue($scope.ratingValue);
       });
 
+      $scope.starsActive = false;
       $scope.clickStar = function(starValue) {
         if ($scope.isEditable) {
           $scope.ratingValue = starValue;
           displayValue(starValue);
           $scope.onEdit(starValue);
+          $scope.starsActive = false;
         }
       };
       $scope.enterStar = function(starValue) {
-        if ($scope.isEditable) {
+        if ($scope.isEditable && $scope.starsActive) {
           displayValue(starValue);
         }
+        // This is necessary because enterStar is running before enterArea
+        $scope.mostRecentStarValue = starValue;
       };
-      $scope.leaveStar = function(starValue) {
-        if ($scope.isEditable) {
-          displayValue($scope.ratingValue);
+      $scope.enterArea = function() {
+        $scope.starsActive = true;
+        if ($scope.isEditable && $scope.mostRecentStarValue) {
+          displayValue($scope.mostRecentStarValue);
         }
+      };
+      $scope.leaveArea = function() {
+        $scope.starsActive = false;
+        displayValue($scope.ratingValue);
+        $scope.mostRecentStarValue = undefined;
       };
     }]
   };

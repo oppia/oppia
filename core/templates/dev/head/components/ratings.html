@@ -1,5 +1,7 @@
 <script type="text/ng-template" id="rating/fromValue">
-  <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="glyphicon <[star.style]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)" ng-mouseleave="leaveStar(star.value)"></span>
+  <span style="cursor: <[isEditable ? 'pointer' : 'auto']>" ng-mouseenter="enterArea()" ng-mouseleave="leaveArea()">
+    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="glyphicon <[star.style]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)" style="color: <[star.color]>"></span>
+  </span>
 </script>
 
 <script type="text/ng-template" id="rating/fromFrequencies">
