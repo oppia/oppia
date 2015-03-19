@@ -124,12 +124,17 @@ oppia.directive('conversationSkin', [function() {
         });
       };
 
+      var _MIN_CARD_LOADING_DELAY_MILLISECS = 1000;
+
       $scope.initializePage = function() {
         $scope.allResponseStates = [];
         $scope.inputTemplate = '';
         $scope.interactionIsInline = false;
         $scope.waitingForOppiaFeedback = false;
         $scope.waitingForNewCard = false;
+
+        // This is measured in milliseconds since the epoch.
+        var timeBeforeServerCall = new Date().getTime();
 
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights, introCardImageUrl) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -162,6 +167,9 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.waitingForNewCard = true;
 
+          var millisecsLeftToWait = Math.max(
+            _MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeBeforeServerCall),
+            1.0);
           $timeout(function() {
             _addNewCard($scope.stateName, initHtml);
             $scope.waitingForNewCard = false;
@@ -170,7 +178,7 @@ oppia.directive('conversationSkin', [function() {
                 focusService.setFocus(_labelForNextFocusTarget);
               }
             });
-          }, 1000);
+          }, millisecsLeftToWait);
         });
       };
 
@@ -192,8 +200,16 @@ oppia.directive('conversationSkin', [function() {
 
         $scope.waitingForOppiaFeedback = true;
 
+        // This is measured in milliseconds since the epoch.
+        var timeBeforeServerCall = new Date().getTime();
+
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
+
+          var millisecsLeftToWait = Math.max(
+            _MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeBeforeServerCall),
+            1.0);
+
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
@@ -253,7 +269,7 @@ oppia.directive('conversationSkin', [function() {
                 });
               }
             }
-          }, 1000);
+          }, millisecsLeftToWait);
         });
       };
 
