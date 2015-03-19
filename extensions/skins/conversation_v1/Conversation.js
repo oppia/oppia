@@ -124,7 +124,7 @@ oppia.directive('conversationSkin', [function() {
         });
       };
 
-      var _MIN_CARD_LOADING_DELAY_MILLISECS = 1000;
+      var MIN_CARD_LOADING_DELAY_MILLISECS = 1000;
 
       $scope.initializePage = function() {
         $scope.allResponseStates = [];
@@ -134,7 +134,7 @@ oppia.directive('conversationSkin', [function() {
         $scope.waitingForNewCard = false;
 
         // This is measured in milliseconds since the epoch.
-        var timeBeforeServerCall = new Date().getTime();
+        var timeAtServerCall = new Date().getTime();
 
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights, introCardImageUrl) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -168,7 +168,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.waitingForNewCard = true;
 
           var millisecsLeftToWait = Math.max(
-            _MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeBeforeServerCall),
+            MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeAtServerCall),
             1.0);
           $timeout(function() {
             _addNewCard($scope.stateName, initHtml);
@@ -201,13 +201,13 @@ oppia.directive('conversationSkin', [function() {
         $scope.waitingForOppiaFeedback = true;
 
         // This is measured in milliseconds since the epoch.
-        var timeBeforeServerCall = new Date().getTime();
+        var timeAtServerCall = new Date().getTime();
 
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
 
           var millisecsLeftToWait = Math.max(
-            _MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeBeforeServerCall),
+            MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeAtServerCall),
             1.0);
 
           $timeout(function() {
