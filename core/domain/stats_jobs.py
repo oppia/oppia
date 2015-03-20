@@ -191,7 +191,7 @@ class StatisticsMRJobManager(
                 yield ('%s:%s' % (exploration_id, _ALL_VERSIONS_STRING), value)
             else:
                 version = _NO_SPECIFIED_VERSION_STRING
-                if version is not None:
+                if item.exploration_version is not None:
                     version = str(item.exploration_version)
 
                 value = {
