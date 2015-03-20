@@ -35,6 +35,9 @@
             <br><br>
             <strong>Username:</strong>
               <input type="text" ng-model="username" id="username" class="form-control protractor-test-username-input" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false" focus-on="usernameInputField" style="display: inline-block; margin-left: 10px; width: 260px;">
+            <span class="help-block" style="font-size: smaller">
+              Your username will be shown next to your contributions.
+            </span>
             <div style="height: 18px; width: 550px;">
               <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
                 <[warningText]>
