@@ -34,9 +34,7 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
 
-      GLOBALS = {
-        INVALID_NAME_CHARS: '#@&^%$'
-      };
+      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
       ess.setStates({
         'First State': {
