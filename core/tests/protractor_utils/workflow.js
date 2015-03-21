@@ -40,6 +40,22 @@ var createExploration = function(name, category) {
   editor.exitTutorialIfNecessary();
 };
 
+// Creates a new exploration and wait for the exploration
+// tutorial to start.
+var startExplorationTutorial = function(name, category) {
+  browser.get(general.GALLERY_URL_SUFFIX);
+  element(by.css('.protractor-test-create-exploration')).click();
+  protractor.getInstance().waitForAngular();
+  element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);
+  forms.AutocompleteDropdownEditor(
+    element(by.css('.protractor-test-new-exploration-category'))
+  ).setValue(category);
+  element(by.css('.protractor-test-submit-new-exploration')).click();
+
+  // We now want to wait for the editor to fully load.
+  protractor.getInstance().waitForAngular();
+};
+
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
@@ -123,6 +139,7 @@ var getExplorationPlaytesters = function() {
 };
 
 exports.createExploration = createExploration;
+exports.startExplorationTutorial = startExplorationTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.markExplorationAsFeatured = markExplorationAsFeatured;

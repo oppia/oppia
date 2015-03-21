@@ -48,6 +48,17 @@ describe('State editor', function() {
     users.logout();
   });
 
+  it('should walk through the tutorial when user repeteadly clicks Next', function() {
+    var TUTORIAL_STAGES = 4;
+    users.createUser('user@example.com', 'user');
+    users.login('user@example.com');
+
+    workflow.startExplorationTutorial('sums', 'maths'); 
+    for(var i = 0; i < TUTORIAL_STAGES; i++) {
+      editor.progressInTutorial();
+    }
+  });
+
   it('should create content and multiple choice interactions', function() {
     users.createUser('user2@example.com', 'user2');
     users.login('user2@example.com');

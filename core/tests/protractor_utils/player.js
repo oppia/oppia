@@ -73,7 +73,6 @@ var submitAnswer = function(interactionName, answerData) {
   general.waitForSystem();
 };
 
-
 var expectExplorationToBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()

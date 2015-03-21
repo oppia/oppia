@@ -35,6 +35,17 @@ var exitTutorialIfNecessary = function() {
   });
 };
 
+var progressInTutorial = function() {
+  // Progress to the next instruction in the tutorial.
+  element.all(by.css('.nextBtn')).then(function(buttons){
+    if(buttons.length === 1) {
+      buttons[0].click();
+    } else {
+      throw 'Expected to find at most one \'next\' button';
+    }
+  });
+};
+
 // NAVIGATION
 
 var navigateToMainTab = function() {
@@ -706,6 +717,7 @@ var revertToVersion = function(version) {
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+exports.progressInTutorial = progressInTutorial;
 
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;
