@@ -208,6 +208,13 @@
           </div>
         </div>
       </div>
+
+    {% if DEV_MODE %}
+      <div class="oppia-dev-mode">
+           Development Mode
+      </div>
+    {% endif %}
+
     {% endif %}
 
     {% include 'directives.html' %}

@@ -170,6 +170,20 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 /*
+  Styles for the development mode indicator
+*/
+.oppia-dev-mode {
+  background-color: DarkSlateGray;
+  border-top-left-radius: 0.5em;
+  bottom: 0;
+  color: white;
+  margin-left: 10px;
+  margin-top: 10px;
+  position: fixed;
+  right: 0;
+}
+
+/*
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
