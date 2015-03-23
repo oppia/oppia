@@ -40,11 +40,11 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
 
-        with self.swap(feconf, "DEV_MODE", True):
+        with self.swap(feconf, 'DEV_MODE', True):
             response = self.testapp.get('/gallery')
             self.assertIn('<div class="oppia-dev-mode">', response.body)
 
-        with self.swap(feconf, "DEV_MODE", False):
+        with self.swap(feconf, 'DEV_MODE', False):
             response = self.testapp.get('/gallery')
             self.assertNotIn('<div class="oppia-dev-mode">', response.body)
 

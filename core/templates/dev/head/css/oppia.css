@@ -177,8 +177,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-top-left-radius: 0.5em;
   bottom: 0;
   color: white;
-  margin-left: 10px;
-  margin-top: 10px;
+  padding: 5px;
   position: fixed;
   right: 0;
 }
