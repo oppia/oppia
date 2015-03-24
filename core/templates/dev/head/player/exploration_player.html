@@ -26,34 +26,14 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <!-- Required for Facebook share API -->
-  <div id="fb-root"></div>
-  <script>(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-  </script>
-  <!-- Required for Twitter share API -->
+
+  <!-- Required for Twitter share dialog popup -->
   <script>
-    $('.popup').click(function(event) {
-      var width  = 575,
-          height = 400,
-          left   = ($(window).width()  - width)  / 2,
-          top    = ($(window).height() - height) / 2,
-          url    = this.href,
-          opts   = 'status=1' +
-                   ',width='  + width  +
-                   ',height=' + height +
-                   ',top='    + top    +
-                   ',left='   + left;
-
-      window.open(url, 'twitter', opts);
-
+    function twitterPopup(url) {
+      newWindow=window.open(url, 'name', 'height=400, width=600');
+      if (window.focus) { newWindow.focus() }
       return false;
-    });
+    }
   </script>
 
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
@@ -72,15 +52,15 @@
           </a>
         </li>
         <li>
-          <a class="fb-share-button"
-             data-href="<[serverName]>/explore/<[explorationId]>"
-             data-layout="icon" tooltip="Facebook" tooltip-placement="left">
+          <!-- TODO (wagnerdmike) Create and replace facebook app_id  -->
+          <a onclick="return !window.open(this.href, 'Share on Facebook', 'width=640, height=536')" href="https://www.facebook.com/sharer/sharer.php?app_id=1584258948480354&sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" target="_window" tooltip="Facebook" tooltip-placement="left">
+            <img src='/images/general/fb.png' alt="Facebook" />
           </a>
         </li>
         <li>
-          <a class="twitter popup"
+          <a class="twitter" onClick="return twitterPopup('http://twitter.com/share?url=<[serverName]>/explore/<[explorationId]>&text=Check%20out%20this%20exploration%20in%20Oppia!')"
              href="http://twitter.com/share?url=<[serverName]>/explore/<[explorationId]>&text=Check%20out%20this%20exploration%20in%20Oppia!"
-             target="_blank" data-layout="icon" tooltip="Twitter"
+             data-layout="icon" tooltip="Twitter"
              tooltip-placement="left">
             <img src="/images/general/tweet.png" alt="Twitter">
           </a>
