@@ -1067,9 +1067,12 @@ def _get_search_rank(exp_id):
         3000 if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
         else 0)
 
-    RATING_WEIGHTINGS = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
-    for rating_value in summary.ratings:
-        rank += summary.ratings[rating_value] * RATING_WEIGHTINGS[rating_value]
+    if summary.ratings:
+        RATING_WEIGHTINGS = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+        for rating_value in summary.ratings:
+            rank += (
+                summary.ratings[rating_value] *
+                RATING_WEIGHTINGS[rating_value])
 
     _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
     time_delta_days = (exploration.last_updated - _BEGINNING_OF_TIME).days
