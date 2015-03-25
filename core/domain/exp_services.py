@@ -1148,7 +1148,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
           '-' character indicating whether to sort in ascending or descending
           order respectively. This character should be followed by a field name
           to sort on. When this is None, results are based on 'rank'. See
-          _exp_to_search_dict to see how rank is determined.
+          _get_search_rank to see how rank is determined.
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
           If there are more documents that match the query than 'limit', this
