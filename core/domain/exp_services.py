@@ -1056,14 +1056,20 @@ def _get_search_rank(exp_id):
     """Returns an integer determining the document's rank in search.
 
     Featured explorations get a ranking bump, and so do explorations that
-    have been more recently updated.
+    have been more recently updated. Good ratings will increase the ranking
+    and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
     exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
+    summary = get_exploration_summary_by_id(exp_id)
     rank = (
         3000 if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
         else 0)
+
+    RATING_WEIGHTINGS = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+    for rating_value in summary.ratings:
+        rank += summary.ratings[rating_value] * RATING_WEIGHTINGS[rating_value]
 
     _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
     time_delta_days = (exploration.last_updated - _BEGINNING_OF_TIME).days
