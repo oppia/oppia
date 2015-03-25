@@ -46,10 +46,10 @@ oppia.directive('ratingFromValue', [function() {
         };
       });
 
-      var ACTIVE = 'active';
-      var INACTIVE = 'inactive';
-      var RATING_SET = 'rating_set';
-      $scope.status = INACTIVE;
+      var STATUS_ACTIVE = 'active';
+      var STATUS_INACTIVE = 'inactive';
+      var STATUS_RATING_SET = 'rating_set';
+      $scope.status = STATUS_INACTIVE;
 
       var displayValue = function(ratingValue) {
         for (var i = 0; i < $scope.stars.length; i++) {
@@ -58,7 +58,7 @@ oppia.directive('ratingFromValue', [function() {
             ratingValue < $scope.stars[i].value  - 0.5 ?
             'glyphicon-star-empty' :
             'glyphicon-star';
-          if ($scope.status === ACTIVE && ratingValue >= $scope.stars[i].value) {
+          if ($scope.status === STATUS_ACTIVE && ratingValue >= $scope.stars[i].value) {
             $scope.stars[i].cssClass += ' oppia-rating-star-active';
           }
         }
@@ -70,8 +70,8 @@ oppia.directive('ratingFromValue', [function() {
       });
 
       $scope.clickStar = function(starValue) {
-        if ($scope.isEditable && $scope.status === ACTIVE) {
-          $scope.status = RATING_SET;
+        if ($scope.isEditable && $scope.status === STATUS_ACTIVE) {
+          $scope.status = STATUS_RATING_SET;
           $scope.ratingValue = starValue;
           displayValue(starValue);
           $scope.onEdit(starValue);
@@ -80,13 +80,14 @@ oppia.directive('ratingFromValue', [function() {
       $scope.enterStar = function(starValue) {
         if (
             $scope.isEditable &&
-            ($scope.status === ACTIVE || $scope.status === INACTIVE)) {
-          $scope.status = ACTIVE;
+            ($scope.status === STATUS_ACTIVE ||
+              $scope.status === STATUS_INACTIVE)) {
+          $scope.status = STATUS_ACTIVE;
           displayValue(starValue);
         }
       };
       $scope.leaveArea = function() {
-        $scope.status = INACTIVE;
+        $scope.status = STATUS_INACTIVE;
         displayValue($scope.ratingValue);
       };
 
