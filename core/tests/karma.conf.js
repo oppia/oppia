@@ -3,6 +3,7 @@ module.exports = function(config) {
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
+      'core/tests/karma-globals.js',
       'third_party/static/jquery-2.1.1/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.3.13/angular.js',
@@ -28,7 +29,8 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/components/ratings.html',
       'extensions/**/*.js',
-      'extensions/interactions/**/*.html'
+      'extensions/interactions/**/*.html',
+      'extensions/skins/**/*.html'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -67,6 +69,7 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/components/ratings.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
+      'extensions/skins/**/*.html': ['ng-html2js']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

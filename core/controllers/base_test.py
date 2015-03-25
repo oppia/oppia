@@ -37,6 +37,17 @@ import webtest
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
+    def test_dev_indicator_appears_in_dev_and_not_in_production(self):
+        """Test dev indicator appears in dev and not in production."""
+
+        with self.swap(feconf, 'DEV_MODE', True):
+            response = self.testapp.get('/gallery')
+            self.assertIn('<div class="oppia-dev-mode">', response.body)
+
+        with self.swap(feconf, 'DEV_MODE', False):
+            response = self.testapp.get('/gallery')
+            self.assertNotIn('<div class="oppia-dev-mode">', response.body)
+
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 

@@ -207,6 +207,12 @@
 
     <button ng-click="clearSearchIndex()">Clear Search Index</button>
 
+    {% if DEV_MODE %}
+      <div class="oppia-dev-mode">
+        Development Mode
+      </div>
+    {% endif %}
+
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
 

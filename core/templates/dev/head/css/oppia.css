@@ -170,6 +170,19 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 /*
+  Styles for the development mode indicator
+*/
+.oppia-dev-mode {
+  background-color: DarkSlateGray;
+  border-top-left-radius: 0.5em;
+  bottom: 0;
+  color: white;
+  padding: 5px;
+  position: fixed;
+  right: 0;
+}
+
+/*
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
@@ -1599,7 +1612,7 @@ div#ng-curtain {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 30px;
-  margin-top: 30px;
+  margin-top: 40px;
   padding: 30px 55px;
 }
 .oppia-page-card li {
