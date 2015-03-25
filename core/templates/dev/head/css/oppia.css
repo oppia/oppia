@@ -1657,3 +1657,7 @@ div#ng-curtain {
     margin-left: 30px;
   }
 }
+
+.oppia-rating-star-active {
+  color: #DBEA00;
+}

@@ -18,7 +18,7 @@
  * @author Jacob Davis
  */
 
-oppia.directive('ratingFromValue', [function($http) {
+oppia.directive('ratingFromValue', [function() {
   return {
     // This will display a star-rating based on the given data. Exactly one of
     // 'ratingValue' and 'ratingFrequencies' should be specified.
@@ -37,26 +37,30 @@ oppia.directive('ratingFromValue', [function($http) {
     },
     templateUrl: 'rating/fromValue',
     controller: ['$scope', function($scope) {
+
       var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
         return {
-          style: 'glyphicon-star-empty',
-          value: starValue,
-          color: 'auto'
+          cssClass: 'glyphicon-star-empty',
+          value: starValue
         };
       });
 
+      var ACTIVE = 'active';
+      var INACTIVE = 'inactive';
+      var RATING_SET = 'rating_set';
+      $scope.status = INACTIVE;
+
       var displayValue = function(ratingValue) {
         for (var i = 0; i < $scope.stars.length; i++) {
-          $scope.stars[i].style =
+          $scope.stars[i].cssClass =
             ratingValue === undefined ? 'glyphicon-star-empty' :
             ratingValue < $scope.stars[i].value  - 0.5 ?
             'glyphicon-star-empty' :
             'glyphicon-star';
-          $scope.stars[i].color =
-            !$scope.starsActive || ratingValue < $scope.stars[i].value - 0.5 ?
-            'auto' :
-            '#DBEA00';
+          if ($scope.status === ACTIVE && ratingValue >= $scope.stars[i].value) {
+            $scope.stars[i].cssClass += ' oppia-rating-star-active';
+          }
         }
       };
 
@@ -65,33 +69,30 @@ oppia.directive('ratingFromValue', [function($http) {
         displayValue($scope.ratingValue);
       });
 
-      $scope.starsActive = false;
       $scope.clickStar = function(starValue) {
-        if ($scope.isEditable) {
+        if ($scope.isEditable && $scope.status === ACTIVE) {
+          $scope.status = RATING_SET;
           $scope.ratingValue = starValue;
           displayValue(starValue);
           $scope.onEdit(starValue);
-          $scope.starsActive = false;
         }
       };
       $scope.enterStar = function(starValue) {
-        if ($scope.isEditable && $scope.starsActive) {
+        if (
+            $scope.isEditable &&
+            ($scope.status === ACTIVE || $scope.status === INACTIVE)) {
+          $scope.status = ACTIVE;
           displayValue(starValue);
-        }
-        // This is necessary because enterStar is running before enterArea
-        $scope.mostRecentStarValue = starValue;
-      };
-      $scope.enterArea = function() {
-        $scope.starsActive = true;
-        if ($scope.isEditable && $scope.mostRecentStarValue) {
-          displayValue($scope.mostRecentStarValue);
         }
       };
       $scope.leaveArea = function() {
-        $scope.starsActive = false;
+        $scope.status = INACTIVE;
         displayValue($scope.ratingValue);
-        $scope.mostRecentStarValue = undefined;
       };
+
+      $scope.getCursorStyle = function() {
+        return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
+      }
     }]
   };
 }]);

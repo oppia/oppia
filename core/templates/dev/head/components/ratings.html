@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="rating/fromValue">
-  <span style="cursor: <[isEditable ? 'pointer' : 'auto']>" ng-mouseenter="enterArea()" ng-mouseleave="leaveArea()">
-    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="glyphicon <[star.style]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)" style="color: <[star.color]>"></span>
+  <span style="<[getCursorStyle()]>" ng-mouseleave="leaveArea()">
+    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="glyphicon <[star.cssClass]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)"></span>
   </span>
 </script>
 

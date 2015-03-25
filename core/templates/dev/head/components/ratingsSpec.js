@@ -45,19 +45,19 @@ describe('Ratings from value directive', function() {
     ctrlScope.ratingValue = 4.2;
     scope.$digest();
     // Note the array here is zero-indexed but ratings are one-indexed
-    expect(ctrlScope.stars[0].style).toBe('glyphicon-star');
-    expect(ctrlScope.stars[1].style).toBe('glyphicon-star');
-    expect(ctrlScope.stars[2].style).toBe('glyphicon-star');
-    expect(ctrlScope.stars[3].style).toBe('glyphicon-star');
-    expect(ctrlScope.stars[4].style).toBe('glyphicon-star-empty');
+    expect(ctrlScope.stars[0].cssClass).toBe('glyphicon-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('glyphicon-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('glyphicon-star');
+    expect(ctrlScope.stars[3].cssClass).toBe('glyphicon-star');
+    expect(ctrlScope.stars[4].cssClass).toBe('glyphicon-star-empty');
 
     ctrlScope.ratingValue = 1.7;
     scope.$digest();
-    expect(ctrlScope.stars[0].style).toBe('glyphicon-star');
-    expect(ctrlScope.stars[1].style).toBe('glyphicon-star');
-    expect(ctrlScope.stars[2].style).toBe('glyphicon-star-empty');
-    expect(ctrlScope.stars[3].style).toBe('glyphicon-star-empty');
-    expect(ctrlScope.stars[4].style).toBe('glyphicon-star-empty');
+    expect(ctrlScope.stars[0].cssClass).toBe('glyphicon-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('glyphicon-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('glyphicon-star-empty');
+    expect(ctrlScope.stars[3].cssClass).toBe('glyphicon-star-empty');
+    expect(ctrlScope.stars[4].cssClass).toBe('glyphicon-star-empty');
   });
 });
 
