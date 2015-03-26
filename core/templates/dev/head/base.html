@@ -32,10 +32,17 @@
     <meta name="msapplication-config" content="none">
     <meta property="og:title" content="Here's a great learning tool.">
     <meta property="og:site_name" content="Oppia">
-    <meta property="og:url" content="<[serverName]>/explore/<[explorationId]>">
+    <meta property="og:url" content="{{serverName}}/explore/{{explorationId}}">
     <meta property="og:description" content="Check out Oppia!">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="<[serverName]>/images/logo/288x128_logo_mint.png">
+    <meta property="og:image" content="/images/gallery/exploration_background_salmon_small.png">
+
+    <meta name="twitter:card" content="photo" />
+    <meta name="twitter:site" content="Oppia" />
+    <meta name="twitter:title" content="Exploration" />
+    <meta name="twitter:image" content="/images/gallery/exploration_background_salmon_small.png" />
+    <meta name="twitter:url" content="<[serverName]>/explore/<[explorationId]>" />
+
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
 
