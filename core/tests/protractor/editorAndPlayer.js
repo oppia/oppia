@@ -49,14 +49,16 @@ describe('State editor', function() {
   });
 
   it('should walk through the tutorial when user repeteadly clicks Next', function() {
-    var TUTORIAL_STAGES = 4;
+    var NUM_TUTORIAL_STAGES = 5;
     users.createUser('user@example.com', 'user');
     users.login('user@example.com');
 
-    workflow.startExplorationTutorial('sums', 'maths'); 
-    for(var i = 0; i < TUTORIAL_STAGES; i++) {
+    workflow.createExplorationAndStartTutorial('sums', 'maths'); 
+    for(var i = 0; i < (NUM_TUTORIAL_STAGES - 1); i++) {
       editor.progressInTutorial();
     }
+    editor.finishTutorial();
+    users.logout();
   });
 
   it('should create content and multiple choice interactions', function() {

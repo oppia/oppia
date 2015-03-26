@@ -37,11 +37,22 @@ var exitTutorialIfNecessary = function() {
 
 var progressInTutorial = function() {
   // Progress to the next instruction in the tutorial.
-  element.all(by.css('.nextBtn')).then(function(buttons){
-    if(buttons.length === 1) {
+  element.all(by.css('.nextBtn')).then(function(buttons) {
+    if (buttons.length === 1) {
       buttons[0].click();
     } else {
-      throw 'Expected to find at most one \'next\' button';
+      throw 'Expected to find exactly one \'next\' button';
+    }
+  });
+};
+
+var finishTutorial = function() {
+  // Finish the tutorial
+  element(by.buttonText('Finish')).then(function(button) {
+    if (button) {
+      button.click();
+    } else {
+      throw 'Expected to find exactly one \'Finish\' button';
     }
   });
 };
@@ -718,6 +729,7 @@ var revertToVersion = function(version) {
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.progressInTutorial = progressInTutorial;
+exports.finishTutorial  = finishTutorial;
 
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;

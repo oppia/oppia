@@ -25,24 +25,13 @@ var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
-  browser.get(general.GALLERY_URL_SUFFIX);
-  element(by.css('.protractor-test-create-exploration')).click();
-  protractor.getInstance().waitForAngular();
-  element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);
-  forms.AutocompleteDropdownEditor(
-    element(by.css('.protractor-test-new-exploration-category'))
-  ).setValue(category);
-  element(by.css('.protractor-test-submit-new-exploration')).click();
-
-  // We now want to wait for the editor to fully load.
-  protractor.getInstance().waitForAngular();
-
+  createExplorationAndStartTutorial(name, category);
   editor.exitTutorialIfNecessary();
 };
 
 // Creates a new exploration and wait for the exploration
 // tutorial to start.
-var startExplorationTutorial = function(name, category) {
+var createExplorationAndStartTutorial = function(name, category) {
   browser.get(general.GALLERY_URL_SUFFIX);
   element(by.css('.protractor-test-create-exploration')).click();
   protractor.getInstance().waitForAngular();
@@ -139,7 +128,7 @@ var getExplorationPlaytesters = function() {
 };
 
 exports.createExploration = createExploration;
-exports.startExplorationTutorial = startExplorationTutorial;
+exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.markExplorationAsFeatured = markExplorationAsFeatured;
