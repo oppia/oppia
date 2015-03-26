@@ -54,7 +54,7 @@ describe('State editor', function() {
     users.login('user@example.com');
 
     workflow.createExplorationAndStartTutorial('sums', 'maths'); 
-    for(var i = 0; i < (NUM_TUTORIAL_STAGES - 1); i++) {
+    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
       editor.progressInTutorial();
     }
     editor.finishTutorial();
