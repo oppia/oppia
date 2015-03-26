@@ -1698,7 +1698,7 @@ class SearchTests(ExplorationServicesUnitTests):
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
         days_since_beginning_of_time = (
-            (datetime.datetime.now() - datetime.datetime(2013, 6, 30)).days)
+            (datetime.datetime.utcnow() - datetime.datetime(2013, 6, 30)).days)
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID),
             days_since_beginning_of_time)

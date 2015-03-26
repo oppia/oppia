@@ -65,6 +65,10 @@
     </div>
 
     <form ng-if="stateInteractionIdService.displayed" name="form.schemaForm" class="protractor-test-interaction-editor">
+      <div ng-if="customizationArgSpecs.length === 0">
+        <em>To use this interaction, click 'Save Interaction'.</em>
+      </div>
+
       <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
         <h3><[customizationArgSpec.description]></h3>
         <div>
