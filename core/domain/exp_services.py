@@ -240,12 +240,13 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
     """
     MAX_ITERATIONS = 10
     summary_models = []
+    search_cursor = cursor
 
     for i in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
 
         exp_ids, search_cursor = search_explorations(
-            query_string, remaining_to_fetch, cursor=cursor)
+            query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
