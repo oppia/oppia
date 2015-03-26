@@ -65,10 +65,11 @@ def get_exploration_from_model(exploration_model):
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.skill_tags,
         exploration_model.blurb, exploration_model.author_notes,
-        exploration_model.default_skin, exploration_model.init_state_name,
-        exploration_model.states, exploration_model.param_specs,
-        exploration_model.param_changes, exploration_model.version,
-        exploration_model.created_on, exploration_model.last_updated)
+        exploration_model.default_skin, exploration_model.skin_customizations,
+        exploration_model.init_state_name, exploration_model.states,
+        exploration_model.param_specs, exploration_model.param_changes,
+        exploration_model.version, exploration_model.created_on,
+        exploration_model.last_updated)
 
 
 def get_exploration_summary_from_model(exp_summary_model):

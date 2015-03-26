@@ -29,6 +29,7 @@ import string
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
@@ -541,6 +542,124 @@ class InteractionInstance(object):
         )
 
 
+class GadgetInstance(object):
+    """Value object for an instance of a gadget."""
+    
+    def __init__(self, gadget_id, visible_in_states, customization_args):
+        self.id = gadget_id
+
+        # List of State name strings where this Gadget is visible.
+        self.visible_in_states = visible_in_states
+
+        # Customization args for the gadget's view.
+        self.customization_args = customization_args
+
+    @property
+    def _gadget_spec(self):
+        """Gadget spec for validation and derived properties below."""
+        return gadget_registry.Registry.get_gadget_by_id(self.id)
+
+    @property
+    def width(self):
+        """Width in pixels."""
+        return self._gadget_spec.get_width(self.customization_args)
+
+    @property
+    def height(self):
+        """Height in pixels."""
+        return self._gadget_spec.get_height(self.customization_args)
+
+    def validate(self):
+        """Validate GadgetInstance given its customization args."""
+        self._gadget_spec.validate(self.customization_args)
+
+        if self.visible_in_states == []:
+            raise utils.ValidationError(
+                '%s gadget not visible in any states.' % (
+                    self._gadget_spec.name))
+
+    def to_dict(self):
+        """Returns GadgetInstance data represented in dict form."""
+        return {
+            'gadget_id': self.id,
+            'visible_in_states': str(self.visible_in_states),
+            'customization_args': self._get_full_customization_args(),
+        }
+
+    @classmethod
+    def from_dict(cls, gadget_dict):
+        """Returns GadgetInstance constructed from dict data."""
+        return GadgetInstance(
+            gadget_dict['gadget_id'],
+            gadget_dict['visible_in_states'],
+            gadget_dict['customization_args'])
+
+    def _get_full_customization_args(self):
+        """Populates the customization_args dict of the gadget with
+        default values, if any of the expected customization_args are missing.
+        """
+        full_customization_args_dict = copy.deepcopy(self.customization_args)
+
+        gadget = gadget_registry.Registry.get_gadget_by_id(self.id)
+        for ca_spec in gadget.customization_arg_specs:
+            if ca_spec.name not in full_customization_args_dict:
+                full_customization_args_dict[ca_spec.name] = {
+                    'value': ca_spec.default_value
+                }
+        return full_customization_args_dict
+
+
+class SkinInstance(object):
+    """Domain object for a skin instance."""
+
+    def __init__(self, skin_id, skin_customizations):
+        self.skin_id = skin_id
+        # panel_configs is a dict with gadget_panel_name strings as keys and
+        # lists of GadgetInstance instances as values.
+        self.panel_configs = {}
+
+        for panel_name, gdict_list in skin_customizations[
+                'panels_contents'].iteritems():
+            self.panel_configs[panel_name] = [GadgetInstance(
+                gdict['gadget_id'], gdict['visible_in_states'],
+                gdict['customization_args']) for gdict in gdict_list]
+
+    def validate(self):
+        """Validates gadgets fit skin panel dimensions."""
+        skin = skins_services.Registry.get_skin_by_id(self.skin_id)
+        for panel_name, gadgets_list in self.panel_configs.iteritems():
+            skin.validate_panel(panel_name, gadgets_list)
+            for gadget_instance in gadgets_list:
+                gadget_instance.validate()
+
+    def to_dict(self):
+        """Returns SkinInstance data represented in dict form.
+        """
+        return {
+            'panels_contents': {
+                panel_name: [
+                    gadget_instance.to_dict() for gadget_instance
+                    in instances_list]
+                for panel_name, instances_list in
+                self.panel_configs.iteritems()
+            },
+        }
+
+    def get_state_names_required_by_gadgets(self):
+        """Returns a list of strings representing State names required by
+        GadgetInstances in this skin."""
+        state_names = set()
+        for gadget_instances_list in self.panel_configs.values():
+            for gadget_instance in gadget_instances_list:
+                for state_name in gadget_instance.visible_in_states:
+                    state_names.add(state_name)
+
+        # We convert to a sorted list for clean deterministic testing.
+        state_names = list(state_names)
+        state_names.sort()
+        return state_names
+
+
 class State(object):
     """Domain object for a state."""
 
@@ -741,9 +860,9 @@ class Exploration(object):
 
     def __init__(self, exploration_id, title, category, objective,
                  language_code, skill_tags, blurb, author_notes, default_skin,
-                 init_state_name, states_dict, param_specs_dict,
-                 param_changes_list, version, created_on=None,
-                 last_updated=None):
+                 skin_customizations, init_state_name, states_dict,
+                 param_specs_dict, param_changes_list, version,
+                 created_on=None, last_updated=None):
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -754,6 +873,8 @@ class Exploration(object):
         self.author_notes = author_notes
         self.default_skin = default_skin
         self.init_state_name = init_state_name
+
+        self.skin_instance = SkinInstance(default_skin, skin_customizations)
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -813,8 +934,8 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', 'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict,
-            {}, [], 0)
+            '', 'conversation_v1', feconf.DEFAULT_SKIN_CUSTOMIZATION,
+            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
     def _require_valid_name(cls, name, name_type):
@@ -1006,6 +1127,22 @@ class Exploration(object):
                                 'The parameter %s was used in a rule, but it '
                                 'does not exist in this exploration'
                                 % param_change.name)
+
+        # Check that required state names exist.
+        state_names_required_by_gadgets = set((
+            self.skin_instance.get_state_names_required_by_gadgets()))
+        missing_state_names = state_names_required_by_gadgets - set(
+            self.states.keys())
+        if missing_state_names:
+            missing_state_names = list(missing_state_names)
+            missing_state_names.sort()
+            raise utils.ValidationError(
+                'Exploration missing required state%s: %s' % (
+                    's' if len(missing_state_names) > 1 else '',
+                    ', '.join(missing_state_names)))
+
+        # Check that GadgetInstances fit the skin.
+        self.skin_instance.validate()
 
         if strict:
             warnings_list = []
@@ -1241,7 +1378,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 4
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 5
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -1287,6 +1424,16 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v4_dict_to_v5_dict(cls, exploration_dict):
+        """Converts a v4 exploration dict into a v5 exploration dict."""
+        exploration_dict['schema_version'] = 5
+
+        exploration_dict['skin_customizations'] = (
+            feconf.DEFAULT_SKIN_CUSTOMIZATION)
+
+        return exploration_dict
+
+    @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string."""
         try:
@@ -1319,6 +1466,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v3_dict_to_v4_dict(
                 exploration_dict)
             exploration_schema_version = 4
+
+        if exploration_schema_version == 4:
+            exploration_dict = cls._convert_v4_dict_to_v5_dict(
+                exploration_dict)
+            exploration_schema_version = 5
 
         exploration = cls.create_default_exploration(
             exploration_id, title, category,
@@ -1382,6 +1534,10 @@ class Exploration(object):
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
 
+        exploration.skin_instance = SkinInstance(
+            exploration_dict['default_skin'],
+            exploration_dict['skin_customizations'])
+
         return exploration
 
     def to_yaml(self):
@@ -1395,6 +1551,7 @@ class Exploration(object):
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
             'skill_tags': self.skill_tags,
+            'skin_customizations': self.skin_instance.to_dict(),
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION

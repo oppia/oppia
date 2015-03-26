@@ -25,6 +25,133 @@ from core.tests import test_utils
 import feconf
 import utils
 
+SAMPLE_YAML_CONTENT = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 5
+skill_tags: []
+skin_customizations:
+  panels_contents: {}
+states:
+  %s:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: %s
+          feedback: []
+          param_changes: []
+      id: null
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      id: null
+    param_changes: []
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME)
+
+SAMPLE_YAML_CONTENT_WITH_GADGETS = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 5
+skill_tags: []
+skin_customizations:
+  panels_contents:
+    left:
+      - gadget_id: AdviceBar
+        visible_in_states:
+          - New state
+        customization_args:
+          title:
+            value: Tips
+          default_icon:
+            value: DefaultAdviceBarIcon.png
+          orientation:
+            value: vertical
+          advice_objects:
+            value:
+              - advice_title: Starting Out
+                advice_text: To start out, try ABC or DEF!
+              - advice_title: What are multiples?
+                advice_text: Multiples are numbers that ABC, DEF...
+    right: []
+    bottom:
+      - gadget_id: ScoreBar
+        visible_in_states:
+          - New state
+        customization_args:
+          title:
+            value: Friend Interest
+          initialValue:
+            value: 20
+states:
+  %s:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: %s
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME)
+
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -136,6 +263,33 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
+    def test_exploration_skin_and_gadget_validation(self):
+        """Test that Explorations including gadgets validate properly."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+
+        # We force a GadgetInstance to requires certain state names.
+        gadget_instance = exploration.skin_instance.panel_configs['bottom'][0]
+        gadget_instance.visible_in_states.extend(['DEF', 'GHI'])
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Exploration missing required states: DEF, GHI'):
+            exploration.validate()
+
+        def_state = exp_domain.State.create_default_state('DEF')
+        def_state.update_interaction_id('TextInput')
+        exploration.states['DEF'] = def_state
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Exploration missing required state: GHI'):
+            exploration.validate()
+
+        ghi_state = exp_domain.State.create_default_state('GHI')
+        ghi_state.update_interaction_id('TextInput')
+        exploration.states['GHI'] = ghi_state
+        exploration.validate()
+
     def test_objective_validation(self):
         """Test that objectives are validated only in 'strict' mode."""
         self.save_new_valid_exploration(
@@ -210,54 +364,6 @@ class StateExportUnitTests(test_utils.GenericTestBase):
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
-    SAMPLE_YAML_CONTENT = (
-"""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 4
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: New state
-          feedback: []
-          param_changes: []
-      id: null
-    param_changes: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
-
     def test_yaml_import_and_export(self):
         """Test the from_yaml() and to_yaml() methods."""
         EXP_ID = 'An exploration_id'
@@ -267,7 +373,7 @@ states:
         self.assertEqual(len(exploration.states), 2)
 
         yaml_content = exploration.to_yaml()
-        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
+        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
         exploration2 = exp_domain.Exploration.from_yaml(
             'exp2', 'Title', 'Category', yaml_content)
@@ -287,6 +393,15 @@ states:
         with self.assertRaises(Exception):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Title', 'Category', 'State1:\n(\nInvalid yaml')
+
+    def test_yaml_import_and_export_with_gadgets(self):
+        """Test from_yaml() and to_yaml() methods including gadgets."""
+
+        EXP_ID = 'An exploration_id'
+        exploration_with_gadgets = exp_domain.Exploration.from_yaml(
+            EXP_ID, 'A title', 'Category', SAMPLE_YAML_CONTENT)
+        yaml_content = exploration_with_gadgets.to_yaml()
+        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
@@ -487,7 +602,63 @@ states:
     param_changes: []
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V4
+    YAML_CONTENT_V5 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 5
+skill_tags: []
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V5
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -513,6 +684,11 @@ states:
             'eid', 'A title', 'A category', self.YAML_CONTENT_V4)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v5(self):
+        """Test direct loading from a v5 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V5)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -620,3 +796,129 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertNotIn(default_state_name, exploration.states)
         self.assertIn('Renamed state', exploration.states)
         self.assertIn('State 2', exploration.states)
+
+
+class SkinInstanceUnitTests(test_utils.GenericTestBase):
+    """Test methods for SkinInstnace."""
+
+    def test_skin_instance_required_state_names(self):
+        """Test SkinInstance accurate generation of GadgetInstance state names."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        skin_instance = exploration.skin_instance
+        self.assertEqual(
+            skin_instance.get_state_names_required_by_gadgets(),
+            ['New state'])
+
+
+class GadgetInstanceUnitTests(test_utils.GenericTestBase):
+    """Tests methods instantiating and validating GadgetInstances."""
+
+    def test_gadget_instantiation(self):
+        """Test instantiation of GadgetInstances."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+
+        # Assert left and bottom panels have 1 GadgetInstance. Right has 0.
+        self.assertEqual(len(exploration.skin_instance.panel_configs[
+            'left']), 1)
+        self.assertEqual(len(exploration.skin_instance.panel_configs[
+            'bottom']), 1)
+        self.assertEqual(len(exploration.skin_instance.panel_configs[
+            'right']), 0)
+
+    def test_gadget_instance_properties(self):
+        """Test accurate representation of gadget properties."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        panel_configs = exploration.skin_instance.panel_configs
+
+        advice_bar_instance = panel_configs['left'][0]
+        self.assertEqual(advice_bar_instance.height, 350)
+        self.assertEqual(advice_bar_instance.width, 100)
+        self.assertIn('New state', advice_bar_instance.visible_in_states)
+        self.assertEqual(
+            len(advice_bar_instance.customization_args[
+                'advice_objects']['value']), 2
+        )
+
+        score_bar_instance = panel_configs['bottom'][0]
+        self.assertEqual(score_bar_instance.height, 100)
+        self.assertEqual(score_bar_instance.width, 250)
+        self.assertEqual(
+            score_bar_instance.customization_args['initialValue']['value'],
+            20
+        )
+        self.assertEqual(
+            score_bar_instance.customization_args['title']['value'],
+            'Friend Interest'
+        )
+
+    def test_gadget_instance_validation(self):
+        """Test validation of GadgetInstance."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        panel_configs = exploration.skin_instance.panel_configs
+        advice_bar_instance = panel_configs['left'][0]
+
+        # Validation against sample YAML should pass without error.
+        exploration.validate()
+
+        # Assert size exceeded error triggers when a gadget's size exceeds
+        # a panel's capacity.
+        with self.swap(
+            advice_bar_instance._gadget_spec,
+            "_FIXED_AXIS_BASE_LENGTH", 2350):
+            with self.assertRaisesRegexp(
+                utils.ValidationError,
+                "Size exceeded: left panel width of 2350 exceeds limit of 100"):
+                exploration.validate()
+
+        # Assert raising too many gadgets.
+        panel_configs['bottom'].append(advice_bar_instance)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            "'bottom' panel expected at most 1 gadget, received 2."):
+            exploration.validate()
+
+        # Assert gadget flags when it's not visible in any states.
+        advice_bar_instance.visible_in_states = []
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            "AdviceBar gadget not visible in any states."):
+            advice_bar_instance.validate()
+
+    def test_conversion_of_gadget_instance_to_and_from_dict(self):
+        """Test conversion of GadgetInstance to and from dict. """
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        panel_configs = exploration.skin_instance.panel_configs
+        score_bar_instance = panel_configs['bottom'][0]
+
+        score_bar_as_dict = score_bar_instance.to_dict()
+
+        self.assertEqual(
+            score_bar_as_dict,
+            {
+                'gadget_id': 'ScoreBar',
+                'visible_in_states': "['New state']",
+                'customization_args': {
+                    'title': {
+                        'value': 'Friend Interest'
+                    },
+                    'initialValue': {
+                        'value': 20
+                    }
+                }
+            }
+        )
+
+        score_bar_as_instance = exp_domain.GadgetInstance.from_dict(
+            score_bar_as_dict)
+
+        self.assertEqual(score_bar_as_instance.width, 250)
+        self.assertEqual(score_bar_as_instance.height, 100)
+        self.assertEqual(
+            score_bar_as_instance.customization_args['title']['value'],
+            'Friend Interest'
+        )
