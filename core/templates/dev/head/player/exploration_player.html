@@ -26,42 +26,47 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
-    <li class="dropdown">
-      <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
-        <span class="glyphicon glyphicon-share"></span>
-      </a>
-      <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-        <li>
-          <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
-          <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
-             onclick="javascript:window.open(this.href,
-                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
-             tooltip="Google+" tooltip-placement="left">
-            <img src="https://www.gstatic.com/images/icons/gplus-64.png"
-                 alt="Share on Google+"/>
-          </a>
-        </li>
-        <li>
-          <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
-            <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
-          </a>
-        </li>
-      </ul>
-    </li>
-    <li>
-      <a href="" tooltip="Feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
-        <span class="glyphicon glyphicon-comment"></span>
-      </a>
-    </li>
-    {% if can_edit %}
+  <div ng-controller="LearnerLocalNav">
+    <span ng-if="isLoggedIn" class="nav navbar-nav oppia-navbar-breadcrumb" style="padding: 18px 20px 15px 20px" tooltip="Rate exploration" tooltip-placement="bottom">
+      <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating"></rating-from-value>
+    </span>
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
+      <li class="dropdown">
+        <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
+          <span class="glyphicon glyphicon-share"></span>
+        </a>
+        <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+          <li>
+            <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
+            <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
+               onclick="javascript:window.open(this.href,
+                        '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
+               tooltip="Google+" tooltip-placement="left">
+              <img src="https://www.gstatic.com/images/icons/gplus-64.png"
+                   alt="Share on Google+"/>
+            </a>
+          </li>
+          <li>
+            <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
+            </a>
+          </li>
+        </ul>
+      </li>
       <li>
-        <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
-          <span class="glyphicon glyphicon-pencil"></span>
+        <a href="" tooltip="Feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
+          <span class="glyphicon glyphicon-comment"></span>
         </a>
       </li>
-    {% endif %}
-  </ul>
+      {% if can_edit %}
+        <li>
+          <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+            <span class="glyphicon glyphicon-pencil"></span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -136,6 +141,7 @@
   </script>
 
   {% include 'components/exploration_embed_button.html' %}
+  {% include 'components/ratings.html' %}
 {% endblock %}
 
 {% block footer_js %}
@@ -144,6 +150,7 @@
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
+    {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 

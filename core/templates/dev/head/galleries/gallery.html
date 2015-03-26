@@ -207,6 +207,9 @@
                     </div>
 
                     <div class="oppia-gallery-tile-second-row">
+                      <span class="oppia-gallery-tile-ratings">
+                        <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
+                      </span>
                       <span ng-if="exploration.status === 'publicized'" style="color: #888">
                         Featured
                         <span class="glyphicon glyphicon-star"></span>
@@ -229,6 +232,7 @@
   </div>
 
   {% include 'components/exploration_creation_button.html' %}
+  {% include 'components/ratings.html' %}
 {% endblock %}
 
 {% block footer_js %}
@@ -236,5 +240,6 @@
   <script>
     {{ include_js_file('components/explorationCreationButton.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
+    {{ include_js_file('components/ratings.js')}}
   </script>
 {% endblock footer_js %}

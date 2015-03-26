@@ -134,8 +134,8 @@ md-card.conversation-skin-card {
 .conversation-skin-loading-dots {
   text-align: center;
 }
-.conversation-skin-loading-dots > .oppia-loading-dot-one, 
-.conversation-skin-loading-dots > .oppia-loading-dot-two, 
+.conversation-skin-loading-dots > .oppia-loading-dot-one,
+.conversation-skin-loading-dots > .oppia-loading-dot-two,
 .conversation-skin-loading-dots > .oppia-loading-dot-three {
   background-color: black;
   display: inline-block;
@@ -166,4 +166,10 @@ md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
   margin: -5px 0;
   max-width: 600px;
+}
+
+.conversation-skin-final-ratings {
+  font-size: 18px;
+  padding-top: 20px;
+  text-align: center;
 }

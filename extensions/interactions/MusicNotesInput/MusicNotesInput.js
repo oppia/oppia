@@ -13,12 +13,49 @@
 // limitations under the License.
 
 /**
- * Directive for the MusicNotesInput interaction.
+ * Directives and associated services for the MusicNotesInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+oppia.factory('musicPhrasePlayerService', ['$timeout', function($timeout) {
+  var _MIDI_CHANNEL = 0;
+  var _MIDI_VELOCITY = 127;
+  var _SECS_TO_MILLISECS = 1000.0;
+
+  var _playNote = function(midiValues, durationInSecs, delayInSecs) {
+    $timeout(function() {
+      MIDI.chordOn(
+        _MIDI_CHANNEL, midiValues, _MIDI_VELOCITY, 0);
+      MIDI.chordOff(
+        _MIDI_CHANNEL, midiValues, durationInSecs);
+    }, delayInSecs * _SECS_TO_MILLISECS);
+  };
+
+  /**
+   * Plays a music phrase. The input is given as an Array of notes. Each
+   * note is represented as an object with three key-value pairs:
+   * - midiValue: Integer. The midi value of the note.
+   * - duration: Float. A decimal number representing the length of the note, in seconds.
+   * - start: Float. A decimal number representing the time offset (after the beginning
+   *     of the phrase) at which to start playing the note.
+   */
+  var _playMusicPhrase = function(notes) {
+    MIDI.Player.stop();
+
+    for (var i = 0; i < notes.length; i++) {
+      _playNote([notes[i].midiValue], notes[i].duration, notes[i].start);
+    }
+  };
+
+  return {
+    playMusicPhrase: function(notes) {
+      _playMusicPhrase(notes);
+    }
+  };
+}]);
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
@@ -26,7 +63,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/MusicNotesInput',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+      controller: [
+          '$scope', '$element', '$attrs', 'musicPhrasePlayerService',
+          function($scope, $element, $attrs, musicPhrasePlayerService) {
         $scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
@@ -415,7 +454,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   $scope._sortNoteSequence();
 
                   // Sounds the note when it is dropped onto staff.
-                  playChord([_convertNoteToMidiPitch(note)]);
+                  playSequence([[_convertNoteToMidiPitch(note)]]);
                   $(ui.helper).addClass('oppia-music-input-on-staff');
 
                   repaintLedgerLines();
@@ -669,10 +708,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
          * Functions involving MIDI playback.
          ******************************************************************/
 
-        $scope.MIDI_CHANNEL = 0;
-        $scope.MIDI_VELOCITY = 127;
-        $scope.MIDI_DELAY = 1;
-
         $scope.playSequenceToGuess = function() {
           var noteSequenceToGuess = [];
           for (var i = 0; i < $scope.sequenceToGuess.length; i++) {
@@ -690,26 +725,27 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // Takes an input > 0, converts to a noteStart object and returns a
         // float representation of the noteStart position.
         function getNoteStart(noteIndex) {
-          var note = {};
-          note.noteStart = {'num': noteIndex, 'den': 1};
-          return getNoteStartAsFloat(note);
+          return getNoteStartAsFloat({
+            noteStart: {'num': noteIndex, 'den': 1}
+          });
         }
 
         // Input is a midiSequence, which is an array of arrays, in the form of
         // [[72], [62], [67, 71, 74]]. An inner array with more than one value is
         // treated like a chord and all its values are played back simultaneously.
         function playSequence(midiSequence) {
+          var notes = [];
           for (var i = 0; i < midiSequence.length; i++) {
             for (var j = 0; j < midiSequence[i].length; j++) {
-              playChord(midiSequence[i][j], getNoteStart(i));
+              notes.push({
+                midiValue: midiSequence[i][j],
+                duration: 1.0,
+                start: getNoteStart(i)
+              });
             }
           }
-        }
 
-        function playChord(midiChord, noteStart) {
-          MIDI.noteOn(
-            $scope.MIDI_CHANNEL, midiChord, $scope.MIDI_VELOCITY, noteStart
-          );
+          musicPhrasePlayerService.playMusicPhrase(notes);
         }
 
         // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.

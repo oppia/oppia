@@ -172,5 +172,60 @@ describe('MusicNotesInput interaction', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
     });
   });
+});
 
+
+describe('Music phrase player service', function() {
+  beforeEach(module('oppia'));
+
+  describe('music phrase player service', function() {
+    var mpps = null;
+
+    beforeEach(inject(function($injector, $window) {
+      mpps = $injector.get('musicPhrasePlayerService');
+      // This is here so that, if the test environment is modified
+      // to include MIDI in the future, we will remember to swap
+      // it out with a dummy MIDI and back again after the test.
+      if ($window.MIDI) {
+        throw 'Expected MIDI library not to show up in tests.'
+      }
+
+      $window.MIDI = {
+        Player: {
+          stop: function() {}
+        },
+        chordOn: function(channel, notes, velocity, delay) {},
+        chordOff: function(channel, notes, delay) {}
+      };
+      spyOn($window.MIDI.Player, 'stop');
+      spyOn($window.MIDI, 'chordOn');
+      spyOn($window.MIDI, 'chordOff');
+    }));
+
+    afterEach(inject(function($window) {
+      $window.MIDI = undefined;
+    }));
+
+    it('should stop any existing playthroughs when a new play is requested', function() {
+      mpps.playMusicPhrase([]);
+      expect(MIDI.Player.stop).toHaveBeenCalled();
+    });
+
+    it('should play all the notes in a music phrase', inject(function($timeout) {
+      mpps.playMusicPhrase([{
+        midiValue: 69,
+        duration: 2,
+        start: 1
+      }, {
+        midiValue: 77,
+        duration: 1.5,
+        start: 3
+      }]);
+      $timeout.flush();
+      expect(MIDI.chordOn).toHaveBeenCalledWith(0, [69], 127, 0);
+      expect(MIDI.chordOn).toHaveBeenCalledWith(0, [77], 127, 0);
+      expect(MIDI.chordOff).toHaveBeenCalledWith(0, [69], 2);
+      expect(MIDI.chordOff).toHaveBeenCalledWith(0, [77], 1.5);
+    }));
+  });
 });

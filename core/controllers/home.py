@@ -152,6 +152,7 @@ class MyExplorationsHandler(base.BaseHandler):
                 'thumbnail_image_url': (
                     '/images/gallery/exploration_background_%s_small.png' %
                     _get_intro_card_color(exp_summary.category)),
+                'ratings': exp_summary.ratings,
             } for exp_summary in editable_exp_summaries.values()],
         })
         self.render_json(self.values)

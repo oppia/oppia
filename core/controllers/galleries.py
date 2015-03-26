@@ -137,7 +137,8 @@ class GalleryHandler(base.BaseHandler):
                 _get_intro_card_color(exp_summary.category)),
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
-                user_id=self.user_id)
+                user_id=self.user_id),
+            'ratings': exp_summary.ratings
         } for exp_summary in exp_summaries_list]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:

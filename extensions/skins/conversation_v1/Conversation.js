@@ -29,9 +29,11 @@ oppia.directive('conversationSkin', [function() {
     controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$modal', 'warningsData',
         'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
+        'ratingService',
         function(
           $scope, $timeout, $rootScope, $window, $modal, warningsData,
-          messengerService, oppiaPlayerService, urlService, focusService) {
+          messengerService, oppiaPlayerService, urlService, focusService,
+          ratingService) {
 
       var hasInteractedAtLeastOnce = false;
       var _labelForNextFocusTarget = null;
@@ -139,6 +141,7 @@ oppia.directive('conversationSkin', [function() {
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights, introCardImageUrl) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
           $scope.introCardImageUrl = introCardImageUrl;
           oppiaPlayerService.getUserProfileImage().then(function(result) {
             // $scope.profilePicture contains a dataURI representation of the
@@ -180,7 +183,18 @@ oppia.directive('conversationSkin', [function() {
             });
           }, millisecsLeftToWait);
         });
+
+        ratingService.init(function(userRating) {
+          $scope.userRating = userRating;
+        });
       };
+
+      $scope.submitUserRating = function(ratingValue) {
+        ratingService.submitUserRating(ratingValue);
+      };
+      $scope.$on('ratingUpdated', function() {
+        $scope.userRating = ratingService.getUserRating();
+      });
 
       $scope.initializePage();
 
