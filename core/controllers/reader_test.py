@@ -312,32 +312,35 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         # User checks rating
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
-        self.assertEqual(ratings['user'], None)
+        self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
-            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
         # User rates and checks rating
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
-                'rating': 2
+                'user_rating': 2
             }, csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
-        self.assertEqual(ratings['user'], 2)
+        self.assertEqual(ratings['user_rating'], 2)
         self.assertEqual(
-            ratings['overall'], {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
+            ratings['overall_ratings'],
+            {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
 
         # User re-rates and checks rating
         self.login('user@example.com')
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
-                'rating': 5
+                'user_rating': 5
             }, csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
-        self.assertEqual(ratings['user'], 5)
+        self.assertEqual(ratings['user_rating'], 5)
         self.assertEqual(
-            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
 
         self.logout()
 
@@ -351,12 +354,13 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
-        self.assertEqual(ratings['user'], None)
+        self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
-            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
-                'rating': 1
+                'user_rating': 1
             }, csrf_token, expected_status_int=401, expect_errors=True
         )
 
@@ -371,7 +375,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             self.testapp.get('/explore/%s' % self.EXP_ID))
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
-                'rating': 4
+                'user_rating': 4
             }, csrf_token
         )
         self.logout()
@@ -380,14 +384,15 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/explore/%s' % self.EXP_ID))
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
-        self.assertEqual(ratings['user'], None)
+        self.assertEqual(ratings['user_rating'], None)
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
-                'rating': 4
+                'user_rating': 4
             }, csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
-        self.assertEqual(ratings['user'], 4)
+        self.assertEqual(ratings['user_rating'], 4)
         self.assertEqual(
-            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
         self.logout()

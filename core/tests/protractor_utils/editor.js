@@ -35,6 +35,28 @@ var exitTutorialIfNecessary = function() {
   });
 };
 
+var progressInTutorial = function() {
+  // Progress to the next instruction in the tutorial.
+  element.all(by.css('.nextBtn')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else {
+      throw 'Expected to find exactly one \'next\' button';
+    }
+  });
+};
+
+var finishTutorial = function() {
+  // Finish the tutorial
+  element(by.buttonText('Finish')).then(function(button) {
+    if (button) {
+      button.click();
+    } else {
+      throw 'Expected to find exactly one \'Finish\' button';
+    }
+  });
+};
+
 // NAVIGATION
 
 var navigateToMainTab = function() {
@@ -114,57 +136,35 @@ var expectContentTextToEqual = function(text) {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
 var setInteraction = function(interactionName) {
+  element(by.css('.protractor-test-delete-interaction')).isPresent().then(function(isVisible) {
+    // If there is already an interaction present, delete it.
+    if (isVisible) {
+      element(by.css('.protractor-test-delete-interaction')).click();
+      // Click through the "are you sure?" warning.
+      browser.driver.switchTo().alert().accept();
+    }
+  });
+
+  element(by.css('.protractor-test-open-add-interaction-modal')).click();
+
   var elem = element(by.css('.protractor-test-interaction-editor'));
   var customizationArgs = [elem];
   for (var i = 1; i < arguments.length; i++) {
     customizationArgs.push(arguments[i]);
   }
 
+  general.waitForSystem();
   element(by.css('.protractor-test-select-interaction-id')).click();
+  element(by.css('.protractor-test-top-level-interaction-id-' + interactionName)).click();
 
-  // Try to find the interaction in the top-level dropdown menu.
-  element.all(by.css(
-      '.protractor-test-top-level-interaction-id-' + interactionName)).count().then(function(count) {
-    if (count === 1) {
-      element(by.css('.protractor-test-top-level-interaction-id-' + interactionName)).click();
-    } else if (count === 0) {
-      var interactionFound = false;
+  if (customizationArgs.length > 1) {
+    interactions.getInteraction(interactionName).customizeInteraction.apply(
+      null, customizationArgs);
+  }
 
-      // Search through the sub-dropdown menus for the correct interaction.
-      element.all(by.css('.protractor-test-interaction-category')).map(function(categoryElem) {
-        if (!interactionFound) {
-          browser.actions().mouseMove(categoryElem).perform();
-          var interactionElem = element(by.css('.protractor-test-interaction-id-' + interactionName));
-          interactionElem.isDisplayed().then(function(isInteractionVisible) {
-            if (isInteractionVisible) {
-              interactionElem.click();
-              interactionFound = true;
-            }
-          });
-        }
-      });
-    } else {
-      throw (
-        'Found more than one instance of ' +
-        interactionName + 'in the interaction dropdown menu');
-    }
-
-    // Click a neutral element on the page to reset the dropdown menu.
-    var neutralElem = element(by.css('.protractor-test-editor-neutral-element'));
-    general.scrollElementIntoView(neutralElem);
-    neutralElem.click();
-
-    if (customizationArgs.length > 1) {
-      element(by.css('.protractor-test-edit-interaction')).click();
-
-      interactions.getInteraction(interactionName).customizeInteraction.apply(
-        null, customizationArgs);
-
-      element(by.css('.protractor-test-save-interaction')).click();
-      // Wait for the customization modal to close.
-      general.waitForSystem();
-    }
-  });
+  element(by.css('.protractor-test-save-interaction')).click();
+  // Wait for the customization modal to close.
+  general.waitForSystem();
 };
 
 // Likewise this can receive additional arguments.
@@ -728,6 +728,8 @@ var revertToVersion = function(version) {
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+exports.progressInTutorial = progressInTutorial;
+exports.finishTutorial  = finishTutorial;
 
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;

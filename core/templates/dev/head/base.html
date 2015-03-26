@@ -32,16 +32,10 @@
     <meta name="msapplication-config" content="none">
     <meta property="og:title" content="Here's a great learning tool.">
     <meta property="og:site_name" content="Oppia">
-    <meta property="og:url" content="{{serverName}}/explore/{{explorationId}}">
+    <meta property="og:url" content="<[serverName]>/explore/<[explorationId]>">
     <meta property="og:description" content="Check out Oppia!">
     <meta property="og:type" content="article">
     <meta property="og:image" content="/images/gallery/exploration_background_salmon_small.png">
-
-    <meta name="twitter:card" content="photo" />
-    <meta name="twitter:site" content="Oppia" />
-    <meta name="twitter:title" content="Exploration" />
-    <meta name="twitter:image" content="/images/gallery/exploration_background_salmon_small.png" />
-    <meta name="twitter:url" content="<[serverName]>/explore/<[explorationId]>" />
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
@@ -182,7 +176,7 @@
                             </li>
                           </ul>
                         </li>
-                      {% else %}
+                      {% elif not user_email %}
                         <li class="dropdown oppia-clickable-dropdown pull-right">
                           <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
                             Sign in
@@ -221,6 +215,13 @@
           </div>
         </div>
       </div>
+
+    {% if DEV_MODE %}
+      <div class="oppia-dev-mode">
+        Development Mode
+      </div>
+    {% endif %}
+
     {% endif %}
 
     {% include 'directives.html' %}

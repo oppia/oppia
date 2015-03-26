@@ -301,11 +301,7 @@ param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
 - type: text
-  value: Welcome to the Oppia editor!<br><br>Anything
-    you type here will be shown to the learner playing
-    your exploration.<br><br>If you need more help getting
-    started, check out the Help link in the navigation
-    bar.
+  value: ''
 interaction:
   customization_args:
     placeholder:

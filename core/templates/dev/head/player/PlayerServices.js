@@ -342,6 +342,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
+          $rootScope.$broadcast('playerServiceInitialized');
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
@@ -550,19 +551,63 @@ oppia.factory('oppiaPlayerService', [
 }]);
 
 
+oppia.factory('ratingService', [
+    '$http', '$rootScope', 'oppiaPlayerService',
+    function($http, $rootScope, oppiaPlayerService) {
+  var explorationId = oppiaPlayerService.getExplorationId();
+  var ratingsUrl = '/explorehandler/rating/' + explorationId;
+  var userRating;
+  return {
+    init: function(successCallback) {
+      $http.get(ratingsUrl).success(function(data) {
+        successCallback(data.user_rating);
+        userRating = data.user_rating;
+        $rootScope.$broadcast('ratingServiceInitialized');
+      });
+    },
+    submitUserRating: function(ratingValue) {
+      $http.put(ratingsUrl, {
+        user_rating: ratingValue
+      });
+      userRating = ratingValue;
+      $rootScope.$broadcast('ratingUpdated');
+    },
+    getUserRating: function() {
+      return userRating;
+    }
+  };
+}]);
+
+
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal',
-    'oppiaPlayerService', 'embedExplorationButtonService',
+    'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
     function(
       $scope, $http, $modal,
-      oppiaPlayerService, embedExplorationButtonService) {
+      oppiaPlayerService, embedExplorationButtonService, ratingService) {
   var _END_DEST = 'END';
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
+
+  $scope.$on('playerServiceInitialized', function() {
+    $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+  });
+  $scope.$on('ratingServiceInitialized', function() {
+    $scope.userRating = ratingService.getUserRating();
+  })
+
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
   $scope.showFeedbackModal = function() {
     oppiaPlayerService.openPlayerFeedbackModal(null);
   };
+
+  $scope.submitUserRating = function(ratingValue) {
+    $scope.userRating = ratingValue;
+    ratingService.submitUserRating(ratingValue);
+  };
+  $scope.$on('ratingUpdated', function() {
+    $scope.userRating = ratingService.getUserRating();
+  });
 }]);

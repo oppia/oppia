@@ -158,7 +158,7 @@
     <rule-type-selector class="protractor-test-rule-description" local-value="currentRuleDefinition.name" on-selection-change="onSelectNewRuleType" can-add-default-rule="canAddDefaultRule()">
     </rule-type-selector>
 
-    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">
+    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px;">
       <span ng-if="item.type == 'select'" style="color: black;">
         <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
         </select>

@@ -331,28 +331,26 @@ describe('New state template service', function() {
     beforeEach(inject(function($injector) {
       // TODO(sll): Make this match the dict in the backend so that there
       // is a single source of truth.
-      GLOBALS = {
-        NEW_STATE_TEMPLATE: {
-          content: [{type: 'text', value: ''}],
-          interaction: {
-            customization_args: {
-              rows: {value: 1},
-              placeholder: {value: 'Type your answer here.'}
-            },
-            handlers: [{
-              name: 'submit',
-              rule_specs: [{
-                dest: '(untitled state)',
-                definition: {rule_type: 'default'},
-                feedback: [],
-                param_changes: []
-              }],
-            }],
-            id: 'TextInput'
+      GLOBALS.NEW_STATE_TEMPLATE = {
+        content: [{type: 'text', value: ''}],
+        interaction: {
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: 'Type your answer here.'}
           },
-          param_changes: [],
-          unresolved_answers: {},
-        }
+          handlers: [{
+            name: 'submit',
+            rule_specs: [{
+              dest: '(untitled state)',
+              definition: {rule_type: 'default'},
+              feedback: [],
+              param_changes: []
+            }],
+          }],
+          id: 'TextInput'
+        },
+        param_changes: [],
+        unresolved_answers: {},
       };
       nsts = $injector.get('newStateTemplateService');
     }));

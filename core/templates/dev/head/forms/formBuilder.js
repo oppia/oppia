@@ -23,8 +23,11 @@
 // when these forms first come into view.
 
 
-// The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
-oppia.constant('RTE_COMPONENT_SPECS', window.GLOBALS ? GLOBALS.RTE_COMPONENT_SPECS : {});
+// The conditioning on window.GLOBALS.RTE_COMPONENT_SPECS is because, in the Karma
+// tests, this value is undefined.
+oppia.constant(
+  'RTE_COMPONENT_SPECS',
+  window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
 
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {

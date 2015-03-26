@@ -1,89 +1,87 @@
-<div ng-controller="StateInteraction">
-  <div ng-if="!hasLoaded" class="oppia-align-center">
-    Loading
-    <span class="oppia-loading-dot-one">.</span>
-    <span class="oppia-loading-dot-two">.</span>
-    <span class="oppia-loading-dot-three">.</span>
-  </div>
+<div ng-controller="StateInteraction" id="tutorialStateInteraction">
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="!interactionId">
+    <div class="oppia-add-interaction-button-container">
+      <button type="button" class="btn btn-default btn-lg oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
+        + Add Interaction
+      </button>
+    </div>
+  </md-card>
 
-  <div class="protractor-test-interaction">
-    <div ng-if="hasLoaded">
-      <div style="margin-bottom: 20px; margin-top: 10px;">
-        <span class="dropdown protractor-test-select-interaction-id" ng-show"editabilityService.isEditable()">
-          <a id="tutorialStateInteraction" role="button" data-toggle="dropdown" class="btn btn-default">
-            <span ng-if="interactionId">
-              <[interactionRepository[interactionId].name]>
+  <div ng-if="interactionId">
+    <md-card class="oppia-editor-card-with-avatar">
+      <div class="oppia-editor-card-body">
+        <div style="background: rgba(5,140,166,0.1); padding-top: 5px; padding-bottom: 1px;">
+          <div class="oppia-editor-card-section" style="height: 100%;">
+            <span style="opacity: 0.7; position: absolute; right: 12px;">
+              <span class="glyphicon glyphicon-remove protractor-test-delete-interaction" ng-click="deleteInteraction()"></span>
             </span>
-            <span ng-if="!interactionId">
-              Select a type of interaction...
-            </span>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" role="menu">
-            <li ng-repeat="interactionId in topLevelInteractionIds track by $index">
-              <a href="#"
-                 ng-click="onChangeInteractionType(interactionId)"
-                 class="protractor-test-top-level-interaction-id-<[interactionId]>">
-                <[interactionRepository[interactionId].name]>
-              </a>
-            </li>
-            <li ng-repeat="(category, interactions) in interactionsByCategory"
-                class="oppia-dropdown-submenu">
-              <a href="#"
-                 class="protractor-test-interaction-category">
-                <[category]>
-              </a>
-              <ul class="dropdown-menu">
-                <li ng-repeat="interactionId in interactions">
-                  <a href="#"
-                     ng-click="onChangeInteractionType(interactionId)"
-                     class="protractor-test-interaction-id-<[interactionId]>">
-                    <[interactionRepository[interactionId].name]>
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </span>
 
-        <span ng-if="interactionId && editabilityService.isEditable() && doesCurrentInteractionHaveCustomizations()">
-          <a href="" ng-click="openInteractionCustomizerModal()" style="margin-left: 8px;" class="protractor-test-edit-interaction">
-            Customize
-          </a>
-        </span>
-      </div>
-
-      <div ng-if="interactionId" style="margin-bottom: 20px;">
-        <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview oppia-pre-avatar-user" style="pointer-events: none;">
+            <div ng-if="hasLoaded" class="protractor-test-interaction" style="padding-bottom: 20px; position: relative; height: 100%;" ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+              <div class="oppia-interaction-preview" style="position: absolute; width: 100%; height: 100%;" ng-click="openInteractionCustomizerModal()">
+              </div>
+              <div angular-html-bind="interactionPreviewHtml" class="oppia-pre-avatar-user" style="pointer-events: none; margin-left: 5px; margin-right: 5px;">
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </md-card>
   </div>
 </div>
 
 <script type="text/ng-template" id="modals/customizeInteraction">
   <div class="modal-header">
-    <h3>Customize Interaction</h3>
+    <h3 ng-if="!stateInteractionIdService.displayed">
+      Choose Interaction
+    </h3>
+
+    <h3 ng-if="stateInteractionIdService.displayed">
+      Customize Interaction
+    </h3>
   </div>
 
   <div class="modal-body">
-    <div class="protractor-test-interaction-editor">
-      <form name="form.schemaForm">
-        <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
-          <h3><[customizationArgSpec.description]></h3>
-          <div>
-            <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
-            </schema-based-editor>
-            <div style="margin-bottom: 15px;"></div>
-          </div>
-        </div>
-      </form>
-
+    <div ng-if="!stateInteractionIdService.displayed">
+      <span class="dropdown protractor-test-select-interaction-id">
+        <a id="tutorialStateInteraction" role="button" data-toggle="dropdown" class="btn btn-default">
+          <span ng-if="stateInteractionIdService.displayed">
+            <[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>
+          </span>
+          <span ng-if="!stateInteractionIdService.displayed">
+            Select a type of interaction...
+          </span>
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+          <li ng-repeat="(interactionId, interactionDict) in INTERACTION_SPECS track by $index">
+            <a href="#"
+               ng-click="onChangeInteractionId(interactionId)"
+               class="protractor-test-top-level-interaction-id-<[interactionId]>">
+              <[interactionDict.name]>
+            </a>
+          </li>
+        </ul>
+      </span>
     </div>
+
+    <form ng-if="stateInteractionIdService.displayed" name="form.schemaForm" class="protractor-test-interaction-editor">
+      <div ng-if="customizationArgSpecs.length === 0">
+        <em>To use this interaction, click 'Save Interaction'.</em>
+      </div>
+
+      <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
+        <h3><[customizationArgSpec.description]></h3>
+        <div>
+          <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
+          </schema-based-editor>
+          <div style="margin-bottom: 15px;"></div>
+        </div>
+      </div>
+    </form>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()" ng-disabled="form.schemaForm.$invalid">Save Customizations</button>
+    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()" ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">Save Interaction</button>
   </div>
 </script>

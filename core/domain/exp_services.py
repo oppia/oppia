@@ -240,12 +240,13 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
     """
     MAX_ITERATIONS = 10
     summary_models = []
+    search_cursor = cursor
 
     for i in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
 
         exp_ids, search_cursor = search_explorations(
-            query_string, remaining_to_fetch, cursor=cursor)
+            query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
@@ -1056,14 +1057,23 @@ def _get_search_rank(exp_id):
     """Returns an integer determining the document's rank in search.
 
     Featured explorations get a ranking bump, and so do explorations that
-    have been more recently updated.
+    have been more recently updated. Good ratings will increase the ranking
+    and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
     exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
+    summary = get_exploration_summary_by_id(exp_id)
     rank = (
         3000 if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
         else 0)
+
+    if summary.ratings:
+        RATING_WEIGHTINGS = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+        for rating_value in summary.ratings:
+            rank += (
+                summary.ratings[rating_value] *
+                RATING_WEIGHTINGS[rating_value])
 
     _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
     time_delta_days = (exploration.last_updated - _BEGINNING_OF_TIME).days
@@ -1139,7 +1149,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
           '-' character indicating whether to sort in ascending or descending
           order respectively. This character should be followed by a field name
           to sort on. When this is None, results are based on 'rank'. See
-          _exp_to_search_dict to see how rank is determined.
+          _get_search_rank to see how rank is determined.
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
           If there are more documents that match the query than 'limit', this

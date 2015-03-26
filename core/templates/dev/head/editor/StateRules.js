@@ -130,7 +130,7 @@ oppia.factory('rulesService', [
             _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
           ]
         };
-        if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+        if (newInteractionId && INTERACTION_SPECS[newInteractionId].is_terminal) {
           _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
         }
       }
@@ -285,7 +285,8 @@ oppia.controller('StateRules', [
 
         $scope.tmpRule = {
           definition: ($scope.canAddDefaultRule ? {
-            rule_type: 'default'
+            rule_type: 'default',
+            subject: 'answer'
           } : {
             rule_type: 'atomic',
             name: null,

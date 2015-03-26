@@ -30,7 +30,6 @@ class ParamSpec(object):
     """Value object for an exploration parameter specification."""
     def __init__(self, obj_type):
         self.obj_type = obj_type
-        self.validate()
 
     def to_dict(self):
         return {
@@ -57,7 +56,6 @@ class ParamChange(object):
         self._name = name
         self._generator_id = generator_id
         self._customization_args = customization_args
-        self.validate()
 
     @property
     def name(self):

@@ -170,6 +170,19 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 /*
+  Styles for the development mode indicator
+*/
+.oppia-dev-mode {
+  background-color: DarkSlateGray;
+  border-top-left-radius: 0.5em;
+  bottom: 0;
+  color: white;
+  padding: 5px;
+  position: fixed;
+  right: 0;
+}
+
+/*
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
@@ -637,6 +650,10 @@ md-card.oppia-gallery-tile {
 .oppia-gallery-tile-second-row {
   font-size: 90%;
 }
+.oppia-gallery-tile-ratings {
+  color: black;
+  letter-spacing: 5px;
+}
 
 .oppia-gallery-edit-btn {
   font-size: 12px;
@@ -853,9 +870,13 @@ md-card.oppia-gallery-tile {
   position: relative;
 }
 .oppia-editable-section:hover .oppia-state-content-display,
-.oppia-editable-section:hover .oppia-interaction-preview,
 .oppia-editable-section:hover .oppia-rule-preview {
   background: #eee;
+  border-radius: 4px;
+}
+
+.oppia-editable-section:hover .oppia-interaction-preview {
+  background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
 }
 
@@ -900,6 +921,7 @@ md-card.oppia-gallery-tile {
   margin-right: 5px;
 }
 
+.oppia-add-interaction-button,
 .oppia-add-rule-button {
   background-color: rgba(5,140,166,0.9);
   border: 0;
@@ -911,9 +933,12 @@ md-card.oppia-gallery-tile {
   width: 100%;
 }
 
-.oppia-add-rule-button:hover,
+.oppia-add-interaction-button:active,
+.oppia-add-interaction-button:focus,
+.oppia-add-interaction-button:hover,
 .oppia-add-rule-button:active,
-.oppia-add-rule-button:focus {
+.oppia-add-rule-button:focus,
+.oppia-add-rule-button:hover {
   background-color: rgba(5,140,166,1);
   color: white;
   opacity: 1;
@@ -1587,7 +1612,7 @@ div#ng-curtain {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 30px;
-  margin-top: 30px;
+  margin-top: 40px;
   padding: 30px 55px;
 }
 .oppia-page-card li {
@@ -1644,4 +1669,8 @@ div#ng-curtain {
   .oppia-page-heading {
     margin-left: 30px;
   }
+}
+
+.oppia-rating-star-active {
+  color: #DBEA00;
 }

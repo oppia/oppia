@@ -25,6 +25,13 @@ var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
+  createExplorationAndStartTutorial(name, category);
+  editor.exitTutorialIfNecessary();
+};
+
+// Creates a new exploration and wait for the exploration
+// tutorial to start.
+var createExplorationAndStartTutorial = function(name, category) {
   browser.get(general.GALLERY_URL_SUFFIX);
   element(by.css('.protractor-test-create-exploration')).click();
   protractor.getInstance().waitForAngular();
@@ -36,8 +43,6 @@ var createExploration = function(name, category) {
 
   // We now want to wait for the editor to fully load.
   protractor.getInstance().waitForAngular();
-
-  editor.exitTutorialIfNecessary();
 };
 
 // This will only work if all changes have been saved and there are no
@@ -52,6 +57,7 @@ var publishExploration = function() {
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(name, category, objective, language) {
   createExploration(name, category);
+  editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
   editor.addRule('TextInput', null, 'END', 'Default');
   editor.setObjective(objective);
@@ -122,6 +128,7 @@ var getExplorationPlaytesters = function() {
 };
 
 exports.createExploration = createExploration;
+exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.markExplorationAsFeatured = markExplorationAsFeatured;

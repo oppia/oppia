@@ -629,9 +629,6 @@ class State(object):
                 'received %s' % ruleset)
 
         interaction_handlers = [AnswerHandlerInstance('submit', [])]
-        generic_interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.interaction.id))
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -657,8 +654,10 @@ class State(object):
                         'last one should not be default rules.' % rule_dict)
 
                 # TODO(sll): Generalize this to Boolean combinations of rules.
-                matched_rule = generic_interaction.get_rule_by_name(
-                    'submit', rule_spec.definition['name'])
+                matched_rule = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        self.interaction.id
+                    ).get_rule_by_name('submit', rule_spec.definition['name']))
 
                 # Normalize and store the rule params.
                 # TODO(sll): Generalize this to Boolean combinations of rules.

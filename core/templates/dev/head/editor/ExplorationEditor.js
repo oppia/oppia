@@ -205,16 +205,13 @@ oppia.controller('ExplorationEditor', [
       }, 1000);
     }
   }, {
-    type: 'element',
-    selector: _ID_TUTORIAL_STATE_INTERACTION,
+    type: 'title',
     heading: 'Interaction',
     text: (
-      'Next, choose how you want the learner to respond by ' +
-      'selecting an <b>interaction type</b> from the drop down menu.<br><br>' +
-      'You can see a preview of the interaction below. <br><br>' +
-      'Then, after the learner responds, you can tell Oppia how to reply by ' +
-      'creating a <b>rule</b>.'),
-    placement: 'right'
+      'After telling Oppia what to say, choose how you want the learner to respond by ' +
+      'selecting an <b>interaction type</b>.' +
+      'Then, based on the learner\'s response, you can tell Oppia how to reply by ' +
+      'creating a <b>rule</b>.')
   }, {
     type: 'function',
     fn: function(isGoingForward) {

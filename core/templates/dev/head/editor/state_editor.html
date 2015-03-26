@@ -14,13 +14,12 @@
           <div id="tutorialStateContent" class="oppia-editor-card-section" style="padding-top: 40px; padding-bottom: 40px;">
             {% include 'editor/state_editor_content.html' %}
           </div>
-          <div style="background: rgba(5,140,166,0.1); border-top: 1px solid #eee; padding-top: 5px; padding-bottom: 1px;">
-            <div class="oppia-editor-card-section">
-              {% include 'editor/state_editor_interaction.html' %}
-            </div>
-          </div>
         </div>
       </md-card>
+
+      <div ng-show="isInteractionShown">
+        {% include 'editor/state_editor_interaction.html' %}
+      </div>
 
       <div ng-hide="!isInteractionIdSet || isCurrentStateTerminal">
         <div style="font-size: 16px; margin-top: 35px;">

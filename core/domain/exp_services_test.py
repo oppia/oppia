@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import user_services
@@ -373,9 +374,7 @@ states:
   %s:
     content:
     - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
+      value: ''
     interaction:
       customization_args:
         placeholder:
@@ -431,9 +430,7 @@ states:
   %s:
     content:
     - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
+      value: ''
     interaction:
       customization_args:
         placeholder:
@@ -557,11 +554,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
 
     _SAMPLE_INIT_STATE_CONTENT = ("""content:
 - type: text
-  value: Welcome to the Oppia editor!<br><br>Anything
-    you type here will be shown to the learner playing
-    your exploration.<br><br>If you need more help getting
-    started, check out the Help link in the navigation
-    bar.
+  value: ''
 interaction:
   customization_args:
     placeholder:
@@ -1701,6 +1694,30 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
+
+    def test_get_search_rank(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        days_since_beginning_of_time = (
+            (datetime.datetime.utcnow() - datetime.datetime(2013, 6, 30)).days)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time)
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time + 3000)
+
+        rating_services.assign_rating(self.OWNER_ID, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time + 3010)
+
+        rating_services.assign_rating(self.user_id_admin, self.EXP_ID, 2)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time + 3008)
 
 
 class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
