@@ -67,6 +67,78 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 oppia.factory('stateGraphArranger', [
     '$log', '$filter', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH', function(
         $log, $filter, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+
+  var MAX_INDENTATION_LEVEL = 2.5;
+
+  var _getGraphAsAdjacencyLists = function(nodes, links) {
+    var adjacencyLists = {};
+
+    for (var nodeId in nodes) {
+      adjacencyLists[nodeId] = [];
+    }
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].source !== links[i].target &&
+          adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
+        adjacencyLists[links[i].source].push(links[i].target);
+      }
+    }
+
+    return adjacencyLists;
+  };
+
+  var _getIndentationLevels = function(adjacencyLists, trunkNodeIds) {
+    var indentationLevels = [];
+
+    // Recursively find and indent the longest shortcut for the segment of
+    // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
+    // (inclusive). It's possible that this shortcut starts from a trunk
+    // node within this interval (A, say) and ends at a trunk node after
+    // this interval, in which case we indent all nodes from A + 1 onwards.
+    // NOTE: this mutates indentationLevels as a side-effect.
+    var indentLongestShortcut = function(startInd, endInd) {
+      if (startInd >= endInd || indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
+        return;
+      }
+
+      var bestSourceInd = -1;
+      var bestTargetInd = -1;
+
+      for (var sourceInd = startInd; sourceInd < endInd; sourceInd++) {
+        var sourceNodeId = trunkNodeIds[sourceInd];
+        for (var i = 0; i < adjacencyLists[sourceNodeId].length; i++) {
+          var possibleTargetInd = trunkNodeIds.indexOf(
+            adjacencyLists[sourceNodeId][i]);
+          if (possibleTargetInd !== -1 && sourceInd < possibleTargetInd) {
+            targetInd = Math.min(possibleTargetInd, endInd + 1);
+            if (targetInd - sourceInd > bestTargetInd - bestSourceInd) {
+              bestSourceInd = sourceInd;
+              bestTargetInd = targetInd;
+            }
+          }
+        }
+      }
+
+      if (bestTargetInd - bestSourceInd > 1) {
+        // Indent nodes in [bestSourceInd + 1, bestTargetInd - 1].
+        for (var i = bestSourceInd + 1; i < bestTargetInd; i++) {
+          indentationLevels[i] += 0.5;
+        }
+
+        // Recursively attempt to indent nodes before, within and after this
+        // interval.
+        indentLongestShortcut(startInd, bestSourceInd);
+        indentLongestShortcut(bestSourceInd + 1, bestTargetInd - 1);
+        indentLongestShortcut(bestTargetInd, endInd);
+      }
+    }
+
+    for (var i = 0; i < trunkNodeIds.length; i++) {
+      indentationLevels.push(0);
+    }
+    indentLongestShortcut(0, trunkNodeIds.length - 1);
+    return indentationLevels;
+  };
+
   return {
     // Returns an object representing the nodes of the graph. The keys of the
     // object are the node labels. The corresponding values are objects with
@@ -89,12 +161,65 @@ oppia.factory('stateGraphArranger', [
     //   - reachableFromEnd: whether there is a path from this node to the END node.
     //   - id: a unique id for the node.
     //   - label: the full label of the node.
-    computeLayout: function(nodes, links, initStateId, finalStateIds) {
-      // In this implementation, nodes are snapped to a grid. We first compute
-      // two additional internal variables for each node:
+    computeLayout: function(nodes, links, initNodeId, finalNodeIds) {
+      var adjacencyLists = _getGraphAsAdjacencyLists(nodes, links);
+
+      // Find a long path through the graph from the initial state to a terminal
+      // state via simple backtracking. Limit the algorithm to a constant number
+      // of calls in order to ensure that the calculation does not take too long.
+      var MAX_BACKTRACKING_CALLS = 1000;
+      var numBacktrackingCalls = 0;
+      var bestPath = [initNodeId];
+      // Note that this is a 'global variable' for the purposes of the backtracking
+      // computation.
+      var currentPath = [];
+
+      var _backtrack = function(currentNodeId) {
+        currentPath.push(currentNodeId);
+
+        // If the current node leads to no other nodes, we consider it a 'terminal state'.
+        if (adjacencyLists[currentNodeId].length === 0) {
+          if (currentPath.length > bestPath.length) {
+            bestPath = angular.copy(currentPath);
+          }
+        } else {
+          numBacktrackingCalls++;
+          if (numBacktrackingCalls <= MAX_BACKTRACKING_CALLS) {
+            for (var i = 0; i < adjacencyLists[currentNodeId].length; i++) {
+              if (currentPath.indexOf(adjacencyLists[currentNodeId][i]) === -1) {
+                _backtrack(adjacencyLists[currentNodeId][i]);
+              }
+            }
+          }
+        }
+
+        currentPath.pop();
+      }
+
+      _backtrack(initNodeId);
+
+      // In this implementation, nodes are aligned with a rectangular grid.
+      // We calculate two additional internal variables for each node in
+      // nodeData:
       //   - depth: its depth in the graph.
       //   - offset: its horizontal offset in the graph.
       // The depth and offset are measured in terms of grid squares.
+      //
+      // We first take the longest path through the graph (the 'trunk') and
+      // find the longest possible shortcuts within that path, then indent
+      // the nodes within those shortcuts and assign depths/offsets to them.
+      // The indentation is done by only half a node width, so that the nodes
+      // still feel 'close' together.
+      //
+      // After that, we traverse all remaining nodes via BFS and arrange them
+      // such that nodes that are immediate descendants of nodes in the trunk
+      // fall in the level just below their parent, and their children fall in
+      // the next level, etc. All these nodes are placed to the right of the
+      // trunk.
+      //
+      // NOTE: This algorithm does not work so well in clarifying articulation
+      // points and 'subclusters' within a graph. For an illustration of this,
+      // see the 'Parameterized Adventure' demo exploration.
       var SENTINEL_DEPTH = -1;
       var SENTINEL_OFFSET = -1;
 
@@ -107,13 +232,21 @@ oppia.factory('stateGraphArranger', [
         };
       }
 
-      // Do a breadth-first search to calculate the depths and offsets.
       var maxDepth = 0;
       var maxOffsetInEachLevel = {0: 0};
-      nodeData[initStateId].depth = 0;
-      nodeData[initStateId].offset = 0;
-      var seenNodes = [initStateId];
-      var queue = [initStateId];
+      var trunkNodesIndentationLevels = _getIndentationLevels(adjacencyLists, bestPath);
+
+      for (var i = 0; i < bestPath.length; i++) {
+        nodeData[bestPath[i]].depth = maxDepth;
+        nodeData[bestPath[i]].offset = trunkNodesIndentationLevels[i];
+        nodeData[bestPath[i]].reachable = true;
+        maxOffsetInEachLevel[maxDepth] = trunkNodesIndentationLevels[i];
+        maxDepth++;
+      }
+
+      // Do a breadth-first search to calculate the depths and offsets for other nodes.
+      var seenNodes = [initNodeId];
+      var queue = [initNodeId];
 
       while (queue.length > 0) {
         var currNodeId = queue[0];
@@ -121,29 +254,39 @@ oppia.factory('stateGraphArranger', [
 
         nodeData[currNodeId].reachable = true;
 
-        for (var i = 0; i < links.length; i++) {
-          // Assign depths and offsets to nodes only when they are first encountered.
-          if (links[i].source == currNodeId && seenNodes.indexOf(links[i].target) == -1) {
-            seenNodes.push(links[i].target);
-            nodeData[links[i].target].depth = nodeData[currNodeId].depth + 1;
-            nodeData[links[i].target].offset = (
-              nodeData[links[i].target].depth in maxOffsetInEachLevel ?
-              maxOffsetInEachLevel[nodeData[links[i].target].depth] + 1 : 0
-            );
+        for (var i = 0; i < adjacencyLists[currNodeId].length; i++) {
+          var linkTarget = adjacencyLists[currNodeId][i];
 
-            while (nodeData[links[i].target].offset >= MAX_NODES_PER_ROW) {
-              nodeData[links[i].target].depth += 1;
-              nodeData[links[i].target].offset = (
-                nodeData[links[i].target].depth in maxOffsetInEachLevel ?
-                maxOffsetInEachLevel[nodeData[links[i].target].depth] + 1 : 0
-              );
+          // If the target node is a trunk node, but isn't at the correct depth to
+          // process now, we ignore it for now and stick it back in the queue to
+          // be processed later.
+          if (bestPath.indexOf(linkTarget) !== -1 &&
+              nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1) {
+            if (seenNodes.indexOf(linkTarget) === -1 &&
+                queue.indexOf(linkTarget) === -1) {
+              queue.push(linkTarget);
+            }
+            continue;
+          }
+
+          // Assign depths and offsets to nodes only if we're processing them
+          // for the first time.
+          if (seenNodes.indexOf(linkTarget) === -1) {
+            seenNodes.push(linkTarget);
+
+            if (nodeData[linkTarget].depth === SENTINEL_DEPTH) {
+              nodeData[linkTarget].depth = nodeData[currNodeId].depth + 1;
+              nodeData[linkTarget].offset = (
+                nodeData[linkTarget].depth in maxOffsetInEachLevel ?
+                maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
+
+              maxDepth = Math.max(maxDepth, nodeData[linkTarget].depth);
+              maxOffsetInEachLevel[nodeData[linkTarget].depth] = nodeData[linkTarget].offset;
             }
 
-            maxDepth = Math.max(maxDepth, nodeData[links[i].target].depth);
-            maxOffsetInEachLevel[nodeData[links[i].target].depth] = (
-              nodeData[links[i].target].offset);
-
-            queue.push(links[i].target);
+            if (queue.indexOf(linkTarget) === -1) {
+              queue.push(linkTarget);
+            }
           }
         }
       }
@@ -157,20 +300,67 @@ oppia.factory('stateGraphArranger', [
           orphanedNodesExist = true;
           nodeData[nodeId].depth = maxDepth;
           nodeData[nodeId].offset = maxOffsetInEachLevel[maxDepth];
-          if (maxOffsetInEachLevel[maxDepth] + 1 >= MAX_NODES_PER_ROW) {
-            maxOffsetInEachLevel[maxDepth + 1] = 0;
-            maxDepth += 1;
-          } else {
-            maxOffsetInEachLevel[maxDepth] += 1;
-          }
+          maxOffsetInEachLevel[maxDepth] += 1;
         }
       }
       if (orphanedNodesExist) {
         maxDepth++;
       }
 
+      // Build the 'inverse index' -- for each row, store the (offset, nodeId)
+      // pairs in ascending order of offset.
+      var nodePositionsToIds = [];
+      for (var i = 0; i <= maxDepth; i++) {
+        nodePositionsToIds.push([]);
+      }
+      for (var nodeId in nodeData) {
+        if (nodeData[nodeId].depth !== SENTINEL_DEPTH) {
+          nodePositionsToIds[nodeData[nodeId].depth].push({
+            offset: nodeData[nodeId].offset,
+            nodeId: nodeId
+          });
+        }
+      }
+      for (var i = 0; i <= maxDepth; i++) {
+        nodePositionsToIds[i].sort(function(a, b) {
+          return a.offset - b.offset;
+        });
+      }
+
+      // Recalculate the node depths and offsets, taking into account MAX_NODES_PER_ROW.
+      // If there are too many nodes in a row, we overflow them into the next one.
+      var currentDepth = 0;
+      var currentLeftMargin = 0;
+      var currentLeftOffset = 0;
+      for (var i = 0; i <= maxDepth; i++) {
+        if (nodePositionsToIds[i].length > 0) {
+          // currentLeftMargin represents the offset of the leftmost node at this depth.
+          // If there are too many nodes in this depth, this variable is used to figure
+          // out which offset to start the continuation rows from.
+          currentLeftMargin = nodePositionsToIds[i][0].offset;
+          // currentLeftOffset represents the offset of the current node under
+          // consideration.
+          currentLeftOffset = currentLeftMargin;
+
+          for (var j = 0; j < nodePositionsToIds[i].length; j++) {
+            var computedOffset = currentLeftOffset;
+            if (computedOffset >= MAX_NODES_PER_ROW) {
+              currentDepth++;
+              computedOffset = currentLeftMargin + 1;
+              currentLeftOffset = computedOffset;
+            }
+
+            nodeData[nodePositionsToIds[i][j].nodeId].depth = currentDepth;
+            nodeData[nodePositionsToIds[i][j].nodeId].offset = currentLeftOffset;
+
+            currentLeftOffset += 1;
+          }
+          currentDepth++;
+        }
+      }
+
       // Calculate the width and height of each grid rectangle.
-      var totalRows = maxDepth;
+      var totalRows = currentDepth;
       // Set totalColumns to be MAX_NODES_PER_ROW, so that the width of the graph
       // visualization can be calculated based on a fixed constant, MAX_NODES_PER_ROW.
       // Otherwise, the width of the individual nodes is dependent on the number
@@ -238,9 +428,9 @@ oppia.factory('stateGraphArranger', [
       }
 
       // Mark nodes that are reachable from any end state via backward links.
-      queue = finalStateIds;
-      for (var i = 0; i < finalStateIds.length; i++) {
-        nodeData[finalStateIds[i]].reachableFromEnd = true;
+      queue = finalNodeIds;
+      for (var i = 0; i < finalNodeIds.length; i++) {
+        nodeData[finalNodeIds[i]].reachableFromEnd = true;
       }
       while (queue.length > 0) {
         var currNodeId = queue[0];
