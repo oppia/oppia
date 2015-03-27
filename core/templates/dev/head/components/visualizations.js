@@ -96,7 +96,7 @@ oppia.factory('stateGraphArranger', [
     // this interval, in which case we indent all nodes from A + 1 onwards.
     // NOTE: this mutates indentationLevels as a side-effect.
     var indentLongestShortcut = function(startInd, endInd) {
-      if (indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
+      if (startInd >= endInd || indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
         return;
       }
 
