@@ -33,36 +33,94 @@ describe('Expression evaluator service', function() {
     },
   ];
 
+  it('should get params used in expressions', function() {
+    [
+      ['numZero', ['numZero']],
+      ['b + a', ['a', 'b']],
+      ['a + b + a', ['a', 'b']],
+      ['+10', []],
+      ['2   + 10', []],
+      ['num100_001   + numZero', ['num100_001', 'numZero']],
+      ['20 - num100_001', ['num100_001']],
+      ['0x100 - 256', []],
+      ['!strNull', ['strNull']],
+      ['1 - 2 * 3', []],
+      ['num100_001 / 0.1', ['num100_001']],
+      ['floor((numZero + num100_001)/2)', ['num100_001', 'numZero']],
+      ['23 % 5', []],
+      ['1 <= numZero || 1 >= numZero', ['numZero']],
+      ['100 < num100_001 && 1 > num100_001', ['num100_001']],
+      ['boolTrue == boolFalse', ['boolFalse', 'boolTrue']],
+      ['strNull != strXYZ', ['strNull', 'strXYZ']],
+      ['if boolFalse then boolTrue else numZero', ['boolFalse', 'boolTrue', 'numZero']],
+      ['num100_001 / 0', ['num100_001']],
+      ['abs(-3)', []],
+      ['pow(num100_001, numZero)', ['num100_001', 'numZero']],
+      ['log(9, 3)', []],
+      ['numZero + numOne', ['numOne', 'numZero']],
+    ].forEach(function(test) {
+      var expression = test[0];
+      var expectedParams = test[1];
+
+      var parsed = typeof(expression) == 'string' ?
+          eps.parse(expression) : expression;
+      var parsed_json = JSON.stringify(parsed);
+      var failed = false;
+
+      var recordFailure = function(params, exception) {
+        console.error('input           : ' + expression);
+        console.error('parsed          : ' + parsed_json);
+        console.error('expected        : ' + JSON.stringify(expectedParams));
+        if (params !== undefined) {
+          console.error('evaluated       : ' + params);
+        } else {
+          console.error('exception       : ' + exception);
+        }
+        failed = true;
+      }
+
+      try {
+        var params = ees.getParamsUsedInExpression(expression);
+        if (!angular.equals(params, expectedParams)) {
+          recordFailure(params, undefined);
+        }
+      } catch (e) {
+        recordFailure(undefined, e);
+      }
+      expect(failed).toBe(false);
+    });
+  });
+
   it('should evaluate to correct values', function() {
     [
-      [0, 'numZero'],
-      [10, '+10'],
-      [12, '2   + 10'],
-      [100.001, 'num100_001   + numZero'],
-      [-80.001, '20 - num100_001'],
-      [0, '0x100 - 256'],
-      [true, '!strNull'],
-      [-5, '1 - 2 * 3'],
-      [1000.01, 'num100_001 / 0.1'],
-      [50, 'floor((numZero + num100_001)/2)'],
-      [3, '23 % 5'],
-      [true, '1 <= numZero || 1 >= numZero'],
-      [false, '100 < num100_001 && 1 > num100_001'],
-      [false, 'boolTrue == boolFalse'],
-      [true, 'strNull != strXYZ'],
-      [0, 'if boolFalse then boolTrue else numZero'],
-      [Infinity, 'num100_001 / 0'],
-      [3, 'abs(-3)'],
-      [1, 'pow(num100_001, numZero)'],
-      [2, 'log(9, 3)'],
-      [ees.ExprUndefinedVarError, 'numZero + numOne'],
-      [ees.ExprWrongNumArgsError, ['+', 10, 20, 30]],
-      [ees.ExprWrongNumArgsError, ['==', true]],
-      [ees.ExprWrongArgTypeError, ['+', 'abc', 1]],
+      ['numZero', 0],
+      ['+10', 10],
+      ['2   + 10', 12],
+      ['num100_001   + numZero', 100.001],
+      ['20 - num100_001', -80.001],
+      ['0x100 - 256', 0],
+      ['!strNull', true],
+      ['1 - 2 * 3', -5],
+      ['num100_001 / 0.1', 1000.01],
+      ['floor((numZero + num100_001)/2)', 50],
+      ['23 % 5', 3],
+      ['1 <= numZero || 1 >= numZero', true],
+      ['100 < num100_001 && 1 > num100_001', false],
+      ['boolTrue == boolFalse', false],
+      ['strNull != strXYZ', true],
+      ['if boolFalse then boolTrue else numZero', 0],
+      ['num100_001 / 0', Infinity],
+      ['abs(-3)', 3],
+      ['pow(num100_001, numZero)', 1],
+      ['log(9, 3)', 2],
+      ['numZero + numOne', ees.ExprUndefinedVarError],
+      [['+', 10, 20, 30], ees.ExprWrongNumArgsError],
+      [['==', true], ees.ExprWrongNumArgsError],
+      [['+', 'abc', 1], ees.ExprWrongArgTypeError],
 
     ].forEach(function(test) {
-      var expected = test[0];
-      var expression = test[1];
+      var expression = test[0];
+      var expected = test[1];
 
       // 'expected' should be either a JavaScript primitive value that would be the
       // result of evaluation 'expression', or an exception that is expected to be

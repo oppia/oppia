@@ -64,5 +64,14 @@ describe('Expression interpolation service', function() {
       expect(expressionInterpolationService.processUnicode(
         'abc{{a+b}}', [{'a': '1', 'b': 'hello'}])).toBeNull();
     });
+
+    it('should correctly get params from strings', function() {
+      expect(expressionInterpolationService.getParamsFromString(
+        'abc')).toEqual([]);
+      expect(expressionInterpolationService.getParamsFromString(
+        'abc{{a}}')).toEqual(['a']);
+      expect(expressionInterpolationService.getParamsFromString(
+        'abc{{a+b}}')).toEqual(['a', 'b']);
+    });
   });
 });

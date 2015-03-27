@@ -944,8 +944,11 @@ oppia.constant('WARNING_TYPES', {
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
-    '$filter', 'graphDataService', 'explorationStatesService', 'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-    function($filter, graphDataService, explorationStatesService, explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES) {
+    '$filter', 'graphDataService', 'explorationStatesService',
+    'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
+    function(
+      $filter, graphDataService, explorationStatesService,
+      explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES) {
   var _warningsList = [];
 
   var _getStatesWithoutInteractionIds = function() {
@@ -1003,6 +1006,18 @@ oppia.factory('explorationWarningsService', [
         target: link.source
       };
     });
+  };
+
+  // Verify that all parameters referred to in a state are guaranteed to
+  // have been set beforehand.
+  var _verifyParameters = function() {
+    // TODO(sll): For each node in the graph, determine:
+    // - what params are referenced and set in it
+    // - for all referenced params, do all start --> node paths set this param?
+    // The second point can be calculated as follows: if we ignore all nodes
+    // that set this param, there should be no way to get from the start node to the
+    // node in question. This can be done with n BFS's, and is O(n(n + m)) where
+    // n is the number of nodes and m is the number of edges.
   };
 
   var _updateWarningsList = function() {
