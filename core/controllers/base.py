@@ -90,6 +90,26 @@ SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
         'icon_filename': 'comment.png',
     }])
 
+SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
+    'social_media_buttons', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'link',
+                'description': 'The link to open in a new tab',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'icon_filename',
+                'description': (
+                    'Filename of the social media icon (in /images/social)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Links and icon filenames for the social media buttons in the sidebar.',
+    default_value=[])
+
 
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
@@ -350,6 +370,7 @@ class BaseHandler(webapp2.RequestHandler):
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
             'SIDEBAR_MENU_ADDITIONAL_LINKS': (
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
+            'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
         })
 
         if redirect_url_on_logout is None:

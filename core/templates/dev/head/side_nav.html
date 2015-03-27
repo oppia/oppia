@@ -38,19 +38,15 @@
       </li>
     {% endfor %}
   </ul>
+
   <div class="oppia-sidebar-footer">
-    <div>Follow Us:</div>
-    <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
-      <img src="/images/general/gplus.png">
-    </a>
-    <a href="https://www.youtube.com" target="_blank">
-      <img src="/images/general/youtube.png">
-    </a>
-    <a href="https://www.facebook.com/oppiaorg" target="_blank">
-      <img src="/images/general/fb.png">
-    </a>
-    <a href="https://twitter.com/oppiaorg" target="_blank">
-      <img src="/images/general/twitter.png">
-    </a>
+    {% if SOCIAL_MEDIA_BUTTONS %}
+      <div>Follow Us:</div>
+      {% for button in SOCIAL_MEDIA_BUTTONS %}
+        <a href="{{button['link']}}" target="_blank">
+          <img src="/images/social/{{button['icon_filename']}}">
+        </a>
+      {% endfor %}
+    {% endif %}
   </div>
 </nav>
