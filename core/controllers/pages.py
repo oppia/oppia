@@ -26,6 +26,10 @@ from core.domain import config_domain
 import feconf
 
 
+ABOUT_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
+    'about_page_youtube_video_id', {'type': 'unicode'},
+    'The (optional) video id for the About page',
+    default_value='')
 ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
     'admin_email_address', {'type': 'unicode'},
     'The admin email address to display on the About pages',
@@ -49,6 +53,7 @@ class AboutPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'ABOUT_EXPLORATION_ID': _ABOUT_EXPLORATION_ID,
+            'ABOUT_PAGE_YOUTUBE_VIDEO_ID': ABOUT_PAGE_YOUTUBE_VIDEO_ID.value,
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
             'MODERATOR_REQUEST_FORUM_URL': (
                 editor.MODERATOR_REQUEST_FORUM_URL.value),
