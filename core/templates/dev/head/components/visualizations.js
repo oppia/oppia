@@ -91,7 +91,9 @@ oppia.factory('stateGraphArranger', [
 
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
-    // (inclusive).
+    // (inclusive). It's possible that this shortcut starts from a trunk
+    // node within this interval (A, say) and ends at a trunk node after
+    // this interval, in which case we indent all nodes from A + 1 onwards.
     // NOTE: this mutates indentationLevels as a side-effect.
     var indentLongestShortcut = function(startInd, endInd) {
       if (indentationLevels[startInd] >= MAX_INDENTATION_LEVEL) {
@@ -104,9 +106,10 @@ oppia.factory('stateGraphArranger', [
       for (var sourceInd = startInd; sourceInd < endInd; sourceInd++) {
         var sourceNodeId = trunkNodeIds[sourceInd];
         for (var i = 0; i < adjacencyLists[sourceNodeId].length; i++) {
-          if (trunkNodeIds.indexOf(adjacencyLists[sourceNodeId][i]) !== -1) {
-            var targetInd = trunkNodeIds.indexOf(adjacencyLists[sourceNodeId][i]);
-
+          var possibleTargetInd = trunkNodeIds.indexOf(
+            adjacencyLists[sourceNodeId][i]);
+          if (possibleTargetInd !== -1 && sourceInd < possibleTargetInd) {
+            targetInd = Math.min(possibleTargetInd, endInd + 1);
             if (targetInd - sourceInd > bestTargetInd - bestSourceInd) {
               bestSourceInd = sourceInd;
               bestTargetInd = targetInd;
@@ -331,7 +334,12 @@ oppia.factory('stateGraphArranger', [
       var currentLeftOffset = 0;
       for (var i = 0; i <= maxDepth; i++) {
         if (nodePositionsToIds[i].length > 0) {
+          // currentLeftMargin represents the offset of the leftmost node at this depth.
+          // If there are too many nodes in this depth, this variable is used to figure
+          // out which offset to start the continuation rows from.
           currentLeftMargin = nodePositionsToIds[i][0].offset;
+          // currentLeftOffset represents the offset of the current node under
+          // consideration.
           currentLeftOffset = currentLeftMargin;
 
           for (var j = 0; j < nodePositionsToIds[i].length; j++) {
