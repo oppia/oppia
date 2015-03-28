@@ -27,15 +27,6 @@
 
 {% block local_top_nav_options %}
 
-  <!-- Required for Twitter share dialog popup -->
-  <script>
-    function twitterPopup(url) {
-      newWindow=window.open(url, 'name', 'height=400, width=600');
-      if (window.focus) { newWindow.focus() }
-      return false;
-    }
-  </script>
-
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
     <li class="dropdown">
       <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
@@ -47,25 +38,28 @@
              onclick="javascript:window.open(this.href,
                       '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
              tooltip="Google+" tooltip-placement="left">
-            <img src="https://www.gstatic.com/images/icons/gplus-64.png"
-                 alt="Share on Google+"/>
+            <img src="/images/general/gplus.png"
+                 alt="Google+"/>
           </a>
         </li>
         <li>
-          <!-- TODO (wagnerdmike) Create and replace facebook app_id  -->
-          <a onclick="return !window.open(this.href, 'Share on Facebook', 'width=640, height=536')" href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" target="_window" tooltip="Facebook" tooltip-placement="left">
+          <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button"
+             onclick="return !window.open(this.href, 'Share on Facebook', 'width=640, height=336')"
+             target="_window" tooltip="Facebook"
+             tooltip-placement="left">
             <img src='/images/general/fb.png' alt="Facebook" />
           </a>
         </li>
         <li>
-          <a class="twitter" onClick="return twitterPopup('http://twitter.com/share?url=<[serverName]>/explore/<[explorationId]>&text=Check%20out%20this%20exploration%20in%20Oppia!')"
-             href="http://twitter.com/share?url=<[serverName]>/explore/<[explorationId]>&text=Check%20out%20this%20exploration%20in%20Oppia!"
+          <a ng-href="http://twitter.com/share?text=Check%20out%20this%20interactive%20lesson%20from%20Oppia.org%20-%20a%20free,%20open-source%20learning%20platform%21&url=<[serverName]>/explore/<[explorationId]>"
+             onclick="return !window.open(this.href, 'Share on Twitter', 'width=640, height=336')"
              data-layout="icon" tooltip="Twitter"
              tooltip-placement="left">
             <img src="/images/general/twitter.png" alt="Twitter">
           </a>
         <li>
-          <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
+          <a href="" ng-click="showEmbedExplorationModal(explorationId)"
+             tooltip="Embed" tooltip-placement="left">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
           </a>
         </li>
@@ -77,21 +71,13 @@
       </a>
     </li>
     {% if can_edit %}
-
       <li>
-        <a href="" tooltip="Feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
-          <span class="glyphicon glyphicon-comment"></span>
+        <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+          <span class="glyphicon glyphicon-pencil"></span>
         </a>
       </li>
-      {% if can_edit %}
-        <li>
-          <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
-            <span class="glyphicon glyphicon-pencil"></span>
-          </a>
-        </li>
-      {% endif %}
-    </ul>
-  </div>
+    {% endif %}
+  </ul>
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -166,7 +152,6 @@
   </script>
 
   {% include 'components/exploration_embed_button.html' %}
-  {% include 'components/ratings.html' %}
 {% endblock %}
 
 {% block footer_js %}
@@ -175,7 +160,6 @@
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
-    {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 

@@ -595,7 +595,7 @@ oppia.controller('LearnerLocalNav', [
   });
   $scope.$on('ratingServiceInitialized', function() {
     $scope.userRating = ratingService.getUserRating();
-  })
+  });
 
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
