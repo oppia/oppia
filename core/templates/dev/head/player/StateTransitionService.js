@@ -80,8 +80,8 @@ oppia.factory('expressionInterpolationService', [
       }
     },
     // This works for both unicode and HTML.
-    getParamsFromString: function(sourceHtml) {
-      var matches = sourceHtml.match(/{{([^}]*)}}/g) || [];
+    getParamsFromString: function(sourceString) {
+      var matches = sourceString.match(/{{([^}]*)}}/g) || [];
 
       var allParams = [];
       for (var i = 0; i < matches.length; i++) {

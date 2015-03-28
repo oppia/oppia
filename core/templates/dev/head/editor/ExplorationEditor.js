@@ -33,8 +33,8 @@ oppia.controller('ExplorationEditor', [
   'explorationInitStateNameService', 'editabilityService',
   'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
-  'explorationParamSpecsService', 'explorationWarningsService',
-  '$templateCache',
+  'explorationParamSpecsService', 'explorationParamChangesService',
+  'explorationWarningsService', '$templateCache',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -43,7 +43,8 @@ oppia.controller('ExplorationEditor', [
     explorationInitStateNameService, editabilityService,
     explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
-    explorationParamSpecsService, explorationWarningsService, $templateCache) {
+    explorationParamSpecsService, explorationParamChangesService,
+    explorationWarningsService, $templateCache) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
@@ -97,6 +98,7 @@ oppia.controller('ExplorationEditor', [
       explorationLanguageCodeService.init(data.language_code);
       explorationInitStateNameService.init(data.init_state_name);
       explorationParamSpecsService.init(data.param_specs);
+      explorationParamChangesService.init(data.param_changes || []);
 
       $scope.explorationTitleService = explorationTitleService;
       $scope.explorationCategoryService = explorationCategoryService;

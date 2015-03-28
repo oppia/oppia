@@ -541,6 +541,17 @@ oppia.factory('explorationParamSpecsService', [
   return child;
 }]);
 
+oppia.factory('explorationParamChangesService', [
+    'explorationPropertyService', function(explorationPropertyService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'param_changes';
+  child._isValid = function(value) {
+    return true;
+  };
+  return child;
+}]);
+
+
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
@@ -945,9 +956,11 @@ oppia.constant('WARNING_TYPES', {
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
     '$filter', 'graphDataService', 'explorationStatesService',
+    'expressionInterpolationService', 'explorationParamChangesService',
     'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
     function(
       $filter, graphDataService, explorationStatesService,
+      expressionInterpolationService, explorationParamChangesService,
       explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES) {
   var _warningsList = [];
 
@@ -1008,16 +1021,226 @@ oppia.factory('explorationWarningsService', [
     });
   };
 
+  var PARAM_ACTION_GET = 'get';
+  var PARAM_ACTION_SET = 'set';
+
+  var PARAM_SOURCE_ANSWER = 'answer';
+  var PARAM_SOURCE_CONTENT = 'content';
+  var PARAM_SOURCE_FEEDBACK = 'feedback';
+  var PARAM_SOURCE_PARAM_CHANGES = 'param_changes';
+
+  var _getMetadataFromParamChanges = function(paramChanges) {
+    var result = [];
+
+    for (var i = 0; i < paramChanges.length; i++) {
+      var pc = paramChanges[i];
+
+      if (pc.generator_id === 'Copier') {
+        if (!pc.customization_args.parse_with_jinja) {
+          result.push({
+            action: PARAM_ACTION_SET,
+            paramName: pc.name,
+            source: PARAM_SOURCE_PARAM_CHANGES,
+            sourceInd: i
+          });
+        } else {
+          var paramsReferenced = expressionInterpolationService.getParamsFromString(
+            pc.customization_args.value);
+          for (var j = 0; j < paramsReferenced.length; j++) {
+            result.push({
+              action: PARAM_ACTION_GET,
+              paramName: paramsReferenced[j],
+              source: PARAM_SOURCE_PARAM_CHANGES,
+              sourceInd: i
+            });
+          }
+
+          result.push({
+            action: PARAM_ACTION_SET,
+            paramName: pc.name,
+            source: PARAM_SOURCE_PARAM_CHANGES,
+            sourceInd: i
+          });
+        }
+      } else {
+        // RandomSelector. Elements in the list of possibilities are treated
+        // as raw unicode strings, not expressions.
+        result.push({
+          action: PARAM_ACTION_SET,
+          paramName: pc.name,
+          source: PARAM_SOURCE_PARAM_CHANGES,
+          sourceInd: i
+        });
+      }
+    }
+
+    return result;
+  };
+
+  // Returns a list of set/get actions for parameters in the given state, in the
+  // order that they occur.
+  // TODO(sll): Add trace data (so that it's easy to figure out in which rule
+  // an issue occurred, say).
+  var _getStateParamMetadata = function(state) {
+    // First, the state param changes are applied: we get their values
+    // and set the params.
+    var result = _getMetadataFromParamChanges(state.param_changes);
+
+    // Next, the content is evaluated.
+    expressionInterpolationService.getParamsFromString(
+        state.content[0].value).forEach(function(paramName) {
+      result.push({
+        action: PARAM_ACTION_GET,
+        paramName: paramName,
+        source: PARAM_SOURCE_CONTENT
+      });
+    });
+
+    // Next, the answer is received.
+    result.push({
+      action: PARAM_ACTION_SET,
+      paramName: 'answer',
+      source: PARAM_SOURCE_ANSWER
+    });
+
+    // Finally, the rule feedback strings are evaluated.
+    state.interaction.handlers.forEach(function(handler) {
+      handler.rule_specs.forEach(function(ruleSpec) {
+        for (var k = 0; k < ruleSpec.feedback.length; k++) {
+          expressionInterpolationService.getParamsFromString(
+              ruleSpec.feedback[k]).forEach(function(paramName) {
+            result.push({
+              action: PARAM_ACTION_GET,
+              paramName: paramName,
+              source: PARAM_SOURCE_FEEDBACK,
+              sourceInd: k
+            });
+          });
+        }
+      });
+    });
+
+    return result;
+  };
+
+  // Returns one of null, PARAM_ACTION_SET, PARAM_ACTION_GET depending on
+  // whether this parameter is not used at all in this state, or
+  // whether its first occurrence is a 'set' or 'get'.
+  var _getParamStatus = function(stateParamMetadata, paramName) {
+    for (var i = 0; i < stateParamMetadata.length; i++) {
+      if (stateParamMetadata[i].paramName === paramName) {
+        return stateParamMetadata[i].action;
+      }
+    }
+    return null;
+  };
+
   // Verify that all parameters referred to in a state are guaranteed to
   // have been set beforehand.
-  var _verifyParameters = function() {
-    // TODO(sll): For each node in the graph, determine:
-    // - what params are referenced and set in it
-    // - for all referenced params, do all start --> node paths set this param?
-    // The second point can be calculated as follows: if we ignore all nodes
-    // that set this param, there should be no way to get from the start node to the
-    // node in question. This can be done with n BFS's, and is O(n(n + m)) where
-    // n is the number of nodes and m is the number of edges.
+  var _verifyParameters = function(initNodeIds, nodes, edges) {
+    var _states = explorationStatesService.getStates();
+
+    // Determine all parameter names that are used within this exploration.
+    var allParamNames = [];
+    var explorationParamMetadata = _getMetadataFromParamChanges(
+      explorationParamChangesService.savedMemento);
+    var stateParamMetadatas = {
+      'END': []
+    };
+
+    explorationParamMetadata.forEach(function(explorationParamMetadataItem) {
+      if (allParamNames.indexOf(explorationParamMetadataItem.paramName) === -1) {
+        allParamNames.push(explorationParamMetadataItem.paramName);
+      }
+    });
+
+    for (var stateName in _states) {
+      stateParamMetadatas[stateName] = _getStateParamMetadata(_states[stateName]);
+      for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
+        var pName = stateParamMetadatas[stateName][i].paramName;
+        if (allParamNames.indexOf(pName) === -1) {
+          allParamNames.push(pName);
+        }
+      }
+    }
+
+    // For each parameter, see if it's possible to get from the start node
+    // to a node requiring this param, without passing through any nodes
+    // that sets this param. Each of these requires a BFS.
+    // TODO(sll): Ensure that there is enough trace information provided to make
+    // any errors clear.
+    var paramWarningsList = [];
+
+    for (var paramInd = 0; paramInd < allParamNames.length; paramInd++) {
+      var paramName = allParamNames[paramInd];
+      var error = null;
+
+      var paramStatusAtOutset = _getParamStatus(explorationParamMetadata, paramName);
+      if (paramStatusAtOutset === PARAM_ACTION_GET) {
+        paramWarningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Please ensure the value of parameter "' + paramName + '" is set ' +
+            'before it is referred to in the initial list of parameter changes.')
+        });
+        continue;
+      } else if (paramStatusAtOutset === PARAM_ACTION_SET) {
+        // This parameter will remain set for the entirety of the exploration.
+        continue;
+      }
+
+      var queue = [];
+      var seen = {};
+      for (var i = 0; i < initNodeIds.length; i++) {
+        seen[initNodeIds[i]] = true;
+        var paramStatus = _getParamStatus(
+          stateParamMetadatas[initNodeIds[i]], paramName);
+        if (paramStatus === PARAM_ACTION_GET) {
+          error = {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure the value of parameter "' + paramName +
+              '" is set before using it in "' + initNodeIds[i] + '".')
+          };
+          break;
+        } else if (!paramStatus) {
+          queue.push(initNodeIds[i]);
+        }
+      }
+
+      if (error) {
+        paramWarningsList.push(error);
+        continue;
+      }
+
+      while (queue.length > 0) {
+        var currNodeId = queue.shift();
+        for (var i = 0; i < edges.length; i++) {
+          var edge = edges[i];
+          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
+            seen[edge.target] = true;
+            paramStatus = _getParamStatus(stateParamMetadatas[edge.target], paramName);
+            if (paramStatus === PARAM_ACTION_GET) {
+              error = {
+                type: WARNING_TYPES.CRITICAL,
+                message: (
+                  'Please ensure the value of parameter "' + paramName +
+                  '" is set before using it in "' + edge.target + '".')
+              };
+              break;
+            } else if (!paramStatus) {
+              queue.push(edge.target);
+            }
+          }
+        };
+      }
+
+      if (error) {
+        paramWarningsList.push(error);
+      }
+    }
+
+    return paramWarningsList;
   };
 
   var _updateWarningsList = function() {
@@ -1067,6 +1290,9 @@ oppia.factory('explorationWarningsService', [
           });
         }
       }
+
+      _warningsList = _warningsList.concat(_verifyParameters(
+        [_graphData.initStateId], _graphData.nodes, _graphData.links));
     }
 
     var _states = explorationStatesService.getStates();
