@@ -14,11 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for methods in gadget registry.
-
-Placeholder for development.
-
-"""
+"""Tests for methods in gadget registry."""
 
 __author__ = 'Michael Anuzis'
 
@@ -31,7 +27,7 @@ import feconf
 
 
 class GadgetRegistryUnitTests(test_utils.GenericTestBase):
-    """Test for the interaction registry."""
+    """Test for the gadget registry."""
 
     def test_allowed_gadgets_and_counts(self):
         """Do sanity checks on the ALLOWED_GADGETS dict in feconf.py."""

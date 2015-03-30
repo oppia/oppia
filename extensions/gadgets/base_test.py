@@ -86,7 +86,7 @@ class GadgetUnitTests(test_utils.GenericTestBase):
         return names
 
     def test_gadget_properties(self):
-        """Test the standard properties of gadget."""
+        """Test the standard properties of gadgets."""
 
         ADVICE_BAR_ID = 'AdviceBar'
 

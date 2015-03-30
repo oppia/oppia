@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for extensions.
-
-"""
+"""Domain objects used within multiple extensions."""
 
 __author__ = 'Michael Anuzis'
 

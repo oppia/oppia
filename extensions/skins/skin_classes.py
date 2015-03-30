@@ -112,12 +112,12 @@ class GadgetPanelSpec(object):
         """
         Args:
         - name: str. Unique name that identifies this panel in the skin.
-        - width: int. Width in pixels
-        - height: int. Height in pixels
-        - stackable_axis: str. Specifies axis multiple gadgets are added along
-          Valid options: [AXIS_HORIZONTAL, AXIS_VERTICAL]
-        - pixels_between_gadgets: int. number of pixels spacing between gadgets
-        - max_gadgets: int. maximum number of gadgets this panel supports.
+        - width: int. Width of panel, in pixels.
+        - height: int. Height of panel, in pixels.
+        - stackable_axis: str. Specifies axis multiple gadgets extend along.
+            Valid options: [AXIS_HORIZONTAL, AXIS_VERTICAL]
+        - pixels_between_gadgets: int. Number of pixels spacing between gadgets
+        - max_gadgets: int. Maximum number of gadgets this panel supports.
         """
         self._name = name
         self._width = width
@@ -142,7 +142,7 @@ class GadgetPanelSpec(object):
                 "'%s' panel expected at most %d gadget%s, received %d." % (
                     self._name,
                     self._max_gadgets,
-                    's' if self._max_gadgets > 1 else '',
+                    's' if self._max_gadgets != 1 else '',
                     len(gadget_list)))
 
         # Calculate total width and height of gadgets given custom args and

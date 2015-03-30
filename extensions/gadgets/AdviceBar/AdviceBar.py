@@ -61,7 +61,7 @@ class AdviceBar(base.BaseGadget):
     _MAX_TIP_COUNT = 3
 
     # TODO(anuzis): position image for delivery.
-    _ADVICE_ICON = 'AdviceBarTipIcon.png'
+    _ADVICE_ICON_FILENAME = 'AdviceBarTipIcon.png'
 
     # Constants for calculation of height and width.
     _FIXED_AXIS_BASE_LENGTH = 100

@@ -78,7 +78,7 @@ DEFAULT_RULE_NAME = 'Default'
 
 # Default valid parameter for instantiating Explorations when explicit
 # skin customizations aren't provided.
-DEFAULT_SKIN_CUSTOMIZATION = {'panels_contents': {}}
+DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded

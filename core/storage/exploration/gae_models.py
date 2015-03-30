@@ -71,10 +71,10 @@ class ExplorationModel(base_models.VersionedModel):
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = ndb.StringProperty(default='conversation_v1')
 
-    # Schema storing specifications on the contents of any gadget panels,
+    # Schema storing specifications of the contents of any gadget panels,
     # along with associated customizations for each gadget instance.
     skin_customizations = ndb.JsonProperty(
-        default=feconf.DEFAULT_SKIN_CUSTOMIZATION,
+        default=feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
         indexed=False)
 
     # The name of the initial state of this exploration.

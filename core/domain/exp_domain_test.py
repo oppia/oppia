@@ -25,6 +25,13 @@ from core.tests import test_utils
 import feconf
 import utils
 
+# Dictionary-like data structures within sample YAML must be formatted
+# alphabetically to match string equivalence with the YAML generation
+# methods tested below.
+#
+# If evaluating differences in YAML, conversion to dict form via
+# utils.dict_from_yaml can isolate differences quickly.
+
 SAMPLE_YAML_CONTENT = (
 """author_notes: ''
 blurb: ''
@@ -88,40 +95,46 @@ schema_version: 5
 skill_tags: []
 skin_customizations:
   panels_contents:
-    left:
-      - gadget_id: AdviceBar
+    bottom:
+      - customization_args:
+          initialValue:
+            value: 20
+          title:
+            value: Friend Interest
+        gadget_id: ScoreBar
         visible_in_states:
           - New state
-        customization_args:
-          title:
-            value: Tips
+          - Second state
+    left:
+      - customization_args:
+          advice_objects:
+            value:
+              - advice_text: To start out, try ABC or DEF!
+                advice_title: Starting Out
+              - advice_text: Multiples are numbers that ABC, DEF...
+                advice_title: What are multiples?
           default_icon:
             value: DefaultAdviceBarIcon.png
           orientation:
             value: vertical
-          advice_objects:
-            value:
-              - advice_title: Starting Out
-                advice_text: To start out, try ABC or DEF!
-              - advice_title: What are multiples?
-                advice_text: Multiples are numbers that ABC, DEF...
-    right: []
-    bottom:
-      - gadget_id: ScoreBar
+          title:
+            value: Tips
+        gadget_id: AdviceBar
         visible_in_states:
           - New state
-        customization_args:
-          title:
-            value: Friend Interest
-          initialValue:
-            value: 20
+          - Second state
+    right: []
 states:
   %s:
     content:
     - type: text
       value: ''
     interaction:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -137,13 +150,37 @@ states:
     - type: text
       value: ''
     interaction:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
         - definition:
             rule_type: default
           dest: New state
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  Second state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Second state
           feedback: []
           param_changes: []
       id: TextInput
@@ -268,8 +305,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
 
-        # We force a GadgetInstance to requires certain state names.
-        gadget_instance = exploration.skin_instance.panel_configs['bottom'][0]
+        # We force a GadgetInstance to require certain state names.
+        gadget_instance = exploration.skin_instance.panel_contents_dict[
+            'bottom'][0]
         gadget_instance.visible_in_states.extend(['DEF', 'GHI'])
 
         with self.assertRaisesRegexp(
@@ -289,6 +327,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ghi_state.update_interaction_id('TextInput')
         exploration.states['GHI'] = ghi_state
         exploration.validate()
+
+        # Adding a panel that doesn't exist in the skin.
+        exploration.skin_instance.panel_contents_dict[
+            'non_existant_panel'] = []
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'non_existant_panel panel not found in skin conversation_v1'):
+            exploration.validate()
 
     def test_objective_validation(self):
         """Test that objectives are validated only in 'strict' mode."""
@@ -394,15 +441,33 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Title', 'Category', 'State1:\n(\nInvalid yaml')
 
+    def test_yaml_import_and_export_without_gadgets(self):
+        """Test from_yaml() and to_yaml() methods without gadgets."""
+
+        EXP_ID = 'An exploration_id'
+        exploration_without_gadgets = exp_domain.Exploration.from_yaml(
+            EXP_ID, 'A title', 'Category', SAMPLE_YAML_CONTENT)
+        yaml_content = exploration_without_gadgets.to_yaml()
+        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
+
+
     def test_yaml_import_and_export_with_gadgets(self):
         """Test from_yaml() and to_yaml() methods including gadgets."""
 
         EXP_ID = 'An exploration_id'
         exploration_with_gadgets = exp_domain.Exploration.from_yaml(
-            EXP_ID, 'A title', 'Category', SAMPLE_YAML_CONTENT)
-        yaml_content = exploration_with_gadgets.to_yaml()
-        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
+            EXP_ID, 'A title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        generated_yaml = exploration_with_gadgets.to_yaml()
 
+        # @sll: This test fails when comparing strings directly due to
+        # a difference of 8-to-10 spaces indentation in our YAML export
+        # processing. Spent 30+ mins trying to correct the formatting. Asking
+        # around, a few folks recommended it may be better to compare dict
+        # equivalence in any case. What do you think?
+        generated_yaml_as_dict = utils.dict_from_yaml(generated_yaml)
+        sample_yaml_as_dict = utils.dict_from_yaml(
+            SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        self.assertEqual(generated_yaml_as_dict, sample_yaml_as_dict)
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
@@ -799,16 +864,83 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
 
 class SkinInstanceUnitTests(test_utils.GenericTestBase):
-    """Test methods for SkinInstnace."""
+    """Test methods for SkinInstance."""
 
-    def test_skin_instance_required_state_names(self):
-        """Test SkinInstance accurate generation of GadgetInstance state names."""
+    def test_get_state_names_required_by_gadgets(self):
+        """Test accurate computation of state_names_required_by_gadgets."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
         skin_instance = exploration.skin_instance
         self.assertEqual(
             skin_instance.get_state_names_required_by_gadgets(),
-            ['New state'])
+            ['New state', 'Second state'])
+
+    def test_conversion_of_skin_to_and_from_dict(self):
+        """Tests convertion of SkinInstance to and from dict representations."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        skin_instance = exploration.skin_instance
+
+        skin_instance_as_dict = skin_instance.to_dict()
+
+        self.assertEqual(
+            skin_instance_as_dict,
+            {
+                'skin_id': 'conversation_v1',
+                'skin_customizations': {
+
+                    'panels_contents': {
+                        'bottom': [
+                            {
+                                'customization_args': {
+                                    'initialValue': {
+                                        'value': 20
+                                    },
+                                    'title': {
+                                        'value': 'Friend Interest'
+                                    }
+                                },
+                                'gadget_id': 'ScoreBar',
+                                'visible_in_states': ['New state', 'Second state']
+                            }
+                        ],
+                        'left': [
+                            {
+                                'customization_args': {
+                                    'advice_objects': {
+                                        'value': [
+                                            {
+                                              'advice_text': 'To start out, try ABC or DEF!',
+                                              'advice_title': 'Starting Out'
+                                            },
+                                            {
+                                                'advice_text': 'Multiples are numbers that ABC, DEF...',
+                                                'advice_title': 'What are multiples?'
+                                            }
+                                        ]
+                                    },
+                                    'default_icon': {
+                                        'value': 'DefaultAdviceBarIcon.png'
+                                    },
+                                    'orientation': {'value': 'vertical'},
+                                    'title': {'value': 'Tips'}},
+                                'gadget_id': 'AdviceBar',
+                                'visible_in_states': ['New state', 'Second state']
+                            }
+                        ],
+                        'right': []
+                    }
+                }
+            }
+        )
+        
+        skin_instance_as_instance = exp_domain.SkinInstance.from_dict(
+            skin_instance_as_dict)
+
+        self.assertEqual(skin_instance_as_instance.skin_id, 'conversation_v1')
+        self.assertEqual(
+            len(skin_instance_as_instance.panel_contents_dict.keys()), 3
+        )
 
 
 class GadgetInstanceUnitTests(test_utils.GenericTestBase):
@@ -820,20 +952,20 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
 
         # Assert left and bottom panels have 1 GadgetInstance. Right has 0.
-        self.assertEqual(len(exploration.skin_instance.panel_configs[
+        self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
             'left']), 1)
-        self.assertEqual(len(exploration.skin_instance.panel_configs[
+        self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
             'bottom']), 1)
-        self.assertEqual(len(exploration.skin_instance.panel_configs[
+        self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
             'right']), 0)
 
     def test_gadget_instance_properties(self):
         """Test accurate representation of gadget properties."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        panel_configs = exploration.skin_instance.panel_configs
+        panel_contents_dict = exploration.skin_instance.panel_contents_dict
 
-        advice_bar_instance = panel_configs['left'][0]
+        advice_bar_instance = panel_contents_dict['left'][0]
         self.assertEqual(advice_bar_instance.height, 350)
         self.assertEqual(advice_bar_instance.width, 100)
         self.assertIn('New state', advice_bar_instance.visible_in_states)
@@ -842,7 +974,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
                 'advice_objects']['value']), 2
         )
 
-        score_bar_instance = panel_configs['bottom'][0]
+        score_bar_instance = panel_contents_dict['bottom'][0]
         self.assertEqual(score_bar_instance.height, 100)
         self.assertEqual(score_bar_instance.width, 250)
         self.assertEqual(
@@ -858,8 +990,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         """Test validation of GadgetInstance."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        panel_configs = exploration.skin_instance.panel_configs
-        advice_bar_instance = panel_configs['left'][0]
+        panel_contents_dict = exploration.skin_instance.panel_contents_dict
+        advice_bar_instance = panel_contents_dict['left'][0]
 
         # Validation against sample YAML should pass without error.
         exploration.validate()
@@ -867,33 +999,37 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         # Assert size exceeded error triggers when a gadget's size exceeds
         # a panel's capacity.
         with self.swap(
-            advice_bar_instance._gadget_spec,
-            "_FIXED_AXIS_BASE_LENGTH", 2350):
+            advice_bar_instance.gadget,
+            '_FIXED_AXIS_BASE_LENGTH',
+            2350):
+
             with self.assertRaisesRegexp(
                 utils.ValidationError,
-                "Size exceeded: left panel width of 2350 exceeds limit of 100"):
+                'Size exceeded: left panel width of 2350 exceeds limit of 100'):
                 exploration.validate()
 
-        # Assert raising too many gadgets.
-        panel_configs['bottom'].append(advice_bar_instance)
+        # Assert that an error is raised when there are too many gadgets in a
+        # panel.
+        panel_contents_dict['bottom'].append(advice_bar_instance)
         with self.assertRaisesRegexp(
             utils.ValidationError,
             "'bottom' panel expected at most 1 gadget, received 2."):
             exploration.validate()
 
-        # Assert gadget flags when it's not visible in any states.
+        # Assert that an error is raised when a gadget is not visible in any
+        # states.
         advice_bar_instance.visible_in_states = []
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            "AdviceBar gadget not visible in any states."):
+            'AdviceBar gadget not visible in any states.'):
             advice_bar_instance.validate()
 
     def test_conversion_of_gadget_instance_to_and_from_dict(self):
         """Test conversion of GadgetInstance to and from dict. """
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        panel_configs = exploration.skin_instance.panel_configs
-        score_bar_instance = panel_configs['bottom'][0]
+        panel_contents_dict = exploration.skin_instance.panel_contents_dict
+        score_bar_instance = panel_contents_dict['bottom'][0]
 
         score_bar_as_dict = score_bar_instance.to_dict()
 
@@ -901,7 +1037,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
             score_bar_as_dict,
             {
                 'gadget_id': 'ScoreBar',
-                'visible_in_states': "['New state']",
+                'visible_in_states': ['New state', 'Second state'],
                 'customization_args': {
                     'title': {
                         'value': 'Friend Interest'

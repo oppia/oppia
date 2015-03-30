@@ -14,11 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for defining gadgets.
-
-Placeholder for development.
-
-"""
+"""Base class for defining gadgets."""
 
 __author__ = 'Michael Anuzis'
 
@@ -30,6 +26,7 @@ import feconf
 import jinja_utils
 import schema_utils
 import utils
+
 
 class BaseGadget(object):
     """Base gadget definition class.
@@ -78,10 +75,6 @@ class BaseGadget(object):
         """The HTML code containing directives and templates for the
         gadget. This contains everything needed to display the gadget
         once the necessary attributes are supplied.
-
-        Each gadget has two directive/template pairs, one for the
-        gadget itself and the other for displaying the learner's response
-        in a read-only view after it has been submitted.
         """
         js_directives = utils.get_file_contents(os.path.join(
             feconf.GADGETS_DIR, self.id, '%s.js' % self.id))

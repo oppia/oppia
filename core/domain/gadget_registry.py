@@ -14,14 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Registry for gadgets.
-
-IN DEVELOPMENT: gadget_registry.py is currently nearly identical to
-interaction_registry.py in part so the two offer similar APIs, and in part
-to help me review why interaction equivalents were implemented the way they
-are.
-
-"""
+"""Registry for gadgets."""
 
 __author__ = 'Michael Anuzis'
 

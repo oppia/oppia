@@ -544,7 +544,7 @@ class InteractionInstance(object):
 
 class GadgetInstance(object):
     """Value object for an instance of a gadget."""
-    
+
     def __init__(self, gadget_id, visible_in_states, customization_args):
         self.id = gadget_id
 
@@ -555,34 +555,34 @@ class GadgetInstance(object):
         self.customization_args = customization_args
 
     @property
-    def _gadget_spec(self):
+    def gadget(self):
         """Gadget spec for validation and derived properties below."""
         return gadget_registry.Registry.get_gadget_by_id(self.id)
 
     @property
     def width(self):
         """Width in pixels."""
-        return self._gadget_spec.get_width(self.customization_args)
+        return self.gadget.get_width(self.customization_args)
 
     @property
     def height(self):
         """Height in pixels."""
-        return self._gadget_spec.get_height(self.customization_args)
+        return self.gadget.get_height(self.customization_args)
 
     def validate(self):
-        """Validate GadgetInstance given its customization args."""
-        self._gadget_spec.validate(self.customization_args)
+        """Validate attributes of this GadgetInstance."""
+        self.gadget.validate(self.customization_args)
 
         if self.visible_in_states == []:
             raise utils.ValidationError(
                 '%s gadget not visible in any states.' % (
-                    self._gadget_spec.name))
+                    self.gadget.name))
 
     def to_dict(self):
         """Returns GadgetInstance data represented in dict form."""
         return {
             'gadget_id': self.id,
-            'visible_in_states': str(self.visible_in_states),
+            'visible_in_states': self.visible_in_states,
             'customization_args': self._get_full_customization_args(),
         }
 
@@ -600,8 +600,7 @@ class GadgetInstance(object):
         """
         full_customization_args_dict = copy.deepcopy(self.customization_args)
 
-        gadget = gadget_registry.Registry.get_gadget_by_id(self.id)
-        for ca_spec in gadget.customization_arg_specs:
+        for ca_spec in self.gadget.customization_arg_specs:
             if ca_spec.name not in full_customization_args_dict:
                 full_customization_args_dict[ca_spec.name] = {
                     'value': ca_spec.default_value
@@ -614,50 +613,75 @@ class SkinInstance(object):
 
     def __init__(self, skin_id, skin_customizations):
         self.skin_id = skin_id
-        # panel_configs is a dict with gadget_panel_name strings as keys and
+        # panel_contents_dict has gadget_panel_name strings as keys and
         # lists of GadgetInstance instances as values.
-        self.panel_configs = {}
+        self.panel_contents_dict = {}
 
         for panel_name, gdict_list in skin_customizations[
                 'panels_contents'].iteritems():
-            self.panel_configs[panel_name] = [GadgetInstance(
+            self.panel_contents_dict[panel_name] = [GadgetInstance(
                 gdict['gadget_id'], gdict['visible_in_states'],
                 gdict['customization_args']) for gdict in gdict_list]
 
+    @property
+    def skin(self):
+        """Skin spec for validation and derived properties."""
+        return skins_services.Registry.get_skin_by_id(self.skin_id)
+
     def validate(self):
-        """Validates gadgets fit skin panel dimensions."""
-        skin = skins_services.Registry.get_skin_by_id(self.skin_id)
-        for panel_name, gadgets_list in self.panel_configs.iteritems():
-            skin.validate_panel(panel_name, gadgets_list)
-            for gadget_instance in gadgets_list:
+        """Validates that gadgets fit the skin panel dimensions, and that the
+        gadgets themselves are valid."""
+        for panel_name, gadget_instances_list in (
+                self.panel_contents_dict.iteritems()):
+
+            # Validate existence of panels in the skin.
+            if not panel_name in self.skin.panels_properties:
+                raise utils.ValidationError(
+                    '%s panel not found in skin %s' % (
+                        panel_name, self.skin_id)
+                )
+
+            # Validate gadgets fit each skin panel.
+            self.skin.validate_panel(panel_name, gadget_instances_list)
+
+            # Validate gadget internal attributes.
+            for gadget_instance in gadget_instances_list:
                 gadget_instance.validate()
 
     def to_dict(self):
         """Returns SkinInstance data represented in dict form.
         """
         return {
-            'panels_contents': {
-                panel_name: [
-                    gadget_instance.to_dict() for gadget_instance
-                    in instances_list]
-                for panel_name, instances_list in
-                self.panel_configs.iteritems()
-            },
+            'skin_id': self.skin_id,
+            'skin_customizations': {
+                'panels_contents': {
+                    panel_name: [
+                        gadget_instance.to_dict() for gadget_instance
+                        in instances_list]
+                    for panel_name, instances_list in
+                    self.panel_contents_dict.iteritems()
+                },
+            }
         }
+
+    @classmethod
+    def from_dict(cls, skin_dict):
+        """Returns SkinInstance instance given dict form."""
+        return SkinInstance(
+            skin_dict['skin_id'],
+            skin_dict['skin_customizations'])
 
     def get_state_names_required_by_gadgets(self):
         """Returns a list of strings representing State names required by
         GadgetInstances in this skin."""
         state_names = set()
-        for gadget_instances_list in self.panel_configs.values():
+        for gadget_instances_list in self.panel_contents_dict.values():
             for gadget_instance in gadget_instances_list:
                 for state_name in gadget_instance.visible_in_states:
                     state_names.add(state_name)
 
         # We convert to a sorted list for clean deterministic testing.
-        state_names = list(state_names)
-        state_names.sort()
-        return state_names
+        return sorted(state_names)
 
 
 class State(object):
@@ -934,7 +958,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', 'conversation_v1', feconf.DEFAULT_SKIN_CUSTOMIZATION,
+            '', 'conversation_v1', feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
@@ -1128,20 +1152,19 @@ class Exploration(object):
                                 'does not exist in this exploration'
                                 % param_change.name)
 
-        # Check that required state names exist.
-        state_names_required_by_gadgets = set((
-            self.skin_instance.get_state_names_required_by_gadgets()))
+        # Check that state names required by gadgets exist.
+        state_names_required_by_gadgets = set(
+            self.skin_instance.get_state_names_required_by_gadgets())
         missing_state_names = state_names_required_by_gadgets - set(
             self.states.keys())
         if missing_state_names:
-            missing_state_names = list(missing_state_names)
-            missing_state_names.sort()
             raise utils.ValidationError(
                 'Exploration missing required state%s: %s' % (
                     's' if len(missing_state_names) > 1 else '',
-                    ', '.join(missing_state_names)))
+                    ', '.join(sorted(missing_state_names)))
+                )
 
-        # Check that GadgetInstances fit the skin.
+        # Check that GadgetInstances fit the skin and that gadgets are valid.
         self.skin_instance.validate()
 
         if strict:
@@ -1429,7 +1452,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 5
 
         exploration_dict['skin_customizations'] = (
-            feconf.DEFAULT_SKIN_CUSTOMIZATION)
+            feconf.DEFAULT_SKIN_CUSTOMIZATIONS)
 
         return exploration_dict
 
@@ -1551,7 +1574,8 @@ class Exploration(object):
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
             'skill_tags': self.skill_tags,
-            'skin_customizations': self.skin_instance.to_dict(),
+            'skin_customizations': self.skin_instance.to_dict()[
+                'skin_customizations'],
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
