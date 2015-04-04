@@ -142,14 +142,6 @@
     <div>
       <div ng-if="inSplashMode" class="oppia-gallery-interstitial">
         <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video" ng-click="showSplashVideoModal()">
-        <div class="oppia-gallery-interstitial-content">
-          <img src="/images/gallery/oppia_bite-sized.png">
-          <img src="/images/gallery/oppia_interactive.png">
-          <img src="/images/gallery/oppia_adaptive.png">
-        </div>
-        <div style="margin: 50px;">
-          <div style="display: inline-block;"><a href="/about">Learn more about Oppia</a></div>
-        </div>
       </div>
 
       <div>
@@ -158,18 +150,19 @@
             <em>
               We don't have any explorations matching this query yet.
             </em>
+            <br><br>
+            <div style="display: inline-block;">
             <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
             {% if not user_email %}
               <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
             {% else %}
               <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
             {% endif %}
+            </div>
           </div>
 
           <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
-            <span>
-              Or, dive into an exploration created by the community:
-            </span>
+            Explorations
           </div>
 
           <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
@@ -252,7 +245,7 @@
   <script>
     $(window).scroll(function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
-      var bannerHeight = oppiaBanner.height() - 150;
+      var bannerHeight = oppiaBanner.height() * 0.7;
       oppiaBanner.css({'opacity':( bannerHeight - $(window).scrollTop() ) / bannerHeight});
     });
   </script>

@@ -592,9 +592,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tiles-introduction {
-  font-size: 1.4em;
+  font-family: Capriola;
+  font-size: 1.6em;
+  font-weight: bold;
   padding-top: 40px;
   padding-bottom: 40px;
+  text-align: center;
 }
 
 .oppia-gallery-tiles-container {
@@ -1289,10 +1292,10 @@ ul.oppia-dashboard-tiles {
 .oppia-gallery-banner-content {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 56px;
+  font-size: 4em;
   position: absolute;
   text-align: center;
-  top: 205px;
+  top: 155px;
   width: 100%;
   z-index: 100;
 }
@@ -1305,8 +1308,8 @@ ul.oppia-dashboard-tiles {
 .oppia-gallery-banner-tagline {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 24px;
-  padding-top: 300px;
+  font-size: 2em;
+  padding-top: 250px;
 }
 
 .oppia-gallery-banner-link {
@@ -1349,13 +1352,13 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-gallery-interstitial-content {
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: center;
 }
 
 .oppia-gallery-interstitial-content > img {
   display: inline-block;
-  padding: 10px 10px;
+  margin: 10px 40px;
 }
 
 .oppia-gallery-modal .modal-body {
