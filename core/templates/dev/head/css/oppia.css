@@ -64,7 +64,7 @@ html {
 body {
   color: #222;
   font-family: "Roboto";
-  height: 100%;
+  height: 98%;
   margin: 0 auto;
   padding: 0;
   width: 100%;
@@ -601,7 +601,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 40px;
+  margin-top: 56px;
   max-width: 800px;
   min-height: 500px;
   padding-bottom: 25px;
@@ -1273,7 +1273,7 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-gallery-banner-container {
-  height: 650px;
+  height: 700px;
   position: fixed;
   top: 56px;
   width: 100%;
@@ -1283,7 +1283,7 @@ ul.oppia-dashboard-tiles {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 650px;
+  height: 700px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
@@ -1317,18 +1317,11 @@ ul.oppia-dashboard-tiles {
   text-decoration: none;
 }
 
-.oppia-gallery-content-container {
-  background-color: #eee;
-  position: relative;
-  z-index: 2;
-}
-
 .oppia-gallery-interstitial {
-  /* background: linear-gradient(to bottom, rgba(245,245,245,.9), rgba(245,245,245,1)); */
-  background-color: #f9f9f9;
+  background: linear-gradient(to bottom, rgba(255,255,255,.9), rgba(255,255,255,1));
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.6em;
-  margin-top: 650px;
+  margin-top: 600px;
   padding-bottom: 45px;
   padding-left: 10px;
   padding-right: 10px;
@@ -1336,16 +1329,64 @@ ul.oppia-dashboard-tiles {
   position: relative;
   text-align: center;
   width: 100%;
+  z-index: 3;
 }
 .oppia-gallery-interstitial-video {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  opacity: 0.95;
+  opacity: 0.85;
+  transition: ease-in-out all .2s;
+  -webkit-transition: ease-in-out all .2s;
+  user-drag: none; 
+  -moz-user-select: none;
+  -webkit-user-drag: none;
 }
-
 .oppia-gallery-interstitial-video:hover {
-  box-shadow: 0 1px 4px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.23);
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   cursor: pointer;
   opacity: 1;
+  transition: ease-in-out all .2s;
+  -webkit-transition: ease-in-out all .2s;
+}
+
+.oppia-gallery-interstitial-content {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.oppia-gallery-interstitial-content > img {
+  display: inline-block;
+  padding: 10px 10px;
+}
+
+.oppia-gallery-modal .modal-body {
+  padding: 0px;
+}
+.oppia-gallery-modal .modal-dialog {
+  margin-top: 50px;
+}
+
+.oppia-gallery-modal-video {
+  padding-bottom: 56.25%;
+  position: relative;
+  width: 100%;
+}
+.oppia-gallery-modal-video > iframe {
+  bottom: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.oppia-modal-close {
+  cursor: pointer;
+  height: 30px;
+  position: absolute;
+  right:-30px;
+  top:-30px;
+  width: 30px;
 }
 
 oppia-expression-error-tag {

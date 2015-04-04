@@ -139,12 +139,16 @@
       </carousel>
     </div>
 
-    <div class="oppia-gallery-content-container">
+    <div>
       <div ng-if="inSplashMode" class="oppia-gallery-interstitial">
-        <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video">
-        <div style="display: none;">
-          Oppia is a personalized learning platform created by and for people like you.
-          <div style="display: inline-block;"><a href="/about">Find out more!</a></div>
+        <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video" ng-click="showSplashVideoModal()">
+        <div class="oppia-gallery-interstitial-content">
+          <img src="/images/gallery/oppia_bite-sized.png">
+          <img src="/images/gallery/oppia_interactive.png">
+          <img src="/images/gallery/oppia_adaptive.png">
+        </div>
+        <div style="margin: 50px;">
+          <div style="display: inline-block;"><a href="/about">Learn more about Oppia</a></div>
         </div>
       </div>
 
@@ -164,7 +168,7 @@
 
           <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
             <span>
-              Dive into an exploration created by the community:
+              Or, dive into an exploration created by the community:
             </span>
           </div>
 
@@ -237,11 +241,19 @@
   {% include 'components/exploration_creation_button.html' %}
   {% include 'components/ratings.html' %}
 
+  <script type="text/ng-template" id="modals/splashVideo">
+    <div class="modal-body">
+      <div class="oppia-gallery-modal-video">
+        <iframe src="https://www.youtube.com/embed/A9OnENhRah8?autoplay=1&controls=2" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </script>
+
   <script>
     $(window).scroll(function() {
-      console.log($(window).scrollTop());
       var oppiaBanner = $('.oppia-gallery-banner-container');
-      oppiaBanner.css({'opacity':( oppiaBanner.height() - $(window).scrollTop() ) / oppiaBanner.height()});
+      var bannerHeight = oppiaBanner.height() - 150;
+      oppiaBanner.css({'opacity':( bannerHeight - $(window).scrollTop() ) / bannerHeight});
     });
   </script>
 {% endblock %}

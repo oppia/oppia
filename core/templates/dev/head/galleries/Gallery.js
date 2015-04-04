@@ -116,10 +116,10 @@ oppia.factory('searchService', [
 }]);
 
 oppia.controller('Gallery', [
-    '$scope', '$http', '$rootScope', '$window', '$timeout', 'createExplorationButtonService',
+    '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout', 'createExplorationButtonService',
     'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL',
     'CATEGORY_LIST', 'searchService',
-    function($scope, $http, $rootScope, $window, $timeout, createExplorationButtonService,
+    function($scope, $http, $rootScope, $modal, $window, $timeout, createExplorationButtonService,
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
 
@@ -151,6 +151,14 @@ oppia.controller('Gallery', [
 
   $scope.showCreateExplorationModal = function() {
     createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+  };
+
+  $scope.showSplashVideoModal = function() {
+    $modal.open({
+      templateUrl: 'modals/splashVideo',
+      size: 'lg',
+      windowClass: 'oppia-gallery-modal'
+    });
   };
 
   $scope.currentUserIsModerator = false;
