@@ -592,8 +592,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tiles-introduction {
-  font-size: 1em;
-  padding-bottom: 20px;
+  font-size: 1.4em;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
 
 .oppia-gallery-tiles-container {
@@ -1271,6 +1272,13 @@ ul.oppia-dashboard-tiles {
   animation-timing-function: ease-in-out;
 }
 
+.oppia-gallery-banner-container {
+  height: 650px;
+  position: fixed;
+  top: 56px;
+  width: 100%;
+  z-index: 0;
+}
 .oppia-gallery-banner {
   background-position: center;
   background-repeat: no-repeat;
@@ -1298,7 +1306,7 @@ ul.oppia-dashboard-tiles {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 24px;
-  padding-top: 250px;
+  padding-top: 300px;
 }
 
 .oppia-gallery-banner-link {
@@ -1309,12 +1317,18 @@ ul.oppia-dashboard-tiles {
   text-decoration: none;
 }
 
+.oppia-gallery-content-container {
+  background-color: #eee;
+  position: relative;
+  z-index: 2;
+}
+
 .oppia-gallery-interstitial {
-  background: linear-gradient(to bottom, rgba(255,255,255,.9), rgba(255,255,255,1));
+  /* background: linear-gradient(to bottom, rgba(245,245,245,.9), rgba(245,245,245,1)); */
+  background-color: #f9f9f9;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  font-size: 1.3em;
-  margin-top: -120px;
-  min-height: 120px;
+  font-size: 1.6em;
+  margin-top: 650px;
   padding-bottom: 45px;
   padding-left: 10px;
   padding-right: 10px;
@@ -1322,6 +1336,16 @@ ul.oppia-dashboard-tiles {
   position: relative;
   text-align: center;
   width: 100%;
+}
+.oppia-gallery-interstitial-video {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  opacity: 0.95;
+}
+
+.oppia-gallery-interstitial-video:hover {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.23);
+  cursor: pointer;
+  opacity: 1;
 }
 
 oppia-expression-error-tag {
