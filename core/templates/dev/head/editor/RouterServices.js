@@ -80,9 +80,10 @@ oppia.factory('routerService', [
           if (allStates.hasOwnProperty(putativeStateName)) {
             editorContextService.setActiveStateName(putativeStateName);
             $rootScope.$broadcast('refreshStateEditor');
-            // This seems to be needed in order to avoid the graph going off-center if
-            // another tab is loaded first and then the user switches to the editor tab.
-            $rootScope.$broadcast('redrawGraph');
+            // TODO(sll): Fire an event to center the graph, in the case where another
+            // tab is loaded first and then the user switches to the editor tab. We
+            // used to redraw the graph completely but this is taking lots of time
+            // and is probably not worth it.
           } else {
             $location.path('/gui/' + explorationInitStateNameService.savedMemento);
           }

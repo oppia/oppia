@@ -28,7 +28,7 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
 
     def test_config_property_schemas_are_valid(self):
         # This is the total number of config and computed properties.
-        self.assertEqual(len(config_domain.Registry._config_registry), 16)
+        self.assertEqual(len(config_domain.Registry._config_registry), 18)
 
         for property_name in config_domain.Registry._config_registry:
             schema = config_domain.Registry.get_config_property(
