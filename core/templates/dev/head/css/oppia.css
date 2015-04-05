@@ -370,7 +370,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #fff;
   cursor: default;
   font-family: "Roboto", "Arial", sans-serif;
-  font-size: 16px;
+  font-size: 1.2em;
   font-weight: 400;
   line-height: 20px;
   padding-top: 17px;
@@ -608,7 +608,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 md-card.oppia-gallery-tile {
   background-color: #fff;
-  border-bottom: 1px solid #ccc;
   color: #888;
   height: 120px;
   margin: 0;
@@ -617,7 +616,7 @@ md-card.oppia-gallery-tile {
   width: 100%;
 }
 .oppia-gallery-tile:hover {
-  background-color: #f5f5f5;
+  background-color: #f9f9f9;
 }
 
 .oppia-gallery-tile-container-link {
@@ -867,7 +866,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-editor-card-section {
-  padding: 0 50px 0 65px;
+  padding: 20px 50px 20px 65px;
 }
 
 .oppia-state-content {
@@ -894,11 +893,20 @@ md-card.oppia-gallery-tile {
 .oppia-editable-section {
   cursor: pointer;
   position: relative;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
 }
+
+.oppia-editable-section:hover {
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
+}
+
 .oppia-editable-section:hover .oppia-state-content-display,
 .oppia-editable-section:hover .oppia-rule-preview {
   background: #eee;
   border-radius: 4px;
+
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {
@@ -917,6 +925,8 @@ md-card.oppia-gallery-tile {
   position: absolute;
   right: -20px;
   top: 5px;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
 }
 
 .oppia-editable-section:hover .oppia-editor-edit-icon {
@@ -974,6 +984,18 @@ md-card.oppia-gallery-tile {
   padding-top: 3px;
 }
 
+.oppia-delete-interaction-button {
+  cursor: pointer; 
+  opacity: 0.5; 
+  position: absolute; 
+  right: 10px; 
+  top: 10px; 
+  width: 20px;
+}
+.oppia-delete-interaction-button:hover {
+  opacity: 1;
+}
+
 .oppia-graph-resize-button {
   border: 0px;
   padding: 9px 10px 6px 10px;
@@ -1015,7 +1037,6 @@ md-card.oppia-gallery-tile {
   margin-bottom: 0;
   margin-left: 0;
   padding: 4px;
-  padding-top: 9px;
 }
 
 .oppia-readonly-rule-tile img, .oppia-rule-tab img {
@@ -1699,4 +1720,9 @@ div#ng-curtain {
 
 .oppia-rating-star-active {
   color: #DBEA00;
+}
+
+.trans200 {
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
 }

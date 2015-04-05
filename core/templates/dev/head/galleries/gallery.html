@@ -130,7 +130,7 @@
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
             <div class="oppia-gallery-banner-tagline">
-              Your personal tutor for <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
+              Your personal tutor for <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link trans200">
               <[slide.topic]>
             </a>
             </div>
@@ -169,7 +169,7 @@
         <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
              infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
           <div ng-repeat="exploration in allExplorationsInOrder track by $index">
-            <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
+            <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile trans200">
               <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
                  ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
                 <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"

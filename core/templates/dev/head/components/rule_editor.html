@@ -1,30 +1,12 @@
 <div style="height: 100%;">
   <div ng-if="!ruleEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this rule, or change its destination' : '']>">
-    <div class="oppia-readonly-rule-tile oppia-pre-avatar-user protractor-test-edit-rule" ng-class="{'oppia-editable-section': isEditable}">
-      <div class="oppia-rule-preview">
+    <div class="oppia-readonly-rule-tile protractor-test-edit-rule oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview trans200">
         <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
         </div>
 
-        <div>
-          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
-
-          <span ng-if="rule.definition.rule_type !== 'default'" style="word-wrap: break-word;">
-            <span ng-if="currentInteractionId !== 'MultipleChoiceInput'">
-              [<em><[rule | parameterizeRuleDescription:currentInteractionId:answerChoices]>...</em>]
-            </span>
-            <span ng-if="currentInteractionId === 'MultipleChoiceInput'">
-              [<em><span angular-html-bind="rule | parameterizeRuleDescription:currentInteractionId:answerChoices"></span>...</em>]
-            </span>
-          </span>
-          <span ng-if="rule.definition.rule_type === 'default'">
-            [<em>No other rules apply...</em>]
-          </span>
-        </div>
-
-        <br>
-
         <div style="position: relative;">
-          <img src="/images/general/oppia_black_48px.png" style="position: absolute; left: -46px; top: -1px; height: 24px; width: 24px;">
+        <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
           <span ng-if="isRuleConfusing()">
             <span class="oppia-rule-warning-text">
               <span class="glyphicon glyphicon-warning-sign"></span>
@@ -44,9 +26,7 @@
           </span>
         </div>
 
-        <br>
-
-        <div style="padding-bottom: 20px;" ng-if="rule.dest !== getActiveStateName()">
+        <div style="padding-top: 20px;" ng-if="rule.dest !== getActiveStateName()">
           Destination:
           <span class="oppia-rule-dest-link" style="position: relative;">
             <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'">
@@ -158,7 +138,7 @@
     <rule-type-selector class="protractor-test-rule-description" local-value="currentRuleDefinition.name" on-selection-change="onSelectNewRuleType" can-add-default-rule="canAddDefaultRule()">
     </rule-type-selector>
 
-    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px;">
+    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px; width: 100%;">
       <span ng-if="item.type == 'select'" style="color: black;">
         <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
         </select>
