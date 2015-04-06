@@ -60,13 +60,12 @@ html, body {
 
 .conversation-skin-row-avatar-img {
   height: 24px;
-  margin-top: 2px;
   max-width: 24px;
 }
 
 .conversation-skin-exploration-header {
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
-  font-size: 20px;
+  font-size: 1.25em;
   text-align: center;
   height: 30%;
   margin-top: -13.9%;
@@ -83,17 +82,12 @@ html, body {
    Material Design stylesheet. */
 md-card.conversation-skin-card {
   background: rgb(255,255,255);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-  font-family: 'Roboto';
   margin: 20px auto;
   margin-top: -5px;
   max-width: 560px;
   padding: 40px 60px 27px 22px;
   position: relative;
-  text-align: justify;
+  text-align: left;
 }
 
 .conversation-skin-card-dropdown {
@@ -121,7 +115,7 @@ md-card.conversation-skin-card {
 
 .conversation-skin-oppia-content {
   padding-left: 15px;
-  padding-top: 5px;
+  padding-top: 2px;
 }
 
 .conversation-skin-oppia-feedback {
@@ -159,17 +153,16 @@ md-card.conversation-skin-inline-interaction {
 
 .conversation-skin-supplemental-interaction {
   margin: 0 auto;
-  max-width: 600px;
+  max-width: 560px;
 }
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
   margin: -5px 0;
-  max-width: 600px;
+  max-width: 560px;
 }
 
 .conversation-skin-final-ratings {
-  font-size: 18px;
   padding-top: 20px;
   text-align: center;
 }
