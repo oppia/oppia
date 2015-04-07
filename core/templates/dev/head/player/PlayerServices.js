@@ -580,15 +580,19 @@ oppia.factory('ratingService', [
 
 
 oppia.controller('LearnerLocalNav', [
-    '$scope', '$http', '$modal',
+    '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
     function(
-      $scope, $http, $modal,
+      $scope, $http, $modal,  oppiaHtmlEscaper,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   var _END_DEST = 'END';
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
+  $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+    "Check out this interactive lesson from Oppia.org - a free, open-source " +
+    "learning platform!"
+  );
 
   $scope.$on('playerServiceInitialized', function() {
     $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
