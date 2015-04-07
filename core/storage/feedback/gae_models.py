@@ -203,3 +203,33 @@ class FeedbackMessageModel(base_models.BaseModel):
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
+
+
+class OpenFeedbacksModel(base_models.BaseModel):
+    """Model for storing open feedback counts for explorations  .
+
+    A OpenFeedbacksModel instance stores the following information:
+
+    id, num_of_open_feedbacks
+
+    The key of each instance is the exploration id.
+    """
+    
+    # The number of open feedbacks for an exploration.
+    num_of_open_feedbacks = ndb.IntegerProperty(default=None, indexed=True)    
+    
+    @classmethod
+    def create_or_update(cls, id):
+      entry = cls.get_by_id(id, strict=false)
+      if entry is None:
+          cls(id=id, num_of_open_feedbacks=1).put()
+      else:
+        entry.num_of_open_feedbacks += 1
+        entry.put()
+
+    @classmethod
+    def update(cls, id):
+      entry = cls.get_by_id(id, strict=false)
+      if entry is not NONE
+          entry.num_of_open_feedbacks -= 1
+          entry.put()

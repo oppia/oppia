@@ -99,6 +99,10 @@ def create_message(
     msg.author_id = author_id
     if updated_status:
         msg.updated_status = updated_status
+    if (thread.status = feedback_models.STATUS_CHOICES_OPEN 
+        and updated_status in feedback_models.STATUS_CHOICES
+        and updated_status != feedback_models.STATUS_CHOICES_OPEN)
+        feedback_closure_update(thread.exploration_id)
     if updated_subject:
         msg.updated_subject = updated_subject
     msg.text = text
@@ -145,3 +149,18 @@ def get_last_updated_time(exploration_id):
     return max(
         [thread['last_updated'] for thread in threadlist]
     ) if threadlist else None
+
+
+def get_open_feedbacks(exploration_id):
+    """Returns the number of open feedbacks for this exploration.
+
+    If this exploration has no open feedbacks, returns None.
+    """
+    return feedback_jobs.OpenFeedbacksStatisticsAggregator.
+        get_num_of_open_feedbacks(exploration_id)
+
+
+def feedback_closure_update(exploration_id):
+    """Decrements the number of open feedbacks for this exploration when a
+    feedback is closed."""
+    feedback_models.OpenFeedbacksModel.update(exploration_id)
