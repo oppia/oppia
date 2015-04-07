@@ -130,9 +130,10 @@
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
             <div class="oppia-gallery-banner-tagline">
-              Your personal tutor for <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
+              Your personal tutor for 
+              <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
               <[slide.topic]>
-            </a>
+              </a>
             </div>
           </div>
         </slide>
@@ -141,10 +142,17 @@
 
     <div>
       <div ng-if="inSplashMode" class="oppia-gallery-interstitial">
-        <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video" ng-click="showSplashVideoModal()">
+        {% if SPLASH_PAGE_YOUTUBE_VIDEO_ID %}
+          <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video" ng-click="showSplashVideoModal()">
+        {% else %}
+          <span>
+             Oppia is a personalized learning platform created by and for people like you.
+             <div style="display: inline-block;"><a href="/about">Find out more!</a></div>
+          </span>
+        {% endif %}
       </div>
 
-      <div>
+      <div class="oppia-gallery-tiles-area">
         <div class="oppia-gallery-tiles-container">
           <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
             <em>
@@ -162,7 +170,7 @@
           </div>
 
           <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
-            Explorations
+            Dive into an exploration created by the community:
           </div>
 
           <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
@@ -237,7 +245,7 @@
   <script type="text/ng-template" id="modals/splashVideo">
     <div class="modal-body">
       <div class="oppia-gallery-modal-video">
-        <iframe src="https://www.youtube.com/embed/Ntcw0H0hwPU?rel=0&autoplay=1&controls=2&showinfo=0" frameborder="0" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/{{SPLASH_PAGE_YOUTUBE_VIDEO_ID}}?rel=0&autoplay=1&controls=2&showinfo=0" frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
   </script>
@@ -247,7 +255,7 @@
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTitle = $('.oppia-gallery-banner-content');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
-      var bannerVanishRate = oppiaBanner.height() * 0.9;
+      var bannerVanishRate = oppiaBanner.height() * 0.85;
       var titleVanishRate = oppiaBanner.height() * 0.5;
 
       oppiaBanner.css({'opacity':( bannerVanishRate - $(window).scrollTop() ) / bannerVanishRate});

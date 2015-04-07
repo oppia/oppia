@@ -591,23 +591,27 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-right: 5px;
 }
 
+.oppia-gallery-tiles-area {
+  background-color: #eee;
+  position: relative;
+  z-index: 2;
+}
+
 .oppia-gallery-tiles-introduction {
-  font-family: Capriola;
-  font-size: 1.6em;
-  font-weight: bold;
+  font-family: Roboto;
+  font-size: 1.4em;
   padding-top: 40px;
   padding-bottom: 40px;
-  text-align: center;
 }
 
 .oppia-gallery-tiles-container {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 56px;
   max-width: 800px;
   min-height: 500px;
   padding-bottom: 25px;
+  padding-top: 56px;
 }
 
 md-card.oppia-gallery-tile {
@@ -1321,7 +1325,7 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-gallery-interstitial {
-  background: linear-gradient(to bottom, rgba(255,255,255,.9), rgba(255,255,255,1));
+  background-color: rgba(255,255,255,0.85);
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.6em;
   margin-top: 600px;
