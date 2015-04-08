@@ -253,14 +253,12 @@
   <script>
     $(window).scroll(function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
-      var oppiaTitle = $('.oppia-gallery-banner-content');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
-      var bannerVanishRate = oppiaBanner.height() * 0.85;
-      var titleVanishRate = oppiaBanner.height() * 0.5;
+      var bannerVanishRate = oppiaBanner.height();
+      var taglineVanishRate = oppiaBanner.height() * 0.3
 
-      oppiaBanner.css({'opacity':( bannerVanishRate - $(window).scrollTop() ) / bannerVanishRate});
-      oppiaTitle.css({'opacity':( titleVanishRate - $(window).scrollTop() ) / titleVanishRate});
-      oppiaTagline.css({'opacity':( titleVanishRate - $(window).scrollTop() ) / titleVanishRate});
+      oppiaBanner.css({'opacity':( bannerVanishRate - $(window).scrollTop() ) / bannerVanishRate});   
+      oppiaTagline.css({'opacity':( taglineVanishRate - $(window).scrollTop() ) / taglineVanishRate});
     });
   </script>
 {% endblock %}
