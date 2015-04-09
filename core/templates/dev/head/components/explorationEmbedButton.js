@@ -39,10 +39,10 @@ oppia.factory('embedExplorationButtonService', ['$modal', function($modal) {
             };
 
             $scope.selectText = function($event) {
-              var span = $event.currentTarget;
+              var codeDiv = $event.currentTarget;
               var range = document.createRange();
-              range.setStartBefore(span.firstChild);
-              range.setEndAfter(span.lastChild);
+              range.setStartBefore(codeDiv.firstChild);
+              range.setEndAfter(codeDiv.lastChild);
               var selection = window.getSelection();
               selection.removeAllRanges();
               selection.addRange(range);
