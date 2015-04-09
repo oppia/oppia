@@ -123,9 +123,9 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
 }
 
 p {
-  line-height: 1.5;
-  /* The following should be the same as the line-height (1.5). */
-  margin: 1.5em 0;
+  line-height: 1.4;
+  /* The following should be the same as the line-height (1.4). */
+  margin: 1.4em 0;
   text-align: left;
   word-spacing: 0;
 }
@@ -1175,6 +1175,18 @@ ul.oppia-dashboard-tiles {
 }
 .oppia-large-modal-window .modal-body {
   height: 60vh;
+}
+
+.oppia-embed-modal-code {
+  background-color: #fcfcfc;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 10px;
+}
+
+.oppia-embed-modal-code:hover {
+  background-color: #f9f9f9;
 }
 
 .oppia-vcenter {

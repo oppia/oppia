@@ -37,6 +37,16 @@ oppia.factory('embedExplorationButtonService', ['$modal', function($modal) {
             $scope.close = function() {
               $modalInstance.dismiss('close');
             };
+
+            $scope.selectText = function($event) {
+              var span = $event.currentTarget;
+              var range = document.createRange();
+              range.setStartBefore(span.firstChild);
+              range.setEndAfter(span.lastChild);
+              var selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+            };
           }
         ]
       });
