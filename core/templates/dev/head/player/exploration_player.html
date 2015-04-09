@@ -38,26 +38,22 @@
         <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
           <li>
             <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
-               onclick="javascript:window.open(this.href,
-                        '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
-               tooltip="Google+" tooltip-placement="left">
-              <img src="/images/general/gplus.png"
-                   alt="Google+"/>
+               onclick="return !window.open(this.href, '', 'height=600, width=800, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')"
+               target="_window" tooltip="Google+" tooltip-placement="left">
+              <img src="/images/general/gplus.png" alt="Google+">
             </a>
           </li>
           <li>
             <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button"
-               onclick="return !window.open(this.href, 'Share on Facebook', 'width=640, height=336')"
-               target="_window" tooltip="Facebook"
-               tooltip-placement="left">
-              <img src='/images/general/fb.png' alt="Facebook" />
+               onclick="return !window.open(this.href, '', 'height=336, width=640')"
+               target="_window" tooltip="Facebook" tooltip-placement="left">
+              <img src='/images/general/fb.png' alt="Facebook">
             </a>
           </li>
           <li>
-            <a ng-href="http://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>"
-               onclick="return !window.open(this.href, 'Share on Twitter', 'width=640, height=336')"
-               data-layout="icon" tooltip="Twitter"
-               tooltip-placement="left">
+            <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>"
+               onclick="return !window.open(this.href, '', 'height=460, width=640')"
+               target="_window" tooltip="Twitter" tooltip-placement="left">
               <img src="/images/general/twitter.png" alt="Twitter">
             </a>
           </li>
