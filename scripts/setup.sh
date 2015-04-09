@@ -61,9 +61,7 @@ export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
-
 mkdir -p $NODE_MODULE_DIR
-chmod -R 744 $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
 export NODE_PATH=$TOOLS_DIR/node-0.10.33
@@ -80,6 +78,7 @@ else
   # Also, change ownership of $NODE_MODULE_DIR. (For Windows,
   # chown does not seem to be available in git bash.)
   chown -R $ME $NODE_MODULE_DIR
+  chmod -R 744 $NODE_MODULE_DIR
 fi
 
 export NPM_INSTALL="$NPM_CMD install"
