@@ -1181,6 +1181,7 @@ ul.oppia-dashboard-tiles {
   background-color: #fcfcfc;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
+  display: inline-block;
   padding: 10px;
 }
 
