@@ -78,6 +78,27 @@ oppia.factory('expressionInterpolationService', [
         }
         throw e;
       }
+    },
+    // This works for both unicode and HTML.
+    getParamsFromString: function(sourceString) {
+      var matches = sourceString.match(/{{([^}]*)}}/g) || [];
+
+      var allParams = [];
+      for (var i = 0; i < matches.length; i++) {
+        // Trim the '{{' and '}}'.
+        matches[i] = matches[i].substring(2, matches[i].length - 2);
+
+        var params = expressionEvaluatorService.getParamsUsedInExpression(
+          $filter('convertHtmlToUnicode')(matches[i]));
+
+        for (var j = 0; j < params.length; j++) {
+          if (allParams.indexOf(params[j]) === -1) {
+            allParams.push(params[j]);
+          }
+        }
+      }
+
+      return allParams.sort();
     }
   };
 }]);

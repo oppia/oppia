@@ -114,6 +114,34 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
     return evaluate(parsed, envs.concat(system));
   };
 
+  var getParamsUsedInExpression = function(expression) {
+    var _findParams = function(parseTree) {
+      var paramsFound = [];
+
+      if (parseTree instanceof Array) {
+        if (parseTree[0] === '#') {
+          paramsFound.push(parseTree[1]);
+        } else {
+          for (var i = 1; i < parseTree.length; i++) {
+            paramsFound = paramsFound.concat(_findParams(parseTree[i]));
+          }
+        }
+      }
+
+      var uniqueParams = [];
+      for (var i = 0; i < paramsFound.length; i++) {
+        if (uniqueParams.indexOf(paramsFound[i]) === -1) {
+          uniqueParams.push(paramsFound[i]);
+        }
+      }
+
+      return uniqueParams.sort();
+    }
+
+    var parsed = expressionParserService.parse(expression);
+    return _findParams(parsed);
+  };
+
   /**
   * @param {*} Parse output from the parser. See parser.pegjs for the data
   *     structure.
@@ -360,6 +388,7 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
     'evaluate': evaluate,
     'evaluateExpression': evaluateExpression,
     'evaluateParseTree': evaluateParseTree,
+    'getParamsUsedInExpression': getParamsUsedInExpression,
     'validate': validate,
     'validateExpression': validateExpression,
   };

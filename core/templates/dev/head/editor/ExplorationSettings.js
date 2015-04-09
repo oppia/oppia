@@ -23,12 +23,14 @@ oppia.controller('ExplorationSettings', [
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
-    'warningsData', 'explorationStatesService', function(
+    'warningsData', 'explorationStatesService', 'explorationParamChangesService',
+    'explorationWarningsService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
-      warningsData, explorationStatesService) {
+      warningsData, explorationStatesService, explorationParamChangesService,
+      explorationWarningsService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -47,9 +49,9 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationRightsService = explorationRightsService;
     $scope.explorationInitStateNameService = explorationInitStateNameService;
     $scope.explorationParamSpecsService = explorationParamSpecsService;
+    $scope.explorationParamChangesService = explorationParamChangesService;
 
     explorationData.getData().then(function(data) {
-      $scope.explorationParamChanges = data.param_changes || [];
       $scope.refreshSettingsTab();
     });
   };
@@ -105,11 +107,9 @@ oppia.controller('ExplorationSettings', [
     $rootScope.$broadcast('refreshGraph');
   };
 
-  $scope.saveExplorationParamChanges = function(newValue, oldValue) {
-    if (!angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty(
-        'param_changes', newValue, oldValue);
-    }
+  $scope.saveExplorationParamChanges = function() {
+    explorationParamChangesService.saveDisplayedValue();
+    explorationWarningsService.updateWarnings();
   };
 
   // TODO(sll): Modify this so that it works correctly when discarding changes
