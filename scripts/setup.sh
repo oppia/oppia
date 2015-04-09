@@ -63,7 +63,6 @@ mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
 
 mkdir -p $NODE_MODULE_DIR
-chown -R $ME $NODE_MODULE_DIR
 chmod -R 744 $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
@@ -78,6 +77,9 @@ if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
 else
   # Otherwise, npm will be installed locally, in NODE_PATH.
   export NPM_CMD=$NODE_PATH/bin/npm
+  # Also, change ownership of $NODE_MODULE_DIR. (For Windows,
+  # chown does not seem to be available in git bash.)
+  chown -R $ME $NODE_MODULE_DIR
 fi
 
 export NPM_INSTALL="$NPM_CMD install"
