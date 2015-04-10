@@ -10,7 +10,7 @@
             <!-- Note that adding "track by $index" here seems to mess up the final
             index in the stop() event handler. -->
             <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-sortable-rule-block" ng-if="!$last" style="margin-top: 0;">
-              <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
+              <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2" ng-show="editabilityService.isEditable()">
                 <img src="/images/general/drag_dots.png" width="10">
               </span>
               <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex === $index}">
