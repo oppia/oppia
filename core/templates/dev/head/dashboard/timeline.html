@@ -22,7 +22,7 @@
 {% block content %}
   <div class="oppia-dashboard-container" ng-controller="Timeline">
     <h2 class="oppia-page-heading">Updates</h2>
-    <span style="font-size: smaller; position: absolute; opacity: 0.7; top: 130px;" ng-if="jobQueuedMsec">
+    <span style="font-size: smaller; opacity: 0.7;" ng-if="jobQueuedMsec">
       Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
     </span>
 

@@ -95,12 +95,12 @@ oppia.directive('conversationSkin', [function() {
             .offset().top;
           var newScrollTop = null;
           if ($(document).height() - oppiaLastContentHeight - 60 <=
-              $(window).height() * 0.4) {
+              $(window).height() * 0.5) {
             // The -60 prevents the attribution guide from being scrolled into view.
             newScrollTop = $(document).height() - $(window).height() - 60;
             _learnerInputIsInView = true;
           } else {
-            newScrollTop = oppiaLastContentHeight - $(window).height() * 0.4;
+            newScrollTop = oppiaLastContentHeight - $(window).height() * 0.5;
             _learnerInputIsInView = false;
           }
 
@@ -112,9 +112,17 @@ oppia.directive('conversationSkin', [function() {
             newScrollTop = $(document).scrollTop();
           }
 
-          $('html, body, iframe').animate({
+          var page = $('html, body, iframe');
+
+          page.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchmove", function() {
+            page.stop();
+          });
+
+          page.animate({
             'scrollTop': newScrollTop
-          }, 1000, 'easeOutQuad').promise().done(postScrollCallback);
+          }, 1000, 'easeOutQuad', function() {
+            page.off("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchmove");
+          }).promise().done(postScrollCallback);
         });
       };
 
