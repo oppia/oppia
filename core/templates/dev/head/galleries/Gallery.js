@@ -123,6 +123,17 @@ oppia.controller('Gallery', [
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
 
+
+  $window.addEventListener('scroll', function(e) {
+    var oppiaBanner = $('.oppia-gallery-banner-container');
+    var oppiaTagline = $('.oppia-gallery-banner-tagline');
+    var bannerVanishRate = oppiaBanner.height();
+    var taglineVanishRate = oppiaBanner.height() * 0.3
+
+    oppiaBanner.css({'opacity':(bannerVanishRate - $(window).scrollTop()) / bannerVanishRate});   
+    oppiaTagline.css({'opacity':(taglineVanishRate - $(window).scrollTop()) / taglineVanishRate});
+  });
+
   $scope.CAROUSEL_INTERVAL = 3500;
   $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
 
@@ -220,7 +231,6 @@ oppia.controller('Gallery', [
     }
   });
 }]);
-
 
 oppia.controller('SearchBar', [
     '$scope', '$rootScope', 'searchService', 'oppiaDebouncer', 'createExplorationButtonService', 'urlService', 'CATEGORY_LIST',

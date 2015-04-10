@@ -598,7 +598,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tiles-introduction {
-  font-family: Roboto;
   font-size: 1.4em;
   padding-top: 40px;
   padding-bottom: 40px;
@@ -1391,8 +1390,8 @@ ul.oppia-dashboard-tiles {
   cursor: pointer;
   height: 30px;
   position: absolute;
-  right:-30px;
-  top:-30px;
+  right: -30px;
+  top: -30px;
   width: 30px;
 }
 

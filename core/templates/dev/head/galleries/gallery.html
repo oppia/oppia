@@ -132,7 +132,7 @@
             <div class="oppia-gallery-banner-tagline">
               Your personal tutor for 
               <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
-              <[slide.topic]>
+                <[slide.topic]>
               </a>
             </div>
           </div>
@@ -146,8 +146,10 @@
           <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video" ng-click="showSplashVideoModal()">
         {% else %}
           <span>
-             Oppia is a personalized learning platform created by and for people like you.
-             <div style="display: inline-block;"><a href="/about">Find out more!</a></div>
+            Oppia is a personalized learning platform created by and for people like you.
+            <div style="display: inline-block;">
+              <a href="/about">Find out more!</a>
+            </div>
           </span>
         {% endif %}
       </div>
@@ -161,11 +163,11 @@
             <br><br>
             <div style="display: inline-block;">
             <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-            {% if not user_email %}
-              <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
-            {% else %}
-              <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
-            {% endif %}
+              {% if not user_email %}
+                <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
+              {% else %}
+                <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
+              {% endif %}
             </div>
           </div>
 
@@ -248,18 +250,6 @@
         <iframe src="https://www.youtube.com/embed/{{SPLASH_PAGE_YOUTUBE_VIDEO_ID}}?rel=0&autoplay=1&controls=2&showinfo=0" frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
-  </script>
-
-  <script>
-    $(window).scroll(function() {
-      var oppiaBanner = $('.oppia-gallery-banner-container');
-      var oppiaTagline = $('.oppia-gallery-banner-tagline');
-      var bannerVanishRate = oppiaBanner.height();
-      var taglineVanishRate = oppiaBanner.height() * 0.3
-
-      oppiaBanner.css({'opacity':( bannerVanishRate - $(window).scrollTop() ) / bannerVanishRate});   
-      oppiaTagline.css({'opacity':( taglineVanishRate - $(window).scrollTop() ) / taglineVanishRate});
-    });
   </script>
 {% endblock %}
 
