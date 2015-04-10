@@ -4,7 +4,7 @@
        ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
     <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Content">
     </span>
-    <div class="oppia-state-content-display protractor-test-state-edit-content trans200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="State Content">
+    <div class="oppia-state-content-display protractor-test-state-edit-content oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="State Content">
       <span ng-show="content[0].value == ''" class="oppia-placeholder">
         You can give context to the learner here, and ask a question -- then,
         in the space below, choose a suitable way for the learner to respond.

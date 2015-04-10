@@ -99,11 +99,9 @@ oppia.directive('conversationSkin', [function() {
             // The -60 prevents the attribution guide from being scrolled into view.
             newScrollTop = $(document).height() - $(window).height() - 60;
             _learnerInputIsInView = true;
-            console.log("All the way!");
           } else {
             newScrollTop = oppiaLastContentHeight - $(window).height() * 0.5;
             _learnerInputIsInView = false;
-            console.log("Part way there...");
           }
 
           // Do not scroll up.
@@ -116,13 +114,9 @@ oppia.directive('conversationSkin', [function() {
 
           var page = $('html, body, iframe');
 
-          page.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchmove", function(){
+          page.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchmove", function() {
             page.stop();
           });
-
-          console.log("Current last: ");
-          console.log($('.conversation-skin-oppia-output:last').html());
-          console.log("New scroll top: " + newScrollTop);
 
           page.animate({
             'scrollTop': newScrollTop

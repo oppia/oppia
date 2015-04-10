@@ -64,7 +64,7 @@ html {
 body {
   color: rgba(0,0,0,0.87);
   font-family: "Roboto", Arial, sans-serif;
-  font-size: 160%;
+  font-size: 1.6rem;
   height: 100%;
   margin: 0 auto;
   padding: 0;
@@ -864,6 +864,12 @@ md-card.oppia-gallery-tile {
   margin: 0;
 }
 
+.oppia-editor-card-section-container {
+  background: rgba(5,140,166,0.1); 
+  padding-bottom: 1px;
+  padding-top: 5px;
+}
+
 .oppia-editor-card-section {
   padding: 20px 50px 20px 65px;
 }
@@ -905,7 +911,6 @@ md-card.oppia-gallery-tile {
 .oppia-editable-section:hover .oppia-rule-preview {
   background: #eee;
   border-radius: 4px;
-
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {
@@ -1054,6 +1059,13 @@ md-card.oppia-gallery-tile {
 .oppia-rule-save-cancel-buttons {
   margin-bottom: 5px;
   margin-top: 2px;
+}
+
+.oppia-rule-block {
+  background-color: white;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
 }
 
 .oppia-rule-sort-handle {
@@ -1681,11 +1693,6 @@ div#ng-curtain {
   width: 300px;
 }
 
-.oppia-about-right-menu-subnav {
-  font-size: 12px;
-  margin-left: 0.7em;
-}
-
 .oppia-about-right-menu p {
   line-height: 1;
   margin: 0.5em 0;
@@ -1700,6 +1707,10 @@ div#ng-curtain {
   display: none;
 }
 
+.oppia-page-heading {
+  margin-bottom: 5px;
+}
+
 @media(max-width: 800px) {
   .oppia-page-heading {
     margin-left: 30px;
@@ -1710,7 +1721,7 @@ div#ng-curtain {
   color: #DBEA00;
 }
 
-.trans200 {
+.oppia-transition-200 {
   -webkit-transition: all 200ms;
   transition: all 200ms;
 }
