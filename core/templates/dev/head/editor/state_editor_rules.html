@@ -9,7 +9,7 @@
             ui-sortable documentation for more details. -->
             <!-- Note that adding "track by $index" here seems to mess up the final
             index in the stop() event handler. -->
-            <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block" ng-if="!$last" style="margin-top: 0;">
+            <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" ng-if="!$last" style="margin-top: 0;">
               <span class="oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
                 <img src="/images/general/drag_dots.png" width="10">
               </span>
@@ -25,7 +25,7 @@
               </a>
 
               <!-- Note that the use of ids for the tutorial here only works because at most one rule editor is visible at a time. -->
-              <div ng-if="activeRuleIndex === $index && !isDraggingOccurring && isActiveRuleEditorShown" id="tutorialStateActiveRule">
+              <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown" id="tutorialStateActiveRule">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container">
                     <rule-editor rule="rule" save-rule="saveActiveRule(rule)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
@@ -43,7 +43,7 @@
                 </span>
               </a>
 
-              <div ng-if="activeRuleIndex === handler.length - 1 && !isDraggingOccurring && isActiveRuleEditorShown" id="tutorialStateActiveRule">
+              <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown" id="tutorialStateActiveRule">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container">
                     <rule-editor rule="handler[handler.length - 1]" save-rule="saveActiveRule(handler[handler.length - 1])" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">

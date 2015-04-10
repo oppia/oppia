@@ -14,8 +14,9 @@
   limitations under the License.
 */
 
-/* Animation keyframes. These must be placed at the top of the file
-   in order to work in IE.
+/* 
+  Animation keyframes. These must be placed at the top of the file
+  in order to work in IE.
 */
 @-webkit-keyframes dot {
   0% { opacity: 0; }
@@ -57,14 +58,30 @@ md-input-group.md-default-theme label
 }
 
 /* Bootstrap overrides and additions. */
-html {
+html {  
+  /* 
+    The HTML font-size is set to 62.5% in order to make 'em' units easier to
+    work with. Modern browsers set their default font-size to 16px. This means
+    that 1em = 16px, which is a difficult base to work with (for example, 
+    1.6em = 25.6px, which is not rounded). By setting the html's font-size to 
+    62.5%, the base font-size becomes 10px, so 1em = 10px, and 1.6em = 16px.
+    The reason for making 'em' easier to work with is that 'em's scale with
+    the user's font-size preferences that they set in the browser, while
+    'px' is a fixed unit of measurement that doesn't scale.
+  */
+  font-size: 62.5%;
   height: 100%;
 }
 
 body {
   color: rgba(0,0,0,0.87);
   font-family: "Roboto", Arial, sans-serif;
-  font-size: 1.6rem;
+  /* 
+    A font-size of 1.6em sets the default font-size on Oppia to 16px, though
+    this will scale depending on the user's font-size preferences set via
+    their browser preferences.
+  */
+  font-size: 1.6em;
   height: 100%;
   margin: 0 auto;
   padding: 0;
@@ -1066,6 +1083,12 @@ md-card.oppia-gallery-tile {
   border-top: 1px solid #ccc;
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
+}
+
+.oppia-rule-block.active {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  margin: -2px;
+  z-index: 1;
 }
 
 .oppia-rule-sort-handle {
