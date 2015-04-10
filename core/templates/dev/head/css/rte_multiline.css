@@ -21,10 +21,9 @@ html {
 }
 
 body {
-  color: #222;
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 20px;
+  color: rgba(0,0,0,0.87);
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1em;
   margin: 0 auto;
   padding: 0;
   width: 98%;
