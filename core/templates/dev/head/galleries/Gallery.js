@@ -116,12 +116,23 @@ oppia.factory('searchService', [
 }]);
 
 oppia.controller('Gallery', [
-    '$scope', '$http', '$rootScope', '$window', '$timeout', 'createExplorationButtonService',
+    '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout', 'createExplorationButtonService',
     'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL',
     'CATEGORY_LIST', 'searchService',
-    function($scope, $http, $rootScope, $window, $timeout, createExplorationButtonService,
+    function($scope, $http, $rootScope, $modal, $window, $timeout, createExplorationButtonService,
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
+
+
+  $window.addEventListener('scroll', function() {
+    var oppiaBanner = $('.oppia-gallery-banner-container');
+    var oppiaTagline = $('.oppia-gallery-banner-tagline');
+    var bannerVanishRate = oppiaBanner.height();
+    var taglineVanishRate = oppiaBanner.height() * 0.3;
+
+    oppiaBanner.css({'opacity': (bannerVanishRate - $(window).scrollTop()) / bannerVanishRate});   
+    oppiaTagline.css({'opacity': (taglineVanishRate - $(window).scrollTop()) / taglineVanishRate});
+  });
 
   $scope.CAROUSEL_INTERVAL = 3500;
   $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
@@ -151,6 +162,14 @@ oppia.controller('Gallery', [
 
   $scope.showCreateExplorationModal = function() {
     createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+  };
+
+  $scope.showSplashVideoModal = function() {
+    $modal.open({
+      templateUrl: 'modals/splashVideo',
+      size: 'lg',
+      windowClass: 'oppia-gallery-modal'
+    });
   };
 
   $scope.currentUserIsModerator = false;
@@ -212,7 +231,6 @@ oppia.controller('Gallery', [
     }
   });
 }]);
-
 
 oppia.controller('SearchBar', [
     '$scope', '$rootScope', 'searchService', 'oppiaDebouncer', 'createExplorationButtonService', 'urlService', 'CATEGORY_LIST',
