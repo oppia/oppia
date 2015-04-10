@@ -590,9 +590,7 @@ oppia.controller('LearnerLocalNav', [
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
   $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
-    "Check out this interactive lesson from Oppia.org - a free, open-source " +
-    "learning platform!"
-  );
+    GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
 
   $scope.$on('playerServiceInitialized', function() {
     $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
