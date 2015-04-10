@@ -373,7 +373,7 @@ oppia.factory('stateGraphArranger', [
       var HORIZONTAL_EDGE_PADDING_FRACTION = 0.05;
       // Vertical edge padding between the graph and the edge of the graph visualization,
       // measured as a fraction of the entire height.
-      var VERTICAL_EDGE_PADDING_FRACTION = 0.05;
+      var VERTICAL_EDGE_PADDING_FRACTION = 0.1;
 
       // The vertical padding, measured as a fraction of the height of a grid rectangle,
       // between the top of the grid rectangle and the top of the node. An equivalent amount
@@ -679,8 +679,8 @@ oppia.directive('stateGraphViz', [
         }
 
         var _getNodeStrokeWidth = function(nodeId) {
-          return nodeId == $scope.currentStateId() ? '4' :
-                 (nodeId == initStateId || nodeId == $scope.initStateId2 ||
+          return nodeId == $scope.currentStateId() ? '3' :
+                 (nodeId == $scope.initStateId2 ||
                  nodeId == 'END') ? '2' : '1';
         };
 

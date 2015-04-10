@@ -43,20 +43,17 @@
       fill: green;
     }
     .oppia-graph-viz .node rect.current-node {
-      fill: #05a69a;
-    }
-    .oppia-graph-viz .node rect.init-node {
-      fill: #bbedb1;
+      fill: #058CA6;
     }
     .oppia-graph-viz .node rect.bad-node {
-      fill: pink;
+      fill: #F35F55;
     }
     .oppia-graph-viz .node rect.current-node:hover,
     .oppia-graph-viz .node rect.init-node:hover,
     .oppia-graph-viz .node rect.terminal-node:hover,
     .oppia-graph-viz .node rect.bad-node:hover,
     .oppia-graph-viz .node rect.normal-node:hover {
-      fill: blue;
+      fill: #058CA6;
     }
 
     .oppia-graph-viz .clickable {
@@ -93,7 +90,7 @@
               </g>
 
               <g class="node protractor-test-node" ng-repeat="node in nodeList">
-                <rect rx="4" ry="4" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
+                <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
                       class="protractor-test-node-background <[node.nodeClass]>"
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                       ng-class="{'clickable': canNavigateToNode(node.id)}"
@@ -102,7 +99,7 @@
                 </rect>
                 <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
-                  <tspan><[getTruncatedLabel(node.label)]></tspan>
+                  <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
                   <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
                 </text>
                 <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
