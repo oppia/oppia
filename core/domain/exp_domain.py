@@ -571,6 +571,25 @@ class GadgetInstance(object):
 
     def validate(self):
         """Validate attributes of this GadgetInstance."""
+        try:
+            self.gadget
+        except KeyError:
+            raise utils.ValidationError(
+                'Unknown gadget with ID %s is not in the registry.' % self.id)
+
+        unknown_customization_arguments = set(
+            self.customization_args.iterkeys()) - set(
+                [customization_arg.name for customization_arg
+                 in self.gadget.customization_arg_specs])
+        if unknown_customization_arguments:
+            raise utils.ValidationError(
+                'Unknown customization argument%s for %s: %s' % (
+                    's' if len(unknown_customization_arguments) > 1 else '',
+                    self.id,
+                    ', '.join(sorted(unknown_customization_arguments))
+                )
+            )
+
         self.gadget.validate(self.customization_args)
 
         if self.visible_in_states == []:
