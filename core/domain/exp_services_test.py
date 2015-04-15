@@ -368,8 +368,10 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 4
+schema_version: 5
 skill_tags: []
+skin_customizations:
+  panels_contents: {}
 states:
   %s:
     content:
@@ -424,8 +426,10 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 4
+schema_version: 5
 skill_tags: []
+skin_customizations:
+  panels_contents: {}
 states:
   %s:
     content:

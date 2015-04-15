@@ -41,6 +41,7 @@ import os
 
 from core.domain import obj_services
 from core.domain import rule_domain
+from extensions import domain
 import feconf
 import jinja_utils
 import schema_utils
@@ -74,16 +75,6 @@ class AnswerHandler(object):
             'name': self.name,
             'obj_type': self.obj_type,
         }
-
-
-class CustomizationArgSpec(object):
-    """Value object for a customization arg specification."""
-
-    def __init__(self, name, description, schema, default_value):
-        self.name = name
-        self.description = description
-        self.schema = schema
-        self.default_value = default_value
 
 
 class BaseInteraction(object):
@@ -128,7 +119,7 @@ class BaseInteraction(object):
     @property
     def customization_arg_specs(self):
         return [
-            CustomizationArgSpec(**cas)
+            domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property

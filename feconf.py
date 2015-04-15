@@ -37,6 +37,7 @@ else:
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
+GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
@@ -74,6 +75,10 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Name (and description) of the default rule.
 DEFAULT_RULE_NAME = 'Default'
+
+# Default valid parameter for instantiating Explorations when explicit
+# skin customizations aren't provided.
+DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -201,6 +206,14 @@ ALLOWED_INTERACTIONS = {
     },
     'TextInput': {
         'dir': os.path.join(INTERACTIONS_DIR, 'TextInput')
+    },
+}
+ALLOWED_GADGETS = {
+    'AdviceBar': {
+        'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
+    },
+    'ScoreBar': {
+        'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },
 }
 

@@ -20,18 +20,9 @@ __author__ = 'Sean Lip'
 
 import os
 
+from extensions import domain
 import feconf
 import utils
-
-
-class CustomizationArgSpec(object):
-    """Value object for an RTE component customization arg specification."""
-
-    def __init__(self, name, description, schema, default_value):
-        self.name = name
-        self.description = description
-        self.schema = schema
-        self.default_value = default_value
 
 
 class BaseRichTextComponent(object):
@@ -69,7 +60,7 @@ class BaseRichTextComponent(object):
     @property
     def customization_arg_specs(self):
         return [
-            CustomizationArgSpec(**cas)
+            domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
