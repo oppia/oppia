@@ -71,6 +71,11 @@ indexes:
   - name: time_queued_msec
     direction: desc
 
+- kind: OpenFeedbacksRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: RecentUpdatesRealtimeModel
   properties:
   - name: realtime_layer

@@ -206,7 +206,7 @@ class FeedbackMessageModel(base_models.BaseModel):
 
 
 class OpenFeedbacksModel(base_models.BaseModel):
-    """Model for storing open feedback counts for explorations  .
+    """Model for storing open feedback counts for explorations.
 
     A OpenFeedbacksModel instance stores the following information:
 
@@ -216,20 +216,9 @@ class OpenFeedbacksModel(base_models.BaseModel):
     """
     
     # The number of open feedbacks for an exploration.
-    num_of_open_feedbacks = ndb.IntegerProperty(default=None, indexed=True)    
+    num_of_open_feedbacks = ndb.IntegerProperty(default=None, indexed=False)    
     
     @classmethod
-    def create_or_update(cls, id):
-      entry = cls.get_by_id(id, strict=false)
-      if entry is None:
-          cls(id=id, num_of_open_feedbacks=1).put()
-      else:
-        entry.num_of_open_feedbacks += 1
-        entry.put()
-
-    @classmethod
-    def update(cls, id):
-      entry = cls.get_by_id(id, strict=false)
-      if entry is not NONE
-          entry.num_of_open_feedbacks -= 1
-          entry.put()
+    def create(cls, id, open_feedbacks):
+        """Creates a new OpenFeedbacksModel entry."""
+        cls(id=id, num_of_open_feedbacks=open_feedbacks).put()

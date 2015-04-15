@@ -1,4 +1,20 @@
-"""Jobs for open feedbacks."""
+# coding: utf-8
+#
+# Copyright 2015 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Jobs for open feedback threads."""
 
 from core import jobs
 from core.platform import models
@@ -47,26 +63,23 @@ class OpenFeedbacksStatisticsAggregator(jobs.BaseContinuousComputationManager):
         """
         Args:
           - exploration_id: id of the exploration to get statistics for
-          - exploration_version: str. Which version of the exploration to get
-              statistics for; this can be a version number, the string 'all',
-              or the string 'none'.
 
         Returns the number of open feedbacks.
         """
 
-        exp_model = user_models.OpenFeedbacksModel.get(
+        feedback_thread_analytics_model = feedback_models.OpenFeedbacksModel.get(
             exploration_id, strict=False)
-        return exp_model.num_of_open_feedbacks if exp_model else None
+        return feedback_thread_analytics_model.num_of_open_feedbacks \
+            if exp_model else None
 
 
 class OpenFeedbacksMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
+    """Job that creates OpenFeedbackModels for explorations by calculating the
+       number of open feedback threads per exploration.
+       Includes:
+       * number of open feedbacks for an exploration.
     """
-    Job that calculates and creates summary models for exploration view.
-    Includes: * number of open feedbacks for an exploration.
-    """
-    
-    STATUS_CHOICES_OPEN = 'open'
 
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -78,11 +91,10 @@ class OpenFeedbacksMRJobManager(
 
     @staticmethod
     def map(item):
-        if (item.status == STATUS_CHOICES_OPEN):
-            feedback_models.OpenFeedbacksModel.create_or_update(
-                item.id.split('.')[0])
-
+        if (item.status == feedback_models.STATUS_CHOICES_OPEN):
+            yield ('%s:%s' % (item.exploration_id, 1))
 
     @staticmethod
     def reduce(key, stringified_values):
-        pass
+        feedback_models.OpenFeedbacksModel.create(
+                key, len(stringified_values))
