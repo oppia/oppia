@@ -74,7 +74,8 @@ class TestGadget(base.BaseGadget):
         """Returns int representing width in pixels.
 
         Args:
-        - customization_args: list of CustomizationArgSpec instances."""
+        - customization_args: list of CustomizationArgSpec instances.
+        """
         characters = customization_args['characters']['value']
         return characters * self._PIXEL_WIDTH_PER_CHARACTER
 
@@ -82,6 +83,7 @@ class TestGadget(base.BaseGadget):
         """Returns int representing height in pixels.
 
         Args:
-        - customization_args: list of CustomizationArgSpec instances."""
+        - customization_args: list of CustomizationArgSpec instances.
+        """
         floors = customization_args['floors']['value']
         return floors * self._PIXEL_HEIGHT_PER_FLOOR

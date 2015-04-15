@@ -865,7 +865,6 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
     _SAMPLE_SKIN_INSTANCE_DICT = {
         'skin_id': 'conversation_v1',
         'skin_customizations': {
-
             'panels_contents': {
                 'bottom': [],
                 'left': [
@@ -886,14 +885,14 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
     def test_get_state_names_required_by_gadgets(self):
         """Test accurate computation of state_names_required_by_gadgets."""
         skin_instance = exp_domain.SkinInstance(
-          'conversation_v1',
-          self._SAMPLE_SKIN_INSTANCE_DICT['skin_customizations'])
+            'conversation_v1',
+            self._SAMPLE_SKIN_INSTANCE_DICT['skin_customizations'])
         self.assertEqual(
             skin_instance.get_state_names_required_by_gadgets(),
             ['New state', 'Second state'])
 
     def test_conversion_of_skin_to_and_from_dict(self):
-        """Tests convertion of SkinInstance to and from dict representations."""
+        """Tests conversion of SkinInstance to and from dict representations."""
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
         skin_instance = exploration.skin_instance
@@ -940,8 +939,9 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(test_gadget_instance.height, 50)
         self.assertEqual(test_gadget_instance.width, 60)
-        self.assertEqual(test_gadget_instance.customization_args['title']['value'],
-          'The Test Gadget!')
+        self.assertEqual(
+            test_gadget_instance.customization_args['title']['value'],
+            'The Test Gadget!')
         self.assertIn('New state', test_gadget_instance.visible_in_states)
 
     def test_gadget_instance_validation(self):
@@ -964,31 +964,23 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
             2300):
 
             with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Size exceeded: left panel width of 4600 exceeds limit of 100'):
+                    utils.ValidationError,
+                    'Size exceeded: left panel width of 4600 exceeds limit of 100'):
                 exploration.validate()
-
-        # Assert unrecognized CustomizationArgSpecs raise a ValidationError.
-        test_gadget_instance.customization_args['fake_arg'] = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Unknown customization argument for TestGadget: fake_arg'):
-            test_gadget_instance.validate()
-        del test_gadget_instance.customization_args['fake_arg']
 
         # Assert internal validation against CustomizationArgSpecs.
         test_gadget_instance.customization_args['floors']['value'] = 5
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'TestGadgets are limited to 3 floors, found 5.'):
+                utils.ValidationError,
+                'TestGadgets are limited to 3 floors, found 5.'):
             test_gadget_instance.validate()
         test_gadget_instance.customization_args['floors']['value'] = 1
 
         # Assert that too many gadgets in a panel raise a ValidationError.
         panel_contents_dict['left'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            "'left' panel expected at most 1 gadget, received 2."):
+                utils.ValidationError,
+                "'left' panel expected at most 1 gadget, received 2."):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any

@@ -582,13 +582,11 @@ class GadgetInstance(object):
                 [customization_arg.name for customization_arg
                  in self.gadget.customization_arg_specs])
         if unknown_customization_arguments:
-            raise utils.ValidationError(
-                'Unknown customization argument%s for %s: %s' % (
-                    's' if len(unknown_customization_arguments) > 1 else '',
-                    self.id,
-                    ', '.join(sorted(unknown_customization_arguments))
-                )
-            )
+            for arg_name in unknown_customization_arguments:
+                logging.warning(
+                    'Gadget %s does not support customization arg %s.'
+                    % (self.id, arg_name))
+            del self.customization_args[arg_name]
 
         self.gadget.validate(self.customization_args)
 
