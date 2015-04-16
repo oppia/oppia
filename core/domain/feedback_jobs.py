@@ -69,8 +69,8 @@ class OpenFeedbacksStatisticsAggregator(jobs.BaseContinuousComputationManager):
 
         feedback_thread_analytics_model = feedback_models.OpenFeedbacksModel.get(
             exploration_id, strict=False)
-        return feedback_thread_analytics_model.num_of_open_feedbacks \
-            if exp_model else None
+        return (feedback_thread_analytics_model.num_of_open_feedbacks
+            if feedback_thread_analytics_model else None)
 
 
 class OpenFeedbacksMRJobManager(
@@ -92,7 +92,7 @@ class OpenFeedbacksMRJobManager(
     @staticmethod
     def map(item):
         if (item.status == feedback_models.STATUS_CHOICES_OPEN):
-            yield ('%s:%s' % (item.exploration_id, 1))
+            yield (item.exploration_id, 1)
 
     @staticmethod
     def reduce(key, stringified_values):

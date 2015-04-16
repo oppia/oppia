@@ -152,5 +152,5 @@ def get_open_feedbacks(exploration_id):
 
     If this exploration has no open feedbacks, returns None.
     """
-    return feedback_jobs.OpenFeedbacksStatisticsAggregator. \
-        get_num_of_open_feedbacks(exploration_id)
+    return (feedback_jobs.OpenFeedbacksStatisticsAggregator. 
+        get_num_of_open_feedbacks(exploration_id))
