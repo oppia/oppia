@@ -123,7 +123,6 @@ oppia.controller('Gallery', [
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
 
-
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
     var oppiaTagline = $('.oppia-gallery-banner-tagline');

@@ -1181,7 +1181,7 @@ oppia-parameter {
 }
 
 .oppia-dashboard-status-green {
-  color: #65e065;
+  color: #05A64B;
   text-transform: capitalize;
 }
 
@@ -1203,6 +1203,7 @@ oppia-parameter {
   color: #888;
   font-size: 0.75em;
   height: 70px;
+  margin-left: 10px;
   padding-left: 20px;
   padding-right: 30px;
   padding-top: 5px;
@@ -1280,22 +1281,22 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-splash-search-input::-webkit-input-placeholder {
-  color: #ccc;
+  color: rgba(255,255,255,0.7);
 }
 .oppia-splash-search-input:-moz-placeholder {
-  color: #ccc;
+  color: rgba(255,255,255,0.7);
 }
 .oppia-splash-search-input::-moz-placeholder {
-  color: #ccc;
+  color: rgba(255,255,255,0.7);
 }
 .oppia-splash-search-input:-ms-input-placeholder {
-  color: #ccc;
+  color: rgba(255,255,255,0.7);
 }
 
 .oppia-splash-search-icon {
   background: #04857c;
   border: 1px solid #018c7f;
-  color: white;
+  color: rgba(255,255,255,0.7);
 }
 
 /* CSS3 Animations */
