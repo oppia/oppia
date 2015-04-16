@@ -1296,7 +1296,7 @@ ul.oppia-dashboard-tiles {
 .oppia-splash-search-icon {
   background: #04857c;
   border: 1px solid #018c7f;
-  color: rgba(255,255,255,.7);
+  color: rgba(255,255,255,0.7);
 }
 
 /* CSS3 Animations */
