@@ -583,7 +583,7 @@ oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
     function(
-      $scope, $http, $modal,  oppiaHtmlEscaper,
+      $scope, $http, $modal, oppiaHtmlEscaper,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   var _END_DEST = 'END';
 
