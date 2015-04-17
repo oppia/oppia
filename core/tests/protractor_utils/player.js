@@ -76,13 +76,13 @@ var submitAnswer = function(interactionName, answerData) {
 var expectExplorationToBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
-  ).toEqual('Congratulations, you have finished this exploration!');
+  ).toEqual('Congratulations, you have finished!');
 };
 
 var expectExplorationToNotBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
-  ).not.toEqual('Congratulations, you have finished this exploration!');
+  ).not.toEqual('Congratulations, you have finished!');
 };
 
 exports.restartExploration = restartExploration;
