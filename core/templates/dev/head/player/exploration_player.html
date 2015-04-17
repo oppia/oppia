@@ -9,6 +9,7 @@
   {% if exploration_version %}
     <script type="text/javascript">
       GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+      GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
     </script>
   {% endif %}
@@ -36,18 +37,39 @@
           <span class="glyphicon glyphicon-share"></span>
         </a>
         <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+          {% if SHARING_OPTIONS['gplus'] %}
+            <li>
+              <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
+                 onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')"
+                 target="_window" tooltip="Google+" tooltip-placement="left">
+                <img src="/images/general/gplus.png" alt="Google+">
+              </a>
+            </li>
+          {% endif %}
+
+          {% if SHARING_OPTIONS['facebook'] %}
+            <li>
+              <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button"
+                 onclick="return !window.open(this.href, '', 'height=336, width=640')"
+                 target="_window" tooltip="Facebook" tooltip-placement="left">
+                <img src='/images/general/fb.png' alt="Facebook">
+              </a>
+            </li>
+          {% endif %}
+
+          {% if SHARING_OPTIONS['twitter'] %}
+            <li>
+              <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>"
+                 onclick="return !window.open(this.href, '', 'height=460, width=640')"
+                 target="_window" tooltip="Twitter" tooltip-placement="left">
+                <img src="/images/general/twitter.png" alt="Twitter">
+              </a>
+            </li>
+          {% endif %}
+
           <li>
-            <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
-            <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
-               onclick="javascript:window.open(this.href,
-                        '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
-               tooltip="Google+" tooltip-placement="left">
-              <img src="https://www.gstatic.com/images/icons/gplus-64.png"
-                   alt="Share on Google+"/>
-            </a>
-          </li>
-          <li>
-            <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="left">
+            <a href="" ng-click="showEmbedExplorationModal(explorationId)"
+               tooltip="Embed" tooltip-placement="left">
               <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
             </a>
           </li>

@@ -580,22 +580,24 @@ oppia.factory('ratingService', [
 
 
 oppia.controller('LearnerLocalNav', [
-    '$scope', '$http', '$modal',
+    '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
     function(
-      $scope, $http, $modal,
+      $scope, $http, $modal, oppiaHtmlEscaper,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   var _END_DEST = 'END';
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
+  $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+    GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
 
   $scope.$on('playerServiceInitialized', function() {
     $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
   });
   $scope.$on('ratingServiceInitialized', function() {
     $scope.userRating = ratingService.getUserRating();
-  })
+  });
 
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 

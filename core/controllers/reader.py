@@ -40,6 +40,43 @@ import utils
 import jinja2
 
 
+SHARING_OPTIONS = config_domain.ConfigProperty(
+    'sharing_options', {
+        'type': 'dict',
+        'properties': [{
+            'name': 'gplus',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'facebook',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'twitter',
+            'schema': {
+                'type': 'bool',
+            }
+        }]
+    },
+    'Sharing options to display in the learner view',
+    default_value={
+        'gplus': False,
+        'facebook': False,
+        'twitter': False,
+    })
+
+SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
+    'sharing_options_twitter_text', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message',
+    default_value=(
+        'Check out this interactive lesson from Oppia - a free, open-source '
+        'learning platform!'))
+
+
 def require_playable(handler):
     """Decorator that checks if the user can play the given exploration."""
     def test_can_play(self, exploration_id, **kwargs):
@@ -141,6 +178,8 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'SHARING_OPTIONS': SHARING_OPTIONS.value,
+            'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
             'additional_angular_modules': additional_angular_modules,
             'can_edit': (
                 bool(self.username) and
