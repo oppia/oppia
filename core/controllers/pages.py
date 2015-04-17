@@ -95,8 +95,8 @@ class ForumPage(base.BaseHandler):
 
         self.values.update({
             'OPPIA_FORUM_URL': (
-                'https://groups.google.com/forum/embed/?hideforumtitle=true'
-                '&parenturl=%s#!categories/oppia/' %
+                'https://groups.google.com/forum/embed/?place=forum/oppia'
+                '&showtabs=false&hideforumtitle=true&parenturl=%s' %
                 urllib.quote(self.request.uri, safe='')
             ),
             'on_localhost': netloc.startswith('localhost'),
