@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the user timeline and 'my explorations' pages."""
+"""Tests for the user notification dashboard and 'my explorations' pages."""
 
 __author__ = 'Sean Lip'
 
@@ -32,31 +32,31 @@ class HomePageTest(test_utils.GenericTestBase):
             'Your personal tutor',
             'Oppia - Gallery', 'About', 'Login',
             # No navbar tabs should be highlighted.
-            no=['class="active"', 'Logout', 'Timeline'])
+            no=['class="active"', 'Logout'])
 
-    def test_timeline_redirects_for_logged_out_users(self):
-        """Test the logged-out view of the timeline."""
-        response = self.testapp.get('/timeline')
+    def test_notifications_dashboard_redirects_for_logged_out_users(self):
+        """Test the logged-out view of the notifications dashboard."""
+        response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
-        self.assertIn('timeline', response.headers['location'])
+        self.assertIn('notifications_dashboard', response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.testapp.get('/timeline')
+        response = self.testapp.get('/notifications_dashboard')
         # This should redirect the user to complete signup.
         self.assertEqual(response.status_int, 302)
         self.logout()
 
-    def test_logged_in_timeline(self):
-        """Test the logged-in view of the timeline."""
+    def test_logged_in_notifications_dashboard(self):
+        """Test the logged-in view of the notifications dashboard."""
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/timeline')
+        response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Timeline', 'Logout',
+            'Notifications', 'Logout',
             self.get_expected_logout_url('/'),
             no=['Login', 'Your personal tutor',
                 self.get_expected_login_url('/')])
@@ -170,12 +170,12 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class TimelineHandlerTest(test_utils.GenericTestBase):
+class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
 
-    TIMELINE_DATA_URL = '/timelinehandler/data'
+    DASHBOARD_DATA_URL = '/notificationsdashboardhandler/data'
 
     def setUp(self):
-        super(TimelineHandlerTest, self).setUp()
+        super(NotificationsDashboardHandlerTest, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -210,7 +210,7 @@ class TimelineHandlerTest(test_utils.GenericTestBase):
                 'get_recent_updates',
                 self._get_recent_updates_mock_by_viewer):
             self.login(self.VIEWER_EMAIL)
-            response = self.get_json(self.TIMELINE_DATA_URL)
+            response = self.get_json(self.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['recent_updates']), 1)
             self.assertEqual(
                 response['recent_updates'][0]['author_username'],
@@ -222,7 +222,7 @@ class TimelineHandlerTest(test_utils.GenericTestBase):
                 'get_recent_updates',
                 self._get_recent_updates_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)
-            response = self.get_json(self.TIMELINE_DATA_URL)
+            response = self.get_json(self.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['recent_updates']), 1)
             self.assertEqual(
                 response['recent_updates'][0]['author_username'], '')

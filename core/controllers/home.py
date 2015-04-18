@@ -26,8 +26,8 @@ import feconf
 import utils
 
 
-class TimelinePage(base.BaseHandler):
-    """Page with timeline updates for the user."""
+class NotificationsDashboardPage(base.BaseHandler):
+    """Page with notifications for the user."""
 
     @base.require_user
     def get(self):
@@ -39,14 +39,15 @@ class TimelinePage(base.BaseHandler):
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
             self.render_template(
-                'dashboard/timeline.html', redirect_url_on_logout='/')
+                'dashboard/notifications_dashboard.html',
+                redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', '/timeline'))
+                feconf.SIGNUP_URL, 'return_url', '/notifications_dashboard'))
 
 
-class TimelineHandler(base.BaseHandler):
-    """Provides data for the user timeline."""
+class NotificationsDashboardHandler(base.BaseHandler):
+    """Provides data for the user notifications dashboard."""
 
     # We use 'gallery' because the createExploration() modal makes a call
     # there.
