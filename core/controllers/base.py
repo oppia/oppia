@@ -373,6 +373,11 @@ class BaseHandler(webapp2.RequestHandler):
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
         })
 
+        if 'meta_description' not in values:
+            values['meta_description'] = (
+                'Oppia is a free, open-source learning platform. Join the '
+                'community to create or try an exploration today!')
+
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
         if self.user_id:

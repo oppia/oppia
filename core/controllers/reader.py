@@ -139,6 +139,16 @@ class ExplorationPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'player'
 
+    def _make_first_letter_uppercase(self, s):
+        """Converts the first letter of a string to its uppercase equivalent,
+        and returns the result.
+        """
+        # This guards against empty strings.
+        if s:
+            return s[0].upper() + s[1:]
+        else:
+            return s
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -195,6 +205,9 @@ class ExplorationPage(base.BaseHandler):
                 interaction_templates),
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
+            # Note that this overwrites the value in base.py.
+            'meta_description': self._make_first_letter_uppercase(
+                exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
@@ -204,7 +217,6 @@ class ExplorationPage(base.BaseHandler):
             'skin_tag': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_tag(exploration.default_skin)
             ),
-            'title': exploration.title,
         })
 
         if is_iframed:
