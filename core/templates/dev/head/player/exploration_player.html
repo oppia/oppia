@@ -76,7 +76,7 @@
         </ul>
       </li>
       <li>
-        <a href="" tooltip="Feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
+        <a href="" tooltip="Feedback" tooltip-placement="bottom" popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
           <span class="glyphicon glyphicon-comment"></span>
         </a>
       </li>
@@ -93,77 +93,47 @@
 
 {% block content %}
   {{ skin_tag }}
+
   <br><br><br>
+
   {% if not iframed %}
     {% include 'attribution_guide.html' %}
   {% endif %}
 
-  <script type="text/ng-template" id="modals/playerFeedback">
-    <div class="modal-header">
-      <h3>
-        <span ng-if="!stateName">
-          Give Feedback on this Exploration
-        </span>
-        <span ng-if="stateName">
-          Give Feedback on this Card
-        </span>
-      </h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        <em>
-          The feedback you write here will be sent to the editors of this exploration.
-          To give general feedback about Oppia, please use the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a> instead. Thanks in advance!
-        </em>
-      </p>
-
-      <div role="form">
-        <div class="form-group">
-          <label for="subject">Subject</label>
-          <input type="text" class="form-control" id="subject" ng-model="subject">
-        </div>
-        <label for="feedback">Feedback</label>
-        <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-        <div ng-show="isLoggedIn">
-          <hr>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" ng-model="isSubmitterAnonymized">
-              Give feedback anonymously
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-success" ng-click="submit(subject, feedback, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
-    </div>
-  </script>
-
-  <script type="text/ng-template" id="modals/playerFeedbackConfirmation">
-    <div class="modal-header">
-      <h3>Thank you for giving feedback</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        Your feedback has been successfully submitted, and the exploration editors will see it when they next visit the exploration editing page.
-      </p>
-      <p>
-        Thank you for helping to improve this exploration!
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Close</button>
-    </div>
-  </script>
-
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/ratings.html' %}
+
+  <script type="text/ng-template" id="popover/feedback">
+    <!--
+      TODO(sll): stateName is implicitly derived from the
+      parent scope. This is confusing and should be replaced
+      when UI Bootstrap v0.13.0 comes out (with support for
+      popover templates).
+    -->
+    <feedback-popup state-name="stateName">
+    </feedback-popup>
+  </script>
+
+  <script type="text/ng-template" id="components/feedback">
+    <div style="min-width: 250px;">
+      <div>
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" class="oppia-close-popover-button" ng-click="closePopover()">
+      </div>
+      <br>
+      <div>
+        <textarea ng-model="feedbackText" rows="5" style="width: 100%" placeholder="Leave feedback for the authors..." autofocus="autofocus">
+        </textarea>
+      </div>
+
+      <md-button class="pull-right" style="margin-top: 4px;" ng-click="saveFeedback()">Submit</md-button>
+      <div class="checkbox" style="font-size: 0.9em;" ng-show="isLoggedIn">
+        <label>
+          <input type="checkbox" ng-model="isSubmitterAnonymized">
+          Submit Anonymously
+        </label>
+      </div>
+    </div>
+  </script>
 {% endblock %}
 
 {% block footer_js %}

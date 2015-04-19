@@ -1012,7 +1012,8 @@ md-card.oppia-gallery-tile {
   padding-top: 3px;
 }
 
-.oppia-delete-interaction-button {
+.oppia-delete-interaction-button,
+.oppia-close-popover-button {
   cursor: pointer; 
   opacity: 0.5; 
   position: absolute; 
@@ -1020,7 +1021,8 @@ md-card.oppia-gallery-tile {
   top: 10px; 
   width: 20px;
 }
-.oppia-delete-interaction-button:hover {
+.oppia-delete-interaction-button:hover,
+.oppia-close-popover-button:hover {
   opacity: 1;
 }
 

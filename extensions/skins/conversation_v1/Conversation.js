@@ -81,14 +81,6 @@ oppia.directive('conversationSkin', [function() {
         }
       });
 
-      $scope.openCardFeedbackModal = function(stateName) {
-        if ($scope.isInPreviewMode) {
-          warningsData.addWarning('This functionality is not available in preview mode.');
-        } else {
-          oppiaPlayerService.openPlayerFeedbackModal(stateName);
-        }
-      };
-
       var _scrollToBottom = function(postScrollCallback) {
         $scope.adjustPageHeight(true, function() {
           var oppiaLastContentHeight = $('.conversation-skin-oppia-output:last')
