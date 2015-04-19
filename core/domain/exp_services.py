@@ -63,7 +63,7 @@ def get_exploration_from_model(exploration_model):
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
-        exploration_model.language_code, exploration_model.skill_tags,
+        exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
         exploration_model.default_skin, exploration_model.skin_customizations,
         exploration_model.init_state_name, exploration_model.states,
@@ -76,7 +76,7 @@ def get_exploration_summary_from_model(exp_summary_model):
     return exp_domain.ExplorationSummary(
         exp_summary_model.id, exp_summary_model.title,
         exp_summary_model.category, exp_summary_model.objective,
-        exp_summary_model.language_code, exp_summary_model.skill_tags,
+        exp_summary_model.language_code, exp_summary_model.tags,
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
@@ -401,8 +401,8 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_objective(change.new_value)
                 elif change.property_name == 'language_code':
                     exploration.update_language_code(change.new_value)
-                elif change.property_name == 'skill_tags':
-                    exploration.update_skill_tags(change.new_value)
+                elif change.property_name == 'tags':
+                    exploration.update_tags(change.new_value)
                 elif change.property_name == 'blurb':
                     exploration.update_blurb(change.new_value)
                 elif change.property_name == 'author_notes':
@@ -596,7 +596,7 @@ def _save_exploration(
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
     exploration_model.language_code = exploration.language_code
-    exploration_model.skill_tags = exploration.skill_tags
+    exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
     exploration_model.default_skin = exploration.default_skin
@@ -634,7 +634,7 @@ def _create_exploration(
         title=exploration.title,
         objective=exploration.objective,
         language_code=exploration.language_code,
-        skill_tags=exploration.skill_tags,
+        tags=exploration.tags,
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
         default_skin=exploration.default_skin,
@@ -819,7 +819,7 @@ def get_summary_of_exploration(exploration):
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id, exploration.title, exploration.category,
         exploration.objective, exploration.language_code,
-        exploration.skill_tags, ratings, exp_rights.status,
+        exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
         exploration_model_created_on, exploration_model_last_updated
@@ -838,7 +838,7 @@ def save_exploration_summary(exp_summary):
         category=exp_summary.category,
         objective=exp_summary.objective,
         language_code=exp_summary.language_code,
-        skill_tags=exp_summary.skill_tags,
+        tags=exp_summary.tags,
         ratings = exp_summary.ratings,
         status=exp_summary.status,
         community_owned=exp_summary.community_owned,
@@ -1090,7 +1090,7 @@ def _exp_to_search_dict(exp):
         'language_code': exp.language_code,
         'title': exp.title,
         'category': exp.category,
-        'skills': exp.skill_tags,
+        'tags': exp.tags,
         'blurb': exp.blurb,
         'objective': exp.objective,
         'author_notes': exp.author_notes,

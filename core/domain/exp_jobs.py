@@ -36,7 +36,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     in ExpSummariesAggregator.
 
     The summaries store the following information:
-        title, category, objective, language_code, skill_tags,
+        title, category, objective, language_code, tags,
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.

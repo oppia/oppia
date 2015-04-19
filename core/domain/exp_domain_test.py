@@ -44,7 +44,6 @@ objective: ''
 param_changes: []
 param_specs: {}
 schema_version: 5
-skill_tags: []
 skin_customizations:
   panels_contents: {}
 states:
@@ -80,6 +79,7 @@ states:
           param_changes: []
       id: null
     param_changes: []
+tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME)
@@ -94,7 +94,6 @@ objective: ''
 param_changes: []
 param_specs: {}
 schema_version: 5
-skill_tags: []
 skin_customizations:
   panels_contents:
     bottom: []
@@ -172,6 +171,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME)
@@ -673,7 +673,6 @@ objective: ''
 param_changes: []
 param_specs: {}
 schema_version: 5
-skill_tags: []
 skin_customizations:
   panels_contents: {}
 states:
@@ -717,6 +716,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+tags: []
 """)
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V5

@@ -369,7 +369,6 @@ objective: The objective
 param_changes: []
 param_specs: {}
 schema_version: 5
-skill_tags: []
 skin_customizations:
   panels_contents: {}
 states:
@@ -413,6 +412,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+tags: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME))
@@ -427,7 +427,6 @@ objective: The objective
 param_changes: []
 param_specs: {}
 schema_version: 5
-skill_tags: []
 skin_customizations:
   panels_contents: {}
 states:
@@ -471,6 +470,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+tags: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME))
@@ -1895,7 +1895,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'ratings', 'status',
+                        'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1933,7 +1933,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'ratings', 'status',
+                        'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1964,7 +1964,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'ratings', 'status',
+                        'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -2007,7 +2007,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'ratings','status',
+                        'language_code', 'tags', 'ratings','status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',

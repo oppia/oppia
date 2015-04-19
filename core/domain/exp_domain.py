@@ -76,7 +76,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS)
 
     EXPLORATION_PROPERTIES = (
-        'title', 'category', 'objective', 'language_code', 'skill_tags',
+        'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'default_skin_id', 'init_state_name')
 
@@ -899,7 +899,7 @@ class Exploration(object):
     """Domain object for an Oppia exploration."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, skill_tags, blurb, author_notes, default_skin,
+                 language_code, tags, blurb, author_notes, default_skin,
                  skin_customizations, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
                  created_on=None, last_updated=None):
@@ -908,7 +908,7 @@ class Exploration(object):
         self.category = category
         self.objective = objective
         self.language_code = language_code
-        self.skill_tags = skill_tags
+        self.tags = tags
         self.blurb = blurb
         self.author_notes = author_notes
         self.default_skin = default_skin
@@ -935,7 +935,7 @@ class Exploration(object):
     def is_equal_to(self, other):
         simple_props = [
             'id', 'title', 'category', 'objective', 'language_code',
-            'skill_tags', 'blurb', 'author_notes', 'default_skin',
+            'tags', 'blurb', 'author_notes', 'default_skin',
             'init_state_name', 'version']
 
         for prop in simple_props:
@@ -1044,14 +1044,13 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.skill_tags, list):
+        if not isinstance(self.tags, list):
             raise utils.ValidationError(
-                'Expected skill_tags to be a list, received %s' %
-                self.skill_tags)
-        for tag in self.skill_tags:
+                'Expected \'tags\' to be a list, received %s' % self.tags)
+        for tag in self.tags:
             if not isinstance(tag, basestring):
                 raise utils.ValidationError(
-                    'Expected each tag in skill_tags to be a string, received '
+                    'Expected each tag in \'tags\' to be a string, received '
                     '%s' % tag)
 
         if not isinstance(self.blurb, basestring):
@@ -1322,8 +1321,8 @@ class Exploration(object):
     def update_language_code(self, language_code):
         self.language_code = language_code
 
-    def update_skill_tags(self, skill_tags):
-        self.skill_tags = skill_tags
+    def update_tags(self, tags):
+        self.tags = tags
 
     def update_blurb(self, blurb):
         self.blurb = blurb
@@ -1467,6 +1466,10 @@ class Exploration(object):
         """Converts a v4 exploration dict into a v5 exploration dict."""
         exploration_dict['schema_version'] = 5
 
+        # Rename the 'skill_tags' field to 'tags'.
+        exploration_dict['tags'] = exploration_dict['skill_tags']
+        del exploration_dict['skill_tags']
+
         exploration_dict['skin_customizations'] = (
             feconf.DEFAULT_SKIN_CUSTOMIZATIONS)
 
@@ -1515,7 +1518,7 @@ class Exploration(object):
             exploration_id, title, category,
             objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'])
-        exploration.skill_tags = exploration_dict['skill_tags']
+        exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
 
@@ -1589,7 +1592,7 @@ class Exploration(object):
             'objective': self.objective,
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
-            'skill_tags': self.skill_tags,
+            'tags': self.tags,
             'skin_customizations': self.skin_instance.to_dict()[
                 'skin_customizations'],
             'states': {state_name: state.to_dict()
@@ -1621,7 +1624,7 @@ class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, skill_tags, ratings, status,
+                 language_code, tags, ratings, status,
                  community_owned, owner_ids, editor_ids,
                  viewer_ids, version, exploration_model_created_on,
                  exploration_model_last_updated):
@@ -1636,7 +1639,7 @@ class ExplorationSummary(object):
         self.category = category
         self.objective = objective
         self.language_code = language_code
-        self.skill_tags = skill_tags
+        self.tags = tags
         self.ratings = ratings
         self.status = status
         self.community_owned = community_owned
