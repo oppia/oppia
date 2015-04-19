@@ -450,7 +450,11 @@ def submit_answer_in_tests(
 
 
 class RatingHandler(base.BaseHandler):
-    """Records the rating of an exploration submitted by a user."""
+    """Records the rating of an exploration submitted by a user.
+
+    Note that this represents ratings submitted on completion of the
+    exploration.
+    """
 
     PAGE_NAME_FOR_CSRF = 'player'
 
@@ -467,7 +471,9 @@ class RatingHandler(base.BaseHandler):
 
     @base.require_user
     def put(self, exploration_id):
-        """Handles PUT requests."""
+        """Handles PUT requests for submitting ratings at the end of an
+        exploration.
+        """
         user_rating = self.payload.get('user_rating')
         rating_services.assign_rating(
             self.user_id, exploration_id, user_rating)
