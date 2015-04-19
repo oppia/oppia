@@ -45,6 +45,25 @@
                 </select>
               </div>
             </div>
+            <div class="form-group">
+              <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <div ng-if="hasPageLoaded">
+                  <select2-dropdown
+                    item="$parent.explorationTagsService.displayed"
+                    
+                    tag-mode="true" allow-multiple-choices="true"
+                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+                    new-choice-regex="<[TAG_REGEX_STRING]>" width="100%"
+                    placeholder="Skills, concepts, topics, ..."
+                    on-selection-change="saveExplorationTags()">
+                  </select2-dropdown>
+                </div>
+                <span class="help-block" style="font-size: smaller">
+                  <em>Tags help learners discover your exploration.</em>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 

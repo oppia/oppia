@@ -274,6 +274,7 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
             'states': states,
+            'tags': exploration.tags,
             'title': exploration.title,
             'version': exploration.version,
         }

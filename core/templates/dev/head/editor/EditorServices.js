@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.constant('TAG_REGEX_STRING', '^[a-z][a-z ]*$');
+
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
   '$http', '$log', 'warningsData', '$q',
@@ -184,6 +186,7 @@ oppia.factory('changeListService', [
     'category': true,
     'objective': true,
     'language_code': true,
+    'tags': true,
     'param_specs': true,
     'param_changes': true,
     'default_skin_id': true,
@@ -526,6 +529,23 @@ oppia.factory('explorationInitStateNameService', [
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'init_state_name';
   child._isValid = function(value) {
+    return true;
+  };
+  return child;
+}]);
+
+// A data service that stores tags for the exploration.
+oppia.factory('explorationTagsService', [
+    'explorationPropertyService', 'TAG_REGEX_STRING', function(explorationPropertyService, TAG_REGEX_STRING) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'tags';
+  child._isValid = function(value) {
+    for (var i = 0; i < value.length; i++) {
+      var tagRegex = new RegExp(TAG_REGEX_STRING);
+      if (!value[i].match(tagRegex)) {
+        return false;
+      }
+    }
     return true;
   };
   return child;

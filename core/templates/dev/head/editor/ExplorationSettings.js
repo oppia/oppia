@@ -20,17 +20,17 @@
 
 oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', '$rootScope', 'activeInputData', 'explorationData',
-    'explorationTitleService', 'explorationCategoryService',
-    'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
+    'explorationTitleService', 'explorationCategoryService', 'explorationObjectiveService',
+    'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', function(
+    'explorationWarningsService', 'TAG_REGEX_STRING', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
-      explorationTitleService, explorationCategoryService,
-      explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
+      explorationTitleService, explorationCategoryService, explorationObjectiveService,
+      explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService) {
+      explorationWarningsService, TAG_REGEX_STRING) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -46,6 +46,7 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationCategoryService = explorationCategoryService;
     $scope.explorationObjectiveService = explorationObjectiveService;
     $scope.explorationLanguageCodeService = explorationLanguageCodeService;
+    $scope.explorationTagsService = explorationTagsService;
     $scope.explorationRightsService = explorationRightsService;
     $scope.explorationInitStateNameService = explorationInitStateNameService;
     $scope.explorationParamSpecsService = explorationParamSpecsService;
@@ -53,6 +54,7 @@ oppia.controller('ExplorationSettings', [
 
     explorationData.getData().then(function(data) {
       $scope.refreshSettingsTab();
+      $scope.hasPageLoaded = true;
     });
   };
 
@@ -91,6 +93,10 @@ oppia.controller('ExplorationSettings', [
 
   $scope.saveExplorationLanguageCode = function() {
     explorationLanguageCodeService.saveDisplayedValue();
+  };
+
+  $scope.saveExplorationTags = function() {
+    explorationTagsService.saveDisplayedValue();
   };
 
   $scope.saveExplorationInitStateName = function() {

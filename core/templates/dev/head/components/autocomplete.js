@@ -41,7 +41,9 @@ oppia.directive('select2Dropdown', [function() {
       dropdownCssClass: '@',
       // Whether to allow multiple choices. In order to do so, the value of
       // this attribute must be the exact string 'true'.
-      allowMultipleChoices: '@'
+      allowMultipleChoices: '@',
+      // Whether select2 is in tagging mode.
+      tagMode: '@'
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
@@ -76,7 +78,7 @@ oppia.directive('select2Dropdown', [function() {
             return choice.id === queryResult.text;
           };
 
-          if ($scope.choices.some(_doesChoiceMatchText)) {
+          if ($scope.choices && $scope.choices.some(_doesChoiceMatchText)) {
             return queryResult.text;
           } else {
             return _convertNewSelectionToText(queryResult.text)
@@ -90,6 +92,10 @@ oppia.directive('select2Dropdown', [function() {
           }
         }
       };
+
+      if ($scope.tagMode) {
+        select2Options.tags = [];
+      }
 
       if ($scope.dropdownCssClass) {
         select2Options.dropdownCssClass = $scope.dropdownCssClass;

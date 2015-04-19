@@ -30,7 +30,7 @@ oppia.controller('ExplorationEditor', [
   'explorationData', 'editorContextService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'explorationRightsService',
-  'explorationInitStateNameService', 'editabilityService',
+  'explorationInitStateNameService', 'explorationTagsService', 'editabilityService',
   'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
@@ -40,7 +40,7 @@ oppia.controller('ExplorationEditor', [
     explorationData,  editorContextService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationLanguageCodeService, explorationRightsService,
-    explorationInitStateNameService, editabilityService,
+    explorationInitStateNameService, explorationTagsService, editabilityService,
     explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
@@ -97,6 +97,7 @@ oppia.controller('ExplorationEditor', [
       explorationObjectiveService.init(data.objective);
       explorationLanguageCodeService.init(data.language_code);
       explorationInitStateNameService.init(data.init_state_name);
+      explorationTagsService.init(data.tags);
       explorationParamSpecsService.init(data.param_specs);
       explorationParamChangesService.init(data.param_changes || []);
 
@@ -541,6 +542,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'category': 'Category',
               'objective': 'Objective',
               'language_code': 'Language',
+              'tags': 'Tags',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
               'default_skin_id': 'Default skin',
