@@ -24,13 +24,15 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', 'TAG_REGEX_STRING', function(
+    'explorationWarningsService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService, TAG_REGEX_STRING) {
+      explorationWarningsService) {
+
+  $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';

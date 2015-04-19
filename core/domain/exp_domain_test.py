@@ -293,6 +293,73 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
+    def test_tag_validation(self):
+        """Test validation of exploration tags."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', 'Title', 'Category')
+        exploration.objective = 'Objective'
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'EndExploration')
+        exploration.validate()
+
+        exploration.tags = 'this should be a list'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected \'tags\' to be a list'):
+            exploration.validate()
+
+        exploration.tags = [123]
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'to be a string'):
+            exploration.validate()
+
+        exploration.tags = ['abc', 123]
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'to be a string'):
+            exploration.validate()
+
+        exploration.tags = ['']
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Tags should be non-empty'):
+            exploration.validate()
+
+        exploration.tags = ['123']
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'should only contain lowercase letters and spaces'):
+            exploration.validate()
+
+        exploration.tags = ['ABC']
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'should only contain lowercase letters and spaces'):
+            exploration.validate()
+
+        exploration.tags = [' a b']
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Tags should not start or end with whitespace'):
+            exploration.validate()
+
+        exploration.tags = ['a b ']
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Tags should not start or end with whitespace'):
+            exploration.validate()
+
+        exploration.tags = ['a    b']
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Adjacent whitespace in tags should be collapsed'):
+            exploration.validate()
+
+        exploration.tags = ['abc', 'abc']
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Some tags duplicate each other'):
+            exploration.validate()
+
+        exploration.tags = ['computer science', 'analysis', 'a b c']
+        exploration.validate()
+
     def test_exploration_skin_and_gadget_validation(self):
         """Test that Explorations including gadgets validate properly."""
         exploration = exp_domain.Exploration.from_yaml(

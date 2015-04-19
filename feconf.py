@@ -112,8 +112,10 @@ for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = ')]}\'\n'
-# A regular expression for alphanumeric characters
+# A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+# A regular expression for tags.
+TAG_REGEX = r'^[a-z ]+$'
 
 # Invalid names for parameters used in expressions.
 AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']

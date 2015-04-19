@@ -1051,7 +1051,28 @@ class Exploration(object):
             if not isinstance(tag, basestring):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received '
-                    '%s' % tag)
+                    '\'%s\'' % tag)
+
+            if not tag:
+                raise utils.ValidationError('Tags should be non-empty.')
+
+            if not re.match(feconf.TAG_REGEX, tag):
+                raise utils.ValidationError(
+                    'Tags should only contain lowercase letters and spaces, '
+                    'received \'%s\'' % tag)
+
+            if (tag[0] not in string.ascii_lowercase or
+                    tag[-1] not in string.ascii_lowercase):
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received '
+                    ' \'%s\'' % tag)
+
+            if re.search('\s\s+', tag):
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, '
+                    'received \'%s\'' % tag)
+        if len(set(self.tags)) != len(self.tags):
+            raise utils.ValidationError('Some tags duplicate each other')
 
         if not isinstance(self.blurb, basestring):
             raise utils.ValidationError(

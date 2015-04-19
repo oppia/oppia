@@ -18,8 +18,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.constant('TAG_REGEX_STRING', '^[a-z][a-z ]*$');
-
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
   '$http', '$log', 'warningsData', '$q',
@@ -536,16 +534,26 @@ oppia.factory('explorationInitStateNameService', [
 
 // A data service that stores tags for the exploration.
 oppia.factory('explorationTagsService', [
-    'explorationPropertyService', 'TAG_REGEX_STRING', function(explorationPropertyService, TAG_REGEX_STRING) {
+    'explorationPropertyService',
+    function(explorationPropertyService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'tags';
-  child._isValid = function(value) {
+  child._normalize = function(value) {
     for (var i = 0; i < value.length; i++) {
-      var tagRegex = new RegExp(TAG_REGEX_STRING);
+      value[i] = value[i].trim().replace(/\s+/g, ' ');
+    }
+    // TODO(sll): Prevent duplicate tags from being added.
+    return value;
+  };
+  child._isValid = function(value) {
+    // Every tag should match the TAG_REGEX.
+    for (var i = 0; i < value.length; i++) {
+      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
       if (!value[i].match(tagRegex)) {
         return false;
       }
     }
+
     return true;
   };
   return child;

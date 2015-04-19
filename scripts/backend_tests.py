@@ -30,7 +30,7 @@ import time
 
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
-EXPECTED_TEST_COUNT = 422
+EXPECTED_TEST_COUNT = 423
 
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-3.6', 'coverage')

@@ -234,6 +234,7 @@ class ExplorationPage(EditorHandler):
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
+            'TAG_REGEX': feconf.TAG_REGEX,
         })
 
         self.render_template('editor/exploration_editor.html')
