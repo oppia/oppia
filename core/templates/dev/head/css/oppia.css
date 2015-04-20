@@ -1819,8 +1819,13 @@ div#ng-curtain {
   margin-bottom: 5px;
 }
 
+.oppia-page-heading-subtext {
+  font-size: smaller;
+  opacity: 0.7;
+}
+
 @media(max-width: 800px) {
-  .oppia-page-heading {
+  .oppia-page-heading, .oppia-page-heading-subtext {
     margin-left: 30px;
   }
 }

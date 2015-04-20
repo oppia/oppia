@@ -163,10 +163,10 @@ oppia.factory('rulesService', [
     },
     deleteActiveRule: function() {
       if (_activeRuleIndex === _interactionHandlers.length - 1) {
-        warningsData.addWarning('Cannot delete default rule.');
+        warningsData.addWarning('Cannot delete default answer group.');
         return false;
       }
-      if (!window.confirm('Are you sure you want to delete this rule?')) {
+      if (!window.confirm('Are you sure you want to delete this answer group?')) {
         return false;
       }
       _interactionHandlersMemento = angular.copy(_interactionHandlers);

@@ -1,12 +1,12 @@
 <div style="height: 100%;">
-  <div ng-if="!ruleEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this rule, or change its destination' : '']>">
+  <div ng-if="!ruleEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this answer group, or change its destination' : '']>">
     <div class="oppia-readonly-rule-tile protractor-test-edit-rule oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
         </div>
 
         <div style="position: relative;">
-          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
+          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Answer Group"></span>
           <span ng-if="isRuleConfusing()">
             <span class="oppia-rule-warning-text">
               <span class="glyphicon glyphicon-warning-sign"></span>
@@ -50,11 +50,11 @@
     <br>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="rule.definition.rule_type !== 'default'" ng-click="deleteThisRule()">Delete Rule</button>
+      <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="rule.definition.rule_type !== 'default'" ng-click="deleteThisRule()">Delete Answer Group</button>
 
       <div class="pull-right">
         <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(rule.definition.rule_type !== 'default' && !rule.definition.name) || editRuleForm.$invalid || isRuleEmpty(rule)" ng-click="saveThisRule()">Save Rule</button>
+        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(rule.definition.rule_type !== 'default' && !rule.definition.name) || editRuleForm.$invalid || isRuleEmpty(rule)" ng-click="saveThisRule()">Save Answer Group</button>
       </div>
 
       <div style="clear: both;"></div>
@@ -65,7 +65,7 @@
 <script type="text/ng-template" id="rules/ruleDetailsEditor">
   <div style="position: relative;">
     <div>
-      <strong>Rule</strong>
+      <strong>Answer Group</strong>
     </div>
     <span ng-if="rule.definition.rule_type !== 'default' || canAddDefaultRule()">
       <rule-description-editor current-rule-definition="rule.definition"
@@ -74,7 +74,7 @@
     </span>
 
     <span ng-if="rule.definition.rule_type === 'default' && !canAddDefaultRule()">
-      No other rules apply...
+      No other answer groups apply...
     </span>
   </div>
 
@@ -140,7 +140,7 @@
 
     <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px; width: 100%;">
       <span ng-if="item.type == 'select'" style="color: black;">
-        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
+        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;" ng-disabled="ruleDescriptionChoices.length === 1">
         </select>
       </span>
 

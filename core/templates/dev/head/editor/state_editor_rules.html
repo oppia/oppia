@@ -24,8 +24,7 @@
                 </div>
               </a>
 
-              <!-- Note that the use of ids for the tutorial here only works because at most one rule editor is visible at a time. -->
-              <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown" id="tutorialStateActiveRule">
+              <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container">
                     <rule-editor rule="rule" save-rule="saveActiveRule(rule)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
@@ -39,11 +38,16 @@
                 ng-class="{'active': activeRuleIndex === handler.length - 1}" class="oppia-rule-block" style="border-bottom: 1px solid #ccc; margin-top: 0;">
               <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex == handler.length - 1}">
                 <span style="padding-left: 24px;">
-                  None of the other rules apply...
+                  <span ng-if="getCurrentInteractionId() === 'Continue'">
+                    When the button is clicked...
+                  </span>
+                  <span ng-if="getCurrentInteractionId() !== 'Continue'">
+                    None of the other answer groups apply...
+                  </span>
                 </span>
               </a>
 
-              <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown" id="tutorialStateActiveRule">
+              <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container">
                     <rule-editor rule="handler[handler.length - 1]" save-rule="saveActiveRule(handler[handler.length - 1])" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
@@ -60,7 +64,7 @@
   <md-card style="margin: 20px 0px; padding: 0px;">
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue' || !isDefaultRuleTabShown())" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
-        + Add Rule
+        + Add Answer Group
       </button>
     </div>
   </md-card>
@@ -68,7 +72,7 @@
 
 <script type="text/ng-template" id="modals/addRule">
   <div class="modal-header">
-    <h3>Add Rule</h3>
+    <h3>Add Answer Group</h3>
   </div>
 
   <div class="modal-body">
