@@ -1619,6 +1619,14 @@ div#ng-curtain {
   background: #eee;
 }
 
+.oppia-feedback-popover-textarea {
+  border: 1px solid rgba(0,0,0,0.2);
+  margin-top: 4px;
+  padding: 4px;
+  resize: none;
+  width: 245px;
+}
+
 
 .oppia-editor-sidebar {
   padding: 7px 5px 0 5px;

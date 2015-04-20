@@ -92,8 +92,8 @@ md-card.conversation-skin-card {
 
 .conversation-skin-card-feedback-toggle-container {
   position: absolute;
-  right: 5px;
-  top: 10px;
+  right: 10px;
+  top: 11px;
   width: 20px;
 }
 .conversation-skin-card-feedback-toggle {
