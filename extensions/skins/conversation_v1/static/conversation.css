@@ -90,16 +90,19 @@ md-card.conversation-skin-card {
   text-align: left;
 }
 
-.conversation-skin-card-dropdown {
+.conversation-skin-card-feedback-toggle-container {
   position: absolute;
-  right: 5px;
-  top: 10px;
+  right: 10px;
+  top: 11px;
   width: 20px;
 }
-.conversation-skin-card-dropdown-toggle {
+.conversation-skin-card-feedback-toggle {
   cursor: pointer;
   height: 20px;
-  opacity: 0.5;
+  opacity: 0.4;
+}
+.conversation-skin-card-feedback-toggle:hover {
+  opacity: 0.8;
 }
 
 .conversation-skin-learner-input {

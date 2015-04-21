@@ -140,6 +140,20 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, target_root_name))
 
 
+# This is a temporary modified version of UI Bootstrap used for displaying
+# HTML in popovers. It should be replaced with UI Bootstrap when version
+# 0.13.0 is released. See https://github.com/angular-ui/bootstrap/issues/220
+# TODO(sll): Delete this snippet of code after v0.13.0 is released.
+UI_BOOTSTRAP_JBRUNI_URL = (
+    'https://raw.githubusercontent.com/jbruni/jbruni.github.io/master/javascripts')
+UI_BOOTSTRAP_JBRUNI_DST = os.path.join(
+    THIRD_PARTY_STATIC_DIR, 'ui-bootstrap-jbruni-0.13.0')
+UI_BOOTSTRAP_JBRUNI_FILES = ['ui-bootstrap-tpls-0.13.0-jbruni.min.js']
+
+download_files(
+    UI_BOOTSTRAP_JBRUNI_URL, UI_BOOTSTRAP_JBRUNI_DST, UI_BOOTSTRAP_JBRUNI_FILES)
+
+
 # Download all the standalone files.
 YUICOMPRESSOR_REV = '2.4.8'
 YUICOMPRESSOR_FILENAME = 'yuicompressor-%s' % YUICOMPRESSOR_REV

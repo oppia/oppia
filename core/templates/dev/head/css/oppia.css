@@ -1012,7 +1012,8 @@ md-card.oppia-gallery-tile {
   padding-top: 3px;
 }
 
-.oppia-delete-interaction-button {
+.oppia-delete-interaction-button,
+.oppia-close-popover-button {
   cursor: pointer; 
   opacity: 0.5; 
   position: absolute; 
@@ -1020,7 +1021,8 @@ md-card.oppia-gallery-tile {
   top: 10px; 
   width: 20px;
 }
-.oppia-delete-interaction-button:hover {
+.oppia-delete-interaction-button:hover,
+.oppia-close-popover-button:hover {
   opacity: 1;
 }
 
@@ -1617,7 +1619,6 @@ div#ng-curtain {
   background: #eee;
 }
 
-
 .oppia-editor-sidebar {
   padding: 7px 5px 0 5px;
   position: absolute;
@@ -1832,4 +1833,16 @@ div#ng-curtain {
 .oppia-transition-200 {
   -webkit-transition: all 200ms;
   transition: all 200ms;
+}
+
+/* Styles for the feedback popover component in the learner view. */
+.oppia-feedback-popover-submit-btn-enabled {
+  color: #05a69a;
+}
+.oppia-feedback-popover-textarea {
+  border: 1px solid rgba(0,0,0,0.2);
+  margin-top: 4px;
+  padding: 4px;
+  resize: none;
+  width: 245px;
 }

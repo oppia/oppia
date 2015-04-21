@@ -45,6 +45,11 @@ oppia.directive('conversationSkin', [function() {
 
       $rootScope.loadingMessage = 'Loading';
 
+      // Returns true if the window is narrow, false otherwise.
+      $scope.isWindowNarrow = function() {
+        return $(window).width() < 700;
+      };
+
       // If the exploration is iframed, send data to its parent about its height so
       // that the parent can be resized as necessary.
       $scope.lastRequestedHeight = 0;
@@ -80,14 +85,6 @@ oppia.directive('conversationSkin', [function() {
           return confirmationMessage;
         }
       });
-
-      $scope.openCardFeedbackModal = function(stateName) {
-        if ($scope.isInPreviewMode) {
-          warningsData.addWarning('This functionality is not available in preview mode.');
-        } else {
-          oppiaPlayerService.openPlayerFeedbackModal(stateName);
-        }
-      };
 
       var _scrollToBottom = function(postScrollCallback) {
         $scope.adjustPageHeight(true, function() {

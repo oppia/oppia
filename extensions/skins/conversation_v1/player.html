@@ -15,13 +15,9 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last}">
           <md-card class="conversation-skin-card">
-            <div dropdown class="dropdown conversation-skin-card-dropdown" ng-if="state.stateName && !isInPreviewMode">
-              <img dropdown-toggle src="/third_party/static/material-design-icons-1.0.1/ic_more_vert_black_48dp.png" class="dropdown-toggle conversation-skin-card-dropdown-toggle">
-              <ul class="dropdown-menu dropdown-menu-right">
-                <li>
-                  <a href="" ng-click="openCardFeedbackModal(state.stateName)">Give Feedback</a>
-                </li>
-              </ul>
+            <div class="conversation-skin-card-feedback-toggle-container" ng-if="state.stateName && !isInPreviewMode">
+              <span class="glyphicon glyphicon-comment conversation-skin-card-feedback-toggle" popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>" popover-template="popover/feedback" popover-trigger="click" tooltip="Feedback" tooltip-placement="bottom">
+              </span>
             </div>
 
             <table class="conversation-skin-card-row-container">
@@ -99,7 +95,10 @@
 
       <div ng-if="finished && isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
         <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
-        <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;"></rating-from-value>
+        <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+          <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">
+          </rating-from-value>
+        </div>
       </div>
     </div>
   </div>
