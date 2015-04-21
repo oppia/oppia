@@ -565,11 +565,18 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
     },
     templateUrl: 'components/feedback',
     controller: [
-        '$scope', '$element', '$http', '$timeout',
-        function($scope, $element, $http, $timeout) {
+        '$scope', '$element', '$http', '$timeout', 'focusService',
+        function($scope, $element, $http, $timeout, focusService) {
       $scope.feedbackText = '';
       $scope.isSubmitterAnonymized = false;
       $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+      $scope.feedbackSubmitted = false;
+      // We generate a random id since there may be multiple popover elements
+      // on the same page.
+      $scope.feedbackPopoverId = (
+        'feedbackPopover' + Math.random().toString(36).slice(2));
+
+      focusService.setFocus($scope.feedbackPopoverId);
 
       var feedbackUrl = (
         '/explorehandler/give_feedback/' + oppiaPlayerService.getExplorationId());
@@ -584,7 +591,10 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
           });
         }
 
-        $scope.closePopover();
+        $scope.feedbackSubmitted = true;
+        $timeout(function() {
+          $scope.closePopover();
+        }, 2000);
       };
 
       $scope.closePopover = function() {
