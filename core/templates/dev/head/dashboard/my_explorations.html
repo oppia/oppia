@@ -74,18 +74,20 @@
                   </div>
 
                   <div class="oppia-gallery-tile-second-row">
-                    <span class="oppia-gallery-tile-ratings">
-                      <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
-                    </span>
-                    <span ng-if="exploration.status === 'publicized'" style="color: #888">
-                      Featured
-                      <span class="glyphicon glyphicon-star"></span>
-                      <span style="font-weight: bold;">&middot;</span>
-                    </span>
                     <span style="color: #888">
                       <strong><[exploration.category]></strong>
                       <span style="font-weight: bold;">&middot;</span>
                       Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                    </span>
+                    <span ng-if="exploration.status === 'publicized'">
+                      <span style="font-weight: bold;">&middot;</span>
+                      <span style="color: #888">Featured</span>
+                    </span>
+                    <span ng-if="areRatingsShown(exploration.ratings)">
+                      <span style="font-weight: bold;">&middot;</span>
+                      <span class="oppia-gallery-tile-ratings">
+                        <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
+                      </span>
                     </span>
                   </div>
 
@@ -116,6 +118,6 @@
   <script>
     {{ include_js_file('components/explorationCreationButton.js') }}
     {{ include_js_file('components/ratings.js') }}
-    {{ include_js_file('/dashboard/MyExplorations.js') }}
+    {{ include_js_file('dashboard/MyExplorations.js') }}
   </script>
 {% endblock footer_js %}

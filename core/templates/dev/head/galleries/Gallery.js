@@ -116,12 +116,15 @@ oppia.factory('searchService', [
 }]);
 
 oppia.controller('Gallery', [
-    '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout', 'createExplorationButtonService',
-    'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL',
-    'CATEGORY_LIST', 'searchService',
-    function($scope, $http, $rootScope, $modal, $window, $timeout, createExplorationButtonService,
-             oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
-             CATEGORY_LIST, searchService) {
+    '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
+    'createExplorationButtonService', 'oppiaDatetimeFormatter', 'oppiaDebouncer',
+    'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService',
+    'ratingVisibilityService',
+    function(
+      $scope, $http, $rootScope, $modal, $window, $timeout,
+      createExplorationButtonService, oppiaDatetimeFormatter, oppiaDebouncer,
+      urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService,
+      ratingVisibilityService) {
 
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
@@ -129,7 +132,7 @@ oppia.controller('Gallery', [
     var bannerVanishRate = oppiaBanner.height();
     var taglineVanishRate = oppiaBanner.height() * 0.3;
 
-    oppiaBanner.css({'opacity': (bannerVanishRate - $(window).scrollTop()) / bannerVanishRate});   
+    oppiaBanner.css({'opacity': (bannerVanishRate - $(window).scrollTop()) / bannerVanishRate});
     oppiaTagline.css({'opacity': (taglineVanishRate - $(window).scrollTop()) / taglineVanishRate});
   });
 
@@ -184,6 +187,10 @@ oppia.controller('Gallery', [
       });
     }
   });
+
+  $scope.areRatingsShown = function(ratingFrequencies) {
+    return ratingVisibilityService.areRatingsShown(ratingFrequencies);
+  };
 
   // SEARCH FUNCTIONALITY
 
