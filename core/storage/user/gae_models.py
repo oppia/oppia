@@ -103,7 +103,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The exploration id
     exploration_id = ndb.StringProperty(indexed=True)
 
-    # The rating (1-5) the user assigned to the exploration
+    # The rating (1-5) the user assigned to the exploration. Note that this
+    # represents a rating given on completion of the exploration.
     rating = ndb.IntegerProperty(default=None, indexed=True)
 
     # When the most recent rating was awarded, or None if not rated

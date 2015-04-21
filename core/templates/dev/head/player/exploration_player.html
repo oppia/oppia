@@ -28,9 +28,6 @@
 
 {% block local_top_nav_options %}
   <div ng-controller="LearnerLocalNav">
-    <span ng-if="isLoggedIn" class="nav navbar-nav oppia-navbar-breadcrumb" style="padding: 18px 20px 15px 20px" tooltip="Rate exploration" tooltip-placement="bottom">
-      <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating"></rating-from-value>
-    </span>
     <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
       <li class="dropdown">
         <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
