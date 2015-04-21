@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import os
 import re
 import string
+import struct
 
 from core.domain import dependency_registry
 from core.domain import interaction_registry
@@ -35,6 +36,9 @@ import utils
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+# Expected dimensions for an interaction thumbnail PNG image.
+INTERACTION_THUMBNAIL_WIDTH_PX = 178
+INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 
 
 class AnswerHandlerUnitTests(test_utils.GenericTestBase):
@@ -160,9 +164,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(interaction_dir))
 
             # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file, (optionally) a
-            # directory named 'static', (optionally) a JS test file,
-            # (optionally) a stats_response.html file and (optionally)
+            # html file, a JS file, a validator.js file, a .png file,
+            # (optionally) a directory named 'static', (optionally) a JS test
+            # file, (optionally) a stats_response.html file and (optionally)
             # a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
@@ -198,19 +202,28 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 4, len(dir_contents),
+                optional_dirs_and_files_count + 5, len(dir_contents),
                 dir_contents
             )
 
+            png_file = os.path.join(interaction_dir, '%s.png' % interaction_id)
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
             js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
             validator_js_file = os.path.join(interaction_dir, 'validator.js')
 
+            self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
             self.assertTrue(os.path.isfile(js_file))
+
+            # Check that the PNG thumbnail image has the correct dimensions.
+            with open(png_file, 'rb') as f:
+                img_data = f.read()
+                w, h = struct.unpack('>LL', img_data[16:24])
+                self.assertEqual(int(w), INTERACTION_THUMBNAIL_WIDTH_PX)
+                self.assertEqual(int(h), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)

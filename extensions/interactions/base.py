@@ -82,6 +82,9 @@ class BaseInteraction(object):
 
     This class is not meant to be user-editable. The only methods on it should
     be get()-type methods.
+
+    Note that all interactions should also include a thumbnail image of size
+    178 x 146 pixels. This image will be shown in the interaction selector.
     """
 
     # The human-readable name of the interaction. Overridden in subclasses.
