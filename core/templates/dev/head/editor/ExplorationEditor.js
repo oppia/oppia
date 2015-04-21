@@ -161,7 +161,6 @@ oppia.controller('ExplorationEditor', [
 
   var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
   var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
-  var _ID_TUTORIAL_STATE_ACTIVE_RULE = '#tutorialStateActiveRule';
   var _ID_TUTORIAL_PREVIEW_TAB = "#tutorialPreviewTab";
   var _ID_TUTORIAL_SAVE_BUTTON = "#tutorialSaveButton";
 
@@ -214,7 +213,7 @@ oppia.controller('ExplorationEditor', [
       'After telling Oppia what to say, choose how you want the learner to respond by ' +
       'selecting an <b>interaction type</b>.' +
       'Then, based on the learner\'s response, you can tell Oppia how to reply by ' +
-      'creating a <b>rule</b>.')
+      'creating an <b>answer group</b>.')
   }, {
     type: 'function',
     fn: function(isGoingForward) {
@@ -567,7 +566,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'content': 'Content',
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
-              'widget_handlers': 'Reader submission rules'
+              'widget_handlers': 'Answer groups'
             }
 
             // An ordered list of state properties that determines the order in which
