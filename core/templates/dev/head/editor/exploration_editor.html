@@ -147,13 +147,13 @@
            title="<[getSaveButtonTooltip()]>">
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
-            <span ng-if="!isPublic()">Save Draft</span>
-            <span ng-if="isPublic()">Publish Changes</span>
+            <span ng-if="isPrivate()">Save Draft</span>
+            <span ng-if="!isPrivate()">Publish Changes</span>
             <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span ng-if="isSaveInProgress">
-            <span ng-if="!isPublic()">Saving...</span>
-            <span ng-if="isPublic()">Publishing...</span>
+            <span ng-if="isPrivate()">Saving...</span>
+            <span ng-if="!isPrivate()">Publishing...</span>
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
