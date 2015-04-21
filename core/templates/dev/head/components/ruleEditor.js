@@ -58,7 +58,10 @@ oppia.directive('ruleTypeSelector', [function() {
       if ($scope.canAddDefaultRule()) {
         choices.push({
           id: 'Default',
-          text: 'When no other rule applies...'
+          text: (
+            stateInteractionIdService.savedMemento === 'Continue' ?
+            'When the button is clicked...' :
+            'When no other rule applies...')
         });
       }
 
@@ -72,10 +75,13 @@ oppia.directive('ruleTypeSelector', [function() {
         // Suppress the search box.
         minimumResultsForSearch: -1,
         allowClear: false,
-        width: '210px',
+        width: '350px',
         formatSelection: function(object, container) {
           if (object.id === 'Default') {
-            return 'When no other rule applies';
+            return (
+              stateInteractionIdService.savedMemento === 'Continue' ?
+              'When the button is clicked' :
+              'When no other rule applies');
           } else {
             return $filter('truncateAtFirstEllipsis')(object.text);
           }
@@ -221,10 +227,12 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
     templateUrl: 'rules/ruleDetailsEditor',
     controller: [
       '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
-      'validatorsService', 'rulesService', 'explorationStatesService',
+      'validatorsService', 'rulesService', 'explorationStatesService', 'stateInteractionIdService',
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
-          validatorsService, rulesService, explorationStatesService) {
+          validatorsService, rulesService, explorationStatesService, stateInteractionIdService) {
+
+        $scope.currentInteractionId = stateInteractionIdService.savedMemento;
 
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',

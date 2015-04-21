@@ -74,7 +74,12 @@
     </span>
 
     <span ng-if="rule.definition.rule_type === 'default' && !canAddDefaultRule()">
-      No other answer groups apply...
+      <span ng-if="currentInteractionId === 'Continue'">
+        When the button is clicked...
+      </span>
+      <span ng-if="currentInteractionId !== 'Continue'">
+        No other answer groups apply...
+      </span>
     </span>
   </div>
 
