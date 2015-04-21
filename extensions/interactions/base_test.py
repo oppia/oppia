@@ -154,7 +154,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             ('display_mode', basestring), ('description', basestring),
             ('_handlers', list), ('_customization_arg_specs', list)]
 
-        for interaction_id in feconf.ALLOWED_INTERACTIONS:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
 

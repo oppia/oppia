@@ -172,44 +172,41 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
-ALLOWED_INTERACTIONS = {
-    'CodeRepl': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'CodeRepl')
-    },
-    'Continue': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
-    },
-    'EndExploration': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'EndExploration')
-    },
-    'GraphInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
-    },
-    'ImageClickInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'ImageClickInput')
-    },
-    'InteractiveMap': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'InteractiveMap')
-    },
-    'LogicProof': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'LogicProof')
-    },
-    'MultipleChoiceInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'MultipleChoiceInput')
-    },
-    'MusicNotesInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'MusicNotesInput')
-    },
-    'NumericInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'NumericInput')
-    },
-    'SetInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'SetInput')
-    },
-    'TextInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'TextInput')
-    },
-}
+
+# These categories and interactions are displayed in the order in which they
+# appear in the interaction selector.
+ALLOWED_INTERACTION_CATEGORIES = [{
+    'name': 'General',
+    'interaction_ids': [
+        'Continue',
+        'EndExploration',
+        'ImageClickInput',
+        'MultipleChoiceInput',
+        'TextInput'
+    ],
+}, {
+    'name': 'Math',
+    'interaction_ids': [
+        'GraphInput',
+        'LogicProof',
+        'NumericInput',
+        'SetInput',
+    ]
+}, {
+    'name': 'Programming',
+    'interaction_ids': ['CodeRepl'],
+}, {
+    'name': 'Music',
+    'interaction_ids': [
+        'MusicNotesInput'
+    ],
+}, {
+    'name': 'Geography',
+    'interaction_ids': [
+        'InteractiveMap'
+    ],
+}]
+
 ALLOWED_GADGETS = {
     'AdviceBar': {
         'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
