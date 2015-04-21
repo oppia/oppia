@@ -18,6 +18,24 @@
  * @author Jacob Davis
  */
 
+// A service that maintains a record of which state in the exploration is
+// currently active.
+oppia.factory('ratingVisibilityService', [function() {
+  return {
+    areRatingsShown: function(ratingFrequencies) {
+      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
+
+      var totalNumber = 0;
+      for (var value in ratingFrequencies) {
+        totalNumber += ratingFrequencies[value];
+      }
+
+      return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
+    }
+  };
+}]);
+
+
 oppia.directive('ratingFromValue', [function() {
   return {
     // This will display a star-rating based on the given data. Exactly one of
@@ -106,17 +124,22 @@ oppia.directive('ratingFromFrequencies', [function() {
       ratingFrequencies: '&'
     },
     templateUrl: 'rating/fromFrequencies',
-    controller: ['$scope', function($scope) {
+    controller: [
+        '$scope', 'ratingVisibilityService',
+        function($scope, ratingVisibilityService) {
+
       $scope.computeAverageRating = function(ratingFrequencies) {
-        var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
-        totalValue = 0.0;
-        totalNumber = 0;
-        for (var value in ratingFrequencies) {
-          totalValue += value * ratingFrequencies[value];
-          totalNumber += ratingFrequencies[value];
+        if (!ratingVisibilityService.areRatingsShown(ratingFrequencies)) {
+          return undefined;
+        } else {
+          var totalNumber = 0;
+          var totalValue = 0.0;
+          for (var value in ratingFrequencies) {
+            totalValue += value * ratingFrequencies[value];
+            totalNumber += ratingFrequencies[value];
+          }
+          return totalValue / totalNumber;
         }
-        return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS ?
-          totalValue / totalNumber : undefined;
       };
 
       $scope.ratingValue = $scope.computeAverageRating(
