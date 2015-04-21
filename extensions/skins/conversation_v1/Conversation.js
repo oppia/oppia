@@ -45,6 +45,11 @@ oppia.directive('conversationSkin', [function() {
 
       $rootScope.loadingMessage = 'Loading';
 
+      // Returns true if the window is narrow, false otherwise.
+      $scope.isWindowNarrow = function() {
+        return $(window).width() < 700;
+      };
+
       // If the exploration is iframed, send data to its parent about its height so
       // that the parent can be resized as necessary.
       $scope.lastRequestedHeight = 0;

@@ -1619,15 +1619,6 @@ div#ng-curtain {
   background: #eee;
 }
 
-.oppia-feedback-popover-textarea {
-  border: 1px solid rgba(0,0,0,0.2);
-  margin-top: 4px;
-  padding: 4px;
-  resize: none;
-  width: 245px;
-}
-
-
 .oppia-editor-sidebar {
   padding: 7px 5px 0 5px;
   position: absolute;
@@ -1842,4 +1833,16 @@ div#ng-curtain {
 .oppia-transition-200 {
   -webkit-transition: all 200ms;
   transition: all 200ms;
+}
+
+/* Styles for the feedback popover component in the learner view. */
+.oppia-feedback-popover-submit-btn-enabled {
+  color: #05a69a;
+}
+.oppia-feedback-popover-textarea {
+  border: 1px solid rgba(0,0,0,0.2);
+  margin-top: 4px;
+  padding: 4px;
+  resize: none;
+  width: 245px;
 }

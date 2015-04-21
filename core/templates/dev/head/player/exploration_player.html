@@ -125,7 +125,7 @@
         </textarea>
       </div>
 
-      <md-button class="pull-right" style="margin-top: 6px;" ng-click="saveFeedback()">Submit</md-button>
+      <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px;" ng-click="saveFeedback()" ng-disabled="!feedbackText">Submit</md-button>
       <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
         <label>
           <input type="checkbox" ng-model="isSubmitterAnonymized">
