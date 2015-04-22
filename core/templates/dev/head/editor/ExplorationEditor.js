@@ -400,8 +400,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   $scope.isExplorationSaveable = function() {
     return (
       $scope.isExplorationLockedForEditing() &&
-      !$scope.isSaveInProgress &&
-      !explorationWarningsService.hasCriticalWarnings());
+      !$scope.isSaveInProgress && (
+        ($scope.isPrivate() && !explorationWarningsService.hasCriticalWarnings()) ||
+        (!$scope.isPrivate() && explorationWarningsService.countWarnings() === 0)
+      )
+    );
   };
 
   $window.addEventListener('beforeunload', function(e) {

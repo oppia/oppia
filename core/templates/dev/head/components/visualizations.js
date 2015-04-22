@@ -579,8 +579,21 @@ oppia.directive('stateGraphViz', [
         return Math.max($scope.GRAPH_HEIGHT, 300);
       };
 
-      $scope.drawGraph = function(nodes, links, initStateId, finalStateIds) {
+      $scope.drawGraph = function(nodes, originalLinks, initStateId, finalStateIds) {
         $scope.finalStateIds = finalStateIds;
+        var links = angular.copy(originalLinks);
+
+        // For each non-END finalStateId, add a link to END. This is a temporary
+        // measure until we get rid of the END state.
+        for (var i = 0; i < $scope.finalStateIds.length; i++) {
+          if ($scope.finalStateIds !== END_DEST) {
+            links.push({
+              source: $scope.finalStateIds[i],
+              target: END_DEST
+            });
+          }
+        }
+
         var nodeData = stateGraphArranger.computeLayout(
           nodes, links, initStateId, angular.copy(finalStateIds));
 

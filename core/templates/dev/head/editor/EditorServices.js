@@ -1310,11 +1310,18 @@ oppia.factory('explorationWarningsService', [
           _graphData.finalStateIds, _graphData.nodes,
           _getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
+          var deadEndStatesString = null;
+          if (deadEndStates.length === 1) {
+            deadEndStatesString = 'the following state: ' + deadEndStates[0];
+          } else {
+            deadEndStatesString = 'each of: ' + deadEndStates.join(', ');
+          }
+
           _warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'Please make sure there\'s a path to END from each of: ' +
-              deadEndStates.join(', ') + '.')
+              'Please make sure there\'s a path to END from ' +
+              deadEndStatesString + '.')
           });
         }
       }
