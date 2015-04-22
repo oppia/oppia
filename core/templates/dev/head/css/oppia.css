@@ -1008,6 +1008,19 @@ md-card.oppia-gallery-tile {
   opacity: 1;
 }
 
+.oppia-interaction-tile {
+  cursor: pointer;
+  display: inline-block;
+  margin: 5px;
+  vertical-align: top;
+  width: 30%;
+}
+.oppia-interaction-tile-name {
+  border: 1px solid #ccc;
+  padding: 3px 0;
+  text-align: center;
+}
+
 .oppia-small-delete-button {
   padding-top: 3px;
 }

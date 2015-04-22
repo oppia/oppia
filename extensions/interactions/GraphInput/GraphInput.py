@@ -22,8 +22,7 @@ from extensions.interactions import base
 class GraphInput(base.BaseInteraction):
     """Interaction for evaluating graphs."""
 
-    name = 'Graph'
-    category = 'Mathematics'
+    name = 'Graph Theory'
     description = 'Allows learners to create and manipulate graphs.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []

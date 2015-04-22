@@ -26,7 +26,6 @@ class EndExploration(base.BaseInteraction):
     """
 
     name = 'End Conversation'
-    category = ''
     description = (
         'Suggests recommendations for explorations to try next.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL

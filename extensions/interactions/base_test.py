@@ -115,14 +115,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             TEXT_INPUT_ID)
         self.assertEqual(interaction.id, TEXT_INPUT_ID)
-        self.assertEqual(interaction.name, 'Text')
+        self.assertEqual(interaction.name, 'Text Input')
 
         self.assertIn('id="interaction/TextInput"', interaction.html_body)
         self.assertIn('id="response/TextInput"', interaction.html_body)
 
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
-            'id', 'name', 'category', 'description', 'display_mode',
+            'id', 'name', 'description', 'display_mode',
             'handler_specs', 'customization_arg_specs', 'is_terminal',
             'rule_descriptions'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
@@ -150,9 +150,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """Test that the default interactions are valid."""
 
         _INTERACTION_CONFIG_SCHEMA = [
-            ('name', basestring), ('category', basestring),
-            ('display_mode', basestring), ('description', basestring),
-            ('_handlers', list), ('_customization_arg_specs', list)]
+            ('name', basestring), ('display_mode', basestring),
+            ('description', basestring), ('_handlers', list),
+            ('_customization_arg_specs', list)]
 
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -167,21 +167,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(interaction_dir))
 
             # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file, a .png file,
-            # (optionally) a directory named 'static', (optionally) a JS test
-            # file, (optionally) a stats_response.html file and (optionally)
-            # a protractor.js file.
+            # html file, a JS file, a validator.js file,  a directory named
+            # 'static' that contains (at least) a .png thumbnail file,
+            # (optionally) a JS test spec file, (optionally) a
+            # stats_response.html file and (optionally) a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
-
-            try:
-                self.assertIn('static', dir_contents)
-                static_dir = os.path.join(interaction_dir, 'static')
-                self.assertTrue(os.path.isdir(static_dir))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
 
             try:
                 self.assertTrue(os.path.isfile(
@@ -209,19 +201,23 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 dir_contents
             )
 
-            png_file = os.path.join(interaction_dir, '%s.png' % interaction_id)
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
             js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
             validator_js_file = os.path.join(interaction_dir, 'validator.js')
 
-            self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
             self.assertTrue(os.path.isfile(js_file))
 
             # Check that the PNG thumbnail image has the correct dimensions.
+            static_dir = os.path.join(interaction_dir, 'static')
+            self.assertTrue(os.path.isdir(static_dir))
+            png_file = os.path.join(
+                interaction_dir, 'static', '%s.png' % interaction_id)
+
+            self.assertTrue(os.path.isfile(png_file))
             with open(png_file, 'rb') as f:
                 img_data = f.read()
                 w, h = struct.unpack('>LL', img_data[16:24])
@@ -264,9 +260,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
                     getattr(interaction, item), item_type))
-                # The string attributes should be non-empty (except for
-                # 'category').
-                if item_type == basestring and item != 'category':
+                if item_type == basestring:
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)

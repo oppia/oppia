@@ -28,7 +28,7 @@
 </div>
 
 <script type="text/ng-template" id="modals/customizeInteraction">
-  <div class="modal-header">
+  <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
     <h3 ng-if="!stateInteractionIdService.displayed">
       Choose Interaction
     </h3>
@@ -40,26 +40,24 @@
 
   <div class="modal-body">
     <div ng-if="!stateInteractionIdService.displayed">
-      <span class="dropdown protractor-test-select-interaction-id">
-        <a id="tutorialStateInteraction" role="button" data-toggle="dropdown" class="btn btn-default">
-          <span ng-if="stateInteractionIdService.displayed">
-            <[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>
-          </span>
-          <span ng-if="!stateInteractionIdService.displayed">
-            Select a type of interaction...
-          </span>
-          <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu" role="menu">
-          <li ng-repeat="(interactionId, interactionDict) in INTERACTION_SPECS track by $index">
-            <a href="#"
-               ng-click="onChangeInteractionId(interactionId)"
-               class="protractor-test-top-level-interaction-id-<[interactionId]>">
-              <[interactionDict.name]>
-            </a>
-          </li>
-        </ul>
-      </span>
+      <div class="protractor-test-select-interaction-id" ng-cloak>
+        <tabset>
+          <tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
+               heading="<[category.name]>" active="category.active">
+            <br>
+            <div ng-repeat="interactionId in category.interaction_ids"
+                 ng-click="onChangeInteractionId(interactionId)"
+                 class="oppia-interaction-tile protractor-test-top-level-interaction-id-<[interactionId]>">
+              <div style="border: 1px solid #ccc;">
+                <img ng-src="/extensions/interactions/<[interactionId]>/static/<[interactionId]>.png">
+              </div>
+              <div class="oppia-interaction-tile-name">
+                <[INTERACTION_SPECS[interactionId].name]>
+              </div>
+            </div>
+          </tab>
+        </tabset>
+      </div>
     </div>
 
     <form ng-if="stateInteractionIdService.displayed" name="form.schemaForm" class="protractor-test-interaction-editor">
@@ -79,6 +77,8 @@
   </div>
 
   <div class="modal-footer">
+    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed">Back</button>
+
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-save-interaction" ng-click="save()" ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">Save Interaction</button>
   </div>

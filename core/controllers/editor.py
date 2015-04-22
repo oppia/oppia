@@ -229,6 +229,8 @@ class ExplorationPage(EditorHandler):
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'ALLOWED_INTERACTION_CATEGORIES': (
+                feconf.ALLOWED_INTERACTION_CATEGORIES),
             # This is needed for the exploration preview.
             'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,

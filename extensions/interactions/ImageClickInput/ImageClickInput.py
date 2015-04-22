@@ -22,8 +22,7 @@ from extensions.interactions import base
 class ImageClickInput(base.BaseInteraction):
     """Interaction allowing multiple-choice selection on an image."""
 
-    name = 'Image Region Select'
-    category = ''
+    name = 'Image Region'
     description = 'Allows learners to click on regions of an image.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []

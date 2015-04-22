@@ -23,7 +23,6 @@ class LogicProof(base.BaseInteraction):
     """Interaction for entering logic proofs."""
 
     name = 'Logic Proof'
-    category = 'Mathematics'
     description = (
         'Allows learners to write proofs for simple logical statements.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL

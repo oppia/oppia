@@ -21,7 +21,6 @@ class InteractiveMap(base.BaseInteraction):
     """Interaction for pinpointing a location on a map."""
 
     name = 'World Map'
-    category = 'Geography'
     description = 'Allows learners to specify a position on a world map.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['google_maps']
