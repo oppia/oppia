@@ -53,7 +53,7 @@ describe('State editor', function() {
     users.createUser('user@example.com', 'user');
     users.login('user@example.com');
 
-    workflow.createExplorationAndStartTutorial('sums', 'maths'); 
+    workflow.createExplorationAndStartTutorial('sums', 'maths');
     for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
       editor.progressInTutorial();
     }
@@ -381,31 +381,31 @@ describe('Interactions', function() {
 
     var defaultRuleSet = false;
 
-    for (var interactionName in interactions.INTERACTIONS) {
-      var interaction = interactions.INTERACTIONS[interactionName];
+    for (var interactionId in interactions.INTERACTIONS) {
+      var interaction = interactions.INTERACTIONS[interactionId];
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
         editor.setInteraction.apply(
-          null, [interactionName].concat(test.interactionArguments));
+          null, [interactionId].concat(test.interactionArguments));
         editor.addRule.apply(
-          null, [interactionName, null, 'END'].concat(test.ruleArguments));
+          null, [interactionId, null, 'END'].concat(test.ruleArguments));
         editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
         if (!defaultRuleSet) {
           // The default rule will be preserved for subsequent tests.
           editor.addRule(
-            interactionName, forms.toRichText('no'), null, 'Default');
+            interactionId, forms.toRichText('no'), null, 'Default');
           defaultRuleSet = true;
         }
 
         editor.navigateToPreviewTab();
         player.expectInteractionToMatch.apply(
-          null, [interactionName].concat(test.expectedInteractionDetails));
+          null, [interactionId].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
-          player.submitAnswer(interactionName, test.wrongAnswers[j]);
+          player.submitAnswer(interactionId, test.wrongAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('no'));
         }
         for (var j = 0; j < test.correctAnswers.length; j++) {
-          player.submitAnswer(interactionName, test.correctAnswers[j]);
+          player.submitAnswer(interactionId, test.correctAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('yes'));
         }
         editor.navigateToMainTab();

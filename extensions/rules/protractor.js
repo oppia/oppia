@@ -88,7 +88,9 @@ var DESCRIPTIONS = {
 
 var getDescription = function(objectName, ruleName) {
   if (ruleName === 'Default') {
-    return 'When no other rule applies';
+    return (
+      objectName ? 'When no other rule applies' :
+      'When the button is clicked');
   }
 
   if (DESCRIPTIONS.hasOwnProperty(objectName)) {

@@ -585,12 +585,17 @@ oppia.directive('stateGraphViz', [
 
         // For each non-END finalStateId, add a link to END. This is a temporary
         // measure until we get rid of the END state.
-        for (var i = 0; i < $scope.finalStateIds.length; i++) {
-          if ($scope.finalStateIds !== END_DEST) {
-            links.push({
-              source: $scope.finalStateIds[i],
-              target: END_DEST
-            });
+        // The outer check is needed to distinguish between the main exploration graph
+        // and the secondary graph in the exploration history tab.
+        // TODO(sll): This is hacky, and should be refactored.
+        if (nodes.hasOwnProperty(END_DEST)) {
+          for (var i = 0; i < $scope.finalStateIds.length; i++) {
+            if ($scope.finalStateIds !== END_DEST) {
+              links.push({
+                source: $scope.finalStateIds[i],
+                target: END_DEST
+              });
+            }
           }
         }
 
