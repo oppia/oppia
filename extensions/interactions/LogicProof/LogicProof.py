@@ -32,7 +32,7 @@ class LogicProof(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'question',
-        'description': 'Question to ask.',
+        'description': 'Question to ask',
         'schema': {
             'type': 'custom',
             'obj_type': 'LogicQuestion',

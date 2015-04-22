@@ -31,7 +31,7 @@ class MultipleChoiceInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'choices',
-        'description': 'The options that the learner can select from.',
+        'description': 'Multiple Choice options',
         'schema': {
             'type': 'list',
             'validators': [{

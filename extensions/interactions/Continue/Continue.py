@@ -29,7 +29,7 @@ class Continue(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'buttonText',
-        'description': 'The text to display on the button.',
+        'description': 'Button label',
         'schema': {
             'type': 'unicode',
         },

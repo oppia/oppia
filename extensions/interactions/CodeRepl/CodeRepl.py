@@ -31,7 +31,7 @@ class CodeRepl(base.BaseInteraction):
     # later re-release.
     _customization_arg_specs = [{
         'name': 'language',
-        'description': 'Programming language to evaluate the code in.',
+        'description': 'Programming language',
         'schema': {
             'type': 'unicode',
             'choices': [
@@ -41,7 +41,7 @@ class CodeRepl(base.BaseInteraction):
         'default_value': 'python'
     }, {
         'name': 'placeholder',
-        'description': 'The initial code displayed in the code input field.',
+        'description': 'Initial code displayed',
         'schema': {
             'type': 'unicode',
             'ui_config': {
@@ -51,7 +51,7 @@ class CodeRepl(base.BaseInteraction):
         'default_value': '# Type your code here.'
     }, {
         'name': 'preCode',
-        'description': 'Code to prepend to the reader\'s submission.',
+        'description': 'Code to prepend to the learner\'s submission',
         'schema': {
             'type': 'unicode',
             'ui_config': {
@@ -61,7 +61,7 @@ class CodeRepl(base.BaseInteraction):
         'default_value': ''
     }, {
         'name': 'postCode',
-        'description': 'Code to append after the reader\'s submission.',
+        'description': 'Code to append after the learner\'s submission',
         'schema': {
             'type': 'unicode',
             'ui_config': {

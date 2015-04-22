@@ -31,7 +31,7 @@ class MusicNotesInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
-        'description': 'The sequence of notes that the reader should guess.',
+        'description': 'Correct sequence of notes',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',
@@ -39,7 +39,7 @@ class MusicNotesInput(base.BaseInteraction):
         'default_value': [],
     }, {
         'name': 'initialSequence',
-        'description': 'The sequence of notes that start on the staff.',
+        'description': 'Starting notes on the staff',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',

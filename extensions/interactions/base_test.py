@@ -128,13 +128,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
-            'description': 'The placeholder for the text input field.',
+            'description': 'Placeholder text (optional)',
             'schema': {'type': 'unicode'},
             'default_value': '',
         }, {
             'name': 'rows',
             'description': (
-                'How long the learner\'s answer is expected to be (in rows).'),
+                'Number of rows'),
             'schema': {
                 'type': 'int',
                 'validators': [{

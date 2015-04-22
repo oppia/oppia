@@ -31,7 +31,7 @@ class GraphInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'graph',
-        'description': 'The initial graph.',
+        'description': 'Initial graph',
         'schema': {
             'type': 'custom',
             'obj_type': 'Graph',
@@ -65,49 +65,49 @@ class GraphInput(base.BaseInteraction):
         }
     }, {
         'name': 'canAddVertex',
-        'description': 'Allow learner to add vertices.',
+        'description': 'Allow learner to add vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canDeleteVertex',
-        'description': 'Allow learner to delete vertices.',
+        'description': 'Allow learner to delete vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canMoveVertex',
-        'description': 'Allow learner to move vertices.',
+        'description': 'Allow learner to move vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canEditVertexLabel',
-        'description': 'Allow learner to edit vertex labels.',
+        'description': 'Allow learner to edit vertex labels',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canAddEdge',
-        'description': 'Allow learner to add edges.',
+        'description': 'Allow learner to add edges',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canDeleteEdge',
-        'description': 'Allow learner to delete edges.',
+        'description': 'Allow learner to delete edges',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canEditEdgeWeight',
-        'description': 'Allow learner to edit edge weights.',
+        'description': 'Allow learner to edit edge weights',
         'schema': {
             'type': 'bool',
         },

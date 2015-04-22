@@ -105,7 +105,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <md-input-group class="long oppia-blue-on-focus md-default-theme">
+      <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0px;">
         <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
                required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
                ng-blur="onInputBlur()" ng-focus="onInputFocus()">

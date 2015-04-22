@@ -32,7 +32,7 @@ class ImageClickInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',
-        'description': 'The image and its regions.',
+        'description': 'Image',
         'schema': {
             'type': 'custom',
             'obj_type': 'ImageWithRegions',

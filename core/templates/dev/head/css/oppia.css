@@ -1009,16 +1009,26 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-interaction-tile {
+  outline: 1px solid #aaa;
   cursor: pointer;
   display: inline-block;
   margin: 5px;
   vertical-align: top;
   width: 30%;
 }
+.oppia-interaction-tile:hover {
+  outline: 2px solid #05A69A;
+}
 .oppia-interaction-tile-name {
-  border: 1px solid #ccc;
+  border-top: 1px solid #ccc;
   padding: 3px 0;
+  position: relative;
   text-align: center;
+}
+.oppia-interaction-customization-label {
+  font-size: 1em;
+  font-weight: bold;
+  padding-bottom: 6px;
 }
 
 .oppia-small-delete-button {
