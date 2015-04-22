@@ -14,7 +14,7 @@
   limitations under the License.
 */
 
-/* 
+/*
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
@@ -58,12 +58,12 @@ md-input-group.md-default-theme label
 }
 
 /* Bootstrap overrides and additions. */
-html {  
-  /* 
+html {
+  /*
     The HTML font-size is set to 62.5% in order to make 'em' units easier to
     work with. Modern browsers set their default font-size to 16px. This means
-    that 1em = 16px, which is a difficult base to work with (for example, 
-    1.6em = 25.6px, which is not rounded). By setting the html's font-size to 
+    that 1em = 16px, which is a difficult base to work with (for example,
+    1.6em = 25.6px, which is not rounded). By setting the html's font-size to
     62.5%, the base font-size becomes 10px, so 1em = 10px, and 1.6em = 16px.
     The reason for making 'em' easier to work with is that 'em's scale with
     the user's font-size preferences that they set in the browser, while
@@ -76,7 +76,7 @@ html {
 body {
   color: rgba(0,0,0,0.87);
   font-family: "Roboto", Arial, sans-serif;
-  /* 
+  /*
     A font-size of 1.6em sets the default font-size on Oppia to 16px, though
     this will scale depending on the user's font-size preferences set via
     their browser preferences.
@@ -266,7 +266,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-sidebar-menu-icon {
-  height: 22px; 
+  height: 22px;
   margin: 0px 16px 3px 6px;
   width: 22px;
 }
@@ -890,7 +890,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-editor-card-section-container {
-  background: rgba(5,140,166,0.1); 
+  background: rgba(5,140,166,0.1);
   padding-bottom: 1px;
   padding-top: 5px;
 }
@@ -1009,10 +1009,10 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-interaction-tile {
-  outline: 1px solid #aaa;
   cursor: pointer;
   display: inline-block;
   margin: 5px;
+  outline: 1px solid #aaa;
   vertical-align: top;
   width: 30%;
 }
@@ -1037,11 +1037,11 @@ md-card.oppia-gallery-tile {
 
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
-  cursor: pointer; 
-  opacity: 0.5; 
-  position: absolute; 
-  right: 10px; 
-  top: 10px; 
+  cursor: pointer;
+  opacity: 0.5;
+  position: absolute;
+  right: 10px;
+  top: 10px;
   width: 20px;
 }
 .oppia-delete-interaction-button:hover,
@@ -1427,7 +1427,7 @@ ul.oppia-dashboard-tiles {
   opacity: 0.85;
   transition: ease-in-out all .2s;
   -webkit-transition: ease-in-out all .2s;
-  user-drag: none; 
+  user-drag: none;
   -moz-user-select: none;
   -webkit-user-drag: none;
 }
