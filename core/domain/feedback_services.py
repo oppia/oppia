@@ -18,6 +18,7 @@
 
 __author__ = 'Koji Ashida'
 
+from core.domain import feedback_jobs
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -147,10 +148,10 @@ def get_last_updated_time(exploration_id):
     ) if threadlist else None
 
 
-def get_open_feedbacks(exploration_id):
+def get_thread_count(exploration_id):
     """Returns the number of open feedbacks for this exploration.
 
-    If this exploration has no open feedbacks, returns None.
+    If this exploration has no open feedbacks, returns 0.
     """
-    return (feedback_jobs.OpenFeedbacksStatisticsAggregator. 
-        get_num_of_open_feedbacks(exploration_id))
+    return (feedback_jobs.OpenFeedbacksStatisticsAggregator.
+        get_thread_count(exploration_id))

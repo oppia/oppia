@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import subscription_services
 from core.domain import user_jobs
 from core.domain import user_services
@@ -129,6 +130,11 @@ class MyExplorationsHandler(base.BaseHandler):
             exp_services.get_at_least_editable_exploration_summaries(
                 self.user_id))
 
+        threads = {}
+        for exp_summary in editable_exp_summaries.values():
+            threads[exp_summary.id] = feedback_services.get_thread_count(
+                exp_summary.id)
+
         def _get_intro_card_color(category):
             return (
                 feconf.CATEGORIES_TO_COLORS[category] if
@@ -154,6 +160,11 @@ class MyExplorationsHandler(base.BaseHandler):
                     _get_intro_card_color(exp_summary.category)),
                 'ratings': exp_summary.ratings,
             } for exp_summary in editable_exp_summaries.values()],
+            'thread_count_list': [{
+                'id': exp_id,
+                'open_threads': threads[exp_id][0] if threads[exp_id] else 0,
+                'total_threads': threads[exp_id][1] if threads[exp_id] else 0,
+            } for exp_id in threads.keys()],
         })
         self.render_json(self.values)
 

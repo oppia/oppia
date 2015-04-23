@@ -59,7 +59,7 @@ class OpenFeedbacksStatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query methods.
     @classmethod
-    def get_num_of_open_feedbacks(cls, exploration_id):
+    def get_thread_count(cls, exploration_id):
         """
         Args:
           - exploration_id: id of the exploration to get statistics for
@@ -69,7 +69,8 @@ class OpenFeedbacksStatisticsAggregator(jobs.BaseContinuousComputationManager):
 
         feedback_thread_analytics_model = feedback_models.OpenFeedbacksModel.get(
             exploration_id, strict=False)
-        return (feedback_thread_analytics_model.num_of_open_feedbacks
+        return ([feedback_thread_analytics_model.num_of_open_threads, 
+                 feedback_thread_analytics_model.total_threads]
             if feedback_thread_analytics_model else None)
 
 
@@ -93,8 +94,12 @@ class OpenFeedbacksMRJobManager(
     def map(item):
         if (item.status == feedback_models.STATUS_CHOICES_OPEN):
             yield (item.exploration_id, 1)
+        else:
+            yield (item.exploration_id, 0)
 
     @staticmethod
     def reduce(key, stringified_values):
-        feedback_models.OpenFeedbacksModel.create(
-                key, len(stringified_values))
+        open_threads = stringified_values.count('1')
+        total_threads = open_threads + stringified_values.count('0')
+        feedback_models.OpenFeedbacksModel.create(key, open_threads, 
+            total_threads)

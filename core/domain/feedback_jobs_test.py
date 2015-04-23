@@ -51,6 +51,24 @@ class OpenFeedbacksAggregatorUnitTests(test_utils.GenericTestBase):
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         ModifiedOpenFeedbacksAggregator]
 
+    def test_no_threads(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            # Create test objects.
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+           
+            # Start job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertIsNone(threads)
+
     def test_single_thread_single_exp(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -64,14 +82,16 @@ class OpenFeedbacksAggregatorUnitTests(test_utils.GenericTestBase):
             thread.exploration_id = exp_id
             thread.put()
            
+            # Start job.
             self.process_and_flush_pending_tasks()
             ModifiedOpenFeedbacksAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            open_feedbacks = (ModifiedOpenFeedbacksAggregator.
-                get_num_of_open_feedbacks(exp_id))
-            self.assertEqual(open_feedbacks, 1)
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 1)
+            self.assertEqual(threads[1], 1)
 
     def test_multiple_threads_single_exp(self):
         with self.swap(
@@ -91,14 +111,16 @@ class OpenFeedbacksAggregatorUnitTests(test_utils.GenericTestBase):
             thread_2.exploration_id = exp_id          
             thread_2.put()
            
+            # Start job.
             self.process_and_flush_pending_tasks()
             ModifiedOpenFeedbacksAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            open_feedbacks = (ModifiedOpenFeedbacksAggregator.
-                get_num_of_open_feedbacks(exp_id))
-            self.assertEqual(open_feedbacks, 2)
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 2)
+            self.assertEqual(threads[1], 2)
 
     def test_multiple_threads_multiple_exp(self):
         with self.swap(
@@ -130,22 +152,26 @@ class OpenFeedbacksAggregatorUnitTests(test_utils.GenericTestBase):
             thread_4.exploration_id = exp_id_2         
             thread_4.put()
            
+            # Start job.
             self.process_and_flush_pending_tasks()
             ModifiedOpenFeedbacksAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            open_feedbacks = (ModifiedOpenFeedbacksAggregator.
-                get_num_of_open_feedbacks(exp_id_1))
-            self.assertEqual(open_feedbacks, 2)
-            open_feedbacks = (ModifiedOpenFeedbacksAggregator.
-                get_num_of_open_feedbacks(exp_id_2))
-            self.assertEqual(open_feedbacks, 2)
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id_1))
+            self.assertEqual(threads[0], 2)
+            self.assertEqual(threads[1], 2)
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id_2))
+            self.assertEqual(threads[0], 2)
+            self.assertEqual(threads[1], 2)
    
     def test_thread_closed_job_running(self): 
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
             thread_id_1 = 'tid1'
@@ -155,32 +181,171 @@ class OpenFeedbacksAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_id, thread_id_1)
             thread_1.exploration_id = exp_id
             thread_1.put()
-            thread_2 = feedback_models.FeedbackThreadModel.create(
-                exp_id, thread_id_2)
-            thread_2.exploration_id = exp_id        
-            thread_2.put()
            
+            # Start job.
             self.process_and_flush_pending_tasks()
             ModifiedOpenFeedbacksAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            open_feedbacks = (ModifiedOpenFeedbacksAggregator.
-                get_num_of_open_feedbacks(exp_id))
-            self.assertEqual(open_feedbacks, 2)
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 1)
+            self.assertEqual(threads[1], 1)
           
+            # Stop job.
             ModifiedOpenFeedbacksAggregator.stop_computation(user_id) 
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
 
+            # Close thread.
             thread = (feedback_models.FeedbackThreadModel.
                       get_by_exp_and_thread_id(exp_id, thread_id_1))
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.put()
             
+            # Restart job.
             self.process_and_flush_pending_tasks()
             ModifiedOpenFeedbacksAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            open_feedbacks = ModifiedOpenFeedbacksAggregator.get_num_of_open_feedbacks(exp_id)
-            self.assertEqual(open_feedbacks, 1)
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 0)
+            self.assertEqual(threads[1], 1)
+   
+    def test_thread_closed_reopened_again(self): 
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            # Create test objects.
+            user_id = 'uid'
+            exp_id = 'eid'
+            thread_id_1 = 'tid1'
+            thread_id_2 = 'tid2'
+            self.save_new_valid_exploration(exp_id, 'owner')
+            thread_1 = feedback_models.FeedbackThreadModel.create(
+                exp_id, thread_id_1)
+            thread_1.exploration_id = exp_id
+            thread_1.put()
+           
+            # Start job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 1)
+            self.assertEqual(threads[1], 1)
+          
+            # Stop job.
+            ModifiedOpenFeedbacksAggregator.stop_computation(user_id) 
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # Close thread.
+            thread = (feedback_models.FeedbackThreadModel.
+                      get_by_exp_and_thread_id(exp_id, thread_id_1))
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
+            
+            # Restart job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 0)
+            self.assertEqual(threads[1], 1)
+
+            # Stop job.
+            ModifiedOpenFeedbacksAggregator.stop_computation(user_id) 
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            
+            # Reopen thread.
+            thread = (feedback_models.FeedbackThreadModel.
+                      get_by_exp_and_thread_id(exp_id, thread_id_1))
+            thread.status = feedback_models.STATUS_CHOICES_OPEN
+            thread.put()
+
+            # Restart job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 1)
+            self.assertEqual(threads[1], 1)
+   
+    def test_thread_closed_status_changed(self): 
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            # Create test objects.
+            user_id = 'uid'
+            exp_id = 'eid'
+            thread_id_1 = 'tid1'
+            thread_id_2 = 'tid2'
+            self.save_new_valid_exploration(exp_id, 'owner')
+            thread_1 = feedback_models.FeedbackThreadModel.create(
+                exp_id, thread_id_1)
+            thread_1.exploration_id = exp_id
+            thread_1.put()
+           
+            # Start job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 1)
+            self.assertEqual(threads[1], 1)
+          
+            # Stop job.
+            ModifiedOpenFeedbacksAggregator.stop_computation(user_id) 
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # Close thread.
+            thread = (feedback_models.FeedbackThreadModel.
+                      get_by_exp_and_thread_id(exp_id, thread_id_1))
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
+            
+            # Restart job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 0)
+            self.assertEqual(threads[1], 1)
+
+            # Stop job.
+            ModifiedOpenFeedbacksAggregator.stop_computation(user_id) 
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            
+            # Change thread status.
+            thread = (feedback_models.FeedbackThreadModel.
+                      get_by_exp_and_thread_id(exp_id, thread_id_1))
+            thread.status = feedback_models.STATUS_CHOICES_IGNORED
+            thread.put()
+
+            # Restart job.
+            self.process_and_flush_pending_tasks()
+            ModifiedOpenFeedbacksAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            threads = (ModifiedOpenFeedbacksAggregator.
+                get_thread_count(exp_id))
+            self.assertEqual(threads[0], 0)
+            self.assertEqual(threads[1], 1)

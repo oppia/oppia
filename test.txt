@@ -1,0 +1,16 @@
+Checking if webtest is installed in third_party
+10:14:47 FINISHED core.controllers.home_test: 3.1 secs
+----------------------------------------
+----------------------------------------
+
++------------------+
+| SUMMARY OF TESTS |
++------------------+
+
+SUCCESS   core.controllers.home_test: 8 tests (2.6 secs)
+
+Ran 8 tests in 1 test class.
+All tests passed.
+
+Done!
+

@@ -1136,10 +1136,15 @@ oppia-parameter {
   text-transform: capitalize;
 }
 
+.oppia-dashboard-status-orange {
+  color: #ffce00;
+  text-transform: capitalize;
+}
+
 .oppia-dashboard-tile-metadata-parent {
   float: right;
-  padding-top: 25px;
-  width: 25%;
+  padding-top: 15px;
+  width: 30%;
 }
 
 .oppia-dashboard-tile-metadata {
@@ -1147,10 +1152,9 @@ oppia-parameter {
   border-left-style: ridge;
   border-left-width: thin;
   color: #888;
-  height: 70px;
+  height: 85px;
   padding-left: 20px;
   padding-right: 30px;
-  padding-top: 5px;
 }
 
 md-card.oppia-dashboard-tile {

@@ -205,7 +205,7 @@ class FeedbackMessageModel(base_models.BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
 
-class OpenFeedbacksModel(base_models.BaseModel):
+class OpenFeedbacksModel(base_models.BaseMapReduceBatchResultsModel):
     """Model for storing open feedback counts for explorations.
 
     A OpenFeedbacksModel instance stores the following information:
@@ -216,9 +216,13 @@ class OpenFeedbacksModel(base_models.BaseModel):
     """
     
     # The number of open feedbacks for an exploration.
-    num_of_open_feedbacks = ndb.IntegerProperty(default=None, indexed=False)    
-    
+    num_of_open_threads = ndb.IntegerProperty(default=None, indexed=False)    
+
+    # Total number of threads against this exploration.
+    total_threads = ndb.IntegerProperty(default=None, indexed=False)    
+
     @classmethod
-    def create(cls, id, open_feedbacks):
+    def create(cls, id, open_threads, total_threads):
         """Creates a new OpenFeedbacksModel entry."""
-        cls(id=id, num_of_open_feedbacks=open_feedbacks).put()
+        cls(id=id, num_of_open_threads=open_threads,
+            total_threads=total_threads).put()
