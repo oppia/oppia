@@ -36,10 +36,10 @@
     <!-- The og tags are for Facebook sharing. -->
     <meta property="og:title" content="{{meta_name}}">
     <meta property="og:site_name" content="Oppia">
-    <meta property="og:url" content="<[serverName]>/explore/<[explorationId]>">
+    <meta property="og:url" content="{{FULL_URL}}">
     <meta property="og:description" content="{{meta_description}}">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="/images/logo/288x288_logo_mint.png">
+    <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
