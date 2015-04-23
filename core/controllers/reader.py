@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import copy
 
 from core.controllers import base
+from core.controllers import pages
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -205,6 +206,8 @@ class ExplorationPage(base.BaseHandler):
                 interaction_templates),
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
+            # Note that this overwrites the value in base.py.
+            'meta_name': exploration.title,
             # Note that this overwrites the value in base.py.
             'meta_description': self._make_first_letter_uppercase(
                 exploration.objective),

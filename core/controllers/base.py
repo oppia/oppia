@@ -373,6 +373,9 @@ class BaseHandler(webapp2.RequestHandler):
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
         })
 
+        if 'meta_name' not in values:
+            values['meta_name'] = 'Personalized Online Learning from Oppia'
+
         if 'meta_description' not in values:
             values['meta_description'] = (
                 'Oppia is a free, open-source learning platform. Join the '
