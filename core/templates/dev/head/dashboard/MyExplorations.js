@@ -35,7 +35,6 @@ oppia.controller('MyExplorations', [
   $rootScope.loadingMessage = 'Loading';
   $http.get('/myexplorationshandler/data').success(function(data) {
     $scope.explorationsList = data.explorations_list;
-    $scope.threadsCount = data.thread_count_list
     $rootScope.loadingMessage = '';
   });
 }]);
