@@ -46,32 +46,39 @@
               <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                 <div class="oppia-dashboard-tile-metadata">
                   Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
+
                   <br>
-                  Feedback:
-                  <span style="color: black;">
-                    <span ng-repeat="thread_count in threadsCount">
-                      <span ng-if="thread_count.id === exploration.id">
-                        <[thread_count.total_threads]>
-                        <span ng-if="thread_count.open_threads > 0">
-                          (<[thread_count.open_threads]> unresolved)
-                        </span>
+
+                  <div ng-show="exploration.num_total_threads == 0">
+                    <br>
+                  </div>
+                  <div ng-show="exploration.num_total_threads > 0">
+                    Feedback:
+                    <span style="color: black;">
+                      <[exploration.num_total_threads]>
+                      <span ng-if="exploration.num_open_threads > 0">
+                        (<[exploration.num_open_threads]> unresolved)
                       </span>
                     </span>
+                  </div>
+                  <br>
+
+                  Status:
+                  <span ng-if="exploration.num_open_threads > 0 && exploration.status !== 'private'">
+                    <span class="oppia-dashboard-status-orange">
+                      Unresolved Feedback
+                    </span>
                   </span>
-                  <br>
-                  <br>
-                  Status: 
-                  <span ng-repeat="thread_count in threadsCount">
-                    <span ng-if="thread_count.id === exploration.id && thread_count.open_threads > 0 && exploration.status !== 'private'">
-                      <span class='oppia-dashboard-status-orange'>Unresolved Feedback</span>
+                  <span ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'">
+                    <span class="oppia-dashboard-status-green">
+                      Good
                     </span>
-                    <span ng-if="thread_count.id === exploration.id && thread_count.open_threads == 0 && exploration.status !== 'private'">
-                      <span class='oppia-dashboard-status-green'>Good</span>
+                  </span>
+                  <span ng-if="exploration.status === 'private'">
+                    <span class="oppia-dashboard-status-grey">
+                      Private
                     </span>
-                    <span ng-if="thread_count.id === exploration.id && exploration.status === 'private'">
-                      <span class='oppia-dashboard-status-grey'><[exploration.status]></span>
-                    </span>
-                 </span>
+                  </span>
                 </div>
               </div>
               <div class="oppia-gallery-tile-contents">
@@ -86,7 +93,7 @@
                       <[exploration.title]>
                     </span>
                     <span style="font-weight: bold;" class="hidden-xs">&middot;</span>
-                    <span class="protractor-test-exploration-objective oppia-gallery-tile-objective hidden-xs">
+                    <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
                       <span ng-if="exploration.objective">
                         <[getFormattedObjective(exploration.objective)]>
                       </span>
@@ -141,4 +148,3 @@
     {{ include_js_file('dashboard/MyExplorations.js') }}
   </script>
 {% endblock footer_js %}
-

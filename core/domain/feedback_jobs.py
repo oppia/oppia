@@ -22,36 +22,35 @@ from core.platform import models
     models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()
-import feconf
-import utils
-
-from google.appengine.ext import ndb
 
 
-class OpenFeedbacksRealtimeModel(
+class FeedbackAnalyticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     pass
 
 
-class OpenFeedbacksStatisticsAggregator(jobs.BaseContinuousComputationManager):
-    """A continuous-computation job that computes the number of open feedbacks
-    for explorations.
+class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that computes analytics for feedback
+    threads of explorations.
 
     This job does not have a realtime component. There will be a delay in
     propagating new updates to the dashboard; the length of the delay will be
     approximately the time it takes a batch job to run.
     """
+    # TODO(sll): Add a realtime component: listen to incoming feedback messages
+    # and adjust the counts appropriately.
+
     @classmethod
     def get_event_types_listened_to(cls):
         return []
 
     @classmethod
     def _get_realtime_datastore_class(cls):
-        return OpenFeedbacksRealtimeModel
+        return FeedbackAnalyticsRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return OpenFeedbacksMRJobManager
+        return FeedbackAnalyticsMRJobManager
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
@@ -59,32 +58,44 @@ class OpenFeedbacksStatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query methods.
     @classmethod
-    def get_thread_count(cls, exploration_id):
+    def get_thread_analytics(cls, exploration_id):
         """
         Args:
-          - exploration_id: id of the exploration to get statistics for
+          - exploration_id: id of the exploration to get statistics for.
 
-        Returns the number of open feedbacks.
+        Returns a dict with two keys: 'num_open_threads' and
+        'num_total_threads', representing the counts of open and all feedback
+        threads, respectively.
         """
+        feedback_thread_analytics_model = (
+            feedback_models.FeedbackAnalyticsModel.get(
+                exploration_id, strict=False))
 
-        feedback_thread_analytics_model = feedback_models.OpenFeedbacksModel.get(
-            exploration_id, strict=False)
-        return ([feedback_thread_analytics_model.num_of_open_threads, 
-                 feedback_thread_analytics_model.total_threads]
-            if feedback_thread_analytics_model else None)
+        num_open_threads = 0
+        num_total_threads = 0
+        if feedback_thread_analytics_model:
+            num_open_threads = feedback_thread_analytics_model.num_open_threads
+            num_total_threads = (
+                feedback_thread_analytics_model.num_total_threads)
+
+        return {
+            'num_open_threads': num_open_threads,
+            'num_total_threads': num_total_threads
+        }
 
 
-class OpenFeedbacksMRJobManager(
+class FeedbackAnalyticsMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """Job that creates OpenFeedbackModels for explorations by calculating the
-       number of open feedback threads per exploration.
-       Includes:
-       * number of open feedbacks for an exploration.
+    """Job that creates FeedbackAnalyticsModels for explorations by calculating
+    various analytics for feedback threads corresponding to an exploration.
+
+    Currently, this job calculates the number of open feedback threads, as well
+    as the total feedback thread count for each exploration.
     """
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return OpenFeedbacksStatisticsAggregator
+        return FeedbackAnalyticsAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -92,14 +103,13 @@ class OpenFeedbacksMRJobManager(
 
     @staticmethod
     def map(item):
-        if (item.status == feedback_models.STATUS_CHOICES_OPEN):
-            yield (item.exploration_id, 1)
-        else:
-            yield (item.exploration_id, 0)
+        yield (item.exploration_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):
-        open_threads = stringified_values.count('1')
-        total_threads = open_threads + stringified_values.count('0')
-        feedback_models.OpenFeedbacksModel.create(key, open_threads, 
-            total_threads)
+        num_open_threads = stringified_values.count(
+            feedback_models.STATUS_CHOICES_OPEN)
+        num_total_threads = len(stringified_values)
+
+        feedback_models.FeedbackAnalyticsModel.create(
+            key, num_open_threads, num_total_threads)

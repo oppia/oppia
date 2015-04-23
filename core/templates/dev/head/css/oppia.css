@@ -248,7 +248,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-sidebar-menu-icon {
-  height: 22px; 
+  height: 22px;
   margin: 0px 16px 3px 6px;
   width: 22px;
 }
@@ -1127,7 +1127,8 @@ oppia-parameter {
 }
 
 .oppia-dashboard-status-green {
-  color: #65e065;
+  color: #05a69a;
+  font-weight: bold;
   text-transform: capitalize;
 }
 
@@ -1137,7 +1138,8 @@ oppia-parameter {
 }
 
 .oppia-dashboard-status-orange {
-  color: #ffce00;
+  color: #f7a541;
+  font-weight: bold;
   text-transform: capitalize;
 }
 

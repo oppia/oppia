@@ -148,10 +148,14 @@ def get_last_updated_time(exploration_id):
     ) if threadlist else None
 
 
-def get_thread_count(exploration_id):
-    """Returns the number of open feedbacks for this exploration.
+def get_thread_analytics(exploration_id):
+    """Returns a dict with feedback thread analytics for the given exploration.
 
-    If this exploration has no open feedbacks, returns 0.
+    The returned dict has two keys:
+    - 'num_open_threads': the number of open feedback threads for this
+         exploration.
+    - 'num_total_threads': the total number of feedback threads for this
+         exploration.
     """
-    return (feedback_jobs.OpenFeedbacksStatisticsAggregator.
-        get_thread_count(exploration_id))
+    return feedback_jobs.FeedbackAnalyticsAggregator.get_thread_analytics(
+        exploration_id)

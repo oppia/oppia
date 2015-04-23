@@ -130,19 +130,17 @@ class MyExplorationsHandler(base.BaseHandler):
             exp_services.get_at_least_editable_exploration_summaries(
                 self.user_id))
 
-        threads = {}
-        for exp_summary in editable_exp_summaries.values():
-            threads[exp_summary.id] = feedback_services.get_thread_count(
-                exp_summary.id)
-
         def _get_intro_card_color(category):
             return (
                 feconf.CATEGORIES_TO_COLORS[category] if
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        self.values.update({
-            'explorations_list': [{
+        explorations_list = []
+        for exp_summary in editable_exp_summaries.values():
+            feedback_thread_analytics = feedback_services.get_thread_analytics(
+                exp_summary.id)
+            explorations_list.append({
                 'id': exp_summary.id,
                 'title': exp_summary.title,
                 'category': exp_summary.category,
@@ -159,12 +157,19 @@ class MyExplorationsHandler(base.BaseHandler):
                     '/images/gallery/exploration_background_%s_small.png' %
                     _get_intro_card_color(exp_summary.category)),
                 'ratings': exp_summary.ratings,
-            } for exp_summary in editable_exp_summaries.values()],
-            'thread_count_list': [{
-                'id': exp_id,
-                'open_threads': threads[exp_id][0] if threads[exp_id] else 0,
-                'total_threads': threads[exp_id][1] if threads[exp_id] else 0,
-            } for exp_id in threads.keys()],
+                'num_open_threads': (
+                    feedback_thread_analytics['num_open_threads']),
+                'num_total_threads': (
+                    feedback_thread_analytics['num_total_threads']),
+            })
+
+        explorations_list = sorted(
+            explorations_list,
+            key=lambda x: (x['num_open_threads'], x['last_updated']),
+            reverse=True)
+
+        self.values.update({
+            'explorations_list': explorations_list,
         })
         self.render_json(self.values)
 
