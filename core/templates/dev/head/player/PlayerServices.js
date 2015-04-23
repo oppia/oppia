@@ -219,13 +219,24 @@ oppia.factory('oppiaPlayerService', [
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
       var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
-      $http.post(stateHitEventHandlerUrl, {
-        new_state_name: newStateName,
-        exploration_version: version,
-        session_id: sessionId,
-        client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-        old_params: learnerParamsService.getAllParams()
-      });
+
+      if (newStateName) {
+        $http.post(stateHitEventHandlerUrl, {
+          new_state_name: newStateName,
+          exploration_version: version,
+          session_id: sessionId,
+          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          old_params: learnerParamsService.getAllParams()
+        });
+      }
+
+      // If the new state is either the END state, or contains a terminal
+      // interaction, record a MaybeLeave event.
+      if (!newStateName ||
+          INTERACTION_SPECS[
+            _exploration.states[newStateName].interaction.id].is_terminal) {
+        _registerMaybeLeaveEvent(newStateName);
+      }
 
       // Broadcast the state hit to the parent page.
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
@@ -252,6 +263,18 @@ oppia.factory('oppiaPlayerService', [
     successCallback(
       newStateName, refreshInteraction, newFeedbackHtml,
       newQuestionHtml, newInteractionId);
+  };
+
+  var _registerMaybeLeaveEvent = function(stateName) {
+    var maybeLeaveExplorationUrl = (
+      '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
+    $http.post(maybeLeaveExplorationUrl, {
+      client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+      params: learnerParamsService.getAllParams(),
+      session_id: sessionId,
+      state_name: stateName,
+      version: version
+    });
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
@@ -438,19 +461,19 @@ oppia.factory('oppiaPlayerService', [
         var finished = (ruleSpec.dest === 'END');
         var newStateName = finished ? null : ruleSpec.dest;
 
-        // Compute the client evaluation result. This may be null if there are
+        // Compute the data for the next state. This may be null if there are
         // malformed expressions.
-        var clientEvalResult = stateTransitionService.getNextStateData(
+        var nextStateData = stateTransitionService.getNextStateData(
           ruleSpec,
           finished ? null : _exploration.states[newStateName],
           answer);
 
-        if (clientEvalResult) {
-          clientEvalResult['state_name'] = newStateName;
+        if (nextStateData) {
+          nextStateData['state_name'] = newStateName;
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(
-            clientEvalResult.state_name, clientEvalResult.params,
-            clientEvalResult.question_html, clientEvalResult.feedback_html,
+            nextStateData.state_name, nextStateData.params,
+            nextStateData.question_html, nextStateData.feedback_html,
             answer, handler, successCallback);
         } else {
           answerIsBeingProcessed = false;
@@ -462,15 +485,7 @@ oppia.factory('oppiaPlayerService', [
       return answerIsBeingProcessed;
     },
     registerMaybeLeaveEvent: function() {
-      var maybeLeaveExplorationUrl = (
-        '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
-      $http.post(maybeLeaveExplorationUrl, {
-        client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-        params: learnerParamsService.getAllParams(),
-        session_id: sessionId,
-        state_name: stateHistory[stateHistory.length - 1],
-        version: version
-      });
+      _registerMaybeLeaveEvent(stateHistory[stateHistory.length - 1]);
     },
     // If the feedback is exploration-scoped, 'stateName' should be null.
     openPlayerFeedbackModal: function(stateName) {
