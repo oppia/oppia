@@ -21,9 +21,9 @@
 oppia.controller('DashboardNotifications', [
     '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
     function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
-  $scope.navigateToItem = function(activityId, updateType) {
-    window.location.href = (
-      '/create/' + activityId + (updateType === 'feedback_thread' ? '#/feedback': ''));
+  $scope.navigateToItem = function(activityId, notificationType) {
+    window.location.href = '/create/' + activityId + (
+        notificationType === 'feedback_thread' ? '#/feedback': '');
   };
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
@@ -33,7 +33,7 @@ oppia.controller('DashboardNotifications', [
 
   $rootScope.loadingMessage = 'Loading';
   $http.get('/notificationsdashboardhandler/data').success(function(data) {
-    $scope.recentUpdates = data.recent_updates;
+    $scope.recentNotifications = data.recent_notifications;
     $scope.jobQueuedMsec = data.job_queued_msec;
     $scope.lastSeenMsec = data.last_seen_msec || 0.0;
     $scope.currentUsername = data.username;

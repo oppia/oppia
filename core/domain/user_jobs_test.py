@@ -55,8 +55,8 @@ class ModifiedRecentUpdatesMRJobManager(user_jobs.RecentUpdatesMRJobManager):
 
 
 class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
-    """Tests for computations involving the recent updates section of the
-    dashboard.
+    """Tests for computations involving the 'recent notifications' section of
+    the user dashboard.
     """
 
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
@@ -95,7 +95,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             self.assertEqual(
-                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID)[1],
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1],
                 [self._get_expected_exploration_created_dict(
                     USER_ID, EXP_ID, EXP_TITLE, expected_last_updated_ms)])
 
@@ -124,8 +125,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 1)
             self.process_and_flush_pending_tasks()
 
-            recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID)[1])
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -133,7 +135,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_title': EXP_TITLE,
                 'author_id': ANOTHER_USER_ID,
                 'subject': 'Update exploration',
-            }], recent_updates)
+            }], recent_notifications)
 
     def test_basic_computation_works_if_exploration_is_deleted(self):
         with self.swap(
@@ -156,10 +158,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 1)
             self.process_and_flush_pending_tasks()
 
-            recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID)[1])
-            self.assertEqual(len(recent_updates), 1)
-            self.assertEqual(sorted(recent_updates[0].keys()), [
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
+            self.assertEqual(len(recent_notifications), 1)
+            self.assertEqual(sorted(recent_notifications[0].keys()), [
                 'activity_id', 'activity_title', 'author_id',
                 'last_updated_ms', 'subject', 'type'])
             self.assertDictContainsSubset({
@@ -168,10 +171,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_title': EXP_TITLE,
                 'author_id': USER_ID,
                 'subject': feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
-            }, recent_updates[0])
+            }, recent_notifications[0])
             self.assertLess(
                 last_updated_ms_before_deletion,
-                recent_updates[0]['last_updated_ms'])
+                recent_notifications[0]['last_updated_ms'])
 
     def test_multiple_commits_and_feedback_messages(self):
         with self.swap(
@@ -215,8 +218,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 1)
             self.process_and_flush_pending_tasks()
 
-            recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     self.EDITOR_ID)[1])
             self.assertEqual([(
                 self._get_expected_exploration_created_dict(
@@ -233,7 +236,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_expected_exploration_created_dict(
                     self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE,
                     exp1_last_updated_ms)
-            )], recent_updates)
+            )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exp(self):
         with self.swap(
@@ -273,13 +276,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 1)
             self.process_and_flush_pending_tasks()
 
-            recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(
+            recent_notifications_for_user_a = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     user_a_id)[1])
-            recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(
+            recent_notifications_for_user_b = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     user_b_id)[1])
-            expected_feedback_thread_update_dict = {
+            expected_feedback_thread_notification_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
@@ -287,18 +290,18 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
-            expected_exploration_created_update_dict = (
+            expected_exploration_created_notification_dict = (
                 self._get_expected_exploration_created_dict(
                     user_a_id, EXP_ID, EXP_TITLE, exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_updates_for_user_a, [
-                expected_feedback_thread_update_dict,
-                expected_exploration_created_update_dict
+            self.assertEqual(recent_notifications_for_user_a, [
+                expected_feedback_thread_notification_dict,
+                expected_exploration_created_notification_dict
             ])
             # User B sees only her feedback thread, but no commits.
-            self.assertEqual(recent_updates_for_user_b, [
-                expected_feedback_thread_update_dict,
+            self.assertEqual(recent_notifications_for_user_b, [
+                expected_feedback_thread_notification_dict,
             ])
 
     def test_subscribing_to_exp_subscribes_to_its_feedback_threads(self):
@@ -343,13 +346,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 1)
             self.process_and_flush_pending_tasks()
 
-            recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(
+            recent_notifications_for_user_a = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     user_a_id)[1])
-            recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(
+            recent_notifications_for_user_b = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     user_b_id)[1])
-            expected_feedback_thread_update_dict = {
+            expected_feedback_thread_notification_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
@@ -357,19 +360,19 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
-            expected_exploration_created_update_dict = (
+            expected_exploration_created_notification_dict = (
                 self._get_expected_exploration_created_dict(
                     user_a_id, EXP_ID, EXP_TITLE, exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_updates_for_user_a, [
-                expected_feedback_thread_update_dict,
-                expected_exploration_created_update_dict
+            self.assertEqual(recent_notifications_for_user_a, [
+                expected_feedback_thread_notification_dict,
+                expected_exploration_created_notification_dict
             ])
             # User B sees A's commit and B's feedback thread.
-            self.assertEqual(recent_updates_for_user_b, [
-                expected_feedback_thread_update_dict,
-                expected_exploration_created_update_dict,
+            self.assertEqual(recent_notifications_for_user_b, [
+                expected_feedback_thread_notification_dict,
+                expected_exploration_created_notification_dict,
             ])
 
 
