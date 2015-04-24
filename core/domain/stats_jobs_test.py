@@ -20,6 +20,8 @@ __author__ = 'Stephanie Federwisch'
 
 from core import jobs_registry
 from core.domain import event_services
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import stats_jobs
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -207,3 +209,96 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
+
+
+class OneOffNullStateHitEventsMigratorTest(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(OneOffNullStateHitEventsMigratorTest, self).setUp()
+
+        self.save_new_valid_exploration(
+            self.EXP_ID, 'user_id', 'title', 'category')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        # Create one good and two bad StateHit events.
+        event_services.StateHitEventHandler.record(
+            self.EXP_ID, 1, exploration.init_state_name,
+            'good_session_id', {}, feconf.PLAY_TYPE_NORMAL)
+        event_services.StateHitEventHandler.record(
+            self.EXP_ID, 1, None,
+            'bad_session_id_1', {'a': 'b'}, feconf.PLAY_TYPE_NORMAL)
+        event_services.StateHitEventHandler.record(
+            self.EXP_ID, 1, None,
+            'bad_session_id_2', {}, feconf.PLAY_TYPE_NORMAL)
+        self.process_and_flush_pending_tasks()
+
+    def test_migration_job_works(self):
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel.query().count(), 3)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            0)
+
+        # Store a temporary copy of the instance corresponding to
+        # bad_session_id_1.
+        source_item = None
+        for item in stats_models.StateHitEventLogEntryModel.query():
+            if item.session_id == 'bad_session_id_1':
+                source_item = item
+
+        # Run the job once.
+        job_id = (stats_jobs.NullStateHitEventsMigrator.create_new())
+        stats_jobs.NullStateHitEventsMigrator.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel.query().count(), 1)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            2)
+        self.assertEqual(
+            stats_jobs.NullStateHitEventsMigrator.get_output(job_id),
+            [['migrated_instances', ['exp_id v1', 'exp_id v1']]])
+
+        # Run the job again; nothing new should happen.
+        new_job_id = (stats_jobs.NullStateHitEventsMigrator.create_new())
+        stats_jobs.NullStateHitEventsMigrator.enqueue(new_job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel.query().count(), 1)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            2)
+        self.assertEqual(
+            stats_jobs.NullStateHitEventsMigrator.get_output(new_job_id), [])
+
+        target_item = None
+        for item in stats_models.MaybeLeaveExplorationEventLogEntryModel.query():
+            if item.session_id == 'bad_session_id_1':
+                target_item = item
+
+        self.assertIsNotNone(target_item)
+        self.assertNotEqual(source_item, target_item)
+        self.assertNotEqual(source_item.id, target_item.id)
+        self.assertEqual(
+            target_item.event_type, feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION)
+        self.assertEqual(
+            source_item.exploration_id, target_item.exploration_id)
+        self.assertEqual(
+            source_item.exploration_version, target_item.exploration_version)
+        self.assertEqual(target_item.state_name, feconf.END_DEST)
+        self.assertEqual(target_item.client_time_spent_in_secs, 0)
+        self.assertEqual(source_item.params, target_item.params)
+        self.assertEqual(source_item.play_type, target_item.play_type)
+        self.assertEqual(source_item.created_on, target_item.created_on)
+        # It is not possible to set the last_updated field explicitly.
+        self.assertLess(source_item.last_updated, target_item.last_updated)
+        self.assertEqual(source_item.deleted, target_item.deleted)
+        self.assertEqual(target_item.deleted, False)

@@ -343,3 +343,48 @@ class StatisticsMRJobManager(
         stats_models.ExplorationAnnotationsModel.create(
             exp_id, str(version), num_starts, num_completions,
             state_hit_counts)
+
+
+class NullStateHitEventsMigrator(jobs.BaseMapReduceJobManager):
+    """This one-off job finds all (StateHit, None) events and converts them
+    to (MaybeLeave, 'END') events instead. It was written to correct an error in
+    release v1.2.12 where we started using a state_name of None to denote the
+    END state.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateHitEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        def _migrate_in_transaction():
+            new_item_id = (
+                stats_models.MaybeLeaveExplorationEventLogEntryModel.get_new_event_entity_id(
+                    item.exploration_id, item.session_id))
+            leave_event_entity = stats_models.MaybeLeaveExplorationEventLogEntryModel(
+                id=new_item_id,
+                event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
+                exploration_id=item.exploration_id,
+                exploration_version=item.exploration_version,
+                state_name=feconf.END_DEST,
+                session_id=item.session_id,
+                client_time_spent_in_secs=0.0,
+                params=item.params,
+                play_type=item.play_type,
+                last_updated=item.last_updated,
+                created_on=item.created_on,
+                deleted=item.deleted)
+            leave_event_entity.put()
+
+            item.delete()
+
+        if item.state_name is None:
+            transaction_services.run_in_transaction(_migrate_in_transaction)
+            yield (
+                'migrated_instances',
+                ('%s v%s' % (item.exploration_id, item.exploration_version)))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
