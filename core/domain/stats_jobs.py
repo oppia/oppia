@@ -294,10 +294,11 @@ class StatisticsMRJobManager(
             if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
                 new_models_start_count += 1
             elif event_type == feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION:
-                # If this maybe-leave event is on the end state or a terminal
-                # state, it is a completion.
-                if (state_name is None or exploration.states[
-                        state_name].interaction.is_terminal):
+                # If this maybe-leave event is on the end state, it is a
+                # completion. (This will be the case even if the event occurs
+                # for a state with a terminal interaction -- the recorded
+                # state_name here will still be 'END'.)
+                if state_name == feconf.END_DEST:
                     new_models_complete_count += 1
                     # Track that we have seen a 'real' end for this session id
                     new_models_end_sessions.add(session_id)

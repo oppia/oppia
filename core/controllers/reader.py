@@ -341,7 +341,10 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
-    """Tracks a reader leaving an exploration before completion."""
+    """Tracks a reader leaving an exploration before or at completion.
+
+    If this is a completion, the state_name recorded should be 'END'.
+    """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 

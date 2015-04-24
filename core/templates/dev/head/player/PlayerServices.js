@@ -235,7 +235,7 @@ oppia.factory('oppiaPlayerService', [
       if (!newStateName ||
           INTERACTION_SPECS[
             _exploration.states[newStateName].interaction.id].is_terminal) {
-        _registerMaybeLeaveEvent(newStateName);
+        _registerMaybeLeaveEvent('END');
       }
 
       // Broadcast the state hit to the parent page.
