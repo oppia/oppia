@@ -92,6 +92,8 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             transaction_services.run_in_transaction(
                 _increment_visit_counter)
         else:
+            # TODO(sll): Shouldn't this check whether it's an actual completion
+            # as opposed to just a leave event?
             transaction_services.run_in_transaction(
                 _increment_completion_counter)
 
@@ -293,7 +295,9 @@ class StatisticsMRJobManager(
                 new_models_start_count += 1
             elif event_type == feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION:
                 # If this maybe-leave event is on the end state, it is a
-                # completion.
+                # completion. (This will be the case even if the event occurs
+                # for a state with a terminal interaction -- the recorded
+                # state_name here will still be 'END'.)
                 if state_name == feconf.END_DEST:
                     new_models_complete_count += 1
                     # Track that we have seen a 'real' end for this session id

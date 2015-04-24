@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import copy
+import logging
 
 from core.controllers import base
 from core.domain import config_domain
@@ -260,15 +261,13 @@ class StateHitEventHandler(base.BaseHandler):
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
 
-        if new_state_name == feconf.END_DEST:
-            event_services.MaybeLeaveExplorationEventHandler.record(
-                exploration_id, exploration_version, feconf.END_DEST,
-                session_id, client_time_spent_in_secs, old_params,
-                feconf.PLAY_TYPE_NORMAL)
-        else:
+        # Record the state hit, if it is not the END state.
+        if new_state_name is not None:
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+        else:
+            logging.error('Unexpected StateHit event for the END state.')
 
 
 class ClassifyHandler(base.BaseHandler):
@@ -342,7 +341,10 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
-    """Tracks a reader leaving an exploration before completion."""
+    """Tracks a reader leaving an exploration before or at completion.
+
+    If this is a completion, the state_name recorded should be 'END'.
+    """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
