@@ -14,7 +14,7 @@
             </span>
           </span>
           <span ng-if="!isRuleConfusing() && rule.feedback.length === 0" style="color: #888">
-            [<em>says nothing...</em>]
+            <em>No feedback</em>
           </span>
           <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
             <span angular-html-bind="rule.feedback[0]"></span>
@@ -64,7 +64,7 @@
 
 <script type="text/ng-template" id="rules/ruleDetailsEditor">
   <div style="position: relative;">
-    <div>
+    <div class="oppia-rule-details-header">
       <strong>Rule</strong>
     </div>
     <span ng-if="rule.definition.rule_type !== 'default' || canAddDefaultRule()">
@@ -86,7 +86,7 @@
   <br>
 
   <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
-    <div>
+    <div class="oppia-rule-details-header">
       <strong>Feedback</strong>
     </div>
     <span ng-if="rule.feedback.length > 1">
@@ -103,7 +103,7 @@
   <br>
 
   <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
-    <div>
+    <div class="oppia-rule-details-header">
       <strong>Destination</strong>
     </div>
     <div class="form-group" style="font-size: 1.1em;">

@@ -13,19 +13,19 @@
       <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
       {% if not user_email %}
         <!-- User must log in. -->
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration"
+        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            href="{{gallery_login_redirect_url}}">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
           <span>Create Exploration</span>
         </a>
       {% else %}
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration"
+        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            ng-click="showCreateExplorationModal()">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
           <span>Create Exploration</span>
         </a>
         {% if allow_yaml_file_upload %}
-          <a class="btn oppia-navbar-add-exploration-button"
+          <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
              ng-click="showUploadExplorationModal()">
             <span class="oppia-navbar-add-exploration-button-plus">+</span>
             <span>Upload Exploration</span>
