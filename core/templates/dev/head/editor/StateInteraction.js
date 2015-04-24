@@ -246,7 +246,7 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.deleteInteraction = function() {
-    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its answer groups.')) {
+    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its rules.')) {
       return false;
     }
 
