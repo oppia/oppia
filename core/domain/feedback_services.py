@@ -18,6 +18,7 @@
 
 __author__ = 'Koji Ashida'
 
+from core.domain import feedback_jobs
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -145,3 +146,16 @@ def get_last_updated_time(exploration_id):
     return max(
         [thread['last_updated'] for thread in threadlist]
     ) if threadlist else None
+
+
+def get_thread_analytics(exploration_id):
+    """Returns a dict with feedback thread analytics for the given exploration.
+
+    The returned dict has two keys:
+    - 'num_open_threads': the number of open feedback threads for this
+         exploration.
+    - 'num_total_threads': the total number of feedback threads for this
+         exploration.
+    """
+    return feedback_jobs.FeedbackAnalyticsAggregator.get_thread_analytics(
+        exploration_id)

@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import subscription_services
 from core.domain import user_jobs
 from core.domain import user_services
@@ -135,8 +136,11 @@ class MyExplorationsHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        self.values.update({
-            'explorations_list': [{
+        explorations_list = []
+        for exp_summary in editable_exp_summaries.values():
+            feedback_thread_analytics = feedback_services.get_thread_analytics(
+                exp_summary.id)
+            explorations_list.append({
                 'id': exp_summary.id,
                 'title': exp_summary.title,
                 'category': exp_summary.category,
@@ -153,7 +157,19 @@ class MyExplorationsHandler(base.BaseHandler):
                     '/images/gallery/exploration_background_%s_small.png' %
                     _get_intro_card_color(exp_summary.category)),
                 'ratings': exp_summary.ratings,
-            } for exp_summary in editable_exp_summaries.values()],
+                'num_open_threads': (
+                    feedback_thread_analytics['num_open_threads']),
+                'num_total_threads': (
+                    feedback_thread_analytics['num_total_threads']),
+            })
+
+        explorations_list = sorted(
+            explorations_list,
+            key=lambda x: (x['num_open_threads'], x['last_updated']),
+            reverse=True)
+
+        self.values.update({
+            'explorations_list': explorations_list,
         })
         self.render_json(self.values)
 

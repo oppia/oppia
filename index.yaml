@@ -58,6 +58,11 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: FeedbackAnalyticsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: FeedbackMessageModel
   properties:
   - name: deleted
