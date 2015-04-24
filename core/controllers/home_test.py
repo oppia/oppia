@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs
 from core.tests import test_utils
@@ -167,6 +168,37 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
+        self.logout()
+
+    def test_can_see_feedback_thread_counts(self):
+        self.save_new_default_exploration(
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+        self.assertEqual(
+            response['explorations_list'][0]['num_open_threads'], 0)
+        self.assertEqual(
+            response['explorations_list'][0]['num_total_threads'], 0)
+
+        def mock_get_thread_analytics(exploration_id):
+            return {
+                'num_open_threads': 2,
+                'num_total_threads': 3,
+            }
+
+        with self.swap(
+                feedback_services, 'get_thread_analytics',
+                mock_get_thread_analytics):
+            response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+            self.assertEqual(len(response['explorations_list']), 1)
+            self.assertEqual(
+                response['explorations_list'][0]['num_open_threads'], 2)
+            self.assertEqual(
+                response['explorations_list'][0]['num_total_threads'], 3)
+
         self.logout()
 
 
