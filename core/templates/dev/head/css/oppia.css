@@ -562,8 +562,16 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .btn.oppia-navbar-add-exploration-button {
   background-color: rgba(5, 190, 178, 0.9);
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.9);
   font-size: 16px;
+  margin-right: 5px;
+}
+.btn.oppia-navbar-add-exploration-button:hover {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
+}
+.oppia-navbar-add-exploration-button-plus {
+  font-weight: bold;
   margin-right: 5px;
 }
 
@@ -591,16 +599,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   .oppia-navbar-add-exploration-button {
     display: none;
   }
-}
-
-.btn.oppia-navbar-add-exploration-button:hover {
-  background-color: rgba(5, 190, 178, 1);
-  color: rgba(255,255,255,1);
-}
-
-.oppia-navbar-add-exploration-button-plus {
-  font-weight: bold;
-  margin-right: 5px;
 }
 
 .oppia-gallery-tiles-area {
@@ -718,6 +716,10 @@ md-card.oppia-gallery-tile {
   background: transparent;
   border-color: transparent;
   color: green;
+}
+
+.oppia-create-exploration-label {
+  margin-top: 5px;
 }
 
 
@@ -1138,6 +1140,10 @@ md-card.oppia-gallery-tile {
 
 .oppia-rule-edit-feedback {
   position: relative;
+}
+
+.oppia-rule-details-header {
+  margin-bottom: 6px;
 }
 
 .about-tabs {
@@ -1687,7 +1693,7 @@ div#ng-curtain {
   border-style: inset;
   border-width: 0 9px 14px 9px;
   bottom: 10px;
-  font-size: 0.8em;
+  font-size: 0.7em;
   font-weight: bold;
   height: 0;
   position: absolute;
