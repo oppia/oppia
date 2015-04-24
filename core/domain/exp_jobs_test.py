@@ -23,6 +23,7 @@ __author__ = 'Frederik Creemers'
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
@@ -246,7 +247,6 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
             '%s%s' % (self.EXP_ID, i), 'title %d' % i, 'category%d' % i)
             for i in xrange(5)]
 
-        from core.domain import exp_services
         for exp in explorations:
             exp_services.save_new_exploration('owner_id', exp)
             rights_manager.publish_exploration('owner_id', exp.id)
@@ -263,7 +263,6 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
         def add_docs_mock(docs, index):
             indexed_docs.extend(docs)
-            from core.domain import exp_services
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
 
         add_docs_swap = self.swap(

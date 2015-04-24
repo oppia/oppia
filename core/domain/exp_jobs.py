@@ -24,7 +24,6 @@ from core import jobs
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
-transaction_services = models.Registry.import_transaction_services()
 import feconf
 import utils
 
