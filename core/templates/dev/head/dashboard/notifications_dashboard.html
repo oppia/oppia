@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Notifications
+{% endblock subtitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Notifications
+    </li>
+  </ul>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-dashboard-container" ng-controller="DashboardNotifications">
+    <h2 class="oppia-page-heading">Notifications</h2>
+    <div class="oppia-page-heading-subtext" ng-if="jobQueuedMsec">
+      Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
+    </div>
+
+    <md-card class="oppia-page-card oppia-notifications-dashboard-card">
+      <div ng-if="recentNotifications.length === 0">
+        <em>No recent notifications.</em>
+      </div>
+
+      <div ng-if="recentNotifications.length > 0">
+        <table class="table">
+          <tr>
+            <th></th>
+            <th></th>
+            <th>Exploration</th>
+            <th>Last updated</th>
+            <th>by</th>
+            <th>Subject</th>
+          </tr>
+          <tr ng-repeat="notification in recentNotifications"
+              ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername, 'oppia-dashboard-row': !lastSeenMsec || lastSeenMsec >= notification.last_updated_ms || notification.author_username === currentUsername}"
+              ng-click="navigateToItem(notification.activity_id, notification.type)">
+            <td>
+              <span class="label label-primary"
+                    ng-if="lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername">
+                New
+              </span>
+            </td>
+            <td>
+              <span ng-if="notification.type === 'exploration_commit'"
+                    class="glyphicon glyphicon-flag"
+                    title="Exploration commit"></span>
+              <span ng-if="notification.type === 'feedback_thread'"
+                    class="glyphicon glyphicon-comment"
+                    title="Feedback thread"></span>
+            </td>
+            <td><[notification.activity_title]></td>
+            <td><[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]></td>
+            <td><[notification.author_username]></td>
+            <td><[notification.subject]></td>
+          </tr>
+        </table>
+      </div>
+    </md-card>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('/dashboard/NotificationsDashboard.js') }}
+  </script>
+{% endblock footer_js %}

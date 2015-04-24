@@ -733,9 +733,9 @@ md-card.oppia-gallery-tile {
   margin-top: -80px;
 }
 
-.oppia-page-title {
+.oppia-signup-page-title {
   color: #222;
-  font-size: 3em;
+  font-size: 1.6em;
   margin: 0 0 30px 0;
 }
 
@@ -1812,7 +1812,7 @@ div#ng-curtain {
   margin-bottom: 30px;
 }
 
-.oppia-timeline-card {
+.oppia-notifications-dashboard-card {
   padding: 15px 40px;
 }
 
