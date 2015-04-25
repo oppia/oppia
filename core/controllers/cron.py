@@ -26,7 +26,7 @@ import utils
 
 from mapreduce.lib.pipeline import pipeline
 
-# The default retention timeline is 2 days.
+# The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
 
 

@@ -35,6 +35,10 @@ import utils
 
 import jinja2
 
+SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
+    'splash_page_youtube_video_id', {'type': 'unicode'},
+    'The (optional) video id for the Splash page',
+    default_value='')
 
 EXPLORATION_ID_KEY = 'explorationId'
 
@@ -85,6 +89,7 @@ class GalleryPage(base.BaseHandler):
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_CREATE_MODE_URL)),
+            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': [{
                 'code': lc['code'],
@@ -137,7 +142,8 @@ class GalleryHandler(base.BaseHandler):
                 _get_intro_card_color(exp_summary.category)),
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
-                user_id=self.user_id)
+                user_id=self.user_id),
+            'ratings': exp_summary.ratings
         } for exp_summary in exp_summaries_list]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:

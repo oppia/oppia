@@ -9,24 +9,23 @@
             ui-sortable documentation for more details. -->
             <!-- Note that adding "track by $index" here seems to mess up the final
             index in the stop() event handler. -->
-            <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-sortable-rule-block" ng-if="!$last" style="margin-top: 0;">
-              <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
+            <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" ng-if="!$last" style="margin-top: 0;">
+              <span class="oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
                 <img src="/images/general/drag_dots.png" width="10">
               </span>
               <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex === $index}">
                 <div style="overflow: hidden; padding-left: 26px; text-overflow: ellipsis; white-space: nowrap; width: 520px;">
                   <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput'">
-                    <[rule | parameterizeRuleDescription: answerChoices]>...
+                    <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
                   </span>
                   <span ng-if="getCurrentInteractionId() === 'MultipleChoiceInput'">
-                    <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
+                    <span angular-html-bind="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices"></span>...
                   </span>
                 </div>
               </a>
 
-              <!-- Note that the use of ids for the tutorial here only works because at most one rule editor is visible at a time. -->
-              <div ng-if="activeRuleIndex === $index && !isDraggingOccurring && isActiveRuleEditorShown" id="tutorialStateActiveRule">
-                <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
+              <div ng-if="activeRuleIndex === $index && isActiveRuleEditorShown">
+                <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container">
                     <rule-editor rule="rule" save-rule="saveActiveRule(rule)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
                     </rule-editor>
@@ -36,15 +35,20 @@
             </li>
 
             <li ng-if="isDefaultRuleTabShown()"
-                ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
+                ng-class="{'active': activeRuleIndex === handler.length - 1}" class="oppia-rule-block" style="border-bottom: 1px solid #ccc; margin-top: 0;">
               <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex == handler.length - 1}">
                 <span style="padding-left: 24px;">
-                  None of the other rules apply...
+                  <span ng-if="getCurrentInteractionId() === 'Continue'">
+                    When the button is clicked...
+                  </span>
+                  <span ng-if="getCurrentInteractionId() !== 'Continue'">
+                    None of the other rules apply...
+                  </span>
                 </span>
               </a>
 
-              <div ng-if="activeRuleIndex === handler.length - 1 && !isDraggingOccurring && isActiveRuleEditorShown" id="tutorialStateActiveRule">
-                <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
+              <div ng-if="activeRuleIndex === handler.length - 1 && isActiveRuleEditorShown">
+                <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container">
                     <rule-editor rule="handler[handler.length - 1]" save-rule="saveActiveRule(handler[handler.length - 1])" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
                     </rule-editor>

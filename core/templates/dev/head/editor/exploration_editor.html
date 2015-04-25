@@ -12,11 +12,14 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
+      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.CATEGORIES_TO_COLORS = JSON.parse('{{CATEGORIES_TO_COLORS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
+    GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -146,21 +149,21 @@
            title="<[getSaveButtonTooltip()]>">
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
-            <span ng-if="!isPublic()">Save Draft</span>
-            <span ng-if="isPublic()">Publish Changes</span>
+            <span ng-if="isPrivate()">Save Draft</span>
+            <span ng-if="!isPrivate()">Publish Changes</span>
             <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span ng-if="isSaveInProgress">
-            <span ng-if="!isPublic()">Saving...</span>
-            <span ng-if="isPublic()">Publishing...</span>
+            <span ng-if="isPrivate()">Saving...</span>
+            <span ng-if="!isPrivate()">Publishing...</span>
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
-                ng-disabled="!isExplorationSaveable()" dropdown-toggle>
+                ng-disabled="!getChangeListLength()" dropdown-toggle>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu">
-          <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
+          <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
         </ul>
       </div>
     </li>

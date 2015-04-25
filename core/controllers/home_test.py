@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the user timeline and 'my explorations' pages."""
+"""Tests for the user notification dashboard and 'my explorations' pages."""
 
 __author__ = 'Sean Lip'
 
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs
 from core.tests import test_utils
@@ -32,31 +33,31 @@ class HomePageTest(test_utils.GenericTestBase):
             'Your personal tutor',
             'Oppia - Gallery', 'About', 'Login',
             # No navbar tabs should be highlighted.
-            no=['class="active"', 'Logout', 'Timeline'])
+            no=['class="active"', 'Logout'])
 
-    def test_timeline_redirects_for_logged_out_users(self):
-        """Test the logged-out view of the timeline."""
-        response = self.testapp.get('/timeline')
+    def test_notifications_dashboard_redirects_for_logged_out_users(self):
+        """Test the logged-out view of the notifications dashboard."""
+        response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
-        self.assertIn('timeline', response.headers['location'])
+        self.assertIn('notifications_dashboard', response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.testapp.get('/timeline')
+        response = self.testapp.get('/notifications_dashboard')
         # This should redirect the user to complete signup.
         self.assertEqual(response.status_int, 302)
         self.logout()
 
-    def test_logged_in_timeline(self):
-        """Test the logged-in view of the timeline."""
+    def test_logged_in_notifications_dashboard(self):
+        """Test the logged-in view of the notifications dashboard."""
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/timeline')
+        response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Timeline', 'Logout',
+            'Notifications', 'Logout',
             self.get_expected_logout_url('/'),
             no=['Login', 'Your personal tutor',
                 self.get_expected_login_url('/')])
@@ -169,17 +170,48 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['explorations_list'], [])
         self.logout()
 
+    def test_can_see_feedback_thread_counts(self):
+        self.save_new_default_exploration(
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
 
-class TimelineHandlerTest(test_utils.GenericTestBase):
+        self.login(self.OWNER_EMAIL)
 
-    TIMELINE_DATA_URL = '/timelinehandler/data'
+        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+        self.assertEqual(
+            response['explorations_list'][0]['num_open_threads'], 0)
+        self.assertEqual(
+            response['explorations_list'][0]['num_total_threads'], 0)
+
+        def mock_get_thread_analytics(exploration_id):
+            return {
+                'num_open_threads': 2,
+                'num_total_threads': 3,
+            }
+
+        with self.swap(
+                feedback_services, 'get_thread_analytics',
+                mock_get_thread_analytics):
+            response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+            self.assertEqual(len(response['explorations_list']), 1)
+            self.assertEqual(
+                response['explorations_list'][0]['num_open_threads'], 2)
+            self.assertEqual(
+                response['explorations_list'][0]['num_total_threads'], 3)
+
+        self.logout()
+
+
+class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
+
+    DASHBOARD_DATA_URL = '/notificationsdashboardhandler/data'
 
     def setUp(self):
-        super(TimelineHandlerTest, self).setUp()
+        super(NotificationsDashboardHandlerTest, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def _get_recent_updates_mock_by_viewer(self, unused_user_id):
+    def _get_recent_notifications_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
         return (100000, [{
             'activity_id': 'exp_id',
@@ -190,7 +222,7 @@ class TimelineHandlerTest(test_utils.GenericTestBase):
             'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
         }])
 
-    def _get_recent_updates_mock_by_anonymous_user(self, unused_user_id):
+    def _get_recent_notifications_mock_by_anonymous_user(self, unused_user_id):
         """Returns a single feedback thread by an anonymous user."""
         return (200000, [{
             'activity_id': 'exp_id',
@@ -207,23 +239,23 @@ class TimelineHandlerTest(test_utils.GenericTestBase):
         """
         with self.swap(
                 user_jobs.DashboardRecentUpdatesAggregator,
-                'get_recent_updates',
-                self._get_recent_updates_mock_by_viewer):
+                'get_recent_notifications',
+                self._get_recent_notifications_mock_by_viewer):
             self.login(self.VIEWER_EMAIL)
-            response = self.get_json(self.TIMELINE_DATA_URL)
-            self.assertEqual(len(response['recent_updates']), 1)
+            response = self.get_json(self.DASHBOARD_DATA_URL)
+            self.assertEqual(len(response['recent_notifications']), 1)
             self.assertEqual(
-                response['recent_updates'][0]['author_username'],
+                response['recent_notifications'][0]['author_username'],
                 self.VIEWER_USERNAME)
-            self.assertNotIn('author_id', response['recent_updates'][0])
+            self.assertNotIn('author_id', response['recent_notifications'][0])
 
         with self.swap(
                 user_jobs.DashboardRecentUpdatesAggregator,
-                'get_recent_updates',
-                self._get_recent_updates_mock_by_anonymous_user):
+                'get_recent_notifications',
+                self._get_recent_notifications_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)
-            response = self.get_json(self.TIMELINE_DATA_URL)
-            self.assertEqual(len(response['recent_updates']), 1)
+            response = self.get_json(self.DASHBOARD_DATA_URL)
+            self.assertEqual(len(response['recent_notifications']), 1)
             self.assertEqual(
-                response['recent_updates'][0]['author_username'], '')
-            self.assertNotIn('author_id', response['recent_updates'][0])
+                response['recent_notifications'][0]['author_username'], '')
+            self.assertNotIn('author_id', response['recent_notifications'][0])

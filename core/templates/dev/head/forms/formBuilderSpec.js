@@ -140,6 +140,8 @@ describe('Normalizer tests', function() {
 describe('RTE directive', function() {
   var elm, scope, $httpBackend;
 
+  var _DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
   beforeEach(module('oppia'));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_) {
     $httpBackend = _$httpBackend_;
@@ -150,7 +152,7 @@ describe('RTE directive', function() {
             frontend_name: 'image',
             name: 'Image',
             tooltip: 'Insert image',
-            icon_data_url: 'data:123'
+            icon_data_url: _DATA_URI
           }]
         }
       }
@@ -168,9 +170,9 @@ describe('RTE directive', function() {
       ['<div>abc</div><br>', '<div>abc</div><br>'],
       ['<div>abc<span>def</span></div><b>ghi</b>', '<div>abc<span>def</span></div><b>ghi</b>'],
       ['<oppia-noninteractive-image></oppia-noninteractive-image>',
-       '<img src="data:123" class="oppia-noninteractive-image">'],
+       '<img src="' + _DATA_URI + '" class="oppia-noninteractive-image">'],
       ['<oppia-noninteractive-image image_id-with-value="&amp;quot;T&amp;quot;"></oppia-noninteractive-image>',
-       '<img src="data:123" class="oppia-noninteractive-image" image_id-with-value="&amp;quot;T&amp;quot;">']
+       '<img src="' + _DATA_URI + '" class="oppia-noninteractive-image" image_id-with-value="&amp;quot;T&amp;quot;">']
     ];
 
     var rteControllerScope = elm.isolateScope();
@@ -180,7 +182,7 @@ describe('RTE directive', function() {
       name: 'image',
       backendName: 'Image',
       tooltip: 'Insert image',
-      iconDataUrl: 'data:123'
+      iconDataUrl: _DATA_URI
     }];
 
     for (var i = 0; i < testData.length; i++) {

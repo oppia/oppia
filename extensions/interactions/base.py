@@ -41,6 +41,7 @@ import os
 
 from core.domain import obj_services
 from core.domain import rule_domain
+from extensions import domain
 import feconf
 import jinja_utils
 import schema_utils
@@ -76,29 +77,18 @@ class AnswerHandler(object):
         }
 
 
-class CustomizationArgSpec(object):
-    """Value object for a customization arg specification."""
-
-    def __init__(self, name, description, schema, default_value):
-        self.name = name
-        self.description = description
-        self.schema = schema
-        self.default_value = default_value
-
-
 class BaseInteraction(object):
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should
     be get()-type methods.
+
+    Note that all interactions should also include a thumbnail image of size
+    178 x 146 pixels. This image will be shown in the interaction selector.
     """
 
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
-    # The category the interaction falls under in the repository. Overridden in
-    # subclasses; a value of '' means that this should be displayed as a
-    # top-level interaction.
-    category = ''
     # A description of the interaction. Overridden in subclasses.
     description = ''
     # Describes how the interaction should be displayed -- either within the
@@ -128,7 +118,7 @@ class BaseInteraction(object):
     @property
     def customization_arg_specs(self):
         return [
-            CustomizationArgSpec(**cas)
+            domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
@@ -200,7 +190,6 @@ class BaseInteraction(object):
         result = {
             'id': self.id,
             'name': self.name,
-            'category': self.category,
             'description': self.description,
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
@@ -219,6 +208,12 @@ class BaseInteraction(object):
                 rule_cls.description,
                 {'classifier': rule_cls.__name__}
             ) for rule_cls in handler.rules)
+
+        # Add information about rule descriptions corresponding to the answer
+        # type for this interaction.
+        result['rule_descriptions'] = (
+            rule_domain.get_description_strings_for_obj_type(
+                self.handlers[0].obj_type))
 
         return result
 

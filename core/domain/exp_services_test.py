@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import user_services
@@ -367,15 +368,14 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 4
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   %s:
     content:
     - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
+      value: ''
     interaction:
       customization_args:
         placeholder:
@@ -412,6 +412,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+tags: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME))
@@ -425,15 +426,14 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 4
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   %s:
     content:
     - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
+      value: ''
     interaction:
       customization_args:
         placeholder:
@@ -470,6 +470,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+tags: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME))
@@ -557,11 +558,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
 
     _SAMPLE_INIT_STATE_CONTENT = ("""content:
 - type: text
-  value: Welcome to the Oppia editor!<br><br>Anything
-    you type here will be shown to the learner playing
-    your exploration.<br><br>If you need more help getting
-    started, check out the Help link in the navigation
-    bar.
+  value: ''
 interaction:
   customization_args:
     placeholder:
@@ -1702,6 +1699,30 @@ class SearchTests(ExplorationServicesUnitTests):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
+    def test_get_search_rank(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        days_since_beginning_of_time = (
+            (datetime.datetime.utcnow() - datetime.datetime(2013, 6, 30)).days)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time)
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time + 3000)
+
+        rating_services.assign_rating(self.OWNER_ID, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time + 3010)
+
+        rating_services.assign_rating(self.user_id_admin, self.EXP_ID, 2)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID),
+            days_since_beginning_of_time + 3008)
+
 
 class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
 
@@ -1863,6 +1884,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
+                feconf.get_empty_ratings(),
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -1873,7 +1895,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1890,6 +1912,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
+                feconf.get_empty_ratings(),
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
@@ -1898,6 +1921,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
+                feconf.get_empty_ratings(),
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -1909,7 +1933,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1929,6 +1953,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
+                feconf.get_empty_ratings(),
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
@@ -1939,7 +1964,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1971,6 +1996,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
+                feconf.get_empty_ratings(),
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -1981,7 +2007,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'tags', 'ratings','status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',

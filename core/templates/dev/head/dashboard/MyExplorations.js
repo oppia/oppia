@@ -19,8 +19,8 @@
  */
 
 oppia.controller('MyExplorations', [
-    '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-    function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
+    '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'ratingVisibilityService',
+    function($scope, $http, $rootScope, oppiaDatetimeFormatter, ratingVisibilityService) {
 
   $scope.getFormattedObjective = function(objective) {
     objective = objective.trim();
@@ -30,6 +30,10 @@ oppia.controller('MyExplorations', [
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
+  };
+
+  $scope.areRatingsShown = function(ratingFrequencies) {
+    return ratingVisibilityService.areRatingsShown(ratingFrequencies);
   };
 
   $rootScope.loadingMessage = 'Loading';

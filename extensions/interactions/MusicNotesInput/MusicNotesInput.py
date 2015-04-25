@@ -21,7 +21,6 @@ class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
     name = 'Music Notes'
-    category = ''
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')
@@ -32,7 +31,7 @@ class MusicNotesInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
-        'description': 'The sequence of notes that the reader should guess.',
+        'description': 'Correct sequence of notes',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',
@@ -40,7 +39,7 @@ class MusicNotesInput(base.BaseInteraction):
         'default_value': [],
     }, {
         'name': 'initialSequence',
-        'description': 'The sequence of notes that start on the staff.',
+        'description': 'Starting notes on the staff',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',

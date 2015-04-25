@@ -89,3 +89,40 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
     job_queued_msec = ndb.FloatProperty(indexed=False)
+
+
+class ExplorationUserDataModel(base_models.BaseModel):
+    """User-specific data pertaining to a specific exploration.
+
+    Instances of this class have keys of the form
+    [USER_ID].[EXPLORATION_ID]
+    """
+
+    # The user id
+    user_id = ndb.StringProperty(indexed=True)
+    # The exploration id
+    exploration_id = ndb.StringProperty(indexed=True)
+
+    # The rating (1-5) the user assigned to the exploration. Note that this
+    # represents a rating given on completion of the exploration.
+    rating = ndb.IntegerProperty(default=None, indexed=True)
+
+    # When the most recent rating was awarded, or None if not rated
+    rated_on = ndb.DateTimeProperty(default=None, indexed=False)
+
+    @classmethod
+    def _generate_id(cls, user_id, exploration_id):
+        return '%s.%s' % (user_id, exploration_id)
+
+    @classmethod
+    def create(cls, user_id, exploration_id):
+        """Creates a new ExplorationUserDataModel entry and returns it."""
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return cls(id=instance_id)
+
+    @classmethod
+    def get(cls, user_id, exploration_id):
+        """Gets the ExplorationUserDataModel for the given ids."""
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return super(ExplorationUserDataModel, cls).get(
+            instance_id, strict=False)

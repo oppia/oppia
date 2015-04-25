@@ -26,29 +26,31 @@ import utils
 class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
-    def test_param_change_class(self):
-        """Test the ParamChange class."""
+    def test_param_change_validation(self):
+        """Test validation of parameter changes."""
         # Raise an error because the name is invalid.
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Only parameter names'):
-            param_domain.ParamChange('¡hola', 'Copier', {})
+            param_domain.ParamChange('¡hola', 'Copier', {}).validate()
 
         # Raise an error because no such generator type exists.
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid generator id'):
-            param_domain.ParamChange('abc', 'InvalidGenerator', {})
+            param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
 
         # Raise an error because the given generator requires initialization
         # args.
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'require any initialization'):
-            param_domain.ParamChange('abc', 'RestrictedCopier', {})
+            param_domain.ParamChange('abc', 'RestrictedCopier', {}).validate()
 
         # Raise an error because customization_args is not a dict.
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected a dict'):
-            param_domain.ParamChange('abc', 'Copier', ['a', 'b'])
+            param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()
 
+    def test_param_change_class(self):
+        """Test the ParamChange class."""
         param_change = param_domain.ParamChange(
             'abc', 'Copier', {'value': '3'})
         self.assertEqual(param_change.name, 'abc')

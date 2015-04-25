@@ -58,8 +58,9 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query methods.
     @classmethod
-    def get_recent_updates(cls, user_id):
-        """Gets a list of recent updates to show on this user's dashboard.
+    def get_recent_notifications(cls, user_id):
+        """Gets a list of recent notifications to show on this user's
+        dashboard.
 
         Returns a 2-tuple. The first element is a float representing the number
         of milliseconds since the Epoch when the job was queued. The second
@@ -80,8 +81,8 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
 
 class RecentUpdatesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """Manager for a MapReduce job that computes a list of recent updates
-    to explorations and feedback threads watched by a user.
+    """Manager for a MapReduce job that computes a list of recent notifications
+    for explorations and feedback threads watched by a user.
     """
     @classmethod
     def _get_continuous_computation_class(cls):

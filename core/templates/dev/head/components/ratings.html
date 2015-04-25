@@ -1,0 +1,9 @@
+<script type="text/ng-template" id="rating/fromValue">
+  <span style="<[getCursorStyle()]>" ng-mouseleave="leaveArea()">
+    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="glyphicon <[star.cssClass]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)"></span>
+  </span>
+</script>
+
+<script type="text/ng-template" id="rating/fromFrequencies">
+  <rating-from-value rating-value="ratingValue" is-editable="false"></rating-from-value>
+</script>

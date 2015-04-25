@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import os
 import re
 import string
+import struct
 
 from core.domain import dependency_registry
 from core.domain import interaction_registry
@@ -35,6 +36,9 @@ import utils
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+# Expected dimensions for an interaction thumbnail PNG image.
+INTERACTION_THUMBNAIL_WIDTH_PX = 178
+INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 
 
 class AnswerHandlerUnitTests(test_utils.GenericTestBase):
@@ -111,25 +115,26 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             TEXT_INPUT_ID)
         self.assertEqual(interaction.id, TEXT_INPUT_ID)
-        self.assertEqual(interaction.name, 'Text')
+        self.assertEqual(interaction.name, 'Text Input')
 
         self.assertIn('id="interaction/TextInput"', interaction.html_body)
         self.assertIn('id="response/TextInput"', interaction.html_body)
 
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
-            'id', 'name', 'category', 'description', 'display_mode',
-            'handler_specs', 'customization_arg_specs', 'is_terminal'])
+            'id', 'name', 'description', 'display_mode',
+            'handler_specs', 'customization_arg_specs', 'is_terminal',
+            'rule_descriptions'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
-            'description': 'The placeholder for the text input field.',
+            'description': 'Placeholder text (optional)',
             'schema': {'type': 'unicode'},
             'default_value': '',
         }, {
             'name': 'rows',
             'description': (
-                'How long the learner\'s answer is expected to be (in rows).'),
+                'Number of rows'),
             'schema': {
                 'type': 'int',
                 'validators': [{
@@ -145,11 +150,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """Test that the default interactions are valid."""
 
         _INTERACTION_CONFIG_SCHEMA = [
-            ('name', basestring), ('category', basestring),
-            ('display_mode', basestring), ('description', basestring),
-            ('_handlers', list), ('_customization_arg_specs', list)]
+            ('name', basestring), ('display_mode', basestring),
+            ('description', basestring), ('_handlers', list),
+            ('_customization_arg_specs', list)]
 
-        for interaction_id in feconf.ALLOWED_INTERACTIONS:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
 
@@ -159,21 +167,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(interaction_dir))
 
             # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file, (optionally) a
-            # directory named 'static', (optionally) a JS test file,
-            # (optionally) a stats_response.html file and (optionally)
-            # a protractor.js file.
+            # html file, a JS file, a validator.js file,  a directory named
+            # 'static' that contains (at least) a .png thumbnail file,
+            # (optionally) a JS test spec file, (optionally) a
+            # stats_response.html file and (optionally) a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
-
-            try:
-                self.assertIn('static', dir_contents)
-                static_dir = os.path.join(interaction_dir, 'static')
-                self.assertTrue(os.path.isdir(static_dir))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
 
             try:
                 self.assertTrue(os.path.isfile(
@@ -197,7 +197,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 4, len(dir_contents),
+                optional_dirs_and_files_count + 5, len(dir_contents),
                 dir_contents
             )
 
@@ -210,6 +210,19 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
             self.assertTrue(os.path.isfile(js_file))
+
+            # Check that the PNG thumbnail image has the correct dimensions.
+            static_dir = os.path.join(interaction_dir, 'static')
+            self.assertTrue(os.path.isdir(static_dir))
+            png_file = os.path.join(
+                interaction_dir, 'static', '%s.png' % interaction_id)
+
+            self.assertTrue(os.path.isfile(png_file))
+            with open(png_file, 'rb') as f:
+                img_data = f.read()
+                w, h = struct.unpack('>LL', img_data[16:24])
+                self.assertEqual(int(w), INTERACTION_THUMBNAIL_WIDTH_PX)
+                self.assertEqual(int(h), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
@@ -247,9 +260,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
                     getattr(interaction, item), item_type))
-                # The string attributes should be non-empty (except for
-                # 'category').
-                if item_type == basestring and item != 'category':
+                if item_type == basestring:
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)

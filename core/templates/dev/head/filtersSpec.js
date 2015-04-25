@@ -25,7 +25,7 @@ describe('Testing filters', function() {
     'truncate',
     'round1',
     'replaceInputsWithEllipses',
-    'truncateAtFirstInput',
+    'truncateAtFirstEllipsis',
     'parameterizeRuleDescription',
     'camelCaseToHyphens'
   ];
@@ -92,18 +92,18 @@ describe('Testing filters', function() {
     expect(filter('{{}}{{hello}}')).toEqual('{{}}...');
   }));
 
-  it('should truncate a string when it first sees a {{...}}', inject(function($filter) {
-    var filter = $filter('truncateAtFirstInput');
+  it('should truncate a string when it first sees a \'...\'', inject(function($filter) {
+    var filter = $filter('truncateAtFirstEllipsis');
 
     expect(filter('')).toEqual('');
     expect(filter(null)).toEqual('');
     expect(filter(undefined)).toEqual('');
 
     expect(filter('hello')).toEqual('hello');
-    expect(filter('{{hello}}')).toEqual('');
-    expect(filter('say {{hello}} and {{goodbye}}')).toEqual('say ');
-    expect(filter('{{hello}} and {{goodbye}}')).toEqual('');
-    expect(filter('{{}}{{hello}}')).toEqual('{{}}');
+    expect(filter('...')).toEqual('');
+    expect(filter('say ... and ...')).toEqual('say ');
+    expect(filter('... and ...')).toEqual('');
+    expect(filter('{{}}...')).toEqual('{{}}');
   }));
 
   it('should correctly normalize whitespace', inject(function($filter) {

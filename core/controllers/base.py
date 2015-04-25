@@ -27,6 +27,7 @@ import sys
 import time
 import traceback
 import urllib
+import urlparse
 
 from core import counters
 from core.domain import config_domain
@@ -89,6 +90,26 @@ SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
         'link': 'http://site/feedback/url',
         'icon_filename': 'comment.png',
     }])
+
+SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
+    'social_media_buttons', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'link',
+                'description': 'The link to open in a new tab',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'icon_filename',
+                'description': (
+                    'Filename of the social media icon (in /images/social)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Links and icon filenames for the social media buttons in the sidebar.',
+    default_value=[])
 
 
 def require_user(handler):
@@ -214,6 +235,7 @@ class BaseHandler(webapp2.RequestHandler):
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
+            self.values['user_email'] = user_settings.email
 
             if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
                 _clear_login_cookies(self.response.headers)
@@ -222,7 +244,6 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.username = user_settings.username
                 self.last_agreed_to_terms = user_settings.last_agreed_to_terms
-                self.values['user_email'] = user_settings.email
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -328,29 +349,42 @@ class BaseHandler(webapp2.RequestHandler):
         if values is None:
             values = self.values
 
+        scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
+
         values.update({
-            'RTE_COMPONENT_SPECS': (
-                rte_component_registry.Registry.get_all_specs()),
+            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
+                BEFORE_END_HEAD_TAG_HOOK.value),
+            'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
-            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
+            'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'EXPLORATION_STATUS_PRIVATE': (
                 rights_manager.EXPLORATION_STATUS_PRIVATE),
             'EXPLORATION_STATUS_PUBLIC': (
                 rights_manager.EXPLORATION_STATUS_PUBLIC),
             'EXPLORATION_STATUS_PUBLICIZED': (
                 rights_manager.EXPLORATION_STATUS_PUBLICIZED),
-            'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
-                BEFORE_END_HEAD_TAG_HOOK.value),
-            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
-            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
-            'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
-            'user_is_logged_in': bool(self.username),
+            'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
+            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
             # part of the base HTML template?
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
+            'RTE_COMPONENT_SPECS': (
+                rte_component_registry.Registry.get_all_specs()),
+            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
             'SIDEBAR_MENU_ADDITIONAL_LINKS': (
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
+            'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
+            'user_is_logged_in': bool(self.username),
         })
+
+        if 'meta_name' not in values:
+            values['meta_name'] = 'Personalized Online Learning from Oppia'
+
+        if 'meta_description' not in values:
+            values['meta_description'] = (
+                'Oppia is a free, open-source learning platform. Join the '
+                'community to create or try an exploration today!')
 
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri

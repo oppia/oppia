@@ -25,6 +25,7 @@ var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 var gallery = require('../protractor_utils/gallery.js');
+var forms = require('../protractor_utils/forms.js');
 
 describe('Gallery view', function() {
   it('should display private, published and featured explorations', function() {
@@ -64,6 +65,7 @@ describe('Gallery view', function() {
 
     users.login('celebrimbor@example.com');
     workflow.createExploration('Vilya', 'rings');
+    editor.setContent(forms.toRichText('Celebrimbor wrote this'));
     editor.setInteraction('EndExploration');
     editor.setObjective('preserve the works of the elves');
     editor.saveChanges();

@@ -18,7 +18,7 @@
     <form role="form" class="form-horizontal">
       <fieldset>
         <div class="form-group" ng-class="{'has-error': !newExplorationTitle}">
-          <label for="newExplorationTitle" class="col-lg-2 col-md-2 col-sm-2">
+          <label for="newExplorationTitle" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
             Title
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
@@ -26,14 +26,12 @@
             <span style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
               <[warningText]>
             </span>
-            <div ng-show="!warningText || !changedAtLeastOnce" style="height: 20px;">
-            </div>
           </div>
         </div>
 
         <div ng-hide="isUploadModal">
           <div class="form-group">
-            <label for="newExplorationObjective" class="col-lg-2 col-md-2 col-sm-2">
+            <label for="newExplorationObjective" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
               Goal
             </label>
             <div class="col-lg-10 col-md-10 col-sm-10">
@@ -54,7 +52,7 @@
 
         <div ng-hide="isUploadModal">
           <div class="form-group">
-            <label for="newExplorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">
+            <label for="newExplorationLanguageCode" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
               Language
             </label>
             <div class="col-lg-10 col-md-10 col-sm-10">

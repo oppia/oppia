@@ -20,8 +20,7 @@ from extensions.interactions import base
 class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 
-    name = 'Text'
-    category = ''
+    name = 'Text Input'
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
@@ -37,7 +36,7 @@ class TextInput(base.BaseInteraction):
     # parameter.
     _customization_arg_specs = [{
         'name': 'placeholder',
-        'description': 'The placeholder for the text input field.',
+        'description': 'Placeholder text (optional)',
         'schema': {
             'type': 'unicode',
         },
@@ -45,7 +44,7 @@ class TextInput(base.BaseInteraction):
     }, {
         'name': 'rows',
         'description': (
-            'How long the learner\'s answer is expected to be (in rows).'),
+            'Number of rows'),
         'schema': {
             'type': 'int',
             'validators': [{

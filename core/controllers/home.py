@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import subscription_services
 from core.domain import user_jobs
 from core.domain import user_services
@@ -26,8 +27,8 @@ import feconf
 import utils
 
 
-class TimelinePage(base.BaseHandler):
-    """Page with timeline updates for the user."""
+class NotificationsDashboardPage(base.BaseHandler):
+    """Page with notifications for the user."""
 
     @base.require_user
     def get(self):
@@ -39,14 +40,15 @@ class TimelinePage(base.BaseHandler):
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
             self.render_template(
-                'dashboard/timeline.html', redirect_url_on_logout='/')
+                'dashboard/notifications_dashboard.html',
+                redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', '/timeline'))
+                feconf.SIGNUP_URL, 'return_url', '/notifications_dashboard'))
 
 
-class TimelineHandler(base.BaseHandler):
-    """Provides data for the user timeline."""
+class NotificationsDashboardHandler(base.BaseHandler):
+    """Provides data for the user notifications dashboard."""
 
     # We use 'gallery' because the createExploration() modal makes a call
     # there.
@@ -57,8 +59,8 @@ class TimelineHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        job_queued_msec, recent_updates = (
-            user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
+        job_queued_msec, recent_notifications = (
+            user_jobs.DashboardRecentUpdatesAggregator.get_recent_notifications(
                 self.user_id))
 
         last_seen_msec = (
@@ -67,8 +69,8 @@ class TimelineHandler(base.BaseHandler):
 
         # Replace author_ids with their usernames.
         author_ids = [
-            update['author_id'] for update in recent_updates
-            if update['author_id']]
+            notification['author_id'] for notification in recent_notifications
+            if notification['author_id']]
         author_usernames = user_services.get_usernames(author_ids)
 
         author_id_to_username = {
@@ -76,10 +78,10 @@ class TimelineHandler(base.BaseHandler):
         }
         for ind in range(len(author_ids)):
             author_id_to_username[author_ids[ind]] = author_usernames[ind]
-        for update in recent_updates:
-            update['author_username'] = (
-                author_id_to_username[update['author_id']])
-            del update['author_id']
+        for notification in recent_notifications:
+            notification['author_username'] = (
+                author_id_to_username[notification['author_id']])
+            del notification['author_id']
 
         subscription_services.record_user_has_seen_notifications(
             self.user_id, job_queued_msec if job_queued_msec else 0.0)
@@ -90,7 +92,7 @@ class TimelineHandler(base.BaseHandler):
             # This may be None if this is the first time the user has seen
             # the dashboard.
             'last_seen_msec': last_seen_msec,
-            'recent_updates': recent_updates,
+            'recent_notifications': recent_notifications,
         })
         self.render_json(self.values)
 
@@ -135,8 +137,11 @@ class MyExplorationsHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        self.values.update({
-            'explorations_list': [{
+        explorations_list = []
+        for exp_summary in editable_exp_summaries.values():
+            feedback_thread_analytics = feedback_services.get_thread_analytics(
+                exp_summary.id)
+            explorations_list.append({
                 'id': exp_summary.id,
                 'title': exp_summary.title,
                 'category': exp_summary.category,
@@ -152,7 +157,20 @@ class MyExplorationsHandler(base.BaseHandler):
                 'thumbnail_image_url': (
                     '/images/gallery/exploration_background_%s_small.png' %
                     _get_intro_card_color(exp_summary.category)),
-            } for exp_summary in editable_exp_summaries.values()],
+                'ratings': exp_summary.ratings,
+                'num_open_threads': (
+                    feedback_thread_analytics['num_open_threads']),
+                'num_total_threads': (
+                    feedback_thread_analytics['num_total_threads']),
+            })
+
+        explorations_list = sorted(
+            explorations_list,
+            key=lambda x: (x['num_open_threads'], x['last_updated']),
+            reverse=True)
+
+        self.values.update({
+            'explorations_list': explorations_list,
         })
         self.render_json(self.values)
 
@@ -167,12 +185,12 @@ class NotificationsHandler(base.BaseHandler):
             last_seen_msec = (
                 subscription_services.get_last_seen_notifications_msec(
                     self.user_id))
-            _, recent_updates = (
-                user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
+            _, recent_notifications = (
+                user_jobs.DashboardRecentUpdatesAggregator.get_recent_notifications(
                     self.user_id))
-            for update in recent_updates:
-                if (update['last_updated_ms'] > last_seen_msec and
-                        update['author_id'] != self.user_id):
+            for notification in recent_notifications:
+                if (notification['last_updated_ms'] > last_seen_msec and
+                        notification['author_id'] != self.user_id):
                     num_unseen_notifications += 1
 
         self.render_json({

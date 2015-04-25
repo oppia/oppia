@@ -18,12 +18,9 @@
 
 __author__ = 'Sean Lip'
 
-import os
-
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
-import feconf
 
 
 class InteractionDependencyTests(test_utils.GenericTestBase):
@@ -49,17 +46,11 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 class InteractionRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the interaction registry."""
 
-    def test_allowed_interactions_and_counts(self):
-        """Do sanity checks on the ALLOWED_INTERACTIONS dict in feconf.py."""
+    def test_interaction_registry(self):
+        """Do some sanity checks on the interaction registry."""
         self.assertEqual(
             len(interaction_registry.Registry.get_all_interactions()),
-            len(feconf.ALLOWED_INTERACTIONS))
-
-        for (interaction_name, interaction_definition) in (
-                feconf.ALLOWED_INTERACTIONS.iteritems()):
-            contents = os.listdir(
-                os.path.join(os.getcwd(), interaction_definition['dir']))
-            self.assertIn('%s.py' % interaction_name, contents)
+            len(interaction_registry.Registry.get_all_interaction_ids()))
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
@@ -67,7 +58,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
-            len(specs_dict.keys()), len(feconf.ALLOWED_INTERACTIONS))
+            len(specs_dict.keys()),
+            len(interaction_registry.Registry.get_all_interaction_ids()))
 
         terminal_interactions_count = 0
         for item in specs_dict.values():

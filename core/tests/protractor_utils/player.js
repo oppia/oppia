@@ -54,36 +54,35 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction's detail checker.
-var expectInteractionToMatch = function(interactionName) {
+var expectInteractionToMatch = function(interactionId) {
   // Convert additional arguments to an array to send on.
   var args = [element(by.css('.protractor-test-conversation-input'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  interactions.getInteraction(interactionName).
+  interactions.getInteraction(interactionId).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
 // `answerData` is a variable that is passed to the corresponding interaction's
 // protractor utilities. Its definition and type are interaction-specific.
-var submitAnswer = function(interactionName, answerData) {
-  interactions.getInteraction(interactionName).submitAnswer(
+var submitAnswer = function(interactionId, answerData) {
+  interactions.getInteraction(interactionId).submitAnswer(
     element.all(by.css('.protractor-test-conversation-input')).last(),
     answerData);
   general.waitForSystem();
 };
 
-
 var expectExplorationToBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
-  ).toEqual('Congratulations, you have finished this exploration!');
+  ).toEqual('Congratulations, you have finished!');
 };
 
 var expectExplorationToNotBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
-  ).not.toEqual('Congratulations, you have finished this exploration!');
+  ).not.toEqual('Congratulations, you have finished!');
 };
 
 exports.restartExploration = restartExploration;

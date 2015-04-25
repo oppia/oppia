@@ -24,7 +24,6 @@ from core import jobs
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
-transaction_services = models.Registry.import_transaction_services()
 import feconf
 import utils
 
@@ -36,7 +35,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     in ExpSummariesAggregator.
 
     The summaries store the following information:
-        title, category, objective, language_code, skill_tags,
+        title, category, objective, language_code, tags,
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.

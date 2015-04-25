@@ -35,6 +35,28 @@ var exitTutorialIfNecessary = function() {
   });
 };
 
+var progressInTutorial = function() {
+  // Progress to the next instruction in the tutorial.
+  element.all(by.css('.nextBtn')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else {
+      throw 'Expected to find exactly one \'next\' button';
+    }
+  });
+};
+
+var finishTutorial = function() {
+  // Finish the tutorial
+  element(by.buttonText('Finish')).then(function(button) {
+    if (button) {
+      button.click();
+    } else {
+      throw 'Expected to find exactly one \'Finish\' button';
+    }
+  });
+};
+
 // NAVIGATION
 
 var navigateToMainTab = function() {
@@ -113,71 +135,74 @@ var expectContentTextToEqual = function(text) {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
-var setInteraction = function(interactionName) {
-  var elem = element(by.css('.protractor-test-interaction-editor'));
-  var customizationArgs = [elem];
-  for (var i = 1; i < arguments.length; i++) {
-    customizationArgs.push(arguments[i]);
-  }
-
-  element(by.css('.protractor-test-select-interaction-id')).click();
-
-  // Try to find the interaction in the top-level dropdown menu.
-  element.all(by.css(
-      '.protractor-test-top-level-interaction-id-' + interactionName)).count().then(function(count) {
-    if (count === 1) {
-      element(by.css('.protractor-test-top-level-interaction-id-' + interactionName)).click();
-    } else if (count === 0) {
-      var interactionFound = false;
-
-      // Search through the sub-dropdown menus for the correct interaction.
-      element.all(by.css('.protractor-test-interaction-category')).map(function(categoryElem) {
-        if (!interactionFound) {
-          browser.actions().mouseMove(categoryElem).perform();
-          var interactionElem = element(by.css('.protractor-test-interaction-id-' + interactionName));
-          interactionElem.isDisplayed().then(function(isInteractionVisible) {
-            if (isInteractionVisible) {
-              interactionElem.click();
-              interactionFound = true;
-            }
-          });
-        }
-      });
-    } else {
-      throw (
-        'Found more than one instance of ' +
-        interactionName + 'in the interaction dropdown menu');
-    }
-
-    // Click a neutral element on the page to reset the dropdown menu.
-    var neutralElem = element(by.css('.protractor-test-editor-neutral-element'));
-    general.scrollElementIntoView(neutralElem);
-    neutralElem.click();
-
-    if (customizationArgs.length > 1) {
-      element(by.css('.protractor-test-edit-interaction')).click();
-
-      interactions.getInteraction(interactionName).customizeInteraction.apply(
-        null, customizationArgs);
-
-      element(by.css('.protractor-test-save-interaction')).click();
-      // Wait for the customization modal to close.
-      general.waitForSystem();
+var setInteraction = function(interactionId) {
+  element(by.css('.protractor-test-delete-interaction')).isPresent().then(function(isVisible) {
+    // If there is already an interaction present, delete it.
+    if (isVisible) {
+      element(by.css('.protractor-test-delete-interaction')).click();
+      // Click through the "are you sure?" warning.
+      browser.driver.switchTo().alert().accept();
     }
   });
+
+  element(by.css('.protractor-test-open-add-interaction-modal')).click();
+
+  general.waitForSystem();
+
+  var interactionElem = element(by.css(
+    '.protractor-test-interaction-tile-' + interactionId));
+
+  // Try to find the interaction in one of the tabs.
+  element.all(by.css('.protractor-test-interaction-tab')).map(function(tabElem) {
+    tabElem.click();
+    return interactionElem.isDisplayed().then(function(isInteractionVisible) {
+      if (isInteractionVisible) {
+        return tabElem;
+      }
+    })
+  }).then(function(tabElems) {
+    var interactionTileFound = false;
+    for (var i = 0; i < tabElems.length; i++) {
+      if (tabElems[i]) {
+        interactionTileFound = true;
+        tabElems[i].click();
+        interactionElem.click();
+        break;
+      }
+    }
+
+    if (!interactionTileFound) {
+      throw 'Could not find interaction with id ' + interactionId;
+    }
+  });
+
+  var elem = element(by.css('.protractor-test-interaction-editor'));
+  var customizationArgs = [elem];
+
+  if (arguments.length > 1) {
+    for (var i = 1; i < arguments.length; i++) {
+      customizationArgs.push(arguments[i]);
+    }
+    interactions.getInteraction(interactionId).customizeInteraction.apply(
+      null, customizationArgs);
+  }
+
+  element(by.css('.protractor-test-save-interaction')).click();
+  // Wait for the customization modal to close.
+  general.waitForSystem();
 };
 
 // Likewise this can receive additional arguments.
 // Note that this refers to the interaction displayed in the editor tab (as
 // opposed to the preview tab, which uses the corresponding function in
 // player.js).
-var expectInteractionToMatch = function(interactionName) {
+var expectInteractionToMatch = function(interactionId) {
   // Convert additional arguments to an array to send on.
   var args = [element(by.css('.protractor-test-interaction'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  interactions.getInteraction(interactionName).
+  interactions.getInteraction(interactionId).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
@@ -188,14 +213,14 @@ var expectInteractionToMatch = function(interactionName) {
 // should be specified after the ruleName as additional arguments. For example
 // with interaction 'NumericInput' and rule 'Equals' then there is a single
 // parameter which the given answer is required to equal.
-var _selectRule = function(ruleElement, interactionName, ruleName) {
+var _selectRule = function(ruleElement, interactionId, ruleName) {
   var parameterValues = [];
   for (var i = 3; i < arguments.length; i++) {
     parameterValues.push(arguments[i]);
   }
 
   var ruleDescription = rules.getDescription(
-    interactions.getInteraction(interactionName).answerObjectType, ruleName);
+    interactions.getInteraction(interactionId).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
@@ -238,7 +263,7 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
     )).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
 
-    if (interactionName === 'MultipleChoiceInput') {
+    if (interactionId === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt
       parameterElement.element(
         by.cssContainingText('option', parameterValues[i])
@@ -269,12 +294,12 @@ var _setRuleDest = function(ruleBodyElem, destinationName) {
 // parameters may be specified after the ruleName.
 // Note that feedbackInstructions may be null (which means 'specify no feedback'),
 // and only represents a single feedback element.
-var addRule = function(interactionName, feedbackInstructions, dest, ruleName) {
+var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
   general.waitForSystem();
 
   var ruleElement = element(by.css('.protractor-test-add-rule-details'));
-  var args = [ruleElement, interactionName];
+  var args = [ruleElement, interactionId];
   for (var i = 3; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
@@ -323,7 +348,7 @@ var RuleEditor = function(ruleNum) {
 
   return {
     // Any number of parameters may be specified after the ruleName
-    setDescription: function(interactionName, ruleName) {
+    setDescription: function(interactionId, ruleName) {
       var args = [bodyElem];
       for (var i = 0; i < arguments.length; i++) {
         args.push(arguments[i]);
@@ -728,6 +753,8 @@ var revertToVersion = function(version) {
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+exports.progressInTutorial = progressInTutorial;
+exports.finishTutorial  = finishTutorial;
 
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;

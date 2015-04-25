@@ -26,10 +26,19 @@ from core.domain import config_domain
 import feconf
 
 
+ABOUT_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
+    'about_page_youtube_video_id', {'type': 'unicode'},
+    'The (optional) video id for the About page',
+    default_value='')
 ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
     'admin_email_address', {'type': 'unicode'},
     'The admin email address to display on the About pages',
     default_value='ADMIN_EMAIL_ADDRESS')
+EMBEDDED_GOOGLE_GROUP_URL = config_domain.ConfigProperty(
+    'embedded_google_group_url', {'type': 'unicode'},
+    'The URL for the embedded Google Group in the Forum page',
+    default_value=(
+        'https://groups.google.com/forum/embed/?place=forum/oppia'))
 SITE_FORUM_URL = config_domain.ConfigProperty(
     'site_forum_url', {'type': 'unicode'},
     'The site forum URL (for links; the Forum page is configured separately)',
@@ -49,6 +58,7 @@ class AboutPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'ABOUT_EXPLORATION_ID': _ABOUT_EXPLORATION_ID,
+            'ABOUT_PAGE_YOUTUBE_VIDEO_ID': ABOUT_PAGE_YOUTUBE_VIDEO_ID.value,
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
             'MODERATOR_REQUEST_FORUM_URL': (
                 editor.MODERATOR_REQUEST_FORUM_URL.value),
@@ -89,10 +99,11 @@ class ForumPage(base.BaseHandler):
         _, netloc, _, _, _ = urlparse.urlsplit(self.request.uri)
 
         self.values.update({
-            'OPPIA_FORUM_URL': (
-                'https://groups.google.com/forum/embed/?hideforumtitle=true'
-                '&parenturl=%s#!categories/oppia/' %
-                urllib.quote(self.request.uri, safe='')
+            'EMBEDDED_GOOGLE_GROUP_URL': (
+                '%s&showtabs=false&hideforumtitle=true&parenturl=%s' % (
+                    EMBEDDED_GOOGLE_GROUP_URL.value,
+                    urllib.quote(self.request.uri, safe=''),
+                )
             ),
             'on_localhost': netloc.startswith('localhost'),
         })

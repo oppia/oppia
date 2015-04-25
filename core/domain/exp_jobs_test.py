@@ -23,9 +23,11 @@ __author__ = 'Frederik Creemers'
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
+import feconf
 (job_models, exp_models,) = models.Registry.import_models([
    models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
@@ -179,7 +181,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     spec['category'],
                     exploration.objective,
                     exploration.language_code,
-                    exploration.skill_tags,
+                    exploration.tags,
+                    feconf.get_empty_ratings(),
                     spec['status'],
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
@@ -194,9 +197,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 # unspecified fields will be empty list in
                 # expected_job_output but will be unspecified in
                 # actual_job_output
-                if exploration.skill_tags:
-                    expected_job_output[exp_id].skill_tags = (
-                        exploration.skill_tags)
+                if exploration.tags:
+                    expected_job_output[exp_id].tags = exploration.tags
                 if exp_rights_model.owner_ids:
                     expected_job_output[exp_id].owner_ids = (
                         exp_rights_model.owner_ids)
@@ -222,7 +224,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.assertEqual(actual_job_output.keys(),
                              expected_job_output.keys())
             simple_props = ['id', 'title', 'category', 'objective',
-                            'language_code', 'skill_tags', 'status',
+                            'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
                             'editor_ids', 'viewer_ids', 'version',
                             'exploration_model_created_on',
@@ -245,7 +247,6 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
             '%s%s' % (self.EXP_ID, i), 'title %d' % i, 'category%d' % i)
             for i in xrange(5)]
 
-        from core.domain import exp_services
         for exp in explorations:
             exp_services.save_new_exploration('owner_id', exp)
             rights_manager.publish_exploration('owner_id', exp.id)
@@ -262,7 +263,6 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
         def add_docs_mock(docs, index):
             indexed_docs.extend(docs)
-            from core.domain import exp_services
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
 
         add_docs_swap = self.swap(

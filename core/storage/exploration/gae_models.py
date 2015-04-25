@@ -61,8 +61,9 @@ class ExplorationModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = ndb.StringProperty(
         default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
-    # Skill tags associated with this exploration.
-    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+    # Tags (topics, skills, concepts, etc.) associated with this
+    # exploration.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
     blurb = ndb.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.
@@ -70,6 +71,12 @@ class ExplorationModel(base_models.VersionedModel):
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = ndb.StringProperty(default='conversation_v1')
+
+    # Schema storing specifications of the contents of any gadget panels,
+    # along with associated customizations for each gadget instance.
+    skin_customizations = ndb.JsonProperty(
+        default=feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
+        indexed=False)
 
     # The name of the initial state of this exploration.
     init_state_name = ndb.StringProperty(required=True, indexed=False)
@@ -291,7 +298,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     A ExpSummaryModel instance stores the following information:
 
-        id, title, category, objective, language_code, skill_tags,
+        id, title, category, objective, language_code, tags,
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.
@@ -308,8 +315,11 @@ class ExpSummaryModel(base_models.BaseModel):
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = ndb.StringProperty(
         required=True, indexed=True)
-    # Skill tags associated with this exploration.
-    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+    # Tags associated with this exploration.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
+
+    # Aggregate user-assigned ratings of the exploration
+    ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the

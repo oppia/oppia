@@ -21,7 +21,6 @@ class InteractiveMap(base.BaseInteraction):
     """Interaction for pinpointing a location on a map."""
 
     name = 'World Map'
-    category = 'Geography'
     description = 'Allows learners to specify a position on a world map.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['google_maps']
@@ -30,7 +29,7 @@ class InteractiveMap(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'latitude',
-        'description': 'Starting map center latitude (-90 to 90).',
+        'description': 'Starting center latitude (-90 to 90)',
         'schema': {
             'type': 'float',
             'validators': [{
@@ -44,7 +43,7 @@ class InteractiveMap(base.BaseInteraction):
         'default_value': 0.0,
     }, {
         'name': 'longitude',
-        'description': 'Starting map center longitude (-180 to 180).',
+        'description': 'Starting center longitude (-180 to 180)',
         'schema': {
             'type': 'float',
             'validators': [{
@@ -58,7 +57,7 @@ class InteractiveMap(base.BaseInteraction):
         'default_value': 0.0,
     }, {
         'name': 'zoom',
-        'description': 'Starting map zoom level (0 shows the entire earth).',
+        'description': 'Starting zoom level (0 shows the entire earth)',
         'schema': {
             'type': 'float',
         },

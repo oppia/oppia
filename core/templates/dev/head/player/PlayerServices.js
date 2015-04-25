@@ -365,6 +365,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
+          $rootScope.$broadcast('playerServiceInitialized');
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
@@ -487,60 +488,6 @@ oppia.factory('oppiaPlayerService', [
     registerMaybeLeaveEvent: function() {
       _registerMaybeLeaveEvent(stateHistory[stateHistory.length - 1]);
     },
-    // If the feedback is exploration-scoped, 'stateName' should be null.
-    openPlayerFeedbackModal: function(stateName) {
-      var modalConfig = {
-        templateUrl: 'modals/playerFeedback',
-        backdrop: true,
-        resolve: {
-          stateName: function() {
-            return stateName;
-          }
-        },
-        controller: ['$scope', '$modalInstance', 'oppiaPlayerService', 'stateName', function(
-            $scope, $modalInstance, oppiaPlayerService, stateName) {
-          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
-
-          $scope.isSubmitterAnonymized = false;
-          $scope.stateName = stateName;
-          $scope.subject = '';
-          $scope.feedback = '';
-
-          $scope.submit = function(subject, feedback, isSubmitterAnonymized) {
-            $modalInstance.close({
-              subject: subject,
-              feedback: feedback,
-              isSubmitterAnonymized: isSubmitterAnonymized
-            });
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-          };
-        }]
-      };
-
-      $modal.open(modalConfig).result.then(function(result) {
-        if (result.feedback) {
-          $http.post('/explorehandler/give_feedback/' + _explorationId, {
-            subject: result.subject,
-            feedback: result.feedback,
-            include_author: !result.isSubmitterAnonymized && _isLoggedIn,
-            state_name: stateName
-          });
-
-          $modal.open({
-            templateUrl: 'modals/playerFeedbackConfirmation',
-            backdrop: true,
-            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-              };
-            }]
-          });
-        }
-      });
-    },
     // Returns a promise for the user profile picture, or the default image if
     // user is not logged in or has not uploaded a profile picture, or the
     // player is in preview mode.
@@ -565,19 +512,150 @@ oppia.factory('oppiaPlayerService', [
 }]);
 
 
+oppia.factory('ratingService', [
+    '$http', '$rootScope', 'oppiaPlayerService',
+    function($http, $rootScope, oppiaPlayerService) {
+  var explorationId = oppiaPlayerService.getExplorationId();
+  var ratingsUrl = '/explorehandler/rating/' + explorationId;
+  var userRating;
+  return {
+    init: function(successCallback) {
+      $http.get(ratingsUrl).success(function(data) {
+        successCallback(data.user_rating);
+        userRating = data.user_rating;
+        $rootScope.$broadcast('ratingServiceInitialized');
+      });
+    },
+    submitUserRating: function(ratingValue) {
+      $http.put(ratingsUrl, {
+        user_rating: ratingValue
+      });
+      userRating = ratingValue;
+      $rootScope.$broadcast('ratingUpdated');
+    },
+    getUserRating: function() {
+      return userRating;
+    }
+  };
+}]);
+
+
 oppia.controller('LearnerLocalNav', [
-    '$scope', '$http', '$modal',
-    'oppiaPlayerService', 'embedExplorationButtonService',
+    '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
+    'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
     function(
-      $scope, $http, $modal,
-      oppiaPlayerService, embedExplorationButtonService) {
+      $scope, $http, $modal, oppiaHtmlEscaper,
+      oppiaPlayerService, embedExplorationButtonService, ratingService) {
   var _END_DEST = 'END';
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
+  $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+    GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+
+  $scope.$on('playerServiceInitialized', function() {
+    $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+  });
+  $scope.$on('ratingServiceInitialized', function() {
+    $scope.userRating = ratingService.getUserRating();
+  });
+
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
-  $scope.showFeedbackModal = function() {
-    oppiaPlayerService.openPlayerFeedbackModal(null);
+  $scope.submitUserRating = function(ratingValue) {
+    $scope.userRating = ratingValue;
+    ratingService.submitUserRating(ratingValue);
+  };
+  $scope.$on('ratingUpdated', function() {
+    $scope.userRating = ratingService.getUserRating();
+  });
+}]);
+
+
+oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerService) {
+  return {
+    restrict: 'E',
+    scope: {
+      stateName: '&',
+    },
+    templateUrl: 'components/feedback',
+    controller: [
+        '$scope', '$element', '$http', '$timeout', 'focusService',
+        function($scope, $element, $http, $timeout, focusService) {
+      $scope.feedbackText = '';
+      $scope.isSubmitterAnonymized = false;
+      $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+      $scope.feedbackSubmitted = false;
+      // We generate a random id since there may be multiple popover elements
+      // on the same page.
+      $scope.feedbackPopoverId = (
+        'feedbackPopover' + Math.random().toString(36).slice(2));
+
+      focusService.setFocus($scope.feedbackPopoverId);
+
+      var feedbackUrl = (
+        '/explorehandler/give_feedback/' + oppiaPlayerService.getExplorationId());
+
+      $scope.saveFeedback = function() {
+        if ($scope.feedbackText) {
+          $http.post(feedbackUrl, {
+            subject: '(Feedback from a learner)',
+            feedback: $scope.feedbackText,
+            include_author: !$scope.isSubmitterAnonymized && $scope.isLoggedIn,
+            state_name: $scope.stateName()
+          });
+        }
+
+        $scope.feedbackSubmitted = true;
+        $timeout(function() {
+          $scope.closePopover();
+        }, 2000);
+      };
+
+      $scope.closePopover = function() {
+        // TODO(sll): When UI Bootstrap v0.13.0 is released (with built-in support
+        // for popover templates), use that instead. See:
+        //
+        //     https://github.com/angular-ui/bootstrap/issues/220
+        //
+        // Until then, we'll need to trigger the popover close event manually. This
+        // is done by clicking on the same place that triggered its display.
+        // Since the popover DOM node is inserted as a sibling to that node, we
+        // therefore climb up the DOM tree until we find the top-level popover
+        // element, then move to its sibling node and trigger a click on it.
+        var elt = $element;
+
+        var popoverChildElt = null;
+        for (var i = 0; i < 10; i++) {
+          elt = elt.parent();
+          if (elt.attr('template')) {
+            popoverChildElt = elt;
+            break;
+          }
+        }
+
+        if (!popoverChildElt) {
+          warningsData.addWarning(
+            'Could not close popover element.');
+        }
+
+        var popoverElt = popoverChildElt.parent();
+
+        // Click on the popover trigger.
+        var childElts = popoverElt.children();
+        for (var i = 0; i < childElts.length; i++) {
+          var childElt = $(childElts[i]);
+          if (childElt.attr('popover-template')) {
+            // The timeout is needed to postpone the click event to
+            // the subsequent digest cycle. Otherwise, an "$apply already
+            // in progress" error is raised.
+            $timeout(function() {
+              childElt.trigger('click');
+            });
+            break;
+          }
+        }
+      };
+    }]
   };
 }]);

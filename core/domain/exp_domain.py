@@ -29,6 +29,7 @@ import string
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
@@ -75,7 +76,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS)
 
     EXPLORATION_PROPERTIES = (
-        'title', 'category', 'objective', 'language_code', 'skill_tags',
+        'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'default_skin_id', 'init_state_name')
 
@@ -546,6 +547,165 @@ class InteractionInstance(object):
         )
 
 
+class GadgetInstance(object):
+    """Value object for an instance of a gadget."""
+
+    def __init__(self, gadget_id, visible_in_states, customization_args):
+        self.id = gadget_id
+
+        # List of State name strings where this Gadget is visible.
+        self.visible_in_states = visible_in_states
+
+        # Customization args for the gadget's view.
+        self.customization_args = customization_args
+
+    @property
+    def gadget(self):
+        """Gadget spec for validation and derived properties below."""
+        return gadget_registry.Registry.get_gadget_by_id(self.id)
+
+    @property
+    def width(self):
+        """Width in pixels."""
+        return self.gadget.get_width(self.customization_args)
+
+    @property
+    def height(self):
+        """Height in pixels."""
+        return self.gadget.get_height(self.customization_args)
+
+    def validate(self):
+        """Validate attributes of this GadgetInstance."""
+        try:
+            self.gadget
+        except KeyError:
+            raise utils.ValidationError(
+                'Unknown gadget with ID %s is not in the registry.' % self.id)
+
+        unknown_customization_arguments = set(
+            self.customization_args.iterkeys()) - set(
+                [customization_arg.name for customization_arg
+                 in self.gadget.customization_arg_specs])
+        if unknown_customization_arguments:
+            for arg_name in unknown_customization_arguments:
+                logging.warning(
+                    'Gadget %s does not support customization arg %s.'
+                    % (self.id, arg_name))
+            del self.customization_args[arg_name]
+
+        self.gadget.validate(self.customization_args)
+
+        if self.visible_in_states == []:
+            raise utils.ValidationError(
+                '%s gadget not visible in any states.' % (
+                    self.gadget.name))
+
+    def to_dict(self):
+        """Returns GadgetInstance data represented in dict form."""
+        return {
+            'gadget_id': self.id,
+            'visible_in_states': self.visible_in_states,
+            'customization_args': self._get_full_customization_args(),
+        }
+
+    @classmethod
+    def from_dict(cls, gadget_dict):
+        """Returns GadgetInstance constructed from dict data."""
+        return GadgetInstance(
+            gadget_dict['gadget_id'],
+            gadget_dict['visible_in_states'],
+            gadget_dict['customization_args'])
+
+    def _get_full_customization_args(self):
+        """Populates the customization_args dict of the gadget with
+        default values, if any of the expected customization_args are missing.
+        """
+        full_customization_args_dict = copy.deepcopy(self.customization_args)
+
+        for ca_spec in self.gadget.customization_arg_specs:
+            if ca_spec.name not in full_customization_args_dict:
+                full_customization_args_dict[ca_spec.name] = {
+                    'value': ca_spec.default_value
+                }
+        return full_customization_args_dict
+
+
+class SkinInstance(object):
+    """Domain object for a skin instance."""
+
+    def __init__(self, skin_id, skin_customizations):
+        self.skin_id = skin_id
+        # panel_contents_dict has gadget_panel_name strings as keys and
+        # lists of GadgetInstance instances as values.
+        self.panel_contents_dict = {}
+
+        for panel_name, gdict_list in skin_customizations[
+                'panels_contents'].iteritems():
+            self.panel_contents_dict[panel_name] = [GadgetInstance(
+                gdict['gadget_id'], gdict['visible_in_states'],
+                gdict['customization_args']) for gdict in gdict_list]
+
+    @property
+    def skin(self):
+        """Skin spec for validation and derived properties."""
+        return skins_services.Registry.get_skin_by_id(self.skin_id)
+
+    def validate(self):
+        """Validates that gadgets fit the skin panel dimensions, and that the
+        gadgets themselves are valid."""
+        for panel_name, gadget_instances_list in (
+                self.panel_contents_dict.iteritems()):
+
+            # Validate existence of panels in the skin.
+            if not panel_name in self.skin.panels_properties:
+                raise utils.ValidationError(
+                    '%s panel not found in skin %s' % (
+                        panel_name, self.skin_id)
+                )
+
+            # Validate gadgets fit each skin panel.
+            self.skin.validate_panel(panel_name, gadget_instances_list)
+
+            # Validate gadget internal attributes.
+            for gadget_instance in gadget_instances_list:
+                gadget_instance.validate()
+
+    def to_dict(self):
+        """Returns SkinInstance data represented in dict form.
+        """
+        return {
+            'skin_id': self.skin_id,
+            'skin_customizations': {
+                'panels_contents': {
+                    panel_name: [
+                        gadget_instance.to_dict() for gadget_instance
+                        in instances_list]
+                    for panel_name, instances_list in
+                    self.panel_contents_dict.iteritems()
+                },
+            }
+        }
+
+    @classmethod
+    def from_dict(cls, skin_dict):
+        """Returns SkinInstance instance given dict form."""
+        return SkinInstance(
+            skin_dict['skin_id'],
+            skin_dict['skin_customizations'])
+
+    def get_state_names_required_by_gadgets(self):
+        """Returns a list of strings representing State names required by
+        GadgetInstances in this skin."""
+        state_names = set()
+        for gadget_instances_list in self.panel_contents_dict.values():
+            for gadget_instance in gadget_instances_list:
+                for state_name in gadget_instance.visible_in_states:
+                    state_names.add(state_name)
+
+        # We convert to a sorted list for clean deterministic testing.
+        return sorted(state_names)
+
+
 class State(object):
     """Domain object for a state."""
 
@@ -561,7 +721,6 @@ class State(object):
                 },
                 'feedback': [],
                 'param_changes': [],
-                'description': 'Default',
             }],
         }],
     }
@@ -635,9 +794,6 @@ class State(object):
                 'received %s' % ruleset)
 
         interaction_handlers = [AnswerHandlerInstance('submit', [])]
-        generic_interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.interaction.id))
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -663,8 +819,10 @@ class State(object):
                         'last one should not be default rules.' % rule_dict)
 
                 # TODO(sll): Generalize this to Boolean combinations of rules.
-                matched_rule = generic_interaction.get_rule_by_name(
-                    'submit', rule_spec.definition['name'])
+                matched_rule = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        self.interaction.id
+                    ).get_rule_by_name('submit', rule_spec.definition['name']))
 
                 # Normalize and store the rule params.
                 # TODO(sll): Generalize this to Boolean combinations of rules.
@@ -746,20 +904,22 @@ class Exploration(object):
     """Domain object for an Oppia exploration."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, skill_tags, blurb, author_notes, default_skin,
-                 init_state_name, states_dict, param_specs_dict,
-                 param_changes_list, version, created_on=None,
-                 last_updated=None):
+                 language_code, tags, blurb, author_notes, default_skin,
+                 skin_customizations, init_state_name, states_dict,
+                 param_specs_dict, param_changes_list, version,
+                 created_on=None, last_updated=None):
         self.id = exploration_id
         self.title = title
         self.category = category
         self.objective = objective
         self.language_code = language_code
-        self.skill_tags = skill_tags
+        self.tags = tags
         self.blurb = blurb
         self.author_notes = author_notes
         self.default_skin = default_skin
         self.init_state_name = init_state_name
+
+        self.skin_instance = SkinInstance(default_skin, skin_customizations)
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -780,7 +940,7 @@ class Exploration(object):
     def is_equal_to(self, other):
         simple_props = [
             'id', 'title', 'category', 'objective', 'language_code',
-            'skill_tags', 'blurb', 'author_notes', 'default_skin',
+            'tags', 'blurb', 'author_notes', 'default_skin',
             'init_state_name', 'version']
 
         for prop in simple_props:
@@ -819,8 +979,8 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', 'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict,
-            {}, [], 0)
+            '', 'conversation_v1', feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
+            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
     def _require_valid_name(cls, name, name_type):
@@ -889,15 +1049,35 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.skill_tags, list):
+        if not isinstance(self.tags, list):
             raise utils.ValidationError(
-                'Expected skill_tags to be a list, received %s' %
-                self.skill_tags)
-        for tag in self.skill_tags:
+                'Expected \'tags\' to be a list, received %s' % self.tags)
+        for tag in self.tags:
             if not isinstance(tag, basestring):
                 raise utils.ValidationError(
-                    'Expected each tag in skill_tags to be a string, received '
-                    '%s' % tag)
+                    'Expected each tag in \'tags\' to be a string, received '
+                    '\'%s\'' % tag)
+
+            if not tag:
+                raise utils.ValidationError('Tags should be non-empty.')
+
+            if not re.match(feconf.TAG_REGEX, tag):
+                raise utils.ValidationError(
+                    'Tags should only contain lowercase letters and spaces, '
+                    'received \'%s\'' % tag)
+
+            if (tag[0] not in string.ascii_lowercase or
+                    tag[-1] not in string.ascii_lowercase):
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received '
+                    ' \'%s\'' % tag)
+
+            if re.search('\s\s+', tag):
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, '
+                    'received \'%s\'' % tag)
+        if len(set(self.tags)) != len(self.tags):
+            raise utils.ValidationError('Some tags duplicate each other')
 
         if not isinstance(self.blurb, basestring):
             raise utils.ValidationError(
@@ -1012,6 +1192,21 @@ class Exploration(object):
                                 'The parameter %s was used in a rule, but it '
                                 'does not exist in this exploration'
                                 % param_change.name)
+
+        # Check that state names required by gadgets exist.
+        state_names_required_by_gadgets = set(
+            self.skin_instance.get_state_names_required_by_gadgets())
+        missing_state_names = state_names_required_by_gadgets - set(
+            self.states.keys())
+        if missing_state_names:
+            raise utils.ValidationError(
+                'Exploration missing required state%s: %s' % (
+                    's' if len(missing_state_names) > 1 else '',
+                    ', '.join(sorted(missing_state_names)))
+                )
+
+        # Check that GadgetInstances fit the skin and that gadgets are valid.
+        self.skin_instance.validate()
 
         if strict:
             warnings_list = []
@@ -1152,8 +1347,8 @@ class Exploration(object):
     def update_language_code(self, language_code):
         self.language_code = language_code
 
-    def update_skill_tags(self, skill_tags):
-        self.skill_tags = skill_tags
+    def update_tags(self, tags):
+        self.tags = tags
 
     def update_blurb(self, blurb):
         self.blurb = blurb
@@ -1243,33 +1438,11 @@ class Exploration(object):
 
         del self.states[state_name]
 
-    def export_state_to_frontend_dict(self, state_name):
-        """Gets a state dict with rule descriptions."""
-        state_dict = self.states[state_name].to_dict()
-
-        for handler in state_dict['interaction']['handlers']:
-            for rule_spec in handler['rule_specs']:
-                if state_dict['interaction']['id'] is None:
-                    rule_spec['description'] = 'Default'
-                else:
-                    interaction = (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            state_dict['interaction']['id']))
-
-                    rule_spec['description'] = (
-                        rule_domain.get_rule_description(
-                            rule_spec['definition'],
-                            self.param_specs,
-                            interaction.get_handler_by_name(
-                                handler['name']).obj_type))
-
-        return state_dict
-
     # The current version of the exploration schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 4
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 5
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -1315,6 +1488,20 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v4_dict_to_v5_dict(cls, exploration_dict):
+        """Converts a v4 exploration dict into a v5 exploration dict."""
+        exploration_dict['schema_version'] = 5
+
+        # Rename the 'skill_tags' field to 'tags'.
+        exploration_dict['tags'] = exploration_dict['skill_tags']
+        del exploration_dict['skill_tags']
+
+        exploration_dict['skin_customizations'] = (
+            feconf.DEFAULT_SKIN_CUSTOMIZATIONS)
+
+        return exploration_dict
+
+    @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string."""
         try:
@@ -1348,11 +1535,16 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 4
 
+        if exploration_schema_version == 4:
+            exploration_dict = cls._convert_v4_dict_to_v5_dict(
+                exploration_dict)
+            exploration_schema_version = 5
+
         exploration = cls.create_default_exploration(
             exploration_id, title, category,
             objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'])
-        exploration.skill_tags = exploration_dict['skill_tags']
+        exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
 
@@ -1410,6 +1602,10 @@ class Exploration(object):
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
 
+        exploration.skin_instance = SkinInstance(
+            exploration_dict['default_skin'],
+            exploration_dict['skin_customizations'])
+
         return exploration
 
     def to_yaml(self):
@@ -1422,7 +1618,9 @@ class Exploration(object):
             'objective': self.objective,
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
-            'skill_tags': self.skill_tags,
+            'tags': self.tags,
+            'skin_customizations': self.skin_instance.to_dict()[
+                'skin_customizations'],
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
@@ -1433,13 +1631,13 @@ class Exploration(object):
         learner view."""
         return {
             'init_state_name': self.init_state_name,
-            'title': self.title,
-            'states': {
-                state_name: self.export_state_to_frontend_dict(state_name)
-                for state_name in self.states
-            },
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
+            'states': {
+                state_name: state.to_dict()
+                for (state_name, state) in self.states.iteritems()
+            },
+            'title': self.title,
         }
 
     def get_interaction_ids(self):
@@ -1452,16 +1650,23 @@ class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, skill_tags, status,
+                 language_code, tags, ratings, status,
                  community_owned, owner_ids, editor_ids,
                  viewer_ids, version, exploration_model_created_on,
                  exploration_model_last_updated):
+        """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
+        values are nonnegative integers representing frequency counts. Note
+        that the keys need to be strings in order for this dict to be
+        JSON-serializable.
+        """
+
         self.id = exploration_id
         self.title = title
         self.category = category
         self.objective = objective
         self.language_code = language_code
-        self.skill_tags = skill_tags
+        self.tags = tags
+        self.ratings = ratings
         self.status = status
         self.community_owned = community_owned
         self.owner_ids = owner_ids

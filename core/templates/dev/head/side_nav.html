@@ -7,15 +7,14 @@
   <ul>
     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
       <a href="/about">
-        <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_help_black_48dp.png" class="oppia-sidebar-menu-icon">
         About
       </a>
     </li>
 
     <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
       <a href="/participate">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png"
-               style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
         Participation Playbook
       </a>
     </li>
@@ -23,8 +22,7 @@
     {% if SHOW_FORUM_PAGE %}
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png"
-               style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png" class="oppia-sidebar-menu-icon">
           Forum
         </a>
       </li>
@@ -34,10 +32,21 @@
       <li>
         <a href="{{additional_link['link']}}" target="_blank">
           <img src="/images/sidebar/{{additional_link['icon_filename']}}"
-                 style="height: 22px; margin-left: 6px; margin-right: 16px; width: 22px;">
+                 class="oppia-sidebar-menu-icon">
           {{additional_link['name']}}
         </a>
       </li>
     {% endfor %}
   </ul>
+
+  <div class="oppia-sidebar-footer">
+    {% if SOCIAL_MEDIA_BUTTONS %}
+      <div>Follow Us:</div>
+      {% for button in SOCIAL_MEDIA_BUTTONS %}
+        <a href="{{button['link']}}" target="_blank">
+          <img src="/images/social/{{button['icon_filename']}}">
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
 </nav>

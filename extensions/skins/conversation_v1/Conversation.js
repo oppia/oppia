@@ -29,9 +29,11 @@ oppia.directive('conversationSkin', [function() {
     controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$modal', 'warningsData',
         'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
+        'ratingService',
         function(
           $scope, $timeout, $rootScope, $window, $modal, warningsData,
-          messengerService, oppiaPlayerService, urlService, focusService) {
+          messengerService, oppiaPlayerService, urlService, focusService,
+          ratingService) {
 
       var hasInteractedAtLeastOnce = false;
       var _labelForNextFocusTarget = null;
@@ -42,6 +44,11 @@ oppia.directive('conversationSkin', [function() {
       $scope.introCardImageUrl = null;
 
       $rootScope.loadingMessage = 'Loading';
+
+      // Returns true if the window is narrow, false otherwise.
+      $scope.isWindowNarrow = function() {
+        return $(window).width() < 700;
+      };
 
       // If the exploration is iframed, send data to its parent about its height so
       // that the parent can be resized as necessary.
@@ -79,26 +86,18 @@ oppia.directive('conversationSkin', [function() {
         }
       });
 
-      $scope.openCardFeedbackModal = function(stateName) {
-        if ($scope.isInPreviewMode) {
-          warningsData.addWarning('This functionality is not available in preview mode.');
-        } else {
-          oppiaPlayerService.openPlayerFeedbackModal(stateName);
-        }
-      };
-
       var _scrollToBottom = function(postScrollCallback) {
         $scope.adjustPageHeight(true, function() {
           var oppiaLastContentHeight = $('.conversation-skin-oppia-output:last')
             .offset().top;
           var newScrollTop = null;
           if ($(document).height() - oppiaLastContentHeight - 60 <=
-              $(window).height() * 0.4) {
+              $(window).height() * 0.5) {
             // The -60 prevents the attribution guide from being scrolled into view.
             newScrollTop = $(document).height() - $(window).height() - 60;
             _learnerInputIsInView = true;
           } else {
-            newScrollTop = oppiaLastContentHeight - $(window).height() * 0.4;
+            newScrollTop = oppiaLastContentHeight - $(window).height() * 0.5;
             _learnerInputIsInView = false;
           }
 
@@ -110,9 +109,17 @@ oppia.directive('conversationSkin', [function() {
             newScrollTop = $(document).scrollTop();
           }
 
-          $('html, body, iframe').animate({
+          var page = $('html, body, iframe');
+
+          page.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchmove", function() {
+            page.stop();
+          });
+
+          page.animate({
             'scrollTop': newScrollTop
-          }, 1000, 'easeOutQuad').promise().done(postScrollCallback);
+          }, 1000, 'easeOutQuad', function() {
+            page.off("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchmove");
+          }).promise().done(postScrollCallback);
         });
       };
 
@@ -124,6 +131,8 @@ oppia.directive('conversationSkin', [function() {
         });
       };
 
+      var MIN_CARD_LOADING_DELAY_MILLISECS = 1000;
+
       $scope.initializePage = function() {
         $scope.allResponseStates = [];
         $scope.inputTemplate = '';
@@ -131,9 +140,13 @@ oppia.directive('conversationSkin', [function() {
         $scope.waitingForOppiaFeedback = false;
         $scope.waitingForNewCard = false;
 
+        // This is measured in milliseconds since the epoch.
+        var timeAtServerCall = new Date().getTime();
+
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights, introCardImageUrl) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
           $scope.introCardImageUrl = introCardImageUrl;
           oppiaPlayerService.getUserProfileImage().then(function(result) {
             // $scope.profilePicture contains a dataURI representation of the
@@ -162,6 +175,9 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.waitingForNewCard = true;
 
+          var millisecsLeftToWait = Math.max(
+            MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeAtServerCall),
+            1.0);
           $timeout(function() {
             _addNewCard($scope.stateName, initHtml);
             $scope.waitingForNewCard = false;
@@ -170,9 +186,20 @@ oppia.directive('conversationSkin', [function() {
                 focusService.setFocus(_labelForNextFocusTarget);
               }
             });
-          }, 1000);
+          }, millisecsLeftToWait);
+        });
+
+        ratingService.init(function(userRating) {
+          $scope.userRating = userRating;
         });
       };
+
+      $scope.submitUserRating = function(ratingValue) {
+        ratingService.submitUserRating(ratingValue);
+      };
+      $scope.$on('ratingUpdated', function() {
+        $scope.userRating = ratingService.getUserRating();
+      });
 
       $scope.initializePage();
 
@@ -192,8 +219,16 @@ oppia.directive('conversationSkin', [function() {
 
         $scope.waitingForOppiaFeedback = true;
 
+        // This is measured in milliseconds since the epoch.
+        var timeAtServerCall = new Date().getTime();
+
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
+
+          var millisecsLeftToWait = Math.max(
+            MIN_CARD_LOADING_DELAY_MILLISECS - (new Date().getTime() - timeAtServerCall),
+            1.0);
+
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
@@ -253,7 +288,7 @@ oppia.directive('conversationSkin', [function() {
                 });
               }
             }
-          }, 1000);
+          }, millisecsLeftToWait);
         });
       };
 

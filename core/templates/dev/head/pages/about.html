@@ -26,86 +26,41 @@
 {% block content %}
   <div class="oppia-page-cards-container">
     <md-card class="oppia-page-card">
-    <a class="oppia-about-anchor" name="our-mission"></a>
-      <h2>Our Mission</h2>
+
+      {% if ABOUT_PAGE_YOUTUBE_VIDEO_ID %}
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ABOUT_PAGE_YOUTUBE_VIDEO_ID}}?rel=0" frameborder="0" allowfullscreen>
+        </iframe>
+      {% endif %}
+
+      <a class="oppia-about-anchor" name="our-mission"></a>
+      <h3>Our Mission</h3>
 
       <p>
-        To help anyone learn anything they want to in an effective, enjoyable way.
+        To help anyone learn anything they want in an effective and enjoyable way.
       </p>
 
       <a class="oppia-about-anchor" name="meet-oppia"></a>
-      <h2>Meet Oppia</h2>
+      <h3 style="margin-top: 40px;">Meet Oppia</h3>
 
       <p>
-        Oppia is a free, open-source learning platform. Full of interactive lessons
-        called 'explorations', Oppia helps curious minds learn and teach efficiently
-        and effectively.
+        Oppia is a free, open-source learning platform. Full of interactive activities
+        called 'explorations', Oppia helps curious minds learn and teach.
       </p>
 
-      <h3>Learn</h3>
+      <strong>Learn</strong>
       <p>
         Oppia recreates the experience of one-on-one tutoring. It adapts to your
         needs and lets you learn in the best way possible &mdash; by doing.
       </p>
 
-      <h3>Teach</h3>
+      <strong>Teach</strong>
       <p>
-        Oppia lets you share your knowledge with people worldwide. Anyone can create
-        and contribute to an exploration. Find out more in our participation playbook.
-      </p>
-
-      <a class="oppia-about-anchor" name="credits"></a>
-      <h2>Credits</h2>
-      <p>
-        Many people have contributed to the open-source codebase powering Oppia.
-        Thanks to:
-      </p>
-
-      <ul style="font-size: 0.8em;">
-        <li>Abraham Mgowano</li>
-        <li>Alex Gower</li>
-        <li>Amit Deutsch</li>
-        <li>Angela Park</li>
-        <li>Chase Albert</li>
-        <li>Chin Zhan Xiong</li>
-        <li>Debanshu Bhaumik</li>
-        <li>Estelle Lee</li>
-        <li>Frederik Creemers</li>
-        <li>Jacob Davis</li>
-        <li>Jasper Deng</li>
-        <li>Jeremy Emerson</li>
-        <li>Jerry Chen</li>
-        <li>Karen Rustad</li>
-        <li>Kevin Lee</li>
-        <li>Koji Ashida</li>
-        <li>Kumari Shalini</li>
-        <li>Manas Tungare</li>
-        <li>Marcel Schmittfull</li>
-        <li>Michael Mossey</li>
-        <li>Michael Wagner</li>
-        <li>Phil Wagner</li>
-        <li>Philip Hayes</li>
-        <li>Reinaldo Aguiar</li>
-        <li>Samara Trilling</li>
-        <li>Sean Lip</li>
-        <li>Shafqat Dulal</li>
-        <li>Shantanu Bhowmik</li>
-        <li>Stephanie Federwisch</li>
-        <li>Tarashish Mishra</li>
-        <li>Wilson Hong</li>
-        <li>Xinyu Wu</li>
-        <li>Yana Malysheva</li>
-      </ul>
-
-      <p>
-        The Oppia development team is also grateful for the feedback, ideas, help
-        and suggestions by Alex Kauffmann, Allison Barros, Amy Latten, Brett Barros,
-        John Cox, John Orr, Katie Berlent, Michael Anuzis, Mike Gainer, Neil Fraser,
-        Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros and Vikrant Nanda.
+        Oppia enables you to share your knowledge with people worldwide. Anyone can create
+        and contribute to an exploration. Find out more in our <a href="/participate">participation playbook</a>.
       </p>
 
       <a class="oppia-about-anchor" name="contact"></a>
-      <h2>Contact</h2>
+      <h3 style="margin-top: 40px;">Contacting Us</h3>
 
       <p>
         <strong>For site questions:</strong> Post to our <a href="{{SITE_FORUM_URL}}">forum</a>.
@@ -128,7 +83,7 @@
       </p>
 
       <a class="oppia-about-anchor" name="license"></a>
-      <h2>License</h2>
+      <h3>License</h3>
 
       <p>
         All content in Oppia's explorations is licensed under
@@ -142,16 +97,69 @@
         <a href="https://code.google.com/p/oppia/">code</a> is released under an
         <a href="https://www.apache.org/licenses/">Apache 2.0</a> license.
       </p>
+
+      <a class="oppia-about-anchor" name="credits"></a>
+      <h3>Credits</h3>
+      <p>
+        Many people have contributed to the open-source codebase powering Oppia.
+        Thanks to:
+      </p>
+
+      <ul style="font-size: 0.8em;">
+        <li>Abraham Mgowano</li>
+        <li>Alex Gower</li>
+        <li>Amit Deutsch</li>
+        <li>Angela Park</li>
+        <li>Chase Albert</li>
+        <li>Chin Zhan Xiong</li>
+        <li>Debanshu Bhaumik</li>
+        <li>Estelle Lee</li>
+        <li>Frederik Creemers</li>
+        <li>Jacob Davis</li>
+        <li>Jasper Deng</li>
+        <li>Jeremy Emerson</li>
+        <li>Jérôme (zolk232)</li>
+        <li>Jerry Chen</li>
+        <li>Karen Rustad</li>
+        <li>Kevin Lee</li>
+        <li>Koji Ashida</li>
+        <li>Kumari Shalini</li>
+        <li>Manas Tungare</li>
+        <li>Marcel Schmittfull</li>
+        <li>Michael Anuzis</li>
+        <li>Michael Mossey</li>
+        <li>Michael Wagner</li>
+        <li>Phil Wagner</li>
+        <li>Philip Hayes</li>
+        <li>Reinaldo Aguiar</li>
+        <li>Samara Trilling</li>
+        <li>Sean Lip</li>
+        <li>Shafqat Dulal</li>
+        <li>Shantanu Bhowmik</li>
+        <li>Stephanie Federwisch</li>
+        <li>Tarashish Mishra</li>
+        <li>Wilson Hong</li>
+        <li>Xinyu Wu</li>
+        <li>Yana Malysheva</li>
+        <li>Zoe Madden-Wood</li>
+      </ul>
+
+      <p>
+        The Oppia development team is also grateful for the feedback, ideas, help
+        and suggestions by Alex Kauffmann, Allison Barros, Amy Latten, Brett Barros,
+        Cat Hicks, John Cox, John Orr, Katie Berlent, Michael Anuzis, Mike Gainer,
+        Neil Fraser, Nupur Jain, Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros, Saurabh Chandra and Vikrant Nanda.
+      </p>
     </md-card>
   </div>
 
   <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
-    <h4><strong>About Oppia</strong></h4>
+    <strong>About Oppia</strong>
     <p><a href="#our-mission">Our Mission</a></p>
     <p><a href="#meet-oppia">Meet Oppia</a></p>
-    <p><a href="#credits">Credits</a></p>
-    <p><a href="#contact">Contact</a></p>
+    <p><a href="#contact">Contacting Us</a></p>
     <p><a href="#license">License</a></p>
+    <p><a href="#credits">Credits</a></p>
   </div>
 
   <script>

@@ -57,7 +57,8 @@ states:
       value: 'Our Solar System consists of nine planets orbiting around our sun: Mercury,
         Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto. They range
         from huge gas giants to small icy dwarf planets.<div><br></div><div>Click
-        on the planets below to find out more about each one!</div>'
+        on the planets below to find out more about each one!</div><div><br></div>
+        <div>Image courtesy NASA/JPL-Caltech</div>'
     interaction:
       customization_args:
         highlightRegionsOnHover:

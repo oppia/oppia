@@ -30,6 +30,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
+    <!-- The itemprops are for G+ sharing. -->
+    <meta itemprop="name" content="{{meta_name}}">
+    <meta itemprop="description" content="{{meta_description}}">
+    <!-- The og tags are for Facebook sharing. -->
+    <meta property="og:title" content="{{meta_name}}">
+    <meta property="og:site_name" content="Oppia">
+    <meta property="og:url" content="{{FULL_URL}}">
+    <meta property="og:description" content="{{meta_description}}">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
+
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
 
@@ -88,10 +99,10 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
+                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <img src="/images/general/menu.png">
                     </a>
-                    <a class="oppia-navbar-brand-name" href="/gallery">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
@@ -139,8 +150,8 @@
                               </a>
                             </li>
                             <li>
-                              <a href="/timeline">
-                                Updates
+                              <a href="/notifications_dashboard">
+                                Notifications
                                 <span ng-if="numUnseenNotifications > 0">
                                   (<[numUnseenNotifications]>)
                                 </span>
@@ -169,7 +180,7 @@
                             </li>
                           </ul>
                         </li>
-                      {% else %}
+                      {% elif not user_email %}
                         <li class="dropdown oppia-clickable-dropdown pull-right">
                           <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
                             Sign in
@@ -208,6 +219,13 @@
           </div>
         </div>
       </div>
+
+    {% if DEV_MODE %}
+      <div class="oppia-dev-mode">
+        Development Mode
+      </div>
+    {% endif %}
+
     {% endif %}
 
     {% include 'directives.html' %}

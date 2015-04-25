@@ -140,10 +140,12 @@ urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     get_redirect_route(
-        r'/timeline', home.TimelinePage, 'timeline_page'),
+        r'/notifications_dashboard', home.NotificationsDashboardPage,
+        'notifications_dashboard_handler'),
     get_redirect_route(
-        r'/timelinehandler/data', home.TimelineHandler,
-        'timeline_handler'),
+        r'/notificationsdashboardhandler/data',
+        home.NotificationsDashboardHandler,
+        'notifications_dashboard_handler'),
     get_redirect_route(
         r'/my_explorations', home.MyExplorationsPage, 'my_explorations_page'),
     get_redirect_route(
@@ -252,6 +254,9 @@ urls = [
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),
+    get_redirect_route(
+        r'/explorehandler/rating/<exploration_id>',
+        reader.RatingHandler, 'rating_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

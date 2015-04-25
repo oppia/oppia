@@ -45,6 +45,24 @@
                 </select>
               </div>
             </div>
+            <div class="form-group">
+              <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <div ng-if="hasPageLoaded">
+                  <select2-dropdown
+                    item="$parent.explorationTagsService.displayed"
+                    tag-mode="true" allow-multiple-choices="true"
+                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+                    new-choice-regex="<[TAG_REGEX]>" width="100%"
+                    placeholder="Skills, concepts, topics, ..."
+                    on-selection-change="saveExplorationTags()">
+                  </select2-dropdown>
+                </div>
+                <span class="help-block" style="font-size: smaller">
+                  <em>Tags help learners discover your exploration.</em>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -341,7 +359,7 @@
           <span class="glyphicon glyphicon-info-sign" tooltip="These changes are applied before the learner begins the exploration." tooltip-placement="right" style="font-size: 12px; padding-left: 18px;"></span>
         </h5>
 
-        <param-change-editor param-changes="explorationParamChanges"
+        <param-change-editor param-changes="explorationParamChangesService.displayed"
                              save-param-changes="saveExplorationParamChanges"
                              is-editable="editabilityService.isEditable()">
         </param-change-editor>

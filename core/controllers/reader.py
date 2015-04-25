@@ -20,6 +20,7 @@ import copy
 import logging
 
 from core.controllers import base
+from core.controllers import pages
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -29,6 +30,7 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import interaction_registry
 from core.domain import param_domain
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
@@ -38,6 +40,43 @@ import jinja_utils
 import utils
 
 import jinja2
+
+
+SHARING_OPTIONS = config_domain.ConfigProperty(
+    'sharing_options', {
+        'type': 'dict',
+        'properties': [{
+            'name': 'gplus',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'facebook',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'twitter',
+            'schema': {
+                'type': 'bool',
+            }
+        }]
+    },
+    'Sharing options to display in the learner view',
+    default_value={
+        'gplus': False,
+        'facebook': False,
+        'twitter': False,
+    })
+
+SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
+    'sharing_options_twitter_text', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message',
+    default_value=(
+        'Check out this interactive lesson from Oppia - a free, open-source '
+        'learning platform!'))
 
 
 def require_playable(handler):
@@ -100,6 +139,18 @@ def classify(
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
+    PAGE_NAME_FOR_CSRF = 'player'
+
+    def _make_first_letter_uppercase(self, s):
+        """Converts the first letter of a string to its uppercase equivalent,
+        and returns the result.
+        """
+        # This guards against empty strings.
+        if s:
+            return s[0].upper() + s[1:]
+        else:
+            return s
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -139,6 +190,8 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'SHARING_OPTIONS': SHARING_OPTIONS.value,
+            'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
             'additional_angular_modules': additional_angular_modules,
             'can_edit': (
                 bool(self.username) and
@@ -154,6 +207,11 @@ class ExplorationPage(base.BaseHandler):
                 interaction_templates),
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
+            # Note that this overwrites the value in base.py.
+            'meta_name': exploration.title,
+            # Note that this overwrites the value in base.py.
+            'meta_description': self._make_first_letter_uppercase(
+                exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
@@ -163,7 +221,6 @@ class ExplorationPage(base.BaseHandler):
             'skin_tag': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_tag(exploration.default_skin)
             ),
-            'title': exploration.title,
         })
 
         if is_iframed:
@@ -407,3 +464,35 @@ def submit_answer_in_tests(
             if not finished else ''),
         'state_name': rule_spec.dest if not finished else None,
     }
+
+
+class RatingHandler(base.BaseHandler):
+    """Records the rating of an exploration submitted by a user.
+
+    Note that this represents ratings submitted on completion of the
+    exploration.
+    """
+
+    PAGE_NAME_FOR_CSRF = 'player'
+
+    @require_playable
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        self.values.update({
+            'overall_ratings':
+                rating_services.get_overall_ratings(exploration_id),
+            'user_rating': rating_services.get_user_specific_rating(
+                self.user_id, exploration_id) if self.user_id else None
+        })
+        self.render_json(self.values)
+
+    @base.require_user
+    def put(self, exploration_id):
+        """Handles PUT requests for submitting ratings at the end of an
+        exploration.
+        """
+        user_rating = self.payload.get('user_rating')
+        rating_services.assign_rating(
+            self.user_id, exploration_id, user_rating)
+        self.render_json({})
+
