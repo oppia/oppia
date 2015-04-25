@@ -13,17 +13,11 @@
 // limitations under the License.
 
 
-oppia.directive('coordTwoDimEditor', function($compile, warningsData) {
+oppia.directive('coordTwoDimEditor', function() {
   return {
-    link: function(scope, element, attrs) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
-      };
-      $compile(element.contents())(scope);
-    },
     restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
+    scope: {},
+    templateUrl: '/object_editor_template/CoordTwoDim',
     controller: function($scope) {
       $scope.schemaLatitude = {
         type: 'float',
@@ -49,7 +43,44 @@ oppia.directive('coordTwoDimEditor', function($compile, warningsData) {
 
       if ($scope.$parent.value === '') {
         $scope.$parent.value = [0.0, 0.0];
+      } else {
+        $scope.hasMarker = true;
       }
+
+      // This is required in order to avoid the following bug:
+      //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
+      window.setTimeout(function() {
+        if ($scope.hasMarker) {
+          $scope.mapMarker = new google.maps.Marker({
+            map: $scope.map,
+            position: new google.maps.LatLng(
+              $scope.$parent.value[0],
+              $scope.$parent.value[1]
+            )
+          });
+        }
+        google.maps.event.trigger($scope.map, 'resize');
+      }, 100);
+
+      $scope.mapOptions = {
+        center: new google.maps.LatLng(
+          $scope.$parent.value[0],
+          $scope.$parent.value[1]
+        ),
+        zoom: 4,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+
+
+      $scope.registerClick = function($event, $params) {
+        var ll = $params[0].latLng;
+        $scope.mapMarker = new google.maps.Marker({
+          map: $scope.map,
+          position: ll
+        });
+
+        $scope.$parent.value = [ll.lat(), ll.lng()];
+      };
     }
   };
 });
