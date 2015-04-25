@@ -24,13 +24,22 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', function(
+    'explorationWarningsService', 'CATEGORY_LIST', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService) {
+      explorationWarningsService, CATEGORY_LIST) {
+
+  $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+
+  for (var i = 0; i < CATEGORY_LIST.length; i++) {
+    $scope.CATEGORY_LIST_FOR_SELECT2.push({
+      id: CATEGORY_LIST[i],
+      text: CATEGORY_LIST[i]
+    });
+  }
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
@@ -67,6 +76,15 @@ oppia.controller('ExplorationSettings', [
     // directly (by entering a URL that ends with /settings) results in a
     // console error.
     if (_states) {
+      var newCategory={
+        id: explorationCategoryService.displayed,
+        text: explorationCategoryService.displayed
+        };
+
+      if($scope.CATEGORY_LIST_FOR_SELECT2.indexOf(newCategory) === -1){
+        $scope.CATEGORY_LIST_FOR_SELECT2.push(newCategory);
+      }
+      
       $scope.stateNames = Object.keys(_states);
     }
   };
