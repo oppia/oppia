@@ -733,9 +733,9 @@ md-card.oppia-gallery-tile {
   margin-top: -80px;
 }
 
-.oppia-page-title {
+.oppia-signup-page-title {
   color: #222;
-  font-size: 3em;
+  font-size: 1.6em;
   margin: 0 0 30px 0;
 }
 
@@ -1206,7 +1206,8 @@ oppia-parameter {
 }
 
 .oppia-dashboard-status-green {
-  color: #05A64B;
+  color: #05a69a;
+  font-weight: bold;
   text-transform: capitalize;
 }
 
@@ -1215,10 +1216,16 @@ oppia-parameter {
   text-transform: capitalize;
 }
 
+.oppia-dashboard-status-orange {
+  color: #f7a541;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
 .oppia-dashboard-tile-metadata-parent {
   float: right;
-  padding-top: 25px;
-  width: 25%;
+  padding-top: 15px;
+  width: 30%;
 }
 
 .oppia-dashboard-tile-metadata {
@@ -1226,12 +1233,11 @@ oppia-parameter {
   border-left-style: ridge;
   border-left-width: thin;
   color: #888;
-  font-size: 0.75em;
-  height: 70px;
+  font-size: 1.0em;
+  height: 85px;
   margin-left: 10px;
   padding-left: 20px;
   padding-right: 30px;
-  padding-top: 5px;
 }
 
 md-card.oppia-dashboard-tile {
@@ -1806,7 +1812,7 @@ div#ng-curtain {
   margin-bottom: 30px;
 }
 
-.oppia-timeline-card {
+.oppia-notifications-dashboard-card {
   padding: 15px 40px;
 }
 

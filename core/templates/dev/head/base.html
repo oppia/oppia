@@ -30,14 +30,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
-    <meta itemprop="name" content="Personalized Online Learning from Oppia">
-    <meta itemprop="description" content="Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!">
-    <meta property="og:title" content="Personalized Online Learning from Oppia">
+    <!-- The itemprops are for G+ sharing. -->
+    <meta itemprop="name" content="{{meta_name}}">
+    <meta itemprop="description" content="{{meta_description}}">
+    <!-- The og tags are for Facebook sharing. -->
+    <meta property="og:title" content="{{meta_name}}">
     <meta property="og:site_name" content="Oppia">
-    <meta property="og:url" content="<[serverName]>/explore/<[explorationId]>">
-    <meta property="og:description" content="Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!">
+    <meta property="og:url" content="{{FULL_URL}}">
+    <meta property="og:description" content="{{meta_description}}">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="/images/logo/288x288_logo_mint.png">
+    <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
@@ -148,8 +150,8 @@
                               </a>
                             </li>
                             <li>
-                              <a href="/timeline">
-                                Updates
+                              <a href="/notifications_dashboard">
+                                Notifications
                                 <span ng-if="numUnseenNotifications > 0">
                                   (<[numUnseenNotifications]>)
                                 </span>

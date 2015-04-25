@@ -145,8 +145,13 @@
 
     <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px; width: 100%;">
       <span ng-if="item.type == 'select'" style="color: black;">
-        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;" ng-disabled="ruleDescriptionChoices.length === 1">
-        </select>
+        <span ng-if="ruleDescriptionChoices.length === 1">
+          "<[ruleDescriptionChoices[0].val|convertRuleChoiceToPlainText|truncate]>"
+        </span>
+        <span ng-if="ruleDescriptionChoices.length !== 1">
+          <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
+          </select>
+        </span>
       </span>
 
       <span ng-if="item.type != 'select' && item.type != 'noneditable'">
