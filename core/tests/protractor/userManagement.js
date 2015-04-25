@@ -24,7 +24,7 @@ var workflow = require('../protractor_utils/workflow.js');
 
 describe('Account creation', function() {
   it('should create users', function() {
-    users.createUser('user@example.com', 'user');
+    users.createUser('ordinaryuser@example.com', 'ordinaryuser');
   });
 
   it('should create moderators', function() {
