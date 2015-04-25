@@ -28,13 +28,13 @@ Editor page:
 * Prevent publishing an exploration to the gallery if it contains warnings or errors.
 * Update the list of warnings when the exploration objective is changed.
 * Fix a bug where the 'publish changes' button reverted to 'save draft' when an exploration was featured.
-* Rename 'rules' to 'answer groups'.
 * Remove the duplicate user response in the rule preview, since it's already in the header.
 * Show a string instead of a dropdown for rule parameter selectors with a single choice.
 * Add some space between the various segments that make up the rule description.
 * In non-edit mode, suppress the sort handles on the rules.
 * Use a more appropriate rule description for the 'Continue Button' interaction.
 * Make the currently-selected rule stand out more.
+* Allow pressing the 'enter' key in the 'add new state' modal to submit the form.
 
 Sitewide frontend changes:
 * Change the body font size to 1.6em.
