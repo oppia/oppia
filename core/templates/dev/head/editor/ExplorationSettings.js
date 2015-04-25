@@ -76,15 +76,15 @@ oppia.controller('ExplorationSettings', [
     // directly (by entering a URL that ends with /settings) results in a
     // console error.
     if (_states) {
-      var newCategory={
+      var newCategory = {
         id: explorationCategoryService.displayed,
         text: explorationCategoryService.displayed
-        };
+      };
 
-      if($scope.CATEGORY_LIST_FOR_SELECT2.indexOf(newCategory) === -1){
+      if ($scope.CATEGORY_LIST_FOR_SELECT2.indexOf(newCategory) === -1) {
         $scope.CATEGORY_LIST_FOR_SELECT2.push(newCategory);
       }
-      
+
       $scope.stateNames = Object.keys(_states);
     }
   };
