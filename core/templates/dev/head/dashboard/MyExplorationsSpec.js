@@ -28,12 +28,16 @@ describe('MyExplorations controller', function() {
       id: 'private_exp_id',
       category: 'Private category',
       status: 'private',
-      title: 'Private exploration'
+      title: 'Private exploration',
+      num_open_threads: 0,
+      num_total_threads: 0
     }, {
       id: 'featured_exp_id',
       category: 'Featured category',
       status: 'publicized',
-      title: 'Featured exploration'
+      title: 'Featured exploration',
+      num_open_threads: 2,
+      num_total_threads: 3
     }];
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {

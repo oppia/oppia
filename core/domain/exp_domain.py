@@ -477,6 +477,11 @@ class InteractionInstance(object):
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
                          for h in handlers]
 
+    @property
+    def is_terminal(self):
+        return interaction_registry.Registry.get_interaction_by_id(
+            self.id).is_terminal
+
     def validate(self):
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(

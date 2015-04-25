@@ -17,8 +17,10 @@
 __author__ = 'Sean Lip'
 
 import copy
+import logging
 
 from core.controllers import base
+from core.controllers import pages
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -139,6 +141,16 @@ class ExplorationPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'player'
 
+    def _make_first_letter_uppercase(self, s):
+        """Converts the first letter of a string to its uppercase equivalent,
+        and returns the result.
+        """
+        # This guards against empty strings.
+        if s:
+            return s[0].upper() + s[1:]
+        else:
+            return s
+
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -195,6 +207,11 @@ class ExplorationPage(base.BaseHandler):
                 interaction_templates),
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
+            # Note that this overwrites the value in base.py.
+            'meta_name': exploration.title,
+            # Note that this overwrites the value in base.py.
+            'meta_description': self._make_first_letter_uppercase(
+                exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
@@ -204,7 +221,6 @@ class ExplorationPage(base.BaseHandler):
             'skin_tag': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_tag(exploration.default_skin)
             ),
-            'title': exploration.title,
         })
 
         if is_iframed:
@@ -302,15 +318,13 @@ class StateHitEventHandler(base.BaseHandler):
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
 
-        if new_state_name == feconf.END_DEST:
-            event_services.MaybeLeaveExplorationEventHandler.record(
-                exploration_id, exploration_version, feconf.END_DEST,
-                session_id, client_time_spent_in_secs, old_params,
-                feconf.PLAY_TYPE_NORMAL)
-        else:
+        # Record the state hit, if it is not the END state.
+        if new_state_name is not None:
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+        else:
+            logging.error('Unexpected StateHit event for the END state.')
 
 
 class ClassifyHandler(base.BaseHandler):
@@ -384,7 +398,10 @@ class ExplorationStartEventHandler(base.BaseHandler):
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
-    """Tracks a reader leaving an exploration before completion."""
+    """Tracks a reader leaving an exploration before or at completion.
+
+    If this is a completion, the state_name recorded should be 'END'.
+    """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
