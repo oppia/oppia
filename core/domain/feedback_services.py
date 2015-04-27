@@ -88,6 +88,7 @@ def create_message(
 
     Returns False if the message with the ID already exists.
     """
+    from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
     # in is valid.
     thread = feedback_models.FeedbackThreadModel.get(thread_id)
@@ -99,12 +100,27 @@ def create_message(
     msg.message_id = message_id
     msg.author_id = author_id
     if updated_status:
+        if message_id == 0:
+            # New thread.
+            event_services.FeedbackThreadOpenedEventHandler.record(
+                thread.exploration_id)
+        else:
+            # Status changed from closed to open.
+            if (thread.status != feedback_models.STATUS_CHOICES_OPEN 
+                and updated_status == feedback_models.STATUS_CHOICES_OPEN):
+                event_services.FeedbackThreadReOpenedEventHandler.record(
+                    thread.exploration_id)
+            # Status changed from open to closed.
+            elif (thread.status == feedback_models.STATUS_CHOICES_OPEN
+                  and updated_status != feedback_models.STATUS_CHOICES_OPEN):
+                  event_services.FeedbackThreadClosedEventHandler.record(
+                      thread.exploration_id)
         msg.updated_status = updated_status
     if updated_subject:
         msg.updated_subject = updated_subject
     msg.text = text
     msg.put()
-
+    
     # We do a put() even if the status and subject are not updated, so that the
     # last_updated time of the thread reflects the last time a message was
     # added to it.
