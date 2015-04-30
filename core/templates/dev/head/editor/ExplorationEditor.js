@@ -517,23 +517,23 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           deletedStates: function() {
             return deletedStates;
           },
-          commitMessageIsOptional: function() {
+          isExplorationPrivate: function() {
             return explorationRightsService.isPrivate();
           }
         },
         controller: [
           '$scope', '$modalInstance', 'explorationPropertyChanges',
           'statePropertyChanges', 'changedStates', 'addedStates',
-          'deletedStates', 'commitMessageIsOptional',
+          'deletedStates', 'isExplorationPrivate',
           function($scope, $modalInstance, explorationPropertyChanges,
                    statePropertyChanges, changedStates, addedStates,
-                   deletedStates, commitMessageIsOptional) {
+                   deletedStates, isExplorationPrivate) {
             $scope.explorationPropertyChanges = explorationPropertyChanges;
             $scope.statePropertyChanges = statePropertyChanges;
             $scope.changedStates = changedStates;
             $scope.addedStates = addedStates;
             $scope.deletedStates = deletedStates;
-            $scope.commitMessageIsOptional = commitMessageIsOptional;
+            $scope.isExplorationPrivate = isExplorationPrivate;
 
             // For reasons of backwards compatibility, the following keys
             // should not be changed.

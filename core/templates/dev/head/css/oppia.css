@@ -1239,7 +1239,7 @@ oppia-parameter {
   border-left-style: ridge;
   border-left-width: thin;
   color: #888;
-  font-size: 1.0em;
+  font-size: 0.85em;
   height: 85px;
   margin-left: 10px;
   padding-left: 20px;
@@ -1400,9 +1400,10 @@ ul.oppia-dashboard-tiles {
   width: 100%;
   z-index: 100;
 }
-@media(max-width: 368px) {
+@media(max-width: 468px) {
   .oppia-gallery-banner-content {
-    top: 125px;
+    font-size: 3em;
+    top: 100px;
   }
 }
 
@@ -1411,6 +1412,11 @@ ul.oppia-dashboard-tiles {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 2em;
   padding-top: 250px;
+}
+@media(max-width: 468px) {
+  .oppia-gallery-banner-tagline {
+    top: 300px;
+  }
 }
 
 .oppia-gallery-banner-link {
