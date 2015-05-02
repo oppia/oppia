@@ -8,8 +8,9 @@ param_changes: []
 param_specs:
   CityName:
     obj_type: UnicodeString
-schema_version: 4
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   AbuDhabi:
     content:
@@ -17319,3 +17320,4 @@ states:
           param_changes: []
       id: InteractiveMap
     param_changes: []
+tags: []

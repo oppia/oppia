@@ -6,8 +6,9 @@ language_code: en
 objective: Learn about the planets of the solar system
 param_changes: []
 param_specs: {}
-schema_version: 4
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Exit:
     content:
@@ -49,7 +50,6 @@ states:
           - Try again.
           param_changes: []
       id: MultipleChoiceInput
-      sticky: false
     param_changes: []
   First State:
     content:
@@ -57,8 +57,7 @@ states:
       value: 'Our Solar System consists of nine planets orbiting around our sun: Mercury,
         Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto. They range
         from huge gas giants to small icy dwarf planets.<div><br></div><div>Click
-        on the planets below to find out more about each one!</div><div><br></div>
-        <div>Image courtesy NASA/JPL-Caltech</div>'
+        on the planets below to find out more about each one!</div>'
     interaction:
       customization_args:
         highlightRegionsOnHover:
@@ -71,22 +70,22 @@ states:
               region:
                 area:
                 - - 0.010981757685823261
-                  - 0.09856375700297611
-                - - 0.04871760674242703
+                  - 0.098563757002976107
+                - - 0.048717606742427033
                   - 0.17073356832373082
                 regionType: Rectangle
             - label: '2'
               region:
                 area:
                 - - 0.036925153912238357
-                  - 0.1755448890784478
+                  - 0.17554488907844781
                 - - 0.10060439919525722
-                  - 0.2958279079463723
+                  - 0.29582790794637231
                 regionType: Rectangle
             - label: '3'
               region:
                 area:
-                - - 0.08645345579903081
+                - - 0.086453455799030812
                   - 0.10818639851241008
                 - - 0.15484968221412515
                   - 0.22846941738033458
@@ -95,49 +94,49 @@ states:
               region:
                 area:
                 - - 0.14777421051601194
-                  - 0.1755448890784478
+                  - 0.17554488907844781
                 - - 0.19258553127072892
-                  - 0.2717713041727874
+                  - 0.27177130417278739
                 regionType: Rectangle
             - label: '5'
               region:
                 area:
                 - - 0.19022704070469118
-                  - 0.06007319096524027
-                - - 0.5723025124028044
+                  - 0.060073190965240268
+                - - 0.57230251240280439
                   - 0.8154505494558062
                 regionType: Rectangle
             - label: '6'
               region:
                 area:
-                - - 0.2491893048556346
+                - - 0.24918930485563459
                   - 0.36799771926712704
-                - - 0.9968308142895969
-                  - 0.9934694173803345
+                - - 0.99683081428959686
+                  - 0.99346941738033445
                 regionType: Rectangle
             - label: '7'
               region:
                 area:
-                - - 0.664283644478276
-                  - 0.05045054945580631
-                - - 0.8152270407046912
+                - - 0.66428364447827604
+                  - 0.050450549455806307
+                - - 0.81522704070469121
                   - 0.3535637570029761
                 regionType: Rectangle
             - label: '8'
               region:
                 area:
-                - - 0.8246610029688421
+                - - 0.82466100296884215
                   - 0.021582624927504426
-                - - 0.9402270407046912
-                  - 0.2525260211539195
+                - - 0.94022704070469121
+                  - 0.25252602115391948
                 regionType: Rectangle
             - label: '9'
               region:
                 area:
-                - - 0.9402270407046912
+                - - 0.94022704070469121
                   - 0.22365809662561761
-                - - 0.977962889761295
-                  - 0.2958279079463723
+                - - 0.97796288976129497
+                  - 0.29582790794637231
                 regionType: Rectangle
       handlers:
       - name: submit
@@ -270,5 +269,5 @@ states:
           - Do you want to exit the exploration?
           param_changes: []
       id: ImageClickInput
-      sticky: false
     param_changes: []
+tags: []

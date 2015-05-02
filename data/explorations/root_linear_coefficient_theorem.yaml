@@ -6,8 +6,9 @@ language_code: en
 objective: discover the Root Linear Coefficient Theorem
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Coefficient Signs:
     content:
@@ -20,8 +21,7 @@ states:
         \ if\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;n&amp;quot;\"\
         ></oppia-noninteractive-math>\_is odd, what's the sign of the constant term?\
         \ \_What's the sign of the linear term?</div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -80,8 +80,8 @@ states:
           feedback:
           - Oops, if you have reached this case, something has gone wrong...
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Coefficient signs WA1:
     content:
     - type: text
@@ -93,8 +93,7 @@ states:
         \ raw_latex-with-value=\"&amp;quot;a_3 = 1&amp;quot;\"></oppia-noninteractive-math>,\
         \ then you're suggesting that the constant term should be positive, right?</div><div><br></div><div>What\
         \ is the constant term?</div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -116,8 +115,8 @@ states:
           feedback:
           - Try again.  We want the constant term.
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Coefficient signs WA2:
     content:
     - type: text
@@ -129,8 +128,7 @@ states:
         \ on this sample case:</div><div><br></div><div><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(x - 3) (x - 4)&amp;quot;\"></oppia-noninteractive-math><br><br>What\
         \ is the coefficient of the constant term?</div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -151,15 +149,14 @@ states:
           feedback:
           - Nope!  Try again.
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   More General Expansion:
     content:
     - type: text
       value: "What about\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x-a)(x-b)(x-c)&amp;quot;\"\
         ></oppia-noninteractive-math>?"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -190,8 +187,8 @@ states:
           feedback:
           - Nope!  Try again.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Particular coefficients (part 1):
     content:
     - type: text
@@ -200,8 +197,7 @@ states:
         \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
         ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
         \ term (the term with no x's)?"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -230,8 +226,8 @@ states:
           feedback:
           - Nope!  Try again.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Particular coefficients (part 2):
     content:
     - type: text
@@ -240,8 +236,7 @@ states:
         ></oppia-noninteractive-math><br><br><span>What is the absolute value of the\
         \ linear term (the\_</span><oppia-noninteractive-math raw_latex-with-value=\"\
         &amp;quot;x^1&amp;quot;\"></oppia-noninteractive-math>\_<span>term)?</span><br>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -273,8 +268,8 @@ states:
             <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x - a_1)\
             \ (x - a_2) (x - a_3)&amp;quot;\"></oppia-noninteractive-math>"
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Quotient of terms:
     content:
     - type: text
@@ -286,8 +281,7 @@ states:
         \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
         is odd, the constant and linear terms also have opposite signs...<br><br>What,\
         \ then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -313,25 +307,24 @@ states:
           feedback:
           - Try again!
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Quotient part 2:
     content:
     - type: text
-      value: "Now for the fun part. \_Do you remember how the linear coefficient was:<div><oppia-noninteractive-math\
-        \ raw_latex-with-value=\"&amp;quot;(-1)^{n+1} a_1 a_2 ... a_{n-1} + a_1 a_2\
-        \ ... a_{n-2} a_n + ... + a_2 a_3 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>and\
-        \ the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value=\"\
-        &amp;quot;(-1)^n a_1 a_2 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>(where,\
-        \ as discussed before, the sign is added in).<br><br>What happens when we\
-        \ divide the linear coefficient by the constant term?</div>"
-    param_changes: []
-    widget:
+      value: Now for the fun part. &nbsp;Do you remember how the linear coefficient
+        was:<div><oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^{n+1}(a_1
+        a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2 a_3 ... a_n)&amp;quot;"></oppia-noninteractive-math><br><br>and
+        the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^n
+        a_1 a_2 ... a_n&amp;quot;"></oppia-noninteractive-math><br><br>(where, as
+        discussed before, the sign is added in).<br><br>What happens when we divide
+        the linear coefficient by the constant term?</div>
+    interaction:
       customization_args:
         choices:
           value:
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;1&amp;quot;"></oppia-noninteractive-math>
-          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^n * (1/a_1
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^n (1/a_1
             + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)(1/a_1
             + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
@@ -356,8 +349,8 @@ states:
           feedback:
           - Oops, that's not right.  Careful; signs can be tricky!
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Simple Expansion:
     content:
     - type: text
@@ -371,9 +364,12 @@ states:
         ></oppia-noninteractive-math>\_and\_<oppia-noninteractive-math raw_latex-with-value=\"\
         &amp;quot;1&amp;quot;\"></oppia-noninteractive-math>, respectively, format\
         \ your answer as the string: a,b,c,d (without spaces).</div>"
-    param_changes: []
-    widget:
-      customization_args: {}
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -393,17 +389,18 @@ states:
           feedback:
           - Sorry, try again.  Remember to format it exactly as shown.
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Start:
     content:
     - type: text
       value: "Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(a + b)(c + d) = ac + ad + bc + bd&amp;quot;\"\
         ></oppia-noninteractive-math>.<br>"
-    param_changes: []
-    widget:
-      customization_args: {}
+    interaction:
+      customization_args:
+        buttonText:
+          value: Continue
       handlers:
       - name: submit
         rule_specs:
@@ -412,8 +409,8 @@ states:
           dest: Simple Expansion
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
   Theorem:
     content:
     - type: text
@@ -430,9 +427,10 @@ states:
         \ raw_latex-with-value=\"&amp;quot;-c_1&amp;quot;\"></oppia-noninteractive-math><br><br>or...<div><br><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;c_1 = -(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;\"\
         ></oppia-noninteractive-math></div>"
-    param_changes: []
-    widget:
-      customization_args: {}
+    interaction:
+      customization_args:
+        buttonText:
+          value: Continue
       handlers:
       - name: submit
         rule_specs:
@@ -443,5 +441,6 @@ states:
           - Congrats!  We may use this theorem later on to prove something even more
             interesting...
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
+tags: []
