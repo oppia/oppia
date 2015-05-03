@@ -335,10 +335,10 @@ NG_JOYRIDE_ZIP_URL = (
 NG_JOYRIDE_ZIP_ROOT_NAME = 'ng-joyride-%s' % NG_JOYRIDE_REV
 NG_JOYRIDE_TARGET_ROOT_NAME = 'ng-joyride-%s' % NG_JOYRIDE_REV
 
-BOOTSTRAP_REV = '3.1.1'
+BOOTSTRAP_REV = '3.3.4'
 BOOTSTRAP_ROOT_NAME = 'bootstrap-%s-dist' % BOOTSTRAP_REV
 BOOTSTRAP_ZIP_URL = (
-    'https://github.com/twbs/bootstrap/releases/download/v3.1.1/%s.zip'
+    'https://github.com/twbs/bootstrap/releases/download/v3.3.4/%s.zip'
     % BOOTSTRAP_ROOT_NAME)
 BOOTSTRAP_ZIP_ROOT_NAME = BOOTSTRAP_ROOT_NAME
 BOOTSTRAP_TARGET_ROOT_NAME = 'bootstrap-%s' % BOOTSTRAP_REV
