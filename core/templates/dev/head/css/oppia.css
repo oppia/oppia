@@ -1894,3 +1894,8 @@ div#ng-curtain {
   resize: none;
   width: 245px;
 }
+
+.oppia-rte-content > div[contenteditable] {
+  /* This counteracts the 1.5em margin that is set globally in Oppia for <p> tags. */
+   margin-top: -1.5em;
+}
