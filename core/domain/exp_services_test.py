@@ -1701,27 +1701,18 @@ class SearchTests(ExplorationServicesUnitTests):
 
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
-        days_since_beginning_of_time = (
-            (datetime.datetime.utcnow() - datetime.datetime(2013, 6, 30)).days)
-        self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID),
-            days_since_beginning_of_time)
+
+        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
         rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
-        self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID),
-            days_since_beginning_of_time + 3000)
+        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 30)
 
         rating_services.assign_rating(self.OWNER_ID, self.EXP_ID, 5)
-        self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID),
-            days_since_beginning_of_time + 3010)
+        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 40)
 
         rating_services.assign_rating(self.user_id_admin, self.EXP_ID, 2)
-        self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID),
-            days_since_beginning_of_time + 3008)
+        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 38)
 
 
 class ExplorationChangedEventsTests(ExplorationServicesUnitTests):

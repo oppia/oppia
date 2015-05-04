@@ -98,16 +98,16 @@ class ExplorationUserDataModel(base_models.BaseModel):
     [USER_ID].[EXPLORATION_ID]
     """
 
-    # The user id
-    user_id = ndb.StringProperty(indexed=True)
-    # The exploration id
-    exploration_id = ndb.StringProperty(indexed=True)
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration id.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
 
     # The rating (1-5) the user assigned to the exploration. Note that this
     # represents a rating given on completion of the exploration.
     rating = ndb.IntegerProperty(default=None, indexed=True)
 
-    # When the most recent rating was awarded, or None if not rated
+    # When the most recent rating was awarded, or None if not rated.
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
 
     @classmethod
@@ -116,9 +116,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
-        """Creates a new ExplorationUserDataModel entry and returns it."""
+        """Creates a new ExplorationUserDataModel entry and returns it.
+
+        Note that the client is responsible for actually saving this entity to
+        the datastore.
+        """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return cls(id=instance_id)
+        return cls(
+            id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
     @classmethod
     def get(cls, user_id, exploration_id):
