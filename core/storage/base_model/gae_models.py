@@ -28,11 +28,12 @@ from google.appengine.ext import ndb
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
-    # When this entity was first created.
+    # When this entity was first created. This can be overwritten and
+    # set explicitly.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    # When this entity was last updated.
+    # When this entity was last updated. This cannot be set directly.
     last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-    # Whether the current version of the file is deleted.
+    # Whether the current version of the model instance is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
 
     @property

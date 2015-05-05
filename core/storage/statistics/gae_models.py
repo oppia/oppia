@@ -139,6 +139,13 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     close and then cancel. Thus, the real event is the last event of this type
     logged for the session id.
 
+    Note: shortly after the release of v2.0.0.rc.2, some of these events
+    were migrated from StateHitEventLogEntryModel. These events have their
+    client_time_spent_in_secs field set to 0.0 (since this field was not
+    recorded in StateHitEventLogEntryModel), and they also have the wrong
+    'last updated' timestamp. However, the 'created_on' timestamp is the
+    same as that of the original model.
+
     Event schema documentation
     --------------------------
     V1:
@@ -169,6 +176,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
+    # Note: Some of these events were migrated from StateHit event instances
+    # which did not record timestamp data. For this, we use a placeholder
+    # value of 0.0 for client_time_spent_in_secs.
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value
     params = ndb.JsonProperty(indexed=False)
@@ -194,7 +204,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
                client_time_spent_in_secs, params, play_type):
         """Creates a new leave exploration event."""
         # TODO(sll): Some events currently do not have an entity id that was
-        # set using this method; it was randomly set instead due tg an error.
+        # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -337,7 +347,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             play_type):
         """Creates a new leave exploration event."""
         # TODO(sll): Some events currently do not have an entity id that was
-        # set using this method; it was randomly set instead due tg an error.
+        # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         state_event_entity = cls(

@@ -6,8 +6,9 @@ language_code: en
 objective: Learn how to model objects as graphs
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Bosses correct:
     content:
@@ -16,8 +17,7 @@ states:
         \ They are widely used in many fields, such as computer science and statistics.\_\
         <div><br></div><div>Maybe from now on you'll start seeing graphs all over\
         \ the place!\_</div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         buttonText:
           value: Continue
@@ -29,8 +29,8 @@ states:
           dest: END
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
   Bosses question:
     content:
     - type: text
@@ -39,8 +39,7 @@ states:
         to George.</li><li>John and George report to Irene.</li></ul><div>Try modeling
         this as a graph, with a directed edge from an employee to his or her immediate
         superior.</div></div>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         canAddEdge:
           value: true
@@ -138,8 +137,8 @@ states:
           feedback:
           - Not exactly... try again!
           param_changes: []
-      sticky: true
-      widget_id: GraphInput
+      id: GraphInput
+    param_changes: []
   Cities correct:
     content:
     - type: text
@@ -152,8 +151,7 @@ states:
         In that case, instead of having lines between dots, we have arrows instead.
         In mathematician-speak, this would be a "directed graph", since every edge
         has a direction.</div><div><br></div><div>Let's give this a try now!</div>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         buttonText:
           value: Continue
@@ -165,8 +163,8 @@ states:
           dest: Bosses question
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
   Cities question:
     content:
     - type: text
@@ -176,8 +174,7 @@ states:
         from Madrid.</li><li>London is 1265km from Madrid.</li><li>Madrid is 1871km
         from Berlin.</li></ul><div>(Note: On the graph, don''t put "km" on the edges,
         just put the number)</div></div>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         canAddEdge:
           value: true
@@ -266,8 +263,8 @@ states:
           feedback:
           - Not quite, try again!
           param_changes: []
-      sticky: true
-      widget_id: GraphInput
+      id: GraphInput
+    param_changes: []
   Friends correct:
     content:
     - type: text
@@ -278,8 +275,7 @@ states:
         numbers to each edge to represent this data. In mathematician-speak, such
         a graph is a "weighted graph", since each edge has a "weight" number.</div><div><br></div><div>Let's
         give this a try!</div>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         buttonText:
           value: Continue
@@ -291,8 +287,8 @@ states:
           dest: Cities question
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
   Friends question:
     content:
     - type: text
@@ -302,8 +298,7 @@ states:
         friends with Alice and David<br></li><li>David is friends with Charlie and
         Emily<br></li><li>Emily is friends with Alice and David<br></li></ul></div><div>Try
         to model the friendships as a graph!</div>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         canAddEdge:
           value: true
@@ -425,8 +420,8 @@ states:
           feedback:
           - Not quite... Let's try again!
           param_changes: []
-      sticky: true
-      widget_id: GraphInput
+      id: GraphInput
+    param_changes: []
   Introduction:
     content:
     - type: text
@@ -439,8 +434,7 @@ states:
         simple graph.png&amp;quot;"></oppia-noninteractive-image><br></div><div><br></div><div>Despite
         this simplicity, graphs are useful for modeling all kinds of real world behavior.
         Not convinced? Let''s take a look at some things that graphs can model...</div>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         buttonText:
           value: Continue
@@ -452,5 +446,6 @@ states:
           dest: Friends question
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
+tags: []

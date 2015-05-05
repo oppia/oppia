@@ -42,7 +42,7 @@
                     When the button is clicked...
                   </span>
                   <span ng-if="getCurrentInteractionId() !== 'Continue'">
-                    None of the other answer groups apply...
+                    None of the other rules apply...
                   </span>
                 </span>
               </a>
@@ -64,7 +64,7 @@
   <md-card style="margin: 20px 0px; padding: 0px;">
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue' || !isDefaultRuleTabShown())" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
-        + Add Answer Group
+        + Add Rule
       </button>
     </div>
   </md-card>
@@ -72,7 +72,7 @@
 
 <script type="text/ng-template" id="modals/addRule">
   <div class="modal-header">
-    <h3>Add Answer Group</h3>
+    <h3>Add Rule</h3>
   </div>
 
   <div class="modal-body">
@@ -84,6 +84,6 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()" ng-disabled="addRuleForm.ruleDetailsForm.$invalid || isRuleEmpty(tmpRule)">Add New Answer Group</button>
+    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()" ng-disabled="addRuleForm.ruleDetailsForm.$invalid || isRuleEmpty(tmpRule)">Add New Rule</button>
   </div>
 </script>

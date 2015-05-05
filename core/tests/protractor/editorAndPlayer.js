@@ -173,8 +173,11 @@ describe('Full exploration editor', function() {
       editor.setInteraction('TextInput');
       editor.addRule('TextInput', null, 'END', 'Default');
       editor.RuleEditor('default').createNewStateAndSetDestination('state2');
-      editor.expectStateNamesToBe(['state1', 'state2', 'END']);
       editor.moveToState('state2');
+      // NOTE: we must move to the state before checking state names to avoid
+      // inexplicable failures of the protractor utility that reads state names
+      // (the user-visible names are fine either way). See issue 732 for more.
+      editor.expectStateNamesToBe(['state1', 'state2', 'END']);
       editor.setInteraction('EndExploration');
 
       editor.discardChanges();

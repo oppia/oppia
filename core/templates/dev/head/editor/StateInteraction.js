@@ -127,7 +127,8 @@ oppia.controller('StateInteraction', [
 
       $modal.open({
         templateUrl: 'modals/customizeInteraction',
-        backdrop: true,
+        // Clicking outside this modal should not dismiss it.
+        backdrop: 'static',
         resolve: {},
         controller: [
             '$scope', '$modalInstance', 'stateInteractionIdService', 'stateCustomizationArgsService', 'interactionDetailsCache', 'INTERACTION_SPECS',
@@ -246,7 +247,7 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.deleteInteraction = function() {
-    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its answer groups.')) {
+    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its rules.')) {
       return false;
     }
 

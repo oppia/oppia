@@ -562,8 +562,16 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .btn.oppia-navbar-add-exploration-button {
   background-color: rgba(5, 190, 178, 0.9);
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.9);
   font-size: 16px;
+  margin-right: 5px;
+}
+.btn.oppia-navbar-add-exploration-button:hover {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
+}
+.oppia-navbar-add-exploration-button-plus {
+  font-weight: bold;
   margin-right: 5px;
 }
 
@@ -591,16 +599,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   .oppia-navbar-add-exploration-button {
     display: none;
   }
-}
-
-.btn.oppia-navbar-add-exploration-button:hover {
-  background-color: rgba(5, 190, 178, 1);
-  color: rgba(255,255,255,1);
-}
-
-.oppia-navbar-add-exploration-button-plus {
-  font-weight: bold;
-  margin-right: 5px;
 }
 
 .oppia-gallery-tiles-area {
@@ -718,6 +716,10 @@ md-card.oppia-gallery-tile {
   background: transparent;
   border-color: transparent;
   color: green;
+}
+
+.oppia-create-exploration-label {
+  margin-top: 5px;
 }
 
 
@@ -1140,6 +1142,10 @@ md-card.oppia-gallery-tile {
   position: relative;
 }
 
+.oppia-rule-details-header {
+  margin-bottom: 6px;
+}
+
 .about-tabs {
   margin-bottom: 0;
 }
@@ -1233,7 +1239,7 @@ oppia-parameter {
   border-left-style: ridge;
   border-left-width: thin;
   color: #888;
-  font-size: 1.0em;
+  font-size: 0.85em;
   height: 85px;
   margin-left: 10px;
   padding-left: 20px;
@@ -1394,9 +1400,10 @@ ul.oppia-dashboard-tiles {
   width: 100%;
   z-index: 100;
 }
-@media(max-width: 368px) {
+@media(max-width: 468px) {
   .oppia-gallery-banner-content {
-    top: 125px;
+    font-size: 3em;
+    top: 100px;
   }
 }
 
@@ -1405,6 +1412,11 @@ ul.oppia-dashboard-tiles {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 2em;
   padding-top: 250px;
+}
+@media(max-width: 468px) {
+  .oppia-gallery-banner-tagline {
+    top: 300px;
+  }
 }
 
 .oppia-gallery-banner-link {
@@ -1687,7 +1699,7 @@ div#ng-curtain {
   border-style: inset;
   border-width: 0 9px 14px 9px;
   bottom: 10px;
-  font-size: 0.8em;
+  font-size: 0.7em;
   font-weight: bold;
   height: 0;
   position: absolute;
