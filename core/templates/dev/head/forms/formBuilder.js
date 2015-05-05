@@ -1274,30 +1274,33 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
-    controller: ['$scope', '$filter', '$sce', 'parameterSpecsService',
-        function($scope, $filter, $sce, parameterSpecsService) {
+    controller: ['$scope', '$filter', '$sce', '$window', 'parameterSpecsService',
+        function($scope, $filter, $sce, $window, parameterSpecsService) {
       $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType('unicode');
       $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
 
-      // TODO(sll): this should be explicitly enabled, by taking in a parameter.
-      // The language to use should also be passed in.
-      $scope.allowSpeechRecognition = !!webkitSpeechRecognition;
+      $scope.allowSpeechRecognition = (
+        $scope.uiConfig().speechRecognitionLanguage &&
+        !!$window.webkitSpeechRecognition);
 
       $scope.startSpeechRecognition = function() {
         var recognition = new webkitSpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = 'en';
+        recognition.lang = $scope.uiConfig().speechRecognitionLanguage;
         recognition.start();
         recognition.stop();
 
         recognition.onresult = function(e) {
-          for (var i = e.resultIndex; i < e.results.length; i++) {
+          for (var i = 0; i < e.results.length; i++) {
             if (e.results[i].isFinal) {
               $scope.localValue = e.results[i][0].transcript;
+              $scope.$apply();
+              recognition.abort();
+              break;
             }
           }
-        }
+        };
       };
 
       if ($scope.uiConfig() && $scope.uiConfig().rows && $scope.doUnicodeParamsExist) {

@@ -31,9 +31,13 @@ oppia.directive('oppiaInteractiveTextInput', [
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
+        // TODO(sll): Document the speechRecognitionLanguage option.
+        // TODO(sll): Allow this option to be customized in the exploration editor.
         $scope.schema = {
           type: 'unicode',
-          ui_config: {}
+          ui_config: {
+            speechRecognitionLanguage: 'en'
+          }
         };
         if ($scope.placeholder) {
           $scope.schema.ui_config.placeholder = $scope.placeholder;
