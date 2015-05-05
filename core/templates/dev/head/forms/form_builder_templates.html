@@ -186,11 +186,15 @@
     </textarea>
 
     <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
-      <input type="text" ng-disabled="isDisabled()"
+      <input type="text" ng-disabled="isDisabled()" ng-class="{'oppia-unicode-editor-with-speech-recognition': allowSpeechRecognition}"
              ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
              ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
              ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"
              style="padding-top: 20px; margin-top: -30px;">
+      <button ng-if="allowSpeechRecognition" type="button"
+              class="btn btn-default btn-sm" ng-click="startSpeechRecognition()">
+        <span class="glyphicon glyphicon-volume-up"></span>
+      </button>
     </md-input-group>
 
     <!-- Note that we do not yet support ng-blur for the code editor. -->

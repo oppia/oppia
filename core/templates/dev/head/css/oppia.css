@@ -1980,6 +1980,7 @@ div#ng-curtain {
   width: 245px;
 }
 
+<<<<<<< HEAD
 .oppia-rte-toolbar-image {
   padding-bottom: 8px;
   padding-top: 8px;
@@ -2000,4 +2001,13 @@ div#ng-curtain {
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
+}
+
+/* This makes some space for the speech recognition button at the right of the
+   input field.
+*/
+md-input-group.long .oppia-unicode-editor-with-speech-recognition {
+  display: inline;
+  padding-top: 0;
+  width: 90%;
 }
