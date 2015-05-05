@@ -34,7 +34,6 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 
         // This is required in order to avoid the following bug:
         //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
-        console.log($scope.map)
         window.setTimeout(function() {
           google.maps.event.trigger($scope.map, 'resize');
         }, 100);

@@ -67,19 +67,22 @@ oppia.directive('coordTwoDimEditor', function() {
           $scope.$parent.value[0],
           $scope.$parent.value[1]
         ),
-        zoom: 4,
+        zoom: 0,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
 
-
       $scope.registerClick = function($event, $params) {
-        var ll = $params[0].latLng;
-        $scope.mapMarker = new google.maps.Marker({
-          map: $scope.map,
-          position: ll
-        });
+        var latLong = $params[0].latLng;
+        if ($scope.mapMarker) {
+          $scope.mapMarker.setPosition(latLong);
+        } else {
+          $scope.mapMarker = new google.maps.Marker({
+            map: $scope.map,
+            position: latLong
+          });
+        }
 
-        $scope.$parent.value = [ll.lat(), ll.lng()];
+        $scope.$parent.value = [latLong.lat(), latLong.lng()];
       };
     }
   };

@@ -166,10 +166,12 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
         var longitude = inputs[varName][1];
         replacementText = '(';
         replacementText += (
-          inputs[varName][0] >= 0.0 ? latitude + '°N' : -latitude + '°S');
+          inputs[varName][0] >= 0.0
+          ? latitude.toFixed(2) + '°N' : -latitude.toFixed(2) + '°S');
         replacementText += ', ';
         replacementText += (
-          inputs[varName][1] >= 0.0 ? longitude + '°E' : -longitude + '°W');
+          inputs[varName][1] >= 0.0
+          ? longitude.toFixed(2) + '°E' : -longitude.toFixed(2) + '°W');
         replacementText += ')';
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + inputs[varName] + '"';
