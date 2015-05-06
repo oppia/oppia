@@ -58,7 +58,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 'invalid_thread_id', 'user_id', None, None, 'Hello')
 
-    def test_feedback_status(self):
+    def test_status_of_newly_created_thread_is_open(self):
         EXP_ID = '0'
         feedback_services.create_thread(
             EXP_ID, 'a_state_name', None, 'a subject', 'some text')

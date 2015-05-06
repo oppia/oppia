@@ -105,7 +105,7 @@ def create_message(
     if updated_status:
         if message_id == 0:
             # New thread.
-            event_services.FeedbackThreadCreatedHandler.record(
+            event_services.FeedbackThreadCreatedEventHandler.record(
                 thread.exploration_id)
         else:
             # Thread status changed.

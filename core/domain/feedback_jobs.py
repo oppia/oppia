@@ -95,12 +95,12 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.num_open_threads -= 1
                 model.put()
 
-        if (event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED):
+        if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
             transaction_services.run_in_transaction(
                 _increment_total_threads_count)
             transaction_services.run_in_transaction(
                 _increment_open_threads_count)
-        elif (event_type == feconf.EVENT_TYPE_THREAD_STATUS_CHANGED):
+        elif event_type == feconf.EVENT_TYPE_THREAD_STATUS_CHANGED:
             old_status = args[1]
             updated_status = args[2]
             # Status changed from closed to open.
