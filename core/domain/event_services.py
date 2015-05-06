@@ -140,37 +140,24 @@ class StateHitEventHandler(BaseEventHandler):
             params, play_type)
 
 
-class FeedbackThreadOpenedEventHandler(BaseEventHandler):
+class FeedbackThreadCreatedHandler(BaseEventHandler):
     """Event handler for recording new feedback thread creation events."""
 
-    EVENT_TYPE = feconf.EVENT_TYPE_THREAD_OPENED
+    EVENT_TYPE = feconf.EVENT_TYPE_NEW_THREAD_CREATED
 
     @classmethod
     def _handle_event(cls, exp_id):
-        feedback_models.NewFeedbackThreadEventLogEntryModel.create(
-            exp_id)
+        pass
 
 
-class FeedbackThreadReOpenedEventHandler(BaseEventHandler):
+class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
     """Event handler for recording reopening feedback thread events."""
 
-    EVENT_TYPE = feconf.EVENT_TYPE_THREAD_REOPENED
+    EVENT_TYPE = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
 
     @classmethod
-    def _handle_event(cls, exp_id):
-        feedback_models.FeedbackThreadReopenedEventLogEntryModel.create(
-            exp_id)
-
-
-class FeedbackThreadClosedEventHandler(BaseEventHandler):
-    """Event handler for recording closing feedback thread events."""
-
-    EVENT_TYPE = feconf.EVENT_TYPE_THREAD_CLOSED
-
-    @classmethod
-    def _handle_event(cls, exp_id):
-        feedback_models.FeedbackThreadClosedEventLogEntryModel.create(
-            exp_id)
+    def _handle_event(cls, exp_id, old_status, new_status):
+        pass
 
 
 class ExplorationContentChangeEventHandler(BaseEventHandler):

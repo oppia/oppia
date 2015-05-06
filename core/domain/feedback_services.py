@@ -53,6 +53,9 @@ def create_thread(
     thread.exploration_id = exploration_id
     thread.state_name = state_name
     thread.original_author_id = original_author_id
+    # The feedback analytics jobs rely on the thread status being set to 'open'
+    # when a new thread is created. If this is changed, changes need to be 
+    # made there as well
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
     thread.put()
@@ -102,19 +105,13 @@ def create_message(
     if updated_status:
         if message_id == 0:
             # New thread.
-            event_services.FeedbackThreadOpenedEventHandler.record(
+            event_services.FeedbackThreadCreatedHandler.record(
                 thread.exploration_id)
         else:
-            # Status changed from closed to open.
-            if (thread.status != feedback_models.STATUS_CHOICES_OPEN 
-                and updated_status == feedback_models.STATUS_CHOICES_OPEN):
-                event_services.FeedbackThreadReOpenedEventHandler.record(
-                    thread.exploration_id)
-            # Status changed from open to closed.
-            elif (thread.status == feedback_models.STATUS_CHOICES_OPEN
-                  and updated_status != feedback_models.STATUS_CHOICES_OPEN):
-                  event_services.FeedbackThreadClosedEventHandler.record(
-                      thread.exploration_id)
+            # Thread status changed.
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                thread.exploration_id, thread.status, updated_status)
+            
         msg.updated_status = updated_status
     if updated_subject:
         msg.updated_subject = updated_subject
