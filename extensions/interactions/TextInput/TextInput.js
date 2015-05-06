@@ -28,15 +28,18 @@ oppia.directive('oppiaInteractiveTextInput', [
       controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
+        var speechRecognitionLanguage = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.speechRecognitionLanguageWithValue);
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-        // TODO(sll): Document the speechRecognitionLanguage option.
-        // TODO(sll): Allow this option to be customized in the exploration editor.
+        // TODO(sll): Document the speechRecognitionLanguage option in the schema.
         $scope.schema = {
           type: 'unicode',
           ui_config: {
-            speechRecognitionLanguage: 'en'
+            speechRecognitionLanguage: (
+              speechRecognitionLanguage === '(none)' ? '' :
+              speechRecognitionLanguage)
           }
         };
         if ($scope.placeholder) {

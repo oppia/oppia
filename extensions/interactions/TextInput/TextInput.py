@@ -42,8 +42,7 @@ class TextInput(base.BaseInteraction):
         'default_value': ''
     }, {
         'name': 'rows',
-        'description': (
-            'Number of rows'),
+        'description': 'Number of rows',
         'schema': {
             'type': 'int',
             'validators': [{
@@ -55,4 +54,15 @@ class TextInput(base.BaseInteraction):
             }]
         },
         'default_value': 1,
+    }, {
+        'name': 'speechRecognitionLanguage',
+        'description': 'Language for speech recognition (only in Chrome).',
+        'schema': {
+            'type': 'unicode',
+            # TODO(sll): Pull '(none)' out into a constant.
+            # TODO(sll): Use human-readable values in the UI.
+            # TODO(sll): Add more languages.
+            'choices': ['(none)', 'en', 'es']
+        },
+        'default_value': 'en',
     }]

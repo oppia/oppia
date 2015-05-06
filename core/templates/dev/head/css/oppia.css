@@ -2011,3 +2011,13 @@ md-input-group.long .oppia-unicode-editor-with-speech-recognition {
   padding-top: 0;
   width: 90%;
 }
+
+.oppia-unicode-form-mic-button {
+  height: 20px;
+  opacity: 0.7;
+  width: 20px;
+}
+.oppia-unicode-form-mic-button:hover {
+  cursor: pointer;
+  opacity: 1.0;
+}
