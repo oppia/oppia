@@ -5,6 +5,13 @@
   </div>
 
   <ul>
+    <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
+      <a href="/">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_home_black_48dp.png" class="oppia-sidebar-menu-icon">
+        Home
+      </a>
+    </li>
+
     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
       <a href="/about">
         <img src="/third_party/static/material-design-icons-1.0.1/ic_help_black_48dp.png" class="oppia-sidebar-menu-icon">
