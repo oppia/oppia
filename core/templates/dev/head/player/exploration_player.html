@@ -72,8 +72,8 @@
           </li>
         </ul>
       </li>
-      <li>
-        <a href="" tooltip="Feedback" tooltip-placement="bottom" popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+      <li popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+        <a href="" tooltip="Feedback" tooltip-placement="bottom">
           <span class="glyphicon glyphicon-comment"></span>
         </a>
       </li>
@@ -101,14 +101,7 @@
   {% include 'components/ratings.html' %}
 
   <script type="text/ng-template" id="popover/feedback">
-    <!--
-      TODO(sll): stateName is implicitly derived from the
-      parent scope. This is confusing and should be replaced
-      when UI Bootstrap v0.13.0 comes out (with support for
-      popover templates).
-    -->
-    <feedback-popup state-name="stateName">
-    </feedback-popup>
+    <feedback-popup></feedback-popup>
   </script>
 
   <script type="text/ng-template" id="components/feedback">
@@ -124,7 +117,8 @@
           </textarea>
         </div>
 
-        <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px;" ng-click="saveFeedback()" ng-disabled="!feedbackText">Submit</md-button>
+        <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
+        <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;" ng-click="saveFeedback()" ng-disabled="!feedbackText">Submit</md-button>
         <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
           <label>
             <input type="checkbox" ng-model="isSubmitterAnonymized">

@@ -572,16 +572,23 @@ oppia.controller('LearnerLocalNav', [
 }]);
 
 
+// This directive is unusual in that it should only be invoked indirectly, as
+// follows:
+//
+// <some-html-element popover-placement="bottom" popover-template="popover/feedback"
+//                    popover-trigger="click" state-name="<[STATE_NAME]>">
+// </some-html-element>
+//
+// The state-name argument is optional. If it is not provided, the feedback is
+// assumed to apply to the exploration as a whole.
 oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerService) {
   return {
     restrict: 'E',
-    scope: {
-      stateName: '&',
-    },
+    scope: {},
     templateUrl: 'components/feedback',
     controller: [
-        '$scope', '$element', '$http', '$timeout', 'focusService',
-        function($scope, $element, $http, $timeout, focusService) {
+        '$scope', '$element', '$http', '$timeout', 'focusService', 'warningsData',
+        function($scope, $element, $http, $timeout, focusService, warningsData) {
       $scope.feedbackText = '';
       $scope.isSubmitterAnonymized = false;
       $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
@@ -596,35 +603,17 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
       var feedbackUrl = (
         '/explorehandler/give_feedback/' + oppiaPlayerService.getExplorationId());
 
-      $scope.saveFeedback = function() {
-        if ($scope.feedbackText) {
-          $http.post(feedbackUrl, {
-            subject: '(Feedback from a learner)',
-            feedback: $scope.feedbackText,
-            include_author: !$scope.isSubmitterAnonymized && $scope.isLoggedIn,
-            state_name: $scope.stateName()
-          });
-        }
-
-        $scope.feedbackSubmitted = true;
-        $timeout(function() {
-          $scope.closePopover();
-        }, 2000);
-      };
-
-      $scope.closePopover = function() {
-        // TODO(sll): When UI Bootstrap v0.13.0 is released (with built-in support
-        // for popover templates), use that instead. See:
-        //
-        //     https://github.com/angular-ui/bootstrap/issues/220
-        //
-        // Until then, we'll need to trigger the popover close event manually. This
-        // is done by clicking on the same place that triggered its display.
-        // Since the popover DOM node is inserted as a sibling to that node, we
+      var getTriggerElt = function() {
+        // Find the popover trigger node (the one with a popover-template
+        // attribute). This is also the DOM node that contains the state name.
+        // Since the popover DOM node is inserted as a sibling to the node, we
         // therefore climb up the DOM tree until we find the top-level popover
-        // element, then move to its sibling node and trigger a click on it.
+        // element. The trigger will be one of its siblings.
+        //
+        // If the trigger element cannot be found, a value of undefined is
+        // returned. This could happen if the trigger is clicked while the
+        // feedback confirmation message is being displayed.
         var elt = $element;
-
         var popoverChildElt = null;
         for (var i = 0; i < 10; i++) {
           elt = elt.parent();
@@ -633,28 +622,57 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
             break;
           }
         }
-
         if (!popoverChildElt) {
-          warningsData.addWarning(
-            'Could not close popover element.');
+          console.log('Could not close popover element.');
+          return undefined;
         }
 
         var popoverElt = popoverChildElt.parent();
-
-        // Click on the popover trigger.
+        var triggerElt = null;
         var childElts = popoverElt.children();
         for (var i = 0; i < childElts.length; i++) {
           var childElt = $(childElts[i]);
           if (childElt.attr('popover-template')) {
-            // The timeout is needed to postpone the click event to
-            // the subsequent digest cycle. Otherwise, an "$apply already
-            // in progress" error is raised.
-            $timeout(function() {
-              childElt.trigger('click');
-            });
+            triggerElt = childElt;
             break;
           }
         }
+
+        if (!triggerElt) {
+          console.log('Could not find popover trigger.');
+          return undefined;
+        }
+
+        return triggerElt;
+      };
+
+      $scope.saveFeedback = function() {
+        if ($scope.feedbackText) {
+          $http.post(feedbackUrl, {
+            subject: '(Feedback from a learner)',
+            feedback: $scope.feedbackText,
+            include_author: !$scope.isSubmitterAnonymized && $scope.isLoggedIn,
+            state_name: getTriggerElt().attr('state-name')
+          });
+        }
+
+        $scope.feedbackSubmitted = true;
+        $timeout(function() {
+          var triggerElt = getTriggerElt();
+          if (triggerElt) {
+            triggerElt.trigger('click');
+          }
+        }, 2000);
+      };
+
+      $scope.closePopover = function() {
+        // Closing the popover is done by clicking on the popover trigger.
+        // The timeout is needed to postpone the click event to
+        // the subsequent digest cycle. Otherwise, an "$apply already
+        // in progress" error is raised.
+        $timeout(function() {
+          getTriggerElt().trigger('click');
+        });
       };
     }]
   };

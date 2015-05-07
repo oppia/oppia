@@ -1554,6 +1554,7 @@ div#ng-curtain {
   margin-left: 10px;
   opacity: 0.9;
   outline-color: transparent;
+  padding-top: 20px;
 }
 .oppia-navbar-menu:hover {
   opacity: 1;
@@ -1801,8 +1802,9 @@ div#ng-curtain {
 
 .oppia-page-cards-container {
   margin: auto;
-  max-width: 660px;
+  max-width: 95%;
   position: relative;
+  width: 660px;
 }
 .oppia-page-card {
   background: rgb(255,255,255);
