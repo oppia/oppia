@@ -12,8 +12,9 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 4
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Code REPL:
     content:
@@ -186,9 +187,9 @@ states:
   Network Graph:
     content:
     - type: text
-      value: Do the following step by step:<br><br>1. Delete Node labelled B<span
-        class=""></span><div>2. Add Node labelled Z</div><div>3. Add Edge of weight
-        150 connecting A to Z</div><div>4. Delete Edge between A and F</div>
+      value: Do the following step by step:<br><br>1. Delete Node labelled B<span></span><div>2.
+        Add Node labelled Z</div><div>3. Add Edge of weight 150 connecting A to Z</div><div>4.
+        Delete Edge between A and F</div>
     interaction:
       customization_args:
         canAddEdge:
@@ -412,3 +413,4 @@ states:
           param_changes: []
       id: InteractiveMap
     param_changes: []
+tags: []

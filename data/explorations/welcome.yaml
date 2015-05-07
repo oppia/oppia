@@ -6,15 +6,15 @@ language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Estimate 100:
     content:
     - type: text
       value: What is 10 times 10?
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -36,8 +36,8 @@ states:
           - No; try again. Remember, multiplication by ten can be done by just adding
             a zero at the end.
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Finding Helsinki:
     content:
     - type: text
@@ -46,8 +46,7 @@ states:
         Oppia!<div><br>Where would people say the word 'Oppia'? Well, in Finland,
         and probably in its capital, Helsinki. Can you find Helsinki on a map of the
         world?</div>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         latitude:
           value: 60.1708
@@ -93,16 +92,15 @@ states:
           feedback:
           - That is rather far away! Try zooming into Finland.
           param_changes: []
-      sticky: true
-      widget_id: InteractiveMap
+      id: InteractiveMap
+    param_changes: []
   Numeric input:
     content:
     - type: text
       value: "<div>Let\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
         ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>?</div><div><br></div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -167,8 +165,8 @@ states:
           - If you got here, something's gone a bit wrong with this exploration. Sorry
             about that. If you're wondering, the answer is 121.
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Things you can do:
     content:
     - type: text
@@ -182,9 +180,10 @@ states:
         using Oppia. If you have feedback, let us know! You can find our discussion
         forum at&nbsp;<oppia-noninteractive-link open_link_in_same_window-with-value=""
         url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>.</div>
-    param_changes: []
-    widget:
-      customization_args: {}
+    interaction:
+      customization_args:
+        buttonText:
+          value: Continue
       handlers:
       - name: submit
         rule_specs:
@@ -193,18 +192,17 @@ states:
           dest: END
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: Continue
+      id: Continue
+    param_changes: []
   Welcome!:
     content:
     - type: text
-      value: <div>Hi, welcome to Oppia!</div><div><br></div><div><span>Oppia is a
-        tool that helps you create interactive learning activities that can be continually
-        improved over time. You can find more information at&nbsp;</span><oppia-noninteractive-link
-        open_link_in_same_window-with-value="true" url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link>.</div><div><br></div><div>But
-        first, do you know where the name 'Oppia' comes from?</div>
-    param_changes: []
-    widget:
+      value: Hi, welcome to Oppia!<br><br>Oppia is a tool that helps you create interactive
+        learning activities that can be continually improved over time. You can find
+        more information at <oppia-noninteractive-link open_link_in_same_window-with-value="true"
+        url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link>.<br><br>But
+        first, do you know where the name 'Oppia' comes from?<br><br>
+    interaction:
       customization_args:
         choices:
           value:
@@ -242,16 +240,26 @@ states:
           - Hm, it certainly looks like it! But it's actually a word from a different
             language.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   What language:
     content:
     - type: text
       value: In fact, the word Oppia means 'learn'. Can you guess which language it
-        comes from?
-    param_changes: []
-    widget:
-      customization_args: {}
+        comes from?<br><br><oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:&amp;quot;Here
+        are some hints. The first hint narrows down the continent, the second tells
+        you the geographical region, and the last gives away the answer.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hints&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;This
+        language is spoken in a European country.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
+        1&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;This country is located
+        in Northern Europe.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
+        2&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;Oppia is a Finnish word.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
+        3&amp;quot;}]"></oppia-noninteractive-tabs><br>
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -401,6 +409,42 @@ states:
             is a question that takes numeric input:'
           param_changes: []
         - definition:
+            inputs:
+              x: Finland
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: What language
+          feedback:
+          - Finland is a country. But what language do they speak there?<br>
+          - That's very close! But we're looking for a language rather than the name
+            of a country.<br>
+          param_changes: []
+        - definition:
+            inputs:
+              x: Norway
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: What language
+          feedback:
+          - You're close! Try heading east...<br>
+          - It is indeed a Nordic language, but one a little different to Norwegian.<br>
+          param_changes: []
+        - definition:
+            inputs:
+              x: Sweden
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: What language
+          feedback:
+          - <span><span><span>That's not it, alas. But you're very close! Oppia is
+            indeed a Nordic word, but it's not from Sweden.</span></span></span>
+          - Try a little further East.... And remember we're looking for a language
+            rather than the name of a country.<br>
+          param_changes: []
+        - definition:
             rule_type: default
           dest: What language
           feedback:
@@ -410,5 +454,6 @@ states:
           - Sorry, nope, we didn't get it from {{answer}}. Here's a hint, though.
             It's a European language you're looking for.
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
+tags: []

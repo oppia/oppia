@@ -179,22 +179,19 @@
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to publish an exploration!
+          Congratulations, you're about to publish an exploration!
         </p>
         <p>
-          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/about#publication-criteria" target="_blank">why?</a>):
+          Before publishing, please ensure that your exploration fits the
+          <a href="/about#publication-criteria" target="_blank">site publication criteria</a>. In particular, it should:
           <ul>
-            <li>It should help its intended audience learn something new.</li>
-            <li>It should convey more than a single isolated factoid.</li>
-            <li>It should provide useful feedback and guidance to help the learner.</li>
-            <li>It should not substantially duplicate existing explorations.</li>
+            <li>help its intended audience learn something new</li>
+            <li>provide useful feedback/guidance to help them if they get stuck.</li>
           </ul>
         </p>
         <p>
-          You can read more about these criteria on the
-          <a href="/about#publication-criteria" target="_blank">About page</a>.
-          If your exploration meets them all, please feel free to publish it so that others
-          can learn from and improve it!
+          Once the exploration is published, it will be available in the gallery for anyone to learn from and provide feedback. You can also check out
+            its stats by clicking on the Stats tab in the top right of the editor.
         </p>
       </div>
 
@@ -223,11 +220,14 @@
 
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">
-        <h3>Save Exploration</h3>
+        <h3>
+          <span ng-if="isExplorationPrivate">Save Draft</span>
+          <span ng-if="!isExplorationPrivate">Publish Changes</span>
+        </h3>
       </div>
       <div class="modal-body">
         <p>
-          <span ng-if="commitMessageIsOptional">(Optional)</span>
+          <span ng-if="isExplorationPrivate">(Optional)</span>
           Please enter a brief description of what you have changed:
           <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input"></textarea>
         </p>
@@ -271,7 +271,10 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success protractor-test-close-save-modal" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
+        <button class="btn btn-success protractor-test-close-save-modal" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="save(commitMessage)">
+          <span ng-if="isExplorationPrivate">Save Draft</span>
+          <span ng-if="!isExplorationPrivate">Publish Changes</span>
+        </button>
       </div>
     </script>
 

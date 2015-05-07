@@ -13,24 +13,32 @@
     height: 60vh;
   }
 </style>
-<div ng-controller="ExplorationHistory">
+<div ng-controller="ExplorationHistory" class="container-fluid" style="word-wrap: break-word;">
   <md-card class="oppia-editor-card">
     <h3>List of Changes</h3>
-    <div ng-repeat="versionNumber in snapshotOrderArray">
-      <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')" class='protractor-test-history-v1-selector'>
-      <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')" class='protractor-test-history-v2-selector'>
-      [<[versionNumber]>]
-      <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
-      <[explorationVersionMetadata[versionNumber].commitMessage]>
-      <span class="pull-right">
-        <em><[explorationVersionMetadata[versionNumber].createdOn]></em>
-        <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
-          | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
-        </span>
+    <div ng-repeat="versionNumber in snapshotOrderArray" class="row">
+      <div class="col-sm-2 col-md-2 col-lg-2">
+        <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')" class='protractor-test-history-v1-selector'>
+        <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')" class='protractor-test-history-v2-selector'>
+        [<[versionNumber]>]
+      </div>
+      <div class="col-sm-2 col-md-2 col-lg-2">
+        <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <[explorationVersionMetadata[versionNumber].commitMessage]>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
         <span>
-          | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
+          <em><[getLocaleAbbreviatedDatetimeString(explorationVersionMetadata[versionNumber].createdOn)]></em>
+          <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
+          </span>
+          <span>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
+          </span>
         </span>
-      </span>
+      </div>
     </div>
 
     <br>

@@ -21,10 +21,10 @@
 oppia.controller('ExplorationHistory', [
     '$scope', '$http', '$rootScope', '$location', '$log', '$modal',
     'explorationData', 'versionsTreeService', 'compareVersionsService',
-    'graphDataService', function(
+    'graphDataService', 'oppiaDatetimeFormatter', function(
     $scope, $http, $rootScope, $location, $log, $modal,
     explorationData, versionsTreeService, compareVersionsService,
-    graphDataService) {
+    graphDataService, oppiaDatetimeFormatter) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl =
       '/createhandler/snapshots/' + $scope.explorationId;
@@ -415,6 +415,10 @@ oppia.controller('ExplorationHistory', [
         location.reload();
       });
     });
+  };
+
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 }]);
 

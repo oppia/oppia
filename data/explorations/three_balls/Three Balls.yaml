@@ -4,12 +4,18 @@ default_skin: conversation_v1
 init_state_name: Intro
 language_code: en
 objective: learn how to count permutations accurately and systematically
-param_changes: []
+param_changes:
+- customization_args:
+    parse_with_jinja: true
+    value: '-1'
+  generator_id: Copier
+  name: guess
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Continue Option:
     content:
@@ -17,8 +23,7 @@ states:
       value: Wow, you got through that really fast!<div><br></div><div>Would you like
         to play around with the problem a bit more, and see how this exploration would
         have presented the material if you didn't figure it out yourself?</div>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -53,8 +58,8 @@ states:
           feedback:
           - This will never get hit and this message should not be necessary.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Final challenge:
     content:
     - type: text
@@ -62,8 +67,7 @@ states:
         out how many ways there are to arrange four balls in a row? Listing all the
         possibilities by hand is going to be tedious, but, by now, you''ve learned
         at least one way to calculate this number quickly and accurately.'
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -179,15 +183,14 @@ states:
             been developing, so that you can get the answer with just one multiplication
             :-)
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Found all the ways:
     content:
     - type: text
       value: So, you've found that there are six ways to arrange these three balls.<br><br>Is
         that the same as your first guess?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -222,8 +225,8 @@ states:
           dest: Introspection
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   General Theory:
     content:
     - type: text
@@ -247,8 +250,7 @@ states:
         this works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,
         can you write out a similar expression for F2, in terms of F1? Then we''ll
         move on to figuring out F4, which starts to become hard to compute manually.</div>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -326,8 +328,8 @@ states:
             ball, and F1 ways to pick the second one. This all works out because F1
             = 1, so F2 = 2 * 1 = 2.
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Guess a generalization:
     content:
     - type: text
@@ -339,8 +341,7 @@ states:
         works for 3 balls; we can figure out exactly why later.<br><br>Do you believe
         this reasoning? Do you agree that there are exactly 8 ways to arrange four
         balls of different colours in a line?'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -366,8 +367,8 @@ states:
           dest: Two balls
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Intro:
     content:
     - type: text
@@ -378,8 +379,7 @@ states:
         doing this with the line stretching from left to right in front of you.<br><br>How
         many different ways can you find to arrange the three balls in a straight
         line? Try to determine all of them.<br>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -411,25 +411,22 @@ states:
           dest: Not 6
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Introspection:
     content:
     - type: text
-      value: "Can you think a little bit about why your answer was different from\
-        \ six? Did you count a particular arrangement twice, or did you miss one?<br><br>Making\
-        \ sure that you've counted everything can be tricky! Two common mistakes are\
-        \ counting one thing twice, and forgetting to count some of the things. These\
-        \ can be overcome by counting systematically and doing sanity checks.<br><br>In\
-        \ the next few explorations, we'll explore what it means to count systematically,\
-        \ and we'll talk a little about sanity checks. But why don't you try and discover\
-        \ some of these for yourself? Take\_a couple of minutes, and think a bit about\
-        \ some checks you can make to ensure that you don't overcount or undercount\
-        \ things, or a systematic way that you could have used to count the balls.\
-        \ Write these down here -- you will probably want to refer to them in a future\
-        \ exercise, and we'll show your jottings to you again at that point."
-    param_changes: []
-    widget:
+      value: Can you think a little bit about why your answer was different from six?
+        Did you count a particular arrangement twice, or did you miss one?<br><br>Making
+        sure that you've counted everything can be tricky! Two common mistakes are
+        counting one thing twice, and forgetting to count some of the things. These
+        can be overcome by counting systematically and doing sanity checks.<br><br>Let's
+        think about these things for a bit. Take a couple of minutes, and think
+        a bit about some checks you can make to ensure that you don't overcount or
+        undercount things, or a systematic way that you could have used to count the
+        balls. Write these down here -- you will probably want to refer to them in
+        a future exercise, and we'll show your jottings to you again at that point.
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -453,24 +450,18 @@ states:
           dest: Guess a generalization
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Not 6:
     content:
     - type: text
-      value: OK, you found {{guess}} ways to do this. I'd be interested in seeing
+      value: OK, you found {{answer}} ways to do this. I'd be interested in seeing
         what you came up with; could you list the different ways?&nbsp;Write them
         as three-character words, for example:<br><br><span>&nbsp; &nbsp; &nbsp;RBY<br></span><br>Means
         put the red ball on the left, the blue ball in the middle, and the yellow
         ball on the right, like this:<div><oppia-noninteractive-image filepath-with-value="&amp;quot;RBY.png&amp;quot;"></oppia-noninteractive-image><br></div><div>Can
         you list all the ways you found?<br><br>&nbsp; &nbsp;&nbsp;</div>
-    param_changes:
-    - customization_args:
-        parse_with_jinja: true
-        value: '{{if guess>0 then guess else answer}}'
-      generator_id: Copier
-      name: guess
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -571,10 +562,16 @@ states:
             rule_type: default
           dest: Not 6
           feedback:
-          - That does not look right; try again?
+          - (Whoops! If you got here, this is a bug. Please leave some feedback and
+            we'll fix it.)<br>
           param_changes: []
-      sticky: true
-      widget_id: SetInput
+      id: SetInput
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{if guess != -1 then guess else answer}}'
+      generator_id: Copier
+      name: guess
   Two balls:
     content:
     - type: text
@@ -585,8 +582,7 @@ states:
         way to arrange one ball in a line.<br><br>How about 2 balls? How many ways
         are there to arrange two balls, with different colours, in a line?<div><oppia-noninteractive-image
         filepath-with-value="&amp;quot;2balls.png&amp;quot;"></oppia-noninteractive-image><br></div>
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -654,14 +650,13 @@ states:
           - I think you may have counted something too many times. Try to remember
             the systematic approach you came up with earlier, and use it here...
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   correct but why:
     content:
     - type: text
       value: Right! Why do you think it is 6?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -718,7 +713,7 @@ states:
             name: Contains
             rule_type: atomic
             subject: answer
-          dest: correct but why
+          dest: END
           feedback:
           - "<span> <span><span>Yes,\n the question is asking for the number of permutations\
             \ of 3 different \nballs, and that is 3! (3 factorial), or 3 x 2 x 1.\
@@ -732,7 +727,7 @@ states:
             name: Contains
             rule_type: atomic
             subject: answer
-          dest: correct but why
+          dest: END
           feedback:
           - "<span> <span><span>Yes,\n the question is asking for the number of permutations\
             \ of 3 different \nballs, and that is 3! (3 factorial), or 3 x 2 x 1.\
@@ -753,5 +748,6 @@ states:
             on the Internet, you''ll also be able to find more information about this
             topic.'
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
+tags: []
