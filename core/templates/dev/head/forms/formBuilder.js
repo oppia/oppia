@@ -965,8 +965,8 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
-oppia.directive('textAngularRte', ['taApplyCustomRenderers', '$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
-  function(taApplyCustomRenderers, $filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
+oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+  function($filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
   return {
     restrict: 'E',
     scope: {
@@ -1051,25 +1051,14 @@ oppia.directive('textAngularRte', ['taApplyCustomRenderers', '$filter', 'oppiaHt
         return elt.html();
       };
 
-      var replaceWithPlaceholder = function(raw){
-        var converted;
-        var openingTag = /<iframe/g;
-        var closingTag = /><\/iframe>/g;
-        var srcAttr = /src="[^\s]*"/g;
-        converted = raw.replace(openingTag, '<img');
-        converted = converted.replace(closingTag, '/>');
-        converted = converted.replace(srcAttr, 'src=""');
-        return converted;
-      };
-
       $scope.init = function(){
-        $scope.tempContent = convertHtmlToRte(replaceWithPlaceholder($scope.htmlContent));
+        $scope.tempContent = convertHtmlToRte($scope.htmlContent);
       };
 
       $scope.init();
 
       $scope.$watch(function(){return $scope.tempContent}, function(newVal, oldVal){
-        $scope.htmlContent = convertRteToHtml(taApplyCustomRenderers(newVal));
+        $scope.htmlContent = convertRteToHtml(newVal);
       });
     }],
   };
