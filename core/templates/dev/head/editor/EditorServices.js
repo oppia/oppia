@@ -1320,7 +1320,8 @@ oppia.factory('explorationWarningsService', [
           _warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'Please make sure there\'s a path to END from ' +
+              'Please make sure there\'s a way to complete ' +
+              'the exploration starting from ' +
               deadEndStatesString + '.')
           });
         }
