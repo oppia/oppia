@@ -158,7 +158,7 @@ describe('RTE directive', function() {
       }
     });
 
-    elm = $compile('<rich-text-editor></rich-text-editor>')($rootScope);
+    elm = $compile('<text-angular-rte></text-angular-rte>')($rootScope);
     scope = $rootScope;
     scope.$digest();
   }));
@@ -186,9 +186,9 @@ describe('RTE directive', function() {
     }];
 
     for (var i = 0; i < testData.length; i++) {
-      expect(rteControllerScope._convertHtmlToRte(testData[i][0]))
+      expect(rteControllerScope.convertHtmlToRte(testData[i][0]))
         .toEqual(testData[i][1]);
-      expect(rteControllerScope._convertRteToHtml(testData[i][1]))
+      expect(rteControllerScope.convertRteToHtml(testData[i][1]))
         .toEqual(testData[i][0]);
     }
   }));
