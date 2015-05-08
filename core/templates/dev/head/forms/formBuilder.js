@@ -173,6 +173,7 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
 }]);
 
 
+// TODO(sll): This whole directive needs to be rewritten to not rely on jWysiwyg.
 oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData', function($modal, $log, warningsData) {
   return {
     restrict: 'E',
@@ -188,8 +189,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       '  </span>' +
       '</div>'),
     controller: [
-        '$scope', '$element', '$attrs', '$filter', '$timeout',
-        function($scope, $element, $attrs, $filter, $timeout) {
+        '$scope', '$element', '$filter', '$timeout',
+        function($scope, $element, $filter, $timeout) {
       if (!$scope.allowedParameterNames().length) {
         console.error(
           'The unicode-with-parameters editor should not be used if there ' +
@@ -490,295 +491,6 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
 }]);
 
 
-
-// Directive for the rich text editor component.
-oppia.directive('richTextEditor', [
-  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
-  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
-    return {
-      restrict: 'E',
-      scope: {
-        htmlContent: '=',
-        disallowOppiaRteComponents: '@',
-        // Optional string; allowed values are 'small' or 'large'.
-        size: '@'
-      },
-      template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.disallowOppiaRteComponents = (
-          $scope.disallowOppiaRteComponents || false);
-
-        var rteNode = $element[0].firstChild;
-        // A pointer to the editorDoc in the RTE iframe. Populated when the RTE is
-        // initialized.
-        $scope.editorDoc = null;
-
-        // Creates a dict.
-        $scope._createCustomizationArgDictFromAttrs = function(attrs) {
-          var customizationArgsDict = {};
-          for (var i = 0; i < attrs.length; i++) {
-            var attr = attrs[i];
-            if (attr.name == 'class' || attr.name == 'src') {
-              continue;
-            }
-            var separatorLocation = attr.name.indexOf('-with-value');
-            if (separatorLocation === -1) {
-              $log.error('RTE Error: invalid customization attribute ' + attr.name);
-              continue;
-            }
-            var argName = attr.name.substring(0, separatorLocation);
-            customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
-          }
-          return customizationArgsDict;
-        };
-
-        $scope._createRteElement = function(componentDefn, customizationArgsDict) {
-          var el = $('<img/>');
-          el.attr('src', componentDefn.iconDataUrl);
-          el.addClass('oppia-noninteractive-' + componentDefn.name);
-
-          for (var attrName in customizationArgsDict) {
-            el.attr(
-              $filter('camelCaseToHyphens')(attrName) + '-with-value',
-              oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
-          }
-
-          var domNode = el.get(0);
-          // This dblclick handler is stripped in the initial HTML --> RTE conversion,
-          // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
-          domNode.ondblclick = function() {
-            el.addClass('insertionPoint');
-            $scope.openRteCustomizationModal(componentDefn, customizationArgsDict);
-          };
-
-          return domNode;
-        };
-
-        // Replace <oppia-noninteractive> tags with <img> tags.
-        $scope._convertHtmlToRte = function(html) {
-          var elt = $('<div>' + html + '</div>');
-
-          $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-            elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-              return $scope._createRteElement(
-                componentDefn, $scope._createCustomizationArgDictFromAttrs(this.attributes));
-            });
-          });
-
-          return elt.html();
-        };
-
-        // Replace <img> tags with <oppia-noninteractive> tags.
-        $scope._convertRteToHtml = function(rte) {
-          var elt = $('<div>' + rte + '</div>');
-
-          $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-            elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-              var jQueryElt = $('<' + this.className + '/>');
-              for (var i = 0; i < this.attributes.length; i++) {
-                var attr = this.attributes[i];
-                if (attr.name !== 'class' && attr.name !== 'src') {
-                  jQueryElt.attr(attr.name, attr.value);
-                }
-              }
-              return jQueryElt.get(0);
-            });
-          });
-
-          return elt.html();
-        };
-
-        $scope.openRteCustomizationModal = function(componentDefn, attrsCustomizationArgsDict) {
-          $modal.open({
-            templateUrl: 'modals/customizeRteComponent',
-            backdrop: true,
-            resolve: {
-              customizationArgSpecs: function() {
-                return componentDefn.customization_arg_specs;
-              },
-              attrsCustomizationArgsDict: function() {
-                return attrsCustomizationArgsDict;
-              }
-            },
-            controller: [
-              '$scope', '$modalInstance', 'customizationArgSpecs', 'attrsCustomizationArgsDict',
-              function($scope, $modalInstance, customizationArgSpecs, attrsCustomizationArgsDict) {
-                $scope.customizationArgSpecs = customizationArgSpecs;
-
-                $scope.tmpCustomizationArgs = [];
-                for (var i = 0; i < customizationArgSpecs.length; i++) {
-                  var caName = customizationArgSpecs[i].name;
-                  $scope.tmpCustomizationArgs.push({
-                    name: caName,
-                    value: (
-                      attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                      attrsCustomizationArgsDict[caName] :
-                      customizationArgSpecs[i].default_value)
-                  });
-                }
-
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
-
-                $scope.save = function(customizationArgs) {
-                  $scope.$broadcast('externalSave');
-
-                  var customizationArgsDict = {};
-                  for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                    var caName = $scope.tmpCustomizationArgs[i].name;
-                    customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
-                  }
-
-                  $modalInstance.close(customizationArgsDict);
-                };
-              }
-            ]
-          }).result.then(function(customizationArgsDict) {
-            var el = $scope._createRteElement(componentDefn, customizationArgsDict);
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            insertionPoint.parentNode.replaceChild(el, insertionPoint);
-            $(rteNode).wysiwyg('save');
-          }, function () {
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            insertionPoint.className = insertionPoint.className.replace(/\binsertionPoint\b/, '');
-          });
-        };
-
-        $scope.currentlyEditing = false;
-        $scope.$watch('htmlContent', function(newValue, oldValue) {
-          if ($scope.hasFullyLoaded && !$scope.currentlyEditing) {
-            // This is an external change.
-            console.log($scope.htmlContent);
-            $scope.rteContent = $scope._convertHtmlToRte(newValue);
-            $(rteNode).wysiwyg('setContent', $scope.rteContent);
-          }
-        });
-
-        $scope._saveContent = function() {
-          var content = $(rteNode).wysiwyg('getContent');
-          if (content !== null && content !== undefined) {
-            // The following $timeout removes the '$apply in progress' errors.
-            $timeout(function() {
-              $scope.$apply(function() {
-                $scope.currentlyEditing = true;
-                $scope.htmlContent = $scope._convertRteToHtml(content);
-                // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
-                $timeout(function() {
-                  $scope.currentlyEditing = false;
-                }, 50);
-              });
-            });
-          }
-        };
-
-        $scope.$on('externalSave', function() {
-          $scope._saveContent();
-        });
-
-        $scope.hasFullyLoaded = false;
-
-        $scope.init = function() {
-          $scope._RICH_TEXT_COMPONENTS = [];
-          if (!$scope.disallowOppiaRteComponents) {
-            var componentIds = Object.keys(RTE_COMPONENT_SPECS);
-            componentIds.sort().forEach(function(componentId) {
-              RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
-              RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
-              RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
-              $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
-            });
-          }
-
-          $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
-
-          var sizeClass = (
-            $scope.size == 'small' ? ' wysiwyg-content-small' :
-            $scope.size == 'large' ? ' wysiwyg-content-large' :
-            '');
-
-          // This is needed for tests, otherwise $(rteNode).wysiwyg is undefined.
-          $timeout(function() {
-            $(rteNode).wysiwyg({
-              autoGrow: true,
-              autoSave: true,
-              controls: {
-                bold: {groupIndex: 2, visible: true},
-                italic: {groupIndex: 2, visible: true},
-                underline: {groupIndex: 2, visible: true},
-                undo: {groupIndex: 2, visible: true},
-                redo: {groupIndex: 2, visible: true},
-                indent: {groupIndex: 2, visible: true},
-                outdent: {groupIndex: 2, visible: true},
-                insertOrderedList: {groupIndex: 2, visible: true},
-                insertUnorderedList: {groupIndex: 2, visible: true},
-                insertHorizontalRule: {groupIndex: 2, visible: true},
-                insertTable: {groupIndex: 2, visible: true},
-                code: {groupIndex: 2, visible: true},
-                removeFormat: {groupIndex: 2, visible: true}
-              },
-              css: '/css/rte_multiline.css',
-              debug: true,
-              events: {
-                save: function(event) {
-                  $scope._saveContent();
-                }
-              },
-              iFrameClass: 'wysiwyg-content' + sizeClass,
-              initialContent: $scope.rteContent,
-              resizeOptions: true,
-              rmUnusedControls: true
-            });
-
-            // Add controls for the additional components to the RTE.
-            $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-              $(rteNode).wysiwyg('addControl', componentDefn.name, {
-                groupIndex: 1,
-                icon: componentDefn.iconDataUrl,
-                tooltip: componentDefn.tooltip,
-                tags: [],
-                visible: true,
-                exec: function() {
-                  $(rteNode).wysiwyg(
-                      'insertHtml', '<span class="insertionPoint"></span>');
-                  $scope.openRteCustomizationModal(componentDefn, {});
-                }
-              });
-            });
-
-            $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
-
-            // Add dblclick handlers to the various nodes.
-            $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-              var elts = Array.prototype.slice.call(
-                $scope.editorDoc.querySelectorAll(
-                  '.oppia-noninteractive-' + componentDefn.name));
-              elts.forEach(function(elt) {
-                elt.ondblclick = function() {
-                  this.className += ' insertionPoint';
-                  $scope.openRteCustomizationModal(
-                    componentDefn,
-                    $scope._createCustomizationArgDictFromAttrs(this.attributes)
-                  );
-                };
-              });
-            });
-
-            // Disable jquery.ui.dialog so that the link control works correctly.
-            $.fn.dialog = null;
-
-            $(rteNode).wysiwyg('focus');
-            $scope.hasFullyLoaded = true;
-          });
-        };
-
-        $scope.init();
-      }]
-    };
-  }
-]);
-
-
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
@@ -795,6 +507,7 @@ oppia.config(['$provide', function($provide) {
 
     var _RICH_TEXT_COMPONENTS = [];
 
+    // Returns a DOM node.
     var createRteElement = function(componentDefn, customizationArgsDict) {
       var el = $('<img/>');
       el.attr('src', componentDefn.iconDataUrl);
@@ -806,8 +519,7 @@ oppia.config(['$provide', function($provide) {
           oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
       }
 
-      var domNode = el.get(0);
-      return domNode;
+      return el.get(0);
     };
 
     var createCustomizationArgDictFromAttrs = function(attrs) {
@@ -828,17 +540,55 @@ oppia.config(['$provide', function($provide) {
       return customizationArgsDict;
     };
 
-    var componentIds = Object.keys(RTE_COMPONENT_SPECS);
-    componentIds.sort().forEach(function(componentId) {
+    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
       RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
       RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
       RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
       _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
     });
 
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback) {
+      $modal.open({
+        templateUrl: 'modals/customizeRteComponent',
+        backdrop: 'static',
+        resolve: {},
+        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.customizationArgSpecs = customizationArgSpecs;
+
+          $scope.tmpCustomizationArgs = [];
+          for (var i = 0; i < customizationArgSpecs.length; i++) {
+            var caName = customizationArgSpecs[i].name;
+            $scope.tmpCustomizationArgs.push({
+              name: caName,
+              value: (
+                attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                attrsCustomizationArgsDict[caName] :
+                customizationArgSpecs[i].default_value)
+            });
+          }
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+
+          $scope.save = function(customizationArgs) {
+            $scope.$broadcast('externalSave');
+
+            var customizationArgsDict = {};
+            for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+              var caName = $scope.tmpCustomizationArgs[i].name;
+              customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
+            }
+
+            $modalInstance.close(customizationArgsDict);
+          };
+        }]
+      }).result.then(onSubmitCallback);
+    }
+
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       var buttonDisplay = createRteElement(componentDefn, {});
-      var onlyWithAttrs = 'oppia-noninteractive-' + componentDefn.frontend_name;
+
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
         onElementSelect: {
@@ -848,113 +598,34 @@ oppia.config(['$provide', function($provide) {
           },
           action: function(event, $element, editorScope) {
             event.preventDefault();
-
             var textAngular = this;
 
-            $modal.open({
-              templateUrl: 'modals/customizeRteComponent',
-              backdrop: 'static',
-              resolve: {
-                customizationArgSpecs: function() {
-                  return componentDefn.customization_arg_specs;
-                }
-              },
-              controller: ['$scope', '$modalInstance', 'customizationArgSpecs',
-                           function($scope, $modalInstance, customizationArgSpecs) {
-                var attrsCustomizationArgsDict = createCustomizationArgDictFromAttrs(
-                  $element[0].attributes);
-
-                $scope.customizationArgSpecs = customizationArgSpecs;
-
-                $scope.tmpCustomizationArgs = [];
-                for (var i = 0; i < customizationArgSpecs.length; i++) {
-                  var caName = customizationArgSpecs[i].name;
-                  $scope.tmpCustomizationArgs.push({
-                    name: caName,
-                    value: (
-                      attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                      attrsCustomizationArgsDict[caName] :
-                      customizationArgSpecs[i].default_value)
-                  });
-                }
-
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
-
-                $scope.save = function(customizationArgs) {
-                  $scope.$broadcast('externalSave');
-
-                  var customizationArgsDict = {};
-                  for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                    var caName = $scope.tmpCustomizationArgs[i].name;
-                    customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
-                  }
-
-                  $modalInstance.close(customizationArgsDict);
-                };
-              }]
-            }).result.then(function(customizationArgsDict) {
-              var el = createRteElement(componentDefn, customizationArgsDict);
-              $element[0].parentNode.replaceChild(el, $element[0]);
-              textAngular.$editor().updateTaBindtaTextElement();
-            });
+            _openCustomizationModal(
+              componentDefn.customization_arg_specs,
+              createCustomizationArgDictFromAttrs($element[0].attributes),
+              function(customizationArgsDict) {
+                var el = createRteElement(componentDefn, customizationArgsDict);
+                $element[0].parentNode.replaceChild(el, $element[0]);
+                textAngular.$editor().updateTaBindtaTextElement();
+              });
 
             return false;
           }
         },
         action: function() {
           var textAngular = this;
-          textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>')
-          $modal.open({
-            templateUrl: 'modals/customizeRteComponent',
-            backdrop: 'static',
-            resolve: {
-              customizationArgSpecs: function() {
-                return componentDefn.customization_arg_specs;
-              }
-            },
-            controller: ['$scope', '$modalInstance', 'customizationArgSpecs',
-                         function($scope, $modalInstance, customizationArgSpecs) {
-              var attrsCustomizationArgsDict = {};
+          textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>');
 
-              $scope.customizationArgSpecs = customizationArgSpecs;
-
-              $scope.tmpCustomizationArgs = [];
-              for (var i = 0; i < customizationArgSpecs.length; i++) {
-                var caName = customizationArgSpecs[i].name;
-                $scope.tmpCustomizationArgs.push({
-                  name: caName,
-                  value: (
-                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                    attrsCustomizationArgsDict[caName] :
-                    customizationArgSpecs[i].default_value)
-                });
-              }
-
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-              };
-
-              $scope.save = function(customizationArgs) {
-                $scope.$broadcast('externalSave');
-
-                var customizationArgsDict = {};
-                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                  var caName = $scope.tmpCustomizationArgs[i].name;
-                  customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
-                }
-
-                $modalInstance.close(customizationArgsDict);
-              };
-            }]
-          }).result.then(function(customizationArgsDict) {
-            var el = createRteElement(componentDefn, customizationArgsDict);
-            var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
-            var parent = insertionPoint.parentNode;
-            parent.replaceChild(el, insertionPoint);
-            textAngular.$editor().updateTaBindtaTextElement();
-          });
+          _openCustomizationModal(
+            componentDefn.customization_arg_specs,
+            {},
+            function(customizationArgsDict) {
+              var el = createRteElement(componentDefn, customizationArgsDict);
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              var parent = insertionPoint.parentNode;
+              parent.replaceChild(el, insertionPoint);
+              textAngular.$editor().updateTaBindtaTextElement();
+            });
         }
       });
 
@@ -971,19 +642,22 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     restrict: 'E',
     scope: {
       htmlContent: '=',
+      // TODO(sll): Make this functional. It is currently not used.
+      disallowOppiaRteComponents: '@',
+      // Optional string; allowed values are 'small' or 'large'. Currently not used.
+      // TODO(sll): Make this functional, or remove it.
+      size: '@'
     },
     template: '<div text-angular="" ng-model="tempContent">',
-    controller: ['$scope', '$element', '$attrs', '$log', function($scope, $element, $attrs, $log) {
-      var _RICH_TEXT_COMPONENTS = [];
-      var componentIds = Object.keys(RTE_COMPONENT_SPECS);
-      componentIds.sort().forEach(function(componentId) {
+    controller: ['$scope', '$log', function($scope, $log) {
+      $scope._RICH_TEXT_COMPONENTS = [];
+      Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
         RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
         RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
         RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
-        _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+        $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
       });
 
-      // Creates a dict.
       var createCustomizationArgDictFromAttrs = function(attrs) {
         var customizationArgsDict = {};
         for (var i = 0; i < attrs.length; i++) {
@@ -1003,13 +677,13 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       };
 
       // Replace <oppia-noninteractive> tags with <img> tags.
-      var convertHtmlToRte = function(html) {
+      $scope.convertHtmlToRte = function(html) {
         var elt = $('<div>' + html + '</div>');
 
-        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
             return createRteElement(
-            componentDefn, createCustomizationArgDictFromAttrs(this.attributes));
+              componentDefn, createCustomizationArgDictFromAttrs(this.attributes));
           });
         });
 
@@ -1032,10 +706,10 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       };
 
       // Replace <img> tags with <oppia-noninteractive> tags.
-      var convertRteToHtml = function(rte) {
+      $scope.convertRteToHtml = function(rte) {
         var elt = $('<div>' + rte + '</div>');
 
-        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
             var jQueryElt = $('<' + this.className + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
@@ -1052,18 +726,17 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       };
 
       $scope.init = function(){
-        $scope.tempContent = convertHtmlToRte($scope.htmlContent);
+        $scope.tempContent = $scope.convertHtmlToRte($scope.htmlContent);
       };
 
       $scope.init();
 
-      $scope.$watch(function(){return $scope.tempContent}, function(newVal, oldVal){
-        $scope.htmlContent = convertRteToHtml(newVal);
+      $scope.$watch(function() {return $scope.tempContent}, function(newVal, oldVal) {
+        $scope.htmlContent = $scope.convertRteToHtml(newVal);
       });
     }],
   };
 }]);
-
 
 
 // The names of these filters must correspond to the names of the backend

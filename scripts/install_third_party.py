@@ -283,12 +283,6 @@ SELECT2_ZIP_URL = (
 SELECT2_ZIP_ROOT_NAME = 'select2-%s' % SELECT2_REV
 SELECT2_TARGET_ROOT_NAME = 'select2-%s' % SELECT2_REV
 
-JWYSIWYG_REV = '496497b0772067a0064b627c02893d989ccc7cc9'
-JWYSIWYG_ZIP_URL = (
-    'https://github.com/jwysiwyg/jwysiwyg/archive/%s.zip' % JWYSIWYG_REV)
-JWYSIWYG_ZIP_ROOT_NAME = 'jwysiwyg-%s' % JWYSIWYG_REV
-JWYSIWYG_TARGET_ROOT_NAME = 'jwysiwyg-496497'
-
 FONTAWESOME_REV='4.3.0'
 FONTAWESOME_ZIP_URL = (
     'http://fortawesome.github.io/Font-Awesome/assets/font-awesome-%s.zip' % FONTAWESOME_REV)
@@ -377,9 +371,6 @@ download_and_unzip_files(
 download_and_unzip_files(
     SELECT2_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     SELECT2_ZIP_ROOT_NAME, SELECT2_TARGET_ROOT_NAME)
-download_and_unzip_files(
-    JWYSIWYG_ZIP_URL, THIRD_PARTY_STATIC_DIR,
-    JWYSIWYG_ZIP_ROOT_NAME, JWYSIWYG_TARGET_ROOT_NAME)
 download_and_unzip_files(
     FONTAWESOME_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     FONTAWESOME_ZIP_ROOT_NAME, FONTAWESOME_TARGET_ROOT_NAME)

@@ -174,20 +174,6 @@ textarea {
 }
 
 /*
-  Adjustments for the jWysiwyg RTE, to allow it to adopt the size
-  of its container.
-*/
-div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
-  width: 100%;
-}
-div.wysiwyg iframe.wysiwyg-content-small {
-  height: 70px;
-}
-div.wysiwyg iframe.wysiwyg-content-large {
-  height: 250px;
-}
-
-/*
   Styles for the development mode indicator
 */
 .oppia-dev-mode {
