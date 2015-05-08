@@ -494,8 +494,11 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-      'taRegisterTool', '$delegate', '$modal', '$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
-      function(taRegisterTool, taOptions, $modal, $filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
+      '$delegate', '$modal', '$filter', '$timeout',
+      'taRegisterTool', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+      function(
+        taOptions, $modal, $filter, $timeout,
+        taRegisterTool, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
 
 		taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -504,6 +507,11 @@ oppia.config(['$provide', function($provide) {
       ['ol', 'ul'],
       []
     ];
+    taOptions.setup.textEditorSetup = function($element) {
+      $timeout(function() {
+        $element.trigger('focus');
+      });
+    };
 
     var _RICH_TEXT_COMPONENTS = [];
 

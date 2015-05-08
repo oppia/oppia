@@ -1881,7 +1881,10 @@ div#ng-curtain {
   width: 245px;
 }
 
+.ta-scroll-window.oppia-rte-content {
+  width: 100%;
+}
 .oppia-rte-content > div[contenteditable] {
   /* This counteracts the 1.5em margin that is set globally in Oppia for <p> tags. */
-   margin-top: -1.5em;
+  margin-top: -1.5em;
 }
