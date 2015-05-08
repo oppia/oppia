@@ -500,7 +500,7 @@ oppia.config(['$provide', function($provide) {
         taOptions, $modal, $filter, $timeout,
         taRegisterTool, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
 
-		taOptions.disableSanitizer = true;
+    taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
     taOptions.toolbar = [
       ['bold', 'italics', 'underline'],
@@ -656,7 +656,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       // TODO(sll): Make this functional, or remove it.
       size: '@'
     },
-    template: '<div text-angular="" ng-model="tempContent">',
+    template: '<div text-angular="" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
       $scope._RICH_TEXT_COMPONENTS = [];
       Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
