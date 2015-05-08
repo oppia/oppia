@@ -176,7 +176,7 @@ class Content(object):
 
     def __init__(self, content_type, value=''):
         self.type = content_type
-        self.value = value
+        self.value = html_cleaner.clean(value)
         self.validate()
 
     def validate(self):
@@ -251,6 +251,9 @@ class RuleSpec(object):
         self.dest = dest
         # Feedback to give the reader if this rule is triggered.
         self.feedback = feedback or []
+        self.feedback = [
+            html_cleaner.clean(feedback_item)
+            for feedback_item in self.feedback]
         # Exploration-level parameter changes to make if this rule is
         # triggered.
         self.param_changes = param_changes or []
