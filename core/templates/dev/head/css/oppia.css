@@ -1884,3 +1884,16 @@ div#ng-curtain {
 .ta-scroll-window.oppia-rte-content {
   width: 100%;
 }
+
+.ta-editor.form-control.oppia-rte-content, .ta-scroll-window.form-control.oppia-rte-content {
+  min-height: 150px;
+  height: auto;
+  overflow: auto;
+  font-family: inherit;
+  font-size: 100%;
+}
+
+.form-control.oppia-rte-content > .ta-bind {
+  height: auto;
+  min-height: 150px;
+}
