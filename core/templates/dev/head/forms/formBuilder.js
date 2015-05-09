@@ -650,10 +650,11 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     restrict: 'E',
     scope: {
       htmlContent: '=',
+      multipleChoice: '=',
       // TODO(sll): Make this functional. It is currently not used.
       disallowOppiaRteComponents: '@'
     },
-    template: '<div text-angular="" ng-model="tempContent"></div>',
+    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
       $scope._RICH_TEXT_COMPONENTS = [];
       Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -662,6 +663,17 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
         RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
         $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
       });
+
+			var toolbar = "[['bold', 'italics', 'underline'], \
+      ['ol', 'ul'], \
+			[";
+			//check each widget before adding it to the toolbar
+			$scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+				if (!(componentDefn.name === "math" && $scope.multipleChoice !== undefined)) {
+					toolbar = toolbar + "'" + componentDefn.name + "', ";
+				}
+			});
+			$scope.toolbarOptions = toolbar.substring(0, toolbar.length - 2) + "]]";
 
       var createCustomizationArgDictFromAttrs = function(attrs) {
         var customizationArgsDict = {};
@@ -940,7 +952,8 @@ oppia.directive('schemaBasedEditor', [function() {
       allowExpressions: '&',
       labelForFocusTarget: '&',
       onInputBlur: '=',
-      onInputFocus: '='
+      onInputFocus: '=',
+      multipleChoice: '@'
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
