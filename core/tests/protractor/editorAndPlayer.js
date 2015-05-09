@@ -67,9 +67,12 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(function(richTextEditor) {
-      richTextEditor.appendBoldText('bold text ');
-      richTextEditor.appendItalicText('italic text ');
+      richTextEditor.appendBoldText('bold text');
+      richTextEditor.appendPlainText(' ');
+      richTextEditor.appendItalicText('italic text');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.appendUnderlineText('underline text');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
@@ -262,15 +265,16 @@ describe('rich-text components', function() {
     workflow.createExploration('RTE components', 'maths');
 
     editor.setContent(function(richTextEditor) {
-      richTextEditor.appendPlainText('plainly');
+      richTextEditor.appendPlainText('plainly ');
       richTextEditor.appendBoldText('bold');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.addRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       // TODO (Jacob) add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
       richTextEditor.appendUnderlineText('underlined');
-      richTextEditor.appendPlainText('extra');
+      richTextEditor.appendPlainText(' extra');
       richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
@@ -285,14 +289,15 @@ describe('rich-text components', function() {
 
     general.moveToPlayer();
     player.expectContentToMatch(function(richTextChecker) {
-      richTextChecker.readPlainText('plainly');
+      richTextChecker.readPlainText('plainly ');
       richTextChecker.readBoldText('bold');
+      richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
       richTextChecker.readUnderlineText('underlined');
-      richTextChecker.readPlainText('extra');
+      richTextChecker.readPlainText(' extra');
       richTextChecker.readRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
