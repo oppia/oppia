@@ -237,10 +237,7 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
-            type: 'html',
-            ui_config: {
-              size: 'small'
-            }
+            type: 'html'
           },
           ui_config: {
             add_element_text: 'Add Variation'
