@@ -730,14 +730,22 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
         return elt.html();
       };
 
-      $scope.init = function(){
+      $scope.init = function() {
         $scope.tempContent = $scope.convertHtmlToRte($scope.htmlContent);
       };
 
       $scope.init();
 
-      $scope.$watch(function() {return $scope.tempContent}, function(newVal, oldVal) {
+      $scope.$watch('tempContent', function(newVal, oldVal) {
         $scope.htmlContent = $scope.convertRteToHtml(newVal);
+      });
+
+      // It is possible for the content of the RTE to be changed externally,
+      // e.g. if there are several RTEs in a list, and one is deleted.
+      $scope.$watch('htmlContent', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          $scope.tempContent = $scope.convertHtmlToRte(newVal);
+        }
       });
     }],
   };
