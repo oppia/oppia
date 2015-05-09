@@ -651,10 +651,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     scope: {
       htmlContent: '=',
       // TODO(sll): Make this functional. It is currently not used.
-      disallowOppiaRteComponents: '@',
-      // Optional string; allowed values are 'small' or 'large'. Currently not used.
-      // TODO(sll): Make this functional, or remove it.
-      size: '@'
+      disallowOppiaRteComponents: '@'
     },
     template: '<div text-angular="" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
@@ -1248,16 +1245,7 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
       uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/html',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.getSize = function() {
-        if (!$scope.uiConfig()) {
-          return null;
-        } else {
-          return $scope.uiConfig().size;
-        }
-      };
-    }]
+    restrict: 'E'
   };
 }]);
 

@@ -219,7 +219,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue" size="<[getSize()]>">
+  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue">
   </text-angular-rte>
   <span ng-if="isDisabled()"
         ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
