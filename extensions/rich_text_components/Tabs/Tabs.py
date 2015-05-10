@@ -33,6 +33,10 @@ TAB_CONTENT_SCHEMA = {
         'description': 'Tab content',
         'schema': {
             'type': 'html',
+            'ui_config': {
+                'hide_complex_extensions': True,
+            }
+
         }
     }]
 }
@@ -46,6 +50,7 @@ class Tabs(base.BaseRichTextComponent):
     description = 'A series of tabs.'
     frontend_name = 'tabs'
     tooltip = 'Insert tabs (e.g. for hints)'
+    is_complex = True
 
     _customization_arg_specs = [{
         'name': 'tab_contents',

@@ -100,6 +100,9 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = function(elem) {
+  // Set focus in the RTE.
+  elem.element(by.model('html')).click();
+
   var _appendContentText = function(text) {
     elem.element(by.model('html')).sendKeys(text);
   };

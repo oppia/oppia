@@ -650,9 +650,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     restrict: 'E',
     scope: {
       htmlContent: '=',
-      multipleChoice: '=',
-      // TODO(sll): Make this functional. It is currently not used.
-      disallowOppiaRteComponents: '@'
+      uiConfig: '&'
     },
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
@@ -661,19 +659,17 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
         RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
         RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
         RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+        RTE_COMPONENT_SPECS[componentId].isComplex = RTE_COMPONENT_SPECS[componentId].is_complex;
         $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
       });
 
-			var toolbar = "[['bold', 'italics', 'underline'], \
-      ['ol', 'ul'], \
-			[";
-			//check each widget before adding it to the toolbar
-			$scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-				if (!(componentDefn.name === "math" && $scope.multipleChoice !== undefined)) {
-					toolbar = toolbar + "'" + componentDefn.name + "', ";
-				}
-			});
-			$scope.toolbarOptions = toolbar.substring(0, toolbar.length - 2) + "]]";
+      var toolbarOptions = [['bold', 'italics', 'underline'], ['ol', 'ul'], []];
+      $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions && componentDefn.isComplex)) {
+          toolbarOptions[2].push(componentDefn.name);
+        }
+      });
+      $scope.toolbarOptions = JSON.stringify(toolbarOptions);
 
       var createCustomizationArgDictFromAttrs = function(attrs) {
         var customizationArgsDict = {};
@@ -952,8 +948,7 @@ oppia.directive('schemaBasedEditor', [function() {
       allowExpressions: '&',
       labelForFocusTarget: '&',
       onInputBlur: '=',
-      onInputFocus: '=',
-      multipleChoice: '@'
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'

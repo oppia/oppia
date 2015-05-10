@@ -219,8 +219,8 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue" 
-											multiple-choice="$parent.$parent.$parent.multipleChoice">
+  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue"
+                    ui-config="uiConfig()">
   </text-angular-rte>
   <span ng-if="isDisabled()"
         ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
@@ -252,7 +252,7 @@
       <td>
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
-                             label-for-focus-target="getFocusLabel($index)" multiple-choice="true"
+                             label-for-focus-target="getFocusLabel($index)"
                              on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
                              on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
