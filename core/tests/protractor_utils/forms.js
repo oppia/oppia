@@ -179,6 +179,7 @@ var RichTextEditor = function(elem) {
 
       // Refocus back into the RTE.
       elem.element(by.model('html')).click();
+      element(by.model('html')).sendKeys(protractor.Key.END);
     },
   };
 };
