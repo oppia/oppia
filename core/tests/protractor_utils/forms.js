@@ -100,22 +100,18 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = function(elem) {
+  // Set focus in the RTE.
+  elem.element(by.model('html')).click();
+
   var _appendContentText = function(text) {
-    elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')).
-      sendKeys(text);
+    elem.element(by.model('html')).sendKeys(text);
   };
-  var _clickContentMenuButton = function(className) {
-    elem.element(by.css('.wysiwyg')).element(by.css('.' + className)).click();
+  var _clickToolbarButton = function(buttonName) {
+    elem.element(by.css('[name="' + buttonName + '"]')).click();
   };
   var _clearContent = function() {
-    expect(elem.element(
-      by.tagName('rich-text-editor')).element(by.tagName('iframe')).isPresent()
-    ).toBe(true);
-    browser.switchTo().frame(
-      elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')));
-    // Angular is not present in this iframe, so we use browser.driver.
-    browser.driver.findElement(by.tagName('body')).clear();
-    browser.switchTo().defaultContent();
+    expect(elem.element(by.model('html')).isPresent()).toBe(true);
+    elem.element(by.model('html')).clear();
   };
 
   return {
@@ -130,44 +126,41 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
     },
     appendBoldText: function(text) {
-      _clickContentMenuButton('bold');
+      _clickToolbarButton('bold');
       _appendContentText(text);
-      _clickContentMenuButton('bold');
+      _clickToolbarButton('bold');
     },
     appendItalicText: function(text) {
-      _clickContentMenuButton('italic');
+      _clickToolbarButton('italics');
       _appendContentText(text);
-      _clickContentMenuButton('italic');
+      _clickToolbarButton('italics');
     },
     appendUnderlineText: function(text) {
-      _clickContentMenuButton('underline');
+      _clickToolbarButton('underline');
       _appendContentText(text);
-      _clickContentMenuButton('underline');
+      _clickToolbarButton('underline');
     },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
-      _clickContentMenuButton('insertOrderedList');
+      _clickToolbarButton('ol');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickContentMenuButton('insertOrderedList');
+      _clickToolbarButton('ol');
     },
     appendUnorderedList: function(textArray) {
       _appendContentText('\n');
-      _clickContentMenuButton('insertUnorderedList');
+      _clickToolbarButton('ul');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickContentMenuButton('insertUnorderedList');
-    },
-    appendHorizontalRule: function() {
-      _clickContentMenuButton('insertHorizontalRule');
+      _clickToolbarButton('ul');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: function(componentName) {
-      _clickContentMenuButton('custom-command-' + componentName.toLowerCase());
+      _clickToolbarButton(componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
@@ -183,9 +176,10 @@ var RichTextEditor = function(elem) {
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
       general.waitForSystem();
-      // TODO (Jacob) remove when issue 422 is fixed
-      elem.element(by.tagName('rich-text-editor')).
-        element(by.tagName('iframe')).click();
+
+      // Refocus back into the RTE.
+      elem.element(by.model('html')).click();
+      element(by.model('html')).sendKeys(protractor.Key.END);
     },
   };
 };
@@ -328,9 +322,9 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
-    // We remove all <span> elements since these are plain text that is
+    // We remove all <p> elements since these are plain text that is
     // sometimes represented just by text nodes.
-    elem.all(by.xpath('./*[not(self::span)]')).map(function(entry) {
+    elem.all(by.xpath('./*[not(self::p)]')).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
       // asynchronous and so not allow us to update the textPointer
@@ -339,8 +333,8 @@ var expectRichText = function(elem) {
         return text;
       });
     }).then(function(arrayOfTexts) {
-      // We re-derive the array of elements as we need it too
-      elem.all(by.xpath('./*[not(self::span)]')).then(function(arrayOfElements) {
+      // We re-derive the array of elements as we need it too.
+      elem.all(by.xpath('./*[not(self::p)]')).then(function(arrayOfElements) {
         elem.getText().then(function(fullText) {
           var checker = RichTextChecker(
             arrayOfElements, arrayOfTexts, fullText);

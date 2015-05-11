@@ -219,8 +219,9 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="!isDisabled()" html-content="$parent.localValue" size="<[getSize()]>">
-  </rich-text-editor>
+  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue"
+                    ui-config="uiConfig()">
+  </text-angular-rte>
   <span ng-if="isDisabled()"
         ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
         ng-bind-html="localValue">
