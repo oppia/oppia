@@ -12,8 +12,8 @@
       </md-card>
 
       <div class="conversation-skin-iframe-container">
-        <oppia-gadget-panel panel-html="gadgetPanelsHtml.left" class="conversation-skin-left-gadget-panel"></oppia-gadget-panel>
-        <oppia-gadget-panel panel-html="gadgetPanelsHtml.right" class="conversation-skin-right-gadget-panel"></oppia-gadget-panel>
+        <oppia-gadget-panel panel-contents="gadgetPanelsContents.left" class="conversation-skin-left-gadget-panel"></oppia-gadget-panel>
+        <oppia-gadget-panel panel-contents="gadgetPanelsContents.right" class="conversation-skin-right-gadget-panel"></oppia-gadget-panel>
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last}">
           <md-card class="conversation-skin-card">
@@ -96,7 +96,7 @@
       </div>
 
       <div ng-if="!waitingForNewCard && finished && isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
-      <oppia-gadget-panel panel-html="gadgetPanelsHtml.bottom"></oppia-gadget-panel>
+      <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"></oppia-gadget-panel>
         <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
         <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
           <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">

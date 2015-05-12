@@ -22,8 +22,36 @@ oppia.directive('oppiaGadgetPanel', function() {
   return {
     restrict: 'E',
     scope: {
-      panelHtml: '&',
+      panelContents: '&',
     },
     templateUrl: 'components/gadgetPanel'
+  };
+});
+
+oppia.directive('oppiaGadget', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      gadgetId: '&',
+      gadgetCustomizationArgs: '&',
+      showInStates: '&'
+    },
+    templateUrl: 'components/gadget',
+    controller: [
+        '$scope', '$filter', 'oppiaPlayerService', 'extensionTagAssemblerService',
+        function($scope, $filter, oppiaPlayerService, extensionTagAssemblerService) {
+
+      var el = $(
+        '<oppia-gadget-' + $filter('camelCaseToHyphens')($scope.gadgetId()) + '>');
+      el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
+        el, $scope.gadgetCustomizationArgs());
+      $scope.gadgetHtml = ($('<div>').append(el)).html();
+
+      $scope.$watch(function() {
+        return oppiaPlayerService.getCurrentStateName();
+      }, function(currentStateName) {
+        $scope.isVisible = $scope.showInStates().indexOf(currentStateName) !== -1;
+      });
+    }]
   };
 });
