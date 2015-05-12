@@ -674,8 +674,7 @@ class SkinInstance(object):
                 gadget_instance.validate()
 
     def to_dict(self):
-        """Returns SkinInstance data represented in dict form.
-        """
+        """Returns SkinInstance data represented in dict form."""
         return {
             'skin_id': self.skin_id,
             'skin_customizations': {
@@ -1636,6 +1635,8 @@ class Exploration(object):
             'init_state_name': self.init_state_name,
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
+            'skin_customizations': self.skin_instance.to_dict()[
+                'skin_customizations'],
             'states': {
                 state_name: state.to_dict()
                 for (state_name, state) in self.states.iteritems()
@@ -1643,10 +1644,20 @@ class Exploration(object):
             'title': self.title,
         }
 
+    def get_gadget_ids(self):
+        """Get all gadget ids used in this exploration."""
+        result = set()
+        for gadget_instances_list in (
+                self.skin_instance.panel_contents_dict.itervalues()):
+            result.update([
+                gadget_instance.id for gadget_instance
+                in gadget_instances_list])
+        return sorted(result)
+
     def get_interaction_ids(self):
         """Get all interaction ids used in this exploration."""
         return list(set([
-            state.interaction.id for state in self.states.values()]))
+            state.interaction.id for state in self.states.itervalues()]))
 
 
 class ExplorationSummary(object):

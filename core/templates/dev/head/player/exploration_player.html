@@ -8,6 +8,7 @@
   {{ super() }}
   {% if exploration_version %}
     <script type="text/javascript">
+      GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
       GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
       GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
@@ -132,11 +133,14 @@
       </div>
     </div>
   </script>
+
+  {% include 'components/gadget_panel.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/gadgetPanel.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
@@ -146,4 +150,5 @@
 
   {{ skin_templates }}
   {{ interaction_templates }}
+  {{ gadget_templates }}
 {% endblock footer_js %}

@@ -405,6 +405,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'non_existent_panel panel not found in skin conversation_v1'):
                 exploration.validate()
 
+    def test_exploration_get_gadget_ids(self):
+        """Test that Exploration.get_gadget_ids returns apt results."""
+        exploration_without_gadgets = exp_domain.Exploration.from_yaml(
+            'An Exploration ID', 'A title', 'Category', SAMPLE_YAML_CONTENT)
+        self.assertEqual(exploration_without_gadgets.get_gadget_ids(), [])
+
+        exploration_with_gadgets = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        self.assertEqual(
+            exploration_with_gadgets.get_gadget_ids(), 
+            ['TestGadget']
+        )
+
+        another_gadget = exp_domain.GadgetInstance('AnotherGadget', [], {})
+        exploration_with_gadgets.skin_instance.panel_contents_dict[
+            'right'].append(another_gadget)
+        self.assertEqual(
+            exploration_with_gadgets.get_gadget_ids(), 
+            ['AnotherGadget', 'TestGadget']
+        )
+
     def test_objective_validation(self):
         """Test that objectives are validated only in 'strict' mode."""
         self.save_new_valid_exploration(
@@ -865,6 +886,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'param_specs': {},
+            'skin_customizations': feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
         })
 
 

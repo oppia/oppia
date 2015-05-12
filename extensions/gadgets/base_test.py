@@ -35,6 +35,12 @@ import utils
 # validity of gadget definitions.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
 
+TEST_GADGETS = {
+    'TestGadget': {
+        'dir': os.path.join(feconf.GADGETS_DIR, 'TestGadget')
+    }
+}
+
 
 class GadgetUnitTests(test_utils.GenericTestBase):
     """Test that the default gadgets are valid."""
@@ -88,29 +94,43 @@ class GadgetUnitTests(test_utils.GenericTestBase):
     def test_gadget_properties(self):
         """Test the standard properties of gadgets."""
 
-        ADVICE_BAR_ID = 'AdviceBar'
+        TEST_GADGET_ID = 'TestGadget'
 
-        gadget = gadget_registry.Registry.get_gadget_by_id(
-            ADVICE_BAR_ID)
-        self.assertEqual(gadget.id, ADVICE_BAR_ID)
-        self.assertEqual(gadget.name, 'AdviceBar')
+        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
+            gadget = gadget_registry.Registry.get_gadget_by_id(
+                TEST_GADGET_ID)
+        self.assertEqual(gadget.id, TEST_GADGET_ID)
+        self.assertEqual(gadget.name, 'TestGadget')
 
-        self.assertIn('id="gadget/AdviceBar"', gadget.html_body)
+        self.assertIn('id="gadget/TestGadget"', gadget.html_body)
 
         gadget_dict = gadget.to_dict()
         self.assertItemsEqual(gadget_dict.keys(), [
             'id', 'name', 'description', 'customization_arg_specs',])
-        self.assertEqual(gadget_dict['id'], ADVICE_BAR_ID)
+        self.assertEqual(gadget_dict['id'], TEST_GADGET_ID)
         self.assertEqual(gadget_dict['customization_arg_specs'], [
-        {
-            'name': 'title',
-            'description': 'Optional title for the advice bar (e.g. "Tips")',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }
-    ])
+            {
+                'name': 'title',
+                'description': 'A text title of the test gadget.',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'floors',
+                'description': 'A test attribute that helps increase height.',
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': 1
+            }, {
+                'name': 'characters',
+                'description': 'A test attribute that helps increase width.',
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': 2
+            }])
 
     def test_default_gadgets_are_valid(self):
         """Test that the default gadgets are valid."""

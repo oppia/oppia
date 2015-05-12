@@ -62,6 +62,12 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /extensions/gadgets/(.*)/static/(.*)
+  static_files: extensions/gadgets/\1/static/\2
+  upload: extensions/gadgets/(.*)/static/(.*)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /extensions/interactions/(.*)/static/(.*)
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*)

@@ -1,0 +1,28 @@
+.oppia-advice-bar-container {
+  width: 140px;
+  height: 100%;
+  padding: 50px 25px 0;
+  vertical-align: top;
+  text-align: center;
+}
+
+.oppia-advice-bar-title {
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+.oppia-advice-resource {
+  margin-bottom: 15px;
+  word-wrap: break-word;
+  cursor: pointer;
+  font-size: 13px;
+  color: #36f;
+}
+
+.oppia-advice-resource-image {
+  background: url('../images/AdviceBarResourceIcon.png');
+  background-repeat: no-repeat;
+  width: 70px;
+  height: 50px;
+  margin: auto;
+}

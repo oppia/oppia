@@ -15,13 +15,43 @@
 /**
  * Directive for the AdviceBar gadget.
  *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by 'With',
+ * followed by the name of the arg.
  */
+
 oppia.directive('oppiaGadgetAdviceBar', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
       templateUrl: 'gadget/AdviceBar',
+      controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
+        $scope.adviceBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
+        $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj($attrs.adviceObjectsWithValue);
+
+        $scope.overlayAdviceModal = function(adviceResourceIndex) {
+          $modal.open({
+            templateUrl: '../extensions/gadgets/AdviceBar/static/html/advice_overlay.html',
+            controller: 'AdviceBarModalCtrl',
+            backdrop: true,
+            resolve: {
+              adviceTitle: function() {
+                return $scope.adviceBarResources[adviceResourceIndex].adviceTitle;
+              },
+              adviceHtml: function() {
+                return $scope.adviceBarResources[adviceResourceIndex].adviceHtml;
+              }
+            },
+          })
+        };
+      }],
     }
   }
 ]);
+
+oppia.controller('AdviceBarModalCtrl',
+  ['$scope', 'adviceTitle', 'adviceHtml',
+  function ($scope, adviceTitle, adviceHtml) {
+    $scope.adviceTitle = adviceTitle;
+    $scope.adviceHtml = adviceHtml;
+}]);

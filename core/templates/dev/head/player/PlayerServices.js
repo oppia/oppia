@@ -19,6 +19,7 @@
  */
 
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('GADGET_SPECS', window.GLOBALS ? GLOBALS.GADGET_SPECS : {});
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
 
 // A simple service that provides stopwatch instances. Each stopwatch can be
@@ -178,6 +179,17 @@ oppia.factory('oppiaPlayerService', [
     stateHistory.push(_currentStateName);
   };
 
+  // Formats CustomizationArgSpecs as angular attributes for the given element.
+  var _formatCustomizationArgAttributesForElement = function(element, customizationArgSpecs) {
+    for (var caSpecName in customizationArgSpecs) {
+      var caSpecValue = customizationArgSpecs[caSpecName].value;
+      element.attr(
+        $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
+        oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+    }
+    return element;
+  }
+
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
   var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
@@ -188,13 +200,7 @@ oppia.factory('oppiaPlayerService', [
     var el = $(
       '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
 
-    for (var caSpecName in interactionCustomizationArgSpecs) {
-      var caSpecValue = interactionCustomizationArgSpecs[caSpecName].value;
-      // TODO(sll): Evaluate any values here that correspond to expressions.
-      el.attr(
-        $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-        oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
-    }
+    el = _formatCustomizationArgAttributesForElement(el, interactionCustomizationArgSpecs);
 
     if (labelForFocusTarget) {
       el.attr('label-for-focus-target', labelForFocusTarget);
@@ -202,6 +208,28 @@ oppia.factory('oppiaPlayerService', [
 
     return ($('<div>').append(el)).html();
   };
+
+  // Generate HTML directives for the given gadgetId and customization args.
+  var _getGadgetHtml = function(gadgetId, gadgetCustomizationArgSpecs) {
+    var el = $(
+      '<oppia-gadget-' + $filter('camelCaseToHyphens')(gadgetId) + '>');
+
+    el = _formatCustomizationArgAttributesForElement(el, gadgetCustomizationArgSpecs);
+
+    return ($('<div>').append(el)).html();
+  };
+
+  // Converts a gadget's panelContents to HTML for each directive.
+  var _getGadgetPanelHtml = function(panelContents) {
+    var resultHtml = '';
+    for (var i = 0; i < panelContents.length; i++) {
+      resultHtml += _getGadgetHtml(
+        panelContents[i]['gadget_id'],
+        panelContents[i]['customization_args']
+      );
+    }
+    return resultHtml;
+  }
 
   var stopwatch = stopwatchProviderService.getInstance();
 
@@ -386,6 +414,14 @@ oppia.factory('oppiaPlayerService', [
         _exploration.states[stateName].interaction.id,
         _exploration.states[stateName].interaction.customization_args,
         labelForFocusTarget);
+    },
+    getGadgetPanelsHtml: function() {
+      var result = {};
+      var panelContents = _exploration.skin_customizations.panels_contents;
+      for (var panelName in panelContents) {
+        result[panelName] = _getGadgetPanelHtml(panelContents[panelName]);
+      }
+      return result;
     },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;

@@ -600,6 +600,8 @@ def _save_exploration(
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
     exploration_model.default_skin = exploration.default_skin
+    exploration_model.skin_customizations = (
+        exploration.skin_instance.to_dict()['skin_customizations'])
 
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
@@ -638,6 +640,8 @@ def _create_exploration(
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
         default_skin=exploration.default_skin,
+        skin_customizations=exploration.skin_instance.to_dict(
+            )['skin_customizations'],
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()

@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rating_services
@@ -175,6 +176,7 @@ class ExplorationPage(base.BaseHandler):
         is_iframed = (self.request.get('iframed') == 'true')
 
         # TODO(sll): Cache these computations.
+        gadget_ids = exploration.get_gadget_ids()
         interaction_ids = exploration.get_interaction_ids()
         dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -183,12 +185,16 @@ class ExplorationPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 dependency_ids))
 
+        gadget_templates = (
+            gadget_registry.Registry.get_gadget_html(gadget_ids))
+
         interaction_templates = (
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
 
         self.values.update({
+            'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'SHARING_OPTIONS': SHARING_OPTIONS.value,
             'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
@@ -202,6 +208,7 @@ class ExplorationPage(base.BaseHandler):
                 dependencies_html),
             'exploration_title': exploration.title,
             'exploration_version': version,
+            'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'iframed': is_iframed,
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
