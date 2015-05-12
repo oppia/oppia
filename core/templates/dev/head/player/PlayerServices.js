@@ -188,7 +188,7 @@ oppia.factory('oppiaPlayerService', [
         oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
     }
     return element;
-  }
+  };
 
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
