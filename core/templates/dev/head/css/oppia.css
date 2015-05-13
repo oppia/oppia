@@ -847,6 +847,10 @@ md-card.oppia-gallery-tile {
   width: 24px;
 }
 
+pre.oppia-pre-wrapped-text {
+  white-space: pre-wrap;
+}
+
 .oppia-pre-avatar-oppia, .oppia-pre-avatar-user {
   position: relative;
 }
