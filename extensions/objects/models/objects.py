@@ -452,7 +452,7 @@ class Graph(BaseObject):
             'schema': Int.SCHEMA
         }, {
             'name': 'weight',
-            'schema': Int.SCHEMA 
+            'schema': Int.SCHEMA
         }]
     }
     SCHEMA = {
@@ -480,7 +480,7 @@ class Graph(BaseObject):
             'schema': Boolean.SCHEMA
         }]
     }
-    
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
@@ -493,11 +493,11 @@ class Graph(BaseObject):
 
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-            
+
             if not raw['isLabeled']:
                 for vertex in raw['vertices']:
                     assert (vertex['label'] == '')
-            
+
             for edge in raw['edges']:
                 assert (edge['src'] != edge['dst'])
                 if not raw['isWeighted']:
@@ -507,11 +507,11 @@ class Graph(BaseObject):
                 edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
             else:
                 edge_pairs = (
-                    [(edge['src'], edge['dst']) for edge in raw['edges']] + 
+                    [(edge['src'], edge['dst']) for edge in raw['edges']] +
                     [(edge['dst'], edge['src']) for edge in raw['edges']]
                 )
             assert len(set(edge_pairs)) == len(edge_pairs)
-            
+
         except Exception:
             raise TypeError('Cannot convert to graph %s' % raw)
 
@@ -520,7 +520,7 @@ class Graph(BaseObject):
 
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
-    
+
     description = 'A rectangle normalized so that the coordinates are within the range [0,1].'
 
     SCHEMA = {
@@ -532,7 +532,7 @@ class NormalizedRectangle2D(BaseObject):
             'items': Real.SCHEMA
         }
     }
-    
+
     @classmethod
     def normalize(cls, raw):
         # Moves cur_value to the nearest available value in the range [min_value, max_value]
@@ -540,7 +540,7 @@ class NormalizedRectangle2D(BaseObject):
             return min(max_value, max(min_value, current_value))
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-            
+
             raw[0][0] = clamp(0.0, raw[0][0], 1.0)
             raw[0][1] = clamp(0.0, raw[0][1], 1.0)
             raw[1][0] = clamp(0.0, raw[1][0], 1.0)
@@ -556,7 +556,7 @@ class ImageRegion(BaseObject):
     """A region of an image, including its shape and coordinates."""
 
     description = 'A region of an image.'
-    
+
     # Note: at the moment, only supports rectangular image regions
     # Coordinates are [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]]
     # origin is top-left, increasing x is to the right, increasing y is down
@@ -595,7 +595,7 @@ class ImageWithRegions(BaseObject):
                         'schema': UnicodeString.SCHEMA
                     }, {
                         'name': 'region',
-                        'schema': ImageRegion.SCHEMA 
+                        'schema': ImageRegion.SCHEMA
                     }]
                 }
             }
@@ -622,6 +622,27 @@ class ClickOnImage(BaseObject):
             'schema': {
                 'type': 'list',
                 'items': UnicodeString.SCHEMA
-            } 
+            }
+        }]
+    }
+
+
+class NumberWithUnits(BaseObject):
+    """Number with units class."""
+
+    description = 'A number with units.'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'number',
+            'schema': {
+                'type': 'float',
+            }
+        }, {
+            'name': 'units',
+            'schema': {
+                'type': 'unicode',
+            }
         }]
     }

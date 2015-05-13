@@ -192,6 +192,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'LogicProof',
         'NumericInput',
         'SetInput',
+        'SimpleNumberWithUnitsInput'
     ]
 }, {
     'name': 'Programming',

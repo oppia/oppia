@@ -40,6 +40,10 @@ class NormalizedStringRule(rule_domain.Rule):
     subject_type = objects.NormalizedString
 
 
+class NumberWithUnitsRule(rule_domain.Rule):
+    subject_type = objects.NumberWithUnits
+
+
 class RealRule(rule_domain.Rule):
     subject_type = objects.Real
 

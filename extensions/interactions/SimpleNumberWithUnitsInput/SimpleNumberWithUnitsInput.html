@@ -1,0 +1,27 @@
+<style>
+  .simple-number-with-units-input-container .choice-form select {
+    display: inline;
+    width: auto;
+  }
+</style>
+
+<script type="text/ng-template" id="interaction/SimpleNumberWithUnitsInput">
+  <div class="row simple-number-with-units-input-container">
+    <form role="form" class="form-horizontal">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <schema-based-editor schema="numberSchema" local-value="answer.number" label-for-focus-target="labelForFocusTarget">
+        </schema-based-editor>
+        <schema-based-editor schema="unitsSchema" local-value="answer.units" class="choice-form">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <br><br><br>
+
+    <md-button class="md-button-success" ng-click="submitAnswer(answer)" style="margin-left: 10px;">Submit</md-button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/SimpleNumberWithUnitsInput">
+  <[answer.number]> <[answer.units]>
+</script>
