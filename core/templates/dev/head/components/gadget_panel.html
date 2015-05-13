@@ -1,3 +1,10 @@
 <script type="text/ng-template" id="components/gadgetPanel">
-  <div angular-html-bind="panelHtml()"></div>
+  <div ng-repeat="gadgetSpec in panelContents()">
+    <oppia-gadget gadget-id="gadgetSpec.gadget_id" gadget-customization-args="gadgetSpec.customization_args" show-in-states="gadgetSpec.visible_in_states">
+    </oppia-gadget>
+  </div>
+</script>
+
+<script type="text/ng-template" id="components/gadget">
+  <div ng-show="isVisible" angular-html-bind="gadgetHtml"></div>
 </script>

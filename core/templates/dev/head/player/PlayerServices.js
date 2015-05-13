@@ -123,12 +123,12 @@ oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
-    'INTERACTION_SPECS',
+    'extensionTagAssemblerService', 'INTERACTION_SPECS',
     function(
       $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
-      INTERACTION_SPECS) {
+      extensionTagAssemblerService, INTERACTION_SPECS) {
   var _END_DEST = 'END';
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
   var _NULL_INTERACTION_HTML = (
@@ -179,17 +179,6 @@ oppia.factory('oppiaPlayerService', [
     stateHistory.push(_currentStateName);
   };
 
-  // Formats CustomizationArgSpecs as angular attributes for the given element.
-  var _formatCustomizationArgAttributesForElement = function(element, customizationArgSpecs) {
-    for (var caSpecName in customizationArgSpecs) {
-      var caSpecValue = customizationArgSpecs[caSpecName].value;
-      element.attr(
-        $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-        oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
-    }
-    return element;
-  };
-
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
   var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
@@ -200,7 +189,8 @@ oppia.factory('oppiaPlayerService', [
     var el = $(
       '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
 
-    el = _formatCustomizationArgAttributesForElement(el, interactionCustomizationArgSpecs);
+    el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
+      el, interactionCustomizationArgSpecs);
 
     if (labelForFocusTarget) {
       el.attr('label-for-focus-target', labelForFocusTarget);
@@ -208,28 +198,6 @@ oppia.factory('oppiaPlayerService', [
 
     return ($('<div>').append(el)).html();
   };
-
-  // Generate HTML directives for the given gadgetId and customization args.
-  var _getGadgetHtml = function(gadgetId, gadgetCustomizationArgSpecs) {
-    var el = $(
-      '<oppia-gadget-' + $filter('camelCaseToHyphens')(gadgetId) + '>');
-
-    el = _formatCustomizationArgAttributesForElement(el, gadgetCustomizationArgSpecs);
-
-    return ($('<div>').append(el)).html();
-  };
-
-  // Converts a gadget's panelContents to HTML for each directive.
-  var _getGadgetPanelHtml = function(panelContents) {
-    var resultHtml = '';
-    for (var i = 0; i < panelContents.length; i++) {
-      resultHtml += _getGadgetHtml(
-        panelContents[i]['gadget_id'],
-        panelContents[i]['customization_args']
-      );
-    }
-    return resultHtml;
-  }
 
   var stopwatch = stopwatchProviderService.getInstance();
 
@@ -277,13 +245,8 @@ oppia.factory('oppiaPlayerService', [
     _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
-    // NB: This may be undefined if newStateName === END_DEST.
+    // NB: These may both be undefined if newStateName === END_DEST.
     var newStateData = _exploration.states[newStateName];
-    if (newStateData) {
-      learnerParamsService.init(newParams);
-    }
-
-    // NB: This may be undefined if newStateName === END_DEST.
     var newInteractionId = newStateData ? newStateData.interaction.id : undefined;
 
     $rootScope.$broadcast('playerStateChange');
@@ -415,13 +378,8 @@ oppia.factory('oppiaPlayerService', [
         _exploration.states[stateName].interaction.customization_args,
         labelForFocusTarget);
     },
-    getGadgetPanelsHtml: function() {
-      var result = {};
-      var panelContents = _exploration.skin_customizations.panels_contents;
-      for (var panelName in panelContents) {
-        result[panelName] = _getGadgetPanelHtml(panelContents[panelName]);
-      }
-      return result;
+    getGadgetPanelsContents: function() {
+      return angular.copy(_exploration.skin_customizations.panels_contents);
     },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
