@@ -40,6 +40,7 @@ oppia.directive('oppiaGadgetPencilCode', [
 
         var pce = new PencilCodeEmbed($element[0].children[0]);
         pce.on('load', function() {
+          pce.hideToggleButton();
           hasLoadingCompleted = true;
         });
 
