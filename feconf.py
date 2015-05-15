@@ -213,6 +213,9 @@ ALLOWED_GADGETS = {
     'AdviceBar': {
         'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
     },
+    'PencilCode': {
+        'dir': os.path.join(GADGETS_DIR, 'PencilCode')
+    },
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },
@@ -251,6 +254,7 @@ DEMO_EXPLORATIONS = [
     # entire exploration as a dev demo.
     ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
      'Welcome'),
+    ('bouncing_ball', 'Bouncing Ball', 'Programming'),
 ]
 
 # TODO(sll): Add all other URLs here.
