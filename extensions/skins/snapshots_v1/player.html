@@ -11,6 +11,12 @@
         <div class="col-lg-4 col-md-4 col-sm-4">
           <div angular-html-bind="currentQuestion"></div>
           <br><br>
+          <div angular-html-bind="feedbackHtml"></div>
+          <br><br>
+
+          <div ng-if="upcomingQuestionHtml">
+            <md-button class="md-button-success" ng-click="onClickContinue()">Continue</md-button>
+          </div>
           <div angular-html-bind="inputTemplate"></div>
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8">

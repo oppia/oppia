@@ -23,39 +23,95 @@ oppia.directive('snapshotsSkin', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'skins/Snapshots',
-    controller: ['$scope', 'warningsData', 'oppiaPlayerService',
-        function($scope, warningsData, oppiaPlayerService) {
+    controller: ['$scope', 'warningsData', 'oppiaPlayerService', 'focusService', '$timeout',
+        function($scope, warningsData, oppiaPlayerService, focusService, $timeout) {
+
+      var currentStateName = oppiaPlayerService.getCurrentStateName();
+      var _labelForNextFocusTarget = '';
+
       $scope.initializePage = function() {
         $scope.inputTemplate = '';
         $scope.currentQuestion = '';
         oppiaPlayerService.init(function(stateName, initHtml) {
           $scope.currentQuestion = initHtml;
-          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
+          _labelForNextFocusTarget = Math.random().toString(36).slice(2);
+          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName, _labelForNextFocusTarget);
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
           $scope.gadgetPanelsContents = oppiaPlayerService.getGadgetPanelsContents();
+          currentStateName = stateName;
+
+          $timeout(function() {
+            focusService.setFocus(_labelForNextFocusTarget);
+          }, 50);
         });
       };
 
+      $scope.upcomingQuestionHtml = null;
+      $scope.upcomingInputTemplate = null;
       $scope.initializePage();
+
+      $scope.nextQuestionHtml = '';
+      $scope.onClickContinue = function() {
+        $scope.currentQuestion = $scope.upcomingQuestionHtml;
+        $scope.inputTemplate = $scope.upcomingInputTemplate;
+        $scope.upcomingQuestionHtml = null;
+        $scope.upcomingInputTemplate = null;
+        $scope.feedbackHtml = '';
+        oppiaPlayerService.applyCachedParamUpdates();
+        $timeout(function() {
+          focusService.setFocus(_labelForNextFocusTarget);
+        }, 50);
+      };
 
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
           if (!newStateName) {
-            $scope.currentQuestion = 'You have finished.';
+            $scope.currentQuestion = 'Congratulations, you have finished!';
             $scope.inputTemplate = '';
             return;
           }
 
-          if (refreshInteraction) {
-            $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
-              newStateName) + oppiaPlayerService.getRandomSuffix();
+          _labelForNextFocusTarget = Math.random().toString(36).slice(2);
+
+          $scope.feedbackHtml = feedbackHtml;
+
+          if (feedbackHtml) {
+            if (currentStateName === newStateName) {
+              $scope.upcomingQuestionHtml = null;
+              if (refreshInteraction) {
+                $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
+                  newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
+                $timeout(function() {
+                  focusService.setFocus(_labelForNextFocusTarget);
+                }, 50);
+              }
+            } else {
+              $scope.inputTemplate = '';
+              $scope.upcomingQuestionHtml = questionHtml + oppiaPlayerService.getRandomSuffix();
+              if (refreshInteraction) {
+                $scope.upcomingInputTemplate = oppiaPlayerService.getInteractionHtml(
+                  newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
+              } else {
+                $scope.upcomingInputTemplate = '';
+              }
+            }
+          } else {
+            // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
+            // and 'question', so that the aria-live attribute will read it out.
+            $scope.currentQuestion = questionHtml + oppiaPlayerService.getRandomSuffix();
+            if (refreshInteraction) {
+              $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
+                newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
+              $timeout(function() {
+                focusService.setFocus(_labelForNextFocusTarget);
+              }, 50);
+            }
+            oppiaPlayerService.applyCachedParamUpdates();
           }
 
-          // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
-          // and 'question', so that the aria-live attribute will read it out.
-          $scope.currentQuestion = questionHtml + oppiaPlayerService.getRandomSuffix();
-        });
+          currentStateName = newStateName;
+        }, true);
       };
     }]
   };
