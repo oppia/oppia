@@ -127,9 +127,10 @@ class MyExplorationsHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        editable_exp_summaries = (
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.user_id))
+        subscribed_summaries = (
+            exp_services.get_exploration_summaries_matching_ids(
+                subscription_services.get_activity_ids_subscribed_to(
+                    self.user_id)))
 
         def _get_intro_card_color(category):
             return (
@@ -138,7 +139,8 @@ class MyExplorationsHandler(base.BaseHandler):
                 feconf.DEFAULT_COLOR)
 
         explorations_list = []
-        for exp_summary in editable_exp_summaries.values():
+
+        for exp_summary in subscribed_summaries:
             feedback_thread_analytics = feedback_services.get_thread_analytics(
                 exp_summary.id)
             explorations_list.append({
