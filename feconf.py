@@ -255,6 +255,11 @@ DEMO_EXPLORATIONS = [
     ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
      'Welcome'),
     ('bouncing_ball', 'Bouncing Ball', 'Programming'),
+    ('classification', 'Classifying Things', 'Programming'),
+    ('genomics', 'Genomics', 'Programming'),
+    ('linguistics', 'Linguistics', 'Programming'),
+    ('recursion', 'Recursion', 'Programming'),
+    ('towers', 'Towers of Hanoi', 'Programming'),
 ]
 
 # TODO(sll): Add all other URLs here.

@@ -1,0 +1,31 @@
+author_notes: ''
+blurb: ''
+default_skin: snapshots_v1
+init_state_name: First State
+language_code: en
+objective: Learn how to classify organisms.
+param_changes: []
+param_specs: {}
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
+states:
+  First State:
+    content:
+    - type: text
+      value: <p>This is a test exploration.</p>
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: First State
+          feedback: []
+          param_changes: []
+      id: EndExploration
+    param_changes: []
+tags: []
