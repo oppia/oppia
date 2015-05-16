@@ -234,27 +234,13 @@ class SnapshotsV1(BaseSkin):
     tag_name = 'snapshots-skin'
 
     panels_properties = {
-        'left': {
-            'width': 100,
-            'height': 350,
+        'main': {
+            'width': 800,
+            'height': 1000,
             'stackable_axis': 'vertical',
             'pixels_between_gadgets': 80,
             'max_gadgets': 1
         },
-        'right': {
-            'width': 160,
-            'height': 350,
-            'stackable_axis': 'vertical',
-            'pixels_between_gadgets': 80,
-            'max_gadgets': 1
-        },
-        'bottom': {
-            'width': 350,
-            'height': 100,
-            'stackable_axis': 'horizontal',
-            'pixels_between_gadgets': 50,
-            'max_gadgets': 1
-        }
     }
 
     options = [{

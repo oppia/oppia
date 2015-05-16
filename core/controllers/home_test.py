@@ -31,7 +31,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Your personal tutor',
-            'Gallery - Oppia', 'About', 'Login', no=['Logout'])
+            'Oppia - Gallery', 'About', 'Login', no=['Logout'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""

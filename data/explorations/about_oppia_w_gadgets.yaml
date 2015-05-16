@@ -31,7 +31,19 @@ skin_customizations:
       gadget_id: AdviceBar
       visible_in_states:
       - Example2
-    right: []
+    right:
+    - customization_args:
+        adviceObjects:
+          value:
+          - adviceHtml: This is an advice bar used to test multiple gadgets sharing the same id but having different visibility. It will disappear in the next state.
+            adviceTitle: Description
+        title:
+          value: ""
+        orientation:
+          value: vertical
+      gadget_id: AdviceBar
+      visible_in_states:
+      - Example1
     bottom: []
 states:
   About this website:

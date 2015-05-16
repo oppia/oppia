@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
+<!-- Gallery page is a special case: we switch the main and sub titles -->
+{% block maintitle %}
   Gallery
+{% endblock maintitle %}
+
+{% block subtitle %}
+  Oppia
 {% endblock subtitle %}
 
 {% block navbar_breadcrumb %}
