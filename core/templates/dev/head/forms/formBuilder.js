@@ -1352,12 +1352,15 @@ oppia.directive('schemaBasedListEditor', [
 
       $scope.minListLength = null;
       $scope.maxListLength = null;
+      $scope.showDuplicatesWarning = false;
       if ($scope.validators()) {
         for (var i = 0; i < $scope.validators().length; i++) {
           if ($scope.validators()[i].id === 'has_length_at_most') {
             $scope.maxListLength = $scope.validators()[i].max_value;
           } else if ($scope.validators()[i].id === 'has_length_at_least') {
             $scope.minListLength = $scope.validators()[i].min_value;
+          } else if ($scope.validators()[i].id === 'is_uniquified') {
+            $scope.showDuplicatesWarning = true;
           }
         }
       }
@@ -1366,6 +1369,19 @@ oppia.directive('schemaBasedListEditor', [
         $scope.localValue.push(
           schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
       }
+
+      $scope.hasDuplicates = function() {
+        var valuesSoFar = {};
+        for (var i = 0; i < $scope.localValue.length; i++) {
+          var value = $scope.localValue[i];
+          if (!valuesSoFar.hasOwnProperty(value)) {
+            valuesSoFar[value] = true;
+          } else {
+            return true;
+          }
+        }
+        return false;
+      };
 
       if ($scope.len === undefined) {
         $scope.addElement = function() {
@@ -1399,7 +1415,6 @@ oppia.directive('schemaBasedListEditor', [
         $scope.hideAddItemButton = function() {
           $scope.isAddItemButtonPresent = false;
         };
-
         
         $scope._onChildFormSubmit = function(evt) {
           if (!$scope.isAddItemButtonPresent) {
@@ -1415,7 +1430,7 @@ oppia.directive('schemaBasedListEditor', [
             /** 
              * If form submission happens on existing element remove focus from it
              */
-             document.activeElement.blur();
+            document.activeElement.blur();
           }
           evt.stopPropagation();
         };
