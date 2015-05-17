@@ -29,6 +29,16 @@ class Equals(base.NormalizedStringRule):
         return subject.lower() == self.x.lower()
 
 
+class EqualsOneOf(base.NormalizedStringRule):
+    description = 'is equal to one of {{x|ListOfUnicodeString}}'
+    is_generic = False
+
+    def _evaluate(self, subject):
+        return any([
+            subject.lower() == ' '.join(item.split()).lower()
+            for item in self.x])
+
+
 class CaseSensitiveEquals(base.NormalizedStringRule):
     description = (
         'is equal to {{x|NormalizedString}}, taking case into account')

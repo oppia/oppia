@@ -32,6 +32,16 @@ class NormalizedStringRuleUnitTests(test_utils.GenericTestBase):
         self.assertTrue(rule.eval('Hello'))
         self.assertFalse(rule.eval('goodbye'))
 
+    def test_equals_one_of_rule(self):
+        rule = normalized_string.EqualsOneOf(['hello', 'hallo'])
+
+        self.assertTrue(rule.eval('hello'))
+        self.assertTrue(rule.eval('Hello'))
+        self.assertTrue(rule.eval('hallo'))
+        self.assertTrue(rule.eval('HaLlO'))
+        self.assertFalse(rule.eval('goodbye world'))
+        self.assertFalse(rule.eval('hello hallo'))
+
     def test_case_sensitive_equals_rule(self):
         rule = normalized_string.CaseSensitiveEquals('hello')
 
