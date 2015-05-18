@@ -226,6 +226,15 @@ states:
             But that''s not enough, since the turtle doesn''t know how far to walk.
             So, what other piece of information does it need?</div>'
           param_changes: []
+      triggers:
+      - name: on_nth_resubmission
+        customization_args:
+          num_submits: 2
+        dest: Velocity
+        feedback:
+        - Actually, we also need to give the turtle a distance, otherwise it will
+          not know how far to walk.
+        param_changes: []
       id: TextInput
     param_changes: []
   Final State:

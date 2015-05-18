@@ -364,6 +364,87 @@ class RuleSpec(object):
 DEFAULT_RULESPEC_STR = 'Default'
 
 
+class TriggerInstance(object):
+    """Value object for a trigger specification."""
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'customization_args': self.customization_args,
+            'dest': self.dest,
+            # Feedback to give the reader if this action is triggered.
+            'feedback': self.feedback,
+            'param_changes': self.param_changes,
+        }
+
+    @classmethod
+    def from_dict(cls, trigger_dict):
+        return cls(
+            trigger_dict['name'],
+            trigger_dict['customization_args'],
+            trigger_dict['dest'],
+            trigger_dict['feedback'],
+            trigger_dict['param_changes'])
+
+    def __init__(self, name, customization_args, dest, feedback, param_changes):
+        self.name = name
+        self.customization_args = customization_args
+        self.dest = dest
+        # Feedback to give the reader if this rule is triggered.
+        self.feedback = feedback or []
+        self.feedback = [
+            html_cleaner.clean(feedback_item)
+            for feedback_item in self.feedback]
+        self.param_changes = param_changes or []
+
+    def validate(self):
+        if self.name != 'on_nth_resubmission':
+            raise utils.ValidationError(
+                'Unexpected trigger name: %s' % self.name)
+
+        if not isinstance(self.customization_args, dict):
+            raise utils.ValidationError(
+                'Expected trigger customization_args to be a dict, received %s'
+                % self.customization_args)
+        if self.customization_args.keys() != ['num_submits']:
+            raise utils.ValidationError(
+                'Expected trigger customization_args to contain only '
+                'num_submits, received %s' % self.customization_args)
+        if not isinstance(self.customization_args['num_submits'], int):
+            raise utils.ValidationError(
+                'Expected num_submits for trigger to be an integer, received '
+                '%s' % self.customization_args['num_submits'])
+        if self.customization_args['num_submits'] <= 0:
+            raise utils.ValidationError(
+                'Expected num_submits for trigger to be a positive integer, '
+                'received %s' % self.customization_args['num_submits'])
+
+        if not isinstance(self.dest, basestring):
+            raise utils.ValidationError(
+                'Expected trigger dest to be a string, received %s'
+                % self.dest)
+        if not self.dest:
+            raise utils.ValidationError(
+                'Every trigger should have a destination.')
+
+        if not isinstance(self.feedback, list):
+            raise utils.ValidationError(
+                'Expected trigger feedback to be a list, received %s'
+                % self.feedback)
+        for feedback_item in self.feedback:
+            if not isinstance(feedback_item, basestring):
+                raise utils.ValidationError(
+                    'Expected trigger feedback item to be a string, received '
+                    '%s' % feedback_item)
+
+        if not isinstance(self.param_changes, list):
+            raise utils.ValidationError(
+                'Expected trigger param_changes to be a list, received %s'
+                % self.param_changes)
+        for param_change in self.param_changes:
+            param_change.validate()
+
+
 class AnswerHandlerInstance(object):
     """Value object for an answer event stream (submit, click ,drag, etc.)."""
 
@@ -448,6 +529,7 @@ class InteractionInstance(object):
                 {} if self.id is None
                 else self._get_full_customization_args()),
             'handlers': [handler.to_dict() for handler in self.handlers],
+            'triggers': [trigger.to_dict() for trigger in self.triggers],
         }
 
     @classmethod
@@ -465,10 +547,13 @@ class InteractionInstance(object):
             interaction_dict['id'],
             interaction_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
-             for h in interaction_dict['handlers']])
+             for h in interaction_dict['handlers']],
+            ([TriggerInstance.from_dict(trigger)
+              for trigger in interaction_dict['triggers']]
+             if 'triggers' in interaction_dict else []))
 
     def __init__(
-            self, interaction_id, customization_args, handlers):
+            self, interaction_id, customization_args, handlers, triggers_list):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -479,6 +564,10 @@ class InteractionInstance(object):
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
                          for h in handlers]
+        self.triggers = [TriggerInstance(
+            trigger.name, trigger.customization_args, trigger.dest,
+            trigger.feedback, trigger.param_changes
+        ) for trigger in triggers_list]
 
     @property
     def is_terminal(self):
@@ -546,7 +635,8 @@ class InteractionInstance(object):
             cls._DEFAULT_INTERACTION_ID,
             {},
             [AnswerHandlerInstance.get_default_handler(
-                default_dest_state_name, default_obj_type)]
+                default_dest_state_name, default_obj_type)],
+            [],
         )
 
 
@@ -725,6 +815,7 @@ class State(object):
                 'param_changes': [],
             }],
         }],
+        'triggers': [],
     }
 
     def __init__(self, content, param_changes, interaction):
@@ -738,7 +829,7 @@ class State(object):
         # The interaction instance associated with this state.
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
-            interaction.handlers)
+            interaction.handlers, interaction.triggers)
 
     def validate(self, allow_null_interaction):
         if not isinstance(self.content, list):
@@ -1501,6 +1592,10 @@ class Exploration(object):
         exploration_dict['skin_customizations'] = (
             feconf.DEFAULT_SKIN_CUSTOMIZATIONS)
 
+        # Added for ct-branch only.
+        for _, state_defn in exploration_dict['states'].iteritems():
+            state_defn['interaction']['triggers'] = []
+
         return exploration_dict
 
     @classmethod
@@ -1593,9 +1688,20 @@ class Exploration(object):
                 }, InteractionInstance._get_obj_type(idict['id']))
                 for handler in idict['handlers']]
 
+            interaction_triggers = []
+            if 'triggers' in idict:
+                interaction_triggers = [
+                    TriggerInstance.from_dict({
+                        'name': trigger['name'],
+                        'customization_args': trigger['customization_args'],
+                        'dest': trigger['dest'],
+                        'feedback': trigger['feedback'],
+                        'param_changes': trigger['param_changes'],
+                    }) for trigger in idict['triggers']]
+
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
-                interaction_handlers)
+                interaction_handlers, interaction_triggers)
 
             exploration.states[state_name] = state
 

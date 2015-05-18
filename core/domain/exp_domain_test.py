@@ -62,6 +62,7 @@ states:
           feedback: []
           param_changes: []
       id: null
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -78,6 +79,7 @@ states:
           feedback: []
           param_changes: []
       id: null
+      triggers: []
     param_changes: []
 tags: []
 """) % (
@@ -130,6 +132,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -150,6 +153,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Second state:
     content:
@@ -170,6 +174,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 tags: []
 """) % (
@@ -414,7 +419,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration_with_gadgets = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
         self.assertEqual(
-            exploration_with_gadgets.get_gadget_ids(), 
+            exploration_with_gadgets.get_gadget_ids(),
             ['TestGadget']
         )
 
@@ -422,7 +427,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration_with_gadgets.skin_instance.panel_contents_dict[
             'right'].append(another_gadget)
         self.assertEqual(
-            exploration_with_gadgets.get_gadget_ids(), 
+            exploration_with_gadgets.get_gadget_ids(),
             ['AnotherGadget', 'TestGadget']
         )
 
@@ -487,10 +492,10 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                         'dest': 'New state',
                         'feedback': [],
                         'param_changes': [],
-
                     }]
                 }],
                 'id': None,
+                'triggers': [],
             },
             'param_changes': [],
         }
@@ -783,6 +788,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -803,6 +809,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 tags: []
 """)
@@ -870,6 +877,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         }],
                     }],
                     'id': None,
+                    'triggers': [],
                 },
                 'param_changes': [],
             }

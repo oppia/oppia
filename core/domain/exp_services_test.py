@@ -391,6 +391,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -411,6 +412,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 tags: []
 """ % (
@@ -449,6 +451,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Renamed state:
     content:
@@ -469,6 +472,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 tags: []
 """ % (
@@ -574,6 +578,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -597,6 +602,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """)
     }
@@ -621,6 +627,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """)
     }
