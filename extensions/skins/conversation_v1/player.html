@@ -2,7 +2,7 @@
   <link rel="stylesheet" type="text/css"
         href="/extensions/skins/conversation_v1/static/conversation.css">
 
-  <div role="main" style="margin: 0 auto; position: relative;">
+  <div role="main" style="margin: 0 auto; max-width: 95%; position: relative;">
     <div class="conversation-skin-cards-container">
       <md-card class="conversation-skin-exploration-intro-card">
         <img ng-src="<[introCardImageUrl]>">
@@ -12,11 +12,13 @@
       </md-card>
 
       <div class="conversation-skin-iframe-container">
+        <oppia-gadget-panel panel-contents="gadgetPanelsContents.left" class="conversation-skin-left-gadget-panel"></oppia-gadget-panel>
+        <oppia-gadget-panel panel-contents="gadgetPanelsContents.right" class="conversation-skin-right-gadget-panel"></oppia-gadget-panel>
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last}">
           <md-card class="conversation-skin-card">
             <div class="conversation-skin-card-feedback-toggle-container" ng-if="state.stateName && !isInPreviewMode">
-              <span class="glyphicon glyphicon-comment conversation-skin-card-feedback-toggle" popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>" popover-template="popover/feedback" popover-trigger="click" tooltip="Feedback" tooltip-placement="bottom">
+              <span class="glyphicon glyphicon-comment conversation-skin-card-feedback-toggle" popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>" popover-template="popover/feedback" popover-trigger="click" tooltip="Feedback" tooltip-placement="bottom" state-name="<[state.stateName]>">
               </span>
             </div>
 
@@ -94,6 +96,7 @@
       </div>
 
       <div ng-if="!waitingForNewCard && finished && isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
+      <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"></oppia-gadget-panel>
         <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
         <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
           <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">

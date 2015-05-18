@@ -140,7 +140,7 @@
                  ng-blur="onBlur()" ng-focus="onFocus()">
 
           <span ng-if="hasLoaded && !isInputInFocus && hasFocusedAtLeastOnce" style="font-size: 0.9em; left: 0; position: absolute; top: 25px;">
-            <span ng-if="floatForm.floatValue.$error.isFloat" class="oppia-form-error" aria-live="assertive">
+            <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
               Please enter a valid decimal number.
             </span>
             <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
@@ -219,8 +219,9 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="!isDisabled()" html-content="$parent.localValue" size="<[getSize()]>">
-  </rich-text-editor>
+  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue"
+                    ui-config="uiConfig()">
+  </text-angular-rte>
   <span ng-if="isDisabled()"
         ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
         ng-bind-html="localValue">
@@ -266,6 +267,10 @@
       </td>
     </tr>
   </table>
+
+  <div ng-if="showDuplicatesWarning && hasDuplicates()" class="oppia-form-error" aria-live="assertive">
+    Please ensure that the list has no duplicates.
+  </div>
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
   <div style="height: 30px; margin-top: 4px;">

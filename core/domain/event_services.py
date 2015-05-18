@@ -23,7 +23,8 @@ import inspect
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,feedback_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import feconf
 
@@ -138,6 +139,26 @@ class StateHitEventHandler(BaseEventHandler):
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             params, play_type)
+
+
+class FeedbackThreadCreatedEventHandler(BaseEventHandler):
+    """Event handler for recording new feedback thread creation events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_NEW_THREAD_CREATED
+
+    @classmethod
+    def _handle_event(cls, exp_id):
+        pass
+
+
+class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
+    """Event handler for recording reopening feedback thread events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
+
+    @classmethod
+    def _handle_event(cls, exp_id, old_status, new_status):
+        pass
 
 
 class ExplorationContentChangeEventHandler(BaseEventHandler):

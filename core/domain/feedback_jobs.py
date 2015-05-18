@@ -22,27 +22,24 @@ from core.platform import models
     models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()
+import feconf
 
+from google.appengine.ext import ndb
 
 class FeedbackAnalyticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    pass
+        num_open_threads = ndb.IntegerProperty(default=0)
+        num_total_threads = ndb.IntegerProperty(default=0)
 
 
 class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
     """A continuous-computation job that computes analytics for feedback
-    threads of explorations.
-
-    This job does not have a realtime component. There will be a delay in
-    propagating new updates to the dashboard; the length of the delay will be
-    approximately the time it takes a batch job to run.
-    """
-    # TODO(sll): Add a realtime component: listen to incoming feedback messages
-    # and adjust the counts appropriately.
+    threads of explorations."""
 
     @classmethod
     def get_event_types_listened_to(cls):
-        return []
+        return [feconf.EVENT_TYPE_NEW_THREAD_CREATED,
+                feconf.EVENT_TYPE_THREAD_STATUS_CHANGED]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
@@ -54,8 +51,69 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
+        exp_id = args[0]
 
+        def _increment_open_threads_count():
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, exp_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, num_open_threads=1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.num_open_threads += 1
+                model.put()
+
+        def _increment_total_threads_count():
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, exp_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, num_total_threads=1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.num_total_threads += 1
+                model.put()
+
+        def _decrement_open_threads_count():
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, exp_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, num_open_threads=-1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.num_open_threads -= 1
+                model.put()
+
+        if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
+            transaction_services.run_in_transaction(
+                _increment_total_threads_count)
+            transaction_services.run_in_transaction(
+                _increment_open_threads_count)
+        elif event_type == feconf.EVENT_TYPE_THREAD_STATUS_CHANGED:
+            old_status = args[1]
+            updated_status = args[2]
+            # Status changed from closed to open.
+            if (old_status != feedback_models.STATUS_CHOICES_OPEN 
+                    and updated_status == feedback_models.STATUS_CHOICES_OPEN):
+                transaction_services.run_in_transaction(
+                     _increment_open_threads_count)
+            # Status changed from open to closed.
+            elif (old_status == feedback_models.STATUS_CHOICES_OPEN
+                  and updated_status != feedback_models.STATUS_CHOICES_OPEN):
+                transaction_services.run_in_transaction(
+                    _decrement_open_threads_count)
+         
     # Public query methods.
     @classmethod
     def get_thread_analytics(cls, exploration_id):
@@ -67,15 +125,20 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         'num_total_threads', representing the counts of open and all feedback
         threads, respectively.
         """
+        realtime_model = cls._get_realtime_datastore_class().get(
+            cls.get_active_realtime_layer_id(exploration_id), strict=False)
         feedback_thread_analytics_model = (
             feedback_models.FeedbackAnalyticsModel.get(
                 exploration_id, strict=False))
 
         num_open_threads = 0
         num_total_threads = 0
+        if realtime_model:
+            num_open_threads = realtime_model.num_open_threads 
+            num_total_threads = realtime_model.num_total_threads
         if feedback_thread_analytics_model:
-            num_open_threads = feedback_thread_analytics_model.num_open_threads
-            num_total_threads = (
+            num_open_threads += feedback_thread_analytics_model.num_open_threads
+            num_total_threads += (
                 feedback_thread_analytics_model.num_total_threads)
 
         return {

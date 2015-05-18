@@ -64,6 +64,11 @@ class ExplorationModel(base_models.VersionedModel):
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
+    # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
+    # caused GAE to raise an error on fetching a specific version of the
+    # exploration model.
+    # TODO(sll): Fix this error and remove this property.
+    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
     blurb = ndb.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.

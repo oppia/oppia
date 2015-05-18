@@ -600,6 +600,8 @@ def _save_exploration(
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
     exploration_model.default_skin = exploration.default_skin
+    exploration_model.skin_customizations = (
+        exploration.skin_instance.to_dict()['skin_customizations'])
 
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
@@ -638,6 +640,8 @@ def _create_exploration(
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
         default_skin=exploration.default_skin,
+        skin_customizations=exploration.skin_instance.to_dict(
+            )['skin_customizations'],
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
@@ -1062,11 +1066,14 @@ def _get_search_rank(exp_id):
     and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
+    _STATUS_PUBLICIZED_BONUS = 30
+
     exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
     summary = get_exploration_summary_by_id(exp_id)
     rank = (
-        3000 if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
+        _STATUS_PUBLICIZED_BONUS
+        if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
         else 0)
 
     if summary.ratings:
@@ -1077,8 +1084,13 @@ def _get_search_rank(exp_id):
                 RATING_WEIGHTINGS[rating_value])
 
     _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
-    time_delta_days = (exploration.last_updated - _BEGINNING_OF_TIME).days
-    rank += int(time_delta_days)
+    time_delta_days = int((exploration.last_updated - _BEGINNING_OF_TIME).days)
+    if time_delta_days == 0:
+        rank += 80
+    elif time_delta_days == 1:
+        rank += 50
+    elif 2 <= time_delta_days <= 7:
+        rank += 35
 
     return rank
 

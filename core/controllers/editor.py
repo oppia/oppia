@@ -28,6 +28,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
@@ -194,6 +195,10 @@ class ExplorationPage(EditorHandler):
             interaction_registry.Registry.get_validators_html(
                 interaction_ids))
 
+        gadget_ids = gadget_registry.Registry.get_all_gadget_ids()
+        gadget_templates = (
+            gadget_registry.Registry.get_gadget_html(gadget_ids))
+
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
 
@@ -216,6 +221,7 @@ class ExplorationPage(EditorHandler):
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'interaction_validators_html': jinja2.utils.Markup(
@@ -276,6 +282,8 @@ class ExplorationHandler(EditorHandler):
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
+            'skin_customizations': exploration.skin_instance.to_dict()[
+                'skin_customizations'],
             'states': states,
             'tags': exploration.tags,
             'title': exploration.title,

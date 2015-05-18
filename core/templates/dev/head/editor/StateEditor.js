@@ -28,10 +28,7 @@ oppia.controller('StateEditor', [
     INTERACTION_SPECS) {
 
   $scope.STATE_CONTENT_SCHEMA = {
-    type: 'html',
-    ui_config: {
-      size: 'large'
-    }
+    type: 'html'
   };
 
   $scope.isCurrentStateTerminal = false;

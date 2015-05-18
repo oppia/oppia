@@ -1,0 +1,24 @@
+ .gauge {
+   margin: 10px auto 30px;
+   width: 378px;
+   height: 74px;
+   background: url('../images/gauge.png') center no-repeat;
+   font-size: 14px;
+   font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+   position: relative;
+ }
+
+.fill {
+  position: relative;
+  left: 15px;
+  top: 33px;
+  width: 345px;
+  height: 7px;
+}
+
+.title {
+  position: absolute;
+  top: 65px;
+  text-align: center;
+  width: 100%;
+}

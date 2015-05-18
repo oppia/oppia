@@ -287,8 +287,8 @@ states:
   Intro:
     content:
     - type: text
-      value: 'Suppose you were given three balls: one red, one blue, and one yellow.
-        How many ways are there to arrange them in a straight line?'
+      value: '<p>Suppose you were given three balls: one red, one blue, and one yellow.
+        How many ways are there to arrange them in a straight line?</p>'
     param_changes: []
     widget:
       customization_args: {}
@@ -550,7 +550,7 @@ states:
   correct but why:
     content:
     - type: text
-      value: Right! Why do you think it is 6?
+      value: <p>Right! Why do you think it is 6?</p>
     param_changes: []
     widget:
       customization_args:

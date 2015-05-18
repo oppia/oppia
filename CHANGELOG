@@ -3,6 +3,73 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v2.0.0.rc.2 (24 Apr 2015)
+-------------------------
+Splash/gallery page:
+* Add a video to the interstitial section.
+* Fix reddish-looking placeholder text in the search input field.
+* Fix an error in search which caused unnecessary errors to be logged.
+* Fix an error where the search cursor was not being overwritten correctly after fetching results.
+
+Learner page:
+* Add the ability for logged-in users to submit ratings at the end of an exploration. The average rating will display in the gallery after at least 5 ratings have been submitted.
+* Adjust the loading time for cards to take the server RPC call into account, in order to reduce the effect of network latency on the end user.
+* Provide options for sharing explorations on Facebook and Twitter.
+* Change the feedback submission modal into a more lightweight popover.
+* Redesign the "embed exploration" modal to include instructions for iframing explorations in a container that does not support adding JavaScript or custom tags.
+* Show the same congratulatory text when the learner completes an exploration via a state with a terminal interaction (as opposed to the END state).
+
+Editor page:
+* Simplify the content + interaction flow: remove unnecessary default content for the initial state and use a redesigned modal for interaction selection.
+* Allow tags to be specified for an exploration.
+* In the exploration graph visualization, add links from states with a terminal interaction to the END state, and change the layout algorithm, colors, text positioning, and node heights.
+* Add checks for errors related to using parameters wrongly.
+* Add CSS transitions to numerous elements.
+* Prevent publishing an exploration to the gallery if it contains warnings or errors.
+* Update the list of warnings when the exploration objective is changed.
+* Fix a bug where the 'publish changes' button reverted to 'save draft' when an exploration was featured.
+* Remove the duplicate user response in the rule preview, since it's already in the header.
+* Show a string instead of a dropdown for rule parameter selectors with a single choice.
+* Add some space between the various segments that make up the rule description.
+* In non-edit mode, suppress the sort handles on the rules.
+* Use a more appropriate rule description for the 'Continue Button' interaction.
+* Make the currently-selected rule stand out more.
+* Allow pressing the 'enter' key in the 'add new state' modal to submit the form.
+
+Sitewide frontend changes:
+* Change the body font size to 1.6em.
+* Add social media chiclets to the sidebar.
+
+Other pages:
+* Updates page: rename this page to 'Notifications'.
+* My Explorations page: show total and unresolved feedback thread counts (issue 632).
+* Updates and Preferences pages: fix a bug where the header subtext was aligned too far too the left on narrow screens.
+* Signup page: show the user's email, and remove the "sign in" navbar tab.
+* About page: improve the text, move the 'contact' and 'license' sections upwards, and fix a missing link.
+* Participation Playbook page: simplify the structure..
+* Forum page: show the 'category' view instead, and make the forum taller and responsive to the page width.
+* Admin page: add admin customization options for the embedded forum URL, the videos for the splash and About pages, the sidebar icons, and the different sharing options to be shown in the learner view.
+
+Interactions
+* Shorten the descriptions for many interaction customization options.
+* EndConversation: add some space above the 'return to gallery' button.
+
+Analytics
+* Fix a bug in the logic for checking null versions in the stats aggregator MapReduce job.
+* Ensure that a leave event is recorded when any terminal state is hit (issue 703).
+
+Infrastructure and tests
+* Simplify the Windows installation process: do not run chown or chmod.
+* In development mode, show a 'Development Mode' indicator in the bottom right (issue 83).
+* Add functionality for running deferred jobs with parameters.
+* In the integration test script, clarify the messaging about screenshots.
+* Create a GLOBALS file to be included before all Karma tests.
+* Add an integration test for the tutorial in the exploration editor.
+
+Demo explorations
+* Add an image credit to the "Solar System" exploration.
+
+
 v2.0.0.rc.1 (5 Mar 2015)
 ------------------------
 Frontend (general):

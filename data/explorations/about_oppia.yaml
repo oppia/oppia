@@ -6,8 +6,9 @@ language_code: en
 objective: Learn about the world's first community-built personal online tutor
 param_changes: []
 param_specs: {}
-schema_version: 4
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   About this website:
     content:
@@ -134,19 +135,19 @@ states:
         by being an active member of the Oppia community. This includes posting on
         our forum, giving feedback to the site, and giving feedback to exploration
         authors. You can take a look at our Community Guidelines here:</div><div><oppia-noninteractive-link
-        url-with-value="&amp;quot;https://www.oppia.org/info#community&amp;quot;"
-        text-with-value="&amp;quot;&amp;quot;" open_link_in_same_window-with-value="false"></oppia-noninteractive-link><br></div><div><br></div><div>Second,
+        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
+        url-with-value="&amp;quot;https://www.oppia.org/info#community&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>Second,
         you can contribute by creating content. This includes creating and publishing
         explorations. Making explorations is fun and easy, you can try it for yourself
         by going back to my home page and clicking 'Create Exploration'. You can take
-        a look at the Publishing Criteria here:</div><div><span class=""></span><oppia-noninteractive-link
-        url-with-value="&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;"
-        text-with-value="&amp;quot;&amp;quot;" open_link_in_same_window-with-value="false"></oppia-noninteractive-link><br></div><div><br></div><div>Finally,
+        a look at the Publishing Criteria here:</div><div><span></span><oppia-noninteractive-link
+        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
+        url-with-value="&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>Finally,
         you can contribute directly to the open source platform. We are always in
         need of designers, programmers, marketers, and everyone in-between. Visit
         the code site to find out more about how you can contribute:</div><div><oppia-noninteractive-link
-        url-with-value="&amp;quot;https://code.google.com/p/oppia&amp;quot;" text-with-value="&amp;quot;&amp;quot;"
-        open_link_in_same_window-with-value="false"></oppia-noninteractive-link><br></div>
+        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
+        url-with-value="&amp;quot;https://code.google.com/p/oppia&amp;quot;"></oppia-noninteractive-link><br></div>
     interaction:
       customization_args:
         buttonText:
@@ -166,8 +167,8 @@ states:
     - type: text
       value: <div>The open-source codebase has been contributed to by many people.
         You can see a full list of contributors on our Credits page:</div><div><oppia-noninteractive-link
-        url-with-value="&amp;quot;https://www.oppia.org/info#credits&amp;quot;" text-with-value="&amp;quot;&amp;quot;"
-        open_link_in_same_window-with-value="false"></oppia-noninteractive-link><br></div><div><br></div><div>We
+        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
+        url-with-value="&amp;quot;https://www.oppia.org/info#credits&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>We
         have lots of plans for the future! If you'd like to help, you'd be very welcome,
         and we'd be delighted to help you get started. Feel free to reach out to us
         at the oppia-dev Google Group, or by contacting admin@oppia.org.</div>
@@ -219,9 +220,9 @@ states:
   End Card:
     content:
     - type: text
-      value: Fantastic. Feel free to try one of my featured explorations below. Then
-        I hope you'll feel inspired to create a few explorations yourself.&nbsp;<div><br></div><div>Have
-        fun!</div>
+      value: "Fantastic. Feel free to try one of my featured explorations below. Then\
+        \ I hope you'll feel inspired to create a few explorations yourself.\_<div><br></div><div>Have\
+        \ fun!</div>"
     interaction:
       customization_args:
         buttonText:
@@ -260,7 +261,7 @@ states:
     content:
     - type: text
       value: "<div>Guess what {{answer}}, you\u2019ve been playing one of my explorations\
-        \ all along!&nbsp;</div><div><br></div><div>Explorations are like interactive\
+        \ all along!\_</div><div><br></div><div>Explorations are like interactive\
         \ lessons. There are many types of interactions you can have in an exploration;\
         \ for example, let's try using a map.</div><div><br></div><div>Can you find\
         \ Helsinki, Finland on the map?</div>"
@@ -328,10 +329,10 @@ states:
         \ out a worksheet-- ugh. My learning explorations are much more dynamic: I\
         \ ask you questions and give you feedback, just like a real tutor!</div><div><br></div><div>I\u2019\
         m completely owned and built by the community, *anyone* can come build and\
-        \ play with me. The more you build, the more helpful I can be to the world.&nbsp;</div><div><br></div><div>You\
-        \ can share my explorations in the public gallery, embed them on a webpage,\
-        \ or just share them with your friends-- it\u2019s all up to you. And best\
-        \ of all, I'm completely free!</div>"
+        \ play with me. The more you build, the more helpful I can be to the world.\_\
+        </div><div><br></div><div>You can share my explorations in the public gallery,\
+        \ embed them on a webpage, or just share them with your friends-- it\u2019\
+        s all up to you. And best of all, I'm completely free!</div>"
     interaction:
       customization_args:
         buttonText:
@@ -351,8 +352,8 @@ states:
     - type: text
       value: Yes, all the content on this website can be used freely under the Creative
         Commons 2.0 License. You can learn more about the License here:<div><oppia-noninteractive-link
-        url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;" text-with-value="&amp;quot;&amp;quot;"
-        open_link_in_same_window-with-value="false"></oppia-noninteractive-link><br></div>
+        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
+        url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></div>
     interaction:
       customization_args:
         choices:
@@ -457,3 +458,4 @@ states:
           param_changes: []
       id: MultipleChoiceInput
     param_changes: []
+tags: []

@@ -457,6 +457,8 @@ var deleteState = function(stateName) {
   });
 };
 
+// For problems with this function see issue 732.
+// TODO (jacob) fix issue 732.
 var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
     return stateNode.element(by.css('.protractor-test-node-label')).getText();

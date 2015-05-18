@@ -6,17 +6,21 @@ language_code: en
 objective: start speaking Spanish
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Adios:
     content:
     - type: text
-      value: "\xA1Ay! \xBF\xA150 pesos para una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
+      value: "\xA1Ay! \xBF\xA150 pesos por una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
         \xA1Adi\xF3s!"
-    param_changes: []
-    widget:
-      customization_args: {}
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -45,14 +49,13 @@ states:
           feedback:
           - Say goodbye
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Colores:
     content:
     - type: text
       value: "\xBFDe qu\xE9 colores son las manzanas?"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -114,16 +117,19 @@ states:
 
             So this is asking, what colors are apples?'
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Como meaning:
     content:
     - type: text
-      value: "So, \"te llamas\" looks a lot like \"me llamo.\"\n<br>And this sentence\
-        \ is a question.\n<br>What would \"\xBFC\xF3mo te llamas?\" mean?"
-    param_changes: []
-    widget:
-      customization_args: {}
+      value: "Now, \"te llamas\" looks a lot like \"me llamo.\"\nAnd this sentence\
+        \ is a question.\n<br><br>What do you think \"\xBFC\xF3mo te llamas?\" means?"
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -159,16 +165,19 @@ states:
 
             So, let''s try this again...Introduce yourself.'
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Hola:
     content:
     - type: text
-      value: "Let's speak Spanish. If you ever don't understand what is being said,\
-        \ just type or select \"I don't know\"\n<br><br>\n\xA1Hola!"
-    param_changes: []
-    widget:
-      customization_args: {}
+      value: "Let's speak some Spanish! I'll say something in Spanish, and you can\
+        \ respond in Spanish. OK?<br><br>\n\xA1Hola!"
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -208,15 +217,18 @@ states:
           feedback:
           - Hola means Hello. Say Hello back (in Spanish).
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Me llamo:
     content:
     - type: text
       value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
-    param_changes: []
-    widget:
-      customization_args: {}
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -253,15 +265,18 @@ states:
           dest: Me llamo meaning
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Me llamo meaning:
     content:
     - type: text
-      value: Can you say what "Me llamo" means?
-    param_changes: []
-    widget:
-      customization_args: {}
+      value: (What do you think "Me llamo" means?)
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -303,15 +318,14 @@ states:
 
             So "Me llamo Oppia" means "My name is Oppia".'
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Supermercado:
     content:
     - type: text
       value: "\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\
         ?"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -363,5 +377,6 @@ states:
 
             What can you buy at a supermarket?'
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
+tags: []

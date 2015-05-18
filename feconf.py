@@ -92,6 +92,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 # Static file url to path mapping
 PATH_MAP = {
     '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
+    '/extensions/gadgets': GADGETS_DIR,
     '/extensions/interactions': INTERACTIONS_DIR,
     '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
     '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
@@ -243,6 +244,12 @@ DEMO_EXPLORATIONS = [
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
+    # TODO(anuzis): Replace about_oppia.yaml with this dev version when gadget
+    # visibility by state is functional. Currently an AdviceBar gadget that
+    # should only display on the Helsinki map state is visible during the
+    # entire exploration as a dev demo.
+    ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
+     'Welcome'),
 ]
 
 # TODO(sll): Add all other URLs here.
@@ -287,6 +294,8 @@ EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
 EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
+EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
+EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 # The values for these two event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'

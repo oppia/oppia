@@ -118,7 +118,9 @@ describe('Datetime Formatter', function() {
     it('should show only the date for a datetime occurring before today', function() {
       // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
       // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
-      expect(['11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17']).toContain(
+      // Also have into account different locales where the order of time/date
+      // formatting is different.
+      expect(['11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014']).toContain(
         df.getLocaleAbbreviatedDatetimeString(
           NOW_MILLIS - 72 * 60 * 60 * 1000));
     });

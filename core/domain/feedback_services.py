@@ -53,6 +53,9 @@ def create_thread(
     thread.exploration_id = exploration_id
     thread.state_name = state_name
     thread.original_author_id = original_author_id
+    # The feedback analytics jobs rely on the thread status being set to 'open'
+    # when a new thread is created. If this is changed, changes need to be 
+    # made there as well
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
     thread.put()
@@ -88,6 +91,7 @@ def create_message(
 
     Returns False if the message with the ID already exists.
     """
+    from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
     # in is valid.
     thread = feedback_models.FeedbackThreadModel.get(thread_id)
@@ -99,12 +103,21 @@ def create_message(
     msg.message_id = message_id
     msg.author_id = author_id
     if updated_status:
+        if message_id == 0:
+            # New thread.
+            event_services.FeedbackThreadCreatedEventHandler.record(
+                thread.exploration_id)
+        else:
+            # Thread status changed.
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                thread.exploration_id, thread.status, updated_status)
+            
         msg.updated_status = updated_status
     if updated_subject:
         msg.updated_subject = updated_subject
     msg.text = text
     msg.put()
-
+    
     # We do a put() even if the status and subject are not updated, so that the
     # last_updated time of the thread reflects the last time a message was
     # added to it.

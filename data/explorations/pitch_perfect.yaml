@@ -6,15 +6,15 @@ language_code: en
 objective: practice listening to and transcribing musical pitches
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
   Choice from Interval-1:
     content:
     - type: text
       value: Where would you like to go next?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -67,14 +67,13 @@ states:
           feedback:
           - Let's keep matching intervals for now.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice from Interval-2:
     content:
     - type: text
       value: Where would you like to go from here?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -132,14 +131,13 @@ states:
           feedback:
           - Let's keep matching intervals for now.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice from Interval-3:
     content:
     - type: text
       value: You've really come a long way. Where would you like to go next?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -196,14 +194,13 @@ states:
           feedback:
           - Let's move on to the Melody Trainer.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice from Melody-1:
     content:
     - type: text
       value: Where would you like to go?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -262,8 +259,8 @@ states:
           feedback:
           - Let's keep matching melodies.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice from Melody-2:
     content:
     - type: text
@@ -272,15 +269,14 @@ states:
         radio, try to pick out intervals that sound familiar. Just remember, ear training
         is a life long journey and you'll get significantly better at it with just
         a little effort. Thanks for playing!
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
           - Replay Melody Trainer.
           - Go to Interval Trainer.
           - Go to Pitch Trainer.
-          - No thanks, I'm done for now.
+          - I'm done for now.
       handlers:
       - name: submit
         rule_specs:
@@ -330,15 +326,14 @@ states:
           feedback:
           - Let's review some intervals.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice from Pitch-2:
     content:
     - type: text
       value: You're getting the hang of this! The world is your oyster, where do you
         want to go?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -395,14 +390,13 @@ states:
           feedback:
           - Let's keep matching pitches for now.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice from Pitch-3:
     content:
     - type: text
       value: Alright you've got that down pretty well. What do you want to try next?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -459,8 +453,8 @@ states:
           feedback:
           - Let's move on to the Interval Trainer.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Choice-1:
     content:
     - type: text
@@ -469,8 +463,7 @@ states:
         move to intervals, and work with melodies last after your ears have warmed
         up. You, however, are a free thinking individual, and should go wherever your
         heart desires. Where would you like to boldly go?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -527,8 +520,8 @@ states:
           feedback:
           - Let's keep matching pitches for now.
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Interval Trainer-1:
     content:
     - type: text
@@ -536,9 +529,10 @@ states:
         \ two, right? Two notes make up what is called an interval. There are a few\
         \ different kinds but you don't have to worry about remembering them all just\
         \ yet. Let's just start with a few common ones.\_"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -761,16 +755,17 @@ states:
           - "Try again. Listen to the desired sequence and make your selection.\_"
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Interval Trainer-2:
     content:
     - type: text
       value: You've come a long way! Let's keep it up and see where it takes us. Listen
         to the desired interval and try to match it on the staff.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -994,17 +989,18 @@ states:
             \ selection. You can compare it with your note as many times as you like\
             \ using the play buttons.\_"
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Interval Trainer-3:
     content:
     - type: text
       value: Great! Now that we have a good feel for the Perfect intervals, let's
         try something a bit more challenging. Listen to the desired interval and try
         to match it on the staff.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -1169,17 +1165,18 @@ states:
           - Try again. Listen to the desired sequence and make your selection.
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Melody Trainer-1:
     content:
     - type: text
       value: Well you've traveled far, haven't you? Let's try our ears at a few melodies.
         Don't worry about the rhythm for now, we're just going to focus on matching
         the pitches. Listen to the desired sequence and match them on the staff.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -1331,16 +1328,17 @@ states:
             \ using the play buttons.\_"
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Melody Trainer-2:
     content:
     - type: text
       value: "You've got the hang of it! Let's try another melody. Listen to the desired\
         \ sequence and try to match it on the staff. \_"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -1570,22 +1568,23 @@ states:
             \ selection. You can compare it with your note as many times as you like\
             \ using the play buttons.\_"
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Pitch Trainer-1:
     content:
     - type: text
       value: "In this exploration, we're going to learn the basics of music theory.\
         \ Now don't be afraid, it's not all that hard, and the good thing is, you've\
         \ been training your ear for it your whole life.\_<div><br></div><div>Music\
-        \ is made up of notes and rests. Listen to the target sequence of notes by\
-        \ pressing the button, artfully named, \"Play Target Sequence\", and then\
+        \ is made up of notes and rests. Listen to the desired sequence of notes by\
+        \ pressing the button, artfully named, \"Play Desired Sequence\", and then\
         \ try to match it by dragging notes onto the staff.\_</div><div><br></div><div>For\
         \ now let's start small with just one note. Don't worry about getting it right\
         \ the first time. Your ears will grow with time.</div>"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -1815,16 +1814,17 @@ states:
           - Try again. Listen to the desired note and make your selection.<br>
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Pitch Trainer-2:
     content:
     - type: text
       value: "Listen to the desired note and make your selection. You can compare\
         \ your note with the desired one as many times as you like before submitting.\_"
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -2054,17 +2054,18 @@ states:
           - "Try again. Listen to the desired note and make your selection.\_"
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
   Pitch Trainer-3:
     content:
     - type: text
       value: Let's match one last pitch before we move on. Listen to the desired note
         and make your selection. You may want to think outside of the box for this
         one.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -2294,5 +2295,6 @@ states:
             \ using the play buttons.\_"
           - Try again. Listen to the desired note and make your selection.
           param_changes: []
-      sticky: true
-      widget_id: MusicNotesInput
+      id: MusicNotesInput
+    param_changes: []
+tags: []

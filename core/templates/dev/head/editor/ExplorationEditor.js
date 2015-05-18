@@ -213,7 +213,7 @@ oppia.controller('ExplorationEditor', [
       'After telling Oppia what to say, choose how you want the learner to respond by ' +
       'selecting an <b>interaction type</b>.' +
       'Then, based on the learner\'s response, you can tell Oppia how to reply by ' +
-      'creating an <b>answer group</b>.')
+      'creating a <b>rule</b>.')
   }, {
     type: 'function',
     fn: function(isGoingForward) {
@@ -517,23 +517,23 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           deletedStates: function() {
             return deletedStates;
           },
-          commitMessageIsOptional: function() {
+          isExplorationPrivate: function() {
             return explorationRightsService.isPrivate();
           }
         },
         controller: [
           '$scope', '$modalInstance', 'explorationPropertyChanges',
           'statePropertyChanges', 'changedStates', 'addedStates',
-          'deletedStates', 'commitMessageIsOptional',
+          'deletedStates', 'isExplorationPrivate',
           function($scope, $modalInstance, explorationPropertyChanges,
                    statePropertyChanges, changedStates, addedStates,
-                   deletedStates, commitMessageIsOptional) {
+                   deletedStates, isExplorationPrivate) {
             $scope.explorationPropertyChanges = explorationPropertyChanges;
             $scope.statePropertyChanges = statePropertyChanges;
             $scope.changedStates = changedStates;
             $scope.addedStates = addedStates;
             $scope.deletedStates = deletedStates;
-            $scope.commitMessageIsOptional = commitMessageIsOptional;
+            $scope.isExplorationPrivate = isExplorationPrivate;
 
             // For reasons of backwards compatibility, the following keys
             // should not be changed.
@@ -569,7 +569,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'content': 'Content',
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
-              'widget_handlers': 'Answer groups'
+              'widget_handlers': 'Rules'
             }
 
             // An ordered list of state properties that determines the order in which
