@@ -110,6 +110,9 @@ class BaseInteraction(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
+    # Desired calculations that should be performed on recorded state answers.
+    # Overridden in subclasses.
+    registered_state_answers_calculations = []
 
     @property
     def id(self):

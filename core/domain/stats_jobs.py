@@ -19,11 +19,11 @@ import collections
 
 from core import jobs
 from core.platform import models
+import feconf
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()
-import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -154,6 +154,8 @@ class StatisticsMRJobManager(
     """Job that calculates and creates stats models for exploration view.
        Includes: * number of visits to the exploration
                  * number of completions of the exploration
+       This deals with statistics of the whole exploration. See
+       stats_domain.StateAnswers for statistics of individual states.
     """
 
     _TYPE_STATE_COUNTER_STRING = 'counter'
@@ -388,3 +390,63 @@ class NullStateHitEventsMigrator(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class InteractionAnswerViewsMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+    """
+    Job to calculate interaction view statistics, e.g. most frequent
+    answers of multiple-choice interactions. Iterate over StateAnswer
+    objects and create StateAnswersCalcOutput objects.
+    """
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return InteractionAnswerViewsAggregator
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import interaction_registry
+        from extensions.answer_summarizers import calculations
+
+        if InteractionAnswerViewsMRJobManager._entity_created_before_job_queued(
+                item):
+
+            # Get all calculations desired for interaction type of the
+            # current state
+            calculations = interaction_registry.Registry.get_interaction_by_id(
+                item.interaction_id).registered_state_answers_calculations
+
+            # Perform calculations and store the output
+            for calc in calculations:
+                calc_output = calc.calculate_from_state_answers_entity(
+                    item)
+                calc_output.save()
+
+    @staticmethod
+    def reduce(id, state_answers_model):
+        pass
+
+
+class InteractionAnswerViewsAggregator(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that listens to answers to states and
+    updates StateAnswer view calculations.
+    """
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return [
+            feconf.EVENT_TYPE_ANSWER_SUBMITTED]
+
+    @classmethod
+    def _get_realtime_datastore_class(cls):
+        return StatisticsRealtimeModel
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return InteractionAnswerViewsMRJobManager
+
+    # TODO(msl): continue writing this, e.g. make sure continous jobs listens
+    # to correct events (especially when answer recorded).

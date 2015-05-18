@@ -621,6 +621,25 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, exploration_version))
 
 
+class AnswerSummarizersHandler(EditorHandler):
+    """
+    Returns output of calculations performed on recorded state answers.
+    """
+
+    def get(self, exploration_id, exploration_version, escaped_state_name):
+        """Handles GET requests."""
+        state_name = self.unescape_state_name(escaped_state_name)
+        try:
+            calculation_outputs = (
+                stats_services.get_answer_summarizers_outputs(
+                    exploration_id, exploration_version, 
+                    state_name)).calculation_outputs
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json({'calculation_outputs': calculation_outputs})
+
+
 class ExplorationStatsVersionsHandler(EditorHandler):
     """Returns statistics versions for an exploration."""
 

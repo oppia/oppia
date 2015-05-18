@@ -20,6 +20,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import event_services
 from core.domain import stats_domain
+from core.domain import stats_services
 from core.tests import test_utils
 import feconf
 
@@ -36,6 +37,9 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(
             'eid', 'title', 'category')
         exp_services.save_new_exploration('user_id', exp)
+        session_id = 'session_id'
+        time_spent = 5.0
+        params = {}
 
         state_name = exp.init_state_name
 
@@ -47,7 +51,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
 
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer1')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -58,10 +62,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
 
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer2')
+            session_id, time_spent, params, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -74,10 +78,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
 
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer2')
+            session_id, time_spent, params, 'answer2')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer2')
+            session_id, time_spent, params, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -92,6 +96,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(
             'eid', 'title', 'category')
         exp_services.save_new_exploration('user_id', exp)
+
+        session_id = 'session_id'
+        time_spent = 5.0
+        params = {}
 
         rule = exp_domain.RuleSpec.from_dict_and_obj_type({
             'definition':  {
@@ -109,10 +117,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
 
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer1')
+            session_id, time_spent, params, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER, rule,
-            'answer2')
+            session_id, time_spent, params, 'answer2')
 
         default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -128,6 +136,9 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(
             'eid', 'title', 'category')
         exp_services.save_new_exploration('user_id', exp)
+        session_id = 'session_id'
+        time_spent = 5.0
+        params = {}
 
         state_name = exp.init_state_name
 
@@ -137,13 +148,13 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
 
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer2')
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -157,3 +168,80 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 1)
+
+
+class StateAnswersTests(test_utils.GenericTestBase):
+    """Test the state answers domain object."""
+
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
+        'sid', 'NormalizedString')
+    SUBMIT_HANDLER = feconf.SUBMIT_HANDLER_NAME
+
+    def test_record_answer(self):
+        self.save_new_default_exploration('eid', 'fake@user.com')
+        exp = exp_services.get_exploration_by_id('eid')
+
+        FIRST_STATE_NAME = exp.init_state_name
+        SECOND_STATE_NAME = 'State 2'
+        exp_services.update_exploration('fake@user.com', 'eid', [{
+            'cmd': 'edit_state_property',
+            'state_name': FIRST_STATE_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }, {
+            'cmd': 'add_state',
+            'state_name': SECOND_STATE_NAME,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': SECOND_STATE_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+        exp = exp_services.get_exploration_by_id('eid')
+
+        session_id = 'session_id'
+        time_spent = 5.0
+        exp_version = exp.version
+        params = {}
+
+        for state_name in [FIRST_STATE_NAME, SECOND_STATE_NAME]:
+            state_answers = stats_services.get_state_answers(
+                'eid', exp_version, state_name)
+            self.assertEquals(state_answers, None)
+
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, SECOND_STATE_NAME, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, session_id, time_spent, params, 'answer3')
+
+        expected_answers_list1 = [
+            {'handler_name': 'submit', 'answer_string': 'answer1',
+             'time_taken_to_answer': 5.0, 'session_id': 'session_id',
+             'interaction_id': 'TextInput', 'params': {}},
+            {'handler_name': 'submit', 'answer_string': 'answer1',
+             'time_taken_to_answer': 5.0, 'session_id': 'session_id',
+             'interaction_id': 'TextInput', 'params': {}},
+            {'handler_name': 'submit', 'answer_string': 'answer2',
+             'time_taken_to_answer': 5.0, 'session_id': 'session_id',
+             'interaction_id': 'TextInput', 'params': {}}]
+        expected_answers_list2 = [
+            {'handler_name': 'submit', 'answer_string': 'answer3',
+             'time_taken_to_answer': 5.0, 'session_id': 'session_id',
+             'interaction_id': 'TextInput', 'params': {}}]
+
+        state_answers = stats_services.get_state_answers(
+            'eid', exp_version, FIRST_STATE_NAME)
+        self.assertEquals(state_answers.answers_list, expected_answers_list1)
+
+        state_answers = stats_services.get_state_answers(
+            'eid', exp_version, SECOND_STATE_NAME)
+        self.assertEquals(state_answers.answers_list, expected_answers_list2)

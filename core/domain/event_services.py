@@ -76,12 +76,17 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
-                      handler_name, rule, answer):
+                      handler_name, rule, session_id, time_spent_in_secs,
+                      params, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
             handler_name, rule, answer)
+        from core.domain import stats_services
+        stats_services.record_answer(            
+            exploration_id, exploration_version, state_name,
+            handler_name, session_id, time_spent_in_secs, params, answer)
 
 
 class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):

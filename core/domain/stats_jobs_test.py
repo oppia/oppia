@@ -23,6 +23,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs
+from core.domain import stats_services
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 from core.tests import test_utils
@@ -302,3 +303,130 @@ class OneOffNullStateHitEventsMigratorTest(test_utils.GenericTestBase):
         self.assertLess(source_item.last_updated, target_item.last_updated)
         self.assertEqual(source_item.deleted, target_item.deleted)
         self.assertEqual(target_item.deleted, False)
+
+
+class ModifiedInteractionAnswerViewsAggregator(
+        stats_jobs.StatisticsAggregator):
+    """A modified InteractionAnswerViewsAggregator that does not start
+    a new batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedInteractionAnswerViewsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class ModifiedInteractionAnswerViewsMRJobManager(
+        stats_jobs.InteractionAnswerViewsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedInteractionAnswerViewsAggregator
+
+
+class InteractionAnswerViewsAggregatorTests(test_utils.GenericTestBase):
+    """Tests for interaction answer view aggregations."""
+
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        ModifiedInteractionAnswerViewsAggregator]
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
+        'sid', 'NormalizedString')
+    SUBMIT_HANDLER = feconf.SUBMIT_HANDLER_NAME
+
+    def _record_start(self, exp_id, exp_version, state_name, session_id):
+        event_services.StartExplorationEventHandler.record(
+            exp_id, exp_version, state_name, session_id, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+    def test_one_answer(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+
+            # setup example exploration
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            FIRST_STATE_NAME = exp.init_state_name
+            SECOND_STATE_NAME = 'State 2'
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': 'edit_state_property',
+                'state_name': FIRST_STATE_NAME,
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput',
+            }, {
+                'cmd': 'add_state',
+                'state_name': SECOND_STATE_NAME,
+            }, {
+                'cmd': 'edit_state_property',
+                'state_name': SECOND_STATE_NAME,
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput',
+            }], 'Add new state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            self._record_start(exp_id, exp_version, FIRST_STATE_NAME,
+                               'session1')
+            self._record_start(exp_id, exp_version, FIRST_STATE_NAME,
+                               'session2')
+            self.process_and_flush_pending_tasks()
+
+            # add some answers
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
+                self.DEFAULT_RULESPEC, 'session1', time_spent, params,
+                'answer1')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
+                self.DEFAULT_RULESPEC, 'session2', time_spent, params,
+                'answer1')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
+                self.DEFAULT_RULESPEC, 'session1', time_spent, params,
+                'answer2')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, SECOND_STATE_NAME, self.SUBMIT_HANDLER,
+                self.DEFAULT_RULESPEC, 'session2', time_spent, params,
+                'answer3')
+
+            # Run job on exploration with answers
+            ModifiedInteractionAnswerViewsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # get job output of first state and check it
+            calculation_outputs = (
+                stats_services.get_answer_summarizers_outputs(
+                    exp_id, exp_version, FIRST_STATE_NAME)).calculation_outputs
+
+            expected_calculation_outputs = [
+                {'visualization_id': 'values_and_counts_table',
+                 'visualization_opts': {
+                     'column_labels': ['Answer', 'Count'],
+                     'data': [['answer1', 2], ['answer2', 1]],
+                     'title': 'Answer counts'}}]
+
+            self.assertEqual(calculation_outputs,
+                             expected_calculation_outputs)
+
+            # get job output of second state and check it
+            calculation_outputs = (
+                stats_services.get_answer_summarizers_outputs(
+                    exp_id, exp_version, SECOND_STATE_NAME)).calculation_outputs
+
+            expected_calculation_outputs = [
+                {'visualization_id': 'values_and_counts_table',
+                 'visualization_opts': {
+                     'column_labels': ['Answer', 'Count'],
+                     'data': [['answer3', 1]],
+                     'title': 'Answer counts'}}]
+
+            self.assertEqual(calculation_outputs, expected_calculation_outputs)

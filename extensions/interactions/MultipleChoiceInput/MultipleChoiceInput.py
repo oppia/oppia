@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from extensions.answer_summarizers import calculations
 from extensions.interactions import base
 
 
@@ -50,3 +51,5 @@ class MultipleChoiceInput(base.BaseInteraction):
         },
         'default_value': ['Sample multiple-choice answer'],
     }]
+
+    registered_state_answers_calculations = [calculations.AnswerCounts]

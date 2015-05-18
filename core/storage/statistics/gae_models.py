@@ -416,6 +416,7 @@ def process_submitted_answer(
         rule: the rule
         answer: an HTML string representation of the answer
     """
+    # Add answer to StateRuleAnswerLogModel
     answer_log = StateRuleAnswerLogModel.get_or_create(
         exploration_id, state_name, handler_name, str(rule))
     if answer in answer_log.answers:
@@ -456,3 +457,108 @@ def resolve_answers(
         else:
             del answer_log.answers[answer]
     answer_log.put()
+
+
+class StateAnswersModel(base_models.BaseModel):
+    """Store all answers of a state.
+
+    The id/key of instances of this class has the form
+        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME].
+    """
+    # Explicitly store exploration id, exploration version and state name
+    # so we can easily do queries on them.
+    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_version = ndb.IntegerProperty(required=True)
+    state_name = ndb.StringProperty(indexed=True)
+    # Store interaction type to know which calculations should be performed
+    interaction_id = ndb.StringProperty(indexed=True, required=True)
+    # List of answer dicts, each of which is stored as JSON blob and
+    # has keys answer_string, time_taken_to_answer, session_id and
+    # dynamic_interaction_info
+    answers_list = ndb.JsonProperty(repeated=True, indexed=False)
+
+    @classmethod
+    def get_model(cls, exploration_id, exploration_version, state_name):
+        entity_id = cls._get_entity_id(
+            exploration_id, str(exploration_version), state_name)
+        instance = cls.get(entity_id, strict=False)
+        return instance
+
+    @classmethod
+    def create_or_update(cls, exploration_id, exploration_version, state_name,
+                         interaction_id, answers_list):
+        entity_id = cls._get_entity_id(
+            exploration_id, str(exploration_version), state_name)
+        instance = cls(id=entity_id, exploration_id=exploration_id,
+                       exploration_version=exploration_version,
+                       state_name=state_name,
+                       interaction_id=interaction_id,
+                       answers_list=answers_list)
+        return instance
+
+    @classmethod
+    def _get_entity_id(cls, exploration_id, exploration_version, state_name):
+        return ':'.join([exploration_id,
+                         str(exploration_version),
+                         state_name])
+
+    def get_exploration_id_and_version_and_state_name(self):
+        return self.exploration_id, self.exploration_version, self.state_name
+
+    def save(self):
+        """Commit to storage."""
+        # This may fail if answers_list is too large.
+        try:
+            self.put()
+        except Exception as e:
+            logging.error(e)
+            pass
+
+
+class StateAnswersCalcOutputModel(base_models.BaseModel):
+    """
+    Store output of calculation performed on StateAnswers.
+    """
+
+    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_version = ndb.IntegerProperty(required=True)
+    state_name = ndb.StringProperty(indexed=True)
+    # List of calculation output dicts, each of which is stored as JSON blob
+    # and has keys visualization_id and visualization_opts.
+    calculation_outputs = ndb.JsonProperty(repeated=True, indexed=False)
+
+    @classmethod
+    def create_or_update(cls, exploration_id, exploration_version, state_name,
+               calculation_outputs):
+        instance_id = cls._get_entity_id(exploration_id, exploration_version,
+                                         state_name)
+        instance = cls.get(instance_id, strict=False)
+        if not instance:
+            # create new instance
+            instance = cls(id=instance_id, exploration_id=exploration_id,
+                           exploration_version=exploration_version,
+                           state_name=state_name,
+                           calculation_outputs=calculation_outputs)
+        else:
+            # update
+            instance.calculation_outputs = calculation_outputs
+
+                # This may fail if answers_list is too large.
+        try:
+            instance.put()
+        except Exception as e:
+            logging.error(e)
+            pass
+
+    @classmethod
+    def get_model(cls, exploration_id, exploration_version, state_name):
+        entity_id = cls._get_entity_id(
+            exploration_id, str(exploration_version), state_name)
+        instance = cls.get(entity_id, strict=False)
+        return instance
+
+    @classmethod
+    def _get_entity_id(cls, exploration_id, exploration_version, state_name):
+        return ':'.join([exploration_id,
+                         str(exploration_version),
+                         state_name])

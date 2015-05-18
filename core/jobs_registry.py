@@ -40,7 +40,8 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     exp_jobs.SearchRanker,
     stats_jobs.StatisticsAggregator,
     user_jobs.DashboardRecentUpdatesAggregator,
-    feedback_jobs.FeedbackAnalyticsAggregator]
+    feedback_jobs.FeedbackAnalyticsAggregator,
+    stats_jobs.InteractionAnswerViewsAggregator]
 
 
 class ContinuousComputationEventDispatcher(object):
