@@ -327,8 +327,8 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
           var _currentStateName = editorContextService.getActiveStateName();
 
           // This is a list of objects, each with an ID and name. These
-          // represent all states, including 'END', as well as an option to
-          // create a new state.
+          // represent all states, as well as an option to create a
+          // new state.
           $scope.destChoices = [{
             id: _currentStateName,
             text: _currentStateName + ' ⟳'
@@ -338,7 +338,6 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
           }];
 
           var stateNames = Object.keys(explorationStatesService.getStates()).sort();
-          stateNames.push(END_DEST);
           for (var i = 0; i < stateNames.length; i++) {
             if (stateNames[i] !== _currentStateName) {
               $scope.destChoices.push({

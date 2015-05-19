@@ -24,6 +24,9 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
+// constants
+var _OPTION_CREATE_NEW = 'Create New State...';
+
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
   element.all(by.css('.skipBtn')).then(function(buttons) {
@@ -289,12 +292,31 @@ var _setRuleDest = function(ruleBodyElem, destinationName) {
     by.cssContainingText('option', destinationName)).click();
 };
 
+var _createStateAsDestination = function(bodyElem, destinationName) {
+  // does not close the save modal; shared by addRule and createNewStateAnd...
+  var destinationElement =
+    bodyElem.element(by.css('.protractor-test-dest-bubble'));
+  destinationElement.element(
+    by.cssContainingText('option', _OPTION_CREATE_NEW)).click();
+  element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
+  element(by.css('.protractor-test-add-state-submit')).click();
+  // Wait for the modal to close.
+  general.waitForSystem();
+};
+
 // This clicks the "add new rule" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
 // Note that feedbackInstructions may be null (which means 'specify no feedback'),
 // and only represents a single feedback element.
-var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
+// 'dest' is an object with a 'state_name' entry and 'create' entry. If create
+// is specified, it allows the caller (if true) to create the provided dest
+// state without using the createNewStateAndSetDestination feature (to avoid
+// having to close the add rule modal). For the sake of backward compatibility,
+// if 'dest' is provided as a non-object, it is treated as the destination state
+// name and will not create the state initially.
+var addRule = function(interactionId, feedbackInstructions, dest,
+    ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
   general.waitForSystem();
 
@@ -308,8 +330,20 @@ var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
   if (feedbackInstructions) {
     _setRuleFeedback(ruleElement, 0, feedbackInstructions)
   }
-  if (dest) {
-    _setRuleDest(ruleElement, dest);
+
+  var create = false, stateName = null;
+  if (dest !== null && typeof dest === 'object') {
+    create = dest.create;
+    stateName = dest.state_name;
+  } else { // dest isn't an object: old approach
+    stateName = dest;
+  }
+
+  // chceck whether to create destination state
+  if (create && stateName) {
+    _createStateAsDestination(ruleElement, stateName);
+  } else if (stateName) { // createDest automatically sets it, too
+    _setRuleDest(ruleElement, stateName);
   }
 
   element(by.css('.protractor-test-add-new-rule')).click();
@@ -319,8 +353,6 @@ var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
-  var _OPTION_CREATE_NEW = 'Create New State...';
-
   if (ruleNum === 'default') {
     element(by.css('.protractor-test-default-rule-tab')).isPresent().then(function(isVisible) {
       // If there is only one rule, no tabs are shown, so we don't have to click
@@ -378,14 +410,7 @@ var RuleEditor = function(ruleNum) {
     },
     // Sets a destination for this rule, creating a state in the process.
     createNewStateAndSetDestination: function(destinationName) {
-      var destinationElement =
-        bodyElem.element(by.css('.protractor-test-dest-bubble'));
-      destinationElement.element(
-        by.cssContainingText('option', _OPTION_CREATE_NEW)).click();
-      element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
-      element(by.css('.protractor-test-add-state-submit')).click();
-      // Wait for the modal to close.
-      general.waitForSystem();
+      _createStateAsDestination(bodyElem, destinationName);
       bodyElem.element(by.css('.protractor-test-save-rule')).click();
     },
     // The current state name must be at the front of the list.

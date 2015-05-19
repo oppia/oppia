@@ -283,6 +283,10 @@ class TestBase(unittest.TestCase):
             exploration_id, title, category)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
+        # Ensure the test exploration has a valid end state
+        exploration.add_states([ feconf.END_DEST] )
+        exploration.states[feconf.END_DEST].update_interaction_id(
+            'EndExploration')
         exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
         exploration.objective = objective

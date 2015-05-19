@@ -269,8 +269,6 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
    */
   function _compareLinks(v1States, originalStateIds, v2States, newestStateIds) {
     links = [];
-    originalStateIds[END_DEST] = _generateNewId();
-    newestStateIds[END_DEST] = _maxId;
     var adjMatrixV1 = _getAdjMatrix(v1States, originalStateIds, _maxId);
     var adjMatrixV2 = _getAdjMatrix(v2States, newestStateIds, _maxId);
 
@@ -378,12 +376,13 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
 
         var links = _compareLinks(v1States, originalStateIds, v2States, stateIds);
 
+        // TODO(bhenning): should this return a list of endStateIds (terminal
+        // nodes)? See TODO in ExplorationHistory.js for more
         return {
           'nodes': statesData,
           'links': links,
           'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
-          'v2InitStateId': stateIds[response.v2Data.data.init_state_name],
-          'endStateId': stateIds[END_DEST]
+          'v2InitStateId': stateIds[response.v2Data.data.init_state_name]
         };
       });
     }

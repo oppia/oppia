@@ -154,12 +154,6 @@ oppia.controller('ExplorationHistory', [
         $scope.diffGraphNodeColors = {};
 
         nodesData = response.nodes;
-        nodesData[response.endStateId] = {
-          'newestStateName': END_DEST,
-          'originalStateName': END_DEST,
-          'stateProperty': STATE_PROPERTY_UNCHANGED
-        };
-
         for (var nodeId in nodesData) {
           if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
@@ -203,7 +197,7 @@ oppia.controller('ExplorationHistory', [
           'nodes': diffGraphNodes,
           'links': response.links,
           'initStateId': response.v2InitStateId,
-          'finalStateIds': [response.endStateId]
+          'finalStateIds': [] // TODO(bhenning): should be a list of term nodes?
         };
 
         // Generate the legend graph
@@ -279,14 +273,12 @@ oppia.controller('ExplorationHistory', [
   // stateId is the unique ID assigned to a state during calculation of state
   // graph.
   $scope.onClickStateInHistoryGraph = function(stateId) {
-    if (nodesData[stateId].newestStateName !== END_DEST) {
-      var oldStateName = undefined;
-      if (nodesData[stateId].newestStateName != nodesData[stateId].originalStateName) {
-        oldStateName = nodesData[stateId].originalStateName;
-      }
-      $scope.showStateDiffModal(nodesData[stateId].newestStateName,
-        oldStateName, nodesData[stateId].stateProperty);
+    var oldStateName = undefined;
+    if (nodesData[stateId].newestStateName != nodesData[stateId].originalStateName) {
+      oldStateName = nodesData[stateId].originalStateName;
     }
+    $scope.showStateDiffModal(nodesData[stateId].newestStateName,
+      oldStateName, nodesData[stateId].stateProperty);
   };
 
   // Shows a modal comparing changes on a state between 2 versions.

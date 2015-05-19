@@ -55,6 +55,7 @@ var _completeSignup = function(username) {
 var createUser = function(email, username) {
   login(email);
   _completeSignup(username);
+  general.waitForSystem();
   logout();
 };
 

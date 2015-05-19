@@ -937,15 +937,54 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exploration.rename_state('State 2', 'Renamed state')
 
-        # And it is not OK to rename a state to the END_DEST.
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid state name'):
-            exploration.rename_state('State 2', feconf.END_DEST)
+        # And it is OK to rename a state to the END_DEST.
+        exploration.rename_state('State 2', feconf.END_DEST)
+
+        # Should successfully be able to name it back.
+        exploration.rename_state(feconf.END_DEST, 'State 2')
 
         # The exploration now has exactly two states.
         self.assertNotIn(default_state_name, exploration.states)
         self.assertIn('Renamed state', exploration.states)
         self.assertIn('State 2', exploration.states)
+
+        # Can successfully add END_DEST state
+        exploration.add_states([feconf.END_DEST])
+
+        # Should fail to rename like any other state
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
+            exploration.rename_state('State 2', feconf.END_DEST)
+
+        # Ensure the other states are connected to END
+        exploration.states['Renamed state'].interaction.handlers[
+            0].rule_specs[0].dest = 'State 2'
+        exploration.states['State 2'].interaction.handlers[
+            0].rule_specs[0].dest = feconf.END_DEST
+
+        # Ensure the other states have interactions
+        exploration.states['Renamed state'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+
+        # Other miscellaneous requirements for validation
+        exploration.objective = 'Objective'
+
+        # The exploration should NOT be terminable even though it has a state
+        # called 'END' and everything else is connected to it.
+        with self.assertRaises(Exception):
+            exploration.validate(strict=True) # tests path to terminal node
+
+        # Renaming the node to something other than END_DEST and giving it an
+        # EndExploration is enough to validate it
+        exploration.rename_state(feconf.END_DEST, 'AnotherEnd')
+        exploration.states['AnotherEnd'].update_interaction_id('EndExploration')
+        exploration.validate(strict=True) # should pass this time
+
+        # Name it back for final tests
+        exploration.rename_state('AnotherEnd', feconf.END_DEST)
+
+        # Should be able to successfully delete it
+        exploration.delete_state(feconf.END_DEST)
+        self.assertNotIn(feconf.END_DEST, exploration.states)
 
 
 class SkinInstanceUnitTests(test_utils.GenericTestBase):

@@ -247,7 +247,7 @@ class RuleSpec(object):
         #
         self.definition = definition
         # Id of the destination state.
-        # TODO(sll): Check that this state is END_DEST or actually exists.
+        # TODO(sll): Check that this state actually exists.
         self.dest = dest
         # Feedback to give the reader if this rule is triggered.
         self.feedback = feedback or []
@@ -1017,10 +1017,6 @@ class Exploration(object):
     def _require_valid_state_name(cls, name):
         cls._require_valid_name(name, 'a state name')
 
-        if name.lower() == feconf.END_DEST.lower():
-            raise utils.ValidationError(
-                'Invalid state name: %s' % feconf.END_DEST)
-
     def validate(self, strict=False, allow_null_interaction=False):
         """Validates the exploration before it is committed to storage.
 
@@ -1176,7 +1172,7 @@ class Exploration(object):
 
         # Check that all rule definitions, destinations and param changes are
         # valid.
-        all_state_names = self.states.keys() + [feconf.END_DEST]
+        all_state_names = self.states.keys()
         for state in self.states.values():
             for handler in state.interaction.handlers:
                 for rule_spec in handler.rule_specs:
@@ -1262,8 +1258,7 @@ class Exploration(object):
                     for rule in handler.rule_specs:
                         dest_state = rule.dest
                         if (dest_state not in curr_queue and
-                                dest_state not in processed_queue and
-                                dest_state != feconf.END_DEST):
+                                dest_state not in processed_queue):
                             curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
@@ -1277,7 +1272,7 @@ class Exploration(object):
         """Verifies that all states can reach a terminal state."""
         # This queue stores state names.
         processed_queue = []
-        curr_queue = [feconf.END_DEST]
+        curr_queue = []
 
         for (state_name, state) in self.states.iteritems():
             if _is_interaction_terminal(state.interaction.id):
@@ -1290,8 +1285,7 @@ class Exploration(object):
             if curr_state_name in processed_queue:
                 continue
 
-            if curr_state_name != feconf.END_DEST:
-                processed_queue.append(curr_state_name)
+            processed_queue.append(curr_state_name)
 
             for (state_name, state) in self.states.iteritems():
                 if (state_name not in curr_queue
@@ -1561,8 +1555,12 @@ class Exploration(object):
             state_name for state_name in exploration_dict['states']
             if state_name != init_state_name])
 
+        targets_end_state = False
+        has_end_state = False
         for (state_name, sdict) in exploration_dict['states'].iteritems():
             state = exploration.states[state_name]
+            if not has_end_state and state_name == feconf.END_DEST:
+                has_end_state = True
 
             state.content = [
                 Content(item['type'], html_cleaner.clean(item['value']))
@@ -1593,6 +1591,13 @@ class Exploration(object):
                 }, InteractionInstance._get_obj_type(idict['id']))
                 for handler in idict['handlers']]
 
+            if not targets_end_state:
+                for handler in sdict['interaction']['handlers']:
+                    for rule_spec in handler['rule_specs']:
+                        if rule_spec['dest'] == feconf.END_DEST:
+                            targets_end_state = True
+                            break
+
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_handlers)
@@ -1607,6 +1612,13 @@ class Exploration(object):
         exploration.skin_instance = SkinInstance(
             exploration_dict['default_skin'],
             exploration_dict['skin_customizations'])
+
+        # ensure any explorations pointing to an END state has a valid END
+        # state to end with (in case it expects an END state)
+        if targets_end_state and not has_end_state:
+            exploration.add_states([ feconf.END_DEST ])
+            exploration.states[feconf.END_DEST].update_interaction_id(
+                'EndExploration')
 
         return exploration
 

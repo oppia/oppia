@@ -164,6 +164,11 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                     'no_answer_count': 0,
                     'first_entry_count': 0,
                 },
+                feconf.END_DEST: {
+                    'total_entry_count': 0,
+                    'no_answer_count': 0,
+                    'first_entry_count': 0,
+                },
             }
 
             # Record 2 start events for exp_id_1 and 1 start event for
