@@ -30,14 +30,7 @@ oppia.directive('unicodeStringEditor', function($compile, warningsData) {
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function ($scope, $attrs) {
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-      $scope.largeInput = false;
-
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
-        $scope.largeInput = false;
-        if (newValue && newValue.largeInput) {
-          $scope.largeInput = newValue.largeInput;
-        }
-      });
+      $scope.largeInput = true;
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
@@ -53,7 +46,7 @@ oppia.directive('unicodeStringEditor', function($compile, warningsData) {
         $scope.openEditor = function() {
           $scope.active = true;
         };
-  
+
         $scope.closeEditor = function() {
           $scope.active = false;
         };
