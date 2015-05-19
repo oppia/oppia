@@ -256,7 +256,7 @@ DEMO_EXPLORATIONS = [
      'Welcome'),
     ('bouncing_ball', 'Bouncing Ball', 'Programming'),
     ('classification', 'Classifying Things', 'Programming'),
-    ('genomics', 'Genomics', 'Programming'),
+    ('turtle_geometry', 'Turtle Geometry', 'Programming'),
     ('linguistics', 'Linguistics', 'Programming'),
     ('recursion', 'Recursion', 'Programming'),
     ('towers', 'Towers of Hanoi', 'Programming'),
