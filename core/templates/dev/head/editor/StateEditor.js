@@ -44,6 +44,7 @@ oppia.controller('StateEditor', [
     $scope.isCurrentStateTerminal = (
       $scope.isInteractionIdSet && INTERACTION_SPECS[
         newInteractionId].is_terminal);
+    $scope.currentInteractionId = newInteractionId;
   });
 
   $scope.initStateEditor = function() {
@@ -62,6 +63,8 @@ oppia.controller('StateEditor', [
         $scope.isInteractionIdSet &&
         INTERACTION_SPECS[stateData.interaction.id].is_terminal);
     }
+
+    $scope.currentInteractionId = stateData.interaction.id;
 
     if ($scope.content[0].value) {
       $scope.isInteractionShown = true;

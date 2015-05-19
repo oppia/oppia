@@ -46,6 +46,7 @@ STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
+STATE_PROPERTY_INTERACTION_TRIGGERS = 'interaction_triggers'
 # Kept for legacy purposes; not used anymore.
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 
@@ -73,7 +74,8 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
-        STATE_PROPERTY_INTERACTION_HANDLERS)
+        STATE_PROPERTY_INTERACTION_HANDLERS,
+        STATE_PROPERTY_INTERACTION_TRIGGERS)
 
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
@@ -944,6 +946,10 @@ class State(object):
 
             interaction_handlers[0].rule_specs.append(rule_spec)
             self.interaction.handlers = interaction_handlers
+
+    def update_interaction_triggers(self, triggers):
+        self.interaction.triggers = [
+            TriggerInstance.from_dict(trigger) for trigger in triggers]
 
     def to_dict(self):
         return {

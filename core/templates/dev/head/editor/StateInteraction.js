@@ -49,12 +49,12 @@ oppia.factory('interactionDetailsCache', [function() {
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
     'editorContextService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
-    'stateInteractionIdService', 'stateCustomizationArgsService',
+    'stateInteractionIdService', 'stateCustomizationArgsService', 'stateInteractionTriggersService',
     'editabilityService', 'explorationStatesService', 'graphDataService',
     'interactionDetailsCache',
     function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
-      stateInteractionIdService, stateCustomizationArgsService,
+      stateInteractionIdService, stateCustomizationArgsService, stateInteractionTriggersService,
       editabilityService, explorationStatesService, graphDataService,
       interactionDetailsCache) {
 
@@ -111,10 +111,16 @@ oppia.controller('StateInteraction', [
     stateCustomizationArgsService.init(
       $scope.stateName, stateData.interaction.customization_args,
       stateData.interaction, 'widget_customization_args');
+    stateInteractionTriggersService.init(
+      $scope.stateName, stateData.interaction.triggers,
+      stateData.interaction, 'interaction_triggers');
 
     $rootScope.$broadcast('initializeHandlers', {
       'interactionId': stateData.interaction.id,
       'handlers': stateData.interaction.handlers
+    });
+    $rootScope.$broadcast('initializeTriggers', {
+      'triggers': stateData.interaction.triggers
     });
 
     _updateInteractionPreviewAndAnswerChoices();
@@ -247,7 +253,7 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.deleteInteraction = function() {
-    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its rules.')) {
+    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its rules and triggers.')) {
       return false;
     }
 

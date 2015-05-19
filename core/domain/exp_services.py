@@ -392,6 +392,9 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     state.update_interaction_handlers(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_TRIGGERS):
+                    state.update_interaction_triggers(change.new_value)
             elif change.cmd == 'edit_exploration_property':
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)

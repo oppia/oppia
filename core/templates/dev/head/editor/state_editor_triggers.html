@@ -1,0 +1,72 @@
+<div ng-controller="StateTriggers">
+  <md-card class="oppia-editor-card-with-avatar">
+    <div class="oppia-editor-card-body">
+      <div ng-repeat="trigger in interactionTriggers">
+        <div style="padding: 20px;">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" class="oppia-delete-interaction-button oppia-transition-200" ng-click="clearTriggers()"></span>
+          When the learner submits an answer <[trigger.customization_args.num_submits]> time(s) for this state:
+          <br><br>
+          <strong>Destination</strong>: <[trigger.dest]>
+          <br><br>
+          <strong>Feedback</strong>:
+          <div angular-html-bind="trigger.feedback[0]"></div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="interactionTriggers.length === 0">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && getCurrentInteractionId() !== 'Continue'" class="oppia-add-rule-button-container">
+      <button type="button" class="btn btn-default btn-lg oppia-add-rule-button" ng-click="openAddTriggerModal()">
+        + Add Trigger
+      </button>
+    </div>
+  </md-card>
+</div>
+
+<script type="text/ng-template" id="modals/addTrigger">
+  <div class="modal-header">
+    <h3>Add Trigger</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="addTriggerForm.triggerDetailsForm" class="form-inline">
+      <p>
+        If the learner answers <input type="number" ng-model="tmpTrigger.customization_args.num_submits" min="1" required> time(s)
+        and still loops back to this state, do the following instead:
+      </p>
+
+      <div class="oppia-rule-edit-feedback">
+        <div class="oppia-rule-details-header">
+          <strong>Feedback</strong>
+        </div>
+        <span ng-if="tmpTrigger.feedback.length > 1">
+          (<em>Oppia picks one of these at random</em>):
+        </span>
+        <span ng-if="tmpTrigger.feedback.length == 0">
+          <em>No feedback specified.</em>
+        </span>
+
+        <schema-based-editor schema="TRIGGER_FEEDBACK_SCHEMA" local-value="tmpTrigger.feedback[0]">
+        </schema-based-editor>
+      </div>
+
+      <br>
+
+      <div class="form-inline" style="margin-bottom: 10px;">
+        <div class="oppia-rule-details-header">
+          <strong>Destination</strong>
+        </div>
+        <div class="form-group" style="font-size: 1.1em;">
+          <select class="form-control" ng-model="tmpTrigger.dest" ng-options="choice.id as choice.text for choice in destChoices" style="width: 200px;">
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success" ng-click="addTrigger()" ng-disabled="addTriggerForm.triggerDetailsForm.$invalid">Add Trigger</button>
+  </div>
+</script>
