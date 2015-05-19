@@ -16,9 +16,10 @@
 oppia.directive('coordTwoDimEditor', function() {
   return {
     restrict: 'E',
-    scope: {},
+    scope: true,
     templateUrl: '/object_editor_template/CoordTwoDim',
     controller: function($scope) {
+      console.log($scope);
       $scope.schemaLatitude = {
         type: 'float',
         validators: [{
@@ -41,7 +42,7 @@ oppia.directive('coordTwoDimEditor', function() {
         }]
       };
 
-      if ($scope.$parent.value === '') {
+      if ($scope.$parent.value === '') {  // A new rule
         $scope.$parent.value = [0.0, 0.0];
       } else {
         $scope.hasMarker = true;
@@ -72,17 +73,17 @@ oppia.directive('coordTwoDimEditor', function() {
       };
 
       $scope.registerClick = function($event, $params) {
-        var latLong = $params[0].latLng;
+        var latLng = $params[0].latLng;
         if ($scope.mapMarker) {
-          $scope.mapMarker.setPosition(latLong);
+          $scope.mapMarker.setPosition(latLng);
         } else {
           $scope.mapMarker = new google.maps.Marker({
             map: $scope.map,
-            position: latLong
+            position: latLng
           });
         }
 
-        $scope.$parent.value = [latLong.lat(), latLong.lng()];
+        $scope.$parent.value = [latLng.lat(), latLng.lng()];
       };
     }
   };
