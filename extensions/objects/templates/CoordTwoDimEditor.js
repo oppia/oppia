@@ -13,12 +13,18 @@
 // limitations under the License.
 
 
-oppia.directive('coordTwoDimEditor', function() {
+oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
   return {
+    link: function(scope, element, attrs) {
+      scope.getTemplateUrl = function() {
+        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+      };
+      $compile(element.contents())(scope);
+    },
     restrict: 'E',
     scope: true,
-    templateUrl: '/object_editor_template/CoordTwoDim',
-    controller: function($scope) {
+    template: '<span ng-include="getTemplateUrl()"></span>',
+    controller: function($scope, $timeout) {
       $scope.schemaLatitude = {
         type: 'float',
         validators: [{
@@ -41,24 +47,39 @@ oppia.directive('coordTwoDimEditor', function() {
         }]
       };
 
+      var updateMarker = function(lat, lng) {
+        var latLng = new google.maps.LatLng(lat, lng);
+
+        $timeout(function() {
+          if ($scope.mapMarker) {
+            $scope.mapMarker.setPosition(latLng);
+          } else {
+            $scope.mapMarker = new google.maps.Marker({
+              map: $scope.map,
+              position: latLng
+            });
+          }
+        }, 10);
+      };
+
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        if ($scope.$parent.value === '') {  // A new rule
+          $scope.$parent.value = [0.0, 0.0];
+        }
+
+        if (!angular.equals(newValue, oldValue)) {
+          updateMarker(newValue[0], newValue[1]);
+        }
+      });
+
       if ($scope.$parent.value === '') {  // A new rule
         $scope.$parent.value = [0.0, 0.0];
-      } else {
-        $scope.hasMarker = true;
       }
 
       // This is required in order to avoid the following bug:
       //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
       window.setTimeout(function() {
-        if ($scope.hasMarker) {
-          $scope.mapMarker = new google.maps.Marker({
-            map: $scope.map,
-            position: new google.maps.LatLng(
-              $scope.$parent.value[0],
-              $scope.$parent.value[1]
-            )
-          });
-        }
+        updateMarker($scope.$parent.value[0], $scope.$parent.value[1]);
         google.maps.event.trigger($scope.map, 'resize');
       }, 100);
 
@@ -73,17 +94,9 @@ oppia.directive('coordTwoDimEditor', function() {
 
       $scope.registerClick = function($event, $params) {
         var latLng = $params[0].latLng;
-        if ($scope.mapMarker) {
-          $scope.mapMarker.setPosition(latLng);
-        } else {
-          $scope.mapMarker = new google.maps.Marker({
-            map: $scope.map,
-            position: latLng
-          });
-        }
-
+        updateMarker(latLng.lat(), latLng.lng());
         $scope.$parent.value = [latLng.lat(), latLng.lng()];
       };
     }
   };
-});
+}]);

@@ -162,8 +162,8 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
         }
         replacementText += ']';
       } else if (varType === 'CoordTwoDim') {
-        var latitude = inputs[varName][0];
-        var longitude = inputs[varName][1];
+        var latitude = inputs[varName][0] || 0.0;
+        var longitude = inputs[varName][1] || 0.0;
         replacementText = '(';
         replacementText += (
           inputs[varName][0] >= 0.0
