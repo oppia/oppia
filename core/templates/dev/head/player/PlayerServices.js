@@ -244,9 +244,8 @@ oppia.factory('oppiaPlayerService', [
     _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
-    // NB: These shouldn't be undefined beacause newStateName cannot be END_DEST
     var newStateData = _exploration.states[newStateName];
-    var newInteractionId = newStateData ? newStateData.interaction.id : undefined;
+    var newInteractionId = newStateData.interaction.id;
 
     $rootScope.$broadcast('playerStateChange');
 

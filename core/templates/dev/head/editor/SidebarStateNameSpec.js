@@ -151,7 +151,7 @@ describe('Sidebar state name controller', function() {
       expect(ecs.getActiveStateName()).toEqual('Fifth State');
     });
 
-    it('should check that states can be named END variations', function() {
+    it('should check that states can be named variations of \'END\'', function() {
       ecs.setActiveStateName('First State');
       scope.initStateNameEditor();
 

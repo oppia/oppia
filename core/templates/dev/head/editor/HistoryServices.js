@@ -374,15 +374,31 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           }
         }
 
+        // Track whether terminal nodes in v1 or v2
+        // TODO(bhenning): could show changes to terminal nodes in diff
+        var finalStateIds = [];
+        for (var stateId in statesData) {
+          var oldState = v1States[statesData[stateId].originalStateName];
+          var newState = v2States[statesData[stateId].newestStateName];
+          var oldStateTerminal = false;
+          var newStateTerminal = false;
+          if (oldState)
+            oldStateTerminal = oldState.interaction.id == 'EndExploration';
+          if (newState)
+            newStateTerminal = newState.interaction.id == 'EndExploration';
+          if (oldStateTerminal || newStateTerminal) {
+            finalStateIds.push(stateId);
+          }
+        }
+
         var links = _compareLinks(v1States, originalStateIds, v2States, stateIds);
 
-        // TODO(bhenning): should this return a list of endStateIds (terminal
-        // nodes)? See TODO in ExplorationHistory.js for more
         return {
           'nodes': statesData,
           'links': links,
           'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
-          'v2InitStateId': stateIds[response.v2Data.data.init_state_name]
+          'v2InitStateId': stateIds[response.v2Data.data.init_state_name],
+          'finalStateIds': finalStateIds
         };
       });
     }

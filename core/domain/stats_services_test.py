@@ -195,7 +195,8 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 }])
 
     def test_no_improvement_flag_hit(self):
-        self.save_new_valid_exploration('eid', 'fake@user.com')
+        self.save_new_valid_exploration('eid', 'fake@user.com',
+            end_state_name='End')
         exp = exp_services.get_exploration_by_id('eid')
 
         not_default_rule_spec = exp_domain.RuleSpec({
@@ -205,7 +206,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             'subject': 'answer'
         }, exp.init_state_name, [], [], 'NormalizedString')
         default_rule_spec = exp_domain.RuleSpec.get_default_rule_spec(
-            feconf.END_DEST, 'NormalizedString')
+            'End', 'NormalizedString')
         exp.init_state.interaction.handlers[0].rule_specs = [
             not_default_rule_spec, default_rule_spec
         ]

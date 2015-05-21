@@ -35,11 +35,10 @@ describe('State editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
     editor.setInteraction('Continue', 'click here');
-    editor.addRule('Continue', null, { state_name: 'END',
-      create: true }, 'Default');
+    editor.addRule('Continue', null, 'final state', true, 'Default');
 
-    // need to setup proper END state (with EndInteraction)
-    editor.moveToState('END');
+    // Setup a terminating state
+    editor.moveToState('final state');
     editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
@@ -85,11 +84,10 @@ describe('State editor', function() {
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    editor.addRule('MultipleChoiceInput', null, { state_name: 'END',
-      create: true }, 'Default');
+    editor.addRule('MultipleChoiceInput', null, 'final state', true, 'Default');
 
-    // need to setup proper END state (with EndInteraction)
-    editor.moveToState('END');
+    // Setup a terminating state
+    editor.moveToState('final state');
     editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
@@ -114,12 +112,12 @@ describe('State editor', function() {
     editor.setInteraction('NumericInput');
     editor.addRule('NumericInput', function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
-    }, { state_name: 'END', create: true }, 'IsInclusivelyBetween', 3, 6);
-    editor.addRule(
-      'NumericInput', forms.toRichText('out of bounds'), null, 'Default');
+    }, 'final state', true, 'IsInclusivelyBetween', 3, 6);
+    editor.addRule('NumericInput',
+      forms.toRichText('out of bounds'), null, false, 'Default');
 
-    // need to setup proper END state (with EndInteraction)
-    editor.moveToState('END');
+    // Setup a terminating state
+    editor.moveToState('final state');
     editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
@@ -147,8 +145,7 @@ describe('Full exploration editor', function() {
     editor.setStateName('state 1');
     editor.setContent(forms.toRichText('this is state 1'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', null, { state_name: 'END',
-      create: true }, 'Equals', 21);
+    editor.addRule('NumericInput', null, 'final state', true, 'Equals', 21);
     editor.RuleEditor(0).createNewStateAndSetDestination('state 2');
 
     editor.moveToState('state 2');
@@ -157,11 +154,13 @@ describe('Full exploration editor', function() {
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addRule('MultipleChoiceInput', null, 'state 1', 'Equals', 'return');
-    editor.addRule('MultipleChoiceInput', null, 'END', 'Default');
+    editor.addRule('MultipleChoiceInput', null, 'state 1', false,
+      'Equals', 'return');
+    editor.addRule('MultipleChoiceInput', null, 'final state',
+      false, 'Default');
 
-    // need to setup proper END state (with EndInteraction)
-    editor.moveToState('END');
+    // Setup a terminating state
+    editor.moveToState('final state');
     editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
@@ -197,14 +196,13 @@ describe('Full exploration editor', function() {
       editor.expectStateNamesToBe(['state1']);
       editor.setContent(forms.toRichText('state1 content'));
       editor.setInteraction('TextInput');
-      editor.addRule('TextInput', null, { state_name: 'END',
-        create: true }, 'Default');
+      editor.addRule('TextInput', null, 'final state', true, 'Default');
       editor.RuleEditor('default').createNewStateAndSetDestination('state2');
       editor.moveToState('state2');
       // NOTE: we must move to the state before checking state names to avoid
       // inexplicable failures of the protractor utility that reads state names
       // (the user-visible names are fine either way). See issue 732 for more.
-      editor.expectStateNamesToBe(['state1', 'END', 'state2']);
+      editor.expectStateNamesToBe(['final state', 'state1', 'state2']);
       editor.setInteraction('EndExploration');
 
       editor.discardChanges();
@@ -214,18 +212,17 @@ describe('Full exploration editor', function() {
 
       // Check deletion of states and changing the first state
       editor.setInteraction('TextInput');
-      editor.addRule('TextInput', null, { state_name: 'END',
-        create: true }, 'Default');
+      editor.addRule('TextInput', null, 'final state', true, 'Default');
       editor.RuleEditor('default').createNewStateAndSetDestination('second');
       editor.moveToState('second');
-      editor.expectStateNamesToBe(['first', 'END', 'second']);
+      editor.expectStateNamesToBe(['final state', 'first', 'second']);
       editor.expectCurrentStateToBe('second');
-      editor.expectAvailableFirstStatesToBe(['first', 'END', 'second']);
+      editor.expectAvailableFirstStatesToBe(['final state', 'first', 'second']);
       editor.setFirstState('second');
       editor.moveToState('first');
       editor.deleteState('first');
       editor.expectCurrentStateToBe('second');
-      editor.expectStateNamesToBe(['END', 'second']);
+      editor.expectStateNamesToBe(['final state', 'second']);
 
       // Check behaviour of the back button
       editor.setObjective('do stuff');
@@ -252,17 +249,19 @@ describe('Full exploration editor', function() {
       editor.expectInteractionToMatch('NumericInput');
 
       // Check deletion of rules
-      editor.addRule('NumericInput', forms.toRichText('Farewell'), null, 'Default');
+      editor.addRule('NumericInput', forms.toRichText('Farewell'), null,
+        false, 'Default');
       editor.RuleEditor('default').
-        expectAvailableDestinationsToBe(['second', 'END']);
-      editor.RuleEditor('default').setDestination('END');
+        expectAvailableDestinationsToBe(['second', 'final state']);
+      editor.RuleEditor('default').setDestination('final state');
       editor.RuleEditor('default').
-        expectAvailableDestinationsToBe(['second', 'END']);
-      editor.addRule('NumericInput', null, 'END', 'IsGreaterThan', 2);
+        expectAvailableDestinationsToBe(['second', 'final state']);
+      editor.addRule('NumericInput', null, 'final state', false,
+        'IsGreaterThan', 2);
       editor.RuleEditor(0).delete();
 
-      // need to setup proper END state (with EndInteraction)
-      editor.moveToState('END');
+      // Setup a terminating state
+      editor.moveToState('final state');
       editor.setContent(forms.toRichText('Congratulations, you have finished!'));
       editor.setInteraction('EndExploration');
 
@@ -400,7 +399,6 @@ describe('Interactions', function() {
     editor.setContent(forms.toRichText('some content'));
 
     var defaultRuleSet = false;
-    var reuseEndState = false;
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
@@ -410,30 +408,14 @@ describe('Interactions', function() {
         editor.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        // create the end state only once
-        if (!reuseEndState) {
-          editor.addRule.apply(
-            null, [interactionId, null, { state_name: 'END',
-            create: !reuseEndState }].concat(test.ruleArguments));
+        editor.addRule.apply(null, [
+          interactionId, forms.toRichText('yes'), 'first', false
+        ].concat(test.ruleArguments));
 
-          // setup proper END state (with EndInteraction)
-          editor.moveToState('END');
-          editor.setContent(forms.toRichText(
-            'Congratulations, you have finished!'));
-          editor.setInteraction('EndExploration');
-          editor.moveToState("first"); // move back to continue
-
-          reuseEndState = true;
-        } else {
-          editor.addRule.apply(
-            null, [interactionId, null, 'END'].concat(test.ruleArguments));
-        }
-
-        editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
         if (!defaultRuleSet) {
           // The default rule will be preserved for subsequent tests.
           editor.addRule(
-            interactionId, forms.toRichText('no'), null, 'Default');
+            interactionId, forms.toRichText('no'), null, false, 'Default');
           defaultRuleSet = true;
         }
 
@@ -484,16 +466,14 @@ describe('Exploration history', function() {
     editor.setStateName('first');
     editor.setContent(forms.toRichText('enter 6 to continue'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', null, { state_name: 'second',
-      create: true }, 'Equals', 6);
+    editor.addRule('NumericInput', null, 'second', true, 'Equals', 6);
     editor.moveToState('second');
     editor.setContent(forms.toRichText('this is state 2'));
     editor.setInteraction('Continue');
-    editor.addRule('Continue', null, { state_name: 'END',
-      create: true }, 'Default');
+    editor.addRule('Continue', null, 'final state', true, 'Default');
 
-    // need to setup proper END state (with EndInteraction)
-    editor.moveToState('END');
+    // Setup a terminating state
+    editor.moveToState('final state');
     editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.moveToState('first');
@@ -559,7 +539,7 @@ describe('Exploration history', function() {
       '    rule_specs:\n' +
       '    - definition:\n' +
       '        rule_type: default\n' +
-      '      dest: END\n' +
+      '      dest: final state\n' +
       '      feedback: []\n' +
       '      param_changes: []\n' +
       '  id: Continue\n' +
@@ -569,7 +549,7 @@ describe('Exploration history', function() {
     editor.expectGraphComparisonOf(1, 2).toBe([
       {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_ADDED},
-      {'label': 'END', 'color': COLOR_ADDED}
+      {'label': 'final state', 'color': COLOR_ADDED}
     ], [2, 2, 0]);
     editor.expectTextComparisonOf(1, 2, 'first (was: First ...')
       .toBeWithHighlighting(VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
@@ -580,19 +560,19 @@ describe('Exploration history', function() {
     editor.expectGraphComparisonOf(2, 1).toBe([
       {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_ADDED},
-      {'label': 'END', 'color': COLOR_ADDED}
+      {'label': 'final state', 'color': COLOR_ADDED}
     ], [2, 2, 0]);
 
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
-    editor.RuleEditor(0).setDestination('END');
+    editor.RuleEditor(0).setDestination('final state');
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 3).toBe([
       {'label': 'first', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_DELETED},
-      {'label': 'END', 'color': COLOR_UNCHANGED}
+      {'label': 'final state', 'color': COLOR_UNCHANGED}
     ], [3, 1, 2]);
     editor.expectTextComparisonOf(2, 3, 'second')
       .toBe(' ', STATE_2_STRING);
@@ -603,7 +583,7 @@ describe('Exploration history', function() {
     editor.saveChanges();
     editor.expectGraphComparisonOf(3, 4).toBe([
       {'label': 'third (was: first)', 'color': COLOR_RENAMED_UNCHANGED},
-      {'label': 'END', 'color': COLOR_UNCHANGED}
+      {'label': 'final state', 'color': COLOR_UNCHANGED}
     ], [1, 0, 0]);
 
     // Check re-inserting a deleted state
@@ -612,13 +592,13 @@ describe('Exploration history', function() {
     editor.moveToState('second');
     editor.setContent(forms.toRichText('this is state 2'));
     editor.setInteraction('Continue');
-    editor.addRule('Continue', null, 'END', 'Default');
+    editor.addRule('Continue', null, 'final state', false, 'Default');
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 5).toBe([
       {'label': 'third (was: first)', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_UNCHANGED},
-      {'label': 'END', 'color': COLOR_UNCHANGED}
+      {'label': 'final state', 'color': COLOR_UNCHANGED}
     ], [2, 0, 0]);
 
     // Check that reverting works
@@ -636,7 +616,7 @@ describe('Exploration history', function() {
     editor.expectGraphComparisonOf(4, 6).toBe([
       {'label': 'first (was: third)', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_ADDED},
-      {'label': 'END', 'color': COLOR_UNCHANGED}
+      {'label': 'final state', 'color': COLOR_UNCHANGED}
     ], [3, 2, 1]);
 
     users.logout();

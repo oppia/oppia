@@ -197,7 +197,7 @@ oppia.controller('ExplorationHistory', [
           'nodes': diffGraphNodes,
           'links': response.links,
           'initStateId': response.v2InitStateId,
-          'finalStateIds': [] // TODO(bhenning): should be a list of term nodes?
+          'finalStateIds': response.finalStateIds
         };
 
         // Generate the legend graph

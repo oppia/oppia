@@ -59,16 +59,15 @@ var createAndPublishExploration = function(name, category, objective, language) 
   createExploration(name, category);
   editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
-  editor.addRule('TextInput', null, { state_name: 'END',
-      create: true }, 'Default');
+  editor.addRule('TextInput', null, 'final state', true, 'Default');
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);
   }
   editor.setInteraction('Continue');
 
-  // need to setup proper END state (with EndInteraction)
-  editor.moveToState('END');
+  // Setup a terminating state
+  editor.moveToState('final state');
   editor.setContent(forms.toRichText('Congratulations, you have finished!'));
   editor.setInteraction('EndExploration');
   editor.saveChanges();

@@ -31,6 +31,11 @@ from google.appengine.ext import ndb
 _NO_SPECIFIED_VERSION_STRING = 'none'
 _ALL_VERSIONS_STRING = 'all'
 
+# States with this name used to be treated as a pseudoend state, but are not
+# anymore. This is kept here until the stats job may be updated to work with
+# proper terminal states, rather than a hardcoded END pseudostate.
+# TODO(bhenning): fix this
+OLD_END_DEST = 'END'
 
 class StatisticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
@@ -271,7 +276,7 @@ class StatisticsMRJobManager(
                     StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING):
                 if value['state_name'] == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
-                if value['state_name'] == feconf.END_DEST:
+                if value['state_name'] == OLD_END_DEST:
                     old_models_complete_count = value['first_entry_count']
                 else:
                     state_hit_counts[state_name]['no_answer_count'] += (
@@ -298,7 +303,7 @@ class StatisticsMRJobManager(
                 # completion. (This will be the case even if the event occurs
                 # for a state with a terminal interaction -- the recorded
                 # state_name here will still be 'END'.)
-                if state_name == feconf.END_DEST:
+                if state_name == OLD_END_DEST:
                     new_models_complete_count += 1
                     # Track that we have seen a 'real' end for this session id
                     new_models_end_sessions.add(session_id)
@@ -367,7 +372,7 @@ class NullStateHitEventsMigrator(jobs.BaseMapReduceJobManager):
                 event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
                 exploration_id=item.exploration_id,
                 exploration_version=item.exploration_version,
-                state_name=feconf.END_DEST,
+                state_name=OLD_END_DEST,
                 session_id=item.session_id,
                 client_time_spent_in_secs=0.0,
                 params=item.params,

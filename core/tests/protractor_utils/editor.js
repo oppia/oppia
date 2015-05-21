@@ -293,7 +293,7 @@ var _setRuleDest = function(ruleBodyElem, destinationName) {
 };
 
 var _createStateAsDestination = function(bodyElem, destinationName) {
-  // does not close the save modal; shared by addRule and createNewStateAnd...
+  // Creates a new state and sets it as the desination of a rule.
   var destinationElement =
     bodyElem.element(by.css('.protractor-test-dest-bubble'));
   destinationElement.element(
@@ -307,22 +307,21 @@ var _createStateAsDestination = function(bodyElem, destinationName) {
 // This clicks the "add new rule" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
-// Note that feedbackInstructions may be null (which means 'specify no feedback'),
-// and only represents a single feedback element.
-// 'dest' is an object with a 'state_name' entry and 'create' entry. If create
-// is specified, it allows the caller (if true) to create the provided dest
-// state without using the createNewStateAndSetDestination feature (to avoid
-// having to close the add rule modal). For the sake of backward compatibility,
-// if 'dest' is provided as a non-object, it is treated as the destination state
-// name and will not create the state initially.
-var addRule = function(interactionId, feedbackInstructions, dest,
-    ruleName) {
+//
+// Note that feedbackInstructions may be null (which means 'specify no
+// feedback'), and only represents a single feedback element.
+//
+// - 'stateName' is the state name to select as the destination.
+// - 'createState' specifies the destination state should be created within the
+//   dialog as part of adding this rule.
+var addRule = function(interactionId, feedbackInstructions, stateName,
+    createState, ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
   general.waitForSystem();
 
   var ruleElement = element(by.css('.protractor-test-add-rule-details'));
   var args = [ruleElement, interactionId];
-  for (var i = 3; i < arguments.length; i++) {
+  for (var i = 4; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   _selectRule.apply(null, args);
@@ -331,18 +330,10 @@ var addRule = function(interactionId, feedbackInstructions, dest,
     _setRuleFeedback(ruleElement, 0, feedbackInstructions)
   }
 
-  var create = false, stateName = null;
-  if (dest !== null && typeof dest === 'object') {
-    create = dest.create;
-    stateName = dest.state_name;
-  } else { // dest isn't an object: old approach
-    stateName = dest;
-  }
-
-  // chceck whether to create destination state
-  if (create && stateName) {
+  // Check whether to create destination state
+  if (createState && stateName) {
     _createStateAsDestination(ruleElement, stateName);
-  } else if (stateName) { // createDest automatically sets it, too
+  } else if (stateName) {
     _setRuleDest(ruleElement, stateName);
   }
 
@@ -488,7 +479,7 @@ var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
     return stateNode.element(by.css('.protractor-test-node-label')).getText();
   }).then(function(stateNames) {
-    expect(stateNames).toEqual(names);
+    expect(stateNames.sort()).toEqual(names.sort());
   });
 };
 
@@ -539,7 +530,7 @@ var expectAvailableFirstStatesToBe = function(names) {
         all(by.tagName('option')).map(function(elem) {
       return elem.getText();
     }).then(function(options) {
-      expect(options).toEqual(names);
+      expect(options.sort()).toEqual(names.sort());
     });
   });
 };

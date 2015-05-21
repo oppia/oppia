@@ -99,10 +99,10 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             self._record_start(exp_id, exp_version, state, 'session1')
             self._record_leave(
-                exp_id, exp_version, feconf.END_DEST, 'session1')
+                exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session1')
             self._record_start(exp_id, exp_version, state, 'session2')
             self._record_leave(
-                exp_id, exp_version, feconf.END_DEST, 'session2')
+                exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -128,7 +128,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self._record_leave(exp_id, exp_version, state, 'session1')
             self._record_leave(exp_id, exp_version, state, 'session1')
             self._record_leave(
-                exp_id, exp_version, feconf.END_DEST, 'session1')
+                exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session1')
 
             self._record_start(exp_id, exp_version, state, 'session2')
             self._record_leave(exp_id, exp_version, state, 'session2')
@@ -163,12 +163,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                     'total_entry_count': 0,
                     'no_answer_count': 0,
                     'first_entry_count': 0,
-                },
-                feconf.END_DEST: {
-                    'total_entry_count': 0,
-                    'no_answer_count': 0,
-                    'first_entry_count': 0,
-                },
+                }
             }
 
             # Record 2 start events for exp_id_1 and 1 start event for
@@ -298,7 +293,7 @@ class OneOffNullStateHitEventsMigratorTest(test_utils.GenericTestBase):
             source_item.exploration_id, target_item.exploration_id)
         self.assertEqual(
             source_item.exploration_version, target_item.exploration_version)
-        self.assertEqual(target_item.state_name, feconf.END_DEST)
+        self.assertEqual(target_item.state_name, stats_jobs.OLD_END_DEST)
         self.assertEqual(target_item.client_time_spent_in_secs, 0)
         self.assertEqual(source_item.params, target_item.params)
         self.assertEqual(source_item.play_type, target_item.play_type)

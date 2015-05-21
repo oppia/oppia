@@ -153,8 +153,6 @@ class EditorTest(BaseEditorControllerTest):
             _get_payload('[Bad State Name]', CURRENT_VERSION))
         self.assertIn('Invalid character [', response_dict['error'])
 
-        # Tests that used to be here: requests for an END state were invalid
-
         # A name cannot have spaces at the front or back.
         response_dict = _put_and_expect_400_error(
             _get_payload('  aa', CURRENT_VERSION))
@@ -350,7 +348,6 @@ param_changes: []
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = exploration.init_state_name
-        exploration.delete_state(feconf.END_DEST) # END state not needed in test
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
         exploration.states['State 2'].update_interaction_id('TextInput')

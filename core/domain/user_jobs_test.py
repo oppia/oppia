@@ -418,7 +418,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_activity', self._null_fn):
             # User A creates and saves a new valid exploration.
-            self.save_new_valid_exploration(self.EXP_ID, self.user_a_id)
+            self.save_new_valid_exploration(self.EXP_ID, self.user_a_id,
+                end_state_name='End')
 
     def test_null_case(self):
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(

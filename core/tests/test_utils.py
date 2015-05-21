@@ -274,7 +274,8 @@ class TestBase(unittest.TestCase):
 
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective'):
+            category='A category', objective='An objective',
+            end_state_name=None):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
@@ -283,13 +284,17 @@ class TestBase(unittest.TestCase):
             exploration_id, title, category)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
-        # Ensure the test exploration has a valid end state
-        exploration.add_states([ feconf.END_DEST] )
-        exploration.states[feconf.END_DEST].update_interaction_id(
-            'EndExploration')
-        exploration.states[exploration.init_state_name].interaction.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
         exploration.objective = objective
+
+        # If an end state name is provided, add terminal node with that name
+        if end_state_name != None:
+            exploration.add_states([end_state_name])
+            exploration.states[end_state_name].update_interaction_id(
+                'EndExploration')
+            # link first state to ending state (to maintain validity)
+            exploration.states[exploration.init_state_name].interaction. \
+                handlers[0].rule_specs[0].dest = end_state_name
+
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 

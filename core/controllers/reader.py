@@ -453,10 +453,15 @@ def submit_answer_in_tests(
         old_interaction_instance.get_stats_log_html(
             old_state.interaction.customization_args, normalized_answer))
 
+    # This is necessary due to legacy reasons with the old 'END' pseudostate
+    # TODO(bhenning): remove the need for this in this function (should be
+    # basing terminal logic on whether it is in a terminal state, not
+    # specifically in the 'END' state)
+    _OLD_END_DEST = 'END'
     new_state = (
-        None if rule_spec.dest == feconf.END_DEST
+        None if rule_spec.dest == _OLD_END_DEST
         else exploration.states[rule_spec.dest])
-    finished = (rule_spec.dest == feconf.END_DEST)
+    finished = (rule_spec.dest == _OLD_END_DEST)
     new_params = _get_updated_param_dict(
         params, {} if finished else new_state.param_changes,
         exp_param_specs)
