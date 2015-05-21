@@ -311,10 +311,10 @@ var _createStateAsDestination = function(bodyElem, destinationName) {
 // Note that feedbackInstructions may be null (which means 'specify no
 // feedback'), and only represents a single feedback element.
 //
-// - 'stateName' is the state name to select as the destination.
+// - 'destStateName' is the state name to select as the destination.
 // - 'createState' specifies the destination state should be created within the
 //   dialog as part of adding this rule.
-var addRule = function(interactionId, feedbackInstructions, stateName,
+var addRule = function(interactionId, feedbackInstructions, destStateName,
     createState, ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
   general.waitForSystem();
@@ -331,10 +331,10 @@ var addRule = function(interactionId, feedbackInstructions, stateName,
   }
 
   // Check whether to create destination state
-  if (createState && stateName) {
-    _createStateAsDestination(ruleElement, stateName);
-  } else if (stateName) {
-    _setRuleDest(ruleElement, stateName);
+  if (createState && destStateName) {
+    _createStateAsDestination(ruleElement, destStateName);
+  } else if (destStateName) {
+    _setRuleDest(ruleElement, destStateName);
   }
 
   element(by.css('.protractor-test-add-new-rule')).click();

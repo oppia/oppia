@@ -287,13 +287,14 @@ class TestBase(unittest.TestCase):
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name
-        if end_state_name != None:
+        if end_state_name is not None:
             exploration.add_states([end_state_name])
             exploration.states[end_state_name].update_interaction_id(
                 'EndExploration')
-            # link first state to ending state (to maintain validity)
-            exploration.states[exploration.init_state_name].interaction. \
-                handlers[0].rule_specs[0].dest = end_state_name
+            # Link first state to ending state (to maintain validity)
+            init_state = exploration.states[exploration.init_state_name]
+            init_state_inter = init_state.interaction
+            init_state_inter.handlers[0].rule_specs[0].dest = end_state_name
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration

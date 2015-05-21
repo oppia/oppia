@@ -195,8 +195,8 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 }])
 
     def test_no_improvement_flag_hit(self):
-        self.save_new_valid_exploration('eid', 'fake@user.com',
-            end_state_name='End')
+        self.save_new_valid_exploration(
+            'eid', 'fake@user.com', end_state_name='End')
         exp = exp_services.get_exploration_by_id('eid')
 
         not_default_rule_spec = exp_domain.RuleSpec({

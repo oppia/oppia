@@ -380,13 +380,15 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
         for (var stateId in statesData) {
           var oldState = v1States[statesData[stateId].originalStateName];
           var newState = v2States[statesData[stateId].newestStateName];
-          var oldStateTerminal = false;
-          var newStateTerminal = false;
-          if (oldState)
-            oldStateTerminal = oldState.interaction.id == 'EndExploration';
-          if (newState)
-            newStateTerminal = newState.interaction.id == 'EndExploration';
-          if (oldStateTerminal || newStateTerminal) {
+          var oldStateIsTerminal = false;
+          var newStateIsTerminal = false;
+          if (oldState) {
+            oldStateIsTerminal = (oldState.interaction.id == 'EndExploration');
+          }
+          if (newState) {
+            newStateIsTerminal = (newState.interaction.id == 'EndExploration');
+          }
+          if (oldStateIsTerminal || newStateIsTerminal) {
             finalStateIds.push(stateId);
           }
         }
