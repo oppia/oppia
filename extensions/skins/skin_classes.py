@@ -126,60 +126,95 @@ class GadgetPanelSpec(object):
         self._pixels_between_gadgets = pixels_between_gadgets
         self._max_gadgets = max_gadgets
 
+    def _get_state_names_gadgets_are_visible(self, gadget_list):
+        """Returns a list of state names where gadgets are visible.
+
+        Args:
+        - gadget_list: list of GadgetInstance instances.
+        """
+        state_names = set()
+        for gadget_instance in gadget_list:
+            for state_name in gadget_instance.visible_in_states:
+                state_names.add(state_name)
+        return sorted(state_names)
+
+    def _map_visibility_by_state(self, gadget_list):
+        """Returns a dict with state names strings as keys and lists of
+        GadgetInstance instances as values.
+
+        Args:
+        - gadget_list: list of GadgetInstance instances.
+        """
+        visibility_map = {state_name: [] for state_name
+                  in self._get_state_names_gadgets_are_visible(gadget_list)}
+
+        for gadget_instance in gadget_list:
+            for state_name in gadget_instance.visible_in_states:
+                visibility_map[state_name].append(gadget_instance)
+
+        return visibility_map
+
     def validate(self, gadget_list):
         """Validate proper fit given space requirements specified by skin.
 
         Args:
-        - gadget_list: list of GadgetInstance instances."""
+        - gadget_list: list of GadgetInstance instances.
+        """
 
         # If the panel contains no gadgets, max() will raise an error,
         # so we return early.
         if not gadget_list:
             return
 
-        if len(gadget_list) > self._max_gadgets:
-            raise utils.ValidationError(
-                "'%s' panel expected at most %d gadget%s, received %d." % (
-                    self._name,
-                    self._max_gadgets,
-                    's' if self._max_gadgets != 1 else '',
-                    len(gadget_list)))
+        # Validate limitations and fit considering visibility for each state.
+        gadget_visibility_map = self._map_visibility_by_state(gadget_list)
 
-        # Calculate total width and height of gadgets given custom args and
-        # panel stackable axis.
-        total_width = 0
-        total_height = 0
+        for state_name, gadget_instances in gadget_visibility_map.iteritems():
+            if len(gadget_instances) > self._max_gadgets:
+                raise utils.ValidationError(
+                    "'%s' panel expected at most %d gadget%s on state '%s'" % (
+                        self._name,
+                        self._max_gadgets,
+                        's' if self._max_gadgets != 1 else '',
+                        state_name)
+                    + ", received %d." % len(gadget_instances))
 
-        if self._stackable_axis == self.AXIS_VERTICAL:
-            # Factor in pixels between gadgets, if any.
-            total_height += self._pixels_between_gadgets * (
-                len(gadget_list) - 1)
-            total_height += sum(gadget.height for gadget in gadget_list)
-            total_width = max(gadget.width for gadget in gadget_list)
-        elif self._stackable_axis == self.AXIS_HORIZONTAL:
-            total_width += self._pixels_between_gadgets * (
-                len(gadget_list) - 1)
-            total_width += sum(gadget.width for gadget in gadget_list)
-            total_height = max(gadget.height for gadget in gadget_list)
-        else:
-            raise utils.ValidationError(
-                "Unrecognized axis for '%s' panel. Valid options are: %s" % (
-                    self._name,
-                    str(self._valid_axes)))
+            # Calculate total width and height of gadgets given custom args and
+            # panel stackable axis.
+            total_width = 0
+            total_height = 0
 
-        # Validate fit for each dimension.
-        if self._height < total_height:
-            raise utils.ValidationError(
-                "Size exceeded: %s panel height of %d exceeds limit of %d" % (
-                    self._name,
-                    total_height,
-                    self._height))
-        elif self._width < total_width:
-            raise utils.ValidationError(
-                "Size exceeded: %s panel width of %d exceeds limit of %d" % (
-                    self._name,
-                    total_width,
-                    self._width))
+            if self._stackable_axis == self.AXIS_VERTICAL:
+                # Factor in pixels between gadgets, if any.
+                total_height += self._pixels_between_gadgets * (
+                    len(gadget_instances) - 1)
+                total_height += sum(gadget.height for gadget
+                                    in gadget_instances)
+                total_width = max(gadget.width for gadget in gadget_instances)
+            elif self._stackable_axis == self.AXIS_HORIZONTAL:
+                total_width += self._pixels_between_gadgets * (
+                    len(gadget_instances) - 1)
+                total_width += sum(gadget.width for gadget in gadget_instances)
+                total_height = max(gadget.height for gadget in gadget_instances)
+            else:
+                raise utils.ValidationError(
+                    "Unrecognized axis for '%s' panel. Valid options are: %s" % (
+                        self._name,
+                        str(self._valid_axes)))
+
+            # Validate fit for each dimension.
+            if self._height < total_height:
+                raise utils.ValidationError(
+                    "Size exceeded: %s panel height of %d exceeds limit of %d" % (
+                        self._name,
+                        total_height,
+                        self._height))
+            elif self._width < total_width:
+                raise utils.ValidationError(
+                    "Size exceeded: %s panel width of %d exceeds limit of %d" % (
+                        self._name,
+                        total_width,
+                        self._width))
 
     @property
     def _valid_axes(self):

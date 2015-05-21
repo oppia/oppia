@@ -1069,7 +1069,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict['left'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                "'left' panel expected at most 1 gadget, received 2."):
+                "'left' panel expected at most 1 gadget on state 'New state', received 2."):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any
