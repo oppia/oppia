@@ -555,7 +555,7 @@ oppia.config(['$provide', function($provide) {
       _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
     });
 
-    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback) {
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, reFocus) {
       $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
@@ -591,7 +591,7 @@ oppia.config(['$provide', function($provide) {
             $modalInstance.close(customizationArgsDict);
           };
         }]
-      }).result.then(onSubmitCallback);
+      }).result.then(onSubmitCallback).finally(reFocus);
     }
 
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -607,6 +607,7 @@ oppia.config(['$provide', function($provide) {
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
+            var savedSel = rangy.saveSelection();
 
             _openCustomizationModal(
               componentDefn.customization_arg_specs,
@@ -615,6 +616,10 @@ oppia.config(['$provide', function($provide) {
                 var el = createRteElement(componentDefn, customizationArgsDict);
                 $element[0].parentNode.replaceChild(el, $element[0]);
                 textAngular.$editor().updateTaBindtaTextElement();
+              },
+              function() {
+                textAngular.$editor().displayElements.text[0].focus();
+                rangy.restoreSelection(savedSel);
               });
 
             return false;
@@ -622,6 +627,7 @@ oppia.config(['$provide', function($provide) {
         },
         action: function() {
           var textAngular = this;
+          var savedSel = rangy.saveSelection();
           textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>');
 
           _openCustomizationModal(
@@ -633,6 +639,10 @@ oppia.config(['$provide', function($provide) {
               var parent = insertionPoint.parentNode;
               parent.replaceChild(el, insertionPoint);
               textAngular.$editor().updateTaBindtaTextElement();
+            },
+            function() {
+              textAngular.$editor().displayElements.text[0].focus();
+              rangy.restoreSelection(savedSel);
             });
         }
       });
