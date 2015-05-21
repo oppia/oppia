@@ -1,0 +1,6 @@
+<Module>
+  <ModulePrefs title="Oppia Gadget" height="800" width="600" author="Google">
+    <Require feature="dynamic-height"/>
+  </ModulePrefs>
+  <Content type="url" href="https://2-0-0-rc-2-dot-oppiaaserversbhowmik.appspot.com/explore/1?#" />
+</Module>
