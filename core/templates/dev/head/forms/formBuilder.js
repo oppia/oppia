@@ -555,9 +555,9 @@ oppia.config(['$provide', function($provide) {
       _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
     });
 
-    //reFocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
+    //refocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
     //back to where it was before the modal was opened
-    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, reFocusFn) {
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, refocusFn) {
       $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
@@ -591,9 +591,9 @@ oppia.config(['$provide', function($provide) {
             }
 
             $modalInstance.close(customizationArgsDict);
-          };
+          }
         }]
-      }).result.then(onSubmitCallback).finally(reFocusFn);
+      }).result.then(onSubmitCallback).finally(refocusFn);
     }
 
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
