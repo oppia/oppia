@@ -555,7 +555,9 @@ oppia.config(['$provide', function($provide) {
       _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
     });
 
-    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, reFocus) {
+    //reFocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
+    //back to where it was before the modal was opened
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, reFocusFn) {
       $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
@@ -591,7 +593,7 @@ oppia.config(['$provide', function($provide) {
             $modalInstance.close(customizationArgsDict);
           };
         }]
-      }).result.then(onSubmitCallback).finally(reFocus);
+      }).result.then(onSubmitCallback).finally(reFocusFn);
     }
 
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -607,7 +609,7 @@ oppia.config(['$provide', function($provide) {
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
-            var savedSel = rangy.saveSelection();
+            var savedSelection = rangy.saveSelection();
 
             _openCustomizationModal(
               componentDefn.customization_arg_specs,
@@ -619,7 +621,7 @@ oppia.config(['$provide', function($provide) {
               },
               function() {
                 textAngular.$editor().displayElements.text[0].focus();
-                rangy.restoreSelection(savedSel);
+                rangy.restoreSelection(savedSelection);
               });
 
             return false;
@@ -627,7 +629,7 @@ oppia.config(['$provide', function($provide) {
         },
         action: function() {
           var textAngular = this;
-          var savedSel = rangy.saveSelection();
+          var savedSelection = rangy.saveSelection();
           textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>');
 
           _openCustomizationModal(
@@ -642,7 +644,7 @@ oppia.config(['$provide', function($provide) {
             },
             function() {
               textAngular.$editor().displayElements.text[0].focus();
-              rangy.restoreSelection(savedSel);
+              rangy.restoreSelection(savedSelection);
             });
         }
       });
