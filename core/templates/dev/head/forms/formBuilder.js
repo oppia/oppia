@@ -558,7 +558,7 @@ oppia.config(['$provide', function($provide) {
     //refocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
     //back to where it was before the modal was opened
     var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, refocusFn) {
-      $modal.open({
+      var modalDialog = $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
         resolve: {},
@@ -593,7 +593,12 @@ oppia.config(['$provide', function($provide) {
             $modalInstance.close(customizationArgsDict);
           }
         }]
-      }).result.then(onSubmitCallback).finally(refocusFn);
+      });
+
+      modalDialog.result.then(onSubmitCallback);
+      // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+      // the minification process throws an error.
+      modalDialog.result['finally'](refocusFn);
     }
 
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
