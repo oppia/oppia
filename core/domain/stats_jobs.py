@@ -325,7 +325,7 @@ class StatisticsMRJobManager(
         # After iterating through all events, take the size of the set of
         # session ids as the first entry count.
         for state_name in state_session_ids:
-            state_hit_counts[state_name]['first_entry_count'] = len(
+            state_hit_counts[state_name]['first_entry_count'] += len(
                 state_session_ids[state_name])
 
         # Get the set of session ids that left without completing. This is

@@ -1067,11 +1067,14 @@ def _get_search_rank(exp_id):
     """
     # TODO(sll): Improve this calculation.
     _STATUS_PUBLICIZED_BONUS = 30
+    # This is done to prevent the rank hitting 0 too easily. Note that
+    # negative ranks are disallowed in the Search API.
+    _DEFAULT_RANK = 20
 
     exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
     summary = get_exploration_summary_by_id(exp_id)
-    rank = (
+    rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
         if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
         else 0)
@@ -1092,7 +1095,8 @@ def _get_search_rank(exp_id):
     elif 2 <= time_delta_days <= 7:
         rank += 35
 
-    return rank
+    # Ranks must be non-negative.
+    return max(rank, 0)
 
 
 def _exp_to_search_dict(exp):

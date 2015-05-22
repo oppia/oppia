@@ -63,6 +63,18 @@ def subscribe_to_activity(user_id, activity_id):
         subscriptions_model.put()
 
 
+def get_activity_ids_subscribed_to(user_id):
+    """Returns a list with all subscriptions' ids of given user.
+
+    Callers of this function should ensure that the user_id is valid.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+    return (
+        subscriptions_model.activity_ids
+        if subscriptions_model else [])
+
+
 def get_last_seen_notifications_msec(user_id):
     """Returns the last time, in milliseconds since the Epoch, when the user
     checked their notifications in the dashboard page or the notifications
