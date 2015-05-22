@@ -69,29 +69,39 @@ states:
           param_changes: []
         - definition:
             rule_type: default
-          dest: Algorithm Question
+          dest: Algorithm Question Feedback
           feedback:
-          - <p>TODO Try again.</p>
+          - <p>Look again at the instructions you wrote for a square</p><table><tbody><tr><td><p><span>instructions</span></p></td><td><p><span>code
+            for your turtle</span></p></td></tr><tr><td><ol><li><p><span>Move forward
+            100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
+            forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
+            forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
+            forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li></ol></td><td><ol><li><p><span>fd
+            100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt
+            90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd
+            100</span></p></li><li><p><span>rt 90</span></p></li></ol></td></tr></tbody></table><br><p>For
+            a 4 sided polygon you wrote 8 instructions. How many instructions do you
+            think you will need for your pentagon (5-sided polygon)?</p>
           param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
-  Using Patterns to Draw a Pentagon:
+  Algorithm Question Feedback:
     content:
     - type: text
-      value: <p>Here is one example of how your instructions might look</p><p><b><br></b></p><div><table><tbody><tr><td><p><span>instructions</span></p></td><td><p><span>code
+      value: <p>Here is one example of instructions for a pentagon.</p><p><br></p><table><tbody><tr><td><p><span>instructions</span></p></td><td><p><span>code
         for your turtle</span></p></td></tr><tr><td><ol><li><p><span>Move forward
-        100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
-        forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
-        forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
-        forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li></ol></td><td><ol><li><p><span>fd
-        100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt
-        90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd
-        100</span></p></li><li><p><span>rt 90</span></p></li></ol></td></tr></tbody></table></div><br><p></p><p><b></b></p><p><b><span></span></b></p>Write
-        your own instructions to create a 5 sided polygon. Try writing out the instructions
-        before translating them into code. Be sure to test your code in Pencil Code.  Making
-        mistakes along the way is a good thing since you can learn from them.<p><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;turtle_pentagon.png&amp;quot;"></oppia-noninteractive-image><br></p><p><br>When
-        your turtle has drawn a pentagon, click <b>Next</b>.</p>
+        100 steps</span></p></li><li><p><span>Turn right 72 degrees</span></p></li><li><p><span>Move
+        forward 100 steps</span></p></li><li><p><span>Turn right 72 degrees</span></p></li><li><p><span>Move
+        forward 100 steps</span></p></li><li><p><span>Turn right 72 degrees</span></p></li><li><p><span>Move
+        forward 100 steps</span></p></li><li><p><span>Turn right 72 degrees</span></p></li><li><p>Move
+        forward 100 steps</p></li><li><p>Turn right 72 degrees</p></li></ol></td><td><ol><li><p><span>fd
+        100</span></p></li><li><p><span>rt 72</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt
+        72</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt 72</span></p></li><li><p><span>fd
+        100</span></p></li><li><p><span>rt 72</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt
+        72</span></p></li></ol></td></tr></tbody></table><br><p>For a 5 sided polygon,
+        10 lines of code are needed. Let's go back and see if we can find the general
+        relationship between sides and lines of code. Click <b>Next</b>.</p>
     interaction:
       customization_args:
         buttonText:
@@ -105,10 +115,49 @@ states:
           feedback: []
           param_changes: []
       id: Continue
+      triggers: []
+    param_changes: []
+  Building the Turtle a Home:
+    content:
+    - type: text
+      value: <p>Why not give the turtle a home to sleep? Continuing adding commands
+        to see if you can draw a house like this. It's ok if you don't get it the
+        first time, keep trying!</p><p><br></p><p><oppia-noninteractive-image filepath-with-value="&amp;quot;turtle_house.png&amp;quot;"></oppia-noninteractive-image><br></p><p><br></p><p>When
+        your turtle has a house, click <b>Next</b>.</p><div><b></b></div><p></p>
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Reducing Code through Loops
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: pen purple fd 100
+        value: 'pen purple
+
+          rt 90
+
+          fd 100
+
+          rt 90
+
+          fd 100
+
+          rt 90
+
+          fd 100
+
+          rt 90
+
+          fd 100'
       generator_id: Copier
       name: PencilCode0initialCode
   Conclusion:
@@ -160,7 +209,61 @@ states:
           feedback: []
           param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
+  Decomposition of Drawing a Square:
+    content:
+    - type: text
+      value: "<p>Let's apply Computational Thinking so your turtle can draw a regular\
+        \ (equal sided) polygon with any number of sides (e.g. pentagon, decagon).\
+        \ To make this challenge more manageable, we can break this problem into smaller\
+        \ problems that might be easier to solve. Breaking a problem down into smaller\
+        \ ones is referred to as <b>decomposition</b>.<br></p><p><br></p><p>You have\
+        \ already written instructions in code for your turtle to draw a 4-sided (square).\
+        \ Write out the steps for what the turtle needs to do in order to draw a square.</p><p><b><br></b></p><div><table><tbody><tr><td><p><span></span></p></td></tr></tbody></table></div><table><tbody><tr><td><p><span>instructions</span></p></td><td><p><span>code\
+        \ for your turtle</span></p></td></tr><tr><td><ol><li><p>\_Move forward 100</p></li><li><p>Turn\
+        \ right 90</p></li><li><p><br></p></li><li><p><br></p></li><li><p><br></p></li><li><p><br></p></li><li><p><br></p></li><li><p>\_\
+        \ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_ \_\_</p></li></ol></td><td><ol><li><p><span>fd\
+        \ 100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt\
+        \ 90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd\
+        \ 100</span></p></li><li><p><span>rt 90</span></p></li></ol></td></tr></tbody></table><br><p></p><p>When\
+        \ you think you have your instructions and code, click <b>Next</b>.</p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Using Patterns to Draw a Pentagon
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: 'pen purple
+
+          fd 100
+
+          rt 90
+
+          fd 100
+
+          rt 90
+
+          fd 100
+
+          rt 90
+
+          fd 100
+
+          rt 90'
+      generator_id: Copier
+      name: PencilCode0initialCode
   Designing a General Algorithm:
     content:
     - type: text
@@ -172,16 +275,17 @@ states:
         \ (because they are indented) 4 times. We need to make two modifications to\
         \ this algorithm in order to generalize it for all polygons. You can press\
         \ play in Pencil Code and run the code to test this.</p><p><br></p><p>Line\
-        \ number 1 is the variable <b><span>n</span></b> which will represent the\
-        \ number of sides. Set <b><span>n = 4</span></b>\_Change the 4 in the <b><span>for</span></b>\
-        \ statement on the next line to n so the algorithm will repeat as many times\
-        \ as we have set n to.<br></p><p><br></p><p>We need to calculate the angle\
-        \ based on the number of sides.  You may have discovered the pattern that\
-        \ the angle is equal to 360 / n since your turtle is essentially making a\
-        \ round trip back to where it started. So on line number 3 change <b><span>rt\
-        \ 90</span></b>\_to <b><span>360/n</span></b>. So the angle will be calculated\
-        \ based on the number of sides. Run the program and try it out with a different\
-        \ number of sides. Feel free to modify the algorithm to make smaller or different\
+        \ number 1 is the variable <b><span>sides</span></b> which will represent\
+        \ the number of sides. Set <b>sides\_= 4</b>.\_Next, change the <b>4</b> in\
+        \ the range of the\_<b><span>for</span></b> statement on the next line to\
+        \ <b>sides</b> so the algorithm will repeat as many times as we have set n\
+        \ to.<br></p><p><br></p><p>We need to calculate the angle based on the number\
+        \ of sides.  You may have discovered the pattern that the angle is equal to\
+        \ 360 / sides since your turtle is essentially making a round trip back to\
+        \ where it started. So on line number 3 change <b><span>rt 90</span></b>\_\
+        to <b><span>360/sides</span></b>. So the angle will be calculated based on\
+        \ the number of sides. Run the program and try it out with a different number\
+        \ of sides. Feel free to modify the algorithm to make smaller or different\
         \ shapes.<br></p><p><br></p><p>When you are finished click <b>Next</b>.</p><p></p><p></p>"
     interaction:
       customization_args:
@@ -197,18 +301,25 @@ states:
           - <p><br></p><p><span></span></p>
           param_changes: []
       id: Continue
+      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: n = 0 for [1..4]   rt 90   fd 100
+        value: "sides = 0\nfor [1..4]\n  rt 90\n  fd 100"
       generator_id: Copier
       name: PencilCode0initialCode
-  Building the Turtle a Home:
+  First State:
     content:
     - type: text
-      value: <p>Why not give the turtle a home to sleep? Continuing adding commands
-        to see if you can draw a house like this.</p><p><oppia-noninteractive-image
-        filepath-with-value="&amp;quot;turtle_house.png&amp;quot;"></oppia-noninteractive-image><br></p><div><b></b></div><p></p>
+      value: "<div></div>After weeks of training, you have succeeded in training your\
+        \ pet turtle to hold a pen in its mouth and move and turn according to your\
+        \ commands. Now let's see if we can teach the turtle to draw some shapes.<div><br></div><div>Try\
+        \ giving it a few more commands so it will draw a square. Use fd to move the\
+        \ turtle forward by a certain amount and rt to turn it by a certain number\
+        \ of degrees for example:\_</div><div><br></div><p><b><span>fd 100</span></b></p><b><span>rt\
+        \ 90</span></b><div><br></div><div>will move the turtle forward 100 pixels\
+        \ and turn right 90 degrees.</div><p><br></p><p>When you are ready to move\
+        \ on click <b>Next</b>.</p>"
     interaction:
       customization_args:
         buttonText:
@@ -218,14 +329,21 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: Reducing Code through Loops
+          dest: Building the Turtle a Home
           feedback: []
           param_changes: []
       id: Continue
+      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: pen purple rt 90 fd 100 rt 90 fd 100 rt 90 fd 100 rt 90 fd 100
+        value: 'pen purple
+
+          fd 100
+
+          rt 90
+
+          fd 100'
       generator_id: Copier
       name: PencilCode0initialCode
   Reducing Code through Loops:
@@ -251,26 +369,33 @@ states:
           feedback: []
           param_changes: []
       id: Continue
+      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: 'for [1..4]   #These two indented commands are repeated   rt 90   fd
-          100 #These commands are not repeated rt 30 fd 100 rt 120 fd 100'
+        value: "pen purple\nfor [1..4]\n  #Indented commands repeat\n  rt 90\n  fd\
+          \ 100\n#These commands are not repeated\nrt 30\nfd 100\nrt 120\nfd 100"
       generator_id: Copier
       name: PencilCode0initialCode
-  First State:
+  Using Patterns to Draw a Pentagon:
     content:
     - type: text
-      value: "<div></div>After weeks of training, you have succeeded in training your\
-        \ pet turtle to hold a pen in its mouth and move and turn according to your\
-        \ commands. Now let's see if with those few skills we can teach the turtle\
-        \ to draw some shapes.<div><br></div><div>Your turtle is already starting\
-        \ to drag the pen across the floor. Can you tell it a few more commands so\
-        \ it will draw a square? Use fd to move the turtle forward by a certain amount\
-        \ and rt to turn it by a certain number of degrees so\_</div><div><br></div><p><b><span>fd\
-        \ 100</span></b></p><b><span>rt 90</span></b><div><br></div><div>will move\
-        \ the turtle forward 100 pixels and turn right 90 degrees.</div><p><br></p><p>When\
-        \ you are ready to move on click <b>Next</b>.</p>"
+      value: <p>Here is one example of how your instructions might look</p><p><b><br></b></p><div><table><tbody><tr><td><p><span>instructions</span></p></td><td><p><span>code
+        for your turtle</span></p></td></tr><tr><td><ol><li><p><span>Move forward
+        100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
+        forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
+        forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li><li><p><span>Move
+        forward 100 steps</span></p></li><li><p><span>Turn right 90 degrees</span></p></li></ol></td><td><ol><li><p><span>fd
+        100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt
+        90</span></p></li><li><p><span>fd 100</span></p></li><li><p><span>rt 90</span></p></li><li><p><span>fd
+        100</span></p></li><li><p><span>rt 90</span></p></li></ol></td></tr></tbody></table></div><br><p></p><p><b></b></p><p><b><span></span></b></p>Write
+        your own instructions to create a 5 sided polygon. You might find it easier
+        to try writing out the instructions before translating them into code or if
+        you get stuck, test out your ideas in Pencil Code with the turtle.  Making
+        mistakes along the way is a good thing since you can learn from them.<p><oppia-noninteractive-image
+        filepath-with-value="&amp;quot;turtle_pentagon.png&amp;quot;"></oppia-noninteractive-image><br></p><p><br>When
+        your turtle has drawn a pentagon and you have the instructions written out,
+        click <b>Next</b>.</p>
     interaction:
       customization_args:
         buttonText:
@@ -280,45 +405,11 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: Building the Turtle a Home
+          dest: Algorithm Question
           feedback: []
           param_changes: []
       id: Continue
-    param_changes:
-    - customization_args:
-        parse_with_jinja: true
-        value: pen purple fd 100 rt 90 fd 100
-      generator_id: Copier
-      name: PencilCode0initialCode
-  Decomposition of Drawing a Square:
-    content:
-    - type: text
-      value: <p>Let's apply Computational Thinking so your turtle can draw a regular
-        (equal sided) polygon with any number of sides (e.g. pentagon, decagon). To
-        make this challenge more manageable, we can break this problem into smaller
-        problems that might be easier to solve. Breaking a problem down into smaller
-        ones is referred to as <b>decomposition</b>.<br></p><p><br></p><p>You have
-        already written instructions for your turtle to draw a 4-sided (square). Write
-        out step-by-step what the turtle needs to do in order to draw a square. It
-        may be helpful to write it out in text before you try to write out the code.
-        If you get stuck, try writing the instructions for the turtle again and testing
-        it out.</p><p><b><br></b></p><div><table><tbody><tr><td><p><span>instructions</span></p></td><td><p><span>code
-        for your turtle</span></p></td></tr><tr><td><ol><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol></td><td><ol><li><p><span>
-        </span></p></li><li></li><li></li><li></li><li></li><li></li><li></li><li><br></li></ol></td></tr></tbody></table></div><br><p></p><p>When
-        you think you have your instructions and code, click <b>Next</b>.</p>
-    interaction:
-      customization_args:
-        buttonText:
-          value: Next
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Using Patterns to Draw a Pentagon
-          feedback: []
-          param_changes: []
-      id: Continue
+      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
