@@ -396,6 +396,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.states['GHI'] = ghi_state
             exploration.validate()
 
+            gadget_instance.visible_in_states.extend(['GHI'])
+            with self.assertRaisesRegexp(
+                    utils.ValidationError,
+                    "TestGadget specifies visibility repeatedly for state: GHI"):
+                exploration.validate()
+
+            # Normalize.
+            gadget_instance.visible_in_states.pop()
+
             # Adding a panel that doesn't exist in the skin.
             exploration.skin_instance.panel_contents_dict[
                 'non_existent_panel'] = []
@@ -1069,7 +1078,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict['left'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                "'left' panel expected at most 1 gadget on state 'New state', received 2."):
+                "'left' panel expected at most 1 gadget, but 2 gadgets are visible in state 'New state'."):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any

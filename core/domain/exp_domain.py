@@ -26,6 +26,7 @@ import copy
 import logging
 import re
 import string
+import collections
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
@@ -602,6 +603,18 @@ class GadgetInstance(object):
             raise utils.ValidationError(
                 '%s gadget not visible in any states.' % (
                     self.gadget.name))
+
+        # Validate state name visibility isn't repeated within each gadget.
+        if len(self.visible_in_states) != len(set(self.visible_in_states)):
+            redundant_visible_states = [
+                state_name for state_name, count
+                in collections.Counter(self.visible_in_states).items()
+                if count > 1]
+            raise utils.ValidationError(
+                '%s specifies visibility repeatedly for state%s: %s' % (
+                    self.id,
+                    's' if len(redundant_visible_states) > 1 else '',
+                    ', '.join(redundant_visible_states)))
 
     def to_dict(self):
         """Returns GadgetInstance data represented in dict form."""
