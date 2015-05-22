@@ -70,9 +70,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id, exp_version, state, session_id, {},
             feconf.PLAY_TYPE_NORMAL)
 
-    def _create_state_counter(self, exp_id, state, count):
+    def _create_state_counter(self, exp_id, state, first_entry_count):
         counter = stats_models.StateCounterModel.get_or_create(exp_id, state)
-        counter.first_entry_count = count
+        counter.first_entry_count = first_entry_count
         counter.put()
 
     def test_state_hit(self):
@@ -93,12 +93,23 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            output_model = stats_jobs.StatisticsAggregator.get_statistics(exp_id, exp_version)
-            self.assertEqual(output_model['state_hit_counts'][state]['first_entry_count'], 2)
-            output_model = stats_jobs.StatisticsAggregator.get_statistics(exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
-            self.assertEqual(output_model['state_hit_counts'][state]['first_entry_count'], 18)
-            output_model = stats_jobs.StatisticsAggregator.get_statistics(exp_id, stats_jobs._ALL_VERSIONS_STRING)
-            self.assertEqual(output_model['state_hit_counts'][state]['first_entry_count'], 20)
+            output_model = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, exp_version)
+            self.assertEqual(
+                output_model['state_hit_counts'][state]['first_entry_count'],
+                2)
+
+            output_model = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
+            self.assertEqual(
+                output_model['state_hit_counts'][state]['first_entry_count'],
+                18)
+
+            output_model = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, stats_jobs._ALL_VERSIONS_STRING)
+            self.assertEqual(
+                output_model['state_hit_counts'][state]['first_entry_count'],
+                20)
 
     def test_no_completion(self):
         with self.swap(
