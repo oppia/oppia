@@ -259,19 +259,21 @@ class StatisticsMRJobManager(
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
 
+            state_name = value['state_name']
+
             # Convert the state name to unicode, if necessary.
             # Note: sometimes, item.state_name is None for
             # StateHitEventLogEntryModel.
             # TODO(sll): Track down the reason for this, and fix it.
-            if (value['state_name'] is not None and
-                    not isinstance(value['state_name'], unicode)):
-                value['state_name'] = value['state_name'].decode('utf-8')
+            if (state_name is not None and
+                    not isinstance(state_name, unicode)):
+                state_name = state_name.decode('utf-8')
 
             if (value['type'] ==
                     StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING):
-                if value['state_name'] == exploration.init_state_name:
+                if state_name == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
-                if value['state_name'] == feconf.END_DEST:
+                if state_name == feconf.END_DEST:
                     old_models_complete_count = value['first_entry_count']
                 else:
                     state_hit_counts[state_name]['no_answer_count'] += (
@@ -285,8 +287,8 @@ class StatisticsMRJobManager(
                         value['first_entry_count']
                         + value['subsequent_entries_count'])
                 continue
+
             event_type = value['event_type']
-            state_name = value['state_name']
             created_on = value['created_on']
             session_id = value['session_id']
 
