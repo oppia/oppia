@@ -293,8 +293,8 @@ class TestBase(unittest.TestCase):
                 'EndExploration')
             # Link first state to ending state (to maintain validity)
             init_state = exploration.states[exploration.init_state_name]
-            init_state_inter = init_state.interaction
-            init_state_inter.handlers[0].rule_specs[0].dest = end_state_name
+            init_interaction = init_state.interaction
+            init_interaction.handlers[0].rule_specs[0].dest = end_state_name
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
