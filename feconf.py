@@ -56,6 +56,12 @@ DEFAULT_QUERY_LIMIT = 1000
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
+# The current version of the exploration states blob schema. If any backward-
+# incompatible changes are made to the states blob schema in the data store,
+# this version number must be changed and the exploration migration job be
+# executed.
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 2
+
 # The default number of exploration tiles to load at a time in the gallery
 # page.
 GALLERY_PAGE_SIZE = 10

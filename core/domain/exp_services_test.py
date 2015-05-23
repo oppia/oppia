@@ -368,7 +368,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 6
 skin_customizations:
   panels_contents: {}
 states:
@@ -412,6 +412,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+states_schema_version: 2
 tags: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -426,7 +427,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 6
 skin_customizations:
   panels_contents: {}
 states:
@@ -470,6 +471,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+states_schema_version: 2
 tags: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,

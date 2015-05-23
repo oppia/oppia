@@ -43,7 +43,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 6
 skin_customizations:
   panels_contents: {}
 states:
@@ -79,6 +79,7 @@ states:
           param_changes: []
       id: null
     param_changes: []
+states_schema_version: 2
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -93,7 +94,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 6
 skin_customizations:
   panels_contents:
     bottom: []
@@ -171,6 +172,7 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+states_schema_version: 2
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -803,7 +805,64 @@ states:
 tags: []
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V5
+    YAML_CONTENT_V6 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+states_schema_version: 2
+tags: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V6
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -833,6 +892,12 @@ tags: []
         """Test direct loading from a v5 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V5)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v6(self):
+        """Test direct loading from a v6 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V6)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 class ConversionUnitTests(test_utils.GenericTestBase):

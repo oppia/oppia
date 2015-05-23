@@ -34,6 +34,8 @@ import zipfile
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import fs_domain
+from core.domain import html_cleaner
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -49,6 +51,44 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
+# Holds the responsibility of performing a step-by-step, sequential update of
+# an exploration states structure based on the schema version of the input
+# exploration dictionary. This is very similar to the YAML conversion process
+# found in exp_domain.py and, in fact, many of the conversion functions for
+# states are also used in the YAML conversion pipeline. If the current
+# exploration states schema version changes above, a new conversion function
+# must be added and some code appended to this function to account for that new
+# version.
+def _migrate_states_schema(exploration_dict):
+    exploration_states_schema_version = exploration_dict[
+        'states_schema_version']
+    initial_version = exploration_states_schema_version
+    if (exploration_states_schema_version is None
+            or exploration_states_schema_version < 1):
+        exploration_states_schema_version = 0
+
+    if not (0 <= exploration_states_schema_version
+            <= feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1 and unversioned exploration state '
+            'schemas at present.')
+
+    # check for conversions to v1
+    if exploration_states_schema_version == 0:
+        exploration_dict = exp_domain.Exploration. \
+            convert_states_v0_dict_to_v1_dict(exploration_dict)
+        exploration_states_schema_version = 1
+
+    # check for conversion to v2
+    if exploration_states_schema_version == 1:
+        exploration_dict = exp_domain.Exploration. \
+            convert_states_v1_dict_to_v2_dict(exploration_dict)
+        exploration_states_schema_version = 2
+
+    # finished pipelining the exploration; if the exploration has been upgraded,
+    # save previous states schema version (useful to the exp migration job)
+    exploration_dict['prev_states_schema_version'] = initial_version
+    return exploration_dict
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -60,16 +100,42 @@ def _get_exploration_memcache_key(exploration_id, version=None):
 
 
 def get_exploration_from_model(exploration_model):
-    return exp_domain.Exploration(
+    exploration = exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
         exploration_model.default_skin, exploration_model.skin_customizations,
+        exploration_model.states_schema_version,
         exploration_model.init_state_name, exploration_model.states,
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.created_on,
         exploration_model.last_updated)
+    if (exploration.states_schema_version ==
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+        return exploration # latest version; no conversion is necessary
+
+    # migrating an exploration involves converting it to a dict, updating the
+    # dict sequentially, then converting the dict back to an exploration for
+    # use in the Oppia backend
+    exploration_dict = _migrate_states_schema(exploration.to_dict())
+
+    # convert the exp dict back into an Exploration (originally part of
+    # exp_domain.from_yaml).
+    exploration_dict['id'] = exploration_model.id
+    exploration_dict['title'] = exploration_model.title
+    exploration_dict['category'] = exploration_model.category
+    exploration = exp_domain.Exploration.create_exploration_from_dict(
+        exploration_dict,
+        exploration_version=exploration_model.version, # doesn't change here
+        exploration_created_on=exploration_model.created_on,
+        exploration_last_updated=exploration_model.last_updated)
+
+    # additional meta data attached to the exploration for use in the migration
+    # job service
+    exploration.prev_states_schema_version = exploration_dict[
+        'prev_states_schema_version']
+    return exploration
 
 
 def get_exploration_summary_from_model(exp_summary_model):
@@ -603,6 +669,7 @@ def _save_exploration(
     exploration_model.skin_customizations = (
         exploration.skin_instance.to_dict()['skin_customizations'])
 
+    exploration_model.states_schema_version = exploration.states_schema_version
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
@@ -789,6 +856,12 @@ def update_exploration(
 
     # update summary of changed exploration
     update_exploration_summary(exploration.id)
+
+def save_exploration(committer_id, exploration, commit_message):
+    """Save an exploration given a committer and message. This does not apply a
+    sequence of changes. For that, use update_exploration.
+    """
+    _save_exploration(committer_id, exploration, commit_message, None)
 
 
 def create_exploration_summary(exploration_id):

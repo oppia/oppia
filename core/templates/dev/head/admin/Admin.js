@@ -117,7 +117,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.clearSearchIndex = function() {
-    if ($scope.message == 'Processing...') {
+    if ($scope.message.startsWith('Processing...')) {
       return;
     }
 
@@ -137,7 +137,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.reloadExploration = function(explorationId) {
-    if ($scope.message == 'Processing...') {
+    if ($scope.message.startsWith('Processing...')) {
       return;
     }
 
@@ -155,6 +155,44 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
+  };
+
+  $scope.reloadExplorations = function(explorations) {
+    if ($scope.message.startsWith('Processing...')) {
+      return;
+    }
+
+    if (!confirm('This action is irreversible. Are you sure?')) {
+      return;
+    }
+
+    var numSucceeded = 0, numFailed = 0, numTried = 0;
+    $scope.message = 'Processing...';
+    var resultPrinter = function() {
+      if (numTried < explorations.length) {
+        $scope.message = 'Processing...' + numTried + '/' + explorations.length;
+        return;
+      }
+      $scope.message = 'Reloaded ' + explorations.length + ' explorations: ' +
+        numSucceeded + " succeeded, " + numFailed + " failed.";
+    };
+
+    for (var i = 0; i < explorations.length; ++i) {
+      var exploration = explorations[i];
+
+      $http.post($scope.adminHandlerUrl, {
+        action: 'reload_exploration',
+        exploration_id: String(exploration[0])
+      }).success(function(data) {
+        ++numSucceeded;
+        ++numTried;
+        resultPrinter();
+      }).error(function(errorResponse) {
+        ++numFailed;
+        ++numTried;
+        resultPrinter();
+      });
+    }
   };
 
   $scope.startNewJob = function(jobType) {

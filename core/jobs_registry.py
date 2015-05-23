@@ -30,6 +30,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs.IndexAllExplorationsJobManager,
     exp_jobs.ExpSummariesCreationOneOffJob,
     exp_jobs.ExplorationValidityJobManager,
+    exp_jobs.ExplorationStrictValidityJobManager,
+    exp_jobs.ExplorationMigrator,
     stats_jobs.NullStateHitEventsMigrator]
 
 # List of all ContinuousComputation managers to show controls for on the

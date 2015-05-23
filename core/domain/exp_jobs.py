@@ -93,6 +93,26 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
     def reduce(key, values):
         yield (key, values)
 
+class ExplorationStrictValidityJobManager(jobs.BaseMapReduceJobManager):
+    """Job that checks (strict) validation status of all explorations."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+        exploration = exp_services.get_exploration_from_model(item)
+        try:
+            exploration.validate(strict=True)
+        except utils.ValidationError as e:
+            yield (item.id, item.title + ':' + unicode(e).encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
 
 class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
 
@@ -199,3 +219,38 @@ class SearchRankerMRJobManager(
     @staticmethod
     def reduce(key, stringified_values):
         pass
+
+class ExplorationMigrator(jobs.BaseMapReduceJobManager):
+    """A reusable one-time job that may be used to migrate exploration schema
+    versions. This job will load all existing explorations from NDB and
+    immediately store them back into NDB. The loading process of an exploration
+    in exp_services automatically performs schema updating. This job persists
+    that conversion work, keeping explorations up-to-date and enhancing the load
+    time of new explorations.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+
+        if item.deleted:
+            return
+
+        exp = exp_services.get_exploration_from_model(item)
+
+        # was the exploration updated?
+        if (hasattr(exp, 'prev_states_schema_version') and
+                exp.prev_states_schema_version is not None):
+            exp_services.save_exploration(feconf.MIGRATION_BOT_USERNAME, exp,
+                'Update exploration states from schema version ' +
+                str(exp.prev_states_schema_version) + ' to ' +
+                str(exp.states_schema_version) + '.')
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
