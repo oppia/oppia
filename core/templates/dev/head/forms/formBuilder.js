@@ -669,8 +669,15 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       htmlContent: '=',
       uiConfig: '&'
     },
-    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ng-model="tempContent"></div>',
+    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
+      // adapted from http://stackoverflow.com/a/6899999
+      $scope.stripFormatting = function(html) {
+        var tmpNode = document.createElement('div');
+        tmpNode.innerHTML = html;
+        return tmpNode.innerText;
+      };
+
       $scope._RICH_TEXT_COMPONENTS = [];
       Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
         RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
