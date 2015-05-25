@@ -22,11 +22,11 @@ should therefore be independent of the specific storage models used."""
 
 __author__ = 'Sean Lip'
 
+import collections
 import copy
 import logging
 import re
 import string
-import collections
 
 from core.domain import fs_domain
 from core.domain import html_cleaner

@@ -399,10 +399,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             gadget_instance.visible_in_states.extend(['GHI'])
             with self.assertRaisesRegexp(
                     utils.ValidationError,
-                    "TestGadget specifies visibility repeatedly for state: GHI"):
+                    'TestGadget specifies visibility repeatedly for state: GHI'):
                 exploration.validate()
 
-            # Normalize.
+            # Remove duplicate state.
             gadget_instance.visible_in_states.pop()
 
             # Adding a panel that doesn't exist in the skin.

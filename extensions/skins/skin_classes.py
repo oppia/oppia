@@ -153,7 +153,7 @@ class GadgetPanelSpec(object):
             state_name: []
             for state_name in self._get_names_of_states_with_visible_gadgets(
                 gadget_list)
-            }
+        }
 
         for gadget_instance in gadget_list:
             for state_name in set(gadget_instance.visible_in_states):
