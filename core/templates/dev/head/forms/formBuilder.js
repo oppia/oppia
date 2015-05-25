@@ -671,12 +671,12 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     },
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
-      //adapted from http://stackoverflow.com/a/6899999
+      // adapted from http://stackoverflow.com/a/6899999
       $scope.stripFormatting = function(html) {
-        var tmp = document.createElement("DIV");
-        tmp.innerHTML = html;
-        return tmp.innerText;
-      }
+        var tmpNode = document.createElement('div');
+        tmpNode.innerHTML = html;
+        return tmpNode.innerText;
+      };
 
       $scope._RICH_TEXT_COMPONENTS = [];
       Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
