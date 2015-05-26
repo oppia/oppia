@@ -646,3 +646,14 @@ class NumberWithUnits(BaseObject):
             }
         }]
     }
+
+
+class HanoiTowerMoveLog(BaseObject):
+    """Class for move log for Hanoi Tower puzzle."""
+
+    description = 'A log of moves for the Hanoi Tower puzzle.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': UnicodeString.SCHEMA,
+    }
