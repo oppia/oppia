@@ -112,6 +112,20 @@ class StartExplorationEventHandler(BaseEventHandler):
             play_type)
 
 
+class CompleteExplorationEventHandler(BaseEventHandler):
+    """Event handler for recording exploration completion events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_COMPLETE_EXPLORATION
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type):
+        stats_models.CompleteExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type)
+
+
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration leave events."""
 

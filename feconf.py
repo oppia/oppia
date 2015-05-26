@@ -296,9 +296,10 @@ EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
 EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
-# The values for these two event types should be left as-is for backwards
+# The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 
 # Play type constants
