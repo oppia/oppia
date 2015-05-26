@@ -26,6 +26,7 @@ from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import recommendation_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -148,12 +149,21 @@ class AdminHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        self.render_json({
-            'config_properties': (
-                config_domain.Registry.get_config_property_schemas()),
-            'computed_properties': (
-                config_domain.Registry.get_computed_property_names()),
-        })
+        action = self.request.get('action')
+
+        if action == 'config':
+            self.render_json({
+                'config_properties': (
+                    config_domain.Registry.get_config_property_schemas()),
+                'computed_properties': (
+                    config_domain.Registry.get_computed_property_names()),
+            })
+        elif action == 'topic':
+            self.response.headers['Content-Type'] = 'text/csv'
+            self.response.headers['Content-Disposition'] = (
+                'attachment; filename=topic_similarities.csv')
+            self.response.write(
+                recommendation_services.download_topic_similarities())
 
     @require_super_admin
     def post(self):
@@ -210,6 +220,9 @@ class AdminHandler(base.BaseHandler):
                     if klass.__name__ == computation_type:
                         klass.stop_computation(self.user_id)
                         break
+            elif self.payload.get('action') == 'upload_topic_similarities':
+                data = self.payload.get('data')
+                recommendation_services.update_topic_similarities(data)
 
             self.render_json({})
         except Exception as e:

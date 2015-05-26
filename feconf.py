@@ -327,6 +327,39 @@ COLOR_SHARKFIN = 'sharkfin'
 COLOR_GUNMETAL = 'gunmetal'
 DEFAULT_COLOR = COLOR_TEAL
 
+# List of default categories.
+DEFAULT_CATEGORIES = [
+    'Architecture',
+    'Art',
+    'Biology',
+    'Business',
+    'Chemistry',
+    'Computing',
+    'Economics',
+    'Education',
+    'Engineering',
+    'Environment',
+    'Geography',
+    'Government',
+    'Hobbies',
+    'Languages',
+    'Law',
+    'Life Skills',
+    'Mathematics',
+    'Medicine',
+    'Music',
+    'Philosophy',
+    'Physics',
+    'Programming',
+    'Psychology',
+    'Puzzles',
+    'Reading',
+    'Religion',
+    'Sport',
+    'Statistics',
+    'Welcome'
+]
+
 # List of supported default categories. For now, each category has
 # a specific color associated with it.
 CATEGORIES_TO_COLORS = {
@@ -441,3 +474,7 @@ ALL_LANGUAGE_CODES = [{
 }, {
     'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
 }]
+
+# Defaults for topic similarities
+DEFAULT_TOPIC_SIMILARITY = 0.5
+SAME_TOPIC_SIMILARITY = 1

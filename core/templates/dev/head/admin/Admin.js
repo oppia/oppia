@@ -41,7 +41,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.reloadConfigProperties = function() {
-    $http.get($scope.adminHandlerUrl).success(function(data) {
+    $http.get($scope.adminHandlerUrl + '?action=config').success(function(data) {
       $scope.configProperties = data.config_properties;
       $scope.computedProperties = data.computed_properties;
     });
@@ -212,5 +212,26 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
+  };
+
+  $scope.uploadTopicSimilaritiesFile = function() {
+    var file = document.getElementById('topicSimilaritiesFile').files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var data = e.target.result;
+      $http.post($scope.adminHandlerUrl, {
+        action: 'upload_topic_similarities',
+        data: data
+      }).success(function(data) {
+        $scope.message = 'Topic similarities uploaded successfully.';
+      }).error(function(errorResponse) {
+        $scope.message = 'Server error: ' + errorResponse.error;
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  $scope.downloadTopicSimilaritiesFile = function() {
+    window.open($scope.adminHandlerUrl + '?action=topic');
   };
 }]);
