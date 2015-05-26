@@ -1046,6 +1046,22 @@ oppia.directive('schemaBasedIntEditor', [function() {
         }
       };
 
+      $scope.getMinValue = function() {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'is_at_least') {
+            return $scope.validators()[i].min_value;
+          }
+        }
+      };
+
+      $scope.getMaxValue = function() {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'is_at_most') {
+            return $scope.validators()[i].max_value;
+          }
+        }
+      };
+
       if ($scope.allowExpressions()) {
         $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
         $scope.expressionMode = angular.isString($scope.localValue);

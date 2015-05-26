@@ -196,7 +196,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
     ]
 }, {
     'name': 'Programming',
-    'interaction_ids': ['CodeRepl'],
+    'interaction_ids': ['CodeRepl', 'HanoiTower'],
 }, {
     'name': 'Music',
     'interaction_ids': [
