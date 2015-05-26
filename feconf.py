@@ -213,6 +213,9 @@ ALLOWED_GADGETS = {
     'AdviceBar': {
         'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
     },
+    'HanoiTower': {
+        'dir': os.path.join(GADGETS_DIR, 'HanoiTower')
+    },
     'PencilCode': {
         'dir': os.path.join(GADGETS_DIR, 'PencilCode')
     },

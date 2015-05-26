@@ -1,0 +1,98 @@
+<style>
+  .towers-container {
+    height: 220px;
+    width: 100%;
+    padding-top: 100px;
+    background-color: #888;
+    position: relative;
+  }
+  .tower-base {
+    background-color: black;
+    height: 30px;
+    left: 10px;
+    position: absolute;
+    top: 175px;
+    width: 500px;
+  }
+
+  .tower {
+    background-color: black;
+    height: 150px;
+    position: absolute;
+    top: 25px;
+    width: 16px;
+  }
+  .tower-drop {
+    top: 0;
+    height: 200px;
+    position: absolute;
+  }
+  .tower-drop.drag-enter .tower {
+    background-color: white;
+  }
+
+  .disk {
+    position: absolute;
+    height: 25px;
+    top: 0;
+  }
+  .disk-number-0 {
+    background-color: red;
+    width: 60px;
+  }
+  .disk-number-1 {
+    background-color: orange;
+    width: 80px;
+  }
+  .disk-number-2 {
+    background-color: yellow;
+    width: 100px;
+  }
+  .disk-number-3 {
+    background-color: green;
+    width: 120px;
+  }
+  .disk-number-4 {
+    background-color: blue;
+    width: 140px;
+  }
+</style>
+
+<script type="text/ng-template" id="gadget/HanoiTower">
+  <div class="towers-container">
+    <div ng-repeat="towerStyle in towerStyles track by $index">
+      <div class="tower-drop" ng-drop="true"
+           ng-drop-success="onDropComplete($data[0], $data[1], $index, $event)"
+           ng-style="towerDropStyles[$index]">
+        <div class="tower tower-number-<[$index]>" ng-style="towerStyle"></div>
+      </div>
+    </div>
+
+    <div class="tower-base"></div>
+
+    <div ng-repeat="diskNumber in towerContents[0] track by $index">
+      <div class="disk disk-number-<[diskNumber]> on-tower-0" ng-drag="$index === 0" ng-drag-data="[diskNumber, 0]" style="<[getDiskStyle(0, $index)]>">
+      </div>
+    </div>
+    <div ng-repeat="diskNumber in towerContents[1] track by $index" class="disk disk-number-<[diskNumber]> on-tower-1" ng-drag="$index === 0" ng-drag-data="[diskNumber, 1]" style="<[getDiskStyle(1, $index)]>">
+    </div>
+    <div ng-repeat="diskNumber in towerContents[2] track by $index" class="disk disk-number-<[diskNumber]> on-tower-2" ng-drag="$index === 0" ng-drag-data="[diskNumber, 2]" style="<[getDiskStyle(2, $index)]>">
+    </div>
+  </div>
+
+  <br><br>
+
+  <div>
+    <strong>Log of moves</strong>
+    <div>
+      <ol>
+        <li ng-repeat="move in moveLog track by $index"><[move]></li>
+      </ol>
+    </div>
+    <div><[completionMessage]></div>
+  </div>
+
+  <div>
+    <button ng-click="resetGame()">Reset</button>
+  </div>
+</script>
