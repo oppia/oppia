@@ -1,19 +1,84 @@
 author_notes: ''
 blurb: ''
-default_skin: snapshots_v1
+default_skin: conversation_v1
 init_state_name: First State
 language_code: en
-objective: Learn how to classify organisms.
+objective: Learn how to classify things efficiently.
 param_changes: []
-param_specs: {}
+param_specs:
+  questions:
+    obj_type: UnicodeString
 schema_version: 5
 skin_customizations:
   panels_contents: {}
 states:
-  First State:
+  All Organism Feedback:
     content:
     - type: text
-      value: <p>This is a test exploration.</p>
+      value: "<p>It would require approximately 33 questions. Which seems to\_like\
+        \ a relatively small number of questions in order to correctly guess out of\
+        \ billions of possibilities. The 20 questions game could potentially guess\
+        \ out of over 1 million possibilities which should be more than enough for\
+        \ most objects I would think of.</p><p><br></p><p>You may have figured out\
+        \ by now that we can figure out how many questions we need by calculating\
+        \ <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\\log_2&amp;quot;\"\
+        ></oppia-noninteractive-math>\_of all of the possibilities or by calculating\
+        \ what power of 2 is necessary to equal the number of possibilities: <oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;2^4 = 16&amp;quot;\"></oppia-noninteractive-math>,\_\
+        <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;2^5 = 32&amp;quot;\"\
+        ></oppia-noninteractive-math>,\_..., <oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;2^{33}&amp;quot;\"></oppia-noninteractive-math> \u2248 8.5 billion.\
+        \ The ability to generalize the pattern found through experimentation into\
+        \ a general rule, equation, or law is known as <b>abstraction</b>.<br></p><p><br></p><p>Click\
+        \ <b>Next</b> to continue.</p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Final State
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Final State:
+    content:
+    - type: text
+      value: "<p>In this exploration, we have figured out how many questions it would\
+        \ ideally take to classify all of the living things on Earth by applying the\
+        \ steps of Computational Thinking to help us not only get the answer, but\
+        \ understand the underlying patterns and process in order to apply it to new\
+        \ situations.</p><p><br></p><p>Again the Computational Thinking process is:\_\
+        </p><ul><li>Decomposition - Breaking a larger problem into smaller ones. We\
+        \ did this when we looked at classifying a few organisms and elements to better\
+        \ understand the challenge of classifying all organisms.</li><li>Pattern recognition\
+        \ - Solving the smaller problems and finding if there is an underlying pattern\
+        \ among them.\nAbstraction or Pattern Generalization - Developing a principle,\
+        \ rule, equation, or otherwise that can be used to solve similar problems.\_\
+        </li><li>Algorithm design - Further developing the abstraction into a step-by-step\
+        \ strategy for solving these types of tasks or problems.</li></ul><span>If\
+        \ you are interested in learning more about this topic, you could search for\
+        \ the following topics: [information theory and decision trees]. <oppia-noninteractive-link\
+        \ open_link_in_same_window-with-value=\"false\" text-with-value=\"&amp;quot;Khan\
+        \ Academy&amp;quot;\" url-with-value=\"&amp;quot;https://www.khanacademy.org/computing/computer-science/informationtheory/info-theory/v/intro-information-theory&amp;quot;\"\
+        ></oppia-noninteractive-link> has videos about Information Theory and <oppia-noninteractive-link\
+        \ open_link_in_same_window-with-value=\"false\" text-with-value=\"&amp;quot;CSUnplugged&amp;quot;\"\
+        \ url-with-value=\"&amp;quot;http://csunplugged.com/databases/&amp;quot;\"\
+        ></oppia-noninteractive-link> has activities about Searching and Sorting Algorithms\
+        \ as well as Databases and Information Theory that could be used to accompany\
+        \ this activity.</span><br><div><span><br></span></div><div><span>In this\
+        \ exploration, we did not go too deeply into algorithm design because it deserves\
+        \ its own deeper exploration. Algorithms are such a powerful tool for understanding\
+        \ a problem and if applied using technology, they can efficiently automate\
+        \ large or repetitious tasks so you can focus on creatively thinking. It's\
+        \ to this we now turn, but if you would like to see how Computational Thinking\
+        \ is applied in computer science, the humanities, or mathematics feel free\
+        \ to click to those explorations as well before moving on.\_<br></span></div>"
     interaction:
       customization_args:
         recommendedExplorationIds:
@@ -23,9 +88,440 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: First State
+          dest: Final State
           feedback: []
           param_changes: []
       id: EndExploration
+      triggers: []
+    param_changes: []
+  First State:
+    content:
+    - type: text
+      value: '<p>Have you ever heard of the game 20 questions? This is the game where
+        one person thinks of something, for example like an airplane, and the other
+        person can only ask 20 yes or no questions to try and guess what it is. A
+        recent estimate of the number of different species of life on Earth is between
+        8 and 9 million.
+
+        <br></p><p><br></p><p>How many questions do you think it would take to be
+        able to confidently guess any species on Earth I was thinking of?<br></p>'
+    interaction:
+      customization_args:
+        placeholder:
+          value: Number of questions
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Organism Question
+          feedback:
+          - <p>This is a pretty big challenge. Let's apply <b>decomposition</b> to
+            this problem, which is breaking this large problem down into a smaller
+            problem. We'll try a smaller example first to understand how this type
+            of problem works.<br></p>
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  Larger Organism Question:
+    content:
+    - type: text
+      value: "<p>In the previous two examples, you took a big task, determining which\
+        \ organism or element I was thinking of, and made this task feasible by asking\
+        \ yes or no questions. Computational Thinking begins with decomposition, in\
+        \ which you break a larger problem into smaller ones.\n\nIn the first activity\
+        \ you were able to figure out which of the 8 organisms I was thinking of with\
+        \ only\_<b>3</b> questions.\_</p><p><br></p><p>How many questions do you think\
+        \ it would take to guess which organism I was thinking of from 16 organisms\
+        \ if each of your questions removed half of the options? Feel free to draw\
+        \ a diagram to figure this out.</p>"
+    interaction:
+      customization_args:
+        placeholder:
+          value: Number of questions
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: '4'
+            name: CaseSensitiveEquals
+            rule_type: atomic
+            subject: answer
+          dest: Larger Organism Question - End
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Larger Organism Question - Help Feedback
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  Larger Organism Question - End:
+    content:
+    - type: text
+      value: "<p>Yes, every question has 2 possibilities, \"Yes and No\" so for:</p><ul><li>8\
+        \ possibilities 2 * 2 * 2 = 8</li><li>16 possibilities 2 * 2 * 2 * 2 = 16</li><li>32\
+        \ possibilities 2 * 2 * 2 * 2 * 2 = 32</li></ul><span>When you look at data\
+        \ from multiple experiments it is helpful to recognize if there is a pattern\
+        \ and what it is in order to determine what the underlying cause or principle\
+        \ is.</span><br><div><span><br></span></div><div><span>Let\u2019s assume,\
+        \ as we said in the beginning, there are about 8 billion species on Earth.\
+        \ How many questions, with each question eliminating about half of the options,\
+        \ would you need to guess the species I was thinking of?\n<br></span></div>"
+    interaction:
+      customization_args:
+        placeholder:
+          value: Number of questions
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: All Organism Feedback
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  Larger Organism Question - Help Feedback:
+    content:
+    - type: text
+      value: "<p>If each question removes half of the organisms then for 16 options:</p><p>\_\
+        - The first question removes 8 and 8 remain</p><p>\_- The second question\
+        \ removes 4 and 4 remain</p><p>\_- The third question removes 2 and 2 remain</p><p>\_\
+        - The fourth question removes 1 and only one remains.</p><p><br></p><p>So\
+        \ for 16 options, 4 questions are needed if each question removes half the\
+        \ organisms. So how many questions do you think are needed for 32 organisms?</p>"
+    interaction:
+      customization_args:
+        placeholder:
+          value: Number of questions
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: '5'
+            name: CaseSensitiveEquals
+            rule_type: atomic
+            subject: answer
+          dest: Larger Organism Question - End
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Larger Organism Question - Help Feedback
+          feedback:
+          - <p>Try and see the pattern above and see how many additional questions
+            are needed as the number of organisms increases.</p>
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  Organism Question:
+    content:
+    - type: text
+      value: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;classify_all.png&amp;quot;"></oppia-noninteractive-image><br></p><p>Above,
+        you see 8 organisms. I am thinking of one of them and the challenge is for
+        you to guess which one it is.</p><p><br></p><p>If you wanted to guess which
+        organism I am thinking of within the fewest number of questions you might
+        try to eliminate half of the organisms with each question. So ask me one of
+        the questions below to try and eliminate some options. See if you can do it
+        with only <b>3</b> questions.</p>
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Does the organism have fins?</p>
+          - <p>Does the organism have legs?</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Fins
+          feedback:
+          - <p>No the organism I am thinking of does not have fins.</p>
+          param_changes: []
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Legs
+          feedback:
+          - <p>Yes the organism I am thinking of does have legs.<br></p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Organism Question
+          feedback: []
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '2'
+      generator_id: Copier
+      name: questions
+  Organism Question - Final State:
+    content:
+    - type: text
+      value: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;classify_minus_fins_leaves_wings_and_bear.png&amp;quot;"></oppia-noninteractive-image><br></p><p>You
+        were able to guess that I was thinking of a tiger out of the 8 choices with
+        only <b>3</b> questions.</p><p><br></p><p>Click <b>Next</b> to continue.</p>
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Periodic Table
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Organism Question - Fins:
+    content:
+    - type: text
+      value: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;classify_minus_fins.png&amp;quot;"></oppia-noninteractive-image><br></p><p>6
+        organisms remain. Ask me another question to see if you can figure out which
+        organism I am thinking of. You have <b>2</b> questions remaining.</p>
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Does the organism have leaves?</p>
+          - <p>Does the organism have legs?<br></p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Leaves 1 Question Remaining
+          feedback:
+          - <p>No the organism I am thinking of does not have leaves.<br></p>
+          param_changes: []
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Leaves 1 Question Remaining
+          feedback:
+          - <p>Yes the organism I am thinking of does have legs.<br></p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Organism Question - Leaves 1 Question Remaining
+          feedback: []
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '1'
+      generator_id: Copier
+      name: questions
+  Organism Question - Fur:
+    content:
+    - type: text
+      value: "<p><oppia-noninteractive-image filepath-with-value=\"&amp;quot;classify_minus_fins_leaves_and_wings.png&amp;quot;\"\
+        ></oppia-noninteractive-image><br></p><p>2 organisms remain. Ask me another\
+        \ question to see if you can figure out which organism I am thinking of. You\
+        \ have <b>1</b>\_question remaining.<br></p>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Does the organism have stripes?</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Organism Question - Final State
+          feedback:
+          - <p>The organism I am thinking of does have stripes.</p>
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  Organism Question - Leaves 1 Question Remaining:
+    content:
+    - type: text
+      value: "<p><oppia-noninteractive-image filepath-with-value=\"&amp;quot;classify_minus_fins_and_leaves.png&amp;quot;\"\
+        ></oppia-noninteractive-image><br></p><p>4 organisms remain. Ask me another\
+        \ question to see if you can figure out which organism I am thinking of. You\
+        \ have <b>1</b>\_question remaining.<br></p>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Does the organism have fur?</p>
+          - <p>Does the organism have wings?<br></p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Out of Questions
+          feedback:
+          - <p>Yes the organism I am thinking of does have fur.<br></p>
+          param_changes: []
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Out of Questions
+          feedback:
+          - <p>No the organism I am thinking of does not have wings.<br></p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Organism Question - Out of Questions
+          feedback: []
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '0'
+      generator_id: Copier
+      name: questions
+  Organism Question - Legs:
+    content:
+    - type: text
+      value: "<p><oppia-noninteractive-image filepath-with-value=\"&amp;quot;classify_minus_fins_and_leaves.png&amp;quot;\"\
+        ></oppia-noninteractive-image><br></p><p>4 organisms remain. Ask me another\
+        \ question to see if you can figure out which organism I am thinking of. You\
+        \ have\_<b>2</b>\_questions remaining.<br></p>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Does the organism have fur?</p>
+          - <p>Does the organism have wings?<br></p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Fur
+          feedback:
+          - <p>Yes the organism I am thinking of does have fur.</p>
+          param_changes: []
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Organism Question - Fur
+          feedback:
+          - <p>No the organism I am thinking of does not have wings.</p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Organism Question - Legs
+          feedback: []
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  Organism Question - Out of Questions:
+    content:
+    - type: text
+      value: "<p><oppia-noninteractive-image filepath-with-value=\"&amp;quot;classify_minus_fins_leaves_and_wings.png&amp;quot;\"\
+        ></oppia-noninteractive-image><br></p><p>2 organisms remain. Unfortunately\
+        \ you have run out of questions. Try asking questions that will remove at\
+        \ least half of the remaining organisms.<br></p><p><br></p><p>When you are\
+        \ ready to try again, click<span>\_</span><b>Next</b></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Organism Question
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Periodic Table:
+    content:
+    - type: text
+      value: "<p><oppia-noninteractive-image filepath-with-value=\"&amp;quot;periodic_table.png&amp;quot;\"\
+        ></oppia-noninteractive-image><br></p><p>You could apply this concept of identifying\
+        \ an object based on its properties to the Periodic Table of the Elements.</p><p><br></p><p>This\
+        \ process is similar to what\_Dmitri Mendeleev used when creating his prediction\
+        \ for what would form the basis for the modern Periodic Table of Elements.\
+        \ In addition to organizing the elements based primarily on atomic weights\
+        \ (the proton was not discovered until almost 50 years after), you can see\
+        \ in the chart below that Mendeleev even left gaps for elements that fit his\
+        \ predictions but had not been discovered yet!\_</p><p><oppia-noninteractive-image\
+        \ filepath-with-value=\"&amp;quot;mendeleev.png&amp;quot;\"></oppia-noninteractive-image><br></p><p>Computational\
+        \ Thinking is not about computers or dependent on whether technology is applied.\
+        \ Computational Thinking is a process that we can see used by scientists for\
+        \ centuries.</p><p><br></p><p>In the traditional steps of the scientific method.\
+        \ Computational Thinking fits nicely into the experimentation and analysis\
+        \ phase.</p><p><br></p><p>Click Next to continue.</p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Larger Organism Question
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
     param_changes: []
 tags: []
