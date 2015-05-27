@@ -29,8 +29,12 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.filepathWithValue);
         $scope.imageUrl = $sce.trustAsResourceUrl(
             '/imagehandler/' + $rootScope.explorationId + '/' +
-            encodeURIComponent($scope.filepath)
-        );
+            encodeURIComponent($scope.filepath));
+
+        $scope.imageAltText = '';
+        if ($attrs.altWithValue) {
+          $scope.imageAltText = oppiaHtmlEscaper.escapedJsonToObj($attrs.altWithValue);
+        }
       }]
     };
   }
