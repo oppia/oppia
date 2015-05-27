@@ -649,7 +649,7 @@ oppia.config(['$provide', function($provide) {
               textAngular.$editor().updateTaBindtaTextElement();
             },
             function() {
-              // clean up the insertion point if no widget was inserted
+              // Clean up the insertion point if no widget was inserted.
               var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
               if (insertionPoint !== null) {
                 insertionPoint.remove();
