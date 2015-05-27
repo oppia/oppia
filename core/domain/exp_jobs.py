@@ -93,6 +93,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
     def reduce(key, values):
         yield (key, values)
 
+
 class ExplorationStrictValidityJobManager(jobs.BaseMapReduceJobManager):
     """Job that checks (strict) validation status of all explorations."""
 
@@ -107,7 +108,7 @@ class ExplorationStrictValidityJobManager(jobs.BaseMapReduceJobManager):
         try:
             exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, item.title + ':' + unicode(e).encode('utf-8'))
+            yield (item.id, '%s:%s' % (item.title, unicode(e).encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):
@@ -220,7 +221,8 @@ class SearchRankerMRJobManager(
     def reduce(key, stringified_values):
         pass
 
-class ExplorationMigrator(jobs.BaseMapReduceJobManager):
+
+class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from NDB and
     immediately store them back into NDB. The loading process of an exploration
@@ -237,18 +239,22 @@ class ExplorationMigrator(jobs.BaseMapReduceJobManager):
     def map(item):
         from core.domain import exp_services
 
-        if item.deleted:
-            return
-
         exp = exp_services.get_exploration_from_model(item)
 
-        # was the exploration updated?
-        if (hasattr(exp, 'prev_states_schema_version') and
+        # If the exploration was updated immediately after it was retrieved
+        # from storage, save the updates.
+        if (hasattr(
+                exp, 'prev_states_schema_version') and
                 exp.prev_states_schema_version is not None):
-            exp_services.save_exploration(feconf.MIGRATION_BOT_USERNAME, exp,
-                'Update exploration states from schema version ' +
-                str(exp.prev_states_schema_version) + ' to ' +
-                str(exp.states_schema_version) + '.')
+            # Special circumstances allow this job to call the private
+            # _save_exploration. In particular, the ability to save an
+            # exploration without using a set of changes is not ideal and
+            # therefore is not exposed in the public API. This job must use this
+            # functionality, however.
+            exp_services._save_exploration(feconf.MIGRATION_BOT_USERNAME, exp,
+                'Update exploration states from schema version %d to %d.' % (
+                exp.prev_states_schema_version,
+                exp.states_schema_version), None)
 
     @staticmethod
     def reduce(key, values):

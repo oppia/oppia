@@ -589,7 +589,7 @@ states:
       rule_specs:
       - definition:
           rule_type: default
-        dest: New state
+        dest: END
         feedback: []
         param_changes: []
     sticky: false
@@ -632,7 +632,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       sticky: false
@@ -688,7 +688,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       sticky: false
@@ -742,7 +742,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       id: TextInput
@@ -797,7 +797,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       id: TextInput
@@ -838,6 +838,24 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+    param_changes: []
   New state:
     content:
     - type: text
@@ -853,7 +871,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       id: TextInput
@@ -899,6 +917,7 @@ tags: []
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V6)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""

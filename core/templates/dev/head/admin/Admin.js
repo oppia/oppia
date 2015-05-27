@@ -157,7 +157,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     });
   };
 
-  $scope.reloadExplorations = function(explorations) {
+  $scope.reloadAllExplorations = function() {
     if ($scope.message.startsWith('Processing...')) {
       return;
     }
@@ -166,31 +166,33 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       return;
     }
 
-    var numSucceeded = 0, numFailed = 0, numTried = 0;
+    var numSucceeded = 0;
+    var numFailed = 0;
+    var numTried = 0;
     $scope.message = 'Processing...';
-    var resultPrinter = function() {
-      if (numTried < explorations.length) {
-        $scope.message = 'Processing...' + numTried + '/' + explorations.length;
+    var printResult = function() {
+      if (numTried < GLOBALS.DEMO_EXPLORATION_IDS.length) {
+        $scope.message = 'Processing...' + numTried + '/' + GLOBALS.DEMO_EXPLORATION_IDS.length;
         return;
       }
-      $scope.message = 'Reloaded ' + explorations.length + ' explorations: ' +
-        numSucceeded + " succeeded, " + numFailed + " failed.";
+      $scope.message = 'Reloaded ' + GLOBALS.DEMO_EXPLORATION_IDS.length + ' explorations: ' +
+        numSucceeded + ' succeeded, ' + numFailed + ' failed.';
     };
 
-    for (var i = 0; i < explorations.length; ++i) {
-      var exploration = explorations[i];
+    for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
+      var exploration = GLOBALS.DEMO_EXPLORATION_IDS[i];
 
       $http.post($scope.adminHandlerUrl, {
         action: 'reload_exploration',
-        exploration_id: String(exploration[0])
+        exploration_id: exploration[0]
       }).success(function(data) {
         ++numSucceeded;
         ++numTried;
-        resultPrinter();
+        printResult();
       }).error(function(errorResponse) {
         ++numFailed;
         ++numTried;
-        resultPrinter();
+        printResult();
       });
     }
   };

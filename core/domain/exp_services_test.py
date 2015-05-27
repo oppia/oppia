@@ -2036,3 +2036,140 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         # check actual summaries equal expected summaries
         self.assertEqual(actual_summaries,
                          expected_summaries)
+
+
+class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
+    """Tests the exploration model -> exploration conversion pipeline."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    OLD_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+
+    UPGRADED_EXP_YAML = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+    param_changes: []
+  %s:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: Continue
+    param_changes: []
+states_schema_version: %d
+tags: []
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+    def setUp(self):
+        super(ExplorationConversionPipelineTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        # Create old exploration from fake ExplorationModel and ensure it is
+        # converted. It has the default states schema version of 0.
+        old_exp_model = exp_models.ExplorationModel(
+            id=self.OLD_EXP_ID,
+            category='Old Category',
+            title='Old Title',
+            objective='',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: {
+                    'content': [{'type': 'text', 'value': ''}],
+                    'param_changes': [],
+                    'interaction': {
+                        'customization_args': {},
+                        'id': 'Continue',
+                        'handlers': [{
+                            'name': 'submit',
+                            'rule_specs': [{
+                                'dest': 'END',
+                                'feedback': [],
+                                'param_changes': [],
+                                'definition': {'rule_type': 'default'}
+                            }]
+                        }]
+                    }
+                }
+            },
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(
+            self.OLD_EXP_ID, self.ALBERT_ID)
+        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
+            'cmd': 'create_new',
+            'title': 'Old Title',
+            'category': 'Old Category',
+        }])
+
+        # Create standard exploration that should not be converted.
+        new_exp = self.save_new_valid_exploration(
+            self.NEW_EXP_ID, self.ALBERT_ID)
+        self._up_to_date_yaml = new_exp.to_yaml()
+
+    def test_converts_exp_model_with_default_states_schema_version(self):
+        exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+
+    def test_does_not_convert_up_to_date_exploration(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
+        

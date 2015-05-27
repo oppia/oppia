@@ -18,7 +18,7 @@
 
 __author__ = 'Frederik Creemers'
 
-"""Tests for ExpSummary continuous computations."""
+"""Tests for Exploration-related jobs."""
 
 from core import jobs_registry
 from core.domain import exp_domain
@@ -280,3 +280,37 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
             self.assertIn('title %d' % i, titles)
             self.assertIn('category%d' % i, categories)
 
+
+class ExplorationMigrationJobTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationMigrationJobTest, self).setUp()
+
+        # Create a new, default exploration that should not be affected by the
+        # job.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'unaffected0', 'title', 'category')
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'EndExploration')
+        exp_services.save_new_exploration('owner_id', exploration)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        self._before_converted_yaml = exploration.to_yaml()
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operations(self):
+        # Start migration job on sample exploration.
+        job_id = (exp_jobs.ExplorationMigrationJobManager.create_new())
+        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the exploration is exactly the same after migration.
+        updated_exp = exp_services.get_exploration_by_id('unaffected0')
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        after_converted_yaml = updated_exp.to_yaml()
+        self.assertEqual(after_converted_yaml, self._before_converted_yaml)

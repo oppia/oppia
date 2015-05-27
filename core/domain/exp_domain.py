@@ -863,33 +863,13 @@ class State(object):
         }
 
     @classmethod
-    def _get_current_state_dict(cls, state_dict):
-        """If the state dict still uses 'widget', change it to 'interaction'.
-
-        This corresponds to the v3 --> v4 migration in the YAML representation
-        of an exploration.
-        """
-        if 'widget' in state_dict:
-            # This is an old version of the state dict which still uses
-            # 'widget'.
-            state_dict['interaction'] = copy.deepcopy(state_dict['widget'])
-            state_dict['interaction']['id'] = copy.deepcopy(
-                state_dict['interaction']['widget_id'])
-            del state_dict['interaction']['widget_id']
-            del state_dict['widget']
-
-        return copy.deepcopy(state_dict)
-
-    @classmethod
     def from_dict(cls, state_dict):
-        current_state_dict = cls._get_current_state_dict(state_dict)
-
         return cls(
             [Content.from_dict(item)
-             for item in current_state_dict['content']],
+             for item in state_dict['content']],
             [param_domain.ParamChange.from_dict(param)
-             for param in current_state_dict['param_changes']],
-            InteractionInstance.from_dict(current_state_dict['interaction']))
+             for param in state_dict['param_changes']],
+            InteractionInstance.from_dict(state_dict['interaction']))
 
     @classmethod
     def create_default_state(
@@ -987,7 +967,8 @@ class Exploration(object):
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
-    def create_exploration_from_dict(cls, exploration_dict,
+    def create_exploration_from_dict(
+            cls, exploration_dict,
             exploration_version=0, exploration_created_on=None,
             exploration_last_updated=None):
         # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and from
@@ -1521,12 +1502,13 @@ class Exploration(object):
 
         del self.states[state_name]
 
-    # Convert old states schema to the modern v1 schema. v1 contains the schema
-    # version 1 and does not contain any old constructs, such as widgets. This is
-    # a complete migration of everything previous to the schema versioning update
-    # to the earliest versioned schema.
     @classmethod
     def convert_states_v0_dict_to_v1_dict(cls, exploration_dict):
+        """ Converts old states schema to the modern v1 schema. v1 contains the
+        schema version 1 and does not contain any old constructs, such as
+        widgets. This is a complete migration of everything previous to the
+        schema versioning update to the earliest versioned schema.
+        """
         exploration_dict['states_schema_version'] = 1
 
         # ensure widgets are renamed to be interactions
@@ -1537,55 +1519,62 @@ class Exploration(object):
             state_defn['interaction']['id'] = copy.deepcopy(
                 state_defn['interaction']['widget_id'])
             del state_defn['interaction']['widget_id']
-            del state_defn['interaction']['sticky']
+            if hasattr(state_defn['interaction'], 'sticky'):
+                del state_defn['interaction']['sticky']
             del state_defn['widget']
         return exploration_dict
 
-    # Converts from version 1 to 2. Version 2 is not a different states schema from
-    # version 1, but it does have different expectations. Version 1 assumes the
-    # existence of an implicit 'END' state, but version 2 does not. As a result, the
-    # conversion process involves introducing a proper ending state for all
-    # explorations previously designed under this assumption.
     @classmethod
     def convert_states_v1_dict_to_v2_dict(cls, exploration_dict):
+        """ Converts from version 1 to 2. Version 2 is not a different states
+        schema from version 1, but it does have different expectations. Version
+        1 assumes the existence of an implicit 'END' state, but version 2 does
+        not. As a result, the conversion process involves introducing a proper
+        ending state for all explorations previously designed under this
+        assumption.
+        """
+        # The name of the implicit END state before the migration. Needed here
+        # to migrate old explorations which expect that implicit END state.
+        _OLD_END_DEST = 'END'
         exploration_dict['states_schema_version'] = 2
 
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in exploration_dict['states'].iteritems():
-            if not has_end_state and state_name == feconf.END_DEST:
+            if not has_end_state and state_name == _OLD_END_DEST:
                 has_end_state = True
 
             if not targets_end_state:
                 for handler in sdict['interaction']['handlers']:
                     for rule_spec in handler['rule_specs']:
-                        if rule_spec['dest'] == feconf.END_DEST:
+                        if rule_spec['dest'] == _OLD_END_DEST:
                             targets_end_state = True
                             break
 
-        # ensure any explorations pointing to an END state has a valid END
+        # Ensure any explorations pointing to an END state has a valid END
         # state to end with (in case it expects an END state)
         if targets_end_state and not has_end_state:
-            exploration_dict['states'][feconf.END_DEST] = {
-                'name': feconf.END_DEST,
-                'content': [ { 'type': 'text', 'value':
-                    'Congratulations, you have finished!' } ],
-                'interaction': { 'id': 'EndExploration',
+            exploration_dict['states'][_OLD_END_DEST] = {
+                'content': [{
+                    'type': 'text',
+                    'value': 'Congratulations, you have finished!'
+                }],
+                'interaction': {
+                    'id': 'EndExploration',
                     'customization_args': {
                         'recommendedExplorationIds': {
                             'value': []
                         }
                     },
-
                     'handlers': [{
                         'name': 'submit',
                         'rule_specs': [{
                             'definition': {
                                 'rule_type': 'default'
                             },
-                        'dest': feconf.END_DEST,
-                        'feedback': [],
-                        'param_changes': []
+                            'dest': _OLD_END_DEST,
+                            'feedback': [],
+                            'param_changes': []
                         }]
                     }]
                 },
