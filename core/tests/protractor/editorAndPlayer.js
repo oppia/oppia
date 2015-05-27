@@ -99,16 +99,18 @@ describe('State editor', function() {
     editor.setInteraction('NumericInput');
     editor.addRule('NumericInput', function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
-    }, 'END', 'IsInclusivelyBetween', 3, 6);
+    }, 'END', 'IsInclusivelyBetween', -1, 3);
     editor.addRule(
       'NumericInput', forms.toRichText('out of bounds'), null, 'Default');
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.submitAnswer('NumericInput', 7);
+    player.submitAnswer('NumericInput', 5);
     player.expectLatestFeedbackToMatch(forms.toRichText('out of bounds'));
     player.expectExplorationToNotBeOver();
-    player.submitAnswer('NumericInput', 4);
+    // It's important to test the value 0 in order to ensure that it would
+    // still get submitted even though it is a falsy value in JavaScript.
+    player.submitAnswer('NumericInput', 0);
     player.expectLatestFeedbackToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('correct');
     });
