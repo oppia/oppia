@@ -448,6 +448,7 @@ class InteractionInstance(object):
                 {} if self.id is None
                 else self._get_full_customization_args()),
             'handlers': [handler.to_dict() for handler in self.handlers],
+            'triggers': self.triggers,
         }
 
     @classmethod
@@ -465,10 +466,11 @@ class InteractionInstance(object):
             interaction_dict['id'],
             interaction_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
-             for h in interaction_dict['handlers']])
+             for h in interaction_dict['handlers']],
+            interaction_dict['triggers'])
 
     def __init__(
-            self, interaction_id, customization_args, handlers):
+            self, interaction_id, customization_args, handlers, triggers):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -479,6 +481,8 @@ class InteractionInstance(object):
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
                          for h in handlers]
+        # TODO(sll): Create Trigger class.
+        self.triggers = copy.deepcopy(triggers)
 
     @property
     def is_terminal(self):
@@ -537,6 +541,7 @@ class InteractionInstance(object):
                 'interaction instance.')
         for handler in self.handlers:
             handler.validate()
+        # TODO(sll): Validate triggers.
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
@@ -546,7 +551,8 @@ class InteractionInstance(object):
             cls._DEFAULT_INTERACTION_ID,
             {},
             [AnswerHandlerInstance.get_default_handler(
-                default_dest_state_name, default_obj_type)]
+                default_dest_state_name, default_obj_type)],
+            []
         )
 
 
@@ -725,6 +731,7 @@ class State(object):
                 'param_changes': [],
             }],
         }],
+        'triggers': [],
     }
 
     def __init__(self, content, param_changes, interaction):
@@ -738,7 +745,7 @@ class State(object):
         # The interaction instance associated with this state.
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
-            interaction.handlers)
+            interaction.handlers, interaction.triggers)
 
     def validate(self, allow_null_interaction):
         if not isinstance(self.content, list):
@@ -1030,7 +1037,7 @@ class Exploration(object):
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
-                interaction_handlers)
+                interaction_handlers, idict['triggers'])
 
             exploration.states[state_name] = state
 
@@ -1526,18 +1533,27 @@ class Exploration(object):
 
     @classmethod
     def convert_states_v1_dict_to_v2_dict(cls, exploration_dict):
-        """Converts from version 1 to 2. Version 2 is not a different states
-        schema from version 1, but it does have different expectations. Version
-        1 assumes the existence of an implicit 'END' state, but version 2 does
-        not. As a result, the conversion process involves introducing a proper
-        ending state for all explorations previously designed under this
-        assumption.
+        """Converts from version 1 to 2. Version 1 assumes the existence of an
+        implicit 'END' state, but version 2 does not. As a result, the
+        conversion process involves introducing a proper ending state for all
+        explorations previously designed under this assumption. Furthermore,
+        version 2 also introduces a new 'triggers' list as part of the
+        interaction dictionary of a state.
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
         _OLD_END_DEST = 'END'
         exploration_dict['states_schema_version'] = 2
 
+        # Adds an explicit state called 'END' with an EndExploration to replace
+        # links other states have to an implicit 'END' state. Otherwise, if no
+        # states refer to a state called 'END', no new state will be introduced
+        # since it would be isolated from all other states in the graph and
+        # create additional warnings for the user. If they were not referring to
+        # an 'END' state before, then they would only be receiving warnings
+        # about not being able to complete the exploration. The introduction of
+        # a real END state would produce additional warnings (state cannot be
+        # reached from other states, etc.)
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in exploration_dict['states'].iteritems():
@@ -1576,10 +1592,17 @@ class Exploration(object):
                             'feedback': [],
                             'param_changes': []
                         }]
-                    }]
+                    }],
+                    'triggers': []
                 },
                 'param_changes': []
             }
+
+        # Ensure all states interactions have a triggers list.
+        for (state_name, sdict) in exploration_dict['states'].iteritems():
+            interaction = sdict['interaction']
+            if 'triggers' not in interaction:
+                interaction['triggers'] = []
 
         return exploration_dict
 

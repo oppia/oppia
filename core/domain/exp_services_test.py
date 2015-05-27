@@ -392,6 +392,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -412,6 +413,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 states_schema_version: 2
 tags: []
@@ -451,6 +453,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Renamed state:
     content:
@@ -471,6 +474,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 states_schema_version: 2
 tags: []
@@ -577,6 +581,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -600,6 +605,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """)
     }
@@ -624,6 +630,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """)
     }
@@ -2079,6 +2086,7 @@ states:
           feedback: []
           param_changes: []
       id: EndExploration
+      triggers: []
     param_changes: []
   %s:
     content:
@@ -2097,6 +2105,7 @@ states:
           feedback: []
           param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
 states_schema_version: %d
 tags: []
@@ -2141,7 +2150,8 @@ tags: []
                                 'param_changes': [],
                                 'definition': {'rule_type': 'default'}
                             }]
-                        }]
+                        }],
+                        'triggers': []
                     }
                 }
             },
@@ -2210,7 +2220,8 @@ tags: []
                                 'param_changes': [],
                                 'definition': {'rule_type': 'default'}
                             }]
-                        }]
+                        }],
+                        'triggers': []
                     }
                 }
             },

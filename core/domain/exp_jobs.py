@@ -258,7 +258,8 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
                 'from_version': str(exp.prev_states_schema_version),
                 'to_version': str(exp.states_schema_version)
             }]
-            exp_services._save_exploration(feconf.MIGRATION_BOT_USERNAME, exp,
+            exp_services._save_exploration(
+                feconf.MIGRATION_BOT_USERNAME, exp,
                 'Update exploration states from schema version %d to %d.' % (
                 exp.prev_states_schema_version,
                 exp.states_schema_version), commit_cmds)

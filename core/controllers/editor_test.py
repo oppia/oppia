@@ -266,6 +266,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """),
         "State B": ("""content:
@@ -286,6 +287,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
@@ -306,6 +308,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -329,6 +332,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """)
 

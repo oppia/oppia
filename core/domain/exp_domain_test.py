@@ -62,6 +62,7 @@ states:
           feedback: []
           param_changes: []
       id: null
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -78,6 +79,7 @@ states:
           feedback: []
           param_changes: []
       id: null
+      triggers: []
     param_changes: []
 states_schema_version: 2
 tags: []
@@ -131,6 +133,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -151,6 +154,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Second state:
     content:
@@ -171,6 +175,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 states_schema_version: 2
 tags: []
@@ -489,6 +494,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     }]
                 }],
                 'id': None,
+                'triggers': [],
             },
             'param_changes': [],
         }
@@ -837,6 +843,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   END:
     content:
@@ -855,6 +862,7 @@ states:
           feedback: []
           param_changes: []
       id: EndExploration
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -875,6 +883,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
 states_schema_version: 2
 tags: []
@@ -950,6 +959,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         }],
                     }],
                     'id': None,
+                    'triggers': [],
                 },
                 'param_changes': [],
             }
