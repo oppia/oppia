@@ -299,8 +299,8 @@ EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
-EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
+EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'

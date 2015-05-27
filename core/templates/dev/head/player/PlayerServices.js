@@ -226,8 +226,8 @@ oppia.factory('oppiaPlayerService', [
         });
       }
 
-      // If the new state is either the END state, or contains a terminal
-      // interaction, record a completion event.
+      // If the new state contains a terminal interaction, record a completion
+      // event.
       if (!newStateName ||
           INTERACTION_SPECS[
             _exploration.states[newStateName].interaction.id].is_terminal) {

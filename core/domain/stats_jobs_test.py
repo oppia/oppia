@@ -193,7 +193,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             self._record_start(exp_id, exp_version, state, 'session2')
             self._record_complete(
-                exp_id, exp_version, feconf.END_DEST, 'session2')
+                exp_id, exp_version, 'END', 'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -205,6 +205,47 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 model_id)
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 1)
+
+    def test_one_leave_and_one_complete_same_session(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            exp_version = 1
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
+            init_state = exploration.init_state_name
+
+            self._record_start(exp_id, exp_version, init_state, 'session1')
+            self._record_state_hit(exp_id, exp_version, init_state, 'session1')
+            self._record_leave(exp_id, exp_version, init_state, 'session1')
+            self._record_state_hit(exp_id, exp_version, 'END', 'session1')
+            self._record_complete(exp_id, exp_version, 'END', 'session1')
+            self.process_and_flush_pending_tasks()
+
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            model_id = '%s:%s' % (exp_id, exp_version)
+            output_model = stats_models.ExplorationAnnotationsModel.get(
+                model_id)
+            self.assertEqual(output_model.num_starts, 1)
+            self.assertEqual(output_model.num_completions, 1)
+
+            stats_dict = ModifiedStatisticsAggregator.get_statistics(exp_id, 1)
+            self.assertEqual(stats_dict['start_exploration_count'], 1)
+            self.assertEqual(stats_dict['complete_exploration_count'], 1)
+            self.assertEqual(stats_dict['state_hit_counts'], {
+                exploration.init_state_name: {
+                    'first_entry_count': 1,
+                    'no_answer_count': 0,
+                    'total_entry_count': 1,
+                },
+                'END': {
+                    'first_entry_count': 1,
+                    'total_entry_count': 1,
+                }
+            })
 
     def test_multiple_maybe_leaves_same_session(self):
         with self.swap(
