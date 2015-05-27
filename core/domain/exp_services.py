@@ -50,7 +50,7 @@ CMD_CREATE_NEW = 'create_new'
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
 def _migrate_states_schema(exploration_dict):
-    """ Holds the responsibility of performing a step-by-step, sequential update
+    """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
     found in exp_domain.py and, in fact, many of the conversion functions for
@@ -103,7 +103,7 @@ def _get_exploration_memcache_key(exploration_id, version=None):
         return 'exploration:%s' % exploration_id
 
 
-def get_exploration_from_model(exploration_model):
+def get_exploration_from_model(exploration_model, run_conversion=True):
     exploration = exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
@@ -116,9 +116,9 @@ def get_exploration_from_model(exploration_model):
         exploration_model.version, exploration_model.created_on,
         exploration_model.last_updated)
 
-    # If the exploration is the latest states schema version, no conversion
+    # If the exploration uses the latest states schema version, no conversion
     # is necessary.
-    if (exploration.states_schema_version ==
+    if (not run_conversion or exploration.states_schema_version ==
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
         return exploration
 

@@ -27,6 +27,8 @@ from core.platform import models
 import feconf
 import utils
 
+# This takes additional 'from_version' and 'to_version' parameters.
+CMD_MIGRATE_STATES_SCHEMA = 'migrate_states_schema'
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     """Job that calculates summaries of explorations, which can be
@@ -251,10 +253,15 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
             # exploration without using a set of changes is not ideal and
             # therefore is not exposed in the public API. This job must use this
             # functionality, however.
+            commit_cmds = [{
+                'cmd': CMD_MIGRATE_STATES_SCHEMA,
+                'from_version': str(exp.prev_states_schema_version),
+                'to_version': str(exp.states_schema_version)
+            }]
             exp_services._save_exploration(feconf.MIGRATION_BOT_USERNAME, exp,
                 'Update exploration states from schema version %d to %d.' % (
                 exp.prev_states_schema_version,
-                exp.states_schema_version), None)
+                exp.states_schema_version), commit_cmds)
 
     @staticmethod
     def reduce(key, values):

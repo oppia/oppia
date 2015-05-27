@@ -1504,7 +1504,7 @@ class Exploration(object):
 
     @classmethod
     def convert_states_v0_dict_to_v1_dict(cls, exploration_dict):
-        """ Converts old states schema to the modern v1 schema. v1 contains the
+        """Converts old states schema to the modern v1 schema. v1 contains the
         schema version 1 and does not contain any old constructs, such as
         widgets. This is a complete migration of everything previous to the
         schema versioning update to the earliest versioned schema.
@@ -1519,14 +1519,14 @@ class Exploration(object):
             state_defn['interaction']['id'] = copy.deepcopy(
                 state_defn['interaction']['widget_id'])
             del state_defn['interaction']['widget_id']
-            if hasattr(state_defn['interaction'], 'sticky'):
+            if 'sticky' in state_defn['interaction']:
                 del state_defn['interaction']['sticky']
             del state_defn['widget']
         return exploration_dict
 
     @classmethod
     def convert_states_v1_dict_to_v2_dict(cls, exploration_dict):
-        """ Converts from version 1 to 2. Version 2 is not a different states
+        """Converts from version 1 to 2. Version 2 is not a different states
         schema from version 1, but it does have different expectations. Version
         1 assumes the existence of an implicit 'END' state, but version 2 does
         not. As a result, the conversion process involves introducing a proper

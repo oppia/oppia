@@ -24,6 +24,7 @@ import zipfile
 from core.domain import config_services
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
@@ -2046,6 +2047,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
+    OLD_EXP_WITH_CHANGES_ID = 'exp_id2'
 
     UPGRADED_EXP_YAML = (
 """author_notes: ''
@@ -2053,7 +2055,7 @@ blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
 language_code: en
-objective: ''
+objective: Old objective
 param_changes: []
 param_specs: {}
 schema_version: 6
@@ -2109,13 +2111,13 @@ tags: []
         self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
 
-        # Create old exploration from fake ExplorationModel and ensure it is
-        # converted. It has the default states schema version of 0.
+        # Create exploration that uses a states schema version of 0 and ensure
+        # it is properly converted.
         old_exp_model = exp_models.ExplorationModel(
             id=self.OLD_EXP_ID,
             category='Old Category',
             title='Old Title',
-            objective='',
+            objective='Old objective',
             language_code='en',
             tags=[],
             blurb='',
@@ -2172,4 +2174,153 @@ tags: []
             exploration.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
-        
+
+    def test_migration_then_reversion_maintains_valid_exploration(self):
+        # This fake validation function for explorations is used to ignore
+        # validating the exploration during saving.
+        def fake_validate(strict=False, allow_null_interaction=False):
+            pass
+
+        # Create a exploration with states schema version 0.
+        old_exp_model = exp_models.ExplorationModel(
+            id=self.OLD_EXP_WITH_CHANGES_ID,
+            category='Old Category',
+            title='Old Title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: {
+                    'content': [{'type': 'text', 'value': ''}],
+                    'param_changes': [],
+                    'interaction': {
+                        'customization_args': {},
+                        'id': 'Continue',
+                        'handlers': [{
+                            'name': 'submit',
+                            'rule_specs': [{
+                                'dest': 'END',
+                                'feedback': [],
+                                'param_changes': [],
+                                'definition': {'rule_type': 'default'}
+                            }]
+                        }]
+                    }
+                }
+            },
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(
+            self.OLD_EXP_WITH_CHANGES_ID, self.ALBERT_ID)
+        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
+            'cmd': 'create_new',
+            'title': 'Old Title',
+            'category': 'Old Category',
+        }])
+
+        # Load the exploration without using the conversion pipeline. All of
+        # these changes are to happen on an exploration with states schema
+        # version 0.
+        exploration_model = exp_models.ExplorationModel.get(
+            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+        exploration = exp_services.get_exploration_from_model(
+            exploration_model,
+            run_conversion=False)
+
+        # Ensure the exploration cannot be validated.
+        exploration.validate = fake_validate
+
+        # In version 1, the title was 'Old title'.
+        # In version 2, the title becomes 'New title'.
+        exploration.title = 'New title'
+        exp_services._save_exploration(
+            self.ALBERT_ID, exploration, 'Changed title.', [])
+
+        # In version 3, a new state is added.
+        exploration_model = exp_models.ExplorationModel.get(
+            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+        exploration = exp_services.get_exploration_from_model(
+            exploration_model,
+            run_conversion=False)
+        exploration.validate = fake_validate
+        exploration.add_states(['New state'])
+        exploration.states['New state'].update_interaction_id('TextInput')
+
+        # Properly link in the new state to avoid an invalid exploration.
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state_inter = init_state.interaction
+        new_state_inter = exploration.states['New state'].interaction
+        new_state_inter.handlers[0].rule_specs[0].dest = 'END'
+        init_state_inter.handlers[0].rule_specs[0].dest = 'New state'
+        exp_services._save_exploration(
+            'committer_id_v3', exploration, 'Added new state', [])
+
+        # Version 4 is an upgrade based on the migration job.
+
+        # Start migration job on sample exploration.
+        job_id = (exp_jobs.ExplorationMigrationJobManager.create_new())
+        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+
+        self.process_and_flush_pending_tasks()
+
+        # Verify the latest version of the exploration has the most up-to-date  
+        # states schema version.
+        exploration_model = exp_models.ExplorationModel.get(
+            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+        exploration = exp_services.get_exploration_from_model(
+            exploration_model,
+            run_conversion=False)
+        self.assertEqual(exploration.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+        # The exploration should be valid after conversion.
+        exploration.validate(strict=True)
+
+        # Version 5 is a reversion to version 1.
+        exp_services.revert_exploration('committer_id_v4',
+            self.OLD_EXP_WITH_CHANGES_ID, 4, 1)
+        exploration = exp_services.get_exploration_by_id(
+            self.OLD_EXP_WITH_CHANGES_ID)
+
+        # The reversion after migration should still be an up-to-date
+        # exploration. exp_services.get_exploration_by_id will automatically
+        # keep it up-to-date.
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+
+        # The exploration should be valid after reversion.
+        exploration.validate(strict=True)
+
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            self.OLD_EXP_WITH_CHANGES_ID)
+
+        # These are used to verify the correct history has been recorded after
+        # both migration and reversion.
+        commit_dict_5 = {
+            'committer_id': 'committer_id_v4',
+            'commit_message': 'Reverted exploration to version 1',
+            'version_number': 5,
+        }
+        commit_dict_4 = {
+            'committer_id': feconf.MIGRATION_BOT_USERNAME,
+            'commit_message':
+                'Update exploration states from schema version 0 to %d.' %
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            'version_number': 4,
+        }
+
+        # Ensure there have been 5 commits.
+        self.assertEqual(len(snapshots_metadata), 5)
+        self.assertDictContainsSubset(
+            commit_dict_5, snapshots_metadata[-1])
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[-2])
+        self.assertGreaterEqual(
+            snapshots_metadata[-1]['created_on'],
+            snapshots_metadata[-2]['created_on'])
+
