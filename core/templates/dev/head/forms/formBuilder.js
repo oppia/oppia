@@ -557,7 +557,7 @@ oppia.config(['$provide', function($provide) {
 
     //refocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
     //back to where it was before the modal was opened
-    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, refocusFn) {
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, onDismissCallback, refocusFn) {
       var modalDialog = $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
@@ -595,7 +595,7 @@ oppia.config(['$provide', function($provide) {
         }]
       });
 
-      modalDialog.result.then(onSubmitCallback);
+      modalDialog.result.then(onSubmitCallback, onDismissCallback);
       // 'finally' is a JS keyword. If it is just used in its ".finally" form,
       // the minification process throws an error.
       modalDialog.result['finally'](refocusFn);
@@ -625,6 +625,7 @@ oppia.config(['$provide', function($provide) {
                 $element[0].parentNode.replaceChild(el, $element[0]);
                 textAngular.$editor().updateTaBindtaTextElement();
               },
+              function() {},
               function() {
                 textAngular.$editor().displayElements.text[0].focus();
                 rangy.restoreSelection(savedSelection);
@@ -647,6 +648,13 @@ oppia.config(['$provide', function($provide) {
               var parent = insertionPoint.parentNode;
               parent.replaceChild(el, insertionPoint);
               textAngular.$editor().updateTaBindtaTextElement();
+            },
+            function() {
+              // Clean up the insertion point if no widget was inserted.
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              if (insertionPoint !== null) {
+                insertionPoint.remove();
+              }
             },
             function() {
               textAngular.$editor().displayElements.text[0].focus();
