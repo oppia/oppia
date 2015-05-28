@@ -27,9 +27,6 @@ from core.platform import models
 import feconf
 import utils
 
-# This takes additional 'from_version' and 'to_version' parameters for logging.
-CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = 'migrate_states_schema'
-
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     """Job that calculates summaries of explorations, which can be
@@ -126,6 +123,7 @@ class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        from core.domain import exp_domain
         from core.domain import exp_services
 
         if item.deleted:
@@ -148,7 +146,7 @@ class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
                         handler['definition']['inputs']['d'] *= 110
 
                 change_list.append({
-                    'cmd': 'edit_state_property',
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': 'widget_handlers',
                     'state_name': state_name,
                     'old_value': old_value,
@@ -240,20 +238,18 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        from core.domain import exp_domain
         from core.domain import exp_services
 
         # If the exploration model being stored in the datastore is not the most
         # up-to-date states schema version, then update it.
         if (item.states_schema_version !=
                 feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
-            # Note: update_exploration does not need to apply a change lsit in
-            # order to perform a migration. Upon loading the exploration model
-            # from the data store and converting it to an Exploration domain
-            # object, it is automatically converted to the latest states schema
-            # version. As a result, resaving that loaded exploration preserves
-            # the upgraded changes and migrates the exploration.
+            # Note: update_exploration does not need to apply a change list in
+            # order to perform a migration. See the related comment in  
+            # exp_services.apply_change_list for more information.
             commit_cmds = [{
-                'cmd': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
@@ -261,8 +257,8 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
-                item.states_schema_version,
-                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+                    item.states_schema_version,
+                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
 
     @staticmethod
     def reduce(key, values):

@@ -115,9 +115,9 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     the exploration will be automatically updated to the latest states schema
     version.
 
-    In general, run_conversion should never be False. It is false in special
-    testing circumstances and that is it. Using an unconverted exploration
-    instance elsewhere in the Oppia backend will very likely break something.
+    IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should never be
+    False. This option is only used for testing that the states schema version
+    migration works correctly, and it should never be changed otherwise.
     """
     exploration = exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -447,20 +447,24 @@ def apply_change_list(exploration_id, change_list):
     Returns:
       the resulting exploration domain object.
     """
+    # Loading the exploration model from the datastore into an Exploration
+    # domain object automatically converts it to use the latest states schema
+    # version. As a result, simply resaving the exploration is sufficient to
+    # complete the migration.
     exploration = get_exploration_by_id(exploration_id)
     try:
         changes = [exp_domain.ExplorationChange(change_dict)
                    for change_dict in change_list]
 
         for change in changes:
-            if change.cmd == 'add_state':
+            if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
-            elif change.cmd == 'rename_state':
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
                 exploration.rename_state(
                     change.old_state_name, change.new_state_name)
-            elif change.cmd == 'delete_state':
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
                 exploration.delete_state(change.state_name)
-            elif change.cmd == 'edit_state_property':
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
@@ -477,7 +481,7 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     state.update_interaction_handlers(change.new_value)
-            elif change.cmd == 'edit_exploration_property':
+            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
                 elif change.property_name == 'category':
@@ -500,6 +504,9 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_default_skin_id(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
+            elif (change.cmd ==
+                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                continue
         return exploration
 
     except Exception as e:
@@ -555,7 +562,7 @@ def get_summary_of_change_list(base_exploration, change_list):
     }
 
     for change in changes:
-        if change.cmd == 'add_state':
+        if change.cmd == exp_domain.CMD_ADD_STATE:
             if change.state_name in changed_states:
                 continue
             elif change.state_name in deleted_states:
@@ -565,7 +572,7 @@ def get_summary_of_change_list(base_exploration, change_list):
             else:
                 added_states.append(change.state_name)
                 original_state_names[change.state_name] = change.state_name
-        elif change.cmd == 'rename_state':
+        elif change.cmd == exp_domain.CMD_RENAME_STATE:
             orig_state_name = original_state_names[change.old_state_name]
             original_state_names[change.new_state_name] = orig_state_name
 
@@ -580,7 +587,7 @@ def get_summary_of_change_list(base_exploration, change_list):
                 }
             state_property_changes[orig_state_name]['name']['new_value'] = (
                 change.new_state_name)
-        elif change.cmd == 'delete_state':
+        elif change.cmd == exp_domain.CMD_DELETE_STATE:
             orig_state_name = original_state_names[change.state_name]
             if orig_state_name in changed_states:
                 continue
@@ -588,7 +595,7 @@ def get_summary_of_change_list(base_exploration, change_list):
                 added_states.remove(orig_state_name)
             else:
                 deleted_states.append(orig_state_name)
-        elif change.cmd == 'edit_state_property':
+        elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
             orig_state_name = original_state_names[change.state_name]
             if orig_state_name in changed_states:
                 continue
@@ -603,7 +610,7 @@ def get_summary_of_change_list(base_exploration, change_list):
                 }
             state_property_changes[orig_state_name][property_name][
                 'new_value'] = change.new_value
-        elif change.cmd == 'edit_exploration_property':
+        elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
             property_name = change.property_name
 
             if property_name not in exploration_property_changes:
@@ -612,6 +619,9 @@ def get_summary_of_change_list(base_exploration, change_list):
                 }
             exploration_property_changes[property_name]['new_value'] = (
                 change.new_value)
+        elif (change.cmd ==
+                exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+            continue
 
     unchanged_exploration_properties = []
     for property_name in exploration_property_changes:

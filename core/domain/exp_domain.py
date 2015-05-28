@@ -49,6 +49,19 @@ STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 # Kept for legacy purposes; not used anymore.
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 
+# This takes an additional 'state_name' parameter.
+CMD_ADD_STATE = 'add_state'
+# This takes additional 'old_state_name' and 'new_state_name' parameters.
+CMD_RENAME_STATE = 'rename_state'
+# This takes an additional 'state_name' parameter.
+CMD_DELETE_STATE = 'delete_state'
+# This takes additional 'property_name' and 'new_value' parameters.
+CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
+# This takes additional 'property_name' and 'new_value' parameters.
+CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
+# This takes additional 'from_version' and 'to_version' parameters for logging.
+CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = 'migrate_states_schema'
+
 
 def _is_interaction_terminal(interaction_id):
     """Returns whether the given interaction id marks the end of an
@@ -104,28 +117,28 @@ class ExplorationChange(object):
             raise Exception('Invalid change_dict: %s' % change_dict)
         self.cmd = change_dict['cmd']
 
-        if self.cmd == 'add_state':
+        if self.cmd == CMD_ADD_STATE:
             self.state_name = change_dict['state_name']
-        elif self.cmd == 'rename_state':
+        elif self.cmd == CMD_RENAME_STATE:
             self.old_state_name = change_dict['old_state_name']
             self.new_state_name = change_dict['new_state_name']
-        elif self.cmd == 'delete_state':
+        elif self.cmd == CMD_DELETE_STATE:
             self.state_name = change_dict['state_name']
-        elif self.cmd == 'edit_state_property':
+        elif self.cmd == CMD_EDIT_STATE_PROPERTY:
             if change_dict['property_name'] not in self.STATE_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.state_name = change_dict['state_name']
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
-        elif self.cmd == 'edit_exploration_property':
+        elif self.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
             if (change_dict['property_name'] not in
                     self.EXPLORATION_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
-        elif self.cmd == 'migrate_states_schema':
+        elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
         else:
@@ -1547,9 +1560,7 @@ class Exploration(object):
         """Converts from version 1 to 2. Version 1 assumes the existence of an
         implicit 'END' state, but version 2 does not. As a result, the
         conversion process involves introducing a proper ending state for all
-        explorations previously designed under this assumption. Furthermore,
-        version 2 also introduces a new 'triggers' list as part of the
-        interaction dictionary of a state.
+        explorations previously designed under this assumption.
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
@@ -1702,8 +1713,6 @@ class Exploration(object):
             exploration_dict)
         exploration_dict = cls.convert_states_v2_dict_to_v3_dict(
             exploration_dict)
-        exploration_dict['states_schema_version'] = 0
-
 
         return exploration_dict
 

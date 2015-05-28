@@ -2188,7 +2188,7 @@ tags: []
     def test_migration_then_reversion_maintains_valid_exploration(self):
         """This integration test simulates the behavior of the domain layer
         prior to the introduction of a states schema. In particular, it deals
-        with an exploration that was created before any exploration migrations
+        with an exploration that was created before any states schema migrations
         occur. The exploration is constructed using multiple change lists, then
         a migration job is run. The test thereafter tests if reverting to a
         version prior to the migration still maintains a valid exploration. It
@@ -2209,9 +2209,12 @@ tags: []
         def fake_validate(strict=False, allow_null_interaction=False):
             pass
 
+        # This refers to an old exploration that is initially pre-migration.
+        _EXP_ID = self.OLD_EXP_WITH_CHANGES_ID
+
         # Create a exploration with states schema version 0.
         old_exp_model = exp_models.ExplorationModel(
-            id=self.OLD_EXP_WITH_CHANGES_ID,
+            id=_EXP_ID,
             category='Old Category',
             title='Old Title',
             objective='Old objective',
@@ -2246,8 +2249,7 @@ tags: []
             param_specs={},
             param_changes=[]
         )
-        rights_manager.create_new_exploration_rights(
-            self.OLD_EXP_WITH_CHANGES_ID, self.ALBERT_ID)
+        rights_manager.create_new_exploration_rights(_EXP_ID, self.ALBERT_ID)
         old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
             'cmd': 'create_new',
             'title': 'Old Title',
@@ -2258,7 +2260,7 @@ tags: []
         # these changes are to happen on an exploration with states schema
         # version 0.
         exploration_model = exp_models.ExplorationModel.get(
-            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+            _EXP_ID, strict=True, version=None)
         exploration = exp_services.get_exploration_from_model(
             exploration_model,
             run_conversion=False)
@@ -2266,13 +2268,17 @@ tags: []
         # In version 1, the title was 'Old title'.
         # In version 2, the title becomes 'New title'.
         exploration.title = 'New title'
+
+        # This uses a fake validate function since _save_exploration calls
+        # validate. Validating the exploration will fail since Oppia no longer
+        # understands the implicit END state this old exploration is using.
         with self.swap(exploration, 'validate', fake_validate):
             exp_services._save_exploration(
                 self.ALBERT_ID, exploration, 'Changed title.', [])
 
         # In version 3, a new state is added.
         exploration_model = exp_models.ExplorationModel.get(
-            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+            _EXP_ID, strict=True, version=None)
         exploration = exp_services.get_exploration_from_model(
             exploration_model,
             run_conversion=False)
@@ -2300,7 +2306,7 @@ tags: []
         # Verify the latest version of the exploration has the most up-to-date  
         # states schema version.
         exploration_model = exp_models.ExplorationModel.get(
-            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+            _EXP_ID, strict=True, version=None)
         exploration = exp_services.get_exploration_from_model(
             exploration_model,
             run_conversion=False)
@@ -2311,22 +2317,20 @@ tags: []
         exploration.validate(strict=True)
 
         # Version 5 is a reversion to version 1.
-        exp_services.revert_exploration('committer_id_v4',
-            self.OLD_EXP_WITH_CHANGES_ID, 4, 1)
+        exp_services.revert_exploration('committer_id_v4', _EXP_ID, 4, 1)
 
         # The exploration model itself should still be the old version
         # (pre-migration).
         exploration_model = exp_models.ExplorationModel.get(
-            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+            _EXP_ID, strict=True, version=None)
         exploration = exp_services.get_exploration_from_model(
             exploration_model,
             run_conversion=False)
-        self.assertNotEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+        self.assertEqual(exploration.states_schema_version, 0)
 
         # The exploration domain object should be updated since it ran through
         # the conversion pipeline.
-        exploration = exp_services.get_exploration_by_id(
-            self.OLD_EXP_WITH_CHANGES_ID)
+        exploration = exp_services.get_exploration_by_id(_EXP_ID)
 
         # The reversion after migration should still be an up-to-date
         # exploration. exp_services.get_exploration_by_id will automatically
@@ -2337,7 +2341,7 @@ tags: []
         exploration.validate(strict=True)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.OLD_EXP_WITH_CHANGES_ID)
+            _EXP_ID)
 
         # These are used to verify the correct history has been recorded after
         # both migration and reversion.
@@ -2376,10 +2380,10 @@ tags: []
         # Ensure that if a converted, then reverted, then converted exploration
         # is saved, it will be the up-to-date version within the datastore.
         exp_services.update_exploration(
-            self.ALBERT_ID, self.OLD_EXP_WITH_CHANGES_ID, [],
+            self.ALBERT_ID, _EXP_ID, [],
             'Resave after reversion')
         exploration_model = exp_models.ExplorationModel.get(
-            self.OLD_EXP_WITH_CHANGES_ID, strict=True, version=None)
+            _EXP_ID, strict=True, version=None)
         exploration = exp_services.get_exploration_from_model(
             exploration_model,
             run_conversion=False)
