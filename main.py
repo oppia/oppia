@@ -249,6 +249,9 @@ urls = [
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
     get_redirect_route(
+        r'/explorehandler/exploration_complete_event/<exploration_id>',
+        reader.ExplorationCompleteEventHandler, 'reader_complete_handler'),
+    get_redirect_route(
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler, 'reader_leave_handler'),
     get_redirect_route(

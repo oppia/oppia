@@ -65,6 +65,11 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id, exp_version, state, session_id, 27, {},
             feconf.PLAY_TYPE_NORMAL)
 
+    def _record_complete(self, exp_id, exp_version, state, session_id):
+        event_services.CompleteExplorationEventHandler.record(
+            exp_id, exp_version, state, session_id, 27, {},
+            feconf.PLAY_TYPE_NORMAL)
+
     def _record_state_hit(self, exp_id, exp_version, state, session_id):
         event_services.StateHitEventHandler.record(
             exp_id, exp_version, state, session_id, {},
@@ -83,10 +88,13 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
             state = exploration.init_state_name
+            state2 = 'sid2'
 
             self._record_state_hit(exp_id, exp_version, state, 'session1')
             self._record_state_hit(exp_id, exp_version, state, 'session2')
             self._create_state_counter(exp_id, state, 18)
+            self._record_state_hit(exp_id, exp_version, state2, 'session1')
+            self._create_state_counter(exp_id, state2, 9)
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -98,18 +106,27 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 output_model['state_hit_counts'][state]['first_entry_count'],
                 2)
+            self.assertEqual(
+                output_model['state_hit_counts'][state2]['first_entry_count'],
+                1)
 
             output_model = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
             self.assertEqual(
                 output_model['state_hit_counts'][state]['first_entry_count'],
                 18)
+            self.assertEqual(
+                output_model['state_hit_counts'][state2]['first_entry_count'],
+                9)
 
             output_model = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._ALL_VERSIONS_STRING)
             self.assertEqual(
                 output_model['state_hit_counts'][state]['first_entry_count'],
                 20)
+            self.assertEqual(
+                output_model['state_hit_counts'][state2]['first_entry_count'],
+                10)
 
     def test_no_completion(self):
         with self.swap(
@@ -144,10 +161,11 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
-            self._record_leave(
+            self._record_complete(
                 exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session1')
+
             self._record_start(exp_id, exp_version, state, 'session2')
-            self._record_leave(
+            self._record_complete(
                 exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session2')
             self.process_and_flush_pending_tasks()
 
@@ -161,6 +179,74 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 2)
 
+    def test_one_leave_and_one_complete(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            exp_version = 1
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
+            state = exploration.init_state_name
+
+            self._record_start(exp_id, exp_version, state, 'session1')
+            self._record_leave(exp_id, exp_version, state, 'session1')
+
+            self._record_start(exp_id, exp_version, state, 'session2')
+            self._record_complete(
+                exp_id, exp_version, 'END', 'session2')
+            self.process_and_flush_pending_tasks()
+
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            model_id = '%s:%s' % (exp_id, exp_version)
+            output_model = stats_models.ExplorationAnnotationsModel.get(
+                model_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 1)
+
+    def test_one_leave_and_one_complete_same_session(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            exp_version = 1
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
+            init_state = exploration.init_state_name
+
+            self._record_start(exp_id, exp_version, init_state, 'session1')
+            self._record_state_hit(exp_id, exp_version, init_state, 'session1')
+            self._record_leave(exp_id, exp_version, init_state, 'session1')
+            self._record_state_hit(exp_id, exp_version, 'END', 'session1')
+            self._record_complete(exp_id, exp_version, 'END', 'session1')
+            self.process_and_flush_pending_tasks()
+
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            model_id = '%s:%s' % (exp_id, exp_version)
+            output_model = stats_models.ExplorationAnnotationsModel.get(
+                model_id)
+            self.assertEqual(output_model.num_starts, 1)
+            self.assertEqual(output_model.num_completions, 1)
+
+            stats_dict = ModifiedStatisticsAggregator.get_statistics(exp_id, 1)
+            self.assertEqual(stats_dict['start_exploration_count'], 1)
+            self.assertEqual(stats_dict['complete_exploration_count'], 1)
+            self.assertEqual(stats_dict['state_hit_counts'], {
+                exploration.init_state_name: {
+                    'first_entry_count': 1,
+                    'no_answer_count': 0,
+                    'total_entry_count': 1,
+                },
+                'END': {
+                    'first_entry_count': 1,
+                    'total_entry_count': 1,
+                }
+            })
+
     def test_multiple_maybe_leaves_same_session(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -173,7 +259,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self._record_start(exp_id, exp_version, state, 'session1')
             self._record_leave(exp_id, exp_version, state, 'session1')
             self._record_leave(exp_id, exp_version, state, 'session1')
-            self._record_leave(
+            self._record_complete(
                 exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session1')
 
             self._record_start(exp_id, exp_version, state, 'session2')
@@ -341,6 +427,111 @@ class OneOffNullStateHitEventsMigratorTest(test_utils.GenericTestBase):
             source_item.exploration_version, target_item.exploration_version)
         self.assertEqual(target_item.state_name, stats_jobs.OLD_END_DEST)
         self.assertEqual(target_item.client_time_spent_in_secs, 0)
+        self.assertEqual(source_item.params, target_item.params)
+        self.assertEqual(source_item.play_type, target_item.play_type)
+        self.assertEqual(source_item.created_on, target_item.created_on)
+        # It is not possible to set the last_updated field explicitly.
+        self.assertLess(source_item.last_updated, target_item.last_updated)
+        self.assertEqual(source_item.deleted, target_item.deleted)
+        self.assertEqual(target_item.deleted, False)
+
+
+class CompletionEventsMigratorTest(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp_id'
+    TIME_SPENT_SECS = 3.0
+
+    def setUp(self):
+        super(CompletionEventsMigratorTest, self).setUp()
+
+        self.save_new_valid_exploration(
+            self.EXP_ID, 'user_id', 'title', 'category')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        # Create one MaybeLeave event to be migrated and two MaybeLeave events
+        # to leave alone.
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            self.EXP_ID, 1, 'END',
+            'migrate_session_id', self.TIME_SPENT_SECS, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            self.EXP_ID, 1, exploration.init_state_name,
+            'keep_session_id', self.TIME_SPENT_SECS, {},
+            feconf.PLAY_TYPE_NORMAL)
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            self.EXP_ID, 1, exploration.init_state_name,
+            'keep_session_id', self.TIME_SPENT_SECS, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_migration_job_works(self):
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
+            0)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            3)
+
+        # Store a temporary copy of the instance corresponding to
+        # migrate_session_id.
+        source_item = None
+        for item in stats_models.MaybeLeaveExplorationEventLogEntryModel.query():
+            if item.session_id == 'migrate_session_id':
+                source_item = item
+
+        # Run the job once.
+        job_id = (stats_jobs.CompletionEventsMigrator.create_new())
+        stats_jobs.CompletionEventsMigrator.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
+            1)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            2)
+        self.assertEqual(
+            stats_jobs.CompletionEventsMigrator.get_output(job_id),
+            [['migrated_instances', ['exp_id v1']]])
+
+        # Run the job again; nothing new should happen.
+        new_job_id = (stats_jobs.CompletionEventsMigrator.create_new())
+        stats_jobs.CompletionEventsMigrator.enqueue(new_job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
+            1)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            2)
+        self.assertEqual(
+            stats_jobs.CompletionEventsMigrator.get_output(new_job_id), [])
+
+        target_item = None
+        for item in stats_models.CompleteExplorationEventLogEntryModel.query():
+            if item.session_id == 'migrate_session_id':
+                target_item = item
+
+        self.assertIsNotNone(target_item)
+        self.assertNotEqual(source_item, target_item)
+        self.assertNotEqual(source_item.id, target_item.id)
+        self.assertEqual(
+            target_item.event_type, feconf.EVENT_TYPE_COMPLETE_EXPLORATION)
+        self.assertEqual(
+            source_item.exploration_id, target_item.exploration_id)
+        self.assertEqual(
+            source_item.exploration_version, target_item.exploration_version)
+        self.assertEqual(target_item.state_name, source_item.state_name)
+        self.assertEqual(
+            target_item.client_time_spent_in_secs,
+            source_item.client_time_spent_in_secs)
         self.assertEqual(source_item.params, target_item.params)
         self.assertEqual(source_item.play_type, target_item.play_type)
         self.assertEqual(source_item.created_on, target_item.created_on)

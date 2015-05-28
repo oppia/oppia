@@ -51,7 +51,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     def get_event_types_listened_to(cls):
         return [
             feconf.EVENT_TYPE_START_EXPLORATION,
-            feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION]
+            feconf.EVENT_TYPE_COMPLETE_EXPLORATION]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
@@ -97,8 +97,6 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             transaction_services.run_in_transaction(
                 _increment_visit_counter)
         else:
-            # TODO(sll): Shouldn't this check whether it's an actual completion
-            # as opposed to just a leave event?
             transaction_services.run_in_transaction(
                 _increment_completion_counter)
 
@@ -172,6 +170,7 @@ class StatisticsMRJobManager(
     def entity_classes_to_map_over(cls):
         return [stats_models.StartExplorationEventLogEntryModel,
                 stats_models.MaybeLeaveExplorationEventLogEntryModel,
+                stats_models.CompleteExplorationEventLogEntryModel,
                 stats_models.StateHitEventLogEntryModel,
                 stats_models.StateCounterModel]
 
@@ -264,19 +263,21 @@ class StatisticsMRJobManager(
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
 
+            state_name = value['state_name']
+
             # Convert the state name to unicode, if necessary.
             # Note: sometimes, item.state_name is None for
             # StateHitEventLogEntryModel.
             # TODO(sll): Track down the reason for this, and fix it.
-            if (value['state_name'] is not None and
-                    not isinstance(value['state_name'], unicode)):
-                value['state_name'] = value['state_name'].decode('utf-8')
+            if (state_name is not None and
+                    not isinstance(state_name, unicode)):
+                state_name = state_name.decode('utf-8')
 
             if (value['type'] ==
                     StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING):
-                if value['state_name'] == exploration.init_state_name:
+                if state_name == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
-                if value['state_name'] == OLD_END_DEST:
+                if state_name == OLD_END_DEST:
                     old_models_complete_count = value['first_entry_count']
                 else:
                     state_hit_counts[state_name]['no_answer_count'] += (
@@ -290,32 +291,26 @@ class StatisticsMRJobManager(
                         value['first_entry_count']
                         + value['subsequent_entries_count'])
                 continue
+
             event_type = value['event_type']
-            state_name = value['state_name']
             created_on = value['created_on']
             session_id = value['session_id']
 
             # If this is a start event, increment start count.
             if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
                 new_models_start_count += 1
+            elif event_type == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
+                new_models_complete_count += 1
+                # Track that we have seen a 'real' end for this session id
+                new_models_end_sessions.add(session_id)
             elif event_type == feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION:
-                # If this maybe-leave event is on the end state, it is a
-                # completion. (This will be the case even if the event occurs
-                # for a state with a terminal interaction -- the recorded
-                # state_name here will still be 'END'.)
-                if state_name == OLD_END_DEST:
-                    new_models_complete_count += 1
-                    # Track that we have seen a 'real' end for this session id
-                    new_models_end_sessions.add(session_id)
-                else:
-                    # If this is not on the end state, identify the last
-                    # learner event for this session.
-                    latest_timestamp_so_far, _ = (
-                        session_id_to_latest_leave_event[session_id])
-                    if latest_timestamp_so_far < created_on:
-                        latest_timestamp_so_far = created_on
-                        session_id_to_latest_leave_event[session_id] = (
-                            created_on, state_name)
+                # Identify the last learner event for this session.
+                latest_timestamp_so_far, _ = (
+                    session_id_to_latest_leave_event[session_id])
+                if latest_timestamp_so_far < created_on:
+                    latest_timestamp_so_far = created_on
+                    session_id_to_latest_leave_event[session_id] = (
+                        created_on, state_name)
             # If this is a state hit, increment the total count and record that
             # we have seen this session id.
             elif event_type == feconf.EVENT_TYPE_STATE_HIT:
@@ -385,6 +380,51 @@ class NullStateHitEventsMigrator(jobs.BaseMapReduceJobManager):
             item.delete()
 
         if item.state_name is None:
+            transaction_services.run_in_transaction(_migrate_in_transaction)
+            yield (
+                'migrated_instances',
+                ('%s v%s' % (item.exploration_id, item.exploration_version)))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class CompletionEventsMigrator(jobs.BaseMapReduceJobManager):
+    """This one-off job finds all (MaybeLeave, 'END') events and converts them
+    to actual completion events instead. It is idempotent.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.MaybeLeaveExplorationEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        def _migrate_in_transaction():
+            # Create a replacement CompletionEventLogEntryModel.
+            new_item_id = (
+                stats_models.CompleteExplorationEventLogEntryModel.get_new_event_entity_id(
+                    item.exploration_id, item.session_id))
+            complete_event_entity = stats_models.CompleteExplorationEventLogEntryModel(
+                id=new_item_id,
+                event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                exploration_id=item.exploration_id,
+                exploration_version=item.exploration_version,
+                state_name=item.state_name,
+                session_id=item.session_id,
+                client_time_spent_in_secs=item.client_time_spent_in_secs,
+                params=item.params,
+                play_type=item.play_type,
+                last_updated=item.last_updated,
+                created_on=item.created_on,
+                deleted=item.deleted)
+            complete_event_entity.put()
+
+            # Delete the old MaybeLeaveEventLogEntryModel.
+            item.delete()
+
+        if item.state_name == 'END':
             transaction_services.run_in_transaction(_migrate_in_transaction)
             yield (
                 'migrated_instances',

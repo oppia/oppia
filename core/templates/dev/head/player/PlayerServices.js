@@ -225,12 +225,20 @@ oppia.factory('oppiaPlayerService', [
         });
       }
 
-      // If the new state is either the END state, or contains a terminal
-      // interaction, record a MaybeLeave event.
+      // If the new state contains a terminal interaction, record a completion
+      // event.
       if (!newStateName ||
           INTERACTION_SPECS[
             _exploration.states[newStateName].interaction.id].is_terminal) {
-        _registerMaybeLeaveEvent('END');
+        var completeExplorationUrl = (
+          '/explorehandler/exploration_complete_event/' + _explorationId);
+        $http.post(completeExplorationUrl, {
+          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          params: learnerParamsService.getAllParams(),
+          session_id: sessionId,
+          state_name: newStateName,
+          version: version
+        });
       }
 
       // Broadcast the state hit to the parent page.

@@ -389,7 +389,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
 
 class ExplorationStartEventHandler(base.BaseHandler):
-    """Tracks a reader starting an exploration."""
+    """Tracks a learner starting an exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -404,10 +404,31 @@ class ExplorationStartEventHandler(base.BaseHandler):
             feconf.PLAY_TYPE_NORMAL)
 
 
-class ExplorationMaybeLeaveHandler(base.BaseHandler):
-    """Tracks a reader leaving an exploration before or at completion.
+class ExplorationCompleteEventHandler(base.BaseHandler):
+    """Tracks a learner completing an exploration.
 
-    If this is a completion, the state_name recorded should be 'END'.
+    The state name recorded should be a state with a terminal interaction.
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.CompleteExplorationEventHandler.record(
+            exploration_id,
+            self.payload.get('version'),
+            self.payload.get('state_name'),
+            self.payload.get('session_id'),
+            self.payload.get('client_time_spent_in_secs'),
+            self.payload.get('params'),
+            feconf.PLAY_TYPE_NORMAL)
+
+
+class ExplorationMaybeLeaveHandler(base.BaseHandler):
+    """Tracks a learner leaving an exploration without completing it.
+
+    The state name recorded should be a state with a non-terminal interaction.
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
