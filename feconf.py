@@ -261,7 +261,7 @@ DEMO_EXPLORATIONS = [
     ('classification', 'Classifying Things', 'Programming'),
     ('turtle_geometry', 'Turtle Geometry', 'Programming'),
     ('linguistics', 'Linguistics', 'Programming'),
-    ('recursion', 'Recursion', 'Programming'),
+    ('calculator', 'Calculator', 'Programming'),
     ('towers', 'Towers of Hanoi', 'Programming'),
 ]
 

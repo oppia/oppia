@@ -1,0 +1,416 @@
+author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: First State
+language_code: en
+objective: Build a small calculator.
+param_changes: []
+param_specs: {}
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
+states:
+  Addition Algorithm Design:
+    content:
+    - type: text
+      value: "<p>In math as well as computer science, a function is defined as applying\
+        \ some operation to a set of inputs to produce a corresponding set of outputs.</p><p><br></p><p>For\
+        \ example for\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\
+        \\\\\\F(x) = x^{2}&amp;quot;\"></oppia-noninteractive-math>\_when the input\
+        \ is 3 the output is 9 or if the input is 10 the output is 100.</p><p><br></p><p>For\
+        \ our calculator we will need a addition function so we will create a function\
+        \ called <i>add</i>. What we want is for the function to take two inputs and\
+        \ produce an output which is the sum of the two numbers. So\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;\\\\\\\\add(3, 5) \\\\rightarrow 8&amp;quot;\"\
+        ></oppia-noninteractive-math>.</p><p><br></p><p>You may have used addition\
+        \ for years so it may have been a while since you have thought about the process.\
+        \ Here is one example of how the addition algorithm could be described:</p><ol><li>Take\
+        \ two numbers as inputs</li><li>Add the two numbers together</li><li><span>Output\
+        \ the result</span></li></ol><span><div><span><br></span></div>Click <b>Next</b>\
+        \ to continue.</span><br><p></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Addition Algorithm Implentation
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Addition Algorithm Implentation:
+    content:
+    - type: text
+      value: <p>We can write this algorithm in the Python programming code as seen
+        below. Try running the code as is to see the results for a variety of inputs.</p>
+    interaction:
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: "def add(a, b):  # Take two numbers as inputs\n  sum = a + b    \
+            \    # Add the two numbers together\n  return sum          # Output the\
+            \ result"
+        postCode:
+          value: "a_list = [1, 2, 10]\nb_list = [1, 3, 10]\n\nfor n in range(0, len(a_list)):\n\
+            \  a = a_list[n]\n  b = b_list[n]\n  print 'The sum of {0:n} + {1:n} =\
+            \ {2:n}'.format(a, b, add(a, b))"
+        preCode:
+          value: ''
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Addition Debrief
+          feedback: []
+          param_changes: []
+      id: CodeRepl
+      triggers: []
+    param_changes: []
+  Addition Debrief:
+    content:
+    - type: text
+      value: "<p>Now whenever we call or use the statement  we should see the result\
+        \ of adding a + b.We are cheating a little because we are using the + (addition\
+        \ operation) for our addition function but for our purposes this should be\
+        \ fine.</p><p><br></p><p>What about multiplication? We could write a function\
+        \ called <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\\\\\
+        \\multiply(a,b)&amp;quot;\"></oppia-noninteractive-math>\_that takes two inputs\
+        \ and returns the result of multiplying the two numbers together. Could we\
+        \ use the addition function we already have to make a multiplication function?</p><p><br></p><p>Try\
+        \ to come up with your own idea of how you might do this and when you are\
+        \ ready click <b>Next</b>.<br></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Recursion Introduction
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Addition Explanation:
+    content:
+    - type: text
+      value: <p>Great let's start with one of the fundamental operations in math,
+        addition. How would you explain the process of addition so it could be understood
+        by a young child?<br></p>
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Addition Algorithm Design
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  Division Algorithm Implementation:
+    content:
+    - type: text
+      value: "<p>Based on what you have accomplished in previous examples, why not\
+        \ try to develop a\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\
+        \\\\\\divide&amp;quot;\"></oppia-noninteractive-math>\_function that uses\
+        \ the\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\\\\\\\
+        subtract&amp;quot;\"></oppia-noninteractive-math>\_function below recursively.\
+        \ The function has been defined so you can focus on what is missing.</p>"
+    interaction:
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: "def subtract(a, b):\n  difference = a - b\n  return difference\n\
+            \ndef divide(a, b):\n  # Fill in your base case here.\n  quotient = 1\
+            \ # Replace '1' with your code\n  return quotient\n\ndef add(a, b):\n\
+            \  sum = a + b\n  return sum\n  \ndef multiply(a, b):\n  if b == 1:\n\
+            \    return a\n  \n  if b > 1:\n    return a + multiply(a, b-1)\n"
+        postCode:
+          value: "a_list = [4, 6, 100]\nb_list = [1, 2, 10]\n\nfor n in range(0, len(a_list)):\n\
+            \  a = a_list[n]\n  b = b_list[n]\n  print 'The quotient of {0:n} / {1:n}\
+            \ = {2:n}'.format(a, b, divide(a, b))"
+        preCode:
+          value: ''
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 'The quotient of 4 / 1 = 4
+
+                The quotient of 6 / 2 = 3
+
+                The quotient of 100 / 10 = 10'
+            name: OutputEquals
+            rule_type: atomic
+            subject: answer
+          dest: Final State
+          feedback:
+          - <p>Great job!</p>
+          param_changes: []
+        - definition:
+            inputs: {}
+            name: ResultsInError
+            rule_type: atomic
+            subject: answer
+          dest: Division Algorithm Implementation
+          feedback:
+          - <p>Don't worry if you don't get it right the first time. Recursion is
+            a tricky concept to understand. Try writing it out in a way that helps
+            you visualize it.</p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Division Algorithm Implementation
+          feedback:
+          - <p>Recursion is a tricky concept to understand. Don't get discouraged
+            when working on problems like this. Try writing it out in a way that helps
+            you visualize it and experiment.<br></p>
+          param_changes: []
+      id: CodeRepl
+      triggers:
+      - customization_args:
+          num_submits: 2
+        dest: Final State
+        feedback:
+        - <p>Recursion is a tricky concept to understand. Don't get discouraged when
+          working on problems like this. Try writing it out in a way that helps you
+          visualize it and experiment.<br></p>
+        name: on_nth_resubmission
+        param_changes: []
+    param_changes: []
+  Final State:
+    content:
+    - type: text
+      value: "<p>Now you are well on your way to building a calculator with all of\
+        \ the basic operations. The next steps you could take with your new multiplication\
+        \ and division functions would be to create <oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;\\\\\\\\square(a) \u2192 a^{2}&amp;quot;\"></oppia-noninteractive-math>\_\
+        or <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\\log(a)\
+        \ \u2192 log_{10} a&amp;quot;\"></oppia-noninteractive-math>.\_<span>You also\
+        \ have what you need to build a function for testing for the greatest common\
+        \ factor between two numbers which can lead to determining whether a number\
+        \ is prime.</span></p><p><span><br></span></p><p><span>Building your own calculator\
+        \ is a good example of computational thinking when you take a bigger problem\
+        \ and break it down into smaller pieces, in this case, functions. You applied\
+        \ computational thinking when you developed algorithms for functions like\
+        \ subtraction as well as generalizing your algorithm to apply to something\
+        \ new like division.</span></p><p><span><br></span></p><p><span>If you would\
+        \ like to explore this topic in more detail you can search for [recursion,\
+        \ functional programming]. The <oppia-noninteractive-link open_link_in_same_window-with-value=\"\
+        false\" text-with-value=\"&amp;quot;Bootstrap&amp;quot;\" url-with-value=\"\
+        &amp;quot;http://www.bootstrapworld.org/&amp;quot;\"></oppia-noninteractive-link>\
+        \ curriculum teaches students algebraic and geometric concepts through functional\
+        \ programming. There are plenty of benefits to students learning how to develop\
+        \ these algorithms in a programming language. In situations where technology\
+        \ is not available, students could write out their algorithms and take turns\
+        \ passing inputs to a person acting as the add algorithm to test their algorithm\
+        \ design.<br></span></p><p><span><br></span></p><p><span>If you would like\
+        \ to see how algorithms apply to computer science, the humanities, mathematics,\
+        \ or the sciences click here, otherwise continue to the next section to explore\
+        \ more ways to use algorithms to enhance what you are already doing in your\
+        \ classroom.<br></span></p>"
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Final State
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  First State:
+    content:
+    - type: text
+      value: "<p>Technology is often able to quickly and efficiently get you the answer\
+        \ you are looking for. When it is [why is the sky blue] or [when is my friend's\
+        \ birthday] or even [what is the value of \u03C0], we appreciate its ability\
+        \ to search out the information we need and respond. It is not enough to be\
+        \ able to use technology to get an answer to questions like  [why is the sky\
+        \ blue?] or [graph <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\
+        \\\\\\x_{2} - 1&amp;quot;\"></oppia-noninteractive-math>]. The real strength\
+        \ of technology is when we use it as a platform to create.<br></p><p><br></p><p>It\
+        \ is one thing to use a calculator, imagine the possibilities if we created\
+        \ our own! If you were going to develop a basic calculator, what functionality\
+        \ would you want it to have?\n</p>"
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Addition Explanation
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  Halting Problem:
+    content:
+    - type: text
+      value: '<p>Here''s something to think about: What would happen if we removed
+        Rule 1 and didn''t have a base case to stop the recursion? You would think
+        that the process would continue forever and you would be right (or at least
+        until the web browser you were running the code in ran out of memory). So
+        why don''t computers check for this sort of issue to prevent it from happening?</p><p><br></p><p>This
+        is known in computer science as the <b>halting problem</b>. While you could
+        look at a series of instructions and possibly know when it will finish, for
+        a certain level of complexity in code it is not yet possible for a computer
+        to determine when a program will finish.</p><p><br></p><p>It may be possible
+        to detect one day that you forgot to create a base case to stop the recursion
+        in your program but for now you''ll just have to be extra careful (or discover
+        that your browser has crashed).</p><p><br></p><p>Click <b>Next</b>.</p>'
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Division Algorithm Implementation
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Multiplication Algorithm Implementation:
+    content:
+    - type: text
+      value: <p>We can write this algorithm in the Python programming code as seen
+        below. Try running the code as is to see the results for a variety of inputs.<br></p>
+    interaction:
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: "def add(a, b):\n  sum = a + b\n  return sum\n  \ndef multiply(a,\
+            \ b):\n  if b == 1:\n    return a\n  \n  if b > 1:\n    return a + multiply(a,\
+            \ b-1)\n"
+        postCode:
+          value: "a_list = [1, 3, 10]\nb_list = [1, 5, 10]\n\nfor n in range(0, len(a_list)):\n\
+            \  a = a_list[n]\n  b = b_list[n]\n  print 'The result of {0:n} * {1:n}\
+            \ = {2:n}'.format(a, b, multiply(a, b))"
+        preCode:
+          value: ''
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Halting Problem
+          feedback: []
+          param_changes: []
+      id: CodeRepl
+      triggers: []
+    param_changes: []
+  Recursion Introduction:
+    content:
+    - type: text
+      value: "<p>One way to create a multiplication function for our calculator is\
+        \ to use another concept that has roots in both mathematics and computer science,\
+        \ recursion. Recursion is describing an algorithm in terms of itself so the\
+        \ problem is approached as a series of smaller problems to solve.\_\n</p><p><br></p><p>One\
+        \ famous example of recursion in mathematics is the Fibonacci sequence 1,\
+        \ 1, 2, 3, 5, 8, 13, ... where each number is defined as the sum of the previous\
+        \ two numbers <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\
+        \\\\\\F(n) = F_{n-2} + F_{n-1}&amp;quot;\"></oppia-noninteractive-math>. So\
+        \ to generate the 3rd number we add the first and second numbers 1 + 1 to\
+        \ get 2, to generate the 4th number we add 1 + 2 to get 3 and so on.\n\nApplying\
+        \ decomposition to this problem will make it easier to solve, allow us to\
+        \ recognize a pattern, and that pattern may help us develop an algorithm for\
+        \ multiplying two numbers.\_\n</p><p><br></p><p>Click <b>Next</b> to see recursion\
+        \ applied to the process of multiplication.<br></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Recursion in Multiplication
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Recursion in Multiplication:
+    content:
+    - type: text
+      value: "<p>Recursion is defining a problem in terms of itself so the algorithm\
+        \ computes smaller versions of the problem until the larger problem is solved.</p><p><br></p><p>Here\
+        \ is one algorithm or instructions for how we could use our <oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;\\\\\\\\add&amp;quot;\"></oppia-noninteractive-math>\_\
+        function to multiply.</p><p><i><br></i></p><p><i>Task: Multiply two numbers\
+        \ a and b</i></p><p><i>\_ \_ Rule 1: If b equals 1 then answer is a</i></p><p><i>\_\
+        \ \_ Rule 2: Multiply two numbers a and b - 1 and add that \_ \_ \_ \_ \_\
+        \ \_ \_ \_ \_ \_ \_ \_result to a.\_</i></p><div><i><br></i></div><div><i>Let's\
+        \ take a look at a couple of examples of this in action:</i></div><div><i>Example\
+        \ 1: Multiply 3 * 2</i></div><div><ol><li><i>Since b is not 1:\_</i><i>(a\
+        \ * b - 1) + a \_ or \_ (3 * 1) + 3</i></li><li><i><i>Answer is 6</i></i></li></ol><div><i><i><br></i></i></div><div><i><i>Here's\
+        \ another example written in another way.</i></i></div><div><i><i><br></i></i></div><div><i><i>Example\
+        \ 2: Multiply 5 * 4</i><br></i></div></div><div><ol><li><i>\_ \_ \_ \_ \_\
+        \ \_ \_ \_ \_(5 * 3) + 5</i></li><li><i>\_ \_ \_ \_ ((5 * 2) + 5) + 5</i></li><li><i>(((5\
+        \ * 1) + 5) + 5 + 5</i></li><li><i>\_ \_ \_ \_ \_ \_ \_5 + 5 + 5 + 5</i></li><li><i>Answer\
+        \ is 20</i></li></ol><div><br></div><div>In recursive functions, a \"base\
+        \ case\" is needed so the function knows when to stop. Rule 1 is the base\
+        \ case because the Multiplicative Identity is 1so it does not make sense for\
+        \ the function to continue after b = 1.<br></div></div><p><br></p><p>In the\
+        \ previous example we rewrote the instructions into the <oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;\\\\\\\\add&amp;quot;\"></oppia-noninteractive-math>\_\
+        function. Why not try writing your own\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;\\\\\\\\multiply&amp;quot;\"></oppia-noninteractive-math>\_function\
+        \ based on the rules above. In the above examples try replacing the\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;\\\\\\\\add&amp;quot;\"></oppia-noninteractive-math>\_\
+        function wherever addition is used.</p><p><br></p><p>When you have an idea\
+        \ of how you might write the\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;\\\\\\\\multiply&amp;quot;\"></oppia-noninteractive-math>\_function\
+        \ based on the addition function click <b>Next</b>.</p><p></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Multiplication Algorithm Implementation
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+tags: []
