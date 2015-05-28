@@ -28,6 +28,10 @@ class CoordTwoDimRule(rule_domain.Rule):
     subject_type = objects.CoordTwoDim
 
 
+class HanoiTowerMoveLogRule(rule_domain.Rule):
+    subject_type = objects.HanoiTowerMoveLog
+
+
 class MusicPhraseRule(rule_domain.Rule):
     subject_type = objects.MusicPhrase
 
