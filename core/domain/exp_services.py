@@ -88,9 +88,12 @@ def _migrate_states_schema(exploration_dict):
                 exploration_dict))
         exploration_states_schema_version = 2
 
-    # Finished pipelining the exploration; if the exploration has been upgraded,
-    # save previous states schema version (useful to the exp migration job).
-    exploration_dict['prev_states_schema_version'] = initial_version
+    # Check for conversion to v3.
+    if exploration_states_schema_version == 2:
+        exploration_dict = (
+            exp_domain.Exploration.convert_states_v2_dict_to_v3_dict(
+                exploration_dict))
+        exploration_states_schema_version = 3
     return exploration_dict
 
 
@@ -104,6 +107,18 @@ def _get_exploration_memcache_key(exploration_id, version=None):
 
 
 def get_exploration_from_model(exploration_model, run_conversion=True):
+    """Returns an Exploration domain object given an exploration model loaded
+    from the datastore.
+
+    If run_conversion is True, then the exploration's states schema version will
+    be checked against the current states schema version. If they do not match,
+    the exploration will be automatically updated to the latest states schema
+    version.
+
+    In general, run_conversion should never be False. It is false in special
+    testing circumstances and that is it. Using an unconverted exploration
+    instance elsewhere in the Oppia backend will very likely break something.
+    """
     exploration = exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
@@ -139,11 +154,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_version=exploration_model.version,
         exploration_created_on=exploration_model.created_on,
         exploration_last_updated=exploration_model.last_updated)
-
-    # Additional metadata attached to the exploration for use in the migration
-    # job service (exp_jobs.ExplorationMigrationJobManager).
-    exploration.prev_states_schema_version = exploration_dict[
-        'prev_states_schema_version']
     return exploration
 
 

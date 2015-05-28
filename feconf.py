@@ -57,7 +57,7 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 2
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 3
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.

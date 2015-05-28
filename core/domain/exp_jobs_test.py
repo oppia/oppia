@@ -301,7 +301,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
     def test_standard_operations(self):
         # Start migration job on sample exploration.
-        job_id = (exp_jobs.ExplorationMigrationJobManager.create_new())
+        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
         exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)

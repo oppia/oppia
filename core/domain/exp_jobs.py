@@ -27,8 +27,9 @@ from core.platform import models
 import feconf
 import utils
 
-# This takes additional 'from_version' and 'to_version' parameters.
-CMD_MIGRATE_STATES_SCHEMA = 'migrate_states_schema'
+# This takes additional 'from_version' and 'to_version' parameters for logging.
+CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = 'migrate_states_schema'
+
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     """Job that calculates summaries of explorations, which can be
@@ -241,28 +242,27 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     def map(item):
         from core.domain import exp_services
 
-        exp = exp_services.get_exploration_from_model(item)
-
-        # If the exploration was updated immediately after it was retrieved
-        # from storage, save the updates.
-        if (hasattr(
-                exp, 'prev_states_schema_version') and
-                exp.prev_states_schema_version is not None):
-            # Special circumstances allow this job to call the private
-            # _save_exploration. In particular, the ability to save an
-            # exploration without using a set of changes is not ideal and
-            # therefore is not exposed in the public API. This job must use this
-            # functionality, however.
+        # If the exploration model being stored in the datastore is not the most
+        # up-to-date states schema version, then update it.
+        if (item.states_schema_version !=
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            # Note: update_exploration does not need to apply a change lsit in
+            # order to perform a migration. Upon loading the exploration model
+            # from the data store and converting it to an Exploration domain
+            # object, it is automatically converted to the latest states schema
+            # version. As a result, resaving that loaded exploration preserves
+            # the upgraded changes and migrates the exploration.
             commit_cmds = [{
-                'cmd': CMD_MIGRATE_STATES_SCHEMA,
-                'from_version': str(exp.prev_states_schema_version),
-                'to_version': str(exp.states_schema_version)
+                'cmd': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': str(item.states_schema_version),
+                'to_version': str(
+                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
             }]
-            exp_services._save_exploration(
-                feconf.MIGRATION_BOT_USERNAME, exp,
+            exp_services.update_exploration(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
-                exp.prev_states_schema_version,
-                exp.states_schema_version), commit_cmds)
+                item.states_schema_version,
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
 
     @staticmethod
     def reduce(key, values):

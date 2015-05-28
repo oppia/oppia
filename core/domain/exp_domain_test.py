@@ -81,7 +81,7 @@ states:
       id: null
       triggers: []
     param_changes: []
-states_schema_version: 2
+states_schema_version: 3
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -177,7 +177,7 @@ states:
       id: TextInput
       triggers: []
     param_changes: []
-states_schema_version: 2
+states_schema_version: 3
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -298,6 +298,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'notAParamSpec': param_domain.ParamSpec.from_dict(
                 {'obj_type': 'Int'})
         }
+        exploration.validate()
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.interaction.triggers = ['element']
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected empty triggers list.'):
+            exploration.validate()
+        init_state.interaction.triggers = []
         exploration.validate()
 
     def test_tag_validation(self):
@@ -885,7 +893,7 @@ states:
       id: TextInput
       triggers: []
     param_changes: []
-states_schema_version: 2
+states_schema_version: 3
 tags: []
 """)
 

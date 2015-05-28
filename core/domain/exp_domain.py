@@ -95,6 +95,7 @@ class ExplorationChange(object):
             optionally, old_value)
         - 'edit_exploration_property' (with property_name, new_value and,
             optionally, old_value)
+        - 'migrate_states_schema' (with from_version and to_version)
 
         For a state, property_name must be one of STATE_PROPERTIES. For an
         exploration, property_name must be one of EXPLORATION_PROPERTIES.
@@ -124,6 +125,9 @@ class ExplorationChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
+        elif self.cmd == 'migrate_states_schema':
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -541,7 +545,14 @@ class InteractionInstance(object):
                 'interaction instance.')
         for handler in self.handlers:
             handler.validate()
-        # TODO(sll): Validate triggers.
+
+        # TODO(sll): Update trigger validation.
+        if not isinstance(self.triggers, list):
+            raise utils.ValidationError(
+                'Expected triggers to be a list, received %s'
+                % self.triggers)
+        if self.triggers:
+            raise utils.ValidationError('Expected empty triggers list.')
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
@@ -1598,6 +1609,14 @@ class Exploration(object):
                 'param_changes': []
             }
 
+        return exploration_dict
+
+    @classmethod
+    def convert_states_v2_dict_to_v3_dict(cls, exploration_dict):
+        """Converts from version 2 to 3. Version 3 introduces a triggers list
+        within interactions.
+        """
+        exploration_dict['states_schema_version'] = 3
         # Ensure all states interactions have a triggers list.
         for (state_name, sdict) in exploration_dict['states'].iteritems():
             interaction = sdict['interaction']
@@ -1605,7 +1624,6 @@ class Exploration(object):
                 interaction['triggers'] = []
 
         return exploration_dict
-
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
@@ -1682,6 +1700,10 @@ class Exploration(object):
             exploration_dict)
         exploration_dict = cls.convert_states_v1_dict_to_v2_dict(
             exploration_dict)
+        exploration_dict = cls.convert_states_v2_dict_to_v3_dict(
+            exploration_dict)
+        exploration_dict['states_schema_version'] = 0
+
 
         return exploration_dict
 
