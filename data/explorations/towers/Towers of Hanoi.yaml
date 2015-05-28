@@ -1,0 +1,614 @@
+author_notes: ''
+blurb: ''
+default_skin: snapshots_v1
+init_state_name: First State
+language_code: en
+objective: Work through the Towers of Hanoi problem.
+param_changes:
+- customization_args:
+    parse_with_jinja: true
+    value: ''
+  generator_id: Copier
+  name: HanoiTower0numDisks
+param_specs:
+  HanoiTower0numDisks:
+    obj_type: UnicodeString
+schema_version: 5
+skin_customizations:
+  panels_contents:
+    main:
+    - customization_args: {}
+      gadget_id: HanoiTower
+      visible_in_states:
+      - First State
+      - Decomposition
+      - 4 Disk Move Question
+      - Reflection on Moves
+      - Abstracting the Pattern Part 1
+states:
+  4 Disk Move Question:
+    content:
+    - type: text
+      value: "<div><span>Now, let's try solving it with 4 disks.\_</span><span>Based\
+        \ on your previous attempt, what is your estimate of the minimum number of\
+        \ moves needed to solve the 4 disk version?</span></div>"
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Moves Pattern Question
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '4'
+      generator_id: Copier
+      name: HanoiTower0numDisks
+  Abstracting the Pattern Part 1:
+    content:
+    - type: text
+      value: "<div><span>Now that we have a way to determine how many moves are required\
+        \ to solve the towers puzzle for a given number of disks, let\u2019s construct\
+        \ a set of instructions that would enable anyone to solve the puzzle even\
+        \ if it was their first time ever approaching the problem.</span><br></div><p><br></p><p>Again,\
+        \ here is an example log of moves for 3 disks:</p><ol><li><span>Disk 1 (red)\
+        \ was moved from tower A to tower C\_</span></li><li><span>Disk 2 (orange)\
+        \ was moved from tower A to tower B\_</span></li><li><span>Disk 1 (red) was\
+        \ moved from tower C to tower B</span></li><li><span>Disk 3 (yellow) was moved\
+        \ from tower A to tower C\_</span></li><li><span>Disk 1 (red) was moved from\
+        \ tower B to tower A</span></li><li><span>Disk 2 (orange) was moved from tower\
+        \ B to tower C\_</span></li><li><span>Disk 1 (red) was moved from tower A\
+        \ to tower C</span></li></ol><p><br></p><p>Using this as a guide, can you\
+        \ generalize or abstract these moves into instructions which could be repeated\
+        \ by anyone? Below is an <b>abstraction</b>\_of the general pattern we see\
+        \ above.</p><p><br></p><ol><li>Move a disk between tower \_ __ \_ and tower\
+        \ \_ __</li><li>Move a disk between tower\_\_ __ \_ and tower \_ __</li><li>Move\
+        \ a disk between tower\_\_ __ \_ and tower \_ __</li><li><span>Repeat this\
+        \ process until the puzzle is solved</span></li></ol><p><br></p><p>When you've\
+        \ figured out what the blanks represent, pick the option below that corresponds\
+        \ to Step 1.<br></p>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>A and B</p>
+          - <p>A and C</p>
+          - <p>B and C</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Abstracting the Pattern Part 2
+          feedback:
+          - <p>Yes this is the first move we see repeated in the pattern and so it
+            should be the first step in the algorithm.</p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Abstracting the Pattern Part 1
+          feedback:
+          - <p>Try again. Look at the first step in the pattern to determine what
+            the first move should be in our algorithm.</p>
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '4'
+      generator_id: Copier
+      name: HanoiTower0numDisks
+  Abstracting the Pattern Part 2:
+    content:
+    - type: text
+      value: "<div></div><div><span>Great, we have the first part of our algoroithm\
+        \ for solving a 3 disk version of the towers puzzle. Let's continue.</span><br></div><p><br></p><p>Here\
+        \ again is an example log of moves for 3 disks:</p><ol><li><span>Disk 1 (red)\
+        \ was moved from tower A to tower C\_</span></li><li><span>Disk 2 (orange)\
+        \ was moved from tower A to tower B\_</span></li><li><span>Disk 1 (red) was\
+        \ moved from tower C to tower B</span></li><li><span>Disk 3 (yellow) was moved\
+        \ from tower A to tower C\_</span></li><li><span>Disk 1 (red) was moved from\
+        \ tower B to tower A</span></li><li><span>Disk 2 (orange) was moved from tower\
+        \ B to tower C\_</span></li><li><span>Disk 1 (red) was moved from tower A\
+        \ to tower C</span></li></ol><p><br></p><p>Select one of the options below\
+        \ for Step 2.</p><ol><li>Move a disk between tower \_ <b>A</b> \_ and tower\
+        \ \_ \_ \_<b>B</b></li><li>Move a disk between tower \_ __ \_and tower \_\
+        \ \_ \___\_</li><li>Move a disk between tower \_ __ \_and tower \_ \_ \___<span>\_\
+        </span></li><li><span>Repeat this process until the puzzle is solved</span></li></ol><div><div></div></div>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>A and B</p>
+          - <p>A and C</p>
+          - <p>B and C</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Abstracting the Pattern Part 3
+          feedback:
+          - <p>Yes this is the second move we see repeated in the pattern and so it
+            should be the second step in the algorithm.</p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Abstracting the Pattern Part 2
+          feedback:
+          - <p>Try again, look at the example pattern to see what is the next move
+            made.</p>
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  Abstracting the Pattern Part 3:
+    content:
+    - type: text
+      value: "<div><span>We have the second part of our\_</span><span>algorithm</span><span>\_\
+        for solving a 3 disk version\_of the towers puzzle. Let's finish it below!</span><br></div><p><br></p><p>Here\
+        \ again is an example log of moves for 3 disks</p><p>3-Tower Sample Solution</p><ol><li><span>Disk\
+        \ 1 (red) was moved from tower A to tower C\_</span></li><li><span>Disk 2\
+        \ (orange) was moved from tower A to tower B\_</span></li><li><span>Disk 1\
+        \ (red) was moved from tower C to tower B</span></li><li><span>Disk 3 (yellow)\
+        \ was moved from tower A to tower C\_</span></li><li><span>Disk 1 (red) was\
+        \ moved from tower B to tower A</span></li><li><span>Disk 2 (orange) was moved\
+        \ from tower B to tower C\_</span></li><li><span>Disk 1 (red) was moved from\
+        \ tower A to tower C</span></li></ol><p><br></p><p>Select one of the options\
+        \ below for Step 3.</p><ol><li>Move a disk between tower \_<span>\_</span><b>A</b><span>\_\
+        </span>\_ and tower \_ \_ \_<b>B</b></li><li><span>Move a disk between tower\
+        \ \_ </span><b>A</b>\_ \_and tower \_ \_ \_<b>C</b></li><li>Move a disk between\
+        \ tower \___ \_and tower \_ \_ \_ __<span>\_</span></li><li><span>Repeat this\
+        \ process until the puzzle is solved</span></li></ol>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>A and B</p>
+          - <p>A and C</p>
+          - <p>B and C</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 2
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Abstraction Debrief
+          feedback:
+          - <p>Yes this is the third move we see repeated in the pattern and so it
+            should be the third step in the algorithm.</p>
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Abstracting the Pattern Part 3
+          feedback:
+          - <p>Try again, look at the example pattern to see what is the next move
+            made.</p>
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  Abstraction Debrief:
+    content:
+    - type: text
+      value: "<div>Congratulations, you were able to identify patterns within a solution\
+        \ and abstract or generalize it into an algorithm.</div><ol><li>Move a disk\
+        \ between tower \_<span>\_</span><b>A</b><span>\_</span>\_ and tower \_ \_\
+        \ \_<b>B</b></li><li><span>Move a disk between tower \_<span>\_</span></span><b>A</b><span>\_\
+        \ \_</span>and tower \_ \_ \_<b>C</b></li><li>Move a disk between tower \_\
+        \_<b>B \_</b> and tower \_ \_ \_<b>C</b></li><li><span>Repeat this process\
+        \ until the puzzle is solved</span></li></ol><p>It turns out that these instructions\
+        \ can be used to solve the towers puzzle where the number of disks is odd\
+        \ (3, 7, 13). You may want to try modifying the algorithm to have one that\
+        \ works for even numbers. Equipped with this you can solve any version of\
+        \ the tower puzzle given enough time.<br></p><p><br></p><p>Speaking of time,\
+        \ let's\_revisit the original question. If someone is solving a 64-disk version\
+        \ of the towers puzzle at a rate of one disk per second, and the world is\
+        \ supposed to end when it is solved, should we be worried? Approximately how\
+        \ long would it take to solve a 64 disk version of the towers puzzle?</p>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>1 day</p>
+          - <p>100 years</p>
+          - <p>Billions and billions of years</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 2
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: End or Recursion Choice
+          feedback:
+          - "<p>Yes, it is incredible how fast the amount of time required grows as\
+            \ the number of disks increase. You might recall that the general rule\
+            \ for the amount of moves required for a number of disks is\_<oppia-noninteractive-math\
+            \ raw_latex-with-value=\"&amp;quot;\\\\\\\\2^{n} - 1&amp;quot;\"></oppia-noninteractive-math>.\_\
+            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\\\\\\2^{64}\
+            \ - 1&amp;quot;\"></oppia-noninteractive-math>\_is a really big number\
+            \ and at one move per second, it would take longer than any estimate of\
+            \ the age of the universe so I think we will be ok.</p>"
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Abstraction Debrief
+          feedback:
+          - <p>Thankfully I think we will have more time than that. Why not try again?<br></p>
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  Debrief:
+    content:
+    - type: text
+      value: '<p>If you are interested in learning more about this topic you can search
+        for [sorting algorithms, recursion, and the towers of hanoi puzzle (its most
+        common name)]
+
+        <br></p><p><br></p><p>Feel free to try developing algorithms for the humanities,
+        mathematics, and sciences or proceed to the final project.</p>'
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Debrief
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  Decomposition:
+    content:
+    - type: text
+      value: "<p><span>All right, let's see if we can figure it out!</span></p><p><span><br></span></p><p><span>Before\
+        \ we can answer that question, though, we need to know if it is possible to\
+        \ determine the minimum number of moves given a number of disks. Otherwise\
+        \ we would only be guessing how long it could take, and that's not very helpful\
+        \ when the end of the world is at stake.</span></p><p><span><br></span></p><p><span>While\
+        \ we could attempt to solve this using the 64 disks mentioned in the original\
+        \ problem, it may be simpler to break this problem into a smaller problem\
+        \ and see what we learn from that and what patterns emerge. In Computational\
+        \ Thinking, this is referred to as <i>decomposition</i>.\_</span><br></p><p><br></p><p>Click\
+        \ <b>Next</b>.</p><p></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Towers - 3 Disks
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '3'
+      generator_id: Copier
+      name: HanoiTower0numDisks
+  End or Recursion Choice:
+    content:
+    - type: text
+      value: "<p>This puzzle is famous not only for its algorithm and the fun people\
+        \ have solving the puzzle, but also as an example of recursion. Recursion\
+        \ in computer science is a way of describing an algorithm in terms of itself\
+        \ so the problem is approached as a series of smaller problems to solve.</p><p><br></p><p>Would\
+        \ you like to see how you can create one algorithm for solving the towers\
+        \ puzzle using recursion?\_If you are interested in diving in a little deeper\
+        \ into the towers puzzle, there is exciting stuff ahead.</p>"
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Yes, I'm interested!</p>
+          - <p>Not right now.</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Debrief
+          feedback: []
+          param_changes: []
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Recursion Intro
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: End or Recursion Choice
+          feedback: []
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  First State:
+    content:
+    - type: text
+      value: <div></div>In the legend of the towers, there is a room with 3 posts
+        (towers). On the leftmost tower, 64 golden disks are stacked from the biggest
+        disk up to the smallest (a simplified version of this is shown on the right).
+        Those entrusted with the task of moving all of the disks from one post to
+        another were told that the world would end when this task was complete.<div><br></div><div>The
+        rules one must follow when solving the tower puzzle are:</div><ol><li><span>Disks
+        must be removed one at a time from the top of one tower and placed onto the
+        top of another tower.</span></li><li><span>No disk can be larger than any
+        disk below it (i.e., the disks on each tower make a pyramid shape).</span></li></ol><span><div><span><br></span></div>If
+        there is indeed someone secretly completing this task by moving one disk per
+        second, what is your guess for how long it would take them to solve it?</span>
+    interaction:
+      customization_args:
+        unitChoices:
+          value:
+          - hours
+          - days
+          - years
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Decomposition
+          feedback: []
+          param_changes: []
+      id: SimpleNumberWithUnitsInput
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '3'
+      generator_id: Copier
+      name: HanoiTower0numDisks
+  Moves Pattern Question:
+    content:
+    - type: text
+      value: <p><span>As you were moving those disks back and forth between the towers,
+        did you feel like there was a pattern, even if you are unable to articulate
+        what that pattern is?</span><br></p>
+    interaction:
+      customization_args:
+        choices:
+          value:
+          - <p>Yes</p>
+          - <p>No</p>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Reflection on Moves
+          feedback: []
+          param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  Recursion Intro:
+    content:
+    - type: text
+      value: "<p>We have a working algorithm for solving the towers puzzle. We will\
+        \ apply the process of Computational Thinking a second time in order to develop\
+        \ our recursive algorithm.</p><p><br></p><p>Before we dive straight into the\
+        \ towers puzzle, let's look at an example of recursion using multiplication.\
+        \ We are able to create a recursive algorithm based on one way of looking\
+        \ at multiplication is as repeated addition.</p><p><br></p><p>Task:\_<span>Multiply\
+        \ two numbers a and b</span></p><p></p><ol><li><span>Rule 1: If b equals 1\
+        \ then answer is a</span></li><li><span>Rule 2: Multiply two numbers a and\
+        \ b - 1 and add that                        result to a.</span></li></ol><span><div><span><br></span></div>Let's\
+        \ take a look at a couple of examples of this in action:\_</span><div><span>Example\
+        \ 1: Multiply 3 * 2\_</span><p></p><p></p><ol><li><span>Since b is not 1:\
+        \ (a * b - 1) + a   or   (3 * 1) + 3\_</span></li><li><span>Answer is 6\_\
+        </span></li></ol><span><div><span><br></span></div>Here's another example\
+        \ written in another way.</span><p></p><p><span>Example 2: Multiply 5 * 4\_\
+        </span></p><p></p><ol><li><span>\_ \_ \_ \_ \_ \_ \_ \_ \_(5 * 3) + 5</span></li><li><span>\_\
+        \ \_ \_ \_ ((5 * 2) + 5) + 5</span></li><li><span>(((5 * 1) + 5) + 5 + 5</span></li><li><span>\_\
+        \ \_ \_ \_ \_ \_ \_5 + 5 + 5 + 5</span></li><li><span>Answer is 20</span><br></li></ol><p><br></p><p></p>While\
+        \ this may seem like a more complex way of solving a problem, a recursive\
+        \ algorithm can sometimes be more succinct than its counterpart. If you are\
+        \ implementing this algorithm using a programming language, then all of the\
+        \ tricky calculation is handled by the computer, freeing you up to think creatively\
+        \ and deeply about interesting problems.\n</div><p><br></p><p>Click <b>Next</b>\
+        \ to see an example of an algorithm to solve the towers puzzle using recursion.</p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Recursion Towers
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Recursion Towers:
+    content:
+    - type: text
+      value: "<p>In our original version of the towers algorithm the steps were repeated\
+        \ until the puzzle was finished.<br></p><p><br></p><ol><li>Move a disk between\
+        \ tower \_<span>\_</span><b>A</b><span>\_</span>\_ and tower \_ \_ \_<b>B</b></li><li><span>Move\
+        \ a disk between tower \_<span>\_</span></span><b>A</b><span>\_ \_</span>and\
+        \ tower \_ \_ \_<b>C</b></li><li>Move a disk between tower \_\_<b>B \_</b><span>\_\
+        </span>and tower \_ \_ \_<b>C</b></li><li><span>Repeat this process until\
+        \ the puzzle is solved</span></li></ol><p>However if you look at steps 1-3\
+        \ there was another pattern you may have found when solving the towers puzzle\
+        \ and that was, keep moving the smaller disks onto the other towers until\
+        \ you can move the largest disk.<br></p><p><br></p><p>So one explanation of\
+        \ how to solve the puzzle recursively is:</p><p><span>Task: Move all the disks\
+        \ from tower A to Tower C</span></p><p></p><ol><li><span>Move all of the disks\
+        \ except the last one from Tower A to Tower B</span></li><li><span>Move the\
+        \ last disk on Tower A to Tower C.</span></li><li><span>Move all of the disks\
+        \ from Tower B to Tower C</span></li></ol><span>This may not seem like an\
+        \ algorithm but just a straightforward explanation of how to solve the puzzle.\
+        \ If you look closely, you'll see that each of these steps will require sub\
+        \ steps where you are applying the algorithm you created above.</span><p></p><p><span><br></span></p><p><span>Here\
+        \ is an interactive diagram of the <oppia-noninteractive-link open_link_in_same_window-with-value=\"\
+        false\" text-with-value=\"&amp;quot;towers recursion algorithm&amp;quot;\"\
+        \ url-with-value=\"&amp;quot;http://upload.wikimedia.org/wikipedia/commons/2/20/Tower_of_Hanoi_recursion_SMIL.svg&amp;quot;\"\
+        ></oppia-noninteractive-link> from Wikipedia that may help you to visualize\
+        \ the steps.</span></p><p><span><br></span></p><p>Click <b>Next</b>.</p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Debrief
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Reflection on Moves:
+    content:
+    - type: text
+      value: "<div><span>Here are examples of solutions for the 3 and 4 disk puzzles.\
+        \ The method you used may have differed.</span><br></div><p><br></p><p><b>3-Tower\
+        \ Sample Solution</b></p><ol><li><span>Disk 1 (red) was moved from tower A\
+        \ to tower C\_</span></li><li><span>Disk 2 (orange) was moved from tower A\
+        \ to tower B\_</span></li><li><span>Disk 1 (red) was moved from tower C to\
+        \ tower B</span></li><li><span>Disk 3 (yellow) was moved from tower A to tower\
+        \ C\_</span></li><li><span>Disk 1 (red) was moved from tower B to tower A</span></li><li><span>Disk\
+        \ 2 (orange) was moved from tower B to tower C\_</span></li><li><span>Disk\
+        \ 1 (red) was moved from tower A to tower C</span></li></ol><p><b>4-Tower\
+        \ Sample Solution</b></p><ol><li>Disk 1 (red) was moved from tower A to tower\
+        \ B</li><li>Disk 2 (orange) was moved from tower A to tower C\_</li><li>Disk\
+        \ 1 (red) was moved from tower B to tower C</li><li>Disk 3 (yellow) was moved\
+        \ from tower A to tower B\_</li><li>Disk 1 (red) was moved from tower C to\
+        \ tower A</li><li>Disk 2 (orange) was moved from tower C to tower B\_</li><li>Disk\
+        \ 1 (red) was moved from tower A to tower B</li><li>Disk 4 (green) was moved\
+        \ from tower A to tower C\_</li><li>Disk 1 (red) was moved from tower B to\
+        \ tower C</li><li>Disk 2 (orange) was moved from tower B to tower A\_</li><li>Disk\
+        \ 1 (red) was moved from tower C to tower A</li><li>Disk 3 (yellow) was moved\
+        \ from tower B to tower C\_</li><li>Disk 1 (red) was moved from tower A to\
+        \ tower B</li><li>Disk 2 (orange) was moved from tower A to tower C\_</li><li>Disk\
+        \ 1 (red) was moved from tower B to tower C</li></ol><p><br></p><p>Based on\
+        \ these example solutions, how many moves do you think it would take to solve\
+        \ a 5-disk version of the Towers puzzle?</p>"
+    interaction:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 31.0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Abstracting the Pattern Part 1
+          feedback:
+          - "<p>Yes, the puzzle follows a pattern of\_<oppia-noninteractive-math raw_latex-with-value=\"\
+            &amp;quot;\\\\\\\\2^{n} - 1&amp;quot;\"></oppia-noninteractive-math>\_\
+            where n is the number of disks. For 3 disks the number of moves required\
+            \ are \_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\
+            \\\\\\2^{3} -1 = 8&amp;quot;\"></oppia-noninteractive-math>\_and for 4\
+            \ disks the number of moves required are\_<oppia-noninteractive-math raw_latex-with-value=\"\
+            &amp;quot;\\\\\\\\2^{4} -1 = 15&amp;quot;\"></oppia-noninteractive-math>.<br></p>"
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Reflection on Moves
+          feedback:
+          - <div>The minimum moves required for the:</div><ul><li>3-disk version are
+            7 moves.</li><li>4-disk version are 15 moves.</li></ul><p><br></p><p>There
+            is a pattern that relates number of disks to moves. You can try solving
+            the 5-disk version if it helps you solve it or write down the pattern
+            of moves you see.</p>
+          param_changes: []
+      id: NumericInput
+      triggers:
+      - customization_args:
+          num_submits: 2
+        dest: Abstracting the Pattern Part 1
+        feedback:
+        - "<p>The puzzle follows a pattern of\_<oppia-noninteractive-math raw_latex-with-value=\"\
+          &amp;quot;\\\\\\\\2^{n} - 1&amp;quot;\"></oppia-noninteractive-math>\_where\
+          \ n is the number of disks. For 3 disks the number of moves required are\
+          \ \_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;\\\\\\\\\
+          2^{3} -1 = 8&amp;quot;\"></oppia-noninteractive-math>\_and for 4 disks the\
+          \ number of moves required are\_<oppia-noninteractive-math raw_latex-with-value=\"\
+          &amp;quot;\\\\\\\\2^{4} -1 = 15&amp;quot;\"></oppia-noninteractive-math><br></p>"
+        name: on_nth_resubmission
+        param_changes: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '5'
+      generator_id: Copier
+      name: HanoiTower0numDisks
+  Towers - 3 Disks:
+    content:
+    - type: text
+      value: "<p><span>In this example of the towers puzzle, there are three disks\
+        \ on the left tower. Try to get all of the pieces from that tower to either\
+        \ the middle or right tower.</span><br></p><p><br></p><p>Again, here are the\
+        \ rules one must follow when solving the tower puzzle:</p><ol><li>disks must\
+        \ be removed one at a time from the top of one tower and placed onto the top\
+        \ of another tower.\_</li><li>no disk can be larger than any disk below it</li></ol><div><span><br></span></div>If\
+        \ you get stuck, you can click the <b>Reset</b> button and try again.<br>"
+    interaction:
+      customization_args:
+        numDisks:
+          value: 3
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: 4 Disk Move Question
+          feedback: []
+          param_changes: []
+      id: HanoiTower
+      triggers: []
+    param_changes: []
+tags: []

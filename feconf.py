@@ -260,7 +260,7 @@ DEMO_EXPLORATIONS = [
     ('bouncing_ball', 'Bouncing Ball', 'Programming'),
     ('classification', 'Classifying Things', 'Programming'),
     ('turtle_geometry', 'Turtle Geometry', 'Programming'),
-    ('linguistics', 'Linguistics', 'Programming'),
+    ('chatbot', 'Chatbot', 'Programming'),
     ('calculator', 'Calculator', 'Programming'),
     ('towers', 'Towers of Hanoi', 'Programming'),
 ]

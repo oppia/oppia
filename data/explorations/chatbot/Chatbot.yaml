@@ -1,0 +1,368 @@
+author_notes: ''
+blurb: ''
+default_skin: snapshots_v1
+init_state_name: First State
+language_code: en
+objective: PencilCode embedding
+param_changes:
+- customization_args:
+    parse_with_jinja: true
+    value: ''
+  generator_id: Copier
+  name: PencilCode0initialCode
+param_specs:
+  PencilCode0initialCode:
+    obj_type: UnicodeString
+schema_version: 5
+skin_customizations:
+  panels_contents:
+    main:
+    - customization_args: {}
+      gadget_id: PencilCode
+      visible_in_states:
+      - First Chatbot
+      - Implementing a New Question
+      - Adding Boolean Logic
+      - Iterating
+      - Learning Chatbot
+states:
+  About Ada:
+    content:
+    - type: text
+      value: "<p><oppia-noninteractive-image filepath-with-value=\"&amp;quot;ada_lovelace.jpeg&amp;quot;\"\
+        ></oppia-noninteractive-image><br></p><p>For our chatbot, let's base it upon\
+        \ a great woman named Ada. Ada is credited as the world's first computer programmer.\
+        \ Born in 1815, her father was a poet, and her mother soon after obtained\
+        \ sole custody of Ada and brought her up to be a mathematician and scientist.\
+        \ Ada wrote the first computer program while working on an early mechanical\
+        \ computer, the Analytical Engine. In 1843 at the age of 27, she translated\
+        \ an article on the engine and added her own notes that include what is recognized\
+        \ as the first computer program, a series of instructions intended to be carried\
+        \ out by a machine. Ada\u2019s algorithm was a plan for how to calculate Bernoulli\
+        \ numbers. She also correctly predicted that such a machine could be used\
+        \ to compose music, create graphics, and have both practical and scientific\
+        \ applications beyond math calculations, more than a century before the computer\
+        \ could actually do many of these tasks. Ada\u2019s insight was truly unique\
+        \ and may have been inspired by the beautiful textiles created by mechanical\
+        \ looms, which were similar to early computers. She often integrated poetry\
+        \ and science, believing that imagination and intuition were critical to math\
+        \ and science.\n<br></p><p><br></p><p>Ada\u2019s drive in math and science\
+        \ was seen as early as the age of 12, when she decided she wanted to fly.\
+        \  Ada methodically constructed wings, examining materials and sizes and studying\
+        \ the anatomy of birds for proportion.  She wrote a book called \"Flyology\"\
+        \ with her findings.<br></p><p><br></p><p>In addition to her pursuit of mathematics\
+        \ and writing, Ada was always interested in poetry, as well as music, horses,\
+        \ and calculating machines. Ada was married to the Earl of Lovelace and had\
+        \ three young children while she wrote the famous article on the Analytical\
+        \ Engine. Sadly, illnesses plagued her most of her life, and she died in 1852\
+        \ at the early age of 36 from uterine cancer.<br></p><p><br></p><p>Now, inspired\
+        \ by the awesome Ada, let\u2019s create a chatbot that answers questions as\
+        \ Ada would! Click <b>Next</b> to continue.\n<br></p><p></p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: First Chatbot
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Adding Boolean Logic:
+    content:
+    - type: text
+      value: "<div><span>In addition to conditional logic, we can make our Ada chatbot\
+        \ even smarter by adding boolean logic. This enables us to add to our chatbot\
+        \ the ability to test 'if' two things are true in a single condition. Our\
+        \ chatbot is able to answer the question 'When were you born?' but what if\
+        \ we wanted to add the question 'Where were you born?'. We couldn't just add\
+        \ another if statement, we need to be able to determine if the question asked\
+        \ contains the text 'where' as well as 'born'.</span><br></div><div><span><br></span></div><div>Our\
+        \ example has already used the boolean logic 'or' operator\_in this example\
+        \ when we check for the word 'name'\_or\_'who' on the fifth line. We have\
+        \ updated the example to test for the words 'born'\_and\_'when' on the seventh\
+        \ line so Ada knows when we are asking for the year she was born.\_Try adding\
+        \ another question asking for 'born' and 'where' \_and write 'London, United\
+        \ Kingdom' as the response.</div><p><br></p><p>When you have added the new\
+        \ question click <b>Next</b>.</p>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Iterating
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: "write \"Hello\"\nchat = ->\n  readstr (question) ->\n    question\
+          \ = question.toLowerCase()\n    if /name/.test(question) or /who/.test(question)\n\
+          \      write 'My name is Ada Lovelace.'\n    else if /born/.test(question)\
+          \ and /when/.test(question)\n      write 'I was born in 1815.'\n    else\n\
+          \      write \"I don't understand. Ask me another question.\"\n    chat()\n\
+          chat()"
+      generator_id: Copier
+      name: PencilCode0initialCode
+  Conclusion:
+    content:
+    - type: text
+      value: "<p>As you saw, a chatbot can be very simple, and as you add complexity\
+        \ and intelligence, it gets smarter. \_We applied decomposition to the task\
+        \ by thinking about each step that our chatbot needed to take to respond to\
+        \ a question. \_We explored how the chatbot can read user input and process\
+        \ it in an appropriate way with logic through if/else statements. \_We also\
+        \ looked at a few ways to abstract the process to make the chatbot more intelligent\
+        \ in continuing to talk and respond forever, responding to varying questions,\
+        \ answering with various responses, responding to things she doesn\u2019t\
+        \ know, and even learning things she doesn\u2019t know. \_We looked at and\
+        \ modified various algorithms to do these things.<br></p><p><br></p><p>This\
+        \ is a great way to understand and envision a character from a book or history,\
+        \ or someone famous. \_You can dive deep into the character by doing research\
+        \ on their culture, family history, social circles, education, career, dialogues,\
+        \ thought processes, etc. It is a creative opportunity to develop your own\
+        \ character to think through much of the same concepts that any writer would\
+        \ need to in developing a character. Computational thinking helps one explore\
+        \ deeper by becoming the character and thinking through his/her logic.<br></p><p><br></p><p>If\
+        \ you would like to see how algorithms apply to computer science, the humanities,\
+        \ mathematics, or the sciences click here, otherwise continue to the next\
+        \ section to explore more ways to use algorithms to enhance what you are already\
+        \ doing in your classroom.<br></p>"
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Conclusion
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  Developing a New Question:
+    content:
+    - type: text
+      value: <div><span></span></div>As a person who does not know Ada, what would
+        you ask her? If you had to answer questions on her behalf, what would she
+        know and what would she say? You could base this on the previously mentioned
+        information or do some of your own research.<div><br></div><div>Simulating
+        a person is quite a daunting task. Let's first break it into a more manageable
+        task. What is a question you think someone might ask Ada? <p></p></div>
+    interaction:
+      customization_args:
+        placeholder:
+          value: Question for Ada
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Implementing a New Question
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  First Chatbot:
+    content:
+    - type: text
+      value: '<p>On the right, we have used Pencil Code to create an initial chatbot
+        for Ada. When you run the code, a text box appears for you to type your questions
+        in. Right now the only question she can answer is her name and when she was
+        born, so if you ask, "What is your name" or "When were you born" you should
+        see a response.
+
+        </p><p><br></p><p>When you are ready to add your own questions, click <b>Next</b>.</p>'
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Developing a New Question
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: "write \"Hello\"\nchat = ->\n  readstr (question) ->\n    question\
+          \ = question.toLowerCase()\n    if /name/.test(question) or /who/.test(question)\n\
+          \      write 'My name is Ada Lovelace.'\n    else if /born/.test(question)\n\
+          \      write 'I was born in 1815.'\n    else\n      write \"I don't understand.\
+          \ Ask me another question.\"\n    chat()\nchat()"
+      generator_id: Copier
+      name: PencilCode0initialCode
+  First State:
+    content:
+    - type: text
+      value: "<div></div>In this activity, we will create a chatbot by applying the\
+        \ Computational Thinking process.<div><br></div><div>You might be wondering:\
+        \ what is a Chatbot? A mathematician named Alan Turing predicted that computers\
+        \ might one day be capable of doing highly complex tasks and proposed a threshold\
+        \ of intelligence.\n\nThis test has become known as the Turing\_<span>Test.</span><div><div><br></div><div>The\
+        \ test is fairly straightforward: if a computer is able to have a conversation\
+        \ with a human, and the human is unable to distinguish the conversation from\
+        \ that they might have with a human, then the computer is said to have passed\
+        \ the Turing Test of intelligence.<div><span></span></div></div></div></div>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: About Ada
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  Implementing a New Question:
+    content:
+    - type: text
+      value: <div><span></span></div>For this chatbot, we are using the logical statements
+        or conditionals 'if' and 'else'. Each time the user types in a question, 'if'
+        the text matches the first condition then the code will 'write' or output
+        that response to the conversation you are having. If it does not match that
+        first 'if' statement then it will try the subsequent 'else if' tests to see
+        if any of those match. If none do then the chatbot will respond with the default
+        statement of 'I don't understand that question'. You can modify the existing
+        responses and add as many as you would like. Conditional statements like 'if'
+        and 'else' are powerful and are used in every significant piece of software
+        you have ever used.<div><br></div><div>Looking at the existing code, can you
+        figure out the logic needed to add your new question?</div><div><br></div><div>When
+        you have added a new question based on the existing examples, click <b>Next</b>.<p></p></div>
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Adding Boolean Logic
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: "write \"Hello\"\nchat = ->\n  readstr (question) ->\n    question\
+          \ = question.toLowerCase()\n    if /name/.test(question) or /who/.test(question)\n\
+          \      write 'My name is Ada Lovelace.'\n    else if /born/.test(question)\n\
+          \      write 'I was born in 1815.'\n    else\n      write \"I don't understand.\
+          \ Ask me another question.\"\n    chat()\nchat()"
+      generator_id: Copier
+      name: PencilCode0initialCode
+  Iterating:
+    content:
+    - type: text
+      value: <p>Hopefully the /text/.test(question) syntax isn't throwing you off
+        too much. Programming is a language with rules like any other language. In
+        fact it's because computers are unable to pass the Turing Test that you must
+        be very specific in what code you type in. While you might be able to understand
+        an email if the spelling and grammar were slightly off, a computer will only
+        do what it is told. Using incorrect syntax or typos results in errors. Perhaps
+        one day computers will be able to better understand what we are saying until
+        then we must write detailed algorithms and review our code for issues.</p><p><br></p><p>There
+        are lots of ways you could continue to iterate on your chatbot. You would
+        quickly find that if you kept adding questions, the length of your program
+        would grow quickly. Some ways computer scientists avoid this is by using 'loops'
+        to run code multiple times and functions to abstract or encapsulate a often
+        used process. If you look at the chatbot code, there is a function called
+        chat() which is called every time we want the user to be able to ask a question.</p><p><br></p><p>To
+        see an example of a chatbot that learns something new, click <b>Next</b>.<br></p>
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Learning Chatbot
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: "write \"Hello\"\nchat = ->\n  readstr (question) ->\n    question\
+          \ = question.toLowerCase()\n    if /name/.test(question) or /who/.test(question)\n\
+          \      write 'My name is Ada Lovelace.'\n    else if /born/.test(question)\
+          \ and /when/.test(question)\n      write 'I was born in 1815.'\n    else\
+          \ if /born/.test(question) and /where/.test(question)\n      write 'I was\
+          \ born in London, United Kingdom'\n    else\n      write \"I don't understand.\
+          \ Ask me another question.\"\n    chat()\nchat()"
+      generator_id: Copier
+      name: PencilCode0initialCode
+  Learning Chatbot:
+    content:
+    - type: text
+      value: <p><span>If you look around for other examples of chatbots, you will
+        find that most of them follow a similar logic to our Ada chatbot, checking
+        for certain works or patterns and then applying an algorithm. Here is an example
+        of a chatbot that learns if it encounters a question it does not know the
+        answer to. The chatbot is storing the questions and answers it sees in its
+        memory. Try running the code and answering some questions. After you have
+        taught it a new question, it should be able to answer that question as long
+        as you ask it in the exact same way.</span><br></p><p><br>This process of
+        developing an algorithm through training instead of writing out every possibility
+        beforehand is an example of machine learning and it is used at Google to better
+        understand ambiguous queries and in many other examples across the Web. There
+        continues to be a gap between how algorithms and living organisms like humans
+        learn something new. Why not reflect for a moment on what those differences
+        are and what it means to be a living thing.<br></p><p><br></p><p>When you
+        are ready for some concluding thoughts, click <b>Next</b>.</p>
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Conclusion
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: "known = {}\nloop\n  await readstr 'Ask me a question:', defer question\n\
+          \  if known[question]\n    write known[question]\n  else\n    write 'I do\
+          \ not know that.'\n    await readstr 'Teach me, what is the answer?', defer\
+          \ answer\n    known[question] = answer"
+      generator_id: Copier
+      name: PencilCode0initialCode
+tags: []
