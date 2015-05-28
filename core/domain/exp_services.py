@@ -447,10 +447,6 @@ def apply_change_list(exploration_id, change_list):
     Returns:
       the resulting exploration domain object.
     """
-    # Loading the exploration model from the datastore into an Exploration
-    # domain object automatically converts it to use the latest states schema
-    # version. As a result, simply resaving the exploration is sufficient to
-    # complete the migration.
     exploration = get_exploration_by_id(exploration_id)
     try:
         changes = [exp_domain.ExplorationChange(change_dict)
@@ -506,6 +502,10 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_init_state_name(change.new_value)
             elif (change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                # Loading the exploration model from the datastore into an
+                # Eploration domain object automatically converts it to use the
+                # latest states schema version. As a result, simply resaving the
+                # exploration is sufficient to apply the states schema update.
                 continue
         return exploration
 

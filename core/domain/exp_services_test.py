@@ -2054,7 +2054,6 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
-    OLD_EXP_WITH_CHANGES_ID = 'exp_id2'
 
     UPGRADED_EXP_YAML = (
 """author_notes: ''
@@ -2209,8 +2208,7 @@ tags: []
         def fake_validate(strict=False, allow_null_interaction=False):
             pass
 
-        # This refers to an old exploration that is initially pre-migration.
-        _EXP_ID = self.OLD_EXP_WITH_CHANGES_ID
+        _EXP_ID = 'exp_id2'
 
         # Create a exploration with states schema version 0.
         old_exp_model = exp_models.ExplorationModel(
@@ -2356,7 +2354,7 @@ tags: []
                 'Update exploration states from schema version 0 to %d.' %
                 feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
             'commit_cmds': [{
-                'cmd': 'migrate_states_schema',
+                'cmd': 'migrate_states_schema_to_latest_version',
                 'from_version': '0',
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)

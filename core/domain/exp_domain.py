@@ -60,7 +60,8 @@ CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
-CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = 'migrate_states_schema'
+CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_states_schema_to_latest_version')
 
 
 def _is_interaction_terminal(interaction_id):
