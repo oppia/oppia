@@ -91,6 +91,13 @@ if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
   echo Installing Protractor
   $NPM_INSTALL protractor@1.2.0
 fi
+# Ensure the Protractor version is set to 1.2.0 in the current branch until the
+# update to Protractor v2 is merged into 'develop'.
+PROTRACTOR_VERSION=$($NPM_CMD list protractor)
+if [[ $PROTRACTOR_VERSION != *"1.2.0"* ]]; then
+  echo Changing Protractor version to 1.2.0.
+  $NPM_INSTALL protractor@1.2.0
+fi
 
 echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
