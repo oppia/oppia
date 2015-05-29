@@ -36,9 +36,9 @@ var editConfigProperty = function(propertyName, objectType, editingInstructions)
       if (title.match(propertyName)) {
         editingInstructions(forms.getEditor(objectType)(configProperty));
         element(by.css('.protractor-test-save-all-configs')).click();
-        browser.driver.switchTo().alert().accept();
+        browser.switchTo().alert().accept();
         // Time is needed for the saving to complete.
-        protractor.getInstance().waitForAngular();
+        browser.waitForAngular();
         return true;
       }
     });
@@ -66,9 +66,9 @@ var reloadExploration = function(name) {
         explorationElement.element(
           by.css('.protractor-test-reload-exploration-button')
         ).click();
-        browser.driver.switchTo().alert().accept();
+        browser.switchTo().alert().accept();
         // Time is needed for the reloading to complete.
-        protractor.getInstance().waitForAngular();
+        browser.waitForAngular();
       }
     });
   });

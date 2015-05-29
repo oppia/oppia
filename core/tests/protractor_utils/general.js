@@ -22,10 +22,10 @@
 var editor = require('./editor.js');
 
 // Time (in ms) to wait when the system needs time for some computations.
-var WAIT_TIME = 4000;
+var WAIT_TIME = 1500;
 
 var waitForSystem = function() {
-  protractor.getInstance().sleep(WAIT_TIME);
+  browser.sleep(WAIT_TIME);
 };
 
 // We will report all console logs of level greater than this.
@@ -98,7 +98,7 @@ var getExplorationIdFromPlayer = function() {
 // The explorationId here should be a string, not a promise.
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
-  protractor.getInstance().waitForAngular();
+  browser.waitForAngular();
   editor.exitTutorialIfNecessary();
 };
 
@@ -122,15 +122,6 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
-// TODO(sll): see if it is possible to remove this once the scrolling in
-// ConversationSkin.js is changed to use ng-animate instead of jQuery.
-var scrollElementIntoView = function(elementToScrollTo) {
-  browser.executeScript(function(elem) {
-    elem.scrollIntoView(false);
-  }, elementToScrollTo);
-};
-
-
 
 exports.waitForSystem = waitForSystem;
 exports.checkForConsoleErrors = checkForConsoleErrors;
@@ -150,5 +141,3 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
-
-exports.scrollElementIntoView = scrollElementIntoView;

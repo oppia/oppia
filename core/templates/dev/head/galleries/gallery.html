@@ -71,6 +71,7 @@
         </li>
         <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
         <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
+            class="protractor-test-deselected"
             ng-if="!selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
             <[item.text]>
@@ -99,6 +100,7 @@
         </li>
         <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
         <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
+            class="protractor-test-deselected"
             ng-if="!selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
             <[item.text]>

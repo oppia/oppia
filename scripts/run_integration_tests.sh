@@ -94,20 +94,24 @@ fi
 echo Checking whether Protractor is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
   echo Installing Protractor
-  $NPM_INSTALL protractor@1.2.0
+  $NPM_INSTALL protractor@2.1.0
 fi
-# Ensure the Protractor version is set to 1.2.0 in the current branch until the
-# update to Protractor v2 is merged into 'develop'.
 PROTRACTOR_VERSION=$($NPM_CMD list protractor)
-if [[ $PROTRACTOR_VERSION != *"1.2.0"* ]]; then
-  echo Changing Protractor version to 1.2.0.
-  $NPM_INSTALL protractor@1.2.0
+if [[ $PROTRACTOR_VERSION != *"2.1.0"* ]]; then
+  echo Upgrading Protractor version to 2.1.0.
+  $NPM_INSTALL protractor@2.1.0
 fi
 
 echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
   echo Installing Protractor screenshot reporter
   $NPM_INSTALL protractor-screenshot-reporter@0.0.5
+fi
+
+echo Checking whether Jasmine spec reporter is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/jasmine-spec-reporter" ]; then
+  echo Installing Jasmine spec reporter
+  $NPM_INSTALL jasmine-spec-reporter@2.2.2
 fi
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update

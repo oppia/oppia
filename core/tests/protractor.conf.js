@@ -53,25 +53,11 @@ exports.config = {
 
   // ----- What tests to run -----
   //
-  // Spec patterns are relative to the location of this config.
-  specs: [
-    'protractor/*.js'
-  ],
-
-  // Patterns to exclude.
-  exclude: [],
-
-  /*
-
-  // Alternatively, suites may be used. When run without a command line parameter,
-  // all suites will run. If run with --suite=smoke, only the patterns matched
-  // by that suite will run.
+  // When run without a command line parameter, all suites will run. If run
+  // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    smoke: 'spec/smoketests/*.js',
-    full: 'spec/*.js'
+    full: 'protractor/*.js'
   },
-
-  */
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -80,7 +66,9 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
-    browserName: 'chrome'
+    browserName: 'chrome',
+    shardTestFiles: true,
+    maxInstances: 3
   },
 
   // If you would like to run more than one instance of webdriver on the same
@@ -107,6 +95,12 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
+
+    var SpecReporter = require('jasmine-spec-reporter');
+    jasmine.getEnv().addReporter(new SpecReporter({
+      displayStacktrace: 'all',
+      displaySpecDuration: true
+    }));
 
     // This is currently pulled out into a flag because it sometimes obscures
     // the actual protractor error logs and does not close the browser after
@@ -151,7 +145,7 @@ exports.config = {
   // Jasmine and Cucumber are fully supported as a test and assertion framework.
   // Mocha has limited beta support. You will need to include your own
   // assertion framework if working with mocha.
-  framework: 'jasmine',
+  framework: 'jasmine2',
 
   // ----- Options to be passed to minijasminenode -----
   //
@@ -166,7 +160,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 600000
+    defaultTimeoutInterval: 500000
   },
 
   // ----- Options to be passed to mocha -----

@@ -50,14 +50,13 @@ var progressInTutorial = function() {
 };
 
 var finishTutorial = function() {
-  // Finish the tutorial
-  element(by.buttonText('Finish')).then(function(button) {
-    if (button) {
-      button.click();
-    } else {
-      throw 'Expected to find exactly one \'Finish\' button';
-    }
-  });
+  // Finish the tutorial.
+  var button = element(by.buttonText('Finish'));
+  if (button) {
+    button.click();
+  } else {
+    throw 'Expected to find exactly one \'Finish\' button';
+  }
 };
 
 // NAVIGATION
@@ -154,34 +153,26 @@ var setInteraction = function(interactionId) {
 
   element(by.css('.protractor-test-open-add-interaction-modal')).click();
 
+  var INTERACTION_ID_TO_TAB_NAME = {
+    'Continue': 'General',
+    'EndExploration': 'General',
+    'ImageClickInput': 'General',
+    'MultipleChoiceInput': 'General',
+    'TextInput': 'General',
+    'GraphInput': 'Math',
+    'LogicProof': 'Math',
+    'NumericInput': 'Math',
+    'SetInput': 'Math',
+    'CodeRepl': 'Programming',
+    'MusicNotesInput': 'Music',
+    'InteractiveMap': 'Geography'
+  }
+
   general.waitForSystem();
-
-  var interactionElem = element(by.css(
-    '.protractor-test-interaction-tile-' + interactionId));
-
-  // Try to find the interaction in one of the tabs.
-  element.all(by.css('.protractor-test-interaction-tab')).map(function(tabElem) {
-    tabElem.click();
-    return interactionElem.isDisplayed().then(function(isInteractionVisible) {
-      if (isInteractionVisible) {
-        return tabElem;
-      }
-    })
-  }).then(function(tabElems) {
-    var interactionTileFound = false;
-    for (var i = 0; i < tabElems.length; i++) {
-      if (tabElems[i]) {
-        interactionTileFound = true;
-        tabElems[i].click();
-        interactionElem.click();
-        break;
-      }
-    }
-
-    if (!interactionTileFound) {
-      throw 'Could not find interaction with id ' + interactionId;
-    }
-  });
+  element(by.css(
+    '.protractor-test-interaction-tab-' +
+    INTERACTION_ID_TO_TAB_NAME[interactionId])).click();
+  element(by.css('.protractor-test-interaction-tile-' + interactionId)).click();
 
   var elem = element(by.css('.protractor-test-interaction-editor'));
   var customizationArgs = [elem];
@@ -269,11 +260,16 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
   ruleElement.element(by.css('.protractor-test-answer-description')).click();
 
   element.all(by.id('select2-drop')).map(function(selectorElement) {
-    selectorElement.element(by.cssContainingText(
+    selectorElement.all(by.cssContainingText(
       'li.select2-results-dept-0', ruleDescriptionInDropdown
-    )).then(function(optionElement) {
-      optionElement.click();
-      protractor.getInstance().waitForAngular();
+    )).then(function(optionElements) {
+      if (optionElements.length !== 1) {
+        throw 'Expected exactly one rule option to match: ' + ruleDescriptionInDropdown;
+      }
+
+      for (var i = 0; i < optionElements.length; i++) {
+        optionElements[i].click();
+      }
     });
   });
 
@@ -515,8 +511,6 @@ var expectCannotAddResponse = function() {
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
-  general.scrollElementIntoView(
-    element(by.css('.protractor-test-exploration-graph')));
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -546,7 +540,7 @@ var deleteState = function(stateName) {
       if (listOfNames[i] === stateName) {
         element.all(by.css('.protractor-test-node')).get(i).
           element(by.css('.protractor-test-delete-node')).click();
-        protractor.getInstance().waitForAngular();
+        browser.waitForAngular();
         general.waitForSystem();
         element(by.css('.protractor-test-confirm-delete-state')).click();
         matched = true;
@@ -630,19 +624,17 @@ var setFirstState = function(stateName) {
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
-  general.scrollElementIntoView(
-    element(by.css('.protractor-test-save-changes')));
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
       element(by.css('.protractor-test-commit-message-input')).
         sendKeys(commitMessage);
     }
-    protractor.getInstance().waitForAngular();
+    browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-close-save-modal')).click();
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
-    protractor.getInstance().waitForAngular();
+    browser.waitForAngular();
     general.waitForSystem();
   });
 };
@@ -685,7 +677,7 @@ var _selectComparedVersions = function(v1, v2) {
       .get(v1Position).click();
     element.all(by.css('.protractor-test-history-v2-selector'))
       .get(v2Position).click();
-    protractor.getInstance().waitForAngular();
+    browser.waitForAngular();
   });
 
   // Click button to show graph if necessary
@@ -728,20 +720,31 @@ var expectGraphComparisonOf = function(v1, v2) {
   var _expectNumberOfLinksToBe = function(totalLinks, addedLinks, deletedLinks) {
     var COLOR_ADDED = 'rgb(31, 125, 31)';
     var COLOR_DELETED = 'rgb(178, 34, 34)';
-    var totalCount = 0;
-    var addedCount = 0;
-    var deletedCount = 0;
+
     element(by.css('.protractor-test-history-graph'))
         .all(by.css('.protractor-test-link')).map(function(link) {
-      link.getCssValue('stroke').then(function(linkColor) {
-        totalCount++;
+      return link.getCssValue('stroke').then(function(linkColor) {
         if (linkColor == COLOR_ADDED) {
-          addedCount++;
+          return 'added';
         } else if (linkColor == COLOR_DELETED) {
-          deletedCount++;
+          return 'deleted';
+        } else {
+          return 'total';
         }
       });
-    }).then(function() {
+    }).then(function(linkTypes) {
+      var totalCount = 0;
+      var addedCount = 0;
+      var deletedCount = 0;
+      for (var i = 0; i < linkTypes.length; i++) {
+        totalCount++;
+        if (linkTypes[i] === 'added') {
+          addedCount++;
+        } else if (linkTypes[i] === 'deleted') {
+          deletedCount++;
+        }
+      }
+
       if (totalCount != totalLinks) {
         throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + totalLinks + ' links in total, ' +
@@ -847,15 +850,14 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
 var revertToVersion = function(version) {
   _runFromHistoryTab(function() {
     var versionPosition = null;
-    element.all(by.css('.protractor-test-history-v1-selector')).first()
-        .then(function(elem) {
-      elem.getAttribute('value').then(function(versionNumber) {
-        // Note: there is no 'revert' link next to the current version
-        versionPosition = versionNumber - version - 1;
-        element.all(by.css('.protractor-test-revert-version'))
-          .get(versionPosition).click();
-        element(by.css('.protractor-test-confirm-revert')).click();
-      });
+    var elem = element.all(by.css(
+      '.protractor-test-history-v1-selector')).first();
+    elem.getAttribute('value').then(function(versionNumber) {
+      // Note: there is no 'revert' link next to the current version
+      versionPosition = versionNumber - version - 1;
+      element.all(by.css('.protractor-test-revert-version'))
+        .get(versionPosition).click();
+      element(by.css('.protractor-test-confirm-revert')).click();
     });
   });
 };
