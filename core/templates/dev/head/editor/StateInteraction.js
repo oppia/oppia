@@ -72,16 +72,6 @@ oppia.controller('StateInteraction', [
     return interactionSpec && interactionSpec.customization_arg_specs.length > 0;
   };
 
-  var _getStateCustomizationArgsFromInteractionCustomizationArgs = function(interactionCustomizationArgs) {
-    var result = {};
-    for (var i = 0; i < interactionCustomizationArgs.length; i++) {
-      result[interactionCustomizationArgs[i].name] = {
-        value: angular.copy(interactionCustomizationArgs[i].value)
-      };
-    }
-    return result;
-  };
-
   var _getInteractionPreviewTag = function(interactionCustomizationArgs) {
     if (!stateInteractionIdService.savedMemento) {
       return '';
@@ -133,55 +123,53 @@ oppia.controller('StateInteraction', [
         controller: [
             '$scope', '$modalInstance', 'stateInteractionIdService', 'stateCustomizationArgsService', 'interactionDetailsCache', 'INTERACTION_SPECS',
             function($scope, $modalInstance, stateInteractionIdService, stateCustomizationArgsService, interactionDetailsCache, INTERACTION_SPECS) {
+          // This binds the services to the HTML template, so that their
+          // displayed values can be used in the HTML.
           $scope.stateInteractionIdService = stateInteractionIdService;
+          $scope.stateCustomizationArgsService = stateCustomizationArgsService;
+
           $scope.INTERACTION_SPECS = INTERACTION_SPECS;
           $scope.ALLOWED_INTERACTION_CATEGORIES = GLOBALS.ALLOWED_INTERACTION_CATEGORIES;
-          var oldInteractionId = angular.copy(stateInteractionIdService.savedMemento);
-          $scope.selectedInteractionId = angular.copy(stateInteractionIdService.savedMemento);
 
           if (stateInteractionIdService.savedMemento) {
             var interactionSpec = INTERACTION_SPECS[stateInteractionIdService.savedMemento];
+            $scope.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
-            $scope.tmpCustomizationArgs = [];
-            for (var i = 0; i < interactionSpec.customization_arg_specs.length; i++) {
-              var caName = interactionSpec.customization_arg_specs[i].name;
-              $scope.tmpCustomizationArgs.push({
-                name: caName,
+            stateInteractionIdService.displayed = angular.copy(
+              stateInteractionIdService.savedMemento);
+            stateCustomizationArgsService.displayed = {};
+            // Ensure that stateCustomizationArgsService.displayed is fully
+            // populated.
+            for (var i = 0; i < $scope.customizationArgSpecs.length; i++) {
+              var argName = $scope.customizationArgSpecs[i].name;
+              stateCustomizationArgsService.displayed[argName] = {
                 value: (
-                  stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
-                  angular.copy(stateCustomizationArgsService.displayed[caName].value) :
-                  angular.copy(interactionSpec.customization_arg_specs[i].default_value)
+                  stateCustomizationArgsService.savedMemento.hasOwnProperty(caName) ?
+                  angular.copy(stateCustomizationArgsService.savedMemento[caName].value) :
+                  angular.copy($scope.customizationArgSpecs[i].default_value)
                 )
-              });
+              };
             }
 
             $scope.$broadcast('schemaBasedFormsShown');
-            $scope.customizationArgSpecs = interactionSpec.customization_arg_specs;
             $scope.form = {};
           }
 
           $scope.onChangeInteractionId = function(newInteractionId) {
-            $scope.selectedInteractionId = newInteractionId;
-
             var interactionSpec = INTERACTION_SPECS[newInteractionId];
             $scope.customizationArgSpecs = interactionSpec.customization_arg_specs;
-            $scope.tmpCustomizationArgs = [];
 
+            stateInteractionIdService.displayed = newInteractionId;
+            stateCustomizationArgsService.displayed = {};
             if (interactionDetailsCache.contains(newInteractionId)) {
-              var _customizationArgs = interactionDetailsCache.get(newInteractionId).customization;
-              for (var i = 0; i < $scope.customizationArgSpecs.length; i++) {
-                var argName = $scope.customizationArgSpecs[i].name;
-                $scope.tmpCustomizationArgs.push({
-                  name: argName,
-                  value: angular.copy(_customizationArgs[argName].value)
-                });
-              }
+              stateCustomizationArgsService.displayed = interactionDetailsCache.get(
+                newInteractionId).customization;
             } else {
               for (var i = 0; i < $scope.customizationArgSpecs.length; i++) {
-                $scope.tmpCustomizationArgs.push({
-                  name: $scope.customizationArgSpecs[i].name,
+                var argName = $scope.customizationArgSpecs[i].name;
+                stateCustomizationArgsService.displayed[argName] = {
                   value: angular.copy($scope.customizationArgSpecs[i].default_value)
-                });
+                };
               }
             }
 
@@ -191,38 +179,29 @@ oppia.controller('StateInteraction', [
 
           $scope.returnToInteractionSelector = function() {
             interactionDetailsCache.set(
-              $scope.selectedInteractionId,
-              _getStateCustomizationArgsFromInteractionCustomizationArgs(
-                $scope.tmpCustomizationArgs));
+              stateInteractionIdService.displayed,
+              stateCustomizationArgsService.displayed);
 
-            $scope.selectedInteractionId = null;
-            $scope.tmpCustomizationArgs = [];
+            stateInteractionIdService.displayed = null;
+            stateCustomizationArgsService.displayed = {};
           };
 
           $scope.save = function() {
-            $modalInstance.close({
-              selectedInteractionId: $scope.selectedInteractionId,
-              tmpCustomizationArgs: $scope.tmpCustomizationArgs
-            });
+            $modalInstance.close();
           };
 
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
           };
         }]
-      }).result.then(function(result) {
-        var selectedInteractionId = result.selectedInteractionId;
-        var tmpCustomizationArgs = result.tmpCustomizationArgs;
-
+      }).result.then(function() {
         var hasInteractionIdChanged = (
-          selectedInteractionId !== stateInteractionIdService.savedMemento);
+          stateInteractionIdService.displayed !==
+          stateInteractionIdService.savedMemento);
         if (hasInteractionIdChanged) {
-          stateInteractionIdService.displayed = selectedInteractionId;
           stateInteractionIdService.saveDisplayedValue();
         }
 
-        stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
-          tmpCustomizationArgs);
         stateCustomizationArgsService.saveDisplayedValue();
 
         interactionDetailsCache.set(
