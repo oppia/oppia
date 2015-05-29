@@ -486,7 +486,8 @@ class InteractionInstance(object):
             interaction_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
              for h in interaction_dict['handlers']],
-            interaction_dict['triggers'])
+            interaction_dict['triggers'] if (
+                'triggers' in interaction_dict) else [])
 
     def __init__(
             self, interaction_id, customization_args, handlers, triggers):

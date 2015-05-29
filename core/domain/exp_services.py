@@ -62,7 +62,6 @@ def _migrate_states_schema(exploration_dict):
     """
     exploration_states_schema_version = exploration_dict[
         'states_schema_version']
-    initial_version = exploration_states_schema_version
     if (exploration_states_schema_version is None
             or exploration_states_schema_version < 1):
         exploration_states_schema_version = 0
