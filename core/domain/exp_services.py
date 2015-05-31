@@ -1082,8 +1082,8 @@ def _get_search_rank(exp_id):
                 summary.ratings[rating_value] *
                 RATING_WEIGHTINGS[rating_value])
 
-    _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
-    time_delta_days = int((exploration.last_updated - _BEGINNING_OF_TIME).days)
+    _TIME_NOW = datetime.datetime.utcnow()
+    time_delta_days = int((_TIME_NOW - exploration.last_updated).days)
     if time_delta_days == 0:
         rank += 80
     elif time_delta_days == 1:
