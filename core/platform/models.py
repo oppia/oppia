@@ -64,8 +64,7 @@ class _Gae(_Platform):
                 from core.storage.feedback import gae_models as feedback_model
                 returned_models.append(feedback_model)
             elif name == NAMES.recommendations:
-                from core.storage.recommendations \
-                    import gae_models as recommendations_model
+                from core.storage.recommendations import gae_models as recommendations_model
                 returned_models.append(recommendations_model)
             else:
                 raise Exception('Invalid model name: %s' % name)

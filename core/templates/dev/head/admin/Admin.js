@@ -22,6 +22,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
   $scope.adminJobOutputUrl = '/adminjoboutput';
+  $scope.adminTopicsHandlerUrl = '/admintopicshandler'
   $scope.configProperties = {};
 
   $scope.showJobOutput = false;
@@ -41,7 +42,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.reloadConfigProperties = function() {
-    $http.get($scope.adminHandlerUrl + '?action=config').success(function(data) {
+    $http.get($scope.adminHandlerUrl).success(function(data) {
       $scope.configProperties = data.config_properties;
       $scope.computedProperties = data.computed_properties;
     });
@@ -232,6 +233,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.downloadTopicSimilaritiesFile = function() {
-    window.open($scope.adminHandlerUrl + '?action=topic');
+    window.open($scope.adminTopicsHandlerUrl);
   };
 }]);

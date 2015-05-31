@@ -75,7 +75,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        response_dict = self.get_json('/adminhandler?action=config')
+        response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
             'value': editor.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
@@ -89,7 +89,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         }
         self.post_json('/adminhandler', payload, csrf_token)
 
-        response_dict = self.get_json('/adminhandler?action=config')
+        response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
             'value': TEST_STRING
