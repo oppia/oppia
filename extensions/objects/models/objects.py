@@ -630,7 +630,7 @@ class ClickOnImage(BaseObject):
 class SetOfHtmlString(BaseObject):
     """A Set of Html Strings"""
 
-    description = "A list of strings that allow for repetition."
+    description = "A list of Html strings."
 
     SCHEMA = {
         'type': 'list',

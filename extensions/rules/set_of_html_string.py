@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for checking if elements are in the key"""
+"""Rules for SetOfHtmlString objects."""
 
 __author__ = 'Kevin Lee'
 
