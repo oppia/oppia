@@ -22,7 +22,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
   $scope.adminJobOutputUrl = '/adminjoboutput';
-  $scope.adminTopicsHandlerUrl = '/admintopicshandler'
+  $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
   $scope.configProperties = {};
 
   $scope.showJobOutput = false;
@@ -233,6 +233,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.downloadTopicSimilaritiesFile = function() {
-    window.open($scope.adminTopicsHandlerUrl);
+    window.location.href = $scope.adminTopicsCsvDownloadHandlerUrl;
   };
 }]);

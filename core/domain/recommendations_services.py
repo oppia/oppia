@@ -37,9 +37,9 @@ def get_topic_similarities_dict():
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
-            recommendations_models.TOPIC_SIMILARITIES_KEY, strict=False))
+            recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
     if topic_similarities_entity is None:
-        topic_similarities_entity = create_default_topic_similarities()
+        topic_similarities_entity = _create_default_topic_similarities()
 
     return json.loads(topic_similarities_entity.content)
 
@@ -50,11 +50,11 @@ def save_topic_similarities(topic_similarities):
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
-            recommendations_models.TOPIC_SIMILARITIES_KEY, strict=False))
+            recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
     if topic_similarities_entity is None:
         topic_similarities_entity = (
             recommendations_models.TopicSimilaritiesModel(
-                id=recommendations_models.TOPIC_SIMILARITIES_KEY,
+                id=recommendations_models.TOPIC_SIMILARITIES_ID,
                 content=json.dumps(topic_similarities)))
     else:
         topic_similarities_entity.content = json.dumps(topic_similarities)
@@ -63,7 +63,7 @@ def save_topic_similarities(topic_similarities):
     return topic_similarities_entity
 
 
-def create_default_topic_similarities():
+def _create_default_topic_similarities():
     """Creates the default topic similarities, and stores them in the datastore.
     The keys are names of the default categories, and values are
     DEFAULT_TOPIC_SIMILARITY if the keys are different and
@@ -85,13 +85,11 @@ def create_default_topic_similarities():
 
 
 def get_topic_similarity(topic_1, topic_2):
-    """Gets the similarity between two topics.
+    """Gets the similarity between two topics, as a float between 0 and 1.
 
     It checks whether the two topics are in the list of default topics. If
     not, it returns the default similarity if the topics are different or 1 if
-    the topics are the same. If both topics are in the list of default topics
-    and the similarity does not exist, a new item is created with a similarity
-    of the default similarity"""
+    the topics are the same."""
 
     if (topic_1 in feconf.DEFAULT_CATEGORIES and
             topic_2 in feconf.DEFAULT_CATEGORIES):
@@ -104,7 +102,7 @@ def get_topic_similarity(topic_1, topic_2):
             return feconf.DEFAULT_TOPIC_SIMILARITY
 
 
-def download_topic_similarities():
+def get_topic_similarities_as_csv():
     """Downloads all similarities corresponding to the current topics as a
     string which contains the contents of a csv file.
 
@@ -197,34 +195,37 @@ def get_item_similarity(reference_exp_id, compared_exp_id):
     returns 0.0 if compared_exp is private."""
 
     try:
-        reference_exp = exp_services.get_exploration_summary_by_id(
+        reference_exp_summary = exp_services.get_exploration_summary_by_id(
             reference_exp_id)
     except:
         raise Exception('Invalid reference_exp_id %s' % reference_exp_id)
 
     try:
-        compared_exp = exp_services.get_exploration_summary_by_id(
+        compared_exp_summary = exp_services.get_exploration_summary_by_id(
             compared_exp_id)
     except:
         raise Exception('Invalid compared_exp_id %s' % compared_exp_id)
 
     similarity_score = 0
 
-    if compared_exp.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if (compared_exp_summary.status ==
+            rights_manager.EXPLORATION_STATUS_PRIVATE):
         return 0
-    elif compared_exp.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+    elif (compared_exp_summary.status ==
+            rights_manager.EXPLORATION_STATUS_PUBLICIZED):
         similarity_score += 1
 
     similarity_score += get_topic_similarity(
-        reference_exp.category, compared_exp.category) * 5
-    if reference_exp.owner_ids == compared_exp.owner_ids:
+        reference_exp_summary.category, compared_exp_summary.category) * 5
+    if reference_exp_summary.owner_ids == compared_exp_summary.owner_ids:
         similarity_score += 1
-    if reference_exp.language_code == compared_exp.language_code:
+    if (reference_exp_summary.language_code ==
+            compared_exp_summary.language_code):
         similarity_score += 2
 
     time_now = datetime.datetime.utcnow()
     time_delta_days = int(
-        (compared_exp.exploration_model_last_updated - time_now).days)
+        (time_now - compared_exp_summary.exploration_model_last_updated).days)
     if time_delta_days <= 7:
         similarity_score += 1
 

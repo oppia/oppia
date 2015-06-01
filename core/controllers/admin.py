@@ -154,7 +154,7 @@ class AdminHandler(base.BaseHandler):
                 config_domain.Registry.get_config_property_schemas()),
             'computed_properties': (
                 config_domain.Registry.get_computed_property_names()),
-            })
+        })
 
     @require_super_admin
     def post(self):
@@ -235,8 +235,8 @@ class AdminJobOutput(base.BaseHandler):
         })
 
 
-class AdminTopicsHandler(base.BaseHandler):
-    """Retrives topic similarity data for download."""
+class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+    """Retrieves topic similarity data for download."""
 
     @require_super_admin
     def get(self):
@@ -244,4 +244,4 @@ class AdminTopicsHandler(base.BaseHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=topic_similarities.csv')
         self.response.write(
-            recommendations_services.download_topic_similarities())
+            recommendations_services.get_topic_similarities_as_csv())

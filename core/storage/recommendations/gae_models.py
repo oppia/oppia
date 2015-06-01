@@ -24,7 +24,7 @@ from core.platform import models
 from google.appengine.ext import ndb
 
 
-TOPIC_SIMILARITIES_KEY = 'topics'
+TOPIC_SIMILARITIES_ID = 'topics'
 
 
 class ExplorationRecommendationModel(base_models.BaseModel):
@@ -44,7 +44,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     be symmetric. A similarity value is a real number between 0.0 and 1.0.
 
     There should only be one instance of this class, and it is keyed by
-    TOPIC_SIMILARITIES_KEY.
+    TOPIC_SIMILARITIES_ID.
 
     Currently, topics are the same as the default categories. However, this may
     change in the future."""

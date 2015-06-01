@@ -168,8 +168,9 @@ urls = [
     get_redirect_route(
         r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output'),
     get_redirect_route(
-        r'/admintopicshandler',
-        admin.AdminTopicsHandler, 'admin_topics_handler'),
+        r'/admintopicscsvdownloadhandler',
+        admin.AdminTopicsCsvDownloadHandler,
+        'admin_topics_csv_download_handler'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',

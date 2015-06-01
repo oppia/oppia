@@ -171,11 +171,11 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
         self.assertEqual(recommendations_services.get_topic_similarity(
             'Art', 'Biology'), 0.2)
 
-    def test_download_topic_similarities(self):
+    def test_get_topic_similarities_as_csv(self):
         # The splitlines() is needed because a carriage return is added in
         # the returned string
         self.assertEqual(
-            recommendations_services.download_topic_similarities().splitlines(),
+            recommendations_services.get_topic_similarities_as_csv().splitlines(),
             self.TOPIC_SIMILARITIES_DEFAULT.splitlines())
 
         recommendations_services.update_topic_similarities(
@@ -184,7 +184,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
         self.assertEqual(
-            recommendations_services.download_topic_similarities().splitlines(),
+            recommendations_services.get_topic_similarities_as_csv().splitlines(),
             self.TOPIC_SIMILARITIES_UPDATED.splitlines())
 
 
