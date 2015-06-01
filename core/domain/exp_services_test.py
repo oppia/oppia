@@ -2205,7 +2205,7 @@ tags: []
         """
         # This fake validation function for explorations is used to ignore
         # validating the exploration during saving.
-        def fake_validate(strict=False, allow_null_interaction=False):
+        def fake_validate(strict=False):
             pass
 
         _EXP_ID = 'exp_id2'
@@ -2317,7 +2317,7 @@ tags: []
         # Version 5 is a reversion to version 1.
         exp_services.revert_exploration('committer_id_v4', _EXP_ID, 4, 1)
 
-        # The exploration model itself should still be the old version
+        # The exploration model itself should now be the old version
         # (pre-migration).
         exploration_model = exp_models.ExplorationModel.get(
             _EXP_ID, strict=True, version=None)

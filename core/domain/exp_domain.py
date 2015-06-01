@@ -804,12 +804,11 @@ class State(object):
         for param_change in self.param_changes:
             param_change.validate()
 
-        if not allow_null_interaction:
-            if self.interaction.id is None:
-                raise utils.ValidationError(
-                    'This state does not have any interaction specified.')
-            else:
-                self.interaction.validate()
+        if not allow_null_interaction and self.interaction.id is None:
+            raise utils.ValidationError(
+                'This state does not have any interaction specified.')
+        elif not (self.interaction.id is None):
+            self.interaction.validate()
 
     def update_content(self, content_list):
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -1128,7 +1127,7 @@ class Exploration(object):
     def _require_valid_state_name(cls, name):
         cls._require_valid_name(name, 'a state name')
 
-    def validate(self, strict=False, allow_null_interaction=False):
+    def validate(self, strict=False):
         """Validates the exploration before it is committed to storage.
 
         If strict is True, performs advanced validation.
@@ -1216,7 +1215,7 @@ class Exploration(object):
         for state_name in self.states:
             self._require_valid_state_name(state_name)
             self.states[state_name].validate(
-                allow_null_interaction=allow_null_interaction)
+                allow_null_interaction=not strict)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1549,16 +1548,14 @@ class Exploration(object):
         del self.states[state_name]
 
     @classmethod
-    def convert_states_v0_dict_to_v1_dict(cls, exploration_dict):
+    def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
         """Converts old states schema to the modern v1 schema. v1 contains the
         schema version 1 and does not contain any old constructs, such as
         widgets. This is a complete migration of everything previous to the
         schema versioning update to the earliest versioned schema.
         """
-        exploration_dict['states_schema_version'] = 1
-
         # ensure widgets are renamed to be interactions
-        for _, state_defn in exploration_dict['states'].iteritems():
+        for _, state_defn in states_dict.iteritems():
             if 'widget' not in state_defn:
                 continue
             state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
@@ -1568,10 +1565,10 @@ class Exploration(object):
             if 'sticky' in state_defn['interaction']:
                 del state_defn['interaction']['sticky']
             del state_defn['widget']
-        return exploration_dict
+        return states_dict
 
     @classmethod
-    def convert_states_v1_dict_to_v2_dict(cls, exploration_dict):
+    def _convert_states_v1_dict_to_v2_dict(cls, states_dict):
         """Converts from version 1 to 2. Version 1 assumes the existence of an
         implicit 'END' state, but version 2 does not. As a result, the
         conversion process involves introducing a proper ending state for all
@@ -1580,7 +1577,6 @@ class Exploration(object):
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
         _OLD_END_DEST = 'END'
-        exploration_dict['states_schema_version'] = 2
 
         # Adds an explicit state called 'END' with an EndExploration to replace
         # links other states have to an implicit 'END' state. Otherwise, if no
@@ -1593,7 +1589,7 @@ class Exploration(object):
         # reached from other states, etc.)
         targets_end_state = False
         has_end_state = False
-        for (state_name, sdict) in exploration_dict['states'].iteritems():
+        for (state_name, sdict) in states_dict.iteritems():
             if not has_end_state and state_name == _OLD_END_DEST:
                 has_end_state = True
 
@@ -1607,7 +1603,7 @@ class Exploration(object):
         # Ensure any explorations pointing to an END state has a valid END
         # state to end with (in case it expects an END state)
         if targets_end_state and not has_end_state:
-            exploration_dict['states'][_OLD_END_DEST] = {
+            states_dict[_OLD_END_DEST] = {
                 'content': [{
                     'type': 'text',
                     'value': 'Congratulations, you have finished!'
@@ -1635,21 +1631,51 @@ class Exploration(object):
                 'param_changes': []
             }
 
-        return exploration_dict
+        return states_dict
 
     @classmethod
-    def convert_states_v2_dict_to_v3_dict(cls, exploration_dict):
+    def _convert_states_v2_dict_to_v3_dict(cls, states_dict):
         """Converts from version 2 to 3. Version 3 introduces a triggers list
         within interactions.
         """
-        exploration_dict['states_schema_version'] = 3
         # Ensure all states interactions have a triggers list.
-        for (state_name, sdict) in exploration_dict['states'].iteritems():
+        for (state_name, sdict) in states_dict.iteritems():
             interaction = sdict['interaction']
             if 'triggers' not in interaction:
                 interaction['triggers'] = []
 
-        return exploration_dict
+        return states_dict
+
+    @classmethod
+    def update_states_v0_to_v1_from_model(cls, exploration_model_dict):
+        """Converts from states schema version 0 to 1 of the states blob
+        contained in the exploration model exploration_model provided.
+        """
+        exploration_model_dict['states_schema_version'] = 1
+        converted_states = cls._convert_states_v0_dict_to_v1_dict(
+            exploration_model_dict['states'])
+        exploration_model_dict['states'] = converted_states
+
+    @classmethod
+    def update_states_v1_to_v2_from_model(cls, exploration_model_dict):
+        """Converts from states schema version 1 to 2 of the states blob
+        contained in the exploration model exploration_model provided.
+        """
+        exploration_model_dict['states_schema_version'] = 2
+        converted_states = cls._convert_states_v1_dict_to_v2_dict(
+            exploration_model_dict['states'])
+        exploration_model_dict['states'] = converted_states
+
+    @classmethod
+    def update_states_v2_to_v3_from_model(cls, exploration_model_dict):
+        """Converts from states schema version 2 to 3 of the states blob
+        contained in the exploration model exploration_model provided.
+        """
+        exploration_model_dict['states_schema_version'] = 3
+        converted_states = cls._convert_states_v2_dict_to_v3_dict(
+            exploration_model_dict['states'])
+        exploration_model_dict['states'] = converted_states
+
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
@@ -1718,16 +1744,16 @@ class Exploration(object):
         """Converts a v5 exploration dict into a v6 exploration dict."""
         exploration_dict['schema_version'] = 6
 
-        # Ensure the exploration has a states schema version
-        exploration_dict['states_schema_version'] = 0
-
         # Ensure this exploration is up-to-date with states schema v2
-        exploration_dict = cls.convert_states_v0_dict_to_v1_dict(
-            exploration_dict)
-        exploration_dict = cls.convert_states_v1_dict_to_v2_dict(
-            exploration_dict)
-        exploration_dict = cls.convert_states_v2_dict_to_v3_dict(
-            exploration_dict)
+        exploration_dict['states'] = cls._convert_states_v0_dict_to_v1_dict(
+            exploration_dict['states'])
+        exploration_dict['states'] = cls._convert_states_v1_dict_to_v2_dict(
+            exploration_dict['states'])
+        exploration_dict['states'] = cls._convert_states_v2_dict_to_v3_dict(
+            exploration_dict['states'])
+
+        # Ensure the exploration is at states schema version 3 after upgrades
+        exploration_dict['states_schema_version'] = 3
 
         return exploration_dict
 
@@ -1778,6 +1804,7 @@ class Exploration(object):
         exploration_dict['id'] = exploration_id
         exploration_dict['title'] = title
         exploration_dict['category'] = category
+        exploration_dict['states_schema_version']=0
 
         return Exploration.create_exploration_from_dict(exploration_dict)
 

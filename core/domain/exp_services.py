@@ -49,7 +49,7 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
-def _migrate_states_schema(exploration_dict):
+def _migrate_states_schema(exploration_model_dict):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -60,7 +60,7 @@ def _migrate_states_schema(exploration_dict):
     function must be added and some code appended to this function to account
     for that new version.
     """
-    exploration_states_schema_version = exploration_dict[
+    exploration_states_schema_version = exploration_model_dict[
         'states_schema_version']
     if (exploration_states_schema_version is None
             or exploration_states_schema_version < 1):
@@ -75,25 +75,21 @@ def _migrate_states_schema(exploration_dict):
 
     # Check for conversion to v1.
     if exploration_states_schema_version == 0:
-        exploration_dict = (
-            exp_domain.Exploration.convert_states_v0_dict_to_v1_dict(
-                exploration_dict))
+        exp_domain.Exploration.update_states_v0_to_v1_from_model(
+            exploration_model_dict)
         exploration_states_schema_version = 1
 
     # Check for conversion to v2.
     if exploration_states_schema_version == 1:
-        exploration_dict = (
-            exp_domain.Exploration.convert_states_v1_dict_to_v2_dict(
-                exploration_dict))
+        exp_domain.Exploration.update_states_v1_to_v2_from_model(
+            exploration_model_dict)
         exploration_states_schema_version = 2
 
     # Check for conversion to v3.
     if exploration_states_schema_version == 2:
-        exploration_dict = (
-            exp_domain.Exploration.convert_states_v2_dict_to_v3_dict(
-                exploration_dict))
+        exp_domain.Exploration.update_states_v2_to_v3_from_model(
+            exploration_model_dict)
         exploration_states_schema_version = 3
-    return exploration_dict
 
 
 # Repository GET methods.
@@ -118,42 +114,30 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     False. This option is only used for testing that the states schema version
     migration works correctly, and it should never be changed otherwise.
     """
-    exploration = exp_domain.Exploration(
+
+    # Ensure the original exploration model does not get altered.
+    temp_exploration_model = {
+        'states_schema_version': exploration_model.states_schema_version,
+        'states': copy.deepcopy(exploration_model.states)
+    }
+
+    # If the exploration uses the latest states schema version, no conversion
+    # is necessary.
+    if (run_conversion and temp_exploration_model['states_schema_version'] !=
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+        _migrate_states_schema(temp_exploration_model)
+
+    return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
         exploration_model.default_skin, exploration_model.skin_customizations,
-        exploration_model.states_schema_version,
-        exploration_model.init_state_name, exploration_model.states,
+        temp_exploration_model['states_schema_version'],
+        exploration_model.init_state_name, temp_exploration_model['states'],
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.created_on,
         exploration_model.last_updated)
-
-    # If the exploration uses the latest states schema version, no conversion
-    # is necessary.
-    if (not run_conversion or exploration.states_schema_version ==
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
-        return exploration
-
-    # Migrating an exploration involves converting it to a dict, updating the
-    # dict sequentially, then converting the dict back to an exploration for
-    # use in the Oppia backend.
-    exploration_dict = _migrate_states_schema(exploration.to_dict())
-
-    # Convert the exp dict back into an Exploration.
-    exploration_dict['id'] = exploration_model.id
-    exploration_dict['title'] = exploration_model.title
-    exploration_dict['category'] = exploration_model.category
-
-    # The exploration_version number is left unchanged, since this occurs
-    # within the context of a 'get' action.
-    exploration = exp_domain.Exploration.create_exploration_from_dict(
-        exploration_dict,
-        exploration_version=exploration_model.version,
-        exploration_created_on=exploration_model.created_on,
-        exploration_last_updated=exploration_model.last_updated)
-    return exploration
 
 
 def get_exploration_summary_from_model(exp_summary_model):
@@ -723,7 +707,7 @@ def _create_exploration(
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
-    exploration.validate(allow_null_interaction=True)
+    exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
     model = exp_models.ExplorationModel(
         id=exploration.id,

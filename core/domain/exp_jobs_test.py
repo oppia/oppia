@@ -283,13 +283,16 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
 class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+
     def setUp(self):
         super(ExplorationMigrationJobTest, self).setUp()
 
         # Create a new, default exploration that should not be affected by the
         # job.
         exploration = exp_domain.Exploration.create_default_exploration(
-            'unaffected0', 'title', 'category')
+            self.VALID_EXP_ID, 'title', 'category')
         exploration.states[exploration.init_state_name].update_interaction_id(
             'EndExploration')
         exp_services.save_new_exploration('owner_id', exploration)
@@ -297,6 +300,16 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
             exploration.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
         self._before_converted_yaml = exploration.to_yaml()
+
+        # Save new default exploration as though a new one were created. Force
+        # the current states schema version to 0 during the creation so that it
+        # is migrated with the other exploration. This will cause a failrue if
+        # non-strict validation fails on the presence of a null interaction.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, 'title', 'category')
+        exploration.states_schema_version = 0
+        exp_services.save_new_exploration('owner_id', exploration)
+
         self.process_and_flush_pending_tasks()
 
     def test_standard_operations(self):
@@ -308,9 +321,15 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the exploration is exactly the same after migration.
-        updated_exp = exp_services.get_exploration_by_id('unaffected0')
+        updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
         after_converted_yaml = updated_exp.to_yaml()
         self.assertEqual(after_converted_yaml, self._before_converted_yaml)
+
+        # Verify the new exploration has been migrated by the job.
+        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)

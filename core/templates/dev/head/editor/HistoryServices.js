@@ -222,6 +222,8 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           if (stateData[stateIds[change.state_name]].stateProperty == STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[change.state_name]].stateProperty = STATE_PROPERTY_CHANGED;
           }
+        } else if (change.cmd == 'migrate_states_schema_to_latest_version') {
+          // Nothing to display to the user for a migration change.
         } else if (change.cmd != 'AUTO_revert_version_number' && change.cmd != 'edit_exploration_property') {
           throw new Error('Invalid change command: ' + change.cmd);
         }
