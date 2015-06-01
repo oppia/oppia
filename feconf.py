@@ -92,6 +92,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 # Static file url to path mapping
 PATH_MAP = {
     '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
+    '/extensions/gadgets': GADGETS_DIR,
     '/extensions/interactions': INTERACTIONS_DIR,
     '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
     '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
@@ -243,6 +244,12 @@ DEMO_EXPLORATIONS = [
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
+    # TODO(anuzis): Replace about_oppia.yaml with this dev version when gadget
+    # visibility by state is functional. Currently an AdviceBar gadget that
+    # should only display on the Helsinki map state is visible during the
+    # entire exploration as a dev demo.
+    ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
+     'Welcome'),
 ]
 
 # TODO(sll): Add all other URLs here.

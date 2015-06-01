@@ -173,6 +173,7 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
 }]);
 
 
+// TODO(sll): This whole directive needs to be rewritten to not rely on jWysiwyg.
 oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData', function($modal, $log, warningsData) {
   return {
     restrict: 'E',
@@ -188,8 +189,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       '  </span>' +
       '</div>'),
     controller: [
-        '$scope', '$element', '$attrs', '$filter', '$timeout',
-        function($scope, $element, $attrs, $filter, $timeout) {
+        '$scope', '$element', '$filter', '$timeout',
+        function($scope, $element, $filter, $timeout) {
       if (!$scope.allowedParameterNames().length) {
         console.error(
           'The unicode-with-parameters editor should not be used if there ' +
@@ -490,293 +491,306 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
 }]);
 
 
+// Add RTE extensions to textAngular toolbar options.
+oppia.config(['$provide', function($provide) {
+  $provide.decorator('taOptions', [
+      '$delegate', '$modal', '$filter', '$timeout',
+      'taRegisterTool', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+      function(
+        taOptions, $modal, $filter, $timeout,
+        taRegisterTool, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
 
-// Directive for the rich text editor component.
-oppia.directive('richTextEditor', [
-  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
-  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
-    return {
-      restrict: 'E',
-      scope: {
-        htmlContent: '=',
-        disallowOppiaRteComponents: '@',
-        // Optional string; allowed values are 'small' or 'large'.
-        size: '@'
-      },
-      template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.disallowOppiaRteComponents = (
-          $scope.disallowOppiaRteComponents || false);
+    taOptions.disableSanitizer = true;
+    taOptions.classes.textEditor = 'form-control oppia-rte-content';
+    taOptions.toolbar = [
+      ['bold', 'italics', 'underline'],
+      ['ol', 'ul'],
+      []
+    ];
+    taOptions.setup.textEditorSetup = function($element) {
+      $timeout(function() {
+        $element.trigger('focus');
+      });
+    };
 
-        var rteNode = $element[0].firstChild;
-        // A pointer to the editorDoc in the RTE iframe. Populated when the RTE is
-        // initialized.
-        $scope.editorDoc = null;
+    var _RICH_TEXT_COMPONENTS = [];
 
-        // Creates a dict.
-        $scope._createCustomizationArgDictFromAttrs = function(attrs) {
-          var customizationArgsDict = {};
-          for (var i = 0; i < attrs.length; i++) {
-            var attr = attrs[i];
-            if (attr.name == 'class' || attr.name == 'src') {
-              continue;
-            }
-            var separatorLocation = attr.name.indexOf('-with-value');
-            if (separatorLocation === -1) {
-              $log.error('RTE Error: invalid customization attribute ' + attr.name);
-              continue;
-            }
-            var argName = attr.name.substring(0, separatorLocation);
-            customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
+    // Returns a DOM node.
+    var createRteElement = function(componentDefn, customizationArgsDict) {
+      var el = $('<img/>');
+      el.attr('src', componentDefn.iconDataUrl);
+      el.addClass('oppia-noninteractive-' + componentDefn.name);
+
+      for (var attrName in customizationArgsDict) {
+        el.attr(
+          $filter('camelCaseToHyphens')(attrName) + '-with-value',
+          oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+      }
+
+      return el.get(0);
+    };
+
+    var createCustomizationArgDictFromAttrs = function(attrs) {
+      var customizationArgsDict = {};
+      for (var i = 0; i < attrs.length; i++) {
+        var attr = attrs[i];
+        if (attr.name == 'class' || attr.name == 'src') {
+          continue;
+        }
+        var separatorLocation = attr.name.indexOf('-with-value');
+        if (separatorLocation === -1) {
+          $log.error('RTE Error: invalid customization attribute ' + attr.name);
+          continue;
+        }
+        var argName = attr.name.substring(0, separatorLocation);
+        customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
+      }
+      return customizationArgsDict;
+    };
+
+    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
+      RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
+      RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
+      RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+      _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+    });
+
+    //refocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
+    //back to where it was before the modal was opened
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, onDismissCallback, refocusFn) {
+      var modalDialog = $modal.open({
+        templateUrl: 'modals/customizeRteComponent',
+        backdrop: 'static',
+        resolve: {},
+        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.customizationArgSpecs = customizationArgSpecs;
+
+          $scope.tmpCustomizationArgs = [];
+          for (var i = 0; i < customizationArgSpecs.length; i++) {
+            var caName = customizationArgSpecs[i].name;
+            $scope.tmpCustomizationArgs.push({
+              name: caName,
+              value: (
+                attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                attrsCustomizationArgsDict[caName] :
+                customizationArgSpecs[i].default_value)
+            });
           }
-          return customizationArgsDict;
-        };
 
-        $scope._createRteElement = function(componentDefn, customizationArgsDict) {
-          var el = $('<img/>');
-          el.attr('src', componentDefn.iconDataUrl);
-          el.addClass('oppia-noninteractive-' + componentDefn.name);
-
-          for (var attrName in customizationArgsDict) {
-            el.attr(
-              $filter('camelCaseToHyphens')(attrName) + '-with-value',
-              oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
-          }
-
-          var domNode = el.get(0);
-          // This dblclick handler is stripped in the initial HTML --> RTE conversion,
-          // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
-          domNode.ondblclick = function() {
-            el.addClass('insertionPoint');
-            $scope.openRteCustomizationModal(componentDefn, customizationArgsDict);
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
           };
 
-          return domNode;
-        };
+          $scope.save = function(customizationArgs) {
+            $scope.$broadcast('externalSave');
 
-        // Replace <oppia-noninteractive> tags with <img> tags.
-        $scope._convertHtmlToRte = function(html) {
-          var elt = $('<div>' + html + '</div>');
+            var customizationArgsDict = {};
+            for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+              var caName = $scope.tmpCustomizationArgs[i].name;
+              customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
+            }
 
-          $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-            elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-              return $scope._createRteElement(
-                componentDefn, $scope._createCustomizationArgDictFromAttrs(this.attributes));
-            });
-          });
+            $modalInstance.close(customizationArgsDict);
+          }
+        }]
+      });
 
-          return elt.html();
-        };
+      modalDialog.result.then(onSubmitCallback, onDismissCallback);
+      // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+      // the minification process throws an error.
+      modalDialog.result['finally'](refocusFn);
+    }
 
-        // Replace <img> tags with <oppia-noninteractive> tags.
-        $scope._convertRteToHtml = function(rte) {
-          var elt = $('<div>' + rte + '</div>');
+    _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+      var buttonDisplay = createRteElement(componentDefn, {});
 
-          $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-            elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-              var jQueryElt = $('<' + this.className + '/>');
-              for (var i = 0; i < this.attributes.length; i++) {
-                var attr = this.attributes[i];
-                if (attr.name !== 'class' && attr.name !== 'src') {
-                  jQueryElt.attr(attr.name, attr.value);
-                }
-              }
-              return jQueryElt.get(0);
-            });
-          });
+      taRegisterTool(componentDefn.name, {
+        display: buttonDisplay.outerHTML,
+        tooltiptext: componentDefn.name.charAt(0).toUpperCase() + componentDefn.name.slice(1),
+        onElementSelect: {
+          element: 'img',
+          filter: function(elt) {
+            return elt.hasClass('oppia-noninteractive-' + componentDefn.frontend_name);
+          },
+          action: function(event, $element, editorScope) {
+            event.preventDefault();
+            var textAngular = this;
+            var savedSelection = rangy.saveSelection();
 
-          return elt.html();
-        };
-
-        $scope.openRteCustomizationModal = function(componentDefn, attrsCustomizationArgsDict) {
-          $modal.open({
-            templateUrl: 'modals/customizeRteComponent',
-            backdrop: true,
-            resolve: {
-              customizationArgSpecs: function() {
-                return componentDefn.customization_arg_specs;
+            _openCustomizationModal(
+              componentDefn.customization_arg_specs,
+              createCustomizationArgDictFromAttrs($element[0].attributes),
+              function(customizationArgsDict) {
+                var el = createRteElement(componentDefn, customizationArgsDict);
+                $element[0].parentNode.replaceChild(el, $element[0]);
+                textAngular.$editor().updateTaBindtaTextElement();
               },
-              attrsCustomizationArgsDict: function() {
-                return attrsCustomizationArgsDict;
+              function() {},
+              function() {
+                textAngular.$editor().displayElements.text[0].focus();
+                rangy.restoreSelection(savedSelection);
+              });
+
+            return false;
+          }
+        },
+        action: function() {
+          var textAngular = this;
+          var savedSelection = rangy.saveSelection();
+          textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>');
+
+          _openCustomizationModal(
+            componentDefn.customization_arg_specs,
+            {},
+            function(customizationArgsDict) {
+              var el = createRteElement(componentDefn, customizationArgsDict);
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              var parent = insertionPoint.parentNode;
+              parent.replaceChild(el, insertionPoint);
+              textAngular.$editor().updateTaBindtaTextElement();
+            },
+            function() {
+              // Clean up the insertion point if no widget was inserted.
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              if (insertionPoint !== null) {
+                insertionPoint.remove();
               }
             },
-            controller: [
-              '$scope', '$modalInstance', 'customizationArgSpecs', 'attrsCustomizationArgsDict',
-              function($scope, $modalInstance, customizationArgSpecs, attrsCustomizationArgsDict) {
-                $scope.customizationArgSpecs = customizationArgSpecs;
+            function() {
+              textAngular.$editor().displayElements.text[0].focus();
+              rangy.restoreSelection(savedSelection);
+            });
+        }
+      });
 
-                $scope.tmpCustomizationArgs = [];
-                for (var i = 0; i < customizationArgSpecs.length; i++) {
-                  var caName = customizationArgSpecs[i].name;
-                  $scope.tmpCustomizationArgs.push({
-                    name: caName,
-                    value: (
-                      attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                      attrsCustomizationArgsDict[caName] :
-                      customizationArgSpecs[i].default_value)
-                  });
-                }
+      taOptions.toolbar[2].push(componentDefn.name);
+    });
 
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
+    return taOptions;
+  }]);
+}]);
 
-                $scope.save = function(customizationArgs) {
-                  $scope.$broadcast('externalSave');
+oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+  function($filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
+  return {
+    restrict: 'E',
+    scope: {
+      htmlContent: '=',
+      uiConfig: '&'
+    },
+    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
+    controller: ['$scope', '$log', function($scope, $log) {
+      // adapted from http://stackoverflow.com/a/6899999
+      $scope.stripFormatting = function(html) {
+        var tmpNode = document.createElement('div');
+        tmpNode.innerHTML = html;
+        return tmpNode.innerText;
+      };
 
-                  var customizationArgsDict = {};
-                  for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                    var caName = $scope.tmpCustomizationArgs[i].name;
-                    customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
-                  }
+      $scope._RICH_TEXT_COMPONENTS = [];
+      Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
+        RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
+        RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
+        RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+        RTE_COMPONENT_SPECS[componentId].isComplex = RTE_COMPONENT_SPECS[componentId].is_complex;
+        $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+      });
 
-                  $modalInstance.close(customizationArgsDict);
-                };
+      var toolbarOptions = [['bold', 'italics', 'underline'], ['ol', 'ul'], []];
+      $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions && componentDefn.isComplex)) {
+          toolbarOptions[2].push(componentDefn.name);
+        }
+      });
+      $scope.toolbarOptions = JSON.stringify(toolbarOptions);
+
+      var createCustomizationArgDictFromAttrs = function(attrs) {
+        var customizationArgsDict = {};
+        for (var i = 0; i < attrs.length; i++) {
+          var attr = attrs[i];
+          if (attr.name == 'class' || attr.name == 'src') {
+            continue;
+          }
+          var separatorLocation = attr.name.indexOf('-with-value');
+          if (separatorLocation === -1) {
+            $log.error('RTE Error: invalid customization attribute ' + attr.name);
+            continue;
+          }
+          var argName = attr.name.substring(0, separatorLocation);
+          customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
+        }
+        return customizationArgsDict;
+      };
+
+      // Replace <oppia-noninteractive> tags with <img> tags.
+      $scope.convertHtmlToRte = function(html) {
+        var elt = $('<div>' + html + '</div>');
+
+        $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+            return createRteElement(
+              componentDefn, createCustomizationArgDictFromAttrs(this.attributes));
+          });
+        });
+
+        return elt.html();
+      };
+
+      var createRteElement = function(componentDefn, customizationArgsDict) {
+        var el = $('<img/>');
+        el.attr('src', componentDefn.iconDataUrl);
+        el.addClass('oppia-noninteractive-' + componentDefn.name);
+
+        for (var attrName in customizationArgsDict) {
+          el.attr(
+          $filter('camelCaseToHyphens')(attrName) + '-with-value',
+          oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+        }
+
+        var domNode = el.get(0);
+        return domNode;
+      };
+
+      // Replace <img> tags with <oppia-noninteractive> tags.
+      $scope.convertRteToHtml = function(rte) {
+        var elt = $('<div>' + rte + '</div>');
+
+        $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+            var jQueryElt = $('<' + this.className + '/>');
+            for (var i = 0; i < this.attributes.length; i++) {
+              var attr = this.attributes[i];
+              if (attr.name !== 'class' && attr.name !== 'src') {
+                jQueryElt.attr(attr.name, attr.value);
               }
-            ]
-          }).result.then(function(customizationArgsDict) {
-            var el = $scope._createRteElement(componentDefn, customizationArgsDict);
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            insertionPoint.parentNode.replaceChild(el, insertionPoint);
-            $(rteNode).wysiwyg('save');
-          }, function () {
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            insertionPoint.className = insertionPoint.className.replace(/\binsertionPoint\b/, '');
+            }
+            return jQueryElt.get(0);
           });
-        };
-
-        $scope.currentlyEditing = false;
-        $scope.$watch('htmlContent', function(newValue, oldValue) {
-          if ($scope.hasFullyLoaded && !$scope.currentlyEditing) {
-            // This is an external change.
-            console.log($scope.htmlContent);
-            $scope.rteContent = $scope._convertHtmlToRte(newValue);
-            $(rteNode).wysiwyg('setContent', $scope.rteContent);
-          }
         });
 
-        $scope._saveContent = function() {
-          var content = $(rteNode).wysiwyg('getContent');
-          if (content !== null && content !== undefined) {
-            // The following $timeout removes the '$apply in progress' errors.
-            $timeout(function() {
-              $scope.$apply(function() {
-                $scope.currentlyEditing = true;
-                $scope.htmlContent = $scope._convertRteToHtml(content);
-                // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
-                $timeout(function() {
-                  $scope.currentlyEditing = false;
-                }, 50);
-              });
-            });
-          }
-        };
+        return elt.html();
+      };
 
-        $scope.$on('externalSave', function() {
-          $scope._saveContent();
-        });
+      $scope.init = function() {
+        $scope.tempContent = $scope.convertHtmlToRte($scope.htmlContent);
+      };
 
-        $scope.hasFullyLoaded = false;
+      $scope.init();
 
-        $scope.init = function() {
-          $scope._RICH_TEXT_COMPONENTS = [];
-          if (!$scope.disallowOppiaRteComponents) {
-            var componentIds = Object.keys(RTE_COMPONENT_SPECS);
-            componentIds.sort().forEach(function(componentId) {
-              RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
-              RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
-              RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
-              $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
-            });
-          }
+      $scope.$watch('tempContent', function(newVal, oldVal) {
+        $scope.htmlContent = $scope.convertRteToHtml(newVal);
+      });
 
-          $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
-
-          var sizeClass = (
-            $scope.size == 'small' ? ' wysiwyg-content-small' :
-            $scope.size == 'large' ? ' wysiwyg-content-large' :
-            '');
-
-          // This is needed for tests, otherwise $(rteNode).wysiwyg is undefined.
-          $timeout(function() {
-            $(rteNode).wysiwyg({
-              autoGrow: true,
-              autoSave: true,
-              controls: {
-                bold: {groupIndex: 2, visible: true},
-                italic: {groupIndex: 2, visible: true},
-                underline: {groupIndex: 2, visible: true},
-                undo: {groupIndex: 2, visible: true},
-                redo: {groupIndex: 2, visible: true},
-                indent: {groupIndex: 2, visible: true},
-                outdent: {groupIndex: 2, visible: true},
-                insertOrderedList: {groupIndex: 2, visible: true},
-                insertUnorderedList: {groupIndex: 2, visible: true},
-                insertHorizontalRule: {groupIndex: 2, visible: true},
-                insertTable: {groupIndex: 2, visible: true},
-                code: {groupIndex: 2, visible: true},
-                removeFormat: {groupIndex: 2, visible: true}
-              },
-              css: '/css/rte_multiline.css',
-              debug: true,
-              events: {
-                save: function(event) {
-                  $scope._saveContent();
-                }
-              },
-              iFrameClass: 'wysiwyg-content' + sizeClass,
-              initialContent: $scope.rteContent,
-              resizeOptions: true,
-              rmUnusedControls: true
-            });
-
-            // Add controls for the additional components to the RTE.
-            $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-              $(rteNode).wysiwyg('addControl', componentDefn.name, {
-                groupIndex: 1,
-                icon: componentDefn.iconDataUrl,
-                tooltip: componentDefn.tooltip,
-                tags: [],
-                visible: true,
-                exec: function() {
-                  $(rteNode).wysiwyg(
-                      'insertHtml', '<span class="insertionPoint"></span>');
-                  $scope.openRteCustomizationModal(componentDefn, {});
-                }
-              });
-            });
-
-            $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
-
-            // Add dblclick handlers to the various nodes.
-            $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-              var elts = Array.prototype.slice.call(
-                $scope.editorDoc.querySelectorAll(
-                  '.oppia-noninteractive-' + componentDefn.name));
-              elts.forEach(function(elt) {
-                elt.ondblclick = function() {
-                  this.className += ' insertionPoint';
-                  $scope.openRteCustomizationModal(
-                    componentDefn,
-                    $scope._createCustomizationArgDictFromAttrs(this.attributes)
-                  );
-                };
-              });
-            });
-
-            // Disable jquery.ui.dialog so that the link control works correctly.
-            $.fn.dialog = null;
-
-            $(rteNode).wysiwyg('focus');
-            $scope.hasFullyLoaded = true;
-          });
-        };
-
-        $scope.init();
-      }]
-    };
-  }
-]);
+      // It is possible for the content of the RTE to be changed externally,
+      // e.g. if there are several RTEs in a list, and one is deleted.
+      $scope.$watch('htmlContent', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          $scope.tempContent = $scope.convertHtmlToRte(newVal);
+        }
+      });
+    }],
+  };
+}]);
 
 
 // The names of these filters must correspond to the names of the backend
@@ -1280,16 +1294,7 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
       uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/html',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.getSize = function() {
-        if (!$scope.uiConfig()) {
-          return null;
-        } else {
-          return $scope.uiConfig().size;
-        }
-      };
-    }]
+    restrict: 'E'
   };
 }]);
 
@@ -1352,12 +1357,15 @@ oppia.directive('schemaBasedListEditor', [
 
       $scope.minListLength = null;
       $scope.maxListLength = null;
+      $scope.showDuplicatesWarning = false;
       if ($scope.validators()) {
         for (var i = 0; i < $scope.validators().length; i++) {
           if ($scope.validators()[i].id === 'has_length_at_most') {
             $scope.maxListLength = $scope.validators()[i].max_value;
           } else if ($scope.validators()[i].id === 'has_length_at_least') {
             $scope.minListLength = $scope.validators()[i].min_value;
+          } else if ($scope.validators()[i].id === 'is_uniquified') {
+            $scope.showDuplicatesWarning = true;
           }
         }
       }
@@ -1366,6 +1374,19 @@ oppia.directive('schemaBasedListEditor', [
         $scope.localValue.push(
           schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
       }
+
+      $scope.hasDuplicates = function() {
+        var valuesSoFar = {};
+        for (var i = 0; i < $scope.localValue.length; i++) {
+          var value = $scope.localValue[i];
+          if (!valuesSoFar.hasOwnProperty(value)) {
+            valuesSoFar[value] = true;
+          } else {
+            return true;
+          }
+        }
+        return false;
+      };
 
       if ($scope.len === undefined) {
         $scope.addElement = function() {
@@ -1400,10 +1421,9 @@ oppia.directive('schemaBasedListEditor', [
           $scope.isAddItemButtonPresent = false;
         };
 
-        
         $scope._onChildFormSubmit = function(evt) {
           if (!$scope.isAddItemButtonPresent) {
-            /** 
+            /**
              * If form submission happens on last element of the set (i.e the add item button is absent)
              * then automatically add the element to the list.
              */
@@ -1412,10 +1432,10 @@ oppia.directive('schemaBasedListEditor', [
               $scope.addElement();
             }
           } else {
-            /** 
+            /**
              * If form submission happens on existing element remove focus from it
              */
-             document.activeElement.blur();
+            document.activeElement.blur();
           }
           evt.stopPropagation();
         };

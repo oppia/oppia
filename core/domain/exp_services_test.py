@@ -1702,17 +1702,45 @@ class SearchTests(ExplorationServicesUnitTests):
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
 
-        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
+        # The search rank has a 'last updated' bonus of 80.
+        _BASE_SEARCH_RANK = 20 + 80
+
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK)
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
         rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
-        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 30)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK + 30)
 
         rating_services.assign_rating(self.OWNER_ID, self.EXP_ID, 5)
-        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 40)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK + 40)
 
         rating_services.assign_rating(self.user_id_admin, self.EXP_ID, 2)
-        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 38)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK + 38)
+
+    def test_search_ranks_cannot_be_negative(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+
+        # The search rank has a 'last updated' bonus of 80.
+        _BASE_SEARCH_RANK = 20 + 80
+
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK)
+
+        # A user can (down-)rate an exploration at most once.
+        for i in xrange(50):
+            rating_services.assign_rating('user_id_1', self.EXP_ID, 1)
+        self.assertEqual(
+            exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK - 5)
+
+        for i in xrange(50):
+            rating_services.assign_rating('user_id_%s' % i, self.EXP_ID, 1)
+
+        # The rank will be at least 0.
+        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
 
 
 class ExplorationChangedEventsTests(ExplorationServicesUnitTests):

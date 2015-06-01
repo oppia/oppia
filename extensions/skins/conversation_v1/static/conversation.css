@@ -41,6 +41,23 @@ html, body {
   text-align: center;
 }
 
+
+.conversation-skin-left-gadget-panel {
+  margin-right: 285px;
+  max-width: 200px;
+  position: fixed;
+  right: 50%;
+  top: 76px;
+}
+
+.conversation-skin-right-gadget-panel {
+  margin-left: 285px;
+  max-width: 200px;
+  position: fixed;
+  left: 50%;
+  top: 76px;
+}
+
 .conversation-skin-card-row-container {
   margin-bottom: 17px;
   table-layout: fixed;

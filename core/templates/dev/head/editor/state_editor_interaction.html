@@ -29,17 +29,17 @@
 
 <script type="text/ng-template" id="modals/customizeInteraction">
   <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
-    <h3 ng-if="!selectedInteractionId">
+    <h3 ng-if="!stateInteractionIdService.displayed">
       Choose Interaction
     </h3>
 
-    <h3 ng-if="selectedInteractionId">
-      Customize Interaction (<[INTERACTION_SPECS[selectedInteractionId].name]>)
+    <h3 ng-if="stateInteractionIdService.displayed">
+      Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
     </h3>
   </div>
 
   <div class="modal-body">
-    <div ng-if="!selectedInteractionId" ng-cloak>
+    <div ng-if="!stateInteractionIdService.displayed" ng-cloak>
       <tabset>
         <tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
              heading="<[category.name]>" active="category.active"
@@ -57,7 +57,7 @@
       </tabset>
     </div>
 
-    <form ng-if="selectedInteractionId" name="form.schemaForm" class="protractor-test-interaction-editor">
+    <form ng-if="stateInteractionIdService.displayed" name="form.schemaForm" class="protractor-test-interaction-editor">
       <div ng-if="customizationArgSpecs.length === 0">
         <em>There are no customizations options available.<br><br>
         To use this interaction, click 'Save Interaction'.</em>
@@ -66,7 +66,7 @@
       <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
         <div class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
         <div>
-          <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
+          <schema-based-editor local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
           </schema-based-editor>
           <div style="margin-bottom: 15px;"></div>
         </div>
@@ -75,9 +75,12 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="selectedInteractionId">Back</button>
+    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed">Back</button>
 
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()" ng-disabled="!selectedInteractionId || form.schemaForm.$invalid">Save Interaction</button>
+    <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
+            ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">
+      Save Interaction
+    </button>
   </div>
 </script>

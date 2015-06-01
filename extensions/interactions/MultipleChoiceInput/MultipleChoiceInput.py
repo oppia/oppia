@@ -41,8 +41,8 @@ class MultipleChoiceInput(base.BaseInteraction):
             'items': {
                 'type': 'html',
                 'ui_config': {
-                    'size': 'small',
-                }
+                    'hide_complex_extensions': True,
+                },
             },
             'ui_config': {
                 'add_element_text': 'Add multiple choice option',

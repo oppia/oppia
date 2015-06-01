@@ -103,6 +103,23 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_activity_ids_subscribed_to(USER_ID),
             [ACTIVITY_ID, ACTIVITY_2_ID])
 
+    def test_get_activity_ids_subscribed_to(self):
+        USER_ID = 'user_id'
+        self.assertEqual(
+            subscription_services.get_activity_ids_subscribed_to(USER_ID), [])
+
+        ACTIVITY_ID = 'activity_id'
+        subscription_services.subscribe_to_activity(USER_ID, ACTIVITY_ID)
+        self.assertEqual(
+            subscription_services.get_activity_ids_subscribed_to(USER_ID), 
+                [ACTIVITY_ID])
+
+        ACTIVITY_2_ID = 'activity_id_2'
+        subscription_services.subscribe_to_activity(USER_ID, ACTIVITY_2_ID)
+        self.assertEqual(
+            subscription_services.get_activity_ids_subscribed_to(USER_ID), 
+            [ACTIVITY_ID, ACTIVITY_2_ID])
+
     def test_thread_and_activity_subscriptions_are_tracked_individually(self):
         USER_ID = 'user_id'
         FEEDBACK_THREAD_ID = 'fthread_id'

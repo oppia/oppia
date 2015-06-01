@@ -396,6 +396,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.states['GHI'] = ghi_state
             exploration.validate()
 
+            gadget_instance.visible_in_states.extend(['GHI'])
+            with self.assertRaisesRegexp(
+                    utils.ValidationError,
+                    'TestGadget specifies visibility repeatedly for state: GHI'):
+                exploration.validate()
+
+            # Remove duplicate state.
+            gadget_instance.visible_in_states.pop()
+
             # Adding a panel that doesn't exist in the skin.
             exploration.skin_instance.panel_contents_dict[
                 'non_existent_panel'] = []
@@ -404,6 +413,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     utils.ValidationError,
                     'non_existent_panel panel not found in skin conversation_v1'):
                 exploration.validate()
+
+    def test_exploration_get_gadget_ids(self):
+        """Test that Exploration.get_gadget_ids returns apt results."""
+        exploration_without_gadgets = exp_domain.Exploration.from_yaml(
+            'An Exploration ID', 'A title', 'Category', SAMPLE_YAML_CONTENT)
+        self.assertEqual(exploration_without_gadgets.get_gadget_ids(), [])
+
+        exploration_with_gadgets = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+        self.assertEqual(
+            exploration_with_gadgets.get_gadget_ids(), 
+            ['TestGadget']
+        )
+
+        another_gadget = exp_domain.GadgetInstance('AnotherGadget', [], {})
+        exploration_with_gadgets.skin_instance.panel_contents_dict[
+            'right'].append(another_gadget)
+        self.assertEqual(
+            exploration_with_gadgets.get_gadget_ids(), 
+            ['AnotherGadget', 'TestGadget']
+        )
 
     def test_objective_validation(self):
         """Test that objectives are validated only in 'strict' mode."""
@@ -865,6 +895,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'param_specs': {},
+            'skin_customizations': feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
         })
 
 
@@ -1047,7 +1078,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict['left'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                "'left' panel expected at most 1 gadget, received 2."):
+                "'left' panel expected at most 1 gadget, but 2 gadgets are visible in state 'New state'."):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any

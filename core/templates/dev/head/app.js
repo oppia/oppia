@@ -25,7 +25,8 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
-    'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate'
+    'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
+    'textAngular'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -334,6 +335,22 @@ oppia.factory('oppiaDebouncer', ['$log', function($log) {
         }
         return result;
       };
+    }
+  };
+}]);
+
+// Service for assembling extension tags (for gadgets and interactions).
+oppia.factory('extensionTagAssemblerService', [
+    '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  return {
+    formatCustomizationArgAttributesForElement: function(element, customizationArgSpecs) {
+      for (var caSpecName in customizationArgSpecs) {
+        var caSpecValue = customizationArgSpecs[caSpecName].value;
+        element.attr(
+          $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
+          oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+      }
+      return element;
     }
   };
 }]);

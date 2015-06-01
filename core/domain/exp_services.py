@@ -600,6 +600,8 @@ def _save_exploration(
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
     exploration_model.default_skin = exploration.default_skin
+    exploration_model.skin_customizations = (
+        exploration.skin_instance.to_dict()['skin_customizations'])
 
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
@@ -638,6 +640,8 @@ def _create_exploration(
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
         default_skin=exploration.default_skin,
+        skin_customizations=exploration.skin_instance.to_dict(
+            )['skin_customizations'],
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
@@ -1063,11 +1067,14 @@ def _get_search_rank(exp_id):
     """
     # TODO(sll): Improve this calculation.
     _STATUS_PUBLICIZED_BONUS = 30
+    # This is done to prevent the rank hitting 0 too easily. Note that
+    # negative ranks are disallowed in the Search API.
+    _DEFAULT_RANK = 20
 
     exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
     summary = get_exploration_summary_by_id(exp_id)
-    rank = (
+    rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
         if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
         else 0)
@@ -1079,8 +1086,8 @@ def _get_search_rank(exp_id):
                 summary.ratings[rating_value] *
                 RATING_WEIGHTINGS[rating_value])
 
-    _BEGINNING_OF_TIME = datetime.datetime(2013, 6, 30)
-    time_delta_days = int((exploration.last_updated - _BEGINNING_OF_TIME).days)
+    _TIME_NOW = datetime.datetime.utcnow()
+    time_delta_days = int((_TIME_NOW - exploration.last_updated).days)
     if time_delta_days == 0:
         rank += 80
     elif time_delta_days == 1:
@@ -1088,7 +1095,8 @@ def _get_search_rank(exp_id):
     elif 2 <= time_delta_days <= 7:
         rank += 35
 
-    return rank
+    # Ranks must be non-negative.
+    return max(rank, 0)
 
 
 def _exp_to_search_dict(exp):

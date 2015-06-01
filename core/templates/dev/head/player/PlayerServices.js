@@ -19,6 +19,7 @@
  */
 
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('GADGET_SPECS', window.GLOBALS ? GLOBALS.GADGET_SPECS : {});
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
 
 // A simple service that provides stopwatch instances. Each stopwatch can be
@@ -122,12 +123,12 @@ oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
-    'INTERACTION_SPECS',
+    'extensionTagAssemblerService', 'INTERACTION_SPECS',
     function(
       $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
-      INTERACTION_SPECS) {
+      extensionTagAssemblerService, INTERACTION_SPECS) {
   var _END_DEST = 'END';
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
   var _NULL_INTERACTION_HTML = (
@@ -188,13 +189,8 @@ oppia.factory('oppiaPlayerService', [
     var el = $(
       '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
 
-    for (var caSpecName in interactionCustomizationArgSpecs) {
-      var caSpecValue = interactionCustomizationArgSpecs[caSpecName].value;
-      // TODO(sll): Evaluate any values here that correspond to expressions.
-      el.attr(
-        $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-        oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
-    }
+    el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
+      el, interactionCustomizationArgSpecs);
 
     if (labelForFocusTarget) {
       el.attr('label-for-focus-target', labelForFocusTarget);
@@ -249,13 +245,8 @@ oppia.factory('oppiaPlayerService', [
     _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
-    // NB: This may be undefined if newStateName === END_DEST.
+    // NB: These may both be undefined if newStateName === END_DEST.
     var newStateData = _exploration.states[newStateName];
-    if (newStateData) {
-      learnerParamsService.init(newParams);
-    }
-
-    // NB: This may be undefined if newStateName === END_DEST.
     var newInteractionId = newStateData ? newStateData.interaction.id : undefined;
 
     $rootScope.$broadcast('playerStateChange');
@@ -386,6 +377,9 @@ oppia.factory('oppiaPlayerService', [
         _exploration.states[stateName].interaction.id,
         _exploration.states[stateName].interaction.customization_args,
         labelForFocusTarget);
+    },
+    getGadgetPanelsContents: function() {
+      return angular.copy(_exploration.skin_customizations.panels_contents);
     },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;

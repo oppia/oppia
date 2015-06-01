@@ -29,71 +29,19 @@ oppia.directive('setOfUnicodeStringEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
-      $scope.initArgs = {'objType': 'UnicodeString'};
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
-        if (newValue) {
-          $scope.initArgs = newValue;
-          $scope.initArgs.objType = 'UnicodeString';
-          $scope.isEditable = (
-            newValue.isEditable !== undefined ? newValue.isEditable : true);
-        }
-      }, true);
-
-      $scope.alwaysEditable = ($scope.$parent.alwaysEditable || '');
-
-      // Get the text for the 'Add Item' button.
-      $scope.getAddItemText = function() {
-        if ($scope.initArgs && $scope.initArgs.addItemText) {
-          return $scope.initArgs.addItemText;
-        } else {
-          return 'Add List Element';
-        }
+      $scope.SCHEMA = {
+        type: 'list',
+        items: {
+          type: 'unicode'
+        },
+        validators: [{
+          id: 'is_uniquified'
+        }]
       };
 
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'value'. This is needed because it is not
-        // possible to modify 'item' directly when using "for item in value";
-        // we need a 'constant key'. So we represent each item as {label: ...}
-        // instead, and manipulate item.label.
-        // TODO(sll): Check that $scope.$parent.value is a list.
-        $scope.localValue = [];
-        if (newValue) {
-          for (var i = 0; i < newValue.length; i++) {
-            $scope.localValue.push({'label': angular.copy(newValue[i])});
-          }
-        }
-      }, true);
-
-      $scope.addItem = function() {
-        $scope.localValue.push({label: ''});
-        if (!$scope.alwaysEditable) {
-          $scope.activeItem = $scope.localValue.length - 1;
-        }
-      };
-
-      $scope.deleteItem = function(index) {
-        $scope.localValue.splice(index, 1);
-        $scope.$parent.value.splice(index, 1);
-        if (!$scope.alwaysEditable) {
-          $scope.activeItem = null;
-        }
-      };
-
-      if (!$scope.alwaysEditable) {
-        $scope.activeItem = null;
+      if (!$scope.$parent.value) {
+        $scope.$parent.value = [];
       }
-
-      $scope.$watch('localValue', function(newValue, oldValue) {
-        if (newValue && oldValue) {
-          var valuesOnly = [];
-          for (var i = 0; i < newValue.length; i++) {
-            valuesOnly.push(newValue[i].label);
-          }
-          $scope.$parent.value = valuesOnly;
-        }
-      }, true);
     }
   };
 });

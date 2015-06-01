@@ -67,9 +67,12 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(function(richTextEditor) {
-      richTextEditor.appendBoldText('bold text ');
-      richTextEditor.appendItalicText('italic text ');
+      richTextEditor.appendBoldText('bold text');
+      richTextEditor.appendPlainText(' ');
+      richTextEditor.appendItalicText('italic text');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.appendUnderlineText('underline text');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
@@ -99,16 +102,18 @@ describe('State editor', function() {
     editor.setInteraction('NumericInput');
     editor.addRule('NumericInput', function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
-    }, 'END', 'IsInclusivelyBetween', 3, 6);
+    }, 'END', 'IsInclusivelyBetween', -1, 3);
     editor.addRule(
       'NumericInput', forms.toRichText('out of bounds'), null, 'Default');
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.submitAnswer('NumericInput', 7);
+    player.submitAnswer('NumericInput', 5);
     player.expectLatestFeedbackToMatch(forms.toRichText('out of bounds'));
     player.expectExplorationToNotBeOver();
-    player.submitAnswer('NumericInput', 4);
+    // It's important to test the value 0 in order to ensure that it would
+    // still get submitted even though it is a falsy value in JavaScript.
+    player.submitAnswer('NumericInput', 0);
     player.expectLatestFeedbackToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('correct');
     });
@@ -262,15 +267,13 @@ describe('rich-text components', function() {
     workflow.createExploration('RTE components', 'maths');
 
     editor.setContent(function(richTextEditor) {
-      richTextEditor.appendPlainText('plainly');
       richTextEditor.appendBoldText('bold');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.addRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       // TODO (Jacob) add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
-      richTextEditor.appendUnderlineText('underlined');
-      richTextEditor.appendPlainText('extra');
       richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
@@ -285,14 +288,12 @@ describe('rich-text components', function() {
 
     general.moveToPlayer();
     player.expectContentToMatch(function(richTextChecker) {
-      richTextChecker.readPlainText('plainly');
       richTextChecker.readBoldText('bold');
+      richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readUnderlineText('underlined');
-      richTextChecker.readPlainText('extra');
       richTextChecker.readRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
@@ -302,6 +303,7 @@ describe('rich-text components', function() {
       }]);
       richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
     });
+
 
     users.logout();
   });
@@ -314,42 +316,26 @@ describe('rich-text components', function() {
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendItalicText('slanted');
+      richTextEditor.appendPlainText(' ');
       richTextEditor.addRteComponent(
           'Collapsible', 'heading', function(collapsibleEditor) {
-        // TODO (Jacob) add sub-components when issue 423 is fixed
-        collapsibleEditor.addRteComponent('Tabs', [{
-          title: 'no1',
-          content: function(tab1Editor) {
-            tab1Editor.setPlainText('boring');
-          }
-        }, {
-          title: 'no2',
-          content: function(tab2Editor) {
-            tab2Editor.appendBoldText('fun!');
-          }
-        }]);
+        collapsibleEditor.appendBoldText('boldtext');
+        collapsibleEditor.appendPlainText(' ');
         collapsibleEditor.addRteComponent('Math', 'xyz');
       });
     });
-    editor.setInteraction('TextInput');
+
+    editor.setInteraction('EndExploration');
     editor.saveChanges();
 
     general.moveToPlayer();
     player.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readItalicText('slanted');
+      richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent(
           'Collapsible', 'heading', function(collapsibleChecker) {
-        collapsibleChecker.readRteComponent('Tabs', [{
-          title: 'no1',
-          content: function(tab1Checker) {
-            tab1Checker.readPlainText('boring');
-          }
-        }, {
-          title: 'no2',
-          content: function(tab2Checker) {
-            tab2Checker.readBoldText('fun!');
-          }
-        }]);
+        collapsibleChecker.readBoldText('boldtext');
+        collapsibleChecker.readPlainText(' ');
         collapsibleChecker.readRteComponent('Math', 'xyz');
       });
     });
@@ -460,7 +446,7 @@ describe('Exploration history', function() {
     var VERSION_1_STATE_1_CONTENTS = {
       1: {text: 'content:', highlighted: false},
       2: {text: '- type: text', highlighted: false},
-      3: {text: '  value: enter 6 to continue', highlighted: true},
+      3: {text: '  value: <p>enter 6 to continue</p>', highlighted: true},
       4: {text: 'interaction:', highlighted: false},
       5: {text: '  customization_args: {}', highlighted: false},
       6: {text: '  handlers:', highlighted: false},
@@ -507,7 +493,7 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'content:\n' +
       '- type: text\n' +
-      '  value: this is state 2\n' +
+      '  value: <p>this is state 2</p>\n' +
       'interaction:\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
