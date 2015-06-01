@@ -307,7 +307,6 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         normalized_answer = old_interaction_instance.normalize_answer(
             answer, handler_name)
 
-        # TODO(sll): Should this also depend on `params`?
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name, handler_name, rule_spec,
             session_id, client_time_spent_in_secs, old_params,
@@ -437,7 +436,7 @@ def submit_answer_in_tests(
         exploration_id, state_name, answer, params, handler_name, version):
     """This function should only be used by tests."""
     params['answer'] = answer
-    session_id = params.get('session_id', '')
+    session_id = ''
 
     # use 0 time spent for answers submitted in tests
     time_spent = 0.0
@@ -456,7 +455,6 @@ def submit_answer_in_tests(
             old_state.interaction.id))
     normalized_answer = old_interaction_instance.normalize_answer(
         answer, handler_name)
-    # TODO(sll): Should this also depend on `params`?
     event_services.AnswerSubmissionEventHandler.record(
         exploration_id, version, state_name, handler_name, rule_spec,
         session_id, time_spent, params,

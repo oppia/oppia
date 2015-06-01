@@ -305,33 +305,33 @@ class OneOffNullStateHitEventsMigratorTest(test_utils.GenericTestBase):
         self.assertEqual(target_item.deleted, False)
 
 
-class ModifiedInteractionAnswerViewsAggregator(
+class ModifiedInteractionAnswerSummariesAggregator(
         stats_jobs.StatisticsAggregator):
-    """A modified InteractionAnswerViewsAggregator that does not start
+    """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedInteractionAnswerViewsMRJobManager
+        return ModifiedInteractionAnswerSummariesMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedInteractionAnswerViewsMRJobManager(
-        stats_jobs.InteractionAnswerViewsMRJobManager):
+class ModifiedInteractionAnswerSummariesMRJobManager(
+        stats_jobs.InteractionAnswerSummariesMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedInteractionAnswerViewsAggregator
+        return ModifiedInteractionAnswerSummariesAggregator
 
 
-class InteractionAnswerViewsAggregatorTests(test_utils.GenericTestBase):
+class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
-        ModifiedInteractionAnswerViewsAggregator]
+        ModifiedInteractionAnswerSummariesAggregator]
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
         'sid', 'NormalizedString')
@@ -397,36 +397,38 @@ class InteractionAnswerViewsAggregatorTests(test_utils.GenericTestBase):
                 'answer3')
 
             # Run job on exploration with answers
-            ModifiedInteractionAnswerViewsAggregator.start_computation()
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
 
+            calc_id = 'AnswerCounts'
+            
             # get job output of first state and check it
-            calculation_outputs = (
-                stats_services.get_answer_summarizers_outputs(
-                    exp_id, exp_version, FIRST_STATE_NAME)).calculation_outputs
+            calculation_output = (
+                stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, exp_version, FIRST_STATE_NAME, calc_id)
+                    ).calculation_output
 
-            expected_calculation_outputs = [
-                {'visualization_id': 'values_and_counts_table',
-                 'visualization_opts': {
-                     'column_labels': ['Answer', 'Count'],
-                     'data': [['answer1', 2], ['answer2', 1]],
-                     'title': 'Answer counts'}}]
+            expected_calculation_output = {
+                'calculation_id': 'AnswerCounts',
+                'calculation_description': (
+                    'Calculate answer counts for each answer.'),
+                'data': [['answer1', 2], ['answer2', 1]]}
 
-            self.assertEqual(calculation_outputs,
-                             expected_calculation_outputs)
+            self.assertEqual(calculation_output,
+                             expected_calculation_output)
 
             # get job output of second state and check it
-            calculation_outputs = (
-                stats_services.get_answer_summarizers_outputs(
-                    exp_id, exp_version, SECOND_STATE_NAME)).calculation_outputs
+            calculation_output = (
+                stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, exp_version, SECOND_STATE_NAME, calc_id)
+                    ).calculation_output
 
-            expected_calculation_outputs = [
-                {'visualization_id': 'values_and_counts_table',
-                 'visualization_opts': {
-                     'column_labels': ['Answer', 'Count'],
-                     'data': [['answer3', 1]],
-                     'title': 'Answer counts'}}]
+            expected_calculation_output = {
+                'calculation_id': 'AnswerCounts',
+                'calculation_description': (
+                    'Calculate answer counts for each answer.'),
+                'data': [['answer3', 1]]}
 
-            self.assertEqual(calculation_outputs, expected_calculation_outputs)
+            self.assertEqual(calculation_output, expected_calculation_output)

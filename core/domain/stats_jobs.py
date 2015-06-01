@@ -392,7 +392,7 @@ class NullStateHitEventsMigrator(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class InteractionAnswerViewsMRJobManager(
+class InteractionAnswerSummariesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
     """
     Job to calculate interaction view statistics, e.g. most frequent
@@ -401,7 +401,7 @@ class InteractionAnswerViewsMRJobManager(
     """
     @classmethod
     def _get_continuous_computation_class(cls):
-        return InteractionAnswerViewsAggregator
+        return InteractionAnswerSummariesAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -409,29 +409,78 @@ class InteractionAnswerViewsMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import interaction_registry
-        from extensions.answer_summarizers import calculations
 
-        if InteractionAnswerViewsMRJobManager._entity_created_before_job_queued(
+        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
 
             # Get all calculations desired for interaction type of the
             # current state
-            calculations = interaction_registry.Registry.get_interaction_by_id(
-                item.interaction_id).registered_state_answers_calculations
+            calculations = (
+                InteractionAnswerSummariesMRJobManager._get_desired_calculations(
+                    item.interaction_id))
 
             # Perform calculations and store the output
             for calc in calculations:
-                calc_output = calc.calculate_from_state_answers_entity(
-                    item)
+                calc_output = calc.calculate_from_state_answers_entity(item)
                 calc_output.save()
 
     @staticmethod
     def reduce(id, state_answers_model):
         pass
 
+    @classmethod
+    def _get_desired_calculations(cls, interaction_id):
+        """
+        Get all calculations desired for a given interaction_id by inspecting
+        data_source entries of answer_visualizations.
+        """
 
-class InteractionAnswerViewsAggregator(jobs.BaseContinuousComputationManager):
+        from core.domain import interaction_registry
+        from extensions.answer_summarizers import calculations
+
+        # All visualizations desired for the interaction.
+        visualizations = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).answer_visualizations
+
+        # All desired calculation ids.
+        calc_ids = []
+        for viz in visualizations:
+            # validate visualization dict
+            # TODO(msl): move this to a backend test.
+            if not viz.has_key('data_source'):
+                raise Exception("visualization must have data_source key.")
+            if not viz['data_source'].has_key('calculation_id'):
+                raise Exception(
+                    "visualization['data_source'] must have calculation_id key")
+
+            if not viz['data_source']['calculation_id'] in calc_ids:
+                calc_ids.append(viz['data_source']['calculation_id'])
+
+        # Get calculations from their ids.
+        calcs = []
+        for calc in calculations.LIST_OF_CALCULATION_CLASSES:
+            if calc.calculation_id in calc_ids:
+                calcs.append(calc)
+
+        # check that all calculations were found
+        # TODO(msl): maybe move to backend test?
+        if not (collections.Counter(calc_ids) 
+                == collections.Counter([c.calculation_id for c in calcs])):
+            raise Exception(
+                "Could not find all calculations specified by "
+                + "answer_visualizations.")
+        
+        return calcs
+
+
+class InteractionAnswerSummariesRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    num_starts = ndb.IntegerProperty(default=0)
+    num_completions = ndb.IntegerProperty(default=0)
+
+    
+class InteractionAnswerSummariesAggregator(
+        jobs.BaseContinuousComputationManager):
     """A continuous-computation job that listens to answers to states and
     updates StateAnswer view calculations.
     """
@@ -442,11 +491,30 @@ class InteractionAnswerViewsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _get_realtime_datastore_class(cls):
-        return StatisticsRealtimeModel
+        return InteractionAnswerSummariesRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return InteractionAnswerViewsMRJobManager
+        return InteractionAnswerSummariesMRJobManager
 
-    # TODO(msl): continue writing this, e.g. make sure continous jobs listens
+    # Public query methods.
+    @classmethod 
+    def get_calc_output(
+            cls, exploration_id, exploration_version, state_name, 
+            calculation_id):
+        """
+        Get state answers calculation output domain object obtained from 
+        StateAnswersCalcOutputModel instance stored in data store.
+        """
+        from core.domain import stats_domain
+        calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
+            exploration_id, exploration_version, state_name, calculation_id)
+        if calc_output_model:
+            return stats_domain.StateAnswersCalcOutput(
+                exploration_id, exploration_version, state_name, calculation_id,
+                calc_output_model.calculation_output)
+        else:
+            return None
+    
+    # TODO(msl): continue writing this, e.g. make sure continuous jobs listens
     # to correct events (especially when answer recorded).

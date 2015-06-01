@@ -53,7 +53,7 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     DEFAULT_SESSION_ID = 'session_id'
     DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
-        DEFAULT_SESSION_ID, 'NormalizedString')
+        'dummy_state_name', 'NormalizedString')
     DEFAULT_TIME_SPENT = 5.0
     DEFAULT_PARAMS = {}
 
@@ -156,7 +156,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     DEFAULT_SESSION_ID = 'session_id'
     DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
-        DEFAULT_SESSION_ID, 'NormalizedString')
+        'dummy_state_name', 'NormalizedString')
     DEFAULT_TIME_SPENT = 5.0
     DEFAULT_PARAMS = {}
 
@@ -385,7 +385,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     DEFAULT_SESSION_ID = 'session_id'
     DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
-        DEFAULT_SESSION_ID, 'NormalizedString')
+        'dummy_state_name', 'NormalizedString')
     DEFAULT_TIME_SPENT = 5.0
     DEFAULT_PARAMS = {}
 

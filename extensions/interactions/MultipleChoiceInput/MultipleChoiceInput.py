@@ -52,4 +52,27 @@ class MultipleChoiceInput(base.BaseInteraction):
         'default_value': ['Sample multiple-choice answer'],
     }]
 
-    registered_state_answers_calculations = [calculations.AnswerCounts]
+    # Registered answer visualizations. 'data_source' entries will
+    # be used to determine which calculations need to be done.
+    answer_visualizations = []
+
+    # Bar chart with answer counts.
+    answer_visualizations.append(
+        {'visualization_id': 'BarChart',
+         'visualization_customization_args': {
+             'x_axis_label': 'Answer',
+             'y_axis_label': 'Count',
+             },
+         'data_source': {
+              'calculation_id': calculations.AnswerCounts.calculation_id,
+              }})
+
+    # Table with answer counts.
+    answer_visualizations.append(
+        {'visualization_id': 'Table',
+         'visualization_customization_args': {
+             'column_labels': ['Answer', 'Count'],
+             },
+         'data_source': {
+              'calculation_id': calculations.AnswerCounts.calculation_id,
+              }})

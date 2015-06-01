@@ -180,8 +180,8 @@ def get_exploration_stats(exploration_id, exploration_version):
 
 
 def record_answer(exploration_id, exploration_version, state_name,
-                  handler_name, session_id, time_spent, params, 
-                  answer_string):
+                  handler_name, rule, session_id, time_spent_in_sec,
+                  params, answer_value):
     """
     Record an answer by storing it to the corresponding StateAnswers entity.
     """
@@ -197,7 +197,7 @@ def record_answer(exploration_id, exploration_version, state_name,
     # be created when the first answer is recorded).
     # If no interaction id exists, use None as placeholder.
     interaction_id = None
-    if not state_answers is None:
+    if state_answers is not None:
         interaction_id = state_answers.interaction_id
 
     if interaction_id is None:
@@ -208,13 +208,14 @@ def record_answer(exploration_id, exploration_version, state_name,
             interaction_id = exploration.states[state_name].interaction.id
 
     # Construct answer_dict and validate it
-    answer_dict = {'answer_string': answer_string, 
-                   'time_taken_to_answer': time_spent,
+    answer_dict = {'answer_value': answer_value, 
+                   'time_spent_in_sec': time_spent_in_sec,
+                   'rule_str': str(rule),
                    'session_id': session_id,
                    'handler_name': handler_name,
                    'interaction_id': interaction_id,
                    'params': params}
-    validate_answer(answer_dict)
+    _validate_answer(answer_dict)
 
     # Add answer to state_answers and commit to storage
     if state_answers:
@@ -223,10 +224,10 @@ def record_answer(exploration_id, exploration_version, state_name,
         state_answers = stats_domain.StateAnswers(
             exploration_id, exploration_version, 
             state_name, interaction_id, [answer_dict])
-    save_state_answers(state_answers)
+    _save_state_answers(state_answers)
 
 
-def save_state_answers(state_answers):
+def _save_state_answers(state_answers):
     """
     Validate StateAnswers domain object and commit to storage.
     """
@@ -254,27 +255,21 @@ def get_state_answers(exploration_id, exploration_version, state_name):
         return None
 
 
-def get_answer_summarizers_outputs(
-        exploration_id, exploration_version, state_name):
+def _validate_answer(answer_dict):
     """
-    Get state answers calculation output domain object obtained from 
-    StateAnswersCalcOutputModel instance stored in data store.
+    Validate answer dicts. In particular, check the following:
+
+    - Minimum set of keys: 'answer_value', 'time_spent_in_sec',
+            'session_id'
+    - Check size of every answer_value
+    - Check time_spent_in_sec is non-negative
     """
+
+    # TODO(msl): These validation methods need tests to ensure that
+    # the right errors show up in the various cases.
     
-    calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-        exploration_id, exploration_version, state_name)
-    if calc_output_model:
-        return stats_domain.StateAnswersCalcOutput(
-            exploration_id, exploration_version, state_name,
-            calc_output_model.calculation_outputs)
-    else:
-        return None
-
-
-def validate_answer(answer_dict):
-
     # Minimum set of keys required for answer_dicts in answers_list
-    REQUIRED_ANSWER_DICT_KEYS = ['answer_string', 'time_taken_to_answer',
+    REQUIRED_ANSWER_DICT_KEYS = ['answer_value', 'time_spent_in_sec',
                                  'session_id']
 
     # There is a danger of data overflow if the answer log exceeds
@@ -282,7 +277,12 @@ def validate_answer(answer_dict):
     # 200-1000 bytes in size. We will address this later if it
     # happens regularly. At the moment, a ValidationError is raised if
     # an answer exceeds the maximum size.
-    MAX_BYTES_PER_ANSWER_STRING = 500
+    MAX_BYTES_PER_ANSWER_VALUE = 500
+
+    # Prefix of strings that are cropped because they are too long.
+    CROPPED_PREFIX_STRING = 'CROPPED: '
+    # Answer value that is stored if non-string answer is too big
+    PLACEHOLDER_FOR_TOO_LARGE_NONSTRING = 'TOO LARGE NONSTRING'
 
     # check type is dict
     if not isinstance(answer_dict, dict):
@@ -294,32 +294,38 @@ def validate_answer(answer_dict):
     required_keys = set(REQUIRED_ANSWER_DICT_KEYS)
     actual_keys = set(answer_dict.keys())
     if not required_keys.issubset(actual_keys):
-        # find missing keys
         missing_keys = required_keys.difference(actual_keys)
         raise utils.ValidationError(
             ('answer_dict misses required keys %s' % missing_keys))
 
-    # check values of answer_dict
-    if not isinstance(answer_dict['answer_string'], basestring):
-        raise utils.ValidationError(
-            'Expected answer_string to be a string, received %s' %
-            answer_dict['answer_string'])
+    # check entries of answer_dict
+    if (sys.getsizeof(answer_dict['answer_value']) >
+            MAX_BYTES_PER_ANSWER_VALUE):
 
-    if not (sys.getsizeof(answer_dict['answer_string']) <= 
-            MAX_BYTES_PER_ANSWER_STRING):
-        logging.warning(
-            'answer_string is too big to be stored: %s ...' %
-            answer_dict['answer_string'][:MAX_BYTES_PER_ANSWER_STRING])
-        answer_dict['answer_string'] = (
-            'CROPPED BECAUSE TOO LONG: %s ...' % 
-            answer_dict['answer_string'][:MAX_BYTES_PER_ANSWER_STRING])
+        if type(answer_dict['answer_value']) == str:
+            logging.warning(
+                'answer_value is too big to be stored: %s ...' %
+            str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
+            answer_dict['answer_value'] = (
+            '%s%s ...' %
+            (CROPPED_PREFIX_STRING,
+            str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE])))
+        else:
+            logging.warning('answer_value is too big to be stored')
+            answer_dict['answer_value'] = PLACEHOLDER_FOR_TOO_LARGE_NONSTRING
 
     if not isinstance(answer_dict['session_id'], basestring):
         raise utils.ValidationError(
             'Expected session_id to be a string, received %s' %
-            answer_dict['session_id'])
+            str(answer_dict['session_id']))
 
-    if not isinstance(answer_dict['time_taken_to_answer'], float):
+    if not isinstance(answer_dict['time_spent_in_sec'], float):
         raise utils.ValidationError(
-            'Expected time_taken_to_answer to be a float, received %s' %
-            answer_dict['time_taken_to_answer'])
+            'Expected time_spent_in_sec to be a float, received %s' %
+            str(answer_dict['time_spent_in_sec']))
+
+    if answer_dict['time_spent_in_sec'] < 0.:
+        raise utils.ValidationError(
+            'Expected time_spent_in_sec to be non-negative, received %f' %
+            answer_dict['time_spent_in_sec'])
+        

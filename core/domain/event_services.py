@@ -80,13 +80,14 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                       params, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
+        # TODO(msl): remove old answer recording models.
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
-            handler_name, rule, answer)
+            handler_name, rule, str(answer))
         from core.domain import stats_services
         stats_services.record_answer(            
             exploration_id, exploration_version, state_name,
-            handler_name, session_id, time_spent_in_secs, params, answer)
+            handler_name, rule, session_id, time_spent_in_secs, params, answer)
 
 
 class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):

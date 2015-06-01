@@ -19,9 +19,7 @@
 __author__ = 'Sean Lip'
 
 import copy
-import logging
 import operator
-import re
 import sys
 import utils
 
@@ -105,8 +103,8 @@ class StateAnswers(object):
         choice. It is None if no interaction id can be retrieved.
 
         answers_list contains a list of answer dicts, each of which
-        contains information about an answer, e.g. answer_string, session_id,
-        time_taken_to_answer.
+        contains information about an answer, e.g. answer_value, session_id,
+        time_spent_in_sec.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -115,14 +113,7 @@ class StateAnswers(object):
         self.answers_list = answers_list
 
     def validate(self):
-        """Validates StateAnswers domain object entity.
-
-        In particular, check structure of answer dicts in answers_list:
-           - Minimum set of keys: 'answer_string', 'time_taken_to_answer',
-             'session_id'
-           - Check length of every answer_string
-           - Check time_taken_to_answer is positive
-        """
+        """Validates StateAnswers domain object entity."""
 
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
@@ -134,14 +125,14 @@ class StateAnswers(object):
                 'Expected state_name to be a string, received %s' %
                 self.state_name)
 
-        if not self.interaction_id is None:
+        if self.interaction_id is not None:
             if not isinstance(self.interaction_id, basestring):
                 raise utils.ValidationError(
                     'Expected interaction_id to be a string, received %s' %
                     str(self.interaction_id))
 
             # check if interaction_id is valid
-            if (not self.interaction_id in
+            if (self.interaction_id not in
                 interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
                     'Unknown interaction id %s' % self.interaction_id)
@@ -159,25 +150,23 @@ class StateAnswers(object):
 
 class StateAnswersCalcOutput(object):
     """
-    Domain object that stores output of calculations operating on
+    Domain object that represents output of calculations operating on
     state answers.
     """
 
     def __init__(self, exploration_id, exploration_version, state_name,
-                 calculation_outputs):
+                 calculation_id, calculation_output):
         """
         Initialize domain object for state answers calculation output.
 
-        calculation_outputs is a list of dicts; each dict represents a
-        visualization and contains the following keys: visualization_id,
-        visualization_opts. visualization_opts contains the data to present,
-        i.e. the calculation output in the format expected by the
-        visualization, and e.g. title or axis labels.
+        calculation_output is a dict with keys calculation_id, 
+        calculation_description and data.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
         self.state_name = state_name
-        self.calculation_outputs = calculation_outputs
+        self.calculation_id = calculation_id
+        self.calculation_output = calculation_output
 
     def save(self):
         """
@@ -186,7 +175,7 @@ class StateAnswersCalcOutput(object):
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
-            self.calculation_outputs)
+            self.calculation_id, self.calculation_output)
 
     def validate(self):
         """
@@ -194,7 +183,7 @@ class StateAnswersCalcOutput(object):
         it is commited to storage.
 
         In particular, check structure of visualization_opts in
-        calculation_outputs.
+        calculation_output.
         """
 
         # TODO(msl): Add specialized validations for each visualization
@@ -203,7 +192,7 @@ class StateAnswersCalcOutput(object):
         # MB. We will address this later if it happens regularly. At
         # the moment, a ValidationError is raised if an answer exceeds
         # the maximum size.
-        MAX_BYTES_PER_VISUALIZATIONS_OPTS = 999999
+        MAX_BYTES_PER_CALC_OUTPUT_DATA = 999999
 
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
@@ -215,26 +204,29 @@ class StateAnswersCalcOutput(object):
                 'Expected state_name to be a string, received %s' %
                 self.state_name)
 
-        if not isinstance(self.calculation_outputs, list):
+        if not isinstance(self.calculation_id, basestring):
             raise utils.ValidationError(
-                'Expected calculation_outputs to be a list, received %s' %
-                self.calculation_outputs)
+                'Expected calculation_id to be a string, received %s' %
+                self.calculation_id)
 
-        for calc_output in self.calculation_outputs:
-            if not isinstance(calc_output['visualization_id'], basestring):
-                raise utils.ValidationError(
-                    "Expected calc_output['visualization_id'] to be a string, received %s" %
-                    self.calc_output['visualization_id'])
-            visualization_opts = calc_output['visualization_opts']
+        if not isinstance(self.calculation_output, dict):
+            raise utils.ValidationError(
+                'Expected calculation_output to be a dict, received %s' %
+                self.calculation_output)
 
-            if not (sys.getsizeof(visualization_opts) <=
-                    MAX_BYTES_PER_VISUALIZATIONS_OPTS):
-                # TODO(msl): find a better way to deal with big
-                # visualization_opts, e.g. just skip. At the moment,
-                # too long answers produce a ValidationError.
-                raise utils.ValidationError(
-                    'visualization_opts is too big to be stored: %s' %
-                    str(visualization_opts))
+        if not isinstance(self.calculation_output['calculation_id'], 
+                          basestring):
+            raise utils.ValidationError(
+                "Expected calculation_id to be a string, received %s" %
+                self.calculation_output['calculation_id'])
+        output_data = self.calculation_output['data']
 
-            # TODO(msl): check structure of visualization_opts
+        if not (sys.getsizeof(output_data) <=
+                MAX_BYTES_PER_CALC_OUTPUT_DATA):
+            # TODO(msl): find a better way to deal with big
+            # calculation output data, e.g. just skip. At the moment,
+            # too long answers produce a ValidationError.
+            raise utils.ValidationError(
+                "calculation_output['data'] is too big to be stored: %s" %
+                str(output_data))
 

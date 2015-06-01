@@ -467,14 +467,13 @@ class StateAnswersModel(base_models.BaseModel):
     """
     # Explicitly store exploration id, exploration version and state name
     # so we can easily do queries on them.
-    exploration_id = ndb.StringProperty(indexed=True)
-    exploration_version = ndb.IntegerProperty(required=True)
-    state_name = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed
     interaction_id = ndb.StringProperty(indexed=True, required=True)
     # List of answer dicts, each of which is stored as JSON blob and
-    # has keys answer_string, time_taken_to_answer, session_id and
-    # dynamic_interaction_info
+    # has keys answer_value, time_spent_in_sec, ...
     answers_list = ndb.JsonProperty(repeated=True, indexed=False)
 
     @classmethod
@@ -485,8 +484,9 @@ class StateAnswersModel(base_models.BaseModel):
         return instance
 
     @classmethod
-    def create_or_update(cls, exploration_id, exploration_version, state_name,
-                         interaction_id, answers_list):
+    def create_or_update(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, answers_list):
         entity_id = cls._get_entity_id(
             exploration_id, str(exploration_version), state_name)
         instance = cls(id=entity_id, exploration_id=exploration_id,
@@ -523,42 +523,45 @@ class StateAnswersCalcOutputModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True)
     exploration_version = ndb.IntegerProperty(required=True)
     state_name = ndb.StringProperty(indexed=True)
-    # List of calculation output dicts, each of which is stored as JSON blob
-    # and has keys visualization_id and visualization_opts.
-    calculation_outputs = ndb.JsonProperty(repeated=True, indexed=False)
+    calculation_id = ndb.StringProperty(indexed=True)
+    # Calculation output dict stored as JSON blob
+    calculation_output = ndb.JsonProperty(indexed=False)
 
     @classmethod
     def create_or_update(cls, exploration_id, exploration_version, state_name,
-               calculation_outputs):
+                         calculation_id, calculation_output):
         instance_id = cls._get_entity_id(exploration_id, exploration_version,
-                                         state_name)
+                                         state_name, calculation_id)
         instance = cls.get(instance_id, strict=False)
         if not instance:
             # create new instance
-            instance = cls(id=instance_id, exploration_id=exploration_id,
-                           exploration_version=exploration_version,
-                           state_name=state_name,
-                           calculation_outputs=calculation_outputs)
+            instance = cls(
+                id=instance_id, exploration_id=exploration_id,
+                exploration_version=exploration_version,
+                state_name=state_name, calculation_id=calculation_id,
+                calculation_output=calculation_output)
         else:
-            # update
-            instance.calculation_outputs = calculation_outputs
+            instance.calculation_output = calculation_output
 
-                # This may fail if answers_list is too large.
         try:
+            # This may fail if calculation_output is too large.
             instance.put()
         except Exception as e:
             logging.error(e)
             pass
 
     @classmethod
-    def get_model(cls, exploration_id, exploration_version, state_name):
+    def get_model(cls, exploration_id, exploration_version, state_name, 
+                  calculation_id):
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name)
+            exploration_id, str(exploration_version), state_name, calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
 
     @classmethod
-    def _get_entity_id(cls, exploration_id, exploration_version, state_name):
+    def _get_entity_id(cls, exploration_id, exploration_version, state_name,
+                       calculation_id):
         return ':'.join([exploration_id,
                          str(exploration_version),
-                         state_name])
+                         state_name,
+                         calculation_id])

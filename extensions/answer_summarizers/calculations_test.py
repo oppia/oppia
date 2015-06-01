@@ -22,6 +22,7 @@ import copy
 import os
 import sys
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_services
 from core.tests import test_utils
@@ -31,8 +32,7 @@ import schema_utils
 import utils
 
 
-
-class InteractionAnswerViewCalculationsTest(test_utils.GenericTestBase):
+class InteractionAnswerSummariesCalculationsTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
     def test_answer_counts_calc_without_job(self):
@@ -41,36 +41,39 @@ class InteractionAnswerViewCalculationsTest(test_utils.GenericTestBase):
 
         exp_id = '0'
         exp_version = 1
-        state_name='Welcome!'
+        state_name = 'Welcome!'
         params = {}
+        DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
+            'dummy_state_name', 'NormalizedString')
         exp_services.load_demo(exp_id)
 
         # Some answers
         dummy_answers_list = [
-            {'answer_string': 'First choice', 'time_taken_to_answer': 4.,
+            {'answer_value': 'First choice', 'time_spent_in_sec': 4.,
             'session_id': 'sid1'},
-            {'answer_string': 'Second choice', 'time_taken_to_answer': 5.,
+            {'answer_value': 'Second choice', 'time_spent_in_sec': 5.,
             'session_id': 'sid1'},
-            {'answer_string': 'Fourth choice', 'time_taken_to_answer': 2.5,
+            {'answer_value': 'Fourth choice', 'time_spent_in_sec': 2.5,
             'session_id': 'sid1'},
-            {'answer_string': 'First choice', 'time_taken_to_answer': 10.,
+            {'answer_value': 'First choice', 'time_spent_in_sec': 10.,
             'session_id': 'sid2'},
-            {'answer_string': 'First choice', 'time_taken_to_answer': 3.,
+            {'answer_value': 'First choice', 'time_spent_in_sec': 3.,
             'session_id': 'sid2'},
-            {'answer_string': 'First choice', 'time_taken_to_answer': 1.,
+            {'answer_value': 'First choice', 'time_spent_in_sec': 1.,
             'session_id': 'sid2'},
-            {'answer_string': 'Second choice', 'time_taken_to_answer': 20.,
+            {'answer_value': 'Second choice', 'time_spent_in_sec': 20.,
             'session_id': 'sid2'},
-            {'answer_string': 'First choice', 'time_taken_to_answer': 20.,
+            {'answer_value': 'First choice', 'time_spent_in_sec': 20.,
             'session_id': 'sid3'}
             ]
 
         # Record answers
         for answer in dummy_answers_list:
             stats_services.record_answer(
-                exp_id, exp_version, state_name, 'test_handler',
-                answer['session_id'], answer['time_taken_to_answer'],
-                params, answer['answer_string'])
+                exp_id, exp_version, state_name, 'test_handler', 
+                DEFAULT_RULESPEC, answer['session_id'], 
+                answer['time_spent_in_sec'], params, 
+                answer['answer_value'])
 
         # Retrieve state answers from storage and get corresponding
         # StateAnswers domain object.
@@ -85,12 +88,11 @@ class InteractionAnswerViewCalculationsTest(test_utils.GenericTestBase):
             calculations.AnswerCounts.calculate_from_state_answers_entity(
                 state_answers))
 
-        actual_calc_outputs = actual_state_answers_calc_output.calculation_outputs
-        self.assertEquals(len(actual_calc_outputs), 1)
-        self.assertEquals(actual_calc_outputs[0]['visualization_id'],
-                          'values_and_counts_table')
-        actual_answer_counts = actual_calc_outputs[0]['visualization_opts']['data']
-
+        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        self.assertEquals(actual_calc_output['calculation_id'],
+                          'AnswerCounts')
+        actual_answer_counts = actual_calc_output['data']
+        
         # Expected answer counts (result of calculation)
         # TODO(msl): Maybe include answers that were never clicked and got 0 count
         # (e.g. useful for multiple choice answers that are never clicked)

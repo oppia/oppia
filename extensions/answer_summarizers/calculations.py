@@ -18,11 +18,12 @@
 
 __author__ = 'Marcel Schmittfull'
 
-from collections import Counter
+import collections
 import copy
 import os
 
 from core.domain import stats_domain
+from extensions import interactions
 import feconf
 import schema_utils
 import utils
@@ -31,12 +32,28 @@ import utils
 """
 Calculations performed on recorded state answers.
 
-NOTE TO DEVELOPERS: Calculations desired for an interaction named
-<INTERACTION_NAME> need to be registered in
+NOTE TO DEVELOPERS: To specify calculations desired for an interaction named
+<INTERACTION_NAME>, edit
 
-    extensions.interactions.<INTERACTION_NAME>.<INTERACTION_NAME>
-    .registered_state_answers_calculations
+    extensions.interactions.<INTERACTION_NAME>.answer_visualizations
+
+This is a list of visualizations, each of which is specified by a dict
+with keys 'visualization_id', 'visualization_customization_args' and 
+'data_source'. The value of 'data_source' should be a dict that specifies a
+calculation_id. An example for a single visualization and calculation may look
+like this:
+
+    answer_visualizations = [
+        {'visualization_id': 'BarChart',
+         'visualization_customization_args': {
+             'x_axis_label': 'Answer',
+             'y_axis_label': 'Count',
+             },
+         'data_source': {
+              'calculation_id': calculations.AnswerCounts.calculation_id,
+              }}]
 """
+
 
 class BaseCalculation(object):
     """
@@ -47,9 +64,8 @@ class BaseCalculation(object):
     """
 
     # These values should be overridden in subclasses.
-    name = ''
-    description = ''
-    allowed_input_interactions = []
+    calculation_id = 'BaseCalculation'
+    description = 'Base calculation overwritten by specific calculations.'
 
     @staticmethod
     def calculate_from_state_answers_entity(state_answers):
@@ -68,32 +84,34 @@ class AnswerCounts(BaseCalculation):
     showing how often each answer was given.
     """
 
-    name = 'Answer counts'
-    description = 'Calculate answer counts for each answer option.'
+    calculation_id = 'AnswerCounts'
+    description = 'Calculate answer counts for each answer.'
 
     @staticmethod
     def calculate_from_state_answers_entity(state_answers):
         """
         Calculate answer counts from a single StateAnswers entity.
-        Return list of pairs (answer_string, count).
+        Return list of pairs (answer_value, count).
         """
 
-        answer_strings = [answer_dict['answer_string'] for answer_dict 
+        answer_values = [answer_dict['answer_value'] for answer_dict 
                           in state_answers.answers_list]
 
-        answer_counts_as_list_of_pairs = Counter(answer_strings).items()
+        answer_counts_as_list_of_pairs = (
+            collections.Counter(answer_values).items())
 
-        calc_outputs = []
-        calc_outputs.append(
-            {'visualization_id': 'values_and_counts_table',
-             'visualization_opts': {'data': answer_counts_as_list_of_pairs,
-                                    'title': 'Answer counts',
-                                    'column_labels': ['Answer', 'Count']}
-             })
+        calc_output = {'data': answer_counts_as_list_of_pairs,
+                       'calculation_id': AnswerCounts.calculation_id,
+                       'calculation_description': AnswerCounts.description}
         
         # get StateAnswersCalcOutput instance
         state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
             state_answers.exploration_id, state_answers.exploration_version,
-            state_answers.state_name, calc_outputs)
+            state_answers.state_name, AnswerCounts.calculation_id, calc_output)
 
         return state_answers_calc_output
+
+
+# List of all calculation classes. Do not include BaseCalculation.
+LIST_OF_CALCULATION_CLASSES = [AnswerCounts]
+

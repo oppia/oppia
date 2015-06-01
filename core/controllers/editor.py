@@ -33,6 +33,7 @@ from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import skins_services
+from core.domain import stats_jobs
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -628,14 +629,17 @@ class AnswerSummarizersHandler(EditorHandler):
 
     def get(self, exploration_id, exploration_version, escaped_state_name):
         """Handles GET requests."""
-        state_name = self.unescape_state_name(escaped_state_name)
+
         try:
-            calculation_outputs = (
-                stats_services.get_answer_summarizers_outputs(
-                    exploration_id, exploration_version, 
-                    state_name)).calculation_outputs
+            exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
+
+        state_name = self.unescape_state_name(escaped_state_name)
+        calculation_outputs = (
+            stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
+                exploration_id, exploration_version, 
+                state_name)).calculation_outputs
 
         self.render_json({'calculation_outputs': calculation_outputs})
 
