@@ -486,8 +486,7 @@ class InteractionInstance(object):
             interaction_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
              for h in interaction_dict['handlers']],
-            interaction_dict['triggers'] if (
-                'triggers' in interaction_dict) else [])
+            interaction_dict['triggers'])
 
     def __init__(
             self, interaction_id, customization_args, handlers, triggers):
@@ -807,7 +806,7 @@ class State(object):
         if not allow_null_interaction and self.interaction.id is None:
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
-        elif not (self.interaction.id is None):
+        elif self.interaction.id is not None:
             self.interaction.validate()
 
     def update_content(self, content_list):
@@ -1553,6 +1552,8 @@ class Exploration(object):
         schema version 1 and does not contain any old constructs, such as
         widgets. This is a complete migration of everything previous to the
         schema versioning update to the earliest versioned schema.
+
+        Note that the states_dict being passed in is modified in-place.
         """
         # ensure widgets are renamed to be interactions
         for _, state_defn in states_dict.iteritems():
@@ -1573,6 +1574,8 @@ class Exploration(object):
         implicit 'END' state, but version 2 does not. As a result, the
         conversion process involves introducing a proper ending state for all
         explorations previously designed under this assumption.
+
+        Note that the states_dict being passed in is modified in-place.
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
@@ -1637,6 +1640,8 @@ class Exploration(object):
     def _convert_states_v2_dict_to_v3_dict(cls, states_dict):
         """Converts from version 2 to 3. Version 3 introduces a triggers list
         within interactions.
+
+        Note that the states_dict being passed in is modified in-place.
         """
         # Ensure all states interactions have a triggers list.
         for (state_name, sdict) in states_dict.iteritems():
@@ -1650,6 +1655,9 @@ class Exploration(object):
     def update_states_v0_to_v1_from_model(cls, exploration_model_dict):
         """Converts from states schema version 0 to 1 of the states blob
         contained in the exploration model exploration_model provided.
+
+        Note that the exploration_model_dict being passed in is modified
+        in-place.
         """
         exploration_model_dict['states_schema_version'] = 1
         converted_states = cls._convert_states_v0_dict_to_v1_dict(
@@ -1660,6 +1668,9 @@ class Exploration(object):
     def update_states_v1_to_v2_from_model(cls, exploration_model_dict):
         """Converts from states schema version 1 to 2 of the states blob
         contained in the exploration model exploration_model provided.
+
+        Note that the exploration_model_dict being passed in is modified
+        in-place.
         """
         exploration_model_dict['states_schema_version'] = 2
         converted_states = cls._convert_states_v1_dict_to_v2_dict(
@@ -1670,6 +1681,9 @@ class Exploration(object):
     def update_states_v2_to_v3_from_model(cls, exploration_model_dict):
         """Converts from states schema version 2 to 3 of the states blob
         contained in the exploration model exploration_model provided.
+
+        Note that the exploration_model_dict being passed in is modified
+        in-place.
         """
         exploration_model_dict['states_schema_version'] = 3
         converted_states = cls._convert_states_v2_dict_to_v3_dict(
@@ -1804,7 +1818,6 @@ class Exploration(object):
         exploration_dict['id'] = exploration_id
         exploration_dict['title'] = title
         exploration_dict['category'] = category
-        exploration_dict['states_schema_version']=0
 
         return Exploration.create_exploration_from_dict(exploration_dict)
 

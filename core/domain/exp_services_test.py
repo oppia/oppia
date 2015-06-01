@@ -2390,3 +2390,65 @@ tags: []
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
         exploration.validate(strict=True)
 
+    def test_loading_old_exploration_does_not_break_domain_object_ctor(self):
+        """This test attempts to load an exploration that is stored in the data
+        store as pre-states schema version 0. The
+        exp_services.get_exploration_by_id function should properly load and
+        convert the exploration without any issues. Structural changes to the
+        states schema will not break the exploration domain class constructor.
+        """
+        _EXP_ID = 'exp_id3'
+
+        # Create a exploration with states schema version 0 and an old states
+        # blob.
+        old_exp_model = exp_models.ExplorationModel(
+            id=_EXP_ID,
+            category='Old Category',
+            title='Old Title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: {
+                    'content': [{'type': 'text', 'value': ''}],
+                    'param_changes': [],
+                    'interaction': {
+                        'customization_args': {},
+                        'id': 'Continue',
+                        'handlers': [{
+                            'name': 'submit',
+                            'rule_specs': [{
+                                'dest': 'END',
+                                'feedback': [],
+                                'param_changes': [],
+                                'definition': {'rule_type': 'default'}
+                            }]
+                        }],
+                    }
+                }
+            },
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(_EXP_ID, self.ALBERT_ID)
+        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
+            'cmd': 'create_new',
+            'title': 'Old Title',
+            'category': 'Old Category',
+        }])
+
+        exploration = exp_services.get_exploration_by_id(_EXP_ID)
+
+        # Ensure the exploration was converted.
+        self.assertEqual(exploration.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+        # The converted exploration should be up-to-date and properly converted.
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+

@@ -49,7 +49,7 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
-def _migrate_states_schema(exploration_model_dict):
+def _migrate_states_schema(versioned_exploration_states):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -59,8 +59,14 @@ def _migrate_states_schema(exploration_model_dict):
     (feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION), a new conversion
     function must be added and some code appended to this function to account
     for that new version.
+
+    Args:
+        versioned_exploration_states: A dictionary representing an exploration's
+        states dictionary and the states_schema_version of that states
+        structure. Both 'states_schema_version' and 'states' are keys within the
+        dictionary.
     """
-    exploration_states_schema_version = exploration_model_dict[
+    exploration_states_schema_version = versioned_exploration_states[
         'states_schema_version']
     if (exploration_states_schema_version is None
             or exploration_states_schema_version < 1):
@@ -76,19 +82,19 @@ def _migrate_states_schema(exploration_model_dict):
     # Check for conversion to v1.
     if exploration_states_schema_version == 0:
         exp_domain.Exploration.update_states_v0_to_v1_from_model(
-            exploration_model_dict)
+            versioned_exploration_states)
         exploration_states_schema_version = 1
 
     # Check for conversion to v2.
     if exploration_states_schema_version == 1:
         exp_domain.Exploration.update_states_v1_to_v2_from_model(
-            exploration_model_dict)
+            versioned_exploration_states)
         exploration_states_schema_version = 2
 
     # Check for conversion to v3.
     if exploration_states_schema_version == 2:
         exp_domain.Exploration.update_states_v2_to_v3_from_model(
-            exploration_model_dict)
+            versioned_exploration_states)
         exploration_states_schema_version = 3
 
 
@@ -116,16 +122,16 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     """
 
     # Ensure the original exploration model does not get altered.
-    temp_exploration_model = {
+    versioned_exploration_states = {
         'states_schema_version': exploration_model.states_schema_version,
         'states': copy.deepcopy(exploration_model.states)
     }
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
-    if (run_conversion and temp_exploration_model['states_schema_version'] !=
+    if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
-        _migrate_states_schema(temp_exploration_model)
+        _migrate_states_schema(versioned_exploration_states)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -133,8 +139,9 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
         exploration_model.default_skin, exploration_model.skin_customizations,
-        temp_exploration_model['states_schema_version'],
-        exploration_model.init_state_name, temp_exploration_model['states'],
+        versioned_exploration_states['states_schema_version'],
+        exploration_model.init_state_name,
+        versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.created_on,
         exploration_model.last_updated)

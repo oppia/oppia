@@ -303,8 +303,9 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Save new default exploration as though a new one were created. Force
         # the current states schema version to 0 during the creation so that it
-        # is migrated with the other exploration. This will cause a failrue if
-        # non-strict validation fails on the presence of a null interaction.
+        # is migrated when loaded later on. This ensures that explorations with
+        # null interactions pass non-strict validation and are migrated
+        # correctly.
         exploration = exp_domain.Exploration.create_default_exploration(
             self.NEW_EXP_ID, 'title', 'category')
         exploration.states_schema_version = 0
