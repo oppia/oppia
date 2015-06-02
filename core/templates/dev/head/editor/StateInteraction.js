@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var DEFAULT_END_STATE_CONTENT = 'Congratulations, you have finished!';
+var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
 // A state-specific cache for interaction details. It stores customization args
 // corresponding to an interaction id so that they can be restored if the
@@ -125,7 +125,14 @@ oppia.controller('StateInteraction', [
     $scope.hasLoaded = true;
   });
 
-  $scope.updateEndExplorationDefaultContent = function() {
+  // If a terminal interaction is selected for a state and it currently has no
+  // content, this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
+  $scope.updateDefaultTerminalStateContent = function(interactionId) {
+    // Nothing to update unless it's a terminal state.
+    if (!INTERACTION_SPECS[interactionId].is_terminal) {
+      return;
+    }
+
     // Get current state.
     var activeStateName = editorContextService.getActiveStateName();
     var state = explorationStatesService.getState(activeStateName);
@@ -139,10 +146,11 @@ oppia.controller('StateInteraction', [
 
     // Update the state's content.
     var previousContent = angular.copy(state.content);
-    state.content = [{ type: 'text', value: DEFAULT_END_STATE_CONTENT }];
+    state.content = [{type: 'text', value: DEFAULT_TERMINAL_STATE_CONTENT}];
 
     // Fire property change for editing the state's content.
-    changeListService.editStateProperty(activeStateName, 'content',
+    changeListService.editStateProperty(
+      activeStateName, 'content',
       angular.copy(state.content), previousContent);
 
     // Save state.
@@ -248,12 +256,9 @@ oppia.controller('StateInteraction', [
         var hasInteractionIdChanged = (
           selectedInteractionId !== stateInteractionIdService.savedMemento);
         if (hasInteractionIdChanged) {
-          // If the user selects the EndExploration and has not filled in any
-          // content for their state, default it to the congrats message.
-          var currentInterId = stateInteractionIdService.savedMemento;
-          if (selectedInteractionId == 'EndExploration') {
-            $scope.updateEndExplorationDefaultContent();
-          }
+          // If the user selects the a terminal interaction and has not filled
+          // in any content for their state, default it to the congrats message.
+          $scope.updateDefaultTerminalStateContent(selectedInteractionId);
 
           stateInteractionIdService.displayed = selectedInteractionId;
           stateInteractionIdService.saveDisplayedValue();

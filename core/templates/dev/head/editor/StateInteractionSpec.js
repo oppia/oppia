@@ -21,7 +21,6 @@
 describe('State Interaction controller', function() {
 
   describe('StateInteraction', function() {
-    var scope, interCtrl, stateCtrl, ecs, cls, ess;
 
     beforeEach(function() {
       module('oppia');
@@ -67,7 +66,7 @@ describe('State Interaction controller', function() {
         },
       });
 
-      stateCtrl = $controller('StateEditor', {
+      stateEditorCtrl = $controller('StateEditor', {
         $scope: scope,
         editorContextService: ecs,
         changeListService: cls,
@@ -85,7 +84,7 @@ describe('State Interaction controller', function() {
         }
       });
 
-      interCtrl = $controller('StateInteraction', {
+      interactionCtrl = $controller('StateInteraction', {
         $scope: scope,
         editorContextService: ecs,
         changeListService: cls,
@@ -99,36 +98,54 @@ describe('State Interaction controller', function() {
           TextInput: {
             display_mode: 'inline',
             is_terminal: false
-          }
+          },
+          TerminalInteraction: {
+            display_mode: 'inline',
+            is_terminal: true
+          },
         }
       });
     }));
 
-    it('should keep non-empty content when setting EndExploration', function() {
+    it('should keep non-empty content when setting a terminal interaction', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
       
       var state = ess.getState('First State');
-      state.interaction.id = 'EndExploration';
+      state.interaction.id = 'TerminalInteraction';
       ess.setState('First State', state);
-      scope.updateEndExplorationDefaultContent(true);
+      scope.updateDefaultTerminalStateContent(state.interaction.id);
 
       expect(ess.getState('First State').content[0].value).toEqual('First State Content');
-      expect(ess.getState('First State').interaction.id).toEqual('EndExploration');
+      expect(ess.getState('First State').interaction.id).toEqual('TerminalInteraction');
     });
 
-    it('should change to default text when adding EndExploration', function() {
+    it('should change to default text when adding a terminal interaction', function() {
       ecs.setActiveStateName('End State');
       scope.initStateEditor();
       
       var state = ess.getState('End State');
-      state.interaction.id = 'EndExploration';
+      state.interaction.id = 'TerminalInteraction';
       ess.setState('End State', state);
-      scope.updateEndExplorationDefaultContent(true);
+      scope.updateDefaultTerminalStateContent(state.interaction.id);
 
       expect(state.content[0].value).toEqual('');
       expect(ess.getState('End State').content[0].value).toEqual('Congratulations, you have finished!');
-      expect(ess.getState('End State').interaction.id).toEqual('EndExploration');
+      expect(ess.getState('End State').interaction.id).toEqual('TerminalInteraction');
+    });
+
+    it('should not default text when adding a non-terminal interaction', function() {
+      ecs.setActiveStateName('End State');
+      scope.initStateEditor();
+      
+      var state = ess.getState('End State');
+      state.interaction.id = 'TextInput';
+      ess.setState('End State', state);
+      scope.updateDefaultTerminalStateContent(state.interaction.id);
+
+      expect(state.content[0].value).toEqual('');
+      expect(ess.getState('End State').content[0].value).toEqual('');
+      expect(ess.getState('End State').interaction.id).toEqual('TextInput');
     });
   });
 });
