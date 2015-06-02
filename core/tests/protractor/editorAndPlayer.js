@@ -39,7 +39,6 @@ describe('State editor', function() {
 
     // Setup a terminating state
     editor.moveToState('final state');
-    editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -88,7 +87,6 @@ describe('State editor', function() {
 
     // Setup a terminating state
     editor.moveToState('final state');
-    editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -118,7 +116,6 @@ describe('State editor', function() {
 
     // Setup a terminating state
     editor.moveToState('final state');
-    editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -161,7 +158,6 @@ describe('Full exploration editor', function() {
 
     // Setup a terminating state
     editor.moveToState('final state');
-    editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -262,7 +258,6 @@ describe('Full exploration editor', function() {
 
       // Setup a terminating state
       editor.moveToState('final state');
-      editor.setContent(forms.toRichText('Congratulations, you have finished!'));
       editor.setInteraction('EndExploration');
 
       // Check editor preview tab
@@ -474,7 +469,6 @@ describe('Exploration history', function() {
 
     // Setup a terminating state
     editor.moveToState('final state');
-    editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
     editor.moveToState('first');
     editor.saveChanges();
