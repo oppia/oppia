@@ -290,26 +290,23 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
     NEW_EXP_ID = 'exp_id1'
 
     VERSION_0_STATES_DICT = {
-        'content': [{
-            'type': 'text',
-            'value': feconf.DEFAULT_INIT_STATE_CONTENT_STR
-        }],
-        'interaction': {
-            'id': None,
-            'customization_args': {},
-            'handlers': [{
-                'name': 'submit',
-                'rule_specs': [{
-                    'definition': {
-                        'rule_type': 'default',
-                    },
-                    'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                    'feedback': [],
-                    'param_changes': [],
-                }],
-            }],
-        },
-        'param_changes': [],
+        feconf.DEFAULT_INIT_STATE_NAME: {
+            'content': [{'type': 'text', 'value': ''}],
+            'param_changes': [],
+            'interaction': {
+                'customization_args': {},
+                'id': None,
+                'handlers': [{
+                    'name': 'submit',
+                    'rule_specs': [{
+                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                        'feedback': [],
+                        'param_changes': [],
+                        'definition': {'rule_type': 'default'}
+                    }]
+                }]
+            }
+        }
     }
 
     def setUp(self):
@@ -372,25 +369,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
             skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: {
-                    'content': [{'type': 'text', 'value': ''}],
-                    'param_changes': [],
-                    'interaction': {
-                        'customization_args': {},
-                        'id': None,
-                        'handlers': [{
-                            'name': 'submit',
-                            'rule_specs': [{
-                                'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                                'feedback': [],
-                                'param_changes': [],
-                                'definition': {'rule_type': 'default'}
-                            }]
-                        }]
-                    }
-                }
-            },
+            states=self.VERSION_0_STATES_DICT,
             param_specs={},
             param_changes=[]
         )
