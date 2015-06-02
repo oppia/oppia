@@ -78,9 +78,11 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
 
       // This is required in order to avoid the following bug:
       //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
-      window.setTimeout(function() {
+      $timeout(function() {
         updateMarker($scope.$parent.value[0], $scope.$parent.value[1]);
-        google.maps.event.trigger($scope.map, 'resize');
+        if ($scope.map) {
+          google.maps.event.trigger($scope.map, 'resize');
+        }
       }, 100);
 
       $scope.mapOptions = {
