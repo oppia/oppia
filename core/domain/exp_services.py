@@ -61,10 +61,11 @@ def _migrate_states_schema(versioned_exploration_states):
     for that new version.
 
     Args:
-        versioned_exploration_states: A dictionary representing an exploration's
-        states dictionary and the states_schema_version of that states
-        structure. Both 'states_schema_version' and 'states' are keys within the
-        dictionary.
+        versioned_exploration_states: A dict with two keys:
+          - states_schema_version: the states schema version for the
+            exploration.
+          - states: the dict of states comprising the exploration. The keys in
+            this dict are state names.
     """
     exploration_states_schema_version = versioned_exploration_states[
         'states_schema_version']

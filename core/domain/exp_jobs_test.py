@@ -286,6 +286,32 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
     VALID_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
+    UPGRADED_STATES_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: {
+            'content': [{
+                'type': 'text',
+                'value': feconf.DEFAULT_INIT_STATE_CONTENT_STR
+            }],
+            'interaction': {
+                'id': None,
+                'customization_args': {},
+                'handlers': [{
+                    'name': 'submit',
+                    'rule_specs': [{
+                        'definition': {
+                            'rule_type': 'default',
+                        },
+                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                        'feedback': [],
+                        'param_changes': [],
+                    }],
+                }],
+                'triggers': [],
+            },
+            'param_changes': [],
+        }
+    }
+
     def setUp(self):
         super(ExplorationMigrationJobTest, self).setUp()
 
@@ -334,3 +360,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+        # Ensure the states structure within the exploration was upgraded.
+        self.assertEqual(
+            updated_exp.to_dict()['states'],
+            self.UPGRADED_STATES_DICT)
