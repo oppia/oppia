@@ -480,6 +480,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'abcd', 'title', 'category')
         self.assertEqual(notdemo2.is_demo, False)
 
+    def test_exploration_export_import(self):
+        """Test that to_dict and from_dict preserve all data within an
+        exploration.
+        """
+        demo = exp_domain.Exploration.create_default_exploration(
+            '0', 'title', 'category')
+        demo_dict = demo.to_dict()
+        exp_from_dict = exp_domain.Exploration.create_exploration_from_dict(
+            demo_dict)
+        self.assertEqual(exp_from_dict.to_dict(), demo_dict)
+
 
 class StateExportUnitTests(test_utils.GenericTestBase):
     """Test export of states."""

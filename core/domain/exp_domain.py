@@ -1824,12 +1824,22 @@ class Exploration(object):
     def to_yaml(self):
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXPLORATION_SCHEMA_VERSION
+
+        # Remove elements from the exploration dictionary that should not be
+        # saved within the YAML representation.
+        del exp_dict['id']
+        del exp_dict['title']
+        del exp_dict['category']
+
         return utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
         necessary information to represent the exploration."""
-        return {
+        return copy.deepcopy({
+            'id': self.id,
+            'title': self.title,
+            'category': self.category,
             'author_notes': self.author_notes,
             'blurb': self.blurb,
             'default_skin': self.default_skin,
@@ -1844,7 +1854,7 @@ class Exploration(object):
                 'skin_customizations'],
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()}
-        }
+        })
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the
