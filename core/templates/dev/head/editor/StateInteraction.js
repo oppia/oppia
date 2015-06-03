@@ -144,8 +144,8 @@ oppia.controller('StateInteraction', [
               var argName = $scope.customizationArgSpecs[i].name;
               stateCustomizationArgsService.displayed[argName] = {
                 value: (
-                  stateCustomizationArgsService.savedMemento.hasOwnProperty(caName) ?
-                  angular.copy(stateCustomizationArgsService.savedMemento[caName].value) :
+                  stateCustomizationArgsService.savedMemento.hasOwnProperty(argName) ?
+                  angular.copy(stateCustomizationArgsService.savedMemento[argName].value) :
                   angular.copy($scope.customizationArgSpecs[i].default_value)
                 )
               };
