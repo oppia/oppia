@@ -30,8 +30,13 @@ describe('State Interaction controller', function() {
 
       scope = $rootScope.$new();
       ecs = $injector.get('editorContextService');
-      cls = $injector.get('changeListService');
+      var cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
+      scope.stateInteractionIdService = $injector.get(
+        'stateInteractionIdService')
+      scope.stateCustomizationArgsService = $injector.get(
+        'stateCustomizationArgsService')
+      scope.interactionDetailsCache = $injector.get('interactionDetailsCache')
 
       ess.setStates({
         'First State': {
@@ -66,7 +71,7 @@ describe('State Interaction controller', function() {
         },
       });
 
-      stateEditorCtrl = $controller('StateEditor', {
+      var stateEditorCtrl = $controller('StateEditor', {
         $scope: scope,
         editorContextService: ecs,
         changeListService: cls,
@@ -84,7 +89,7 @@ describe('State Interaction controller', function() {
         }
       });
 
-      interactionCtrl = $controller('StateInteraction', {
+      var interactionCtrl = $controller('StateInteraction', {
         $scope: scope,
         editorContextService: ecs,
         changeListService: cls,
@@ -114,7 +119,12 @@ describe('State Interaction controller', function() {
       var state = ess.getState('First State');
       state.interaction.id = 'TerminalInteraction';
       ess.setState('First State', state);
-      scope.updateDefaultTerminalStateContent(state.interaction.id);
+
+      var result = {
+        'selectedInteractionId': state.interaction.id,
+        'tmpCustomizationArgs': []
+      };
+      scope.onCustomizationModalSavePostHook(result);
 
       expect(ess.getState('First State').content[0].value).toEqual('First State Content');
       expect(ess.getState('First State').interaction.id).toEqual('TerminalInteraction');
@@ -127,7 +137,12 @@ describe('State Interaction controller', function() {
       var state = ess.getState('End State');
       state.interaction.id = 'TerminalInteraction';
       ess.setState('End State', state);
-      scope.updateDefaultTerminalStateContent(state.interaction.id);
+
+      var result = {
+        'selectedInteractionId': state.interaction.id,
+        'tmpCustomizationArgs': []
+      };
+      scope.onCustomizationModalSavePostHook(result);
 
       expect(state.content[0].value).toEqual('');
       expect(ess.getState('End State').content[0].value).toEqual('Congratulations, you have finished!');
@@ -141,7 +156,12 @@ describe('State Interaction controller', function() {
       var state = ess.getState('End State');
       state.interaction.id = 'TextInput';
       ess.setState('End State', state);
-      scope.updateDefaultTerminalStateContent(state.interaction.id);
+
+      var result = {
+        'selectedInteractionId': state.interaction.id,
+        'tmpCustomizationArgs': []
+      };
+      scope.onCustomizationModalSavePostHook(result);
 
       expect(state.content[0].value).toEqual('');
       expect(ess.getState('End State').content[0].value).toEqual('');

@@ -127,12 +127,7 @@ oppia.controller('StateInteraction', [
 
   // If a terminal interaction is selected for a state and it currently has no
   // content, this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
-  $scope.updateDefaultTerminalStateContent = function(interactionId) {
-    // Nothing to update unless it's a terminal state.
-    if (!INTERACTION_SPECS[interactionId].is_terminal) {
-      return;
-    }
-
+  var updateDefaultTerminalStateContentIfEmpty = function(interactionId) {
     // Get current state.
     var activeStateName = editorContextService.getActiveStateName();
     var state = explorationStatesService.getState(activeStateName);
@@ -160,6 +155,43 @@ oppia.controller('StateInteraction', [
     $rootScope.$broadcast('refreshStateEditor');
   };
 
+  $scope.onCustomizationModalSavePostHook = function(result) {
+    var selectedInteractionId = result.selectedInteractionId;
+    var tmpCustomizationArgs = result.tmpCustomizationArgs;
+
+    var hasInteractionIdChanged = (
+      selectedInteractionId !== stateInteractionIdService.savedMemento);
+    if (hasInteractionIdChanged) {
+      // If user selects the a terminal interaction and has not filled in
+      // any content for their state, default it to the congrats message.
+      if (INTERACTION_SPECS[selectedInteractionId].is_terminal) {
+        updateDefaultTerminalStateContentIfEmpty(selectedInteractionId);
+      }
+
+      stateInteractionIdService.displayed = selectedInteractionId;
+      stateInteractionIdService.saveDisplayedValue();
+    }
+
+    stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
+      tmpCustomizationArgs);
+    stateCustomizationArgsService.saveDisplayedValue();
+
+    interactionDetailsCache.set(
+      stateInteractionIdService.savedMemento,
+      stateCustomizationArgsService.savedMemento);
+
+    // This must be called here so that the rules are updated before the state
+    // graph is recomputed.
+    if (hasInteractionIdChanged) {
+      $rootScope.$broadcast(
+        'onInteractionIdChanged', stateInteractionIdService.savedMemento);
+    }
+
+    _updateStatesDict();
+    graphDataService.recompute();
+    _updateInteractionPreviewAndAnswerChoices();
+  };
+
   $scope.openInteractionCustomizerModal = function() {
     if (editabilityService.isEditable()) {
       warningsData.clear();
@@ -173,6 +205,8 @@ oppia.controller('StateInteraction', [
             '$scope', '$modalInstance', 'stateInteractionIdService', 'stateCustomizationArgsService', 'interactionDetailsCache', 'INTERACTION_SPECS',
             function($scope, $modalInstance, stateInteractionIdService, stateCustomizationArgsService, interactionDetailsCache, INTERACTION_SPECS) {
           $scope.stateInteractionIdService = stateInteractionIdService;
+          $scope.stateCustomizationArgsService = stateCustomizationArgsService;
+          $scope.interactionDetailsCache = interactionDetailsCache;
           $scope.INTERACTION_SPECS = INTERACTION_SPECS;
           $scope.ALLOWED_INTERACTION_CATEGORIES = GLOBALS.ALLOWED_INTERACTION_CATEGORIES;
           var oldInteractionId = angular.copy(stateInteractionIdService.savedMemento);
@@ -249,40 +283,7 @@ oppia.controller('StateInteraction', [
             $modalInstance.dismiss('cancel');
           };
         }]
-      }).result.then(function(result) {
-        var selectedInteractionId = result.selectedInteractionId;
-        var tmpCustomizationArgs = result.tmpCustomizationArgs;
-
-        var hasInteractionIdChanged = (
-          selectedInteractionId !== stateInteractionIdService.savedMemento);
-        if (hasInteractionIdChanged) {
-          // If the user selects the a terminal interaction and has not filled
-          // in any content for their state, default it to the congrats message.
-          $scope.updateDefaultTerminalStateContent(selectedInteractionId);
-
-          stateInteractionIdService.displayed = selectedInteractionId;
-          stateInteractionIdService.saveDisplayedValue();
-        }
-
-        stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
-          tmpCustomizationArgs);
-        stateCustomizationArgsService.saveDisplayedValue();
-
-        interactionDetailsCache.set(
-          stateInteractionIdService.savedMemento,
-          stateCustomizationArgsService.savedMemento);
-
-        // This must be called here so that the rules are updated before the state
-        // graph is recomputed.
-        if (hasInteractionIdChanged) {
-          $rootScope.$broadcast(
-            'onInteractionIdChanged', stateInteractionIdService.savedMemento);
-        }
-
-        _updateStatesDict();
-        graphDataService.recompute();
-        _updateInteractionPreviewAndAnswerChoices();
-      }, function() {
+      }).result.then($scope.onCustomizationModalSavePostHook, function() {
         stateInteractionIdService.restoreFromMemento();
         stateCustomizationArgsService.restoreFromMemento();
       });
