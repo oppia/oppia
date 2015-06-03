@@ -679,12 +679,31 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       uiConfig: '&'
     },
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
-    controller: ['$scope', '$log', function($scope, $log) {
-      // adapted from http://stackoverflow.com/a/6899999
+    controller: ['$scope', '$log', '$sanitize', function($scope, $log, $sanitize) {
       $scope.stripFormatting = function(html) {
-        var tmpNode = document.createElement('div');
-        tmpNode.innerHTML = html;
-        return tmpNode.innerText;
+        var widgets = html.match(/<img.+oppia-noninteractive.+>/g) || [];
+        for (var i = 0; i < widgets.length; i++) {
+          var wrapper = document.createElement('div');
+          wrapper.innerHTML = widgets[i];
+          var el = wrapper.firstChild;
+          var attrs = el.attributes;
+          // copied widgets come with multiple unnecessary attributes, which are removed here
+          for (var j = 0; j < attrs.length; j++) {
+            var attr = attrs[j];
+            if (attr.name != 'class' && attr.name != 'src' && attr.name.indexOf('-with-value') === -1) {
+              el.removeAttribute(attr.name);
+            }
+          }
+          widgets[i] = el.outerHTML;
+        }
+        var widgetIndex = 0;
+        // use *oppia-noninteractive* placeholders to save location of widgets before sanitizing
+        var sanitized = $sanitize(html.replace(/<img.+oppia-noninteractive.+>/g, '*oppia-noninteractive*'));
+        var result = sanitized.replace(/\*oppia-noninteractive\*/g, function(match){
+          return widgets[widgetIndex];
+          widgetIndex++;
+        });
+        return result;
       };
 
       $scope._RICH_TEXT_COMPONENTS = [];
