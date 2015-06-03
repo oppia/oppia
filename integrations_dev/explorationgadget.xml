@@ -2,5 +2,10 @@
   <ModulePrefs title="Oppia Gadget" height="800" width="600" author="Google">
     <Require feature="dynamic-height"/>
   </ModulePrefs>
-  <Content type="url" href="https://2-0-0-rc-2-dot-oppiaaserversbhowmik.appspot.com/explore/1?#" />
+  <Content type="html">
+    <![CDATA[
+      <script src="//cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"></script>
+      <oppia oppia-id="VleQP9cg-40V" src="https://www.oppia.org"></oppia>
+    ]]>
+  </Content>
 </Module>
