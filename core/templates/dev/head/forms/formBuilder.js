@@ -681,7 +681,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', '$sanitize', function($scope, $log, $sanitize) {
       $scope.stripFormatting = function(html) {
-        var widgets = html.match(/<img.+oppia-noninteractive.+>/g) || [];
+        var widgets = html.match(/<img.+?oppia-noninteractive.+?>/g) || [];
         for (var i = 0; i < widgets.length; i++) {
           var wrapper = document.createElement('div');
           wrapper.innerHTML = widgets[i];
@@ -698,7 +698,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
         }
         var widgetIndex = 0;
         // use *oppia-noninteractive* placeholders to save location of widgets before sanitizing
-        var sanitized = $sanitize(html.replace(/<img.+oppia-noninteractive.+>/g, '*oppia-noninteractive*'));
+        var sanitized = $sanitize(html.replace(/<img.+?oppia-noninteractive.+?>/g, '*oppia-noninteractive*'));
         var result = sanitized.replace(/\*oppia-noninteractive\*/g, function(match){
           return widgets[widgetIndex];
           widgetIndex++;
