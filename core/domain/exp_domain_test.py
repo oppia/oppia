@@ -491,6 +491,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             demo_dict)
         self.assertEqual(exp_from_dict.to_dict(), demo_dict)
 
+    def test_interaction_with_none_id_is_not_terminal(self):
+        """Test that an interaction with an id of None leads to is_terminal
+        being false.
+        """
+        # Default exploration has a default interaction with an ID of None.
+        demo = exp_domain.Exploration.create_default_exploration(
+            '0', 'title', 'category')
+        init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
+        self.assertFalse(init_state.interaction.is_terminal)
+
 
 class StateExportUnitTests(test_utils.GenericTestBase):
     """Test export of states."""

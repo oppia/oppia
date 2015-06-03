@@ -127,6 +127,8 @@ oppia.controller('StateInteraction', [
 
   // If a terminal interaction is selected for a state and it currently has no
   // content, this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
+  // NOTE TO DEVELOPERS: Callers of this function must ensure that the current
+  // active state is a terminal one.
   var updateDefaultTerminalStateContentIfEmpty = function(interactionId) {
     // Get current state.
     var activeStateName = editorContextService.getActiveStateName();
@@ -205,8 +207,6 @@ oppia.controller('StateInteraction', [
             '$scope', '$modalInstance', 'stateInteractionIdService', 'stateCustomizationArgsService', 'interactionDetailsCache', 'INTERACTION_SPECS',
             function($scope, $modalInstance, stateInteractionIdService, stateCustomizationArgsService, interactionDetailsCache, INTERACTION_SPECS) {
           $scope.stateInteractionIdService = stateInteractionIdService;
-          $scope.stateCustomizationArgsService = stateCustomizationArgsService;
-          $scope.interactionDetailsCache = interactionDetailsCache;
           $scope.INTERACTION_SPECS = INTERACTION_SPECS;
           $scope.ALLOWED_INTERACTION_CATEGORIES = GLOBALS.ALLOWED_INTERACTION_CATEGORIES;
           var oldInteractionId = angular.copy(stateInteractionIdService.savedMemento);

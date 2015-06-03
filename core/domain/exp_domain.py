@@ -65,14 +65,6 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
 
-def _is_interaction_terminal(interaction_id):
-    """Returns whether the given interaction id marks the end of an
-    exploration.
-    """
-    return interaction_registry.Registry.get_interaction_by_id(
-        interaction_id).is_terminal
-
-
 class ExplorationChange(object):
     """Domain object class for an exploration change.
 
@@ -505,7 +497,10 @@ class InteractionInstance(object):
 
     @property
     def is_terminal(self):
-        return interaction_registry.Registry.get_interaction_by_id(
+        """Determines if this interaction type is terminal. If no ID is set for
+        this interaction, it is assumed to not be terminal.
+        """
+        return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
     def validate(self):
@@ -1365,7 +1360,7 @@ class Exploration(object):
 
             curr_state = self.states[curr_state_name]
 
-            if not _is_interaction_terminal(curr_state.interaction.id):
+            if not curr_state.interaction.is_terminal:
                 for handler in curr_state.interaction.handlers:
                     for rule in handler.rule_specs:
                         dest_state = rule.dest
@@ -1387,7 +1382,7 @@ class Exploration(object):
         curr_queue = []
 
         for (state_name, state) in self.states.iteritems():
-            if _is_interaction_terminal(state.interaction.id):
+            if state.interaction.is_terminal:
                 curr_queue.append(state_name)
 
         while curr_queue:
