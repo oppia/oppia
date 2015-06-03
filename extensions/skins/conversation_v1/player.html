@@ -17,11 +17,6 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last}">
           <md-card class="conversation-skin-card">
-            <div class="conversation-skin-card-feedback-toggle-container" ng-if="state.stateName && !isInPreviewMode">
-              <span class="glyphicon glyphicon-comment conversation-skin-card-feedback-toggle" popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>" popover-template="popover/feedback" popover-trigger="click" tooltip="Feedback" tooltip-placement="bottom" state-name="<[state.stateName]>">
-              </span>
-            </div>
-
             <table class="conversation-skin-card-row-container">
               <tr class="conversation-skin-card-row">
                 <td class="conversation-skin-row-avatar" valign="top">
@@ -39,7 +34,7 @@
                   <td class="conversation-skin-row-avatar" valign="top">
                     <img class="conversation-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
                   </td>
-                  <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
+                  <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"></td>
                 </tr>
               </table>
               <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">

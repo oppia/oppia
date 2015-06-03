@@ -1,0 +1,117 @@
+/*
+  Copyright 2014 The Oppia Authors. All Rights Reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  Note that this affects both the learner mode and the 'editor preview'
+  mode.
+*/
+html, body {
+  background-color: #fff;
+}
+
+/*
+  Additional CSS for the snapshots_v1 skin.
+  All classes below should start with .snapshots-skin
+ */
+
+.snapshots-skin-cards-container {
+  margin-bottom: 50px;
+}
+
+.snapshots-skin-card-row-container {
+  margin-bottom: 17px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.snapshots-skin-card-row {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.snapshots-skin-row-avatar {
+  padding-right: 10px;
+  width: 30px;
+}
+
+.snapshots-skin-row-avatar-img {
+  height: 24px;
+  max-width: 24px;
+}
+
+.snapshots-skin-exploration-header {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
+  font-size: 1.25em;
+  text-align: center;
+  height: 30%;
+  margin-top: -13.9%;
+  padding-bottom: 1%;
+  padding-top: 1%;
+  position: relative;
+}
+
+.snapshots-skin-iframe-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 'md-card' is needed to ensure that this takes precedence over the default
+   Material Design stylesheet. */
+md-card.snapshots-skin-card {
+  background: rgb(255,255,255);
+  margin: 20px auto;
+  margin-top: -5px;
+  max-width: 560px;
+  padding: 40px 60px 27px 22px;
+  position: relative;
+  text-align: left;
+}
+
+.snapshots-skin-learner-input {
+  padding-left: 15px;
+}
+
+.snapshots-skin-learner-answer {
+  color: #579287;
+  padding-left: 15px;
+  width: 100%;
+  word-wrap: break-word;
+}
+
+.snapshots-skin-oppia-content {
+  padding-left: 15px;
+  padding-top: 2px;
+}
+
+.snapshots-skin-oppia-feedback {
+  padding-left: 15px;
+  text-align: left;
+  width: 100%;
+  word-wrap: break-word;
+}
+
+.snapshots-skin-loading-dots {
+  text-align: center;
+}
+.snapshots-skin-loading-dots > .oppia-loading-dot-one,
+.snapshots-skin-loading-dots > .oppia-loading-dot-two,
+.snapshots-skin-loading-dots > .oppia-loading-dot-three {
+  background-color: black;
+  display: inline-block;
+  height: 10px;
+  margin: 10px;
+  width: 10px;
+}

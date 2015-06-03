@@ -1,25 +1,80 @@
 <script type="text/ng-template" id="skins/Snapshots">
-  <div ng-cloak>
+  <link rel="stylesheet" type="text/css"
+        href="/extensions/skins/snapshots_v1/static/snapshots.css">
+
+  <div ng-if="transcript.length > 0">
     <div class="container">
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <h3 role="heading"><[explorationTitle]></h3>
-        </div>
-      </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <md-card style="padding: 24px;">
+            <div style="width: 100%;" ng-if="transcript.length > 1">
+              <button ng-disabled="transcriptIndex <= 0" ng-click="goToPreviousCard()">
+                <span class="glyphicon glyphicon-triangle-left" ng-show="transcriptIndex <= 0" style="opacity: 0.3;"></span>
+                <span class="glyphicon glyphicon-triangle-left" ng-show="transcriptIndex > 0"></span>
+              </button>
 
-      <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4">
-          <div angular-html-bind="currentQuestion"></div>
-          <br><br>
-          <div angular-html-bind="feedbackHtml"></div>
-          <br><br>
+              <span ng-if="transcriptIndex >= 0 && transcriptIndex < transcript.length - 1" class="pull-right">
+                <button ng-click="goToNextCard()">
+                  <span class="glyphicon glyphicon-triangle-right"></span>
+                </button>
+              </span>
+            </div>
 
-          <div ng-if="upcomingQuestionHtml">
-            <md-button class="md-button-success" ng-click="onClickContinue()">Continue</md-button>
-          </div>
-          <div angular-html-bind="inputTemplate"></div>
+            <br>
+
+            <table class="snapshots-skin-card-row-container">
+              <tr class="snapshots-skin-card-row">
+                <td class="snapshots-skin-row-avatar" valign="top">
+                  <img class="snapshots-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
+                </td>
+                <td class="snapshots-skin-oppia-output snapshots-skin-oppia-content">
+                  <div angular-html-bind="transcript[transcriptIndex].content"></div>
+                </td>
+              </tr>
+            </table>
+
+            <div ng-repeat="responsePair in transcript[transcriptIndex].answerFeedbackPairs track by $index">
+              <table class="snapshots-skin-card-row-container">
+                <tr ng-show="responsePair.learnerAnswer" class="snapshots-skin-card-row">
+                  <td class="snapshots-skin-row-avatar" valign="top">
+                    <img class="snapshots-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
+                  </td>
+                  <td class="snapshots-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"></td>
+                </tr>
+              </table>
+              <table ng-show="responsePair.oppiaFeedback" class="snapshots-skin-card-row-container">
+                <tr class="snapshots-skin-card-row">
+                  <td class="snapshots-skin-row-avatar" valign="top">
+                    <img class="snapshots-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
+                  </td>
+                  <td class="snapshots-skin-oppia-output snapshots-skin-oppia-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
+                </tr>
+              </table>
+            </div>
+
+            <div ng-if="transcriptIndex === transcript.length - 1 && waitingForLearner">
+              <table class="snapshots-skin-card-row-container" style="margin-bottom: 0;">
+                <tr class="snapshots-skin-card-row">
+                  <td class="snapshots-skin-row-avatar" valign="top">
+                    <img class="snapshots-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
+                  </td>
+                  <td>
+                    <div ng-if="upcomingQuestionHtml">
+                      <div class="snapshots-skin-learner-input">
+                        <md-button class="md-button-success" ng-click="onClickContinue()">Continue</md-button>
+                      </div>
+                    </div>
+                    <div ng-if="!upcomingQuestionHtml">
+                      <div class="snapshots-skin-learner-input" angular-html-bind="inputTemplate"></div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </md-card>
         </div>
-        <div class="col-lg-8 col-md-8 col-sm-8">
+
+        <div class="col-lg-6 col-md-6 col-sm-6" style="padding-top: 10px;">
           <oppia-gadget-panel panel-contents="gadgetPanelsContents.main"></oppia-gadget-panel>
         </div>
       </div>

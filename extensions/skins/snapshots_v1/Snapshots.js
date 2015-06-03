@@ -29,16 +29,50 @@ oppia.directive('snapshotsSkin', [function() {
       var currentStateName = oppiaPlayerService.getCurrentStateName();
       var _labelForNextFocusTarget = '';
 
+      $scope.transcript = [];
+      $scope.transcriptIndex = -1;
+      $scope.waitingForLearner = false;
+      $scope.inputTemplate = '';
+      $scope.upcomingQuestionHtml = null;
+      $scope.upcomingInputTemplate = null;
+
+      $scope.goToPreviousCard = function() {
+        $scope.transcriptIndex--;
+      };
+
+      $scope.goToNextCard = function() {
+        $scope.transcriptIndex++;
+      };
+
+      var _addNewElementToTranscript = function(stateName, contentHtml) {
+        $scope.transcript.push({
+          stateName: stateName,
+          content: contentHtml,
+          answerFeedbackPairs: []
+        });
+        $scope.transcriptIndex++;
+      };
+
       $scope.initializePage = function() {
-        $scope.inputTemplate = '';
-        $scope.currentQuestion = '';
+        $scope.transcript = [];
+        $scope.transcriptIndex = -1;
+
+        oppiaPlayerService.getUserProfileImage().then(function(result) {
+          // $scope.profilePicture contains a dataURI representation of the
+          // user-uploaded profile image, or the path to the default image.
+          $scope.profilePicture = result;
+        });
+
         oppiaPlayerService.init(function(stateName, initHtml) {
-          $scope.currentQuestion = initHtml;
           _labelForNextFocusTarget = Math.random().toString(36).slice(2);
-          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName, _labelForNextFocusTarget);
+          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
+            stateName, _labelForNextFocusTarget);
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
           $scope.gadgetPanelsContents = oppiaPlayerService.getGadgetPanelsContents();
           currentStateName = stateName;
+
+          _addNewElementToTranscript(currentStateName, initHtml);
+          $scope.waitingForLearner = true;
 
           $timeout(function() {
             focusService.setFocus(_labelForNextFocusTarget);
@@ -46,39 +80,51 @@ oppia.directive('snapshotsSkin', [function() {
         });
       };
 
-      $scope.upcomingQuestionHtml = null;
-      $scope.upcomingInputTemplate = null;
       $scope.initializePage();
 
-      $scope.nextQuestionHtml = '';
       $scope.onClickContinue = function() {
-        $scope.currentQuestion = $scope.upcomingQuestionHtml;
+        oppiaPlayerService.applyCachedParamUpdates();
+        _addNewElementToTranscript(currentStateName, $scope.upcomingQuestionHtml);
         $scope.inputTemplate = $scope.upcomingInputTemplate;
+        $scope.feedbackHtml = '';
+
         $scope.upcomingQuestionHtml = null;
         $scope.upcomingInputTemplate = null;
-        $scope.feedbackHtml = '';
-        oppiaPlayerService.applyCachedParamUpdates();
+
         $timeout(function() {
           focusService.setFocus(_labelForNextFocusTarget);
         }, 50);
       };
 
       $scope.submitAnswer = function(answer, handler) {
+        // Prevent duplicate submissions.
+        if (!$scope.waitingForLearner) {
+          return;
+        }
+
+        $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs.push({
+          learnerAnswer: oppiaPlayerService.getAnswerAsHtml(answer),
+          oppiaFeedback: ''
+        });
+        $scope.waitingForLearner = false;
+
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
           if (!newStateName) {
-            $scope.currentQuestion = 'Congratulations, you have finished!';
+            _addNewElementToTranscript(newStateName, 'Congratulations, you have finished!');
             $scope.inputTemplate = '';
             return;
           }
 
           _labelForNextFocusTarget = Math.random().toString(36).slice(2);
-
           $scope.feedbackHtml = feedbackHtml;
 
           if (feedbackHtml) {
+            var pairs = $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs;
+            pairs[pairs.length - 1].oppiaFeedback = feedbackHtml;
+
             if (currentStateName === newStateName) {
-              $scope.upcomingQuestionHtml = null;
+              // Stay at the same state.
               if (refreshInteraction) {
                 $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
                   newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
@@ -87,7 +133,10 @@ oppia.directive('snapshotsSkin', [function() {
                 }, 50);
               }
             } else {
+              // Move on to a new state after giving the learner a chance to
+              // read the feedback.
               $scope.inputTemplate = '';
+
               $scope.upcomingQuestionHtml = questionHtml + oppiaPlayerService.getRandomSuffix();
               if (refreshInteraction) {
                 $scope.upcomingInputTemplate = oppiaPlayerService.getInteractionHtml(
@@ -97,20 +146,24 @@ oppia.directive('snapshotsSkin', [function() {
               }
             }
           } else {
+            // There is no feedback. Move to the new state.
+
+            oppiaPlayerService.applyCachedParamUpdates();
             // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
             // and 'question', so that the aria-live attribute will read it out.
-            $scope.currentQuestion = questionHtml + oppiaPlayerService.getRandomSuffix();
-            if (refreshInteraction) {
-              $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
-                newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
-              $timeout(function() {
-                focusService.setFocus(_labelForNextFocusTarget);
-              }, 50);
-            }
-            oppiaPlayerService.applyCachedParamUpdates();
+            _addNewElementToTranscript(
+              newStateName,
+              questionHtml + oppiaPlayerService.getRandomSuffix());
+            $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
+              newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
+
+            $timeout(function() {
+              focusService.setFocus(_labelForNextFocusTarget);
+            }, 50);
           }
 
           currentStateName = newStateName;
+          $scope.waitingForLearner = true;
         }, true);
       };
     }]
