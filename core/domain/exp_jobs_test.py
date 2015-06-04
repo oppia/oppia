@@ -435,11 +435,19 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.ALBERT_ID, self.NEW_EXP_ID)
 
-        # Start migration job on sample exploration. The job should not fail.
+        # Ensure the exploration is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        # Start migration job on sample exploration.
         job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
         exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+
+        # This running without errors indicates the deleted exploration is being
+        # ignored, since otherwise exp_services.get_exploration_by_id (used
+        # within the job) will raise an error.
         self.process_and_flush_pending_tasks()
 
-        # Ensure the exploration is deleted.
+        # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
