@@ -502,11 +502,6 @@ oppia.config(['$provide', function($provide) {
 
     taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
-    taOptions.toolbar = [
-      ['bold', 'italics', 'underline'],
-      ['ol', 'ul'],
-      []
-    ];
     taOptions.setup.textEditorSetup = function($element) {
       $timeout(function() {
         $element.trigger('focus');
@@ -681,29 +676,24 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', '$sanitize', function($scope, $log, $sanitize) {
       $scope.stripFormatting = function(html) {
-        var widgets = html.match(/<img.+?oppia-noninteractive.+?>/g) || [];
-        for (var i = 0; i < widgets.length; i++) {
-          var wrapper = document.createElement('div');
-          wrapper.innerHTML = widgets[i];
-          var el = wrapper.firstChild;
-          var attrs = el.attributes;
-          // copied widgets come with multiple unnecessary attributes, which are removed here
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        // save the pre-sanitized widgets
+        var widgets = $(wrapper).find('[class^=oppia-noninteractive-]');
+        wrapper.innerHTML = $sanitize(wrapper.innerHTML);
+        var sanitizedWidgets = $(wrapper).find('[class^=oppia-noninteractive-]');
+        for (var i = 0; i < sanitizedWidgets.length; i++) {
+          var el = sanitizedWidgets[i];
+          var attrs = widgets[i].attributes;
           for (var j = 0; j < attrs.length; j++) {
             var attr = attrs[j];
-            if (attr.name != 'class' && attr.name != 'src' && attr.name.indexOf('-with-value') === -1) {
-              el.removeAttribute(attr.name);
+            // reinstate sanitized widget attributes
+            if (attr.name.indexOf("-with-value") !== -1 && !el.hasAttribute(attr.name)) {
+              el.setAttribute(attr.name, attr.value);
             }
           }
-          widgets[i] = el.outerHTML;
         }
-        var widgetIndex = 0;
-        // use *oppia-noninteractive* placeholders to save location of widgets before sanitizing
-        var sanitized = $sanitize(html.replace(/<img.+?oppia-noninteractive.+?>/g, '*oppia-noninteractive*'));
-        var result = sanitized.replace(/\*oppia-noninteractive\*/g, function(match){
-          return widgets[widgetIndex];
-          widgetIndex++;
-        });
-        return result;
+        return wrapper.innerHTML;
       };
 
       $scope._RICH_TEXT_COMPONENTS = [];
