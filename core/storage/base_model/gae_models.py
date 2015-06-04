@@ -349,12 +349,17 @@ class VersionedModel(BaseModel):
             'version_number': version_number
         }]
 
-        
-
         # Do not overwrite the version number.
         current_version = model.version
 
-        # Create new model to default properties before applying the snapshot.
+        # If a new property is introduced after a certain version of a model,
+        # the property should be its default value when an old snapshot of the
+        # model is applied during reversion. E.g. states_schema_version in
+        # ExplorationModel may be added after some version of a saved
+        # exploration. If that exploration is reverted to a version that does
+        # not have a states_schema_version property, it should revert to the
+        # default states_schema_version value rather than taking the
+        # states_schema_version value from the latest exploration version.
         snapshot_id = model._get_snapshot_id(model.id, version_number)
         new_model = cls(id=model.id)
         new_model._reconstitute_from_snapshot_id(snapshot_id)
