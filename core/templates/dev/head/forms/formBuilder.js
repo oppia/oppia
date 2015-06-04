@@ -520,6 +520,7 @@ oppia.config(['$provide', function($provide) {
       var el = $('<img/>');
       el.attr('src', componentDefn.iconDataUrl);
       el.addClass('oppia-noninteractive-' + componentDefn.name);
+      el.addClass('oppia-rte-toolbar-image');
 
       for (var attrName in customizationArgsDict) {
         el.attr(

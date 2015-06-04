@@ -1890,6 +1890,11 @@ div#ng-curtain {
   width: 245px;
 }
 
+.oppia-rte-toolbar-image {
+  height: 34px;
+  width: 42px;
+}
+
 .ta-scroll-window.oppia-rte-content {
   width: 100%;
 }
