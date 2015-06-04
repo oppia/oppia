@@ -504,7 +504,7 @@ oppia.config(['$provide', function($provide) {
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
     taOptions.toolbar = [
       ['bold', 'italics', 'underline'],
-      ['ol', 'ul'],
+      ['ol', 'ul', 'code'],
       []
     ];
     taOptions.setup.textEditorSetup = function($element) {
@@ -514,6 +514,17 @@ oppia.config(['$provide', function($provide) {
     };
 
     var _RICH_TEXT_COMPONENTS = [];
+
+    // Register a tool for code highlighting.
+    // TODO(sll): This tool has a few quirks: it removes all line breaks and
+    // it is hard to switch to normal text if the entire RTE is highlighted and
+    // turned to code. However, it is still useful.
+    taRegisterTool('code', {
+      iconclass: 'fa fa-code',
+      action: function(){
+        return this.$editor().wrapSelection("formatBlock", "<code>");
+      }
+    });
 
     // Returns a DOM node.
     var createRteElement = function(componentDefn, customizationArgsDict) {
@@ -663,7 +674,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
         $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
       });
 
-      var toolbarOptions = [['bold', 'italics', 'underline'], ['ol', 'ul'], []];
+      var toolbarOptions = [['bold', 'italics', 'underline'], ['ol', 'ul', 'code'], []];
       $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
         if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions && componentDefn.isComplex)) {
           toolbarOptions[2].push(componentDefn.name);

@@ -195,7 +195,8 @@ MATERIAL_DESIGN_ICON_ACTION_FILES = ['ic_info_black_48dp.png', 'ic_help_black_48
 MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
 MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
-    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png', 'ic_close_black_48dp.png']
+    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png',
+    'ic_close_black_48dp.png', 'ic_refresh_black_48dp.png']
 MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png']
 
 # Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.

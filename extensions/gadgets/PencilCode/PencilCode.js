@@ -27,10 +27,14 @@ oppia.directive('oppiaGadgetPencilCode', [
       templateUrl: 'gadget/PencilCode',
       controller: ['$scope', '$element', function ($scope, $element) {
         var hasLoadingCompleted = false;
+        // A copy of the value set via parameters, so that the gadget can be
+        // reset when needed.
+        $scope.newValueCached = '';
 
         $scope.$watch(function() {
           return learnerParamsService.getValue('PencilCode0initialCode');
         }, function(newValue, oldValue) {
+          $scope.newValueCached = newValue;
           if (hasLoadingCompleted) {
             $scope.resetGadget(newValue);
           } else {
