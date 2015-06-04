@@ -67,11 +67,12 @@ else:
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 RELEASE_DIR_NAME = '%s-deploy-%s' % (
-    APP_NAME, CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+    '-'.join('-'.join(APP_NAME.split('.')).split(':')),
+    CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.11', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.19', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')

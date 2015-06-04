@@ -132,14 +132,14 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <label for="newMessageText">Add new message <span ng-if="editabilityService.isEditable()">(and/or change status)</span></label>
-              <textarea class="form-control" ng-model="$parent.$parent.$parent.newMessageText" id="newMessageText" rows="6"></textarea>
+              <textarea class="form-control" ng-model="$parent.$parent.newMessageText" id="newMessageText" rows="6"></textarea>
               <br>
               <span ng-show="editabilityService.isEditable()">
                 Change status (optional):
                 <select ng-model="updatedStatus" ng-options="choice.id as choice.text for choice in STATUS_CHOICES"></select>
               </span>
               <br>
-              <button style="margin-top: 10px;" class="btn btn-success" ng-click="addMessage(currentThreadId, $parent.$parent.$parent.newMessageText, updatedStatus)" ng-disabled="messageSendingInProgress || !$parent.$parent.$parent.newMessageText">
+              <button style="margin-top: 10px;" class="btn btn-success" ng-click="addMessage(currentThreadId, $parent.$parent.newMessageText, updatedStatus)" ng-disabled="messageSendingInProgress || !$parent.$parent.newMessageText">
                 <span ng-if="messageSendingInProgress">Sending...</span>
                 <span ng-if="!messageSendingInProgress">Send</span>
               </button>

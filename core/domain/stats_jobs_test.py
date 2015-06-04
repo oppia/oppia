@@ -65,6 +65,65 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id, exp_version, state, session_id, 27, {},
             feconf.PLAY_TYPE_NORMAL)
 
+    def _record_state_hit(self, exp_id, exp_version, state, session_id):
+        event_services.StateHitEventHandler.record(
+            exp_id, exp_version, state, session_id, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+    def _create_state_counter(self, exp_id, state, first_entry_count):
+        counter = stats_models.StateCounterModel.get_or_create(exp_id, state)
+        counter.first_entry_count = first_entry_count
+        counter.put()
+
+    def test_state_hit(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            exp_version = 1
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
+            state = exploration.init_state_name
+            state2 = 'sid2'
+
+            self._record_state_hit(exp_id, exp_version, state, 'session1')
+            self._record_state_hit(exp_id, exp_version, state, 'session2')
+            self._create_state_counter(exp_id, state, 18)
+            self._record_state_hit(exp_id, exp_version, state2, 'session1')
+            self._create_state_counter(exp_id, state2, 9)
+            self.process_and_flush_pending_tasks()
+
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            output_model = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, exp_version)
+            self.assertEqual(
+                output_model['state_hit_counts'][state]['first_entry_count'],
+                2)
+            self.assertEqual(
+                output_model['state_hit_counts'][state2]['first_entry_count'],
+                1)
+
+            output_model = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
+            self.assertEqual(
+                output_model['state_hit_counts'][state]['first_entry_count'],
+                18)
+            self.assertEqual(
+                output_model['state_hit_counts'][state2]['first_entry_count'],
+                9)
+
+            output_model = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, stats_jobs._ALL_VERSIONS_STRING)
+            self.assertEqual(
+                output_model['state_hit_counts'][state]['first_entry_count'],
+                20)
+            self.assertEqual(
+                output_model['state_hit_counts'][state2]['first_entry_count'],
+                10)
+
+
     def test_no_completion(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',

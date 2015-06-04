@@ -555,8 +555,10 @@ oppia.config(['$provide', function($provide) {
       _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
     });
 
-    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback) {
-      $modal.open({
+    //refocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
+    //back to where it was before the modal was opened
+    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, onDismissCallback, refocusFn) {
+      var modalDialog = $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
         resolve: {},
@@ -589,9 +591,14 @@ oppia.config(['$provide', function($provide) {
             }
 
             $modalInstance.close(customizationArgsDict);
-          };
+          }
         }]
-      }).result.then(onSubmitCallback);
+      });
+
+      modalDialog.result.then(onSubmitCallback, onDismissCallback);
+      // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+      // the minification process throws an error.
+      modalDialog.result['finally'](refocusFn);
     }
 
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -599,6 +606,7 @@ oppia.config(['$provide', function($provide) {
 
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
+        tooltiptext: componentDefn.name.charAt(0).toUpperCase() + componentDefn.name.slice(1),
         onElementSelect: {
           element: 'img',
           filter: function(elt) {
@@ -607,6 +615,7 @@ oppia.config(['$provide', function($provide) {
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
+            var savedSelection = rangy.saveSelection();
 
             _openCustomizationModal(
               componentDefn.customization_arg_specs,
@@ -615,6 +624,11 @@ oppia.config(['$provide', function($provide) {
                 var el = createRteElement(componentDefn, customizationArgsDict);
                 $element[0].parentNode.replaceChild(el, $element[0]);
                 textAngular.$editor().updateTaBindtaTextElement();
+              },
+              function() {},
+              function() {
+                textAngular.$editor().displayElements.text[0].focus();
+                rangy.restoreSelection(savedSelection);
               });
 
             return false;
@@ -622,6 +636,7 @@ oppia.config(['$provide', function($provide) {
         },
         action: function() {
           var textAngular = this;
+          var savedSelection = rangy.saveSelection();
           textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>');
 
           _openCustomizationModal(
@@ -633,6 +648,17 @@ oppia.config(['$provide', function($provide) {
               var parent = insertionPoint.parentNode;
               parent.replaceChild(el, insertionPoint);
               textAngular.$editor().updateTaBindtaTextElement();
+            },
+            function() {
+              // Clean up the insertion point if no widget was inserted.
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              if (insertionPoint !== null) {
+                insertionPoint.remove();
+              }
+            },
+            function() {
+              textAngular.$editor().displayElements.text[0].focus();
+              rangy.restoreSelection(savedSelection);
             });
         }
       });
@@ -652,8 +678,15 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       htmlContent: '=',
       uiConfig: '&'
     },
-    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ng-model="tempContent"></div>',
+    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
+      // adapted from http://stackoverflow.com/a/6899999
+      $scope.stripFormatting = function(html) {
+        var tmpNode = document.createElement('div');
+        tmpNode.innerHTML = html;
+        return tmpNode.innerText;
+      };
+
       $scope._RICH_TEXT_COMPONENTS = [];
       Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
         RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
