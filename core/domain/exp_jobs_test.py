@@ -396,3 +396,50 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self.assertNotEqual(
             updated_exp.to_dict()['states'],
             self.VERSION_0_STATES_DICT)
+
+    def test_migration_job_skips_deleted_explorations(self):
+        """Tests that the exploration migration job skips deleted explorations
+        and does not attempt to migrate.
+        """
+        # Save new default exploration with a default version 0 states
+        # dictionary.
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category='category',
+            title='title',
+            objective='',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, self.ALBERT_ID)
+        exp_model.commit(self.ALBERT_ID, 'old commit', [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
+        # Note: This creates a summary based on the upgraded model (which is
+        # fine). A summary is needed to delete the exploration.
+        exp_services.create_exploration_summary(self.NEW_EXP_ID)
+
+        # Delete the exploration before migration occurs.
+        exp_services.delete_exploration(self.ALBERT_ID, self.NEW_EXP_ID)
+
+        # Start migration job on sample exploration. The job should not fail.
+        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
+        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Ensure the exploration is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
