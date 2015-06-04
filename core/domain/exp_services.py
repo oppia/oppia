@@ -980,7 +980,7 @@ def revert_exploration(
     else:
         exploration.validate()
 
-    exploration_model.revert(
+    exp_models.ExplorationModel.revert(exploration_model,
         committer_id, 'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
