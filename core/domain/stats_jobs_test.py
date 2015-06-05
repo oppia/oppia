@@ -343,99 +343,6 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             }, results)
 
 
-class OneOffNullStateHitEventsMigratorTest(test_utils.GenericTestBase):
-
-    EXP_ID = 'exp_id'
-
-    def setUp(self):
-        super(OneOffNullStateHitEventsMigratorTest, self).setUp()
-
-        self.save_new_valid_exploration(
-            self.EXP_ID, 'user_id', 'title', 'category')
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        # Create one good and two bad StateHit events.
-        event_services.StateHitEventHandler.record(
-            self.EXP_ID, 1, exploration.init_state_name,
-            'good_session_id', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.StateHitEventHandler.record(
-            self.EXP_ID, 1, None,
-            'bad_session_id_1', {'a': 'b'}, feconf.PLAY_TYPE_NORMAL)
-        event_services.StateHitEventHandler.record(
-            self.EXP_ID, 1, None,
-            'bad_session_id_2', {}, feconf.PLAY_TYPE_NORMAL)
-        self.process_and_flush_pending_tasks()
-
-    def test_migration_job_works(self):
-        self.assertEqual(
-            stats_models.StateHitEventLogEntryModel.query().count(), 3)
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
-            0)
-
-        # Store a temporary copy of the instance corresponding to
-        # bad_session_id_1.
-        source_item = None
-        for item in stats_models.StateHitEventLogEntryModel.query():
-            if item.session_id == 'bad_session_id_1':
-                source_item = item
-
-        # Run the job once.
-        job_id = (stats_jobs.NullStateHitEventsMigrator.create_new())
-        stats_jobs.NullStateHitEventsMigrator.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            stats_models.StateHitEventLogEntryModel.query().count(), 1)
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
-            2)
-        self.assertEqual(
-            stats_jobs.NullStateHitEventsMigrator.get_output(job_id),
-            [['migrated_instances', ['exp_id v1', 'exp_id v1']]])
-
-        # Run the job again; nothing new should happen.
-        new_job_id = (stats_jobs.NullStateHitEventsMigrator.create_new())
-        stats_jobs.NullStateHitEventsMigrator.enqueue(new_job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            stats_models.StateHitEventLogEntryModel.query().count(), 1)
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
-            2)
-        self.assertEqual(
-            stats_jobs.NullStateHitEventsMigrator.get_output(new_job_id), [])
-
-        target_item = None
-        for item in stats_models.MaybeLeaveExplorationEventLogEntryModel.query():
-            if item.session_id == 'bad_session_id_1':
-                target_item = item
-
-        self.assertIsNotNone(target_item)
-        self.assertNotEqual(source_item, target_item)
-        self.assertNotEqual(source_item.id, target_item.id)
-        self.assertEqual(
-            target_item.event_type, feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION)
-        self.assertEqual(
-            source_item.exploration_id, target_item.exploration_id)
-        self.assertEqual(
-            source_item.exploration_version, target_item.exploration_version)
-        self.assertEqual(target_item.state_name, stats_jobs.OLD_END_DEST)
-        self.assertEqual(target_item.client_time_spent_in_secs, 0)
-        self.assertEqual(source_item.params, target_item.params)
-        self.assertEqual(source_item.play_type, target_item.play_type)
-        self.assertEqual(source_item.created_on, target_item.created_on)
-        # It is not possible to set the last_updated field explicitly.
-        self.assertLess(source_item.last_updated, target_item.last_updated)
-        self.assertEqual(source_item.deleted, target_item.deleted)
-        self.assertEqual(target_item.deleted, False)
-
-
 class CompletionEventsMigratorTest(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
@@ -466,6 +373,42 @@ class CompletionEventsMigratorTest(test_utils.GenericTestBase):
 
         self.process_and_flush_pending_tasks()
 
+    def _verify_migration_results(self, source_item):
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
+            1)
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            2)
+
+        target_item = None
+        for item in (
+                stats_models.CompleteExplorationEventLogEntryModel.query()):
+            if item.session_id == 'migrate_session_id':
+                target_item = item
+
+        self.assertIsNotNone(target_item)
+        self.assertNotEqual(source_item, target_item)
+        self.assertNotEqual(source_item.id, target_item.id)
+        self.assertEqual(
+            target_item.event_type, feconf.EVENT_TYPE_COMPLETE_EXPLORATION)
+        self.assertEqual(
+            source_item.exploration_id, target_item.exploration_id)
+        self.assertEqual(
+            source_item.exploration_version,
+            target_item.exploration_version)
+        self.assertEqual(target_item.state_name, source_item.state_name)
+        self.assertEqual(
+            target_item.client_time_spent_in_secs,
+            source_item.client_time_spent_in_secs)
+        self.assertEqual(source_item.params, target_item.params)
+        self.assertEqual(source_item.play_type, target_item.play_type)
+        self.assertEqual(source_item.created_on, target_item.created_on)
+        # It is not possible to set the last_updated field explicitly.
+        self.assertLess(source_item.last_updated, target_item.last_updated)
+        self.assertEqual(source_item.deleted, target_item.deleted)
+        self.assertEqual(target_item.deleted, False)
+
     def test_migration_job_works(self):
         self.assertEqual(
             stats_models.CompleteExplorationEventLogEntryModel.query().count(),
@@ -485,57 +428,12 @@ class CompletionEventsMigratorTest(test_utils.GenericTestBase):
         job_id = (stats_jobs.CompletionEventsMigrator.create_new())
         stats_jobs.CompletionEventsMigrator.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
-            1)
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
-            2)
-        self.assertEqual(
-            stats_jobs.CompletionEventsMigrator.get_output(job_id),
-            [['migrated_instances', ['exp_id v1']]])
+        self._verify_migration_results(source_item)
 
         # Run the job again; nothing new should happen.
         new_job_id = (stats_jobs.CompletionEventsMigrator.create_new())
         stats_jobs.CompletionEventsMigrator.enqueue(new_job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
-            1)
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
-            2)
-        self.assertEqual(
-            stats_jobs.CompletionEventsMigrator.get_output(new_job_id), [])
-
-        target_item = None
-        for item in stats_models.CompleteExplorationEventLogEntryModel.query():
-            if item.session_id == 'migrate_session_id':
-                target_item = item
-
-        self.assertIsNotNone(target_item)
-        self.assertNotEqual(source_item, target_item)
-        self.assertNotEqual(source_item.id, target_item.id)
-        self.assertEqual(
-            target_item.event_type, feconf.EVENT_TYPE_COMPLETE_EXPLORATION)
-        self.assertEqual(
-            source_item.exploration_id, target_item.exploration_id)
-        self.assertEqual(
-            source_item.exploration_version, target_item.exploration_version)
-        self.assertEqual(target_item.state_name, source_item.state_name)
-        self.assertEqual(
-            target_item.client_time_spent_in_secs,
-            source_item.client_time_spent_in_secs)
-        self.assertEqual(source_item.params, target_item.params)
-        self.assertEqual(source_item.play_type, target_item.play_type)
-        self.assertEqual(source_item.created_on, target_item.created_on)
-        # It is not possible to set the last_updated field explicitly.
-        self.assertLess(source_item.last_updated, target_item.last_updated)
-        self.assertEqual(source_item.deleted, target_item.deleted)
-        self.assertEqual(target_item.deleted, False)
+        self._verify_migration_results(source_item)
