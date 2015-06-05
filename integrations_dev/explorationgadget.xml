@@ -2,10 +2,21 @@
   <ModulePrefs title="Oppia Gadget" height="800" width="600" author="Google">
     <Require feature="dynamic-height"/>
   </ModulePrefs>
+  <UserPref name="explorationID" display_name="Exploration ID" />
   <Content type="html">
     <![CDATA[
       <script src="//cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"></script>
-      <oppia oppia-id="VleQP9cg-40V" src="https://www.oppia.org"></oppia>
+      <oppia id="oppiaTag" oppia-id="" src="https://www.oppia.org"></oppia>
+      <script type="text/javascript">
+        var prefs = new gadgets.Prefs();
+
+        function loadGadget () {
+      	  var element = document.getElementById('oppiaTag');
+      	  element.setAttribute('oppia-id', prefs.getString('explorationID'));
+        }
+
+        gadgets.util.registerOnLoadHandler(loadGadget);
+      </script>
     ]]>
   </Content>
 </Module>
