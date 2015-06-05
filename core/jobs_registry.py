@@ -30,7 +30,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs.IndexAllExplorationsJobManager,
     exp_jobs.ExpSummariesCreationOneOffJob,
     exp_jobs.ExplorationValidityJobManager,
-    exp_jobs.ExplorationStrictValidityJobManager,
     exp_jobs.ExplorationMigrationJobManager,
     stats_jobs.CompletionEventsMigrator]
 

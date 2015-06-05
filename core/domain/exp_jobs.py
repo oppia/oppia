@@ -106,27 +106,6 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class ExplorationStrictValidityJobManager(jobs.BaseMapReduceJobManager):
-    """Job that checks (strict) validation status of all explorations."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        from core.domain import exp_services
-        exploration = exp_services.get_exploration_from_model(item)
-        try:
-            exploration.validate(strict=True)
-        except utils.ValidationError as e:
-            yield (item.id, unicode(e).encode('utf-8'))
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @classmethod
