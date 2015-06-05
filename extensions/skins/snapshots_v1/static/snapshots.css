@@ -19,7 +19,7 @@
   mode.
 */
 html, body {
-  background-color: #fff;
+  background-color: #f9f9f9;
 }
 
 /*
@@ -41,6 +41,11 @@ html, body {
   margin-bottom: 20px;
   margin-top: 20px;
   width: 100%;
+}
+
+.snapshots-skin-card-nav-button {
+  background: none;
+  border: none;
 }
 
 .snapshots-skin-row-avatar {
