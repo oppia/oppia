@@ -55,6 +55,7 @@ html, body {
 
 .snapshots-skin-row-avatar-img {
   height: 24px;
+  margin-top: 4px;
   max-width: 24px;
 }
 
@@ -94,6 +95,10 @@ md-card.snapshots-skin-card {
   padding-left: 15px;
   width: 100%;
   word-wrap: break-word;
+}
+
+.snapshots-skin-oppia-output.old {
+  opacity: 0.8;
 }
 
 .snapshots-skin-oppia-content {
