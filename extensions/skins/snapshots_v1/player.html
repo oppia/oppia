@@ -9,13 +9,13 @@
           <md-card style="background-color: white; padding: 24px;">
             <div style="width: 100%;" ng-if="transcript.length > 1">
               <button ng-disabled="transcriptIndex <= 0" ng-click="goToPreviousCard()" class="snapshots-skin-card-nav-button">
-                <span class="glyphicon glyphicon-triangle-left" ng-show="transcriptIndex <= 0" style="opacity: 0.3;"></span>
-                <span class="glyphicon glyphicon-triangle-left" ng-show="transcriptIndex > 0"></span>
+                <span class="glyphicon glyphicon-arrow-left" ng-show="transcriptIndex <= 0" style="opacity: 0.3;"></span>
+                <span class="glyphicon glyphicon-arrow-left" ng-show="transcriptIndex > 0"></span>
               </button>
 
               <span ng-if="transcriptIndex >= 0 && transcriptIndex < transcript.length - 1" class="pull-right">
                 <button ng-click="goToNextCard()" class="snapshots-skin-card-nav-button">
-                  <span class="glyphicon glyphicon-triangle-right"></span>
+                  <span class="glyphicon glyphicon-arrow-right"></span>
                 </button>
               </span>
             </div>
