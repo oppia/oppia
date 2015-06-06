@@ -638,7 +638,7 @@ oppia.factory('explorationStatesService', [
       warningsData.clear();
 
       var initStateName = explorationInitStateNameService.displayed;
-      if (deleteStateName === initStateName || deleteStateName === END_DEST) {
+      if (deleteStateName === initStateName) {
         return;
       }
       if (!_states[deleteStateName]) {
@@ -866,7 +866,7 @@ oppia.factory('computeGraphService', ['INTERACTION_SPECS', function(INTERACTION_
   var _computeGraphData = function(initStateId, states) {
     var nodes = {};
     var links = [];
-    var finalStateIds = [END_DEST];
+    var finalStateIds = [];
     for (var stateName in states) {
       if (states[stateName].interaction.id &&
           INTERACTION_SPECS[states[stateName].interaction.id].is_terminal) {
@@ -888,7 +888,6 @@ oppia.factory('computeGraphService', ['INTERACTION_SPECS', function(INTERACTION_
         }
       }
     }
-    nodes[END_DEST] = END_DEST;
 
     return {
       nodes: nodes,
@@ -1172,9 +1171,7 @@ oppia.factory('explorationWarningsService', [
     var allParamNames = [];
     var explorationParamMetadata = _getMetadataFromParamChanges(
       explorationParamChangesService.savedMemento);
-    var stateParamMetadatas = {
-      'END': []
-    };
+    var stateParamMetadatas = {};
 
     explorationParamMetadata.forEach(function(explorationParamMetadataItem) {
       if (allParamNames.indexOf(explorationParamMetadataItem.paramName) === -1) {
@@ -1280,7 +1277,7 @@ oppia.factory('explorationWarningsService', [
     var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
     if (statesWithoutInteractionIds.length) {
       _warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
+        type: WARNING_TYPES.ERROR,
         message: (
           'Please add interactions for these states: ' +
           statesWithoutInteractionIds.join(', ') + '.')
@@ -1290,12 +1287,6 @@ oppia.factory('explorationWarningsService', [
     if (_graphData) {
       var unreachableStateNames = _getUnreachableNodeNames(
         [_graphData.initStateId], _graphData.nodes, _graphData.links);
-
-      // We do not care if the END state is unreachable.
-      var endIndex = unreachableStateNames.indexOf('END');
-      if (endIndex !== -1) {
-        unreachableStateNames.splice(endIndex, 1);
-      }
 
       if (unreachableStateNames.length) {
         _warningsList.push({

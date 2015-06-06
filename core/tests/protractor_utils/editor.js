@@ -24,6 +24,9 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
+// constants
+var _OPTION_CREATE_NEW = 'Create New State...';
+
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
   element.all(by.css('.skipBtn')).then(function(buttons) {
@@ -289,18 +292,36 @@ var _setRuleDest = function(ruleBodyElem, destinationName) {
     by.cssContainingText('option', destinationName)).click();
 };
 
+var _createStateAsDestination = function(bodyElem, destinationName) {
+  // Creates a new state and sets it as the desination of a rule.
+  var destinationElement =
+    bodyElem.element(by.css('.protractor-test-dest-bubble'));
+  destinationElement.element(
+    by.cssContainingText('option', _OPTION_CREATE_NEW)).click();
+  element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
+  element(by.css('.protractor-test-add-state-submit')).click();
+  // Wait for the modal to close.
+  general.waitForSystem();
+};
+
 // This clicks the "add new rule" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
-// Note that feedbackInstructions may be null (which means 'specify no feedback'),
-// and only represents a single feedback element.
-var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
+//
+// Note that feedbackInstructions may be null (which means 'specify no
+// feedback'), and only represents a single feedback element.
+//
+// - 'destStateName' is the state name to select as the destination.
+// - 'createState' specifies the destination state should be created within the
+//   dialog as part of adding this rule.
+var addRule = function(interactionId, feedbackInstructions, destStateName,
+    createState, ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
   general.waitForSystem();
 
   var ruleElement = element(by.css('.protractor-test-add-rule-details'));
   var args = [ruleElement, interactionId];
-  for (var i = 3; i < arguments.length; i++) {
+  for (var i = 4; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   _selectRule.apply(null, args);
@@ -308,8 +329,12 @@ var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
   if (feedbackInstructions) {
     _setRuleFeedback(ruleElement, 0, feedbackInstructions)
   }
-  if (dest) {
-    _setRuleDest(ruleElement, dest);
+
+  // Check whether to create destination state
+  if (createState && destStateName) {
+    _createStateAsDestination(ruleElement, destStateName);
+  } else if (destStateName) {
+    _setRuleDest(ruleElement, destStateName);
   }
 
   element(by.css('.protractor-test-add-new-rule')).click();
@@ -319,8 +344,6 @@ var addRule = function(interactionId, feedbackInstructions, dest, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
-  var _OPTION_CREATE_NEW = 'Create New State...';
-
   if (ruleNum === 'default') {
     element(by.css('.protractor-test-default-rule-tab')).isPresent().then(function(isVisible) {
       // If there is only one rule, no tabs are shown, so we don't have to click
@@ -378,14 +401,7 @@ var RuleEditor = function(ruleNum) {
     },
     // Sets a destination for this rule, creating a state in the process.
     createNewStateAndSetDestination: function(destinationName) {
-      var destinationElement =
-        bodyElem.element(by.css('.protractor-test-dest-bubble'));
-      destinationElement.element(
-        by.cssContainingText('option', _OPTION_CREATE_NEW)).click();
-      element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
-      element(by.css('.protractor-test-add-state-submit')).click();
-      // Wait for the modal to close.
-      general.waitForSystem();
+      _createStateAsDestination(bodyElem, destinationName);
       bodyElem.element(by.css('.protractor-test-save-rule')).click();
     },
     // The current state name must be at the front of the list.
@@ -463,7 +479,7 @@ var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
     return stateNode.element(by.css('.protractor-test-node-label')).getText();
   }).then(function(stateNames) {
-    expect(stateNames).toEqual(names);
+    expect(stateNames.sort()).toEqual(names.sort());
   });
 };
 
@@ -514,7 +530,7 @@ var expectAvailableFirstStatesToBe = function(names) {
         all(by.tagName('option')).map(function(elem) {
       return elem.getText();
     }).then(function(options) {
-      expect(options).toEqual(names);
+      expect(options.sort()).toEqual(names.sort());
     });
   });
 };

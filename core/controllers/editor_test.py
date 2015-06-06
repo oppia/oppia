@@ -153,17 +153,6 @@ class EditorTest(BaseEditorControllerTest):
             _get_payload('[Bad State Name]', CURRENT_VERSION))
         self.assertIn('Invalid character [', response_dict['error'])
 
-        # A request with a state name of feconf.END_DEST is invalid.
-        response_dict = _put_and_expect_400_error(
-            _get_payload(feconf.END_DEST, CURRENT_VERSION))
-        self.assertIn('Invalid state name', response_dict['error'])
-
-        # Even if feconf.END_DEST is mixed case, it is still invalid.
-        response_dict = _put_and_expect_400_error(
-            _get_payload('eNd', CURRENT_VERSION))
-        self.assertEqual('eNd'.lower(), feconf.END_DEST.lower())
-        self.assertIn('Invalid state name', response_dict['error'])
-
         # A name cannot have spaces at the front or back.
         response_dict = _put_and_expect_400_error(
             _get_payload('  aa', CURRENT_VERSION))
@@ -277,6 +266,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """),
         "State B": ("""content:
@@ -297,6 +287,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
@@ -317,6 +308,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -340,6 +332,7 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
+  triggers: []
 param_changes: []
 """)
 

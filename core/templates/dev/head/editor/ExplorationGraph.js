@@ -34,9 +34,7 @@ oppia.controller('ExplorationGraph', [
   };
 
   $scope.onClickStateInMinimap = function(stateName) {
-    if (stateName !== END_DEST) {
-      routerService.navigateToMainTab(stateName);
-    }
+    routerService.navigateToMainTab(stateName);
   };
 
   $scope.getActiveStateName = function() {
@@ -72,12 +70,10 @@ oppia.controller('ExplorationGraph', [
           };
 
           $scope.selectState = function(stateName) {
-            if (stateName !== END_DEST) {
-              $modalInstance.close({
-                action: 'navigate',
-                stateName: stateName
-              });
-            }
+            $modalInstance.close({
+              action: 'navigate',
+              stateName: stateName
+            });
           };
 
           $scope.cancel = function() {

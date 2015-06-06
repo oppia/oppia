@@ -8,9 +8,28 @@ param_changes: []
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 3
-skill_tags: []
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
 states:
+  END:
+    content:
+    - type: text
+      value: <p>Congratulations, you have finished!</p>
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+    param_changes: []
   Final challenge:
     content:
     - type: text
@@ -18,8 +37,7 @@ states:
         out how many ways there are to arrange four balls in a row? Listing all the
         possibilities by hand is going to be tedious, but, by now, you''ve learned
         at least one way to calculate this number quickly and accurately.'
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -99,15 +117,14 @@ states:
             been developing, so that you can get the answer with just one multiplication
             :-)
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Found all the ways:
     content:
     - type: text
       value: So, you've found that there are six ways to arrange these three balls.<br><br>Is
         that the same as your first guess?
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -142,8 +159,8 @@ states:
           dest: Introspection
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   General Theory:
     content:
     - type: text
@@ -163,8 +180,7 @@ states:
         \ this works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,\
         \ can you write out a similar expression for F2, in terms of F1? Then we'll\
         \ move on to figuring out F4, which starts to become hard to compute manually."
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -242,8 +258,8 @@ states:
             ball, and F1 ways to pick the second one. This all works out because F1
             = 1, so F2 = 2 * 1 = 2.
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Guess a generalization:
     content:
     - type: text
@@ -255,8 +271,7 @@ states:
         works for 3 balls; we can figure out exactly why later.<br><br>Do you believe
         this reasoning? Do you agree that there are exactly 8 ways to arrange four
         balls of different colours in a line?'
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         choices:
           value:
@@ -282,15 +297,14 @@ states:
           dest: Two balls
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      id: MultipleChoiceInput
+    param_changes: []
   Intro:
     content:
     - type: text
       value: '<p>Suppose you were given three balls: one red, one blue, and one yellow.
         How many ways are there to arrange them in a straight line?</p>'
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -322,8 +336,8 @@ states:
           dest: Not 6
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   Introspection:
     content:
     - type: text
@@ -339,8 +353,7 @@ states:
         \ things, or a systematic way that you could have used to count the balls.\
         \ Write these down here -- you will probably want to refer to them in a future\
         \ exercise, and we'll show your jottings to you again at that point."
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -364,8 +377,8 @@ states:
           dest: Guess a generalization
           feedback: []
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
   Not 6:
     content:
     - type: text
@@ -375,13 +388,7 @@ states:
         \ means: put the red ball on the left, the blue ball in the middle, and the\
         \ yellow ball on the right. Can you list all the ways you found?<br><br>\_\
         \ \_\_"
-    param_changes:
-    - customization_args:
-        parse_with_jinja: true
-        value: '{{answer}}'
-      generator_id: Copier
-      name: guess
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -465,8 +472,13 @@ states:
           feedback:
           - No, try again.
           param_changes: []
-      sticky: true
-      widget_id: SetInput
+      id: SetInput
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{answer}}'
+      generator_id: Copier
+      name: guess
   Two balls:
     content:
     - type: text
@@ -476,8 +488,7 @@ states:
         general pattern.<br><br>The most obvious small case is 1 ball! There's one
         way to arrange one ball in a line.<br><br>How about 2 balls? How many ways
         are there to arrange two balls, with different colours, in a line?
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -545,14 +556,13 @@ states:
           - I think you may have counted something too many times. Try to remember
             the systematic approach you came up with earlier, and use it here...
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+      id: NumericInput
+    param_changes: []
   correct but why:
     content:
     - type: text
       value: <p>Right! Why do you think it is 6?</p>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -602,5 +612,6 @@ states:
             on the Internet, you''ll also be able to find more information about this
             topic. See if you can figure out what the answer for 4 balls is!'
           param_changes: []
-      sticky: false
-      widget_id: TextInput
+      id: TextInput
+    param_changes: []
+tags: []

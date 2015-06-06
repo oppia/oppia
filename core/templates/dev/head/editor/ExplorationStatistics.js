@@ -79,6 +79,10 @@ oppia.controller('ExplorationStatistics', [
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
       };
+      // TODO(bhenning): before, there was a special opacity computed for the
+      // ending (numCompletions/numVisits), should we do this for all
+      // terminal nodes, instead? If so, explorationStatesService needs to be
+      // able to provide whether given states are terminal
       for (var stateName in explorationStatesService.getStates()) {
         var visits = 0;
         if ($scope.stateStats.hasOwnProperty(stateName)) {
@@ -87,8 +91,6 @@ oppia.controller('ExplorationStatistics', [
         $scope.statsGraphOpacities[stateName] = Math.max(
           visits / numVisits, 0.05);
       }
-      $scope.statsGraphOpacities[END_DEST] = Math.max(
-        numCompletions / numVisits, 0.05);
 
       $scope.highlightStates = {};
       improvements.forEach(function(impItem) {
@@ -104,9 +106,7 @@ oppia.controller('ExplorationStatistics', [
   };
 
   $scope.onClickStateInStatsGraph = function(stateName) {
-    if (stateName !== END_DEST) {
-      $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
-    }
+    $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
   };
 
   $scope.showStateStatsModal = function(stateName, improvementType) {

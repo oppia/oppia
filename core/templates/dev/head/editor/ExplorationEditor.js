@@ -20,7 +20,6 @@
  */
 
 // TODO(sll): Move all hardcoded strings to the top of the file.
-var END_DEST = 'END';
 
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});

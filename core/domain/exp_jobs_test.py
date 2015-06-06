@@ -18,7 +18,7 @@
 
 __author__ = 'Frederik Creemers'
 
-"""Tests for ExpSummary continuous computations."""
+"""Tests for Exploration-related jobs."""
 
 from core import jobs_registry
 from core.domain import exp_domain
@@ -280,3 +280,174 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
             self.assertIn('title %d' % i, titles)
             self.assertIn('category%d' % i, categories)
 
+
+class ExplorationMigrationJobTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+
+    VERSION_0_STATES_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: {
+            'content': [{'type': 'text', 'value': ''}],
+            'param_changes': [],
+            'interaction': {
+                'customization_args': {},
+                'id': None,
+                'handlers': [{
+                    'name': 'submit',
+                    'rule_specs': [{
+                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                        'feedback': [],
+                        'param_changes': [],
+                        'definition': {'rule_type': 'default'}
+                    }]
+                }]
+            }
+        }
+    }
+
+    def setUp(self):
+        super(ExplorationMigrationJobTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_migration_job_does_not_convert_up_to_date_exp(self):
+        """Tests that the exploration migration job does not convert an
+        exploration that is already the latest states schema version.
+        """
+        # Create a new, default exploration that should not be affected by the
+        # job.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, 'title', 'category')
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'EndExploration')
+        exp_services.save_new_exploration(self.ALBERT_ID, exploration)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        self._before_converted_yaml = exploration.to_yaml()
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
+        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the exploration is exactly the same after migration.
+        updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        after_converted_yaml = updated_exp.to_yaml()
+        self.assertEqual(after_converted_yaml, self._before_converted_yaml)
+
+    def test_migration_job_does_not_have_validation_fail_on_default_exp(self):
+        """Tests that the exploration migration job does not have a validation
+        failure for a default exploration (of states schema version 0), due to
+        the exploration having a null interaction ID in its initial state.
+        """
+        # Save new default exploration with a default version 0 states
+        # dictionary. This will be used to test default exploration migration,
+        # which includes ensuring the job does not have a validation failure for
+        # an exploration with a null interaction ID.
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category='category',
+            title='title',
+            objective='',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, self.ALBERT_ID)
+        exp_model.commit(self.ALBERT_ID, 'old commit', [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
+        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the new exploration has been migrated by the job.
+        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            updated_exp.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+        # Ensure the states structure within the exploration was changed.
+        self.assertNotEqual(
+            updated_exp.to_dict()['states'],
+            self.VERSION_0_STATES_DICT)
+
+    def test_migration_job_skips_deleted_explorations(self):
+        """Tests that the exploration migration job skips deleted explorations
+        and does not attempt to migrate.
+        """
+        # Save new default exploration with a default version 0 states
+        # dictionary.
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category='category',
+            title='title',
+            objective='',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, self.ALBERT_ID)
+        exp_model.commit(self.ALBERT_ID, 'old commit', [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
+        # Note: This creates a summary based on the upgraded model (which is
+        # fine). A summary is needed to delete the exploration.
+        exp_services.create_exploration_summary(self.NEW_EXP_ID)
+
+        # Delete the exploration before migration occurs.
+        exp_services.delete_exploration(self.ALBERT_ID, self.NEW_EXP_ID)
+
+        # Ensure the exploration is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
+        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+
+        # This running without errors indicates the deleted exploration is being
+        # ignored, since otherwise exp_services.get_exploration_by_id (used
+        # within the job) will raise an error.
+        self.process_and_flush_pending_tasks()
+
+        # Ensure the exploration is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
