@@ -1,0 +1,24 @@
+<Module>
+  <ModulePrefs title="Oppia Gadget" height="800" width="600" author="Google">
+    <Require feature="dynamic-height"/>
+  </ModulePrefs>
+  <UserPref name="explorationId" display_name="Exploration ID" />
+  <UserPref name="serverBaseUrl" display_name="Oppia Server Base URL" default_value="https://www.oppia.org" />
+  <Content type="html">
+    <![CDATA[
+      <script src="//cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"></script>
+      <oppia id="oppiaTag" oppia-id="" src=""></oppia>
+      <script type="text/javascript">
+        var prefs = new gadgets.Prefs();
+
+        function loadGadget() {
+      	  var element = document.getElementById('oppiaTag');
+      	  element.setAttribute('oppia-id', prefs.getString('explorationId'));
+          element.setAttribute('src', prefs.getString('serverBaseUrl'));
+        }
+
+        gadgets.util.registerOnLoadHandler(loadGadget);
+      </script>
+    ]]>
+  </Content>
+</Module>

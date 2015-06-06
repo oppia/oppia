@@ -1,4 +1,0 @@
-Instructions to add the gadget on a google sites page:
-1. Select 'Insert' -> 'More Gadgets' -> 'Add gadget by URL'
-2. Add the URL: https://code.google.com/p/oppia/source/browse/integrations_dev/exploration_gadget/explorationgadget.xml
-3. Enter values for 'Exploration ID' (required) and 'Oppia Base Server URL' (optional, default is https://www.oppia.org) and hit 'OK'.
