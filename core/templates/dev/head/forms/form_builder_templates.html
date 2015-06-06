@@ -390,7 +390,7 @@
     <form name="form.schemaForm">
       <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index" style="margin-bottom: 25px;">
         <strong><[customizationArgSpec.description]></strong>
-        <div>
+        <div style="margin-top: 15px;">
           <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
           </schema-based-editor>
         </div>

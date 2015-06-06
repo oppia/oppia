@@ -33,7 +33,7 @@ class Collapsible(base.BaseRichTextComponent):
         'schema': {
             'type': 'unicode',
         },
-        'default_value': 'More information...',
+        'default_value': 'Sample Header',
     }, {
         'name': 'content',
         'description': 'The content of the collapsible block',
