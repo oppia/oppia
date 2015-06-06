@@ -27,7 +27,7 @@
                 <td class="snapshots-skin-row-avatar" valign="top">
                   <img class="snapshots-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
                 </td>
-                <td class="snapshots-skin-oppia-output snapshots-skin-oppia-content" ng-class="{'old': transcriptIndex < transcript.length - 1}">
+                <td class="snapshots-skin-oppia-output snapshots-skin-oppia-content" ng-class="{'snapshots-skin-old-content': transcriptIndex < transcript.length - 1}">
                   <div angular-html-bind="transcript[transcriptIndex].content"></div>
                 </td>
               </tr>
