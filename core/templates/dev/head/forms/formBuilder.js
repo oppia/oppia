@@ -494,10 +494,10 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-      '$delegate', '$modal', '$filter', '$timeout',
+      '$delegate', '$modal', '$filter', '$timeout', '$log', 'focusService',
       'taRegisterTool', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
       function(
-        taOptions, $modal, $filter, $timeout,
+        taOptions, $modal, $filter, $timeout, $log, focusService,
         taRegisterTool, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
 
     taOptions.disableSanitizer = true;
@@ -529,7 +529,7 @@ oppia.config(['$provide', function($provide) {
       var customizationArgsDict = {};
       for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i];
-        if (attr.name == 'class' || attr.name == 'src') {
+        if (attr.name == 'class' || attr.name == 'src' || attr.name == '_moz_resizing') {
           continue;
         }
         var separatorLocation = attr.name.indexOf('-with-value');
@@ -557,8 +557,19 @@ oppia.config(['$provide', function($provide) {
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
         resolve: {},
-        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        controller: ['$scope', '$modalInstance', '$timeout', function($scope, $modalInstance, $timeout) {
           $scope.customizationArgSpecs = customizationArgSpecs;
+
+          // Without this code, the focus will remain in the background RTE
+          // even after the modal loads. This switches the focus to a temporary
+          // field in the modal which is then removed from the DOM.
+          // TODO(sll): Make this switch to the first input field in the modal
+          // instead.
+          $scope.modalIsLoading = true;
+          focusService.setFocus('tmpFocusPoint');
+          $timeout(function() {
+            $scope.modalIsLoading = false;
+          });
 
           $scope.tmpCustomizationArgs = [];
           for (var i = 0; i < customizationArgSpecs.length; i++) {
@@ -657,8 +668,6 @@ oppia.config(['$provide', function($provide) {
             });
         }
       });
-
-      taOptions.toolbar[2].push(componentDefn.name);
     });
 
     return taOptions;

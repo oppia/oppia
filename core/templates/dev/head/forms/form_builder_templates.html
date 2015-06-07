@@ -387,6 +387,8 @@
   </div>
 
   <div class="modal-body">
+    <!-- Provide a sink to move the focus into while the modal loads. -->
+    <input ng-if="modalIsLoading" type="text" focus-on="tmpFocusPoint">
     <form name="form.schemaForm">
       <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
         <strong><[customizationArgSpec.description]></strong>
