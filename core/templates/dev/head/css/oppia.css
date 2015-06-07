@@ -1891,8 +1891,8 @@ div#ng-curtain {
 }
 
 .oppia-rte-toolbar-image {
-  height: 34px;
-  width: 42px;
+  padding-bottom: 8px;
+  padding-top: 8px;
 }
 
 .ta-scroll-window.oppia-rte-content {
