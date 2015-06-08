@@ -263,6 +263,7 @@ DEMO_EXPLORATIONS = [
     ('chatbot', 'Chatbot', 'Programming'),
     ('calculator', 'Calculator', 'Programming'),
     ('towers', 'Towers of Hanoi', 'Programming'),
+    ('genetics', 'Genetics', 'Programming'),
 ]
 
 # TODO(sll): Add all other URLs here.

@@ -1,0 +1,81 @@
+author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: First State
+language_code: en
+objective: A test exploration to illustrate a genetics calculation.
+param_changes: []
+param_specs: {}
+schema_version: 5
+skin_customizations:
+  panels_contents: {}
+states:
+  First State:
+    content:
+    - type: text
+      value: "<p>The code below simulates transcription of DNA to mRNA and translation\
+        \ of mRNA to an amino acid chain.</p><p><br></p><p>The first DNA snippet used\
+        \ is a\_<oppia-noninteractive-link open_link_in_same_window-with-value=\"\
+        false\" text-with-value=\"&amp;quot;short sample&amp;quot;\" url-with-value=\"\
+        &amp;quot;http://www.ncbi.nlm.nih.gov/nuccore/NG_000007.3&amp;quot;\"></oppia-noninteractive-link>\
+        \ of the DNA code for HBB (Hemoglobin). The second and third are identical\
+        \ except that in the second DNA snippet the 5th base is changed from 'T' to\
+        \ 'C' and in the third DNA snippet 'T' was deleted entirely. A small point\
+        \ mutation can have a dramatic effect on the resulting protein and this would\
+        \ have required a lot of work for a geneticist to detect this using prior\
+        \ existing processes.</p><p><br></p><p>In contrast, you can instantly see\
+        \ the effects on the resulting amino acids. Integrating algorithms into technology\
+        \ can yield insights more efficiently and provide more time for analysis and\
+        \ experimentation.</p>"
+    interaction:
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: "#DNA ---> mRNA\ntranscription_dictionary = {'A':'U', 'G':'C', 'C':'G',\
+            \ 'T':'A'}\n\n#mRNA ---> Amino acid\ntranslation_dictionary = {'UUU':'Phe',\
+            \ 'UUC':'Phe', 'UUA':'Leu', 'UUG':'Leu', 'UCU':'Ser', 'UCC':'Ser', 'UCA':'Ser',\
+            \ 'UCG':'Ser', 'UAA': 'Stop', 'UAG': 'Stop', 'UAU':'Tyr', 'UAC':'Tyr',\
+            \ 'AUU':'Ter', 'AUC':'Ter', 'UGU':'Cys', 'UGC':'Cys', 'ACU':'Ter', 'UGA':\
+            \ 'Stop', 'UGG':'Trp', 'CUU':'Leu', 'CUC':'Leu', 'CUA':'Leu', 'CUG':'Leu',\
+            \ 'CCU':'Pro', 'CCC':'Pro', 'CCA':'Pro', 'CCG':'Pro', 'CAU':'His', 'CAC':'His',\
+            \ 'GUU':'Gln', 'GUC':'Gln', 'CGU':'Arg', 'CGC':'Arg', 'CGA':'Arg', 'CGG':'Arg',\
+            \ 'AUU':'Ile', 'AUC':'Ile', 'AUA':'Ile', 'AUG':'Met', 'ACU':'Thr', 'ACC':'Thr',\
+            \ 'ACA':'Thr', 'ACG':'Thr', 'AAU':'Asn', 'AAC':'Asn', 'AAA':'Lys', 'AAG':'Lys',\
+            \ 'AGU':'Ser', 'AGC':'Ser', 'AGA':'Arg', 'AGG':'Arg', 'GUU':'Val', 'GUC':'Val',\
+            \ 'GUA':'Val', 'GUG':'Val', 'GCU':'Ala', 'GCC':'Ala', 'GCA':'Ala', 'GCG':'Ala',\
+            \ 'GAU':'Asp', 'GAC':'Asp', 'GAA':'Glu', 'GAG':'Glu', 'GGU':'Gly', 'GGC':'Gly',\
+            \ 'GGA':'Gly','GGG':'Gly'}\ndef transcription(DNA):\n    '''Return a string\
+            \ of RNA for a given string of DNA'''\n    mRNA = ''\n    for base in\
+            \ DNA:\n        mRNA += transcription_dictionary[base]\n    return mRNA\n\
+            \ndef translation(mRNA):\n    ''''Return a list of amino acids for a string\
+            \ of mRNA codons''' \n    amino_acid_chain = []\n    codon_length = 3\n\
+            \    end = len(mRNA)\n    ribosome_one = 0\n    ribosome_two = 3\n   \
+            \ while ribosome_two <= end:\n        codon = mRNA[ribosome_one:ribosome_two]\n\
+            \        if codon in translation_dictionary and translation_dictionary[codon]\
+            \ is not 'Stop':\n            amino_acid = translation_dictionary[codon]\n\
+            \            amino_acid_chain.append(amino_acid)\n        ribosome_one\
+            \ = ribosome_two\n        ribosome_two += codon_length\n    return amino_acid_chain\n\
+            \n"
+        postCode:
+          value: "for DNA in DNA_array:\n    mRNA = transcription(DNA)\n    amino_acid_chain\
+            \ = translation(mRNA)\n\n    print 'DNA:  ' + DNA\n    print 'mRNA: '\
+            \ + mRNA\n    print 'Number of Codons: ' + str(len(amino_acid_chain))\n\
+            \    print 'Amino Acid Chain: ' + '-'.join(amino_acid_chain)"
+        preCode:
+          value: 'DNA_array = [''GGATCCTCACATGAGTTCAGTATATAATTGTAACAGAATAAAAAAT'',
+            ''GGATTCTCACATGAGTTCAGTATATAATTGTAACAGAATAAAAAAT'', ''GGATCTCACATGAGTTCAGTATATAATTGTAACAGAATAAAAAATC'']
+
+            '
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: CodeRepl
+      triggers: []
+    param_changes: []
+tags: []
