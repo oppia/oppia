@@ -23,8 +23,11 @@ oppia.directive('snapshotsSkin', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'skins/Snapshots',
-    controller: ['$scope', 'warningsData', 'oppiaPlayerService', 'focusService', '$timeout',
-        function($scope, warningsData, oppiaPlayerService, focusService, $timeout) {
+    controller: [
+        '$scope', '$timeout', 'warningsData', 'oppiaPlayerService',
+        'focusService', 'messengerService',
+        function($scope, $timeout, warningsData, oppiaPlayerService,
+          focusService, messengerService) {
 
       var currentStateName = oppiaPlayerService.getCurrentStateName();
       var _labelForNextFocusTarget = '';
@@ -74,6 +77,9 @@ oppia.directive('snapshotsSkin', [function() {
           _addNewElementToTranscript(currentStateName, initHtml);
           $scope.waitingForLearner = true;
 
+          messengerService.sendMessage(
+            messengerService.EXPLORATION_LOADED, null);
+
           $timeout(function() {
             focusService.setFocus(_labelForNextFocusTarget);
           }, 50);
@@ -113,6 +119,8 @@ oppia.directive('snapshotsSkin', [function() {
           if (!newStateName) {
             _addNewElementToTranscript(newStateName, 'Congratulations, you have finished!');
             $scope.inputTemplate = '';
+            messengerService.sendMessage(
+              messengerService.EXPLORATION_COMPLETED, null);
             return;
           }
 
