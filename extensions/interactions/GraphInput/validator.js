@@ -50,7 +50,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', ['$filter', 'WARNING_TYPES',
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please specify what Oppia should do in rules ' +
+            'please specify what Oppia should do in rule ' +
             String(i + 1) + '.')
         });
       }

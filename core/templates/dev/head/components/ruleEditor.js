@@ -228,9 +228,11 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
     controller: [
       '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
       'validatorsService', 'rulesService', 'explorationStatesService', 'stateInteractionIdService',
+      'stateGraphArranger',
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
-          validatorsService, rulesService, explorationStatesService, stateInteractionIdService) {
+          validatorsService, rulesService, explorationStatesService, stateInteractionIdService,
+          stateGraphArranger) {
 
         $scope.currentInteractionId = stateInteractionIdService.savedMemento;
 
@@ -337,7 +339,28 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
             text: 'Create New State...'
           }];
 
-          var stateNames = Object.keys(explorationStatesService.getStates()).sort();
+          // Arrange the remaining states based on their order in the state graph.
+          var lastComputedArrangement = stateGraphArranger.getLastComputedArrangement();
+          var allStateNames = Object.keys(explorationStatesService.getStates());
+          // Higher scores come later.
+          var allStateScores = {};
+          var unarrangedStateCount = 0;
+          for (var i = 0; i < allStateNames.length; i++) {
+            var stateName = allStateNames[i];
+            if (lastComputedArrangement.hasOwnProperty(stateName)) {
+              allStateScores[stateName] = (
+                lastComputedArrangement[stateName].depth * 1000.0 +
+                lastComputedArrangement[stateName].offset);
+            } else {
+              allStateScores[stateName] = 1000000.0 + unarrangedStateCount;
+              unarrangedStateCount++;
+            }
+          }
+
+          var stateNames = allStateNames.sort(function(a, b) {
+            return allStateScores[a] - allStateScores[b];
+          });
+
           for (var i = 0; i < stateNames.length; i++) {
             if (stateNames[i] !== _currentStateName) {
               $scope.destChoices.push({

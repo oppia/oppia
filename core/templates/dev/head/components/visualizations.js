@@ -70,6 +70,10 @@ oppia.factory('stateGraphArranger', [
 
   var MAX_INDENTATION_LEVEL = 2.5;
 
+  // The last result of a call to computeLayout(). Used for determining the
+  // order in which to specify states in rules.
+  var _lastComputedArrangement = null;
+
   var _getGraphAsAdjacencyLists = function(nodes, links) {
     var adjacencyLists = {};
 
@@ -445,7 +449,12 @@ oppia.factory('stateGraphArranger', [
         }
       }
 
+      _lastComputedArrangement = angular.copy(nodeData);
+
       return nodeData;
+    },
+    getLastComputedArrangement: function() {
+      return angular.copy(_lastComputedArrangement);
     }
   };
 }]);

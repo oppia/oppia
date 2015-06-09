@@ -29,7 +29,7 @@ oppia.filter('oppiaInteractiveCodeReplValidator', ['$filter', 'WARNING_TYPES', f
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please specify what Oppia should do in rules ' +
+            'please specify what Oppia should do in rule ' +
             String(i + 1) + '.')
         });
       }
