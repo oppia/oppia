@@ -443,13 +443,17 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     } else if ($scope.isExplorationLockedForEditing()) {
       return 'Please save your changes before publishing.';
     } else {
-      return 'Click this button to publish your exploration to the gallery.';
+      return 'Publish to Gallery';
     }
   };
 
   $scope.getSaveButtonTooltip = function() {
     if (explorationWarningsService.hasCriticalWarnings() > 0) {
       return 'Please resolve the warnings.';
+    } else if ($scope.isPrivate()) {
+      return 'Save Draft';
+    } else {
+      return 'Publish Changes';
     }
   };
 
