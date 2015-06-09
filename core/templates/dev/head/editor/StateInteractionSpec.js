@@ -41,7 +41,7 @@ describe('State Interaction controller', function() {
       scope.stateCustomizationArgsService = scas;
       scope.interactionDetailsCache = idc;
 
-      ess.setStates({
+      ess.init({
         'First State': {
           content: [{
             type: 'text',

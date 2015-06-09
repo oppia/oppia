@@ -38,7 +38,7 @@ describe('Sidebar state name controller', function() {
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
-      ess.setStates({
+      ess.init({
         'First State': {
           content: [{
             type: 'text',
