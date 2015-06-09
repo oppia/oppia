@@ -592,7 +592,7 @@ oppia.factory('explorationStatesService', [
              newStateTemplateService) {
   var _states = null;
   return {
-    setStates: function(value) {
+    init: function(value) {
       _states = angular.copy(value);
     },
     getStates: function() {

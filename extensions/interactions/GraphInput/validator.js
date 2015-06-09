@@ -17,7 +17,9 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveGraphInputValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveGraphInputValidator', [
+    'WARNING_TYPES', 'baseInteractionValidationService',
+    function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
     var warningsList = [];
@@ -43,27 +45,9 @@ oppia.filter('oppiaInteractiveGraphInputValidator', ['$filter', 'WARNING_TYPES',
       });
     }
 
-    var numRuleSpecs = ruleSpecs.length;
-
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'please specify what Oppia should do in rule ' +
-            String(i + 1) + '.')
-        });
-      }
-    }
-
-    var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-    if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'please add a rule to cover what should happen in the general case.')
-      });
-    }
+    warningsList = warningsList.concat(
+      baseInteractionValidationService.getAllRuleSpecsWarnings(
+        ruleSpecs, stateName));
 
     return warningsList;
   };

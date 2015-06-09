@@ -342,6 +342,16 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
           // Arrange the remaining states based on their order in the state graph.
           var lastComputedArrangement = stateGraphArranger.getLastComputedArrangement();
           var allStateNames = Object.keys(explorationStatesService.getStates());
+
+          var maxDepth = 0;
+          var maxOffset = 0;
+          for (var stateName in lastComputedArrangement) {
+            maxDepth = Math.max(
+              maxDepth, lastComputedArrangement[stateName].depth);
+            maxOffset = Math.max(
+              maxOffset, lastComputedArrangement[stateName].offset);
+          }
+
           // Higher scores come later.
           var allStateScores = {};
           var unarrangedStateCount = 0;
@@ -349,10 +359,14 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
             var stateName = allStateNames[i];
             if (lastComputedArrangement.hasOwnProperty(stateName)) {
               allStateScores[stateName] = (
-                lastComputedArrangement[stateName].depth * 1000.0 +
+                lastComputedArrangement[stateName].depth * (maxOffset + 1) +
                 lastComputedArrangement[stateName].offset);
             } else {
-              allStateScores[stateName] = 1000000.0 + unarrangedStateCount;
+              // States that have just been added in the rule 'create new'
+              // modal are not yet included as part of lastComputedArrangement,
+              // so we account for them here.
+              allStateScores[stateName] = (
+                (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
               unarrangedStateCount++;
             }
           }

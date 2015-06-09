@@ -17,23 +17,15 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveLogicProofValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveLogicProofValidator', [
+    'baseInteractionValidationService', function(baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
     var warningsList = [];
 
-    var numRuleSpecs = ruleSpecs.length;
-
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'please specify what Oppia should do in rule ' +
-            String(i + 1) + '.')
-        });
-      }
-    }
+    warningsList = warningsList.concat(
+      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
+        ruleSpecs, stateName));
 
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.

@@ -17,7 +17,9 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveImageClickInputValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveImageClickInputValidator', [
+    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+    function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
     var warningsList = [];
@@ -71,19 +73,12 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', ['$filter', 'WARNING_TY
       });
     }
 
-    var numRuleSpecs = ruleSpecs.length;
+    warningsList = warningsList.concat(
+      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
+        ruleSpecs, stateName));
 
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'please specify what Oppia should do in rule ' +
-            String(i + 1) + '.')
-        });
-      }
-
-      // Check that rules refer to valid region strings.
+    // Check that each rule refers to a valid region string.
+    for (var i = 0; i < ruleSpecs.length - 1; i++) {
       if (ruleSpecs[i].definition.name === 'IsInRegion') {
         var label = ruleSpecs[i].definition.inputs.x;
         if (seenRegionStrings.indexOf(label) === -1) {
@@ -101,7 +96,8 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', ['$filter', 'WARNING_TY
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (
-          'please add a rule to cover what should happen if no region is clicked.')
+          'please add a rule to cover what should happen if none of the ' +
+          'given regions are clicked.')
       });
     }
 

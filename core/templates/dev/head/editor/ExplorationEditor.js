@@ -89,7 +89,7 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
-      explorationStatesService.setStates(data.states);
+      explorationStatesService.init(data.states);
 
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
