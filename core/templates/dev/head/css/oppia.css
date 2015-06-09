@@ -810,6 +810,12 @@ md-card.oppia-gallery-tile {
   font-style: italic;
 }
 
+.oppia-save-publish-button-icon {
+  height: 18px;
+  margin: 0 0 2px 0;
+  width: 18px;
+}
+
 .oppia-state-name-container {
   background: #eee;
   border-bottom-left-radius: 5px;
