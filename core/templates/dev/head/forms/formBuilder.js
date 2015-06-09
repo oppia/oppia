@@ -515,12 +515,18 @@ oppia.config(['$provide', function($provide) {
 
     var _RICH_TEXT_COMPONENTS = [];
 
+    var _createToolbarIcon = function(componentDefn) {
+      var el = $('<img/>');
+      el.attr('src', componentDefn.iconDataUrl);
+      el.addClass('oppia-rte-toolbar-image');
+      return el.get(0);
+    };
+
     // Returns a DOM node.
     var createRteElement = function(componentDefn, customizationArgsDict) {
       var el = $('<img/>');
       el.attr('src', componentDefn.iconDataUrl);
       el.addClass('oppia-noninteractive-' + componentDefn.name);
-      el.addClass('oppia-rte-toolbar-image');
 
       for (var attrName in customizationArgsDict) {
         el.attr(
@@ -603,7 +609,7 @@ oppia.config(['$provide', function($provide) {
     }
 
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-      var buttonDisplay = createRteElement(componentDefn, {});
+      var buttonDisplay = _createToolbarIcon(componentDefn);
 
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
