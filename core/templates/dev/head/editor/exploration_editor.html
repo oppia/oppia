@@ -139,7 +139,8 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png" class="oppia-save-publish-button-icon" alt="Publish to Gallery">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
+               class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish to Gallery">
           <span class="hidden-sm hidden-xs">Publish to Gallery</span>
         </button>
       </div>
@@ -151,11 +152,13 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_save_black_48dp.png" class="oppia-save-publish-button-icon" alt="Save Draft">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_save_black_48dp.png"
+                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Save Draft">
               <span class="hidden-sm hidden-xs">Save Draft</span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png" class="oppia-save-publish-button-icon" alt="Publish Changes">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
+                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish Changes">
               <span class="hidden-sm hidden-xs">Publish Changes</span>
             </span>
             <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
