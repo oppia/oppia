@@ -674,6 +674,29 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
+oppia.filter('pasteHandler', ['$sanitize', function($sanitize){
+  return function(html) {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    // save the pre-sanitized widgets
+    var widgets = $(wrapper).find('[class^=oppia-noninteractive-]');
+    wrapper.innerHTML = $sanitize(wrapper.innerHTML);
+    var sanitizedWidgets = $(wrapper).find('[class^=oppia-noninteractive-]');
+    for (var i = 0; i < sanitizedWidgets.length; i++) {
+      var el = sanitizedWidgets[i];
+      var attrs = widgets[i].attributes;
+      for (var j = 0; j < attrs.length; j++) {
+        var attr = attrs[j];
+        // reinstate sanitized widget attributes
+        if (attr.name.indexOf("-with-value") !== -1 && !el.hasAttribute(attr.name)) {
+          el.setAttribute(attr.name, attr.value);
+        }
+      }
+    }
+    return wrapper.innerHTML;
+  }
+}]);
+
 oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
   function($filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
   return {
@@ -683,26 +706,10 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
       uiConfig: '&'
     },
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
-    controller: ['$scope', '$log', '$sanitize', function($scope, $log, $sanitize) {
+    controller: ['$scope', '$log', function($scope, $log) {
       $scope.stripFormatting = function(html) {
-        var wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-        // save the pre-sanitized widgets
-        var widgets = $(wrapper).find('[class^=oppia-noninteractive-]');
-        wrapper.innerHTML = $sanitize(wrapper.innerHTML);
-        var sanitizedWidgets = $(wrapper).find('[class^=oppia-noninteractive-]');
-        for (var i = 0; i < sanitizedWidgets.length; i++) {
-          var el = sanitizedWidgets[i];
-          var attrs = widgets[i].attributes;
-          for (var j = 0; j < attrs.length; j++) {
-            var attr = attrs[j];
-            // reinstate sanitized widget attributes
-            if (attr.name.indexOf("-with-value") !== -1 && !el.hasAttribute(attr.name)) {
-              el.setAttribute(attr.name, attr.value);
-            }
-          }
-        }
-        return wrapper.innerHTML;
+        console.log(html);
+        return $filter('pasteHandler')(html);
       };
 
       $scope._RICH_TEXT_COMPONENTS = [];
