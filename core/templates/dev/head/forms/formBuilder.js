@@ -674,25 +674,30 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
-oppia.filter('pasteHandler', ['$sanitize', function($sanitize){
+oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
+  var _EXTENSION_SELECTOR = '[class^=oppia-noninteractive-]';
+
   return function(html) {
     var wrapper = document.createElement('div');
     wrapper.innerHTML = html;
-    // save the pre-sanitized widgets
-    var widgets = $(wrapper).find('[class^=oppia-noninteractive-]');
+
+    // Save the unsanitized extensions.
+    var unsanitizedExtensions = $(wrapper).find(_EXTENSION_SELECTOR);
+
     wrapper.innerHTML = $sanitize(wrapper.innerHTML);
-    var sanitizedWidgets = $(wrapper).find('[class^=oppia-noninteractive-]');
-    for (var i = 0; i < sanitizedWidgets.length; i++) {
-      var el = sanitizedWidgets[i];
-      var attrs = widgets[i].attributes;
+    var sanitizedExtensions = $(wrapper).find(_EXTENSION_SELECTOR);
+    for (var i = 0; i < sanitizedExtensions.length; i++) {
+      var el = sanitizedExtensions[i];
+      var attrs = unsanitizedExtensions[i].attributes;
       for (var j = 0; j < attrs.length; j++) {
         var attr = attrs[j];
-        // reinstate sanitized widget attributes
-        if (attr.name.indexOf("-with-value") !== -1 && !el.hasAttribute(attr.name)) {
+        // Reinstate the sanitized widget attributes.
+        if (attr.name.indexOf('-with-value') !== -1 && !el.hasAttribute(attr.name)) {
           el.setAttribute(attr.name, attr.value);
         }
       }
     }
+
     return wrapper.innerHTML;
   }
 }]);
@@ -708,8 +713,7 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
       $scope.stripFormatting = function(html) {
-        console.log(html);
-        return $filter('pasteHandler')(html);
+        return $filter('sanitizeHtmlForRte')(html);
       };
 
       $scope._RICH_TEXT_COMPONENTS = [];
