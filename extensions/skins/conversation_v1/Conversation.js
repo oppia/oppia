@@ -44,6 +44,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.introCardImageUrl = null;
 
       $rootScope.loadingMessage = 'Loading';
+      $scope.isIframed = urlService.isIframed();
 
       // Returns true if the window is narrow, false otherwise.
       $scope.isWindowNarrow = function() {

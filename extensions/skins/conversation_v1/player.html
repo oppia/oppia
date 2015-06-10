@@ -87,7 +87,7 @@
       </div>
 
       <div class="conversation-skin-supplemental-interaction">
-        <div ng-if="!waitingForNewCard && !interactionIsInline && inputTemplate">
+        <div ng-if="!waitingForNewCard && !interactionIsInline && inputTemplate && (!finished || !isIframed)">
           <md-card class="conversation-skin-supplemental-card">
             <div class="protractor-test-conversation-input" angular-html-bind="inputTemplate">
             </div>
@@ -95,7 +95,7 @@
         </div>
       </div>
 
-      <div ng-if="!waitingForNewCard && finished && isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
+      <div ng-if="!waitingForNewCard && finished && isLoggedIn && !isInPreviewMode && !isIframed" class="conversation-skin-final-ratings">
       <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"></oppia-gadget-panel>
         <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
         <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
