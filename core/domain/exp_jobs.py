@@ -74,7 +74,9 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
 
 class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
-    """Job that checks (non-strict) validation status of all explorations."""
+    """Job that checks that all explorations have appropriate validation
+    statuses.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -83,9 +85,19 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         from core.domain import exp_services
+        from core.domain import rights_manager
+
+        if item.deleted:
+            return
+
         exploration = exp_services.get_exploration_from_model(item)
+        exp_summary = rights_manager.get_exploration_rights(item.id)
+
         try:
-            exploration.validate(strict=False)
+            if exp_summary.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+                exploration.validate()
+            else:
+                exploration.validate(strict=True)
         except utils.ValidationError as e:
             yield (item.id, unicode(e).encode('utf-8'))
 
@@ -102,6 +114,7 @@ class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        from core.domain import exp_domain
         from core.domain import exp_services
 
         if item.deleted:
@@ -124,7 +137,7 @@ class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
                         handler['definition']['inputs']['d'] *= 110
 
                 change_list.append({
-                    'cmd': 'edit_state_property',
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': 'widget_handlers',
                     'state_name': state_name,
                     'old_value': old_value,
@@ -199,3 +212,46 @@ class SearchRankerMRJobManager(
     @staticmethod
     def reduce(key, stringified_values):
         pass
+
+
+class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
+    """A reusable one-time job that may be used to migrate exploration schema
+    versions. This job will load all existing explorations from NDB and
+    immediately store them back into NDB. The loading process of an exploration
+    in exp_services automatically performs schema updating. This job persists
+    that conversion work, keeping explorations up-to-date and enhancing the
+    load time of new explorations.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_domain
+        from core.domain import exp_services
+
+        # If the exploration model being stored in the datastore is not the
+        # most up-to-date states schema version, then update it.
+        if (not item.deleted and item.states_schema_version !=
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            # Note: update_exploration does not need to apply a change list in
+            # order to perform a migration. See the related comment in
+            # exp_services.apply_change_list for more information.
+            commit_cmds = [{
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': str(item.states_schema_version),
+                'to_version': str(
+                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+            }]
+            exp_services.update_exploration(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                'Update exploration states from schema version %d to %d.' % (
+                    item.states_schema_version,
+                    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+

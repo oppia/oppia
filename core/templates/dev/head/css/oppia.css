@@ -810,6 +810,12 @@ md-card.oppia-gallery-tile {
   font-style: italic;
 }
 
+.oppia-save-publish-button-icon {
+  height: 18px;
+  margin: 0 0 2px 0;
+  width: 18px;
+}
+
 .oppia-state-name-container {
   background: #eee;
   border-bottom-left-radius: 5px;
@@ -876,10 +882,6 @@ pre.oppia-pre-wrapped-text {
 }
 .oppia-editor-card-body h3 {
   font-size: 1.8em;
-  margin: 0;
-}
-.oppia-editor-card-body h4 {
-  font-size: 1.4em;
   margin: 0;
 }
 .oppia-editor-card-body form {
@@ -1888,6 +1890,11 @@ div#ng-curtain {
   padding: 4px;
   resize: none;
   width: 245px;
+}
+
+.oppia-rte-toolbar-image {
+  padding-bottom: 8px;
+  padding-top: 8px;
 }
 
 .ta-scroll-window.oppia-rte-content {

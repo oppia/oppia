@@ -29,12 +29,9 @@
         <div style="padding-top: 20px;" ng-if="rule.dest !== getActiveStateName()">
           <strong>Destination:</strong>
           <span class="oppia-rule-dest-link" style="position: relative;">
-            <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'">
+            <a ng-click="navigateToRuleDest()">
               <[rule.dest]>
             </a>
-          </span>
-          <span ng-if="rule.dest === 'END'">
-            END
           </span>
         </div>
       </div>

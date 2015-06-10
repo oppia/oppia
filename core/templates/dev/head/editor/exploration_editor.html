@@ -139,7 +139,9 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          Publish to Gallery
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
+               class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish to Gallery">
+          <span class="hidden-sm hidden-xs">Publish to Gallery</span>
         </button>
       </div>
     </li>
@@ -149,9 +151,17 @@
            title="<[getSaveButtonTooltip()]>">
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
-            <span ng-if="isPrivate()">Save Draft</span>
-            <span ng-if="!isPrivate()">Publish Changes</span>
-            <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+            <span ng-if="isPrivate()">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_save_black_48dp.png"
+                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Save Draft">
+              <span class="hidden-sm hidden-xs">Save Draft</span>
+            </span>
+            <span ng-if="!isPrivate()" title="Publish Changes">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
+                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish Changes">
+              <span class="hidden-sm hidden-xs">Publish Changes</span>
+            </span>
+            <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span ng-if="isSaveInProgress">
             <span ng-if="isPrivate()">Saving...</span>
@@ -177,7 +187,7 @@
         <h3>Publish Exploration</h3>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body oppia-long-text">
         <p>
           Congratulations, you're about to publish an exploration!
         </p>
@@ -225,7 +235,7 @@
           <span ng-if="!isExplorationPrivate">Publish Changes</span>
         </h3>
       </div>
-      <div class="modal-body">
+      <div class="modal-body oppia-long-text">
         <p>
           <span ng-if="isExplorationPrivate">(Optional)</span>
           Please enter a brief description of what you have changed:

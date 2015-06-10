@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
+
 // A state-specific cache for interaction details. It stores customization args
 // corresponding to an interaction id so that they can be restored if the
 // interaction is changed back while the user is still in this state. This
@@ -48,14 +50,16 @@ oppia.factory('interactionDetailsCache', [function() {
 
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
-    'editorContextService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
-    'stateInteractionIdService', 'stateCustomizationArgsService',
-    'editabilityService', 'explorationStatesService', 'graphDataService',
+    'editorContextService', 'changeListService', 'oppiaHtmlEscaper',
+    'INTERACTION_SPECS', 'stateInteractionIdService',
+    'stateCustomizationArgsService', 'editabilityService',
+    'explorationStatesService', 'graphDataService',
     'interactionDetailsCache',
     function($scope, $http, $rootScope, $modal, $filter, warningsData,
-      editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
-      stateInteractionIdService, stateCustomizationArgsService,
-      editabilityService, explorationStatesService, graphDataService,
+      editorContextService, changeListService, oppiaHtmlEscaper,
+      INTERACTION_SPECS, stateInteractionIdService,
+      stateCustomizationArgsService, editabilityService,
+      explorationStatesService, graphDataService,
       interactionDetailsCache) {
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -111,6 +115,68 @@ oppia.controller('StateInteraction', [
     $scope.hasLoaded = true;
   });
 
+  // If a terminal interaction is selected for a state and it currently has no
+  // content, this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
+  // NOTE TO DEVELOPERS: Callers of this function must ensure that the current
+  // active state is a terminal one.
+  var updateDefaultTerminalStateContentIfEmpty = function() {
+    // Get current state.
+    var activeStateName = editorContextService.getActiveStateName();
+    var state = explorationStatesService.getState(activeStateName);
+
+    // Check if the content is currently empty, as expected.
+    if (state.content.length != 1
+        || state.content[0].value !== ''
+        || state.content[0].type != 'text') {
+      return;
+    }
+
+    // Update the state's content.
+    var previousContent = angular.copy(state.content);
+    state.content = [{type: 'text', value: DEFAULT_TERMINAL_STATE_CONTENT}];
+
+    // Fire property change for editing the state's content.
+    changeListService.editStateProperty(
+      activeStateName, 'content',
+      angular.copy(state.content), previousContent);
+
+    // Save state.
+    explorationStatesService.setState(activeStateName, state);
+  };
+
+  $scope.onCustomizationModalSavePostHook = function(unusedResult) {
+    var hasInteractionIdChanged = (
+      stateInteractionIdService.displayed !==
+      stateInteractionIdService.savedMemento);
+    if (hasInteractionIdChanged) {
+      stateInteractionIdService.saveDisplayedValue();
+      if (INTERACTION_SPECS[stateInteractionIdService.displayed].is_terminal) {
+        updateDefaultTerminalStateContentIfEmpty();
+      }
+    }
+
+    stateCustomizationArgsService.saveDisplayedValue();
+
+    interactionDetailsCache.set(
+      stateInteractionIdService.savedMemento,
+      stateCustomizationArgsService.savedMemento);
+
+    // This must be called here so that the rules are updated before the state
+    // graph is recomputed.
+    if (hasInteractionIdChanged) {
+      $rootScope.$broadcast(
+        'onInteractionIdChanged', stateInteractionIdService.savedMemento);
+    }
+
+    _updateStatesDict();
+    graphDataService.recompute();
+    _updateInteractionPreviewAndAnswerChoices();
+
+    // Refresh some related elements so the updated state appears (if its
+    // content has been changed).
+    $rootScope.$broadcast('refreshStateEditor');
+  };
+
   $scope.openInteractionCustomizerModal = function() {
     if (editabilityService.isEditable()) {
       warningsData.clear();
@@ -144,8 +210,8 @@ oppia.controller('StateInteraction', [
               var argName = $scope.customizationArgSpecs[i].name;
               stateCustomizationArgsService.displayed[argName] = {
                 value: (
-                  stateCustomizationArgsService.savedMemento.hasOwnProperty(caName) ?
-                  angular.copy(stateCustomizationArgsService.savedMemento[caName].value) :
+                  stateCustomizationArgsService.savedMemento.hasOwnProperty(argName) ?
+                  angular.copy(stateCustomizationArgsService.savedMemento[argName].value) :
                   angular.copy($scope.customizationArgSpecs[i].default_value)
                 )
               };
@@ -194,31 +260,7 @@ oppia.controller('StateInteraction', [
             $modalInstance.dismiss('cancel');
           };
         }]
-      }).result.then(function() {
-        var hasInteractionIdChanged = (
-          stateInteractionIdService.displayed !==
-          stateInteractionIdService.savedMemento);
-        if (hasInteractionIdChanged) {
-          stateInteractionIdService.saveDisplayedValue();
-        }
-
-        stateCustomizationArgsService.saveDisplayedValue();
-
-        interactionDetailsCache.set(
-          stateInteractionIdService.savedMemento,
-          stateCustomizationArgsService.savedMemento);
-
-        // This must be called here so that the rules are updated before the state
-        // graph is recomputed.
-        if (hasInteractionIdChanged) {
-          $rootScope.$broadcast(
-            'onInteractionIdChanged', stateInteractionIdService.savedMemento);
-        }
-
-        _updateStatesDict();
-        graphDataService.recompute();
-        _updateInteractionPreviewAndAnswerChoices();
-      }, function() {
+      }).result.then($scope.onCustomizationModalSavePostHook, function() {
         stateInteractionIdService.restoreFromMemento();
         stateCustomizationArgsService.restoreFromMemento();
       });

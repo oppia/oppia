@@ -239,14 +239,6 @@ oppia.factory('validatorsService', [
         return false;
       }
 
-      if (input.toUpperCase() === END_DEST) {
-        if (showWarnings) {
-          warningsData.addWarning(
-            'Please choose a state name that is not \'END\'.');
-        }
-        return false;
-      }
-
       return true;
     },
     isNonempty: function(input, showWarnings) {
