@@ -1007,6 +1007,15 @@ pre.oppia-pre-wrapped-text {
   opacity: 1;
 }
 
+/* Workaround to ensure that single-line paragraphs comprising multiple-choice
+   options are displayed inline. */
+.oppia-multiple-choice-rule p {
+  display: inline;
+}
+.oppia-multiple-choice-rule p::before {
+  content: ' ';
+}
+
 .oppia-interaction-tile {
   cursor: pointer;
   display: inline-block;
