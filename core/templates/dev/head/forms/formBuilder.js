@@ -494,19 +494,14 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-      '$delegate', '$modal', '$filter', '$timeout',
+      '$delegate', '$modal', '$filter', '$timeout', '$log', 'focusService',
       'taRegisterTool', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
       function(
-        taOptions, $modal, $filter, $timeout,
+        taOptions, $modal, $filter, $timeout, $log, focusService,
         taRegisterTool, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
 
     taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
-    taOptions.toolbar = [
-      ['bold', 'italics', 'underline'],
-      ['ol', 'ul'],
-      []
-    ];
     taOptions.setup.textEditorSetup = function($element) {
       $timeout(function() {
         $element.trigger('focus');
@@ -541,7 +536,7 @@ oppia.config(['$provide', function($provide) {
       var customizationArgsDict = {};
       for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i];
-        if (attr.name == 'class' || attr.name == 'src') {
+        if (attr.name == 'class' || attr.name == 'src' || attr.name == '_moz_resizing') {
           continue;
         }
         var separatorLocation = attr.name.indexOf('-with-value');
@@ -569,8 +564,19 @@ oppia.config(['$provide', function($provide) {
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
         resolve: {},
-        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        controller: ['$scope', '$modalInstance', '$timeout', function($scope, $modalInstance, $timeout) {
           $scope.customizationArgSpecs = customizationArgSpecs;
+
+          // Without this code, the focus will remain in the background RTE
+          // even after the modal loads. This switches the focus to a temporary
+          // field in the modal which is then removed from the DOM.
+          // TODO(sll): Make this switch to the first input field in the modal
+          // instead.
+          $scope.modalIsLoading = true;
+          focusService.setFocus('tmpFocusPoint');
+          $timeout(function() {
+            $scope.modalIsLoading = false;
+          });
 
           $scope.tmpCustomizationArgs = [];
           for (var i = 0; i < customizationArgSpecs.length; i++) {
@@ -669,12 +675,38 @@ oppia.config(['$provide', function($provide) {
             });
         }
       });
-
-      taOptions.toolbar[2].push(componentDefn.name);
     });
 
     return taOptions;
   }]);
+}]);
+
+oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
+  var _EXTENSION_SELECTOR = '[class^=oppia-noninteractive-]';
+
+  return function(html) {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+
+    // Save the unsanitized extensions.
+    var unsanitizedExtensions = $(wrapper).find(_EXTENSION_SELECTOR);
+
+    wrapper.innerHTML = $sanitize(wrapper.innerHTML);
+    var sanitizedExtensions = $(wrapper).find(_EXTENSION_SELECTOR);
+    for (var i = 0; i < sanitizedExtensions.length; i++) {
+      var el = sanitizedExtensions[i];
+      var attrs = unsanitizedExtensions[i].attributes;
+      for (var j = 0; j < attrs.length; j++) {
+        var attr = attrs[j];
+        // Reinstate the sanitized widget attributes.
+        if (attr.name.indexOf('-with-value') !== -1 && !el.hasAttribute(attr.name)) {
+          el.setAttribute(attr.name, attr.value);
+        }
+      }
+    }
+
+    return wrapper.innerHTML;
+  }
 }]);
 
 oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
@@ -687,11 +719,8 @@ oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT
     },
     template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
     controller: ['$scope', '$log', function($scope, $log) {
-      // adapted from http://stackoverflow.com/a/6899999
       $scope.stripFormatting = function(html) {
-        var tmpNode = document.createElement('div');
-        tmpNode.innerHTML = html;
-        return tmpNode.innerText;
+        return $filter('sanitizeHtmlForRte')(html);
       };
 
       $scope._RICH_TEXT_COMPONENTS = [];
