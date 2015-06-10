@@ -230,3 +230,33 @@ def get_item_similarity(reference_exp_id, compared_exp_id):
         similarity_score += 1
 
     return similarity_score
+
+
+def set_recommendations(exp_id, new_recommendations):
+    """Stores a list of exploration ids of recommended explorations to play
+    after completing the exploration keyed by exp_id."""
+
+    recommendations_model = (
+        recommendations_models.ExplorationRecommendationsModel.get(
+            exp_id, strict=False))
+    if recommendations_model is None:
+        recommendations_model = (
+            recommendations_models.ExplorationRecommendationsModel(
+                id=exp_id,
+                recommended_exploration_ids=new_recommendations))
+    else:
+        recommendations_model.recommended_exploration_ids = new_recommendations
+    recommendations_model.put()
+
+
+def get_exploration_recommendations(exp_id):
+    """Gets a list of ids of at most 10 recommended explorations to play
+    after completing the exploration keyed by exp_id."""
+
+    recommendations_model = (
+        recommendations_models.ExplorationRecommendationsModel.get(
+            exp_id, strict=False))
+    if recommendations_model is None:
+        return []
+    else:
+        return recommendations_model.recommended_exploration_ids

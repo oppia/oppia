@@ -241,11 +241,10 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_EMAIL])
 
 
-class ItemSimilarityUnitTests(RecommendationsServicesUnitTests):
-    """Test recommendations services relating to item comparison."""
+class ExplorationRecommendationsUnitTests(RecommendationsServicesUnitTests):
+    """Test recommendations services relating to exploration comparison."""
 
     def test_get_item_similarity(self):
-
         with self.assertRaisesRegexp(
                 Exception, 'Invalid reference_exp_id fake_exp_id'):
             recommendations_services.get_item_similarity(
@@ -267,3 +266,12 @@ class ItemSimilarityUnitTests(RecommendationsServicesUnitTests):
             self.ADMIN_ID, self.EXP_DATA[3]['id'])
         self.assertEqual(recommendations_services.get_item_similarity(
             self.EXP_DATA[3]['id'], self.EXP_DATA[3]['id']), 10.0)
+
+    def test_get_and_set_exploration_recommendations(self):
+        recommended_exp_ids = [self.EXP_DATA[1]['id'], self.EXP_DATA[2]['id']]
+        recommendations_services.set_recommendations(
+            self.EXP_DATA[0]['id'], recommended_exp_ids)
+        saved_recommendation_ids = (
+            recommendations_services.get_exploration_recommendations(
+                self.EXP_DATA[0]['id']))
+        self.assertEqual(recommended_exp_ids, saved_recommendation_ids)

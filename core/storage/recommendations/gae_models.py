@@ -27,7 +27,7 @@ from google.appengine.ext import ndb
 TOPIC_SIMILARITIES_ID = 'topics'
 
 
-class ExplorationRecommendationModel(base_models.BaseModel):
+class ExplorationRecommendationsModel(base_models.BaseModel):
     """A list of recommended explorations similar to an exploration.
 
     Instances of this class are keyed by exploration id."""
