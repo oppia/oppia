@@ -191,48 +191,54 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
     """Test recommendations services."""
 
-    EXP_DATA = [{
-        'id': 'exp_id_1',
-        'category': 'Art'
-    }, {
-        'id': 'exp_id_2',
-        'category': 'Biology'
-    }, {
-        'id': 'exp_id_3',
-        'category': 'Chemistry'
-    }, {
-        'id': 'exp_id_4',
-        'category': 'Art'
-    }]
-    USERNAMES = ['alice', 'bob', 'charlie']
-    USER_EMAILS = ['alice@example.com',
-                   'bob@example.com',
-                   'charlie@example.com']
+    EXP_DATA = {
+        'exp_id_1': {
+            'category': 'Art',
+        },
+        'exp_id_2': {
+            'category': 'Biology',
+        },
+        'exp_id_3': {
+            'category': 'Chemistry',
+        },
+        'exp_id_4': {
+            'category': 'Art',
+        }
+    }
+    USER_DATA = {
+        'alice': {
+            'email': 'alice@example.com'
+        },
+        'bob': {
+            'email': 'bob@example.com'
+        },
+        'charlie': {
+            'email': 'charlie@example.com'
+        },
+    }
 
     def setUp(self):
         """Before each individual test, set up dummy explorations, users
         and admin."""
         super(RecommendationsServicesUnitTests, self).setUp()
 
-        self.user_ids = []
-        for i in range(len(self.USERNAMES)):
-            self.user_ids.append(
-                self.get_user_id_from_email(self.USER_EMAILS[i]))
-            user_services.get_or_create_user(
-                self.user_ids[i], self.USER_EMAILS[i])
-            self.signup(self.USER_EMAILS[i], self.USERNAMES[i])
+        for name, user in self.USER_DATA.iteritems():
+            user['id'] = self.get_user_id_from_email(
+                user['email'])
+            user_services.get_or_create_user(user['id'], user['email'])
+            self.signup(user['email'], name)
+            self.USER_DATA[name]['id'] = user['id']
 
-        self.exp_ind_to_owner_id = {
-            0: self.user_ids[0],
-            1: self.user_ids[0],
-            2: self.user_ids[1],
-            3: self.user_ids[2],
-        }
+        self.EXP_DATA['exp_id_1']['owner_id'] = self.USER_DATA['alice']['id']
+        self.EXP_DATA['exp_id_2']['owner_id'] = self.USER_DATA['alice']['id']
+        self.EXP_DATA['exp_id_3']['owner_id'] = self.USER_DATA['bob']['id']
+        self.EXP_DATA['exp_id_4']['owner_id'] = self.USER_DATA['charlie']['id']
+
         self.explorations = []
-        for ind, owner_id in self.exp_ind_to_owner_id.iteritems():
+        for exp_id, exp in self.EXP_DATA.iteritems():
             self.save_new_valid_exploration(
-                self.EXP_DATA[ind]['id'], owner_id,
-                category=self.EXP_DATA[ind]['category'])
+                exp_id, exp['owner_id'], category=exp['category'])
+            rights_manager.publish_exploration(exp['owner_id'], exp_id)
 
         self.ADMIN_ID = self.get_user_id_from_email(self.ADMIN_EMAIL)
         user_services.get_or_create_user(
@@ -251,27 +257,31 @@ class ExplorationRecommendationsUnitTests(RecommendationsServicesUnitTests):
                 'fake_exp_id', 'fake_exp_id_2')
 
         self.assertEqual(recommendations_services.get_item_similarity(
-            self.EXP_DATA[0]['id'], self.EXP_DATA[1]['id']), 0.0)
-
-        for ind, owner_id in self.exp_ind_to_owner_id.iteritems():
-            rights_manager.publish_exploration(
-                owner_id, self.EXP_DATA[ind]['id'])
-
+            'exp_id_1', 'exp_id_2'), 6.5)
         self.assertEqual(recommendations_services.get_item_similarity(
-            self.EXP_DATA[0]['id'], self.EXP_DATA[1]['id']), 6.5)
-        self.assertEqual(recommendations_services.get_item_similarity(
-            self.EXP_DATA[3]['id'], self.EXP_DATA[3]['id']), 9.0)
+            'exp_id_4', 'exp_id_4'), 9.0)
 
-        rights_manager.publicize_exploration(
-            self.ADMIN_ID, self.EXP_DATA[3]['id'])
+        rights_manager.publicize_exploration(self.ADMIN_ID, 'exp_id_4')
         self.assertEqual(recommendations_services.get_item_similarity(
-            self.EXP_DATA[3]['id'], self.EXP_DATA[3]['id']), 10.0)
+            'exp_id_4', 'exp_id_4'), 10.0)
+
+        rights_manager.unpublish_exploration(self.ADMIN_ID, 'exp_id_2')
+        self.assertEqual(recommendations_services.get_item_similarity(
+            'exp_id_1', 'exp_id_2'), 0.0)
 
     def test_get_and_set_exploration_recommendations(self):
-        recommended_exp_ids = [self.EXP_DATA[1]['id'], self.EXP_DATA[2]['id']]
+        recommended_exp_ids = ['exp_id_2', 'exp_id_3']
         recommendations_services.set_recommendations(
-            self.EXP_DATA[0]['id'], recommended_exp_ids)
+            'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
-                self.EXP_DATA[0]['id']))
+                'exp_id_1'))
+        self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
+
+        recommended_exp_ids = ['exp_id_3']
+        recommendations_services.set_recommendations(
+            'exp_id_1', recommended_exp_ids)
+        saved_recommendation_ids = (
+            recommendations_services.get_exploration_recommendations(
+                'exp_id_1'))
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)

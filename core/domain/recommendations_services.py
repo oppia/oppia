@@ -236,17 +236,8 @@ def set_recommendations(exp_id, new_recommendations):
     """Stores a list of exploration ids of recommended explorations to play
     after completing the exploration keyed by exp_id."""
 
-    recommendations_model = (
-        recommendations_models.ExplorationRecommendationsModel.get(
-            exp_id, strict=False))
-    if recommendations_model is None:
-        recommendations_model = (
-            recommendations_models.ExplorationRecommendationsModel(
-                id=exp_id,
-                recommended_exploration_ids=new_recommendations))
-    else:
-        recommendations_model.recommended_exploration_ids = new_recommendations
-    recommendations_model.put()
+    recommendations_models.ExplorationRecommendationsModel(
+        id=exp_id, recommended_exploration_ids=new_recommendations).put()
 
 
 def get_exploration_recommendations(exp_id):

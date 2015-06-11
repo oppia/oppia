@@ -37,8 +37,8 @@ class ExplorationRecommendationsAggregator(
     exploration.
 
     This job does not have a realtime component. There will be a delay in
-    propagating new updates to explorations; the length of the delay will be
-    approximately the time it takes a batch job to run."""
+    propagating new updates to new recommendations; the length of the delay
+    will be approximately the time it takes a batch job to run."""
     @classmethod
     def get_event_types_listened_to(cls):
         return []
@@ -71,14 +71,17 @@ class ExplorationRecommendationsMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import recommendations_services
         from core.domain import exp_services
+        from core.domain import recommendations_services
 
+        # Note: There is a threshold so that bad recommendations will be
+        # discarded even if an exploration has few similar explorations.
         SIMILARITY_SCORE_THRESHOLD = 4.0
 
         exp_summary_id = item.id
-        exp_summaries_dict = exp_services.get_all_exploration_summaries()
-        for compared_exp_id in exp_summaries_dict.keys():
+        exp_summaries_dict = (
+            exp_services.get_non_private_exploration_summaries())
+        for compared_exp_id in exp_summaries_dict:
             if compared_exp_id != exp_summary_id:
                 similarity_score = (
                     recommendations_services.get_item_similarity(
@@ -90,13 +93,25 @@ class ExplorationRecommendationsMRJobManager(
     def reduce(key, stringified_values):
         from core.domain import recommendations_services
 
-        values = sorted(
-            [ast.literal_eval(v) for v in stringified_values], reverse=True)
-        del values[10:]
+        MAX_RECOMMENDATIONS = 10
 
-        recommended_exploration_ids = []
-        for similarity_score, exp_id in values:
-            recommended_exploration_ids.append(exp_id)
+        other_exploration_similarities = []
+
+        for value in stringified_values:
+            similarity_score, exp_id = ast.literal_eval(value)
+            other_exploration_similarities.append({
+                'exp_id': exp_id,
+                'similarity_score': similarity_score
+                })
+
+        other_exploration_similarities = sorted(
+            other_exploration_similarities,
+            reverse=True,
+            key=lambda x: x['similarity_score'])
+
+        recommended_exploration_ids = [
+            item['exp_id']
+            for item in other_exploration_similarities[:MAX_RECOMMENDATIONS]]
 
         recommendations_services.set_recommendations(
             key, recommended_exploration_ids)

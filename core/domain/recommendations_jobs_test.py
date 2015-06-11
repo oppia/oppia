@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for Oppia recommendations."""
+"""Tests for recommendations_jobs."""
 
 __author__ = 'Xinyu Wu'
 
@@ -64,9 +64,6 @@ class ExplorationRecommendationsAggregatorUnitTests(
             '1.0,0.2,0.1\n'
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
-        for ind, owner_id in self.exp_ind_to_owner_id.iteritems():
-            rights_manager.publish_exploration(
-                owner_id, self.EXP_DATA[ind]['id'])
 
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -80,14 +77,12 @@ class ExplorationRecommendationsAggregatorUnitTests(
 
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
-                    self.EXP_DATA[0]['id']))
-            self.assertEqual(recommendations,
-                             [self.EXP_DATA[3]['id'], self.EXP_DATA[1]['id']])
+                    'exp_id_1'))
+            self.assertEqual(recommendations, ['exp_id_4', 'exp_id_2'])
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
-                    self.EXP_DATA[3]['id']))
-            self.assertEqual(recommendations,
-                             [self.EXP_DATA[0]['id'], self.EXP_DATA[1]['id']])
+                    'exp_id_4'))
+            self.assertEqual(recommendations, ['exp_id_1', 'exp_id_2'])
 
     def test_recommendations_after_changes_in_rights(self):
         with self.swap(
@@ -96,38 +91,24 @@ class ExplorationRecommendationsAggregatorUnitTests(
             ModifiedExplorationRecommendationsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
             self.process_and_flush_pending_tasks()
 
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
-                    self.EXP_DATA[0]['id']))
-            self.assertEqual(recommendations, [])
+                    'exp_id_1'))
+            self.assertEqual(
+                recommendations, ['exp_id_4', 'exp_id_2', 'exp_id_3'])
 
-            for ind, owner_id in self.exp_ind_to_owner_id.iteritems():
-                rights_manager.publish_exploration(
-                    owner_id, self.EXP_DATA[ind]['id'])
+            rights_manager.unpublish_exploration(self.ADMIN_ID, 'exp_id_4')
             ModifiedExplorationRecommendationsAggregator.stop_computation(
                 self.ADMIN_ID)
             ModifiedExplorationRecommendationsAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
             self.process_and_flush_pending_tasks()
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
-                    self.EXP_DATA[0]['id']))
-            self.assertEqual(recommendations, [
-                self.EXP_DATA[3]['id'],
-                self.EXP_DATA[1]['id'],
-                self.EXP_DATA[2]['id']])
-
-            rights_manager.unpublish_exploration(
-                self.ADMIN_ID, self.EXP_DATA[3]['id'])
-            ModifiedExplorationRecommendationsAggregator.stop_computation(
-                self.ADMIN_ID)
-            ModifiedExplorationRecommendationsAggregator.start_computation()
-            self.process_and_flush_pending_tasks()
-            recommendations = (
-                recommendations_services.get_exploration_recommendations(
-                    self.EXP_DATA[0]['id']))
-            self.assertEqual(recommendations,
-                             [self.EXP_DATA[1]['id'], self.EXP_DATA[2]['id']])
+                    'exp_id_1'))
+            self.assertEqual(recommendations, ['exp_id_2', 'exp_id_3'])
