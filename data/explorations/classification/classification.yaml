@@ -1,6 +1,6 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+default_skin: snapshots_v1
 init_state_name: First State
 language_code: en
 objective: Learn how to classify things efficiently.
