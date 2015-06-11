@@ -37,7 +37,7 @@ class ExplorationRecommendationsAggregator(
     exploration.
 
     This job does not have a realtime component. There will be a delay in
-    propagating new updates to new recommendations; the length of the delay
+    propagating new updates to recommendations; the length of the delay
     will be approximately the time it takes a batch job to run."""
     @classmethod
     def get_event_types_listened_to(cls):
@@ -87,7 +87,10 @@ class ExplorationRecommendationsMRJobManager(
                     recommendations_services.get_item_similarity(
                         exp_summary_id, compared_exp_id))
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
-                    yield (exp_summary_id, (similarity_score, compared_exp_id))
+                    yield (exp_summary_id, {
+                        'similarity_score': similarity_score,
+                        'exp_id': compared_exp_id
+                        })
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -95,17 +98,8 @@ class ExplorationRecommendationsMRJobManager(
 
         MAX_RECOMMENDATIONS = 10
 
-        other_exploration_similarities = []
-
-        for value in stringified_values:
-            similarity_score, exp_id = ast.literal_eval(value)
-            other_exploration_similarities.append({
-                'exp_id': exp_id,
-                'similarity_score': similarity_score
-                })
-
         other_exploration_similarities = sorted(
-            other_exploration_similarities,
+            [ast.literal_eval(v) for v in stringified_values],
             reverse=True,
             key=lambda x: x['similarity_score'])
 
