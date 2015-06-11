@@ -88,9 +88,9 @@ class InteractionAnswerSummariesCalculationsTest(test_utils.GenericTestBase):
             calculations.AnswerCounts.calculate_from_state_answers_entity(
                 state_answers))
 
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
-        self.assertEquals(actual_calc_output['calculation_id'],
+        self.assertEquals(actual_state_answers_calc_output.calculation_id,
                           'AnswerCounts')
+        actual_calc_output = actual_state_answers_calc_output.calculation_output
         actual_answer_counts = actual_calc_output['data']
         
         # Expected answer counts (result of calculation)

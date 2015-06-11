@@ -57,15 +57,15 @@ class MultipleChoiceInput(base.BaseInteraction):
     answer_visualizations = []
 
     # Bar chart with answer counts.
-    answer_visualizations.append(
-        {'visualization_id': 'BarChart',
-         'visualization_customization_args': {
-             'x_axis_label': 'Answer',
-             'y_axis_label': 'Count',
-             },
-         'data_source': {
-              'calculation_id': calculations.AnswerCounts.calculation_id,
-              }})
+    answer_visualizations.append({
+        'visualization_id': 'BarChart',
+        'visualization_customization_args': {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
+        },
+        'data_source': {
+            'calculation_id': calculations.AnswerCounts.calculation_id,
+        }})
 
     # Table with answer counts.
     answer_visualizations.append(

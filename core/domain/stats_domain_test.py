@@ -210,20 +210,28 @@ class StateAnswersTests(test_utils.GenericTestBase):
                 'eid', exp_version, state_name)
             self.assertEquals(state_answers, None)
 
+        # answer is a string
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, 'sid1', TIME_SPENT, PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, 'sid2', TIME_SPENT, PARAMS, 'answer1')
+        # answer is a dict
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, 'sid1', TIME_SPENT, PARAMS,
             {'x': 1.0, 'y': 5.0})
+        # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, SECOND_STATE_NAME, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, 'sid3', TIME_SPENT, PARAMS,
             [2, 4, 8])
+        # answer is a unicode string
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', exp_version, SECOND_STATE_NAME, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, 'sid4', TIME_SPENT, PARAMS,
+            self.UNICODE_TEST_STRING)
 
         expected_answers_list1 = [
             {'handler_name': 'submit', 'answer_value': 'answer1',
@@ -244,6 +252,11 @@ class StateAnswersTests(test_utils.GenericTestBase):
              'answer_value': [2, 4, 8],
              'time_spent_in_sec': 5.0, 'rule_str': 'Default',
              'session_id': 'sid3', 'interaction_id': 'TextInput', 
+             'params': {}},
+            {'handler_name': 'submit', 
+             'answer_value': self.UNICODE_TEST_STRING,
+             'time_spent_in_sec': 5.0, 'rule_str': 'Default',
+             'session_id': 'sid4', 'interaction_id': 'TextInput', 
              'params': {}}]
 
         state_answers = stats_services.get_state_answers(

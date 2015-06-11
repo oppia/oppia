@@ -405,13 +405,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'AnswerCounts'
             
             # get job output of first state and check it
-            calculation_output = (
+            calc_output_domain_object = (
                 stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
                     exp_id, exp_version, FIRST_STATE_NAME, calc_id)
-                    ).calculation_output
+                    )
+            self.assertEqual('AnswerCounts',
+                             calc_output_domain_object.calculation_id)
+
+            calculation_output = calc_output_domain_object.calculation_output
 
             expected_calculation_output = {
-                'calculation_id': 'AnswerCounts',
                 'calculation_description': (
                     'Calculate answer counts for each answer.'),
                 'data': [['answer1', 2], ['answer2', 1]]}
@@ -420,13 +423,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                              expected_calculation_output)
 
             # get job output of second state and check it
-            calculation_output = (
+            calc_output_domain_object = (
                 stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
                     exp_id, exp_version, SECOND_STATE_NAME, calc_id)
-                    ).calculation_output
+                    )
+
+            self.assertEqual('AnswerCounts',
+                             calc_output_domain_object.calculation_id)
+            
+            calculation_output = calc_output_domain_object.calculation_output
 
             expected_calculation_output = {
-                'calculation_id': 'AnswerCounts',
                 'calculation_description': (
                     'Calculate answer counts for each answer.'),
                 'data': [['answer3', 1]]}

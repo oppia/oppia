@@ -23,7 +23,6 @@ import copy
 import os
 
 from core.domain import stats_domain
-from extensions import interactions
 import feconf
 import schema_utils
 import utils
@@ -43,15 +42,15 @@ with keys 'visualization_id', 'visualization_customization_args' and
 calculation_id. An example for a single visualization and calculation may look
 like this:
 
-    answer_visualizations = [
-        {'visualization_id': 'BarChart',
-         'visualization_customization_args': {
-             'x_axis_label': 'Answer',
-             'y_axis_label': 'Count',
-             },
-         'data_source': {
-              'calculation_id': calculations.AnswerCounts.calculation_id,
-              }}]
+    answer_visualizations = [{
+        'visualization_id': 'BarChart',
+        'visualization_customization_args': {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
+        },
+        'data_source': {
+            'calculation_id': calculations.AnswerCounts.calculation_id,
+        }}]
 """
 
 
@@ -101,7 +100,6 @@ class AnswerCounts(BaseCalculation):
             collections.Counter(answer_values).items())
 
         calc_output = {'data': answer_counts_as_list_of_pairs,
-                       'calculation_id': AnswerCounts.calculation_id,
                        'calculation_description': AnswerCounts.description}
         
         # get StateAnswersCalcOutput instance

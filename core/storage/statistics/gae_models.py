@@ -472,8 +472,8 @@ class StateAnswersModel(base_models.BaseModel):
     state_name = ndb.StringProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed
     interaction_id = ndb.StringProperty(indexed=True, required=True)
-    # List of answer dicts, each of which is stored as JSON blob and
-    # has keys answer_value, time_spent_in_sec, ...
+    # List of answer dicts, each of which is stored as JSON blob. The content
+    # of answer dicts is specified in core.domain.stats_services.record_answer.
     answers_list = ndb.JsonProperty(repeated=True, indexed=False)
 
     @classmethod

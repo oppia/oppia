@@ -445,14 +445,6 @@ class InteractionAnswerSummariesMRJobManager(
         # All desired calculation ids.
         calc_ids = []
         for viz in visualizations:
-            # validate visualization dict
-            # TODO(msl): move this to a backend test.
-            if not viz.has_key('data_source'):
-                raise Exception("visualization must have data_source key.")
-            if not viz['data_source'].has_key('calculation_id'):
-                raise Exception(
-                    "visualization['data_source'] must have calculation_id key")
-
             if not viz['data_source']['calculation_id'] in calc_ids:
                 calc_ids.append(viz['data_source']['calculation_id'])
 
@@ -462,14 +454,10 @@ class InteractionAnswerSummariesMRJobManager(
             if calc.calculation_id in calc_ids:
                 calcs.append(calc)
 
-        # check that all calculations were found
-        # TODO(msl): maybe move to backend test?
-        if not (collections.Counter(calc_ids) 
-                == collections.Counter([c.calculation_id for c in calcs])):
-            raise Exception(
-                "Could not find all calculations specified by "
-                + "answer_visualizations.")
-        
+        # Note: interaction_registry_test tests if the visualization dicts
+        # have the correct form and that all calculations/calculation_ids
+        # specified by interactions really exist.
+
         return calcs
 
 

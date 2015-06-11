@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import interaction_registry
 from core.tests import test_utils
+from extensions.answer_summarizers import calculations
 from extensions.interactions import base
 
 
@@ -70,3 +71,35 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             terminal_interactions_count, EXPECTED_TERMINAL_INTERACTIONS_COUNT)
+
+
+class InteractionVisualizationsTests(test_utils.GenericTestBase):
+    """Test the visualizations specified by interactions."""
+
+    def test_visualization_dicts(self):
+        """
+        Check structure of all visualization_dicts.
+        """
+        all_interactions = interaction_registry.Registry.get_all_interactions()
+        for interaction in all_interactions:
+            visualizations = interaction.answer_visualizations
+            for viz in visualizations:
+                # validate visualization dict
+                self.assertTrue(viz.has_key('data_source'))
+                self.assertTrue(viz['data_source'].has_key('calculation_id'))
+
+    def test_all_calculations_exist(self):
+        """
+        Check that all calculation_ids specified by visualizations really
+        exist.
+        """
+        available_calc_ids = []
+        for calc in calculations.LIST_OF_CALCULATION_CLASSES:
+            available_calc_ids.append(calc.calculation_id)
+            
+        all_interactions = interaction_registry.Registry.get_all_interactions()
+        for interaction in all_interactions:
+            visualizations = interaction.answer_visualizations
+            for viz in visualizations:
+                self.assertTrue(viz['data_source']['calculation_id']
+                                in available_calc_ids)

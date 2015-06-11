@@ -110,8 +110,8 @@ class BaseInteraction(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
-    # Desired visualizations that should be performed on recorded state answers.
-    # Overridden in subclasses.
+    # Desired visualizations of recorded state answers. Overridden in 
+    # subclasses.
     answer_visualizations = []
 
     @property

@@ -159,8 +159,8 @@ class StateAnswersCalcOutput(object):
         """
         Initialize domain object for state answers calculation output.
 
-        calculation_output is a dict with keys calculation_id, 
-        calculation_description and data.
+        calculation_output is a dict with keys calculation_description
+        and data.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -181,12 +181,7 @@ class StateAnswersCalcOutput(object):
         """
         Validates StateAnswersCalcOutputModel domain object entity before
         it is commited to storage.
-
-        In particular, check structure of visualization_opts in
-        calculation_output.
         """
-
-        # TODO(msl): Add specialized validations for each visualization
 
         # There is a danger of data overflow if answer_opts exceeds 1
         # MB. We will address this later if it happens regularly. At
@@ -214,13 +209,7 @@ class StateAnswersCalcOutput(object):
                 'Expected calculation_output to be a dict, received %s' %
                 self.calculation_output)
 
-        if not isinstance(self.calculation_output['calculation_id'], 
-                          basestring):
-            raise utils.ValidationError(
-                "Expected calculation_id to be a string, received %s" %
-                self.calculation_output['calculation_id'])
         output_data = self.calculation_output['data']
-
         if not (sys.getsizeof(output_data) <=
                 MAX_BYTES_PER_CALC_OUTPUT_DATA):
             # TODO(msl): find a better way to deal with big
