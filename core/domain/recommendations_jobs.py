@@ -90,7 +90,7 @@ class ExplorationRecommendationsMRJobManager(
                     yield (exp_summary_id, {
                         'similarity_score': similarity_score,
                         'exp_id': compared_exp_id
-                        })
+                    })
 
     @staticmethod
     def reduce(key, stringified_values):
