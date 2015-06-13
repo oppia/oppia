@@ -99,6 +99,21 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
+    def _validate_answer_visualization_specs(self, answer_visualization_specs):
+        _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
+            ('id', basestring), ('options', dict),
+            ('calculation_id', basestring)]
+        _ANSWER_VISUALIZATION_KEYS = [
+            item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
+
+        # Check that the keys and the types of their values are correct.
+        for spec in answer_visualization_specs:
+            self.assertItemsEqual(spec.keys(), _ANSWER_VISUALIZATION_KEYS)
+            for key, item_type in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA:
+                self.assertTrue(isinstance(spec[key], item_type))
+                if item_type == basestring:
+                    self.assertTrue(spec[key])
+
     def _listdir_omit_ignored(self, dir):
         """List all files and directories within 'dir', omitting the ones whose
         name ends in one of the IGNORED_FILE_SUFFIXES."""
@@ -288,3 +303,22 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction._customization_arg_specs)
 
             self._validate_dependencies(interaction.dependency_ids)
+
+            answer_visualization_specs = (
+                interaction._answer_visualization_specs)
+            self._validate_answer_visualization_specs(
+                answer_visualization_specs)
+
+            answer_visualizations = interaction.answer_visualizations
+            for ind, visualization in enumerate(answer_visualizations):
+                self.assertEqual(
+                    visualization.id, answer_visualization_specs[ind]['id'])
+                self.assertEqual(
+                    visualization.calculation_id,
+                    answer_visualization_specs[ind]['calculation_id'])
+                self.assertEqual(
+                    visualization.options,
+                    answer_visualization_specs[ind]['options'])
+
+                # Check that the derived visualization is valid.
+                visualization.validate()

@@ -407,17 +407,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of first state and check it
             calc_output_domain_object = (
                 stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
-                    exp_id, exp_version, FIRST_STATE_NAME, calc_id)
-                    )
+                    exp_id, exp_version, FIRST_STATE_NAME, calc_id))
             self.assertEqual('AnswerCounts',
                              calc_output_domain_object.calculation_id)
 
             calculation_output = calc_output_domain_object.calculation_output
 
-            expected_calculation_output = {
-                'calculation_description': (
-                    'Calculate answer counts for each answer.'),
-                'data': [['answer1', 2], ['answer2', 1]]}
+            expected_calculation_output = [{
+                'answer': 'answer1',
+                'frequency': 2
+            }, {
+                'answer': 'answer2',
+                'frequency': 1
+            }]
 
             self.assertEqual(calculation_output,
                              expected_calculation_output)
@@ -425,17 +427,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of second state and check it
             calc_output_domain_object = (
                 stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
-                    exp_id, exp_version, SECOND_STATE_NAME, calc_id)
-                    )
+                    exp_id, exp_version, SECOND_STATE_NAME, calc_id))
 
             self.assertEqual('AnswerCounts',
                              calc_output_domain_object.calculation_id)
             
             calculation_output = calc_output_domain_object.calculation_output
 
-            expected_calculation_output = {
-                'calculation_description': (
-                    'Calculate answer counts for each answer.'),
-                'data': [['answer3', 1]]}
+            expected_calculation_output = [{
+                'answer': 'answer3',
+                'frequency': 1
+            }]
 
             self.assertEqual(calculation_output, expected_calculation_output)

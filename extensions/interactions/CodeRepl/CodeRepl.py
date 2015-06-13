@@ -70,3 +70,5 @@ class CodeRepl(base.BaseInteraction):
         },
         'default_value': ''
     }]
+
+    _answer_visualization_specs = []

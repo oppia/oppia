@@ -204,18 +204,12 @@ class StateAnswersCalcOutput(object):
                 'Expected calculation_id to be a string, received %s' %
                 self.calculation_id)
 
-        if not isinstance(self.calculation_output, dict):
-            raise utils.ValidationError(
-                'Expected calculation_output to be a dict, received %s' %
-                self.calculation_output)
-
-        output_data = self.calculation_output['data']
+        output_data = self.calculation_output
         if not (sys.getsizeof(output_data) <=
                 MAX_BYTES_PER_CALC_OUTPUT_DATA):
             # TODO(msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
-                "calculation_output['data'] is too big to be stored: %s" %
+                "calculation_output is too big to be stored: %s" %
                 str(output_data))
-

@@ -29,3 +29,4 @@ class NumericInput(base.BaseInteraction):
         'name': 'submit', 'obj_type': 'Real'}]
 
     _customization_arg_specs = []
+    _answer_visualization_specs = []

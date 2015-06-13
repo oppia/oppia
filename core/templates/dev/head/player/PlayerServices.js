@@ -448,6 +448,8 @@ oppia.factory('oppiaPlayerService', [
             handler: handler,
             params: learnerParamsService.getAllParams(),
             version: version,
+            session_id: sessionId,
+            client_time_spent_in_secs: stopwatch.getTimeInSecs(),
             old_state_name: _currentStateName,
             rule_spec: ruleSpec
           });

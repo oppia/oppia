@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Registry of all interaction answer view calculations."""
+"""Registry for calculations."""
 
-__author__ = 'Marcel Schmittfull'
-
-import copy
 import inspect
+import os
+
+from extensions.answer_summarizers import models
+import feconf
+import utils
 
 
 class Registry(object):
-    """Registry of all calculations."""
+    """Registry of all calculations for summarizing answers."""
 
-    # Dict mapping calculation names to calculation classes.
+    # Dict mapping calculation class names to their classes.
     calculations_dict = {}
 
     @classmethod
     def _refresh_registry(cls):
         cls.calculations_dict.clear()
 
-        # Add new calculation instances to the registry.
-        for name, clazz in inspect.getmembers(calculations, inspect.isclass):
+        # Add new visualization instances to the registry.
+        for name, clazz in inspect.getmembers(models, inspect.isclass):
             if name.endswith('_test') or name == 'BaseCalculation':
                 continue
 
@@ -43,20 +47,15 @@ class Registry(object):
             cls.calculations_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_calculation_classes(cls):
-        """Get the dict of all calculation classes."""
-        cls._refresh_registry()
-        return copy.deepcopy(cls.calculations_dict)
+    def get_calculation_by_id(cls, calculation_id):
+        """Gets a calculation instance by its id (which is also its class name).
 
-    @classmethod
-    def get_calculation_class_by_name(cls, calc_name):
-        """Gets a calculation class by its name.
-        
         Refreshes once if the class is not found; subsequently, throws an
-        error."""
-        if calc_name not in cls.calculations_dict:
+        error.
+        """
+        if calculation_id not in cls.calculations_dict:
             cls._refresh_registry()
-        if calc_name not in cls.calculations_dict:
-            raise TypeError('\'%s\' is not a valid calculation name.' % calc_name)
-        return cls.calculations_dict[calc_name]
-
+        if calculation_id not in cls.calculations_dict:
+            raise TypeError(
+            	'\'%s\' is not a valid calculation id.' % calculation_id)
+        return cls.calculations_dict[calculation_id]()

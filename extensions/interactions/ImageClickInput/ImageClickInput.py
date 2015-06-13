@@ -49,3 +49,5 @@ class ImageClickInput(base.BaseInteraction):
         },
         'default_value': False
     }]
+
+    _answer_visualization_specs = []

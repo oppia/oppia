@@ -409,17 +409,23 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def map(item):
+        from core.domain import calculation_registry
+        from core.domain import interaction_registry
 
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
 
-            # Get all calculations desired for interaction type of the
-            # current state
-            calculations = (
-                InteractionAnswerSummariesMRJobManager._get_desired_calculations(
-                    item.interaction_id))
+            # All visualizations desired for the interaction.
+            visualizations = interaction_registry.Registry.get_interaction_by_id(
+                item.interaction_id).answer_visualizations
 
-            # Perform calculations and store the output
+            # Get all desired calculations for the current state interaction id.
+            calc_ids = list(set(viz.calculation_id for viz in visualizations))
+            calculations = [
+                calculation_registry.Registry.get_calculation_by_id(calc_id)
+                for calc_id in calc_ids]
+
+            # Perform each calculation, and store the output.
             for calc in calculations:
                 calc_output = calc.calculate_from_state_answers_entity(item)
                 calc_output.save()
@@ -427,38 +433,6 @@ class InteractionAnswerSummariesMRJobManager(
     @staticmethod
     def reduce(id, state_answers_model):
         pass
-
-    @classmethod
-    def _get_desired_calculations(cls, interaction_id):
-        """
-        Get all calculations desired for a given interaction_id by inspecting
-        data_source entries of answer_visualizations.
-        """
-
-        from core.domain import interaction_registry
-        from extensions.answer_summarizers import calculations
-
-        # All visualizations desired for the interaction.
-        visualizations = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).answer_visualizations
-
-        # All desired calculation ids.
-        calc_ids = []
-        for viz in visualizations:
-            if not viz['data_source']['calculation_id'] in calc_ids:
-                calc_ids.append(viz['data_source']['calculation_id'])
-
-        # Get calculations from their ids.
-        calcs = []
-        for calc in calculations.LIST_OF_CALCULATION_CLASSES:
-            if calc.calculation_id in calc_ids:
-                calcs.append(calc)
-
-        # Note: interaction_registry_test tests if the visualization dicts
-        # have the correct form and that all calculations/calculation_ids
-        # specified by interactions really exist.
-
-        return calcs
 
 
 class InteractionAnswerSummariesRealtimeModel(

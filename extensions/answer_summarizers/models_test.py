@@ -22,11 +22,11 @@ import copy
 import os
 import sys
 
+from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_services
 from core.tests import test_utils
-from extensions.answer_summarizers import calculations
 import feconf
 import schema_utils
 import utils
@@ -79,28 +79,36 @@ class InteractionAnswerSummariesCalculationsTest(test_utils.GenericTestBase):
         # StateAnswers domain object.
         state_answers = stats_services.get_state_answers(
             exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id,
-                          'MultipleChoiceInput')
+        self.assertEquals(
+            state_answers.interaction_id, 'MultipleChoiceInput')
 
         # Calculate answer counts. Input is dummy StateAnswersModel entity, 
-        # output is List of pairs (values, frequencies). 
+        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        calculation_instance = (
+            calculation_registry.Registry.get_calculation_by_id(
+                'AnswerCounts'))
         actual_state_answers_calc_output = (
-            calculations.AnswerCounts.calculate_from_state_answers_entity(
+            calculation_instance.calculate_from_state_answers_entity(
                 state_answers))
 
-        self.assertEquals(actual_state_answers_calc_output.calculation_id,
-                          'AnswerCounts')
+        self.assertEquals(
+            actual_state_answers_calc_output.calculation_id, 'AnswerCounts')
         actual_calc_output = actual_state_answers_calc_output.calculation_output
-        actual_answer_counts = actual_calc_output['data']
-        
+
         # Expected answer counts (result of calculation)
         # TODO(msl): Maybe include answers that were never clicked and got 0 count
         # (e.g. useful for multiple choice answers that are never clicked)
-        expected_answer_counts = [('First choice', 5),
-                                  ('Second choice', 2), 
-                                  ('Fourth choice', 1)]
+        expected_answer_counts = [{
+            'answer': 'First choice',
+            'frequency': 5,
+        }, {
+            'answer': 'Second choice',
+            'frequency': 2,
+        }, {
+            'answer': 'Fourth choice',
+            'frequency': 1,        
+        }]
 
         # Check if actual and expected answer counts agree
-        self.assertEquals(set(actual_answer_counts), 
-                          set(expected_answer_counts))
-
+        self.assertItemsEqual(
+            actual_calc_output, expected_answer_counts)

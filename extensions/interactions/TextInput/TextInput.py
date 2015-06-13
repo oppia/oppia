@@ -57,3 +57,5 @@ class TextInput(base.BaseInteraction):
         },
         'default_value': 1,
     }]
+
+    _answer_visualization_specs = []

@@ -37,20 +37,17 @@ NOTE TO DEVELOPERS: To specify calculations desired for an interaction named
     extensions.interactions.<INTERACTION_NAME>.answer_visualizations
 
 This is a list of visualizations, each of which is specified by a dict
-with keys 'visualization_id', 'visualization_customization_args' and 
-'data_source'. The value of 'data_source' should be a dict that specifies a
-calculation_id. An example for a single visualization and calculation may look
-like this:
+with keys 'id', 'options' and 'calculation_id'. An example for a single
+visualization and calculation may look like this:
 
     answer_visualizations = [{
-        'visualization_id': 'BarChart',
-        'visualization_customization_args': {
+        'id': 'BarChart',
+        'options': {
             'x_axis_label': 'Answer',
             'y_axis_label': 'Count',
         },
-        'data_source': {
-            'calculation_id': calculations.AnswerCounts.calculation_id,
-        }}]
+        'calculation_id': 'AnswerCounts',
+    }]
 """
 
 
@@ -62,15 +59,15 @@ class BaseCalculation(object):
     answer views.
     """
 
-    # These values should be overridden in subclasses.
-    calculation_id = 'BaseCalculation'
-    description = 'Base calculation overwritten by specific calculations.'
+    @property
+    def id(self):
+        return self.__class__.__name__
 
-    @staticmethod
-    def calculate_from_state_answers_entity(state_answers):
-        """
-        Perform calculation on a single StateAnswers entity. 
-        This must be overwritten in subclasses.
+    def calculate_from_state_answers_entity(self, state_answers):
+        """Perform calculation on a single StateAnswers entity. This is run
+        in the context of a batch MapReduce job.
+
+        This method must be overwritten in subclasses.
         """
         raise NotImplementedError(
             'Subclasses of BaseCalculation should implement the '
@@ -78,19 +75,15 @@ class BaseCalculation(object):
 
 
 class AnswerCounts(BaseCalculation):
-    """
-    Class for calculating answer counts, i.e. list of all answers
+    """Class for calculating answer counts, i.e. list of all answers
     showing how often each answer was given.
     """
 
-    calculation_id = 'AnswerCounts'
-    description = 'Calculate answer counts for each answer.'
+    def calculate_from_state_answers_entity(self, state_answers):
+        """Computes the number of occurrences of each answer, and returns a
+        list of dicts; each dict has keys 'answer_value' and 'count'.
 
-    @staticmethod
-    def calculate_from_state_answers_entity(state_answers):
-        """
-        Calculate answer counts from a single StateAnswers entity.
-        Return list of pairs (answer_value, count).
+        This method is run from within the context of a MapReduce job.
         """
 
         answer_values = [answer_dict['answer_value'] for answer_dict 
@@ -99,17 +92,16 @@ class AnswerCounts(BaseCalculation):
         answer_counts_as_list_of_pairs = (
             collections.Counter(answer_values).items())
 
-        calc_output = {'data': answer_counts_as_list_of_pairs,
-                       'calculation_description': AnswerCounts.description}
+        calculation_output = []
+        for item in answer_counts_as_list_of_pairs:
+            calculation_output.append({
+                'answer': item[0],
+                'frequency': item[1],
+            })
         
-        # get StateAnswersCalcOutput instance
-        state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
-            state_answers.exploration_id, state_answers.exploration_version,
-            state_answers.state_name, AnswerCounts.calculation_id, calc_output)
-
-        return state_answers_calc_output
-
-
-# List of all calculation classes. Do not include BaseCalculation.
-LIST_OF_CALCULATION_CLASSES = [AnswerCounts]
-
+        return stats_domain.StateAnswersCalcOutput(
+            state_answers.exploration_id,
+            state_answers.exploration_version,
+            state_answers.state_name,
+            self.id,
+            calculation_output)

@@ -24,6 +24,7 @@ import utils
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.domain import stats_jobs
 from core.platform import models
@@ -76,6 +77,46 @@ def get_state_rules_stats(exploration_id, state_name):
         }
 
     return results
+
+
+def get_visualizations_info(exploration_id, exploration_version, state_name):
+    """Returns a list of visualization info. Each item in the list is a dict
+    with keys 'data' and 'options'.
+    """
+    exploration = exp_services.get_exploration_by_id(exploration_id)
+    if exploration.states[state_name].interaction.id is None:
+        return []
+
+    visualizations = interaction_registry.Registry.get_interaction_by_id(
+        exploration.states[state_name].interaction.id).answer_visualizations
+
+    calculation_ids = list(set([
+        visualization.calculation_id for visualization in visualizations]))
+
+    calculation_ids_to_outputs = {}
+    for calculation_id in calculation_ids:
+        # This is None if the calculation job has not yet been run for this
+        # state.
+        calc_output_domain_object = (
+            stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
+                exploration_id, exploration_version, state_name, calculation_id))
+
+        # If the calculation job has not yet been run for this state, we simply
+        # exclude the corresponding visualization results.
+        if calc_output_domain_object is None:
+            continue
+
+        calculation_ids_to_outputs[calculation_id] = (
+            calc_output_domain_object.calculation_output)
+
+    results_list = [{
+        'id': visualization.id,
+        'data': calculation_ids_to_outputs[visualization.calculation_id],
+        'options': visualization.options,
+    } for visualization in visualizations if
+        visualization.calculation_id in calculation_ids_to_outputs]
+
+    return results_list
 
 
 def get_state_improvements(exploration_id, exploration_version):

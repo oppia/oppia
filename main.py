@@ -298,11 +298,6 @@ urls = [
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
-        r'%s%s' % (
-            '/createhandler/answer_summarizers/<exploration_id>/',
-            '<exploration_version>/<escaped_state_name>'),
-        editor.AnswerSummarizersHandler, 'answer_summarizers_handler'),
-    get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(

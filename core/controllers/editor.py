@@ -37,6 +37,7 @@ from core.domain import stats_jobs
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
+from core.domain import visualization_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -178,6 +179,8 @@ class ExplorationPage(EditorHandler):
 
         value_generators_js = VALUE_GENERATORS_JS.value
 
+        visualizations_html = visualization_registry.Registry.get_full_html()
+
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -235,6 +238,8 @@ class ExplorationPage(EditorHandler):
                 for skin_id in skins_services.Registry.get_all_skin_ids()],
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
+            'visualizations_html': jinja2.utils.Markup(
+                visualizations_html),
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
@@ -622,28 +627,6 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, exploration_version))
 
 
-class AnswerSummarizersHandler(EditorHandler):
-    """
-    Returns output of calculations performed on recorded state answers.
-    """
-
-    def get(self, exploration_id, exploration_version, escaped_state_name):
-        """Handles GET requests."""
-
-        try:
-            exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
-
-        state_name = self.unescape_state_name(escaped_state_name)
-        calculation_outputs = (
-            stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
-                exploration_id, exploration_version, 
-                state_name)).calculation_outputs
-
-        self.render_json({'calculation_outputs': calculation_outputs})
-
-
 class ExplorationStatsVersionsHandler(EditorHandler):
     """Returns statistics versions for an exploration."""
 
@@ -666,6 +649,7 @@ class StateRulesStatsHandler(EditorHandler):
         """Handles GET requests."""
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_version = exploration.version
         except:
             raise self.PageNotFoundException
 
@@ -677,7 +661,9 @@ class StateRulesStatsHandler(EditorHandler):
 
         self.render_json({
             'rules_stats': stats_services.get_state_rules_stats(
-                exploration_id, state_name)
+                exploration_id, state_name),
+            'visualizations_info': stats_services.get_visualizations_info(
+                exploration_id, current_version, state_name),
         })
 
 

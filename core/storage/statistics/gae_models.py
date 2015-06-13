@@ -515,10 +515,8 @@ class StateAnswersModel(base_models.BaseModel):
             pass
 
 
-class StateAnswersCalcOutputModel(base_models.BaseModel):
-    """
-    Store output of calculation performed on StateAnswers.
-    """
+class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
+    """Store output of calculation performed on StateAnswers."""
 
     exploration_id = ndb.StringProperty(indexed=True)
     exploration_version = ndb.IntegerProperty(required=True)

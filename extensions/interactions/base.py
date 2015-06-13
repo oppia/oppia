@@ -41,7 +41,9 @@ import os
 
 from core.domain import obj_services
 from core.domain import rule_domain
+from core.domain import visualization_registry
 from extensions import domain
+from extensions.visualizations import models
 import feconf
 import jinja_utils
 import schema_utils
@@ -110,9 +112,9 @@ class BaseInteraction(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
-    # Desired visualizations of recorded state answers. Overridden in 
-    # subclasses.
-    answer_visualizations = []
+    # Specs for desired visualizations of recorded state answers. Overridden
+    # in subclasses.
+    _answer_visualization_specs = []
 
     @property
     def id(self):
@@ -123,6 +125,15 @@ class BaseInteraction(object):
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
+
+    @property
+    def answer_visualizations(self):
+        result = []
+        for spec in self._answer_visualization_specs:
+            factory_cls = (
+                visualization_registry.Registry.get_visualization_class(spec['id']))
+            result.append(factory_cls(spec['calculation_id'], spec['options']))
+        return result
 
     @property
     def handlers(self):

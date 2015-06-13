@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from extensions.answer_summarizers import calculations
 from extensions.interactions import base
 
 
@@ -52,27 +51,19 @@ class MultipleChoiceInput(base.BaseInteraction):
         'default_value': ['Sample multiple-choice answer'],
     }]
 
-    # Registered answer visualizations. 'data_source' entries will
-    # be used to determine which calculations need to be done.
-    answer_visualizations = []
-
-    # Bar chart with answer counts.
-    answer_visualizations.append({
-        'visualization_id': 'BarChart',
-        'visualization_customization_args': {
+    _answer_visualization_specs = [{
+        # Bar chart with answer counts.
+        'id': 'BarChart',
+        'options': {
             'x_axis_label': 'Answer',
             'y_axis_label': 'Count',
         },
-        'data_source': {
-            'calculation_id': calculations.AnswerCounts.calculation_id,
-        }})
-
-    # Table with answer counts.
-    answer_visualizations.append(
-        {'visualization_id': 'Table',
-         'visualization_customization_args': {
-             'column_labels': ['Answer', 'Count'],
-             },
-         'data_source': {
-              'calculation_id': calculations.AnswerCounts.calculation_id,
-              }})
+        'calculation_id': 'AnswerCounts',
+    }, {
+        # Table with answer counts.
+        'id': 'TwoColumnFrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+        },
+        'calculation_id': 'AnswerCounts',
+    }]

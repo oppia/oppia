@@ -49,6 +49,7 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
