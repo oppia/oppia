@@ -18,3 +18,10 @@ instructions in the tutorial here:
 Note that, in order to use this XBlock in a course, you will also need to add
 the value "oppia" to the advanced_modules field in Studio's 'Advanced Settings'
 menu.
+
+Notes:
+
+(1) On devstack, the XBlock does not show up in Studio as a live preview in the
+    editor. However, it does show up in the LMS.
+(2) If you wish to record events, you can do so by modifying the _log() method
+    in the oppia.py file.
