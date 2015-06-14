@@ -137,30 +137,25 @@ describe('Normalizer tests', function() {
   }));
 });
 
-describe('RTE directive', function() {
-  var elm, scope, $httpBackend;
-
-  var _DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+describe('RTE helper service', function() {
+  var _DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///';
+  var rhs;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($rootScope, $compile, _$httpBackend_) {
-    $httpBackend = _$httpBackend_;
-    $httpBackend.expectGET('/rich_text_component_repository/data').respond({
-      data: {
-        repository: {
-          'Image': [{
-            frontend_name: 'image',
-            name: 'Image',
-            tooltip: 'Insert image',
-            icon_data_url: _DATA_URI
-          }]
-        }
-      }
-    });
 
-    elm = $compile('<text-angular-rte></text-angular-rte>')($rootScope);
-    scope = $rootScope;
-    scope.$digest();
+  beforeEach(function() {
+    module(function($provide) {
+      $provide.constant('RTE_COMPONENT_SPECS', [{
+        frontend_name: 'image',
+        backend_name: 'Image',
+        tooltip: 'Insert image',
+        icon_data_url: _DATA_URI
+      }]);
+    });
+  });
+
+  beforeEach(inject(function($injector) {
+    rhs = $injector.get('rteHelperService');
   }));
 
   it('should convert correctly between HTML and RTE', inject(function($rootScope, $compile) {
@@ -175,20 +170,10 @@ describe('RTE directive', function() {
        '<img src="' + _DATA_URI + '" class="oppia-noninteractive-image" image_id-with-value="&amp;quot;T&amp;quot;">']
     ];
 
-    var rteControllerScope = elm.isolateScope();
-
-    // TODO(sll): Why isn't this being auto-populated?
-    rteControllerScope._RICH_TEXT_COMPONENTS = [{
-      name: 'image',
-      backendName: 'Image',
-      tooltip: 'Insert image',
-      iconDataUrl: _DATA_URI
-    }];
-
     for (var i = 0; i < testData.length; i++) {
-      expect(rteControllerScope.convertHtmlToRte(testData[i][0]))
+      expect(rhs.convertHtmlToRte(testData[i][0]))
         .toEqual(testData[i][1]);
-      expect(rteControllerScope.convertRteToHtml(testData[i][1]))
+      expect(rhs.convertRteToHtml(testData[i][1]))
         .toEqual(testData[i][0]);
     }
   }));
