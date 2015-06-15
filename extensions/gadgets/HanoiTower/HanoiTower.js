@@ -112,7 +112,6 @@ oppia.directive('oppiaGadgetHanoiTower', [
                 ($scope.towerContents[1].length === 0 || $scope.towerContents[2].length === 0)) {
               var numberOfMoves = $scope.moveLog.length;
               $scope.completionMessage = 'You finished the puzzle in ' + numberOfMoves + ' moves.';
-              $scope.submitAnswer($scope.moveLog);
             }
           }
         };
