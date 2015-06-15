@@ -185,6 +185,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'Continue',
         'EndExploration',
         'ImageClickInput',
+        'ItemSelectionInput',
         'MultipleChoiceInput',
         'TextInput'
     ],

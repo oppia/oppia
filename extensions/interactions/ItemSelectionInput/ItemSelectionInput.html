@@ -1,0 +1,15 @@
+<script type="text/ng-template" id="interaction/ItemSelectionInput">
+  <div class="item-selection-form-container">
+    <form ng-submit="submitAnswer()">
+        <label ng-repeat="item in items">
+            <input type="checkbox" ng-model="answer[item]" ng-click="toggleSelection(item)">
+                <span angular-html-bind="item"></span>
+        </label>
+      </br><button ng-click="submitAnswer()">Submit</button>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/ItemSelectionInput">
+  <span angular-html-bind="response"></span>
+</script>
