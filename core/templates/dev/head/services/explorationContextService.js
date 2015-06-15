@@ -49,8 +49,8 @@ oppia.factory('explorationContextService', [
         }
 
         throw Error(
-          'ERROR: pageContextService should not be used outside the context ' +
-          'of an exploration.');
+          'ERROR: explorationContextService should not be used outside the ' +
+          'context of an exploration.');
       }
     },
     // Returns a string representing the explorationId (obtained from the URL).
@@ -69,8 +69,8 @@ oppia.factory('explorationContextService', [
         }
 
         throw Error(
-          'ERROR: pageContextService should not be used outside the context ' +
-          'of an exploration.');
+          'ERROR: explorationContextService should not be used outside the ' +
+          'context of an exploration.');
       }
     }
   };
