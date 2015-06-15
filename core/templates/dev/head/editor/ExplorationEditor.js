@@ -33,7 +33,7 @@ oppia.controller('ExplorationEditor', [
   'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache',
+  'explorationWarningsService', '$templateCache', 'explorationContextService',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -43,7 +43,7 @@ oppia.controller('ExplorationEditor', [
     explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
-    explorationWarningsService, $templateCache) {
+    explorationWarningsService, $templateCache, explorationContextService) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
@@ -53,14 +53,7 @@ oppia.controller('ExplorationEditor', [
    *********************************************************/
   $rootScope.loadingMessage = 'Loading';
 
-  // The pathname should be: .../create/{exploration_id}
-  var _pathnameArray = $window.location.pathname.split('/');
-  $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
-  // The exploration id needs to be attached to the root scope in order for
-  // the file picker RTE component to work. (Note that an alternative approach
-  // might also be to replicate this URL-based calculation in the file picker
-  // RTE component.)
-  $rootScope.explorationId = $scope.explorationId;
+  $scope.explorationId = explorationContextService.getExplorationId();
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
