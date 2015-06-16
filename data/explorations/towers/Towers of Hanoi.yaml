@@ -28,6 +28,26 @@ skin_customizations:
       - Reflection on Moves
       - Abstracting the Pattern Part 1
 states:
+  3 Disk Solution:
+    content:
+    - type: text
+      value: <p><span></span><span></span>TODO Add solution video/gif</p><p><br></p><p>Click
+        <b>Next</b> to Continue.</p>
+    interaction:
+      customization_args:
+        buttonText:
+          value: Next
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: 4 Disk Move Question
+          feedback: []
+          param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
   4 Disk Move Question:
     content:
     - type: text
@@ -349,8 +369,8 @@ states:
         \ problem, it may be simpler to break this problem into a smaller problem\
         \ and see if it is possible to determine the minimum number of moves given\
         \ a number of disks. Otherwise we would only be guessing. In Computational\
-        \ Thinking, this is referred to as <i>decomposition</i>.\_</span><br></p><p><br></p><p>Click\
-        \ <b>Next</b>.</p><p></p>"
+        \ Thinking, this is referred to as <b>decomposition</b>.\_</span><br></p><p><br></p><p>Click\
+        \ <b>Next </b>to continue.</p><p></p>"
     interaction:
       customization_args:
         buttonText:
@@ -542,7 +562,7 @@ states:
         \ from Tower B to Tower C</span></li></ol><span>This may not seem like an\
         \ algorithm but just a straightforward explanation of how to solve the puzzle.\
         \ If you look closely, you'll see that each of these steps will require sub\
-        \ steps where you are applying the algorithm you created above.</span><p></p><p><span><br></span></p><p><span>Here\
+        \ steps where you are applying the algorithm you created above.</span><p></p><p><span><br></span></p><p><span>There\
         \ is an interactive diagram of the <oppia-noninteractive-link open_link_in_same_window-with-value=\"\
         false\" text-with-value=\"&amp;quot;towers recursion algorithm&amp;quot;\"\
         \ url-with-value=\"&amp;quot;http://upload.wikimedia.org/wikipedia/commons/2/20/Tower_of_Hanoi_recursion_SMIL.svg&amp;quot;\"\
@@ -653,17 +673,37 @@ states:
         \ you get stuck, you can click the <b>Reset</b> button and try again.<br>"
     interaction:
       customization_args:
-        numDisks:
-          value: 3
+        choices:
+          value:
+          - <p>Show me a possible solution.</p>
+          - <p>I'm ready to continue.</p>
       handlers:
       - name: submit
         rule_specs:
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: 4 Disk Move Question
+          feedback: []
+          param_changes: []
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: 3 Disk Solution
+          feedback: []
+          param_changes: []
         - definition:
             rule_type: default
           dest: 4 Disk Move Question
           feedback: []
           param_changes: []
-      id: HanoiTower
+      id: MultipleChoiceInput
       triggers: []
     param_changes: []
 tags: []
