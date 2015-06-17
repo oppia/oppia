@@ -519,8 +519,8 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-    '$filter', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-    function($filter, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+    '$filter', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper', '$log',
+    function($filter, RTE_COMPONENT_SPECS, oppiaHtmlEscaper, $log) {
 
   var _RICH_TEXT_COMPONENTS = [];
 
@@ -712,6 +712,13 @@ oppia.config(['$provide', function($provide) {
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
+
+            var elRange = rangy.createRange();
+            elRange.setStartAfter($element.get(0));
+            elRange.setEndAfter($element.get(0));
+            var elSelection = rangy.getSelection();
+            elSelection.removeAllRanges();
+            elSelection.addRange(elRange);
             var savedSelection = rangy.saveSelection();
 
             _openCustomizationModal(
