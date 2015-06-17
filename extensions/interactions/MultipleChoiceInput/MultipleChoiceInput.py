@@ -61,7 +61,7 @@ class MultipleChoiceInput(base.BaseInteraction):
         'calculation_id': 'AnswerCounts',
     }, {
         # Table with answer counts.
-        'id': 'TwoColumnFrequencyTable',
+        'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
         },

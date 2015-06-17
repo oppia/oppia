@@ -40,7 +40,7 @@ class BaseVisualization(object):
     def validate(self):
         """Validates a visualization object.
 
-        This is only used in tests.
+        This is only used in tests for the validity of interactions.
         """
         # Check that the calculation id exists.
         calculation_registry.Registry.get_calculation_by_id(self.calculation_id)
@@ -79,7 +79,7 @@ class BarChart(BaseVisualization):
     }]
 
 
-class TwoColumnFrequencyTable(BaseVisualization):
+class FrequencyTable(BaseVisualization):
     """A visualization representing a two-column table with answer counts."""
 
     _OPTIONS_SPECS = [{

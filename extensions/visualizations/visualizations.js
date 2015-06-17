@@ -52,11 +52,11 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
 }]);
 
 
-oppia.directive('oppiaVisualizationTwoColumnFrequencyTable', [function() {
+oppia.directive('oppiaVisualizationFrequencyTable', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'visualizations/TwoColumnFrequencyTable',
+    templateUrl: 'visualizations/FrequencyTable',
     controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
       $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
       $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
