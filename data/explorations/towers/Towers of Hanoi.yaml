@@ -24,6 +24,7 @@ skin_customizations:
       visible_in_states:
       - First State
       - Decomposition
+      - Towers - 3 Disks
       - 4 Disk Move Question
       - Reflection on Moves
       - Abstracting the Pattern Part 1
