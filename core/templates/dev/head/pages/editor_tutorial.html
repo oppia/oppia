@@ -36,14 +36,203 @@
       <h3>Exploration Editor</h3>
 
       <p>
-        The first thing you see...
+        The first thing you see when you click on "Create an Exploration," and fill out the
+        initial information, is the following page, the Exploration Editor.
       </p>
+      <img src="/images/tutorial/emptyExploration0.png">
+      <p>
+        Oppia will start you off with a State called First State. States are important because
+        they are the building blocks for your explorations. Oppia is based on States.
+        You can think of States as the places a learner (anybody who views your
+        exploration) can potentially reach. All of your States are visible in the
+        Exploration Overview (also in the picture). The interface will only show
+        one state at a time, and you can navigate to your other States by clicking
+        on them in the Exploration Overview box.
+      </p>
+
+      <a class="oppia-about-anchor" name="state-components"></a>
+      <h3>Components of a State</h3>
+
+      <p>
+        Simply put, a State is just some text along with a question (interaction)
+        and some rules that can take the learner to another State depending on
+        their answer. These are the technical terms and definitions:
+      </p>
+      <h4><b>Content</b></h4>
+      <p>
+        The editable block of text you see in the picture. Write whatever you want the learner
+        to read.
+      </p>
+      <img src="/images/tutorial/content.png">
+      <h4><b>Interaction</b></h4>
+      <p>
+        This could be a text field or any kind of input field, even a map. A learner will
+        interact with these elements by putting in some text or placing
+        a marker on a map.
+      </p>
+      <img src="/images/tutorial/interaction.png">
+      <h4><b>Rule</b></h4>
+      <p>
+        Once an interaction is chosen, you can choose what happens according to what a learner
+        inputs. From here, you can provide feedback and then have the learner
+        redo the interaction or move them to a different state.
+      </p>
+      <p>
+        <b>Note</b> Rules are where you can specify a new state for the
+        learner to go to. You can't do it from the Content on the Interaction.
+      </p>
+      <img src="/images/tutorial/rule.png">
+
+      <a class="oppia-about-anchor" name="typical-use"></a>
+      <h3><b>Typical Use Case</b></h3>
+      <p>
+        You will start off with a State. After you add some content, you can add an interaction,
+        and then add one or more rules. When you create a Rule you will specify
+        the destination, which will either be the current state (if you want the
+        learner to redo the interaction) or a new state (if you want to move the
+        learner forward). Read on to see a concrete example.
+      </p>
+      <p><b>What should an exploration be about? </b>
+      </p>
+      <p>
+
+        Typically, it will revolve around a question. Usually, the more specific, the better.
+        A few examples are:
+
+        <ul>
+          <li>
+            What is the slope of a line?
+          </li>
+          <li>
+            What are the nutritional benefits of a banana?
+          </li>
+          <li>
+            What is the difference between Python and C#?
+          </li>
+        </ul>
+      </p>
+      <p>
+        <b>Note</b> The exploration does <em>not</em> need to go in depth or cover
+        all the aspects of what you are trying to teach. The goal is to make something
+        basic, and then expand on it once learners start using the exploration
+        (because you'll have access to their answers and can use that to add more
+        content/interactions/rules).
+      </p>
+
+      <a class="oppia-about-anchor" name="sample-exploration"></a>
+      <h3><b>Sample Exploration</b></h3>
+      <p>
+        Ok, now let's write a small exploration to help the learner understand the slope
+        of a line.
+      </p>
+      <p>
+        We'll create a total of 3 States for the learner to go through in a linear fashion.
+        The user will start at the First State, answer a question to go to the
+        Second State, and then answer another question to go to the Third State.
+        Along the way, we'll add a couple rules.
+      </p>
+
+      <h4><b>First State</b></h4>
+      <p>
+        Let's begin by writing our introduction and asking the learner a question.
+      </p>
+      <p>
+        Click on the box under "First State" that you saw when the Exploration Editor first
+        opened. That's the Content box. Type in the following:
+      </p>
+      <img src="/images/tutorial/state1InitialContent.png">
+      <p>
+        Notice that after saving, you have access to an interaction. Let's add a number input
+        interaction so the learner could input their answer to our question.
+      </p>
+      <p>Click on Add Interaction.</p>
+      <img src="/images/tutorial/state1AddInteraction.png">
+      <p>This is what you should see. Go ahead and click on Number Input</p>
+      <img src="/images/tutorial/state1NumberInput.png">
+      <p>Click Save Interaction. The green box represents what the learner will see. They
+        will be able to type their answer here.</p>
+      <img src="/images/tutorial/state1AfterNumberInput.png">
+      <p>
+        Notice that a Rule component is now available. Now we can choose what happens if
+        the user types in "2" or "3" or any number. To keep it simple, let's take the user
+        to the next state regardless of what they inputed. The following shows how to do
+        just that.
+      </p>
+      <img src="/images/tutorial/state1Rule.png">
+      <p>
+        Now this is important, the Destination section is where you will take the user next.
+        By default, it will point back to the current State, which means the user will
+        be prompted by the interaction again (but he won't see the content again, since
+        he can just scroll up to see it). Let's set the Destination to a new State and
+        call it "Method 2".
+      </p>
+      <img src="/images/tutorial/state1DestinationState.png">
+      <p>
+        Click Add State, and then Add New Rule and you should see
+      </p>
+      <img src="/images/tutorial/state1End.png">
+      <p>
+        We're done with this state. The learner will proceed to the State "Method 2", so
+        let's go there and teach the second method. We can do that by clicking on "Method
+        2" in the Destination link or in the Exploration Overview window. Once you do that,
+        you'll be taken to Method 2.
+      </p>
+
+      <h4><b>Second State</b></h4>
+      <p>
+        Now we're in the second State, method 2. This looks just like what you started the
+        exploration with, exept the title is different and the Exploration Overview shows
+        two states.
+      </p>
+      <p>Add the following text:</p>
+      <img src="/images/tutorial/state2Content.png">
+      <p>
+        Add a Number Input Interaction just like in the First State.
+      </p>
+      <p>
+        Now let's add two rules for the interaction, one if the learner types in an incorrect
+        answer, and one if the answer is correct. Click on Add Rule and make sure it looks
+        like the following:
+      </p>
+      <img src="/images/tutorial/state2Rule1.png">
+      <p>
+        Notice that I didn't change the Destination, which means that if the learner input
+        falls into this category, the learner will see the feedback and then the
+        interaction again.
+      </p>
+      <p>
+        Click Add Rule again and this time change the rule to "Answer is equal to". Type
+        in 1, then add the following feedback and create a new Destination called "Last
+        State". It should look like this:
+      </p>
+      <img src="/images/tutorial/state2Rule2.png">
+      <p>
+        After clicking "Add New Rule", we are done with this state, so let's move to the
+        "Last State" and conclude the exploration (or as an exercise you can explain the
+        third slope method).
+      </p>
+
+      <h4><b>Third State</b></h4>
+      <p>
+        Once you're in Last State, add the following content, and then add the Interaction
+        "End Conversation". It should end up looking like this:
+      </p>
+      <img src="/images/tutorial/state3End.png">
+      <p>
+        And that's it! You can always go back and add new States, refine your current ones,
+        or check out any data you've gathered from learners.
+      </p>
+
+
     </md-card>
   </div>
 
   <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
     <strong>Editor Tutorial</strong>
     <p><a href="#exploration-editor">Exploration Editor</a></p>
+    <p><a href="#state-components">Components of a State</a></p>
+    <p><a href="#typical-use">Typical Use Case</a></p>
+    <p><a href="#sample-exploration">Sample Exploration</a></p>
   </div>
 
   <script>
