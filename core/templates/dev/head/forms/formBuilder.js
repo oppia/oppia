@@ -519,8 +519,8 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-    '$filter', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper', '$log',
-    function($filter, RTE_COMPONENT_SPECS, oppiaHtmlEscaper, $log) {
+    '$filter', '$log', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+    function($filter, $log, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
 
   var _RICH_TEXT_COMPONENTS = [];
 
