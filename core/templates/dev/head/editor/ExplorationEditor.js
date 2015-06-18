@@ -20,7 +20,6 @@
  */
 
 // TODO(sll): Move all hardcoded strings to the top of the file.
-var END_DEST = 'END';
 
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
@@ -34,7 +33,7 @@ oppia.controller('ExplorationEditor', [
   'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache',
+  'explorationWarningsService', '$templateCache', 'explorationContextService',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -44,7 +43,7 @@ oppia.controller('ExplorationEditor', [
     explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
-    explorationWarningsService, $templateCache) {
+    explorationWarningsService, $templateCache, explorationContextService) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
@@ -54,14 +53,7 @@ oppia.controller('ExplorationEditor', [
    *********************************************************/
   $rootScope.loadingMessage = 'Loading';
 
-  // The pathname should be: .../create/{exploration_id}
-  var _pathnameArray = $window.location.pathname.split('/');
-  $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
-  // The exploration id needs to be attached to the root scope in order for
-  // the file picker RTE component to work. (Note that an alternative approach
-  // might also be to replicate this URL-based calculation in the file picker
-  // RTE component.)
-  $rootScope.explorationId = $scope.explorationId;
+  $scope.explorationId = explorationContextService.getExplorationId();
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
@@ -90,7 +82,7 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
-      explorationStatesService.setStates(data.states);
+      explorationStatesService.init(data.states);
 
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
@@ -444,13 +436,17 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     } else if ($scope.isExplorationLockedForEditing()) {
       return 'Please save your changes before publishing.';
     } else {
-      return 'Click this button to publish your exploration to the gallery.';
+      return 'Publish to Gallery';
     }
   };
 
   $scope.getSaveButtonTooltip = function() {
     if (explorationWarningsService.hasCriticalWarnings() > 0) {
       return 'Please resolve the warnings.';
+    } else if ($scope.isPrivate()) {
+      return 'Save Draft';
+    } else {
+      return 'Publish Changes';
     }
   };
 

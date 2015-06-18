@@ -17,7 +17,9 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
+    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+    function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
     var warningsList = [];
@@ -65,16 +67,11 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', ['$filter', 'WARNIN
           message: 'please ensure that each rule corresponds to a valid choice.'
         });
       }
-
-      if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'please specify what Oppia should do in rules ' +
-            String(i + 1) + '.')
-        });
-      }
     }
+
+    warningsList = warningsList.concat(
+      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
+        ruleSpecs, stateName));
 
     // Only require a default rule if some choices have not been taken care of by rules.
     if (uniqueRuleChoices.length < numChoices) {

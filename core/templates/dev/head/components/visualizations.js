@@ -70,6 +70,10 @@ oppia.factory('stateGraphArranger', [
 
   var MAX_INDENTATION_LEVEL = 2.5;
 
+  // The last result of a call to computeLayout(). Used for determining the
+  // order in which to specify states in rules.
+  var _lastComputedArrangement = null;
+
   var _getGraphAsAdjacencyLists = function(nodes, links) {
     var adjacencyLists = {};
 
@@ -445,7 +449,12 @@ oppia.factory('stateGraphArranger', [
         }
       }
 
+      _lastComputedArrangement = angular.copy(nodeData);
+
       return nodeData;
+    },
+    getLastComputedArrangement: function() {
+      return angular.copy(_lastComputedArrangement);
     }
   };
 }]);
@@ -469,7 +478,7 @@ oppia.directive('stateGraphViz', [
       //              link style defaults to the gray arrow.
       //  - 'initStateId': The initial state id
       //  - 'finalStateIds': The list of ids corresponding to terminal states (i.e.,
-      //             those whose interactions are terminal, or 'END').
+      //             those whose interactions are terminal).
       graphData: '&',
       // Object whose keys are ids of nodes to display a warning tooltip over
       highlightStates: '=',
@@ -583,22 +592,6 @@ oppia.directive('stateGraphViz', [
         $scope.finalStateIds = finalStateIds;
         var links = angular.copy(originalLinks);
 
-        // For each non-END finalStateId, add a link to END. This is a temporary
-        // measure until we get rid of the END state.
-        // The outer check is needed to distinguish between the main exploration graph
-        // and the secondary graph in the exploration history tab.
-        // TODO(sll): This is hacky, and should be refactored.
-        if (nodes.hasOwnProperty(END_DEST)) {
-          for (var i = 0; i < $scope.finalStateIds.length; i++) {
-            if ($scope.finalStateIds !== END_DEST) {
-              links.push({
-                source: $scope.finalStateIds[i],
-                target: END_DEST
-              });
-            }
-          }
-        }
-
         var nodeData = stateGraphArranger.computeLayout(
           nodes, links, initStateId, angular.copy(finalStateIds));
 
@@ -697,9 +690,11 @@ oppia.directive('stateGraphViz', [
         }
 
         var _getNodeStrokeWidth = function(nodeId) {
+          var currentNodeIsTerminal = (
+            $scope.finalStateIds.indexOf(nodeId) !== -1);
           return nodeId == $scope.currentStateId() ? '3' :
-                 (nodeId == $scope.initStateId2 ||
-                 nodeId == 'END') ? '2' : '1';
+                 (nodeId == $scope.initStateId2
+                    || currentNodeIsTerminal) ? '2' : '1';
         };
 
         var _getNodeFillOpacity = function(nodeId) {
@@ -731,7 +726,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.onNodeDeletionClick = function(nodeId) {
-          if (nodeId != initStateId && nodeId !== 'END') {
+          if (nodeId != initStateId) {
             $scope.onDeleteFunction(nodeId);
           }
         };
@@ -745,7 +740,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.canNavigateToNode = function(nodeId) {
-          return nodeId !== 'END' && nodeId != $scope.currentStateId();
+          return nodeId != $scope.currentStateId();
         };
 
         $scope.getTruncatedLabel = function(nodeLabel) {
@@ -780,15 +775,14 @@ oppia.directive('stateGraphViz', [
             $scope.finalStateIds.indexOf(nodeId) !== -1);
 
           nodeData[nodeId].nodeClass = (
-            nodeId === 'END'                     ? 'end-node' :
+            currentNodeIsTerminal                ? 'terminal-node' :
             nodeId === $scope.currentStateId()   ? 'current-node' :
             nodeId === initStateId               ? 'init-node' :
-            currentNodeIsTerminal                ? 'terminal-node' :
             !(nodeData[nodeId].reachable &&
               nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
                                                    'normal-node');
 
-          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId !== 'END');
+          nodeData[nodeId].canDelete = (nodeId != initStateId);
           $scope.nodeList.push(nodeData[nodeId]);
         }
 

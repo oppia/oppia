@@ -43,7 +43,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 6
 skin_customizations:
   panels_contents: {}
 states:
@@ -62,6 +62,7 @@ states:
           feedback: []
           param_changes: []
       id: null
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -78,7 +79,9 @@ states:
           feedback: []
           param_changes: []
       id: null
+      triggers: []
     param_changes: []
+states_schema_version: 3
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -93,7 +96,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 6
 skin_customizations:
   panels_contents:
     bottom: []
@@ -130,6 +133,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   New state:
     content:
@@ -150,6 +154,7 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Second state:
     content:
@@ -170,7 +175,9 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
+states_schema_version: 3
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -291,6 +298,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'notAParamSpec': param_domain.ParamSpec.from_dict(
                 {'obj_type': 'Int'})
         }
+        exploration.validate()
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.interaction.triggers = ['element']
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected empty triggers list.'):
+            exploration.validate()
+        init_state.interaction.triggers = []
         exploration.validate()
 
     def test_tag_validation(self):
@@ -439,7 +454,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         """Test that objectives are validated only in 'strict' mode."""
         self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='Title', category='Category',
-            objective='')
+            objective='', end_state_name='End')
         exploration = exp_services.get_exploration_by_id('exp_id')
         exploration.validate()
 
@@ -448,10 +463,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate(strict=True)
 
         exploration.objective = 'An objective'
-        # Link the start state to the END state in order to make the
-        # exploration valid.
-        exploration.states[exploration.init_state_name].interaction.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
 
         exploration.validate(strict=True)
 
@@ -468,6 +479,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         notdemo2 = exp_domain.Exploration.create_default_exploration(
             'abcd', 'title', 'category')
         self.assertEqual(notdemo2.is_demo, False)
+
+    def test_exploration_export_import(self):
+        """Test that to_dict and from_dict preserve all data within an
+        exploration.
+        """
+        demo = exp_domain.Exploration.create_default_exploration(
+            '0', 'title', 'category')
+        demo_dict = demo.to_dict()
+        exp_from_dict = exp_domain.Exploration.create_exploration_from_dict(
+            demo_dict)
+        self.assertEqual(exp_from_dict.to_dict(), demo_dict)
+
+    def test_interaction_with_none_id_is_not_terminal(self):
+        """Test that an interaction with an id of None leads to is_terminal
+        being false.
+        """
+        # Default exploration has a default interaction with an ID of None.
+        demo = exp_domain.Exploration.create_default_exploration(
+            '0', 'title', 'category')
+        init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
+        self.assertFalse(init_state.interaction.is_terminal)
 
 
 class StateExportUnitTests(test_utils.GenericTestBase):
@@ -500,6 +532,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     }]
                 }],
                 'id': None,
+                'triggers': [],
             },
             'param_changes': [],
         }
@@ -600,7 +633,7 @@ states:
       rule_specs:
       - definition:
           rule_type: default
-        dest: New state
+        dest: END
         feedback: []
         param_changes: []
     sticky: false
@@ -643,7 +676,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       sticky: false
@@ -699,7 +732,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       sticky: false
@@ -753,7 +786,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       id: TextInput
@@ -808,7 +841,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: New state
+          dest: END
           feedback: []
           param_changes: []
       id: TextInput
@@ -816,7 +849,85 @@ states:
 tags: []
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V5
+    YAML_CONTENT_V6 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+states_schema_version: 3
+tags: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V6
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -847,6 +958,13 @@ tags: []
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V5)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v6(self):
+        """Test direct loading from a v6 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V6)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -879,6 +997,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         }],
                     }],
                     'id': None,
+                    'triggers': [],
                 },
                 'param_changes': [],
             }
@@ -946,15 +1065,57 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exploration.rename_state('State 2', 'Renamed state')
 
-        # And it is not OK to rename a state to the END_DEST.
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid state name'):
-            exploration.rename_state('State 2', feconf.END_DEST)
+        # And it is OK to rename a state to 'END' (old terminal pseudostate). It
+        # is tested throughout this test because a lot of old behavior used to
+        # be specific to states named 'END'. These tests validate that is no
+        # longer the situation.
+        exploration.rename_state('State 2', 'END')
+
+        # Should successfully be able to name it back.
+        exploration.rename_state('END', 'State 2')
 
         # The exploration now has exactly two states.
         self.assertNotIn(default_state_name, exploration.states)
         self.assertIn('Renamed state', exploration.states)
         self.assertIn('State 2', exploration.states)
+
+        # Can successfully add 'END' state
+        exploration.add_states(['END'])
+
+        # Should fail to rename like any other state
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
+            exploration.rename_state('State 2', 'END')
+
+        # Ensure the other states are connected to END
+        exploration.states['Renamed state'].interaction.handlers[
+            0].rule_specs[0].dest = 'State 2'
+        exploration.states['State 2'].interaction.handlers[
+            0].rule_specs[0].dest = 'END'
+
+        # Ensure the other states have interactions
+        exploration.states['Renamed state'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+
+        # Other miscellaneous requirements for validation
+        exploration.objective = 'Objective'
+
+        # The exploration should NOT be terminable even though it has a state
+        # called 'END' and everything else is connected to it.
+        with self.assertRaises(Exception):
+            exploration.validate(strict=True)
+
+        # Renaming the node to something other than 'END' and giving it an
+        # EndExploration is enough to validate it
+        exploration.rename_state('END', 'AnotherEnd')
+        exploration.states['AnotherEnd'].update_interaction_id('EndExploration')
+        exploration.validate(strict=True)
+
+        # Name it back for final tests
+        exploration.rename_state('AnotherEnd', 'END')
+
+        # Should be able to successfully delete it
+        exploration.delete_state('END')
+        self.assertNotIn('END', exploration.states)
 
 
 class SkinInstanceUnitTests(test_utils.GenericTestBase):

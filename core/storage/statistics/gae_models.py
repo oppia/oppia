@@ -131,6 +131,80 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         return entities
 
 
+class StartExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student starting the exploration.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'start'
+        exploration_id: id of exploration currently being played
+        exploration_version: version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: 0
+        play_type: 'normal'
+        created_on date
+        event_schema_version: 1
+        session_id: ID of current student's session
+        params: current parameter values, in the form of a map of parameter
+            name to value
+    """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    # Current parameter values, map of parameter name to value
+    params = ndb.JsonProperty(indexed=False)
+    # Which type of play-through this is (preview, from gallery)
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+    # The version of the event schema used to describe an event of this type.
+    # Details on the schema are given in the docstring for this class.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+                              utils.get_time_in_millisecs(timestamp),
+                              exp_id,
+                              session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               params, play_type, version=1):
+        """Creates a new start exploration event."""
+        # TODO(sll): Some events currently do not have an entity id that was
+        # set using this method; it was randomly set instead due tg an error.
+        # Might need to migrate them.
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        start_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_START_EXPLORATION,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=0.0,
+            params=params,
+            play_type=play_type)
+        start_event_entity.put()
+
+
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a reader attempting to leave the
     exploration without completing.
@@ -221,23 +295,30 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         leave_event_entity.put()
 
 
-class StartExplorationEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student starting the exploration.
+class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a learner reaching a terminal state of an
+    exploration.
 
     Event schema documentation
     --------------------------
     V1:
-        event_type: 'start'
+        event_type: 'complete'
         exploration_id: id of exploration currently being played
         exploration_version: version of exploration
-        state_name: Name of current state
-        client_time_spent_in_secs: 0
+        state_name: Name of the terminal state
         play_type: 'normal'
         created_on date
         event_schema_version: 1
         session_id: ID of current student's session
         params: current parameter values, in the form of a map of parameter
             name to value
+        client_time_spent_in_secs: time spent in this state before the event
+            was triggered
+
+    Note: shortly after the release of v2.0.0.rc.3, some of these events
+    were migrated from MaybeLeaveExplorationEventLogEntryModel. These events
+    have the wrong 'last updated' timestamp. However, the 'created_on'
+    timestamp is the same as that of the original model.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -253,6 +334,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
+    # Note: Some of these events were migrated from StateHit event instances
+    # which did not record timestamp data. For this, we use a placeholder
+    # value of 0.0 for client_time_spent_in_secs.
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value
     params = ndb.JsonProperty(indexed=False)
@@ -275,24 +359,20 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               params, play_type, version=1):
-        """Creates a new start exploration event."""
-        # TODO(sll): Some events currently do not have an entity id that was
-        # set using this method; it was randomly set instead due tg an error.
-        # Might need to migrate them.
-        entity_id = cls.get_new_event_entity_id(
-            exp_id, session_id)
-        start_event_entity = cls(
+               client_time_spent_in_secs, params, play_type):
+        """Creates a new exploration completion event."""
+        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
+        complete_event_entity = cls(
             id=entity_id,
-            event_type=feconf.EVENT_TYPE_START_EXPLORATION,
+            event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
             exploration_id=exp_id,
             exploration_version=exp_version,
             state_name=state_name,
             session_id=session_id,
-            client_time_spent_in_secs=0.0,
+            client_time_spent_in_secs=client_time_spent_in_secs,
             params=params,
             play_type=play_type)
-        start_event_entity.put()
+        complete_event_entity.put()
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):

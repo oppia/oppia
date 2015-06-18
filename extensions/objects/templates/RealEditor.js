@@ -29,6 +29,12 @@ oppia.directive('realEditor', function($compile, warningsData) {
         type: 'float'
       };
 
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        if ($scope.$parent.value === '') {  // A new rule
+          $scope.$parent.value = 0.0;
+        }
+      });
+
       if ($scope.$parent.value === '') {
         $scope.$parent.value = 0.0;
       }

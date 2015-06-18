@@ -24,8 +24,13 @@ oppia.controller('StateStatistics', [
     function($scope, explorationData, editorContextService, explorationStatesService) {
   $scope.unresolvedAnswersList = [];
 
+  var INTERACTIONS_WITHOUT_UNRESOLVED_ANSWERS = ['Continue'];
+
   $scope.initStateStatistics = function(data) {
-    $scope.unresolvedAnswers = data.unresolved_answers;
+    // Do not show unresolved answers if the interaction is of type 'Continue'.
+    $scope.unresolvedAnswers = (
+      INTERACTIONS_WITHOUT_UNRESOLVED_ANSWERS.indexOf(data.interaction.id) !== -1 ?
+      {} : data.unresolved_answers);
     $scope.generateUnresolvedAnswersList();
   };
 

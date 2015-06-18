@@ -80,7 +80,9 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
-    'browserName': 'chrome'
+    browserName: 'chrome',
+    shardTestFiles: true,
+    maxInstances: 5 // one instance for each protractor test file
   },
 
   // If you would like to run more than one instance of webdriver on the same

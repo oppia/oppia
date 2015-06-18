@@ -17,33 +17,11 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveSetInputValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveSetInputValidator', [
+    'baseInteractionValidationService', function(baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
-    var warningsList = [];
-
-    var numRuleSpecs = ruleSpecs.length;
-
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'please specify what Oppia should do in rules ' +
-            String(i + 1) + '.')
-        });
-      }
-    }
-
-    var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-    if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'please add a rule to cover what should happen in the general case.')
-      });
-    }
-
-    return warningsList;
+    return baseInteractionValidationService.getAllRuleSpecsWarnings(
+      ruleSpecs, stateName);
   };
 }]);

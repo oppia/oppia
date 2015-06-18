@@ -23,6 +23,7 @@ import os
 import pkgutil
 
 import feconf
+import utils
 
 
 class Registry(object):
@@ -87,9 +88,19 @@ class Registry(object):
     @classmethod
     def get_validators_html(cls, interaction_ids):
         """Returns the HTML bodies for the interaction validators."""
-        return ' \n'.join([
+
+        # Add the base validator.
+        html_fragments = [
+            '<script>%s</script>' %
+            utils.get_file_contents(os.path.join(
+                feconf.INTERACTIONS_DIR, 'baseValidator.js'))]
+
+        # Add individual validators for each interaction.
+        html_fragments += [
             cls.get_interaction_by_id(interaction_id).validator_html
-            for interaction_id in interaction_ids])
+            for interaction_id in interaction_ids]
+
+        return ' \n'.join(html_fragments)
 
     @classmethod
     def get_deduplicated_dependency_ids(cls, interaction_ids):
