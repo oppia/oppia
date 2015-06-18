@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Editor Tutorial
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Editor Tutorial
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-cards-container">
+    <md-card class="oppia-page-card oppia-long-text">
+      <p>
+        Welcome to the Oppia Tutorial! We will help you get started with your
+        first exploration. First, we'll go over basic definitions and best
+        practices. Then we'll end by making a small exploration.
+      </p>
+
+      <a class="oppia-about-anchor" name="exploration-editor"></a>
+      <h3>Exploration Editor</h3>
+
+      <p>
+        The first thing you see...
+      </p>
+    </md-card>
+  </div>
+
+  <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
+    <strong>Editor Tutorial</strong>
+    <p><a href="#exploration-editor">Exploration Editor</a></p>
+  </div>
+
+  <script>
+    // This scrolls the page to the anchor clicked on in the quick links menu.
+    $('a[href*=#]:not([href=#])').click(function() {
+      if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
+        var target = $('[name=' + this.hash.slice(1) +']');
+        if (target.length) {
+          $('html,body').animate({
+            scrollTop: target.offset().top
+          }, 1000);
+          return false;
+        }
+      }
+    });
+  </script>
+{% endblock %}
