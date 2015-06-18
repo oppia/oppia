@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import copy
 import datetime
 import os
 import re
@@ -30,7 +31,9 @@ from core.domain import exp_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import jinja_utils
 import main
+import utils
 
 import inspect
 import json
@@ -171,7 +174,8 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(json_response, expect_errors=False)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
-                  expected_status_int=200, upload_files=None):
+                  expected_status_int=200, upload_files=None,
+                  expect_response=True):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -182,8 +186,11 @@ class TestBase(unittest.TestCase):
             upload_files=upload_files)
 
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
+        if expect_response:
+            return self._parse_json_response(
+                json_response, expect_errors=expect_errors)
+        else:
+            return None
 
     def put_json(self, url, payload, csrf_token=None, expect_errors=False,
                  expected_status_int=200):
@@ -294,23 +301,76 @@ class TestBase(unittest.TestCase):
             # Link first state to ending state (to maintain validity)
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
-            init_interaction.handlers[0].rule_specs[0].dest = end_state_name
+            init_interaction.default_outcome.dest = end_state_name
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def get_updated_param_dict(
+            self, param_dict, param_changes, exp_param_specs):
+        """Updates a param dict using the given list of param_changes.
+
+        Note that the list of parameter changes is ordered. Parameter
+        changes later in the list may depend on parameter changes that have
+        been set earlier in the same list.
+        """
+        new_param_dict = copy.deepcopy(param_dict)
+        for pc in param_changes:
+            try:
+                obj_type = exp_param_specs[pc.name].obj_type
+            except:
+                raise Exception('Parameter %s not found' % pc.name)
+            new_param_dict[pc.name] = pc.get_normalized_value(
+                obj_type, new_param_dict)
+        return new_param_dict
+
     def submit_answer(
             self, exploration_id, state_name, answer,
-            params=None, handler_name=feconf.SUBMIT_HANDLER_NAME,
-            exploration_version=None):
+            params=None, exploration_version=None):
         """Submits an answer as an exploration player and returns the
-        corresponding dict.
+        corresponding dict. This function has strong parallels to code in
+        PlayerServices.js which has the non-test code to perform the same
+        functionality.
         """
         if params is None:
             params = {}
-        return reader.submit_answer_in_tests(
-            exploration_id, state_name, answer, params, handler_name,
-            exploration_version)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+
+        # First, the answer must be classified.
+        classify_result = self.post_json(
+            '/explorehandler/classify/%s' % exploration_id, {
+                'old_state': exploration.states[state_name].to_dict(),
+                'params': params,
+                'answer': answer
+            }
+        )
+
+        # Next, ensure the submission is recorded.
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
+                'answer': answer,
+                'params': params,
+                'version': exploration.version,
+                'old_state_name': state_name,
+                'rule_spec_string': classify_result['rule_spec_string']
+            }, expect_response=False
+        )
+
+        # Now the next state's data must be calculated.
+        outcome = classify_result['outcome']
+        new_state = exploration.states[outcome['dest']]
+        params['answer'] = answer
+        new_params = self.get_updated_param_dict(
+            params, new_state.param_changes, exploration.param_specs)
+
+        return {
+            'feedback_html': jinja_utils.parse_string(
+                utils.get_random_choice(outcome['feedback'])
+                if outcome['feedback'] else '', params),
+            'question_html': new_state.content[0].to_html(new_params),
+            'state_name': outcome['dest']
+        }
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):

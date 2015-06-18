@@ -24,8 +24,7 @@ class TextInput(base.BaseInteraction):
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'NormalizedString'}]
+    _submit_handler = base.SubmitAnswerHandler('NormalizedString')
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in

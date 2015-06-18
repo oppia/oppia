@@ -700,7 +700,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               _convertNoteToReadableNote($scope.noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
-          $scope.$parent.$parent.submitAnswer(readableSequence, 'submit');
+          $scope.$parent.$parent.submitAnswer(readableSequence);
         };
 
 

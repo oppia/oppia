@@ -24,7 +24,6 @@ import itertools
 # TODO(czx): Speed up the isomorphism checker?
 class IsIsomorphicTo(base.GraphRule):
     description = 'is isomorphic to {{g|Graph}}, including matching labels'
-    is_generic = False
 
     def _evaluate(self, subject):
         if len(subject['vertices']) != len(self.g['vertices']):

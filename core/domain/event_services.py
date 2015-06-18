@@ -76,12 +76,12 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
-                      handler_name, rule, answer):
+                      rule_spec_string, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
-            handler_name, rule, answer)
+            rule_spec_string, answer)
 
 
 class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
@@ -91,11 +91,11 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
 
     @classmethod
-    def _handle_event(cls, exploration_id, state_name, handler_name, answers):
+    def _handle_event(cls, exploration_id, state_name, answers):
         """Resolves a list of answers for the default rule of this state."""
         # TODO(sll): Escape these args?
         stats_models.resolve_answers(
-            exploration_id, state_name, handler_name,
+            exploration_id, state_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
 

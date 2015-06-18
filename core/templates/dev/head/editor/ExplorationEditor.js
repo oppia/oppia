@@ -572,7 +572,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'content': 'Content',
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
-              'widget_handlers': 'Rules'
+              'answer_groups': 'Answer groups',
+              'default_outcome': 'Default outcome'
             }
 
             // An ordered list of state properties that determines the order in which
@@ -582,7 +583,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             // TODO(sll): Implement this fully. Currently there is no sorting.
             $scope.ORDERED_STATE_PROPERTIES = [
               'name', 'param_changes', 'content', 'widget_id',
-              'widget_customization_args', 'widget_handlers'
+              'widget_customization_args', 'answer_groups', 'default_outcome'
             ];
 
             $scope.explorationChangesExist = !$.isEmptyObject(

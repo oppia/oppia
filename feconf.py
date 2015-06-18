@@ -57,7 +57,7 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 3
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 4
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
@@ -322,9 +322,6 @@ OUTPUT_FORMAT_ZIP = 'zip'
 # Types of updates shown in the 'recent updates' table in the dashboard page.
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
-
-# The name for the default handler of an interaction.
-SUBMIT_HANDLER_NAME = 'submit'
 
 # Default color
 COLOR_TEAL = 'teal'

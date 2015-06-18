@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractiveTextInput', [
             return;
           }
 
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
+          $scope.$parent.$parent.submitAnswer(answer);
         };
       }]
     };

@@ -26,8 +26,7 @@ class GraphInput(base.BaseInteraction):
     description = 'Allows learners to create and manipulate graphs.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Graph'}]
+    _submit_handler = base.SubmitAnswerHandler('Graph')
 
     _customization_arg_specs = [{
         'name': 'graph',

@@ -110,7 +110,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             output: $scope.output,
             evaluation: $scope.evaluation,
             error: $scope.err
-          }, 'submit');
+          });
         };
       }]
     };

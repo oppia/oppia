@@ -480,7 +480,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
         if 'resolved_answers' in self.payload:
             event_services.DefaultRuleAnswerResolutionEventHandler.record(
-                exploration_id, state_name, 'submit', resolved_answers)
+                exploration_id, state_name, resolved_answers)
 
         self.render_json({})
 

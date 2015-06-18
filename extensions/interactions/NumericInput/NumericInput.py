@@ -25,7 +25,6 @@ class NumericInput(base.BaseInteraction):
         'Allows learners to enter integers and floating point numbers.')
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Real'}]
+    _submit_handler = base.SubmitAnswerHandler('Real')
 
     _customization_arg_specs = []

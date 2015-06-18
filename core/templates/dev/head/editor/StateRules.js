@@ -22,7 +22,7 @@
 // corresponding to an interaction id so that they can be restored if the
 // interaction is changed back while the user is still in this state. This
 // cache should be reset each time the state editor is initialized.
-oppia.factory('interactionHandlersCache', [function() {
+oppia.factory('interactionAnswerGroupsCache', [function() {
   var _cache = {};
   return {
     reset: function() {
@@ -31,8 +31,8 @@ oppia.factory('interactionHandlersCache', [function() {
     contains: function(interactionId) {
       return _cache.hasOwnProperty(interactionId);
     },
-    set: function(interactionId, interactionHandlers) {
-      _cache[interactionId] = angular.copy(interactionHandlers);
+    set: function(interactionId, interactionAnswerGroups) {
+      _cache[interactionId] = angular.copy(interactionAnswerGroups);
     },
     get: function(interactionId) {
       if (!_cache.hasOwnProperty(interactionId)) {
@@ -45,142 +45,162 @@ oppia.factory('interactionHandlersCache', [function() {
 
 
 oppia.factory('rulesService', [
-    'stateInteractionIdService', 'INTERACTION_SPECS', 'interactionHandlersCache',
+    'stateInteractionIdService', 'INTERACTION_SPECS', 'interactionAnswerGroupsCache',
     'editorContextService', 'changeListService', 'explorationStatesService', 'graphDataService',
     'warningsData',
     function(
-      stateInteractionIdService, INTERACTION_SPECS, interactionHandlersCache,
+      stateInteractionIdService, INTERACTION_SPECS, interactionAnswerGroupsCache,
       editorContextService, changeListService, explorationStatesService, graphDataService,
       warningsData) {
 
-  var _interactionHandlersMemento = null;
+  var _interactionAnswerGroupsMemento = null;
+  var _interactionDefaultOutcomeMemento = null;
+  var _activeGroupIndex = null;
   var _activeRuleIndex = null;
-  var _interactionHandlers = null;
+  var _interactionAnswerGroups = null;
+  var _interactionDefaultOutcome = null;
   var _answerChoices = null;
-  var _interactionHandlerSpecs = null;
+  var _interactionAnswerGroupSpecs = null;
 
-  var _refreshHandlerSpecs = function() {
+  var _refreshAnswerGroupSpecs = function() {
     if (!stateInteractionIdService.savedMemento) {
       // This can happen for a newly-created state, where the user has not set
       // an interaction id.
-      _interactionHandlerSpecs = null;
+      _interactionAnswerGroupSpecs = null;
       return;
     }
 
-    _interactionHandlerSpecs = INTERACTION_SPECS[
+    _interactionAnswerGroupSpecs = INTERACTION_SPECS[
       stateInteractionIdService.savedMemento].handler_specs;
   };
 
-  var _saveInteractionHandlers = function(newHandlers) {
-    var oldHandlers = _interactionHandlersMemento;
-    if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
-      _interactionHandlers = newHandlers;
+  var _saveInteractionAnswerGroups = function(newGroups) {
+    var oldGroups = _interactionAnswerGroupsMemento;
+    var oldDefaultOutcome = _interactionDefaultOutcomeMemento;
+    if (newGroups && oldGroups && !angular.equals(newGroups, oldGroups)) {
+      _interactionAnswerGroups = newGroups;
 
       changeListService.editStateProperty(
-        editorContextService.getActiveStateName(), 'widget_handlers',
-        angular.copy(newHandlers), angular.copy(oldHandlers));
+        editorContextService.getActiveStateName(), 'answer_groups',
+        angular.copy(newGroups), angular.copy(oldGroups));
 
       var activeStateName = editorContextService.getActiveStateName();
-
       var _stateDict = explorationStatesService.getState(activeStateName);
-      for (var i = 0; i < _stateDict.interaction.handlers.length; i++) {
-        var handlerName = _stateDict.interaction.handlers[i].name;
-        _stateDict.interaction.handlers[i].rule_specs = _interactionHandlers[handlerName];
-      }
+      _stateDict.interaction.answer_groups = angular.copy(
+        _interactionAnswerGroups);
       explorationStatesService.setState(activeStateName, _stateDict);
 
       graphDataService.recompute();
-      _interactionHandlersMemento = angular.copy(newHandlers);
+      _interactionAnswerGroupsMemento = angular.copy(newGroups);
+    }
+  };
+
+  var _saveInteractionDefaultOutcome = function(newDefaultOutcome) {
+    var oldDefaultOutcome = _interactionDefaultOutcomeMemento;
+    if (newDefaultOutcome && oldDefaultOutcome &&
+        !angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
+      _interactionDefaultOutcome = newDefaultOutcome;
+
+      changeListService.editStateProperty(
+        editorContextService.getActiveStateName(),
+        'default_outcome', angular.copy(newDefaultOutcome),
+        angular.copy(oldDefaultOutcome));
+
+      var activeStateName = editorContextService.getActiveStateName();
+      var _stateDict = explorationStatesService.getState(activeStateName);
+      _stateDict.interaction.default_outcome = angular.copy(
+        _interactionDefaultOutcome);
+      explorationStatesService.setState(activeStateName, _stateDict);
+
+      _interactionDefaultOutcomeMemento = angular.copy(newDefaultOutcome);
     }
   };
 
   return {
     // The 'data' arg is a list of interaction handlers for the currently-active state.
     init: function(data) {
-      interactionHandlersCache.reset();
-      _refreshHandlerSpecs();
+      interactionAnswerGroupsCache.reset();
+      _refreshAnswerGroupSpecs();
 
-      // Stores rules as key-value pairs. For each pair, the key is the
-      // corresponding handler name and the value has several keys:
-      // - 'definition' (the rule definition)
-      // - 'dest' (the destination for this rule)
-      // - 'feedback' (list of feedback given for this rule)
-      // - 'param_changes' (parameter changes associated with this rule)
-      _interactionHandlers = {};
-      for (var i = 0; i < data.handlers.length; i++) {
-        _interactionHandlers[data.handlers[i].name] = data.handlers[i].rule_specs;
-      }
-      interactionHandlersCache.set(
-        stateInteractionIdService.savedMemento, _interactionHandlers);
+      _interactionAnswerGroups = angular.copy(data.answerGroups);
+      _interactionDefaultOutcome = angular.copy(data.defaultOutcome);
+      interactionAnswerGroupsCache.set(
+        stateInteractionIdService.savedMemento, _interactionAnswerGroups);
 
-      _interactionHandlersMemento = angular.copy(_interactionHandlers);
+      _interactionAnswerGroupsMemento = angular.copy(_interactionAnswerGroups);
+      _interactionDefaultOutcomeMemento = angular.copy(
+        _interactionDefaultOutcome);
+      _activeGroupIndex = 0;
       _activeRuleIndex = 0;
     },
     onInteractionIdChanged: function(newInteractionId, callback) {
-      _refreshHandlerSpecs();
+      _refreshAnswerGroupSpecs();
 
-      if (interactionHandlersCache.contains(newInteractionId)) {
-        _interactionHandlers = interactionHandlersCache.get(newInteractionId);
+      if (interactionAnswerGroupsCache.contains(newInteractionId)) {
+        _interactionAnswerGroups = interactionAnswerGroupsCache.get(newInteractionId);
       } else {
-        // Preserve just the default rule, unless the new interaction id is a
-        // terminal one (in which case, change its destination to be a
-        // self-loop instead).
-        _interactionHandlers = {
-          'submit': [
-            _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
-          ]
-        };
+        // Preserve just the default rule by retaining the default outcome,
+        // unless the new interaction id is a terminal one (in which case,
+        // change its destination to be a self-loop instead).
+        _interactionAnswerGroups = [];
         if (newInteractionId && INTERACTION_SPECS[newInteractionId].is_terminal) {
-          _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
+          _interactionDefaultOutcome.dest = editorContextService.getActiveStateName();
         }
       }
 
-      _saveInteractionHandlers(_interactionHandlers);
-      interactionHandlersCache.set(newInteractionId, _interactionHandlers);
+      _saveInteractionAnswerGroups(_interactionAnswerGroups);
+      _saveInteractionDefaultOutcome(_interactionDefaultOutcome);
+      interactionAnswerGroupsCache.set(newInteractionId, _interactionAnswerGroups);
 
-      _interactionHandlersMemento = angular.copy(_interactionHandlers);
+      _interactionAnswerGroupsMemento = angular.copy(_interactionAnswerGroups);
+      _interactionDefaultOutcomeMemento = angular.copy(
+        _interactionDefaultOutcome);
+      _activeGroupIndex = 0;
       _activeRuleIndex = 0;
 
       if (callback) {
         callback();
       }
     },
-    getActiveRuleIndex: function() {
-      return _activeRuleIndex;
+    getActiveGroupIndex: function() {
+      return _activeGroupIndex;
     },
     getAnswerChoices: function() {
       return angular.copy(_answerChoices);
     },
-    changeActiveRuleIndex: function(newIndex) {
-      _activeRuleIndex = newIndex;
+    changeActiveGroupIndex: function(newIndex) {
+      _activeGroupIndex = newIndex;
     },
     getActiveRule: function() {
-      if (_interactionHandlers) {
-        return _interactionHandlers['submit'][_activeRuleIndex];
+      if (_interactionAnswerGroups) {
+        return _interactionAnswerGroups[_activeGroupIndex];
       } else {
         return null;
       }
     },
     deleteActiveRule: function() {
-      if (_activeRuleIndex === _interactionHandlers.length - 1) {
-        warningsData.addWarning('Cannot delete default rule.');
-        return false;
-      }
       if (!window.confirm('Are you sure you want to delete this rule?')) {
         return false;
       }
-      _interactionHandlersMemento = angular.copy(_interactionHandlers);
-      _interactionHandlers['submit'].splice(_activeRuleIndex, 1);
-      _saveInteractionHandlers(_interactionHandlers);
-      _activeRuleIndex = 0;
+      _interactionAnswerGroupsMemento = angular.copy(_interactionAnswerGroups);
+      _interactionAnswerGroups.splice(_activeGroupIndex, 1);
+      _saveInteractionAnswerGroups(_interactionAnswerGroups);
+      _activeGroupIndex = 0;
       return true;
     },
-    saveActiveRule: function(activeRule) {
-      _interactionHandlers['submit'][_activeRuleIndex] = activeRule;
-      _saveInteractionHandlers(_interactionHandlers);
+    saveActiveRule: function(activeRule, activeOutcome) {
+      // TODO(bhenning): Change this to appropriately distinguish between saving
+      // rules and saving groups.
+      var group = _interactionAnswerGroups[_activeGroupIndex];
+      group.rule_specs[_activeRuleIndex] = activeRule;
+      group.outcome = activeOutcome;
+      _saveInteractionAnswerGroups(_interactionAnswerGroups);
     },
-    getInteractionHandlerSpecs: function() {
-      return angular.copy(_interactionHandlerSpecs);
+    saveDefaultRule: function(outcome) {
+      _saveInteractionDefaultOutcome(outcome);
+    },
+    getInteractionAnswerGroupSpecs: function() {
+      return angular.copy(_interactionAnswerGroupSpecs);
     },
     // Updates answer choices when the interaction requires it -- for example,
     // the rules for multiple choice need to refer to the multiple choice
@@ -188,13 +208,17 @@ oppia.factory('rulesService', [
     updateAnswerChoices: function(newAnswerChoices) {
       _answerChoices = newAnswerChoices;
     },
-    getInteractionHandlers: function() {
-      return angular.copy(_interactionHandlers);
+    getInteractionAnswerGroups: function() {
+      return angular.copy(_interactionAnswerGroups);
+    },
+    getInteractionDefaultOutcome: function() {
+      return angular.copy(_interactionDefaultOutcome);
     },
     // This registers the change to the handlers in the list of changes, and also
     // updates the states object in explorationStatesService.
-    save: function(newHandlers) {
-      _saveInteractionHandlers(newHandlers);
+    save: function(newGroups, defaultOutcome) {
+      _saveInteractionAnswerGroups(newGroups);
+      _saveInteractionDefaultOutcome(defaultOutcome);
     }
   };
 }]);
@@ -213,20 +237,21 @@ oppia.controller('StateRules', [
   };
   $scope.editorContextService = editorContextService;
 
-  $scope.changeActiveRuleIndex = function(newIndex) {
+  $scope.changeActiveGroupIndex = function(newIndex) {
     $rootScope.$broadcast('externalSave');
-    rulesService.changeActiveRuleIndex(newIndex);
-    $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+    rulesService.changeActiveGroupIndex(newIndex);
+    $scope.activeGroupIndex = rulesService.getActiveGroupIndex();
   };
 
   $scope.getCurrentInteractionId = function() {
     return stateInteractionIdService.savedMemento;
   };
 
-  $scope.$on('initializeHandlers', function(evt, data) {
+  $scope.$on('initializeAnswerGroups', function(evt, data) {
     rulesService.init(data);
-    $scope.interactionHandlers = rulesService.getInteractionHandlers();
-    $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+    $scope.interactionAnswerGroups = rulesService.getInteractionAnswerGroups();
+    $scope.interactionDefaultOutcome = rulesService.getInteractionDefaultOutcome();
+    $scope.activeGroupIndex = rulesService.getActiveGroupIndex();
     $scope.answerChoices = $scope.getAnswerChoices();
     $rootScope.$broadcast('externalSave');
   });
@@ -234,20 +259,23 @@ oppia.controller('StateRules', [
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
     $rootScope.$broadcast('externalSave');
     rulesService.onInteractionIdChanged(newInteractionId, function() {
-      $scope.interactionHandlers = rulesService.getInteractionHandlers();
-      $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+      $scope.interactionAnswerGroups = rulesService.getInteractionAnswerGroups();
+      $scope.interactionDefaultOutcome = rulesService.getInteractionDefaultOutcome();
+      $scope.activeGroupIndex = rulesService.getActiveGroupIndex();
       $scope.answerChoices = $scope.getAnswerChoices();
     });
   });
 
   $scope.$on('ruleDeleted', function(evt) {
-    $scope.interactionHandlers = rulesService.getInteractionHandlers();
-    $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+    $scope.interactionAnswerGroups = rulesService.getInteractionAnswerGroups();
+    $scope.interactionDefaultOutcome = rulesService.getInteractionDefaultOutcome();
+    $scope.activeGroupIndex = rulesService.getActiveGroupIndex();
   });
 
   $scope.$on('ruleSaved', function(evt) {
-    $scope.interactionHandlers = rulesService.getInteractionHandlers();
-    $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+    $scope.interactionAnswerGroups = rulesService.getInteractionAnswerGroups();
+    $scope.interactionDefaultOutcome = rulesService.getInteractionDefaultOutcome();
+    $scope.activeGroupIndex = rulesService.getActiveGroupIndex();
   });
 
   // Updates answer choices when the interaction requires it -- for example,
@@ -259,13 +287,6 @@ oppia.controller('StateRules', [
     $scope.answerChoices = $scope.getAnswerChoices();
   });
 
-  $scope.isDefaultRuleTabShown = function() {
-    var defaultRule = $scope.interactionHandlers.submit[$scope.interactionHandlers.submit.length - 1];
-    return (
-      defaultRule.dest !== editorContextService.getActiveStateName() ||
-      defaultRule.feedback.length > 0);
-  };
-
   $scope.openAddRuleModal = function() {
     warningsData.clear();
     $rootScope.$broadcast('externalSave');
@@ -273,52 +294,44 @@ oppia.controller('StateRules', [
     $modal.open({
       templateUrl: 'modals/addRule',
       backdrop: true,
-      resolve: {
-        canAddDefaultRule: function() {
-          return !$scope.isDefaultRuleTabShown();
-        }
-      },
       controller: [
-          '$scope', '$modalInstance', 'rulesService', 'editorContextService', 'canAddDefaultRule',
-          function($scope, $modalInstance, rulesService, editorContextService, canAddDefaultRule) {
-        $scope.canAddDefaultRule = canAddDefaultRule;
-
+          '$scope', '$modalInstance', 'rulesService', 'editorContextService',
+          function($scope, $modalInstance, rulesService, editorContextService) {
         $scope.tmpRule = {
-          definition: ($scope.canAddDefaultRule ? {
-            rule_type: 'default',
-            subject: 'answer'
-          } : {
-            rule_type: 'atomic',
-            name: null,
-            inputs: {},
-            subject: 'answer'
-          }),
+          name: null,
+          inputs: {},
+        };
+        $scope.tmpOutcome = {
           dest: editorContextService.getActiveStateName(),
           feedback: [''],
           param_changes: []
         };
+        $scope.isDefaultRule = false;
 
-        $scope.isRuleEmpty = function(tmpRule) {
+        $scope.isRuleEmpty = function(tmpOutcome) {
           var hasFeedback = false;
-          for (var i = 0; i < tmpRule.feedback.length; i++) {
-            if (tmpRule.feedback[i].length > 0) {
+          for (var i = 0; i < tmpOutcome.feedback.length; i++) {
+            if (tmpOutcome.feedback[i].length > 0) {
               hasFeedback = true;
             }
           }
 
           return (
-            tmpRule.dest === editorContextService.getActiveStateName() &&
+            tmpOutcome.dest === editorContextService.getActiveStateName() &&
             !hasFeedback);
         };
 
         $scope.addRuleForm = {};
 
-        $scope.interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
+        $scope.interactionAnswerGroupSpecs = rulesService.getInteractionAnswerGroupSpecs();
         $scope.answerChoices = rulesService.getAnswerChoices();
 
         $scope.addNewRule = function() {
           $scope.$broadcast('saveRuleDetails');
-          $modalInstance.close($scope.tmpRule);
+          $modalInstance.close({
+            'tmpRule': $scope.tmpRule,
+            'tmpOutcome': $scope.tmpOutcome
+          });
         };
 
         $scope.cancel = function() {
@@ -326,26 +339,17 @@ oppia.controller('StateRules', [
           warningsData.clear();
         };
       }]
-    }).result.then(function(tmpRule) {
-      _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
-
-      var numRules = $scope.interactionHandlers['submit'].length;
-
-      if (tmpRule.definition.rule_type === 'default') {
-        if ($scope.isDefaultRuleTabShown()) {
-          warningsData.addWarning('Tried to add a duplicate default rule');
-          return;
-        } else {
-          tmpRule.definition = {rule_type: 'default'};
-          $scope.interactionHandlers['submit'][numRules - 1] = tmpRule;
-        }
-        rulesService.save($scope.interactionHandlers);
-        $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 1);
-      } else {
-        $scope.interactionHandlers['submit'].splice(numRules - 1, 0, tmpRule);
-        rulesService.save($scope.interactionHandlers);
-        $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 2);
-      }
+    }).result.then(function(result) {
+      var tmpRule = result['tmpRule'];
+      var tmpOutcome = result['tmpOutcome'];
+      _interactionAnswerGroupsMemento = angular.copy($scope.interactionAnswerGroups);
+      $scope.interactionAnswerGroups.push({
+        'rule_specs': [tmpRule],
+        'outcome': tmpOutcome
+      });
+      rulesService.save($scope.interactionAnswerGroups,
+        $scope.interactionDefaultOutcome);
+      $scope.changeActiveGroupIndex($scope.interactionAnswerGroups.length - 1);
     });
   };
 
@@ -366,8 +370,9 @@ oppia.controller('StateRules', [
     stop: function(e, ui) {
       $scope.isDraggingOccurring = false;
       $scope.$apply();
-      rulesService.save($scope.interactionHandlers);
-      $scope.changeActiveRuleIndex(ui.item.index());
+      rulesService.save($scope.interactionAnswerGroups,
+        $scope.interactionDefaultOutcome);
+      $scope.changeActiveGroupIndex(ui.item.index());
       $rootScope.$broadcast('externalSave');
     }
   };
@@ -387,8 +392,13 @@ oppia.controller('StateRules', [
     }
   };
 
-  $scope.saveActiveRule = function(updatedRule) {
-    rulesService.saveActiveRule(updatedRule);
+  $scope.saveActiveRule = function(updatedRule, updatedOutcome) {
+    rulesService.saveActiveRule(updatedRule, updatedOutcome);
+    $rootScope.$broadcast('ruleSaved');
+  };
+
+  $scope.saveDefaultRule = function(updatedOutcome) {
+    rulesService.saveDefaultRule(updatedOutcome);
     $rootScope.$broadcast('ruleSaved');
   };
 }]);

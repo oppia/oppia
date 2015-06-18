@@ -57,11 +57,10 @@ DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
-class AnswerHandler(object):
-    """Value object for an answer event stream (e.g. submit, click, drag)."""
+class SubmitAnswerHandler(object):
+    """Value object for an answer submission."""
 
-    def __init__(self, name, obj_type):
-        self.name = name
+    def __init__(self, obj_type):
         self.obj_type = obj_type
         self.obj_class = obj_services.Registry.get_object_class_by_type(
             obj_type)
@@ -72,7 +71,6 @@ class AnswerHandler(object):
 
     def to_dict(self):
         return {
-            'name': self.name,
             'obj_type': self.obj_type,
         }
 
@@ -103,10 +101,9 @@ class BaseInteraction(object):
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. Overridden in subclasses.
-    _handlers = []
+    # Handler for an answer submission action. This is to be overridden in
+    # subclasses.
+    _submit_handler = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -122,22 +119,17 @@ class BaseInteraction(object):
             for cas in self._customization_arg_specs]
 
     @property
-    def handlers(self):
-        return [AnswerHandler(**ah) for ah in self._handlers]
-
-    @property
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
 
-    def normalize_answer(self, answer, handler_name):
+    def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""
-        for handler in self.handlers:
-            if handler.name == handler_name:
-                return handler.obj_class.normalize(answer)
+        if self._submit_handler:
+            return self._submit_handler.obj_class.normalize(answer)
 
         raise Exception(
-            'Could not find handler in interaction %s with name %s' %
-            (self.name, handler_name))
+            'Could not find submit handler in interaction %s' %
+            (self.name))
 
     def validate_customization_arg_values(self, customization_args):
         """Validates customization arg values. The input is a dict whose
@@ -176,7 +168,7 @@ class BaseInteraction(object):
     @property
     def validator_html(self):
         """The HTML code containing validators for the interaction's
-        customization_args and handlers.
+        customization_args and submission handler.
         """
         return (
             '<script>%s</script>\n' %
@@ -201,40 +193,35 @@ class BaseInteraction(object):
             } for ca_spec in self.customization_arg_specs],
         }
 
-        # Add information about the handlers.
-        result['handler_specs'] = [h.to_dict() for h in self.handlers]
-        for idx, handler in enumerate(self.handlers):
-            result['handler_specs'][idx]['rules'] = dict((
+        # Add information about the submission handler.
+        result['handler_specs'] = [self._submit_handler.to_dict()]
+        result['handler_specs'][0]['rules'] = dict((
                 rule_cls.description,
                 {'classifier': rule_cls.__name__}
-            ) for rule_cls in handler.rules)
+            ) for rule_cls in self._submit_handler.rules)
 
         # Add information about rule descriptions corresponding to the answer
         # type for this interaction.
         result['rule_descriptions'] = (
             rule_domain.get_description_strings_for_obj_type(
-                self.handlers[0].obj_type))
+                self._submit_handler.obj_type))
 
         return result
 
-    def get_handler_by_name(self, handler_name):
-        """Get the handler for an interaction, given the handler's name."""
-        try:
-            return next(h for h in self.handlers if h.name == handler_name)
-        except StopIteration:
-            raise Exception(
-                'Could not find handler with name %s' % handler_name)
+    def get_submit_handler(self):
+        """Get the submission handler for an interaction."""
+        return self._submit_handler
 
-    def get_rule_by_name(self, handler_name, rule_name):
-        """Gets a rule, given its name and ancestors."""
-        handler = self.get_handler_by_name(handler_name)
+    def get_rule_by_name(self, rule_name):
+        """Gets a rule given its name."""
+        handler = self.get_submit_handler()
         try:
             return next(
                 r for r in handler.rules if r.__name__ == rule_name)
         except StopIteration:
             raise Exception(
-                'Could not find rule with name %s for handler %s'
-                % (rule_name, handler_name))
+                'Could not find rule with name %s for submit handler'
+                % rule_name)
 
     def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a learner's response in the stats log.

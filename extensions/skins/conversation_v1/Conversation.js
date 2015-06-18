@@ -205,7 +205,7 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.initializePage();
 
-      $scope.submitAnswer = function(answer, handler) {
+      $scope.submitAnswer = function(answer) {
         // For some reason, answers are getting submitted twice when the submit
         // button is clicked. This guards against that.
         if (_answerIsBeingProcessed) {
@@ -224,7 +224,7 @@ oppia.directive('conversationSkin', [function() {
         // This is measured in milliseconds since the epoch.
         var timeAtServerCall = new Date().getTime();
 
-        oppiaPlayerService.submitAnswer(answer, handler, function(
+        oppiaPlayerService.submitAnswer(answer, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
 
           var millisecsLeftToWait = Math.max(

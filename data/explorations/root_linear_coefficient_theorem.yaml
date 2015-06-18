@@ -6,7 +6,7 @@ language_code: en
 objective: discover the Root Linear Coefficient Theorem
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 7
 skin_customizations:
   panels_contents: {}
 states:
@@ -22,6 +22,45 @@ states:
         ></oppia-noninteractive-math>\_is odd, what's the sign of the constant term?\
         \ \_What's the sign of the linear term?</div>"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Quotient of terms
+          feedback:
+          - Good.  As a side note, what do you think the sign is of the x^i term given
+            n is even? Given n is odd?
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          name: Equals
+      - outcome:
+          dest: Coefficient signs WA1
+          feedback:
+          - Hmm... that's a bit weird isn't it?  The expression had only negative
+            signs, and your answer has all positive signs...
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          name: Equals
+      - outcome:
+          dest: Coefficient signs WA1
+          feedback:
+          - That looks correct, but let's try a sample case just to make sure.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          name: Equals
+      - outcome:
+          dest: Coefficient signs WA2
+          feedback:
+          - That looks a little fishy... let's try a sample case just to be sure...
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 3
+          name: Equals
       customization_args:
         choices:
           value:
@@ -29,58 +68,13 @@ states:
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,+,+,+&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,+,-&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;-,+,-,+&amp;quot;"></oppia-noninteractive-math>
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Quotient of terms
-          feedback:
-          - Good.  As a side note, what do you think the sign is of the x^i term given
-            n is even? Given n is odd?
-          param_changes: []
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Coefficient signs WA1
-          feedback:
-          - Hmm... that's a bit weird isn't it?  The expression had only negative
-            signs, and your answer has all positive signs...
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Coefficient signs WA1
-          feedback:
-          - That looks correct, but let's try a sample case just to make sure.
-          param_changes: []
-        - definition:
-            inputs:
-              x: 3
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Coefficient signs WA2
-          feedback:
-          - That looks a little fishy... let's try a sample case just to be sure...
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Coefficient Signs
-          feedback:
-          - Oops, if you have reached this case, something has gone wrong...
-          param_changes: []
+      default_outcome:
+        dest: Coefficient Signs
+        feedback:
+        - Oops, if you have reached this case, something has gone wrong...
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Coefficient signs WA1:
     content:
@@ -94,28 +88,25 @@ states:
         \ then you're suggesting that the constant term should be positive, right?</div><div><br></div><div>What\
         \ is the constant term?</div>"
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: -12.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Coefficient Signs
           feedback:
           - Right!  But wait-- that's not positive.  Let's try the previous question
             again...
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Coefficient signs WA1
-          feedback:
-          - Try again.  We want the constant term.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: -12.0
+          name: Equals
+      customization_args: {}
+      default_outcome:
+        dest: Coefficient signs WA1
+        feedback:
+        - Try again.  We want the constant term.
+        param_changes: []
       id: NumericInput
+      triggers: []
     param_changes: []
   Coefficient signs WA2:
     content:
@@ -129,27 +120,37 @@ states:
         \ raw_latex-with-value=\"&amp;quot;(x - 3) (x - 4)&amp;quot;\"></oppia-noninteractive-math><br><br>What\
         \ is the coefficient of the constant term?</div>"
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 12.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Coefficient Signs
           feedback:
           - Right.  And that's not negative.  Let's try the previous question again...
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Coefficient signs WA2
-          feedback:
-          - Nope!  Try again.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 12.0
+          name: Equals
+      customization_args: {}
+      default_outcome:
+        dest: Coefficient signs WA2
+        feedback:
+        - Nope!  Try again.
+        param_changes: []
       id: NumericInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
     param_changes: []
   More General Expansion:
     content:
@@ -157,6 +158,16 @@ states:
       value: "What about\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x-a)(x-b)(x-c)&amp;quot;\"\
         ></oppia-noninteractive-math>?"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Particular coefficients (part 1)
+          feedback:
+          - Great!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          name: Equals
       customization_args:
         choices:
           value:
@@ -168,26 +179,13 @@ states:
             + (ab+bc+ca)x - abc&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;x^3 + (a+b+c)x^2
             - (ab+bc+ca)x + abc&amp;quot;"></oppia-noninteractive-math>
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Particular coefficients (part 1)
-          feedback:
-          - Great!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: More General Expansion
-          feedback:
-          - Nope!  Try again.
-          param_changes: []
+      default_outcome:
+        dest: More General Expansion
+        feedback:
+        - Nope!  Try again.
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Particular coefficients (part 1):
     content:
@@ -198,6 +196,16 @@ states:
         ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
         \ term (the term with no x's)?"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Particular coefficients (part 2)
+          feedback:
+          - That's correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 3
+          name: Equals
       customization_args:
         choices:
           value:
@@ -207,26 +215,13 @@ states:
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;1&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 a_2 a_3
             ... a_n&amp;quot;"></oppia-noninteractive-math>
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 3
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Particular coefficients (part 2)
-          feedback:
-          - That's correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Particular coefficients (part 1)
-          feedback:
-          - Nope!  Try again.
-          param_changes: []
+      default_outcome:
+        dest: Particular coefficients (part 1)
+        feedback:
+        - Nope!  Try again.
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Particular coefficients (part 2):
     content:
@@ -237,6 +232,16 @@ states:
         \ linear term (the\_</span><oppia-noninteractive-math raw_latex-with-value=\"\
         &amp;quot;x^1&amp;quot;\"></oppia-noninteractive-math>\_<span>term)?</span><br>"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Coefficient Signs
+          feedback:
+          - Yep!  Admit it, you just chose the longest answer...
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 3
+          name: Equals
       customization_args:
         choices:
           value:
@@ -247,28 +252,15 @@ states:
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_2&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 a_2 ...
             a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2 a_3 ... a_n&amp;quot;"></oppia-noninteractive-math>
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 3
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Coefficient Signs
-          feedback:
-          - Yep!  Admit it, you just chose the longest answer...
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Particular coefficients (part 2)
-          feedback:
-          - "This one's a little tricky.  Maybe trying this case will help you out?\_\
-            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x - a_1)\
-            \ (x - a_2) (x - a_3)&amp;quot;\"></oppia-noninteractive-math>"
-          param_changes: []
+      default_outcome:
+        dest: Particular coefficients (part 2)
+        feedback:
+        - "This one's a little tricky.  Maybe trying this case will help you out?\_\
+          <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x - a_1) (x\
+          \ - a_2) (x - a_3)&amp;quot;\"></oppia-noninteractive-math>"
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Quotient of terms:
     content:
@@ -282,44 +274,51 @@ states:
         is odd, the constant and linear terms also have opposite signs...<br><br>What,\
         \ then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>"
     interaction:
-      customization_args:
-        choices:
-          value:
-          - Positive
-          - Negative
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Quotient part 2
           feedback:
           - Yep.  For example, 5 / (-3) is negative, and -3 / 5 is negative, but 3
             / 5 is positive.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Quotient of terms
-          feedback:
-          - Try again!
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          name: Equals
+      customization_args:
+        choices:
+          value:
+          - Positive
+          - Negative
+      default_outcome:
+        dest: Quotient of terms
+        feedback:
+        - Try again!
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Quotient part 2:
     content:
     - type: text
-      value: Now for the fun part. &nbsp;Do you remember how the linear coefficient
-        was:<div><oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^{n+1}(a_1
-        a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2 a_3 ... a_n)&amp;quot;"></oppia-noninteractive-math><br><br>and
-        the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^n
-        a_1 a_2 ... a_n&amp;quot;"></oppia-noninteractive-math><br><br>(where, as
-        discussed before, the sign is added in).<br><br>What happens when we divide
-        the linear coefficient by the constant term?</div>
+      value: "Now for the fun part. \_Do you remember how the linear coefficient was:<div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(-1)^{n+1}(a_1 a_2 ... a_{n-1} + a_1 a_2\
+        \ ... a_{n-2} a_n + ... + a_2 a_3 ... a_n)&amp;quot;\"></oppia-noninteractive-math><br><br>and\
+        \ the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;(-1)^n a_1 a_2 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>(where,\
+        \ as discussed before, the sign is added in).<br><br>What happens when we\
+        \ divide the linear coefficient by the constant term?</div>"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Theorem
+          feedback:
+          - Yep... that leads us to the statement of the theorem...
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          name: Equals
       customization_args:
         choices:
           value:
@@ -330,26 +329,13 @@ states:
             + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
           - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(1/a_1 + 1/a_2
             + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Theorem
-          feedback:
-          - Yep... that leads us to the statement of the theorem...
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Quotient part 2
-          feedback:
-          - Oops, that's not right.  Careful; signs can be tricky!
-          param_changes: []
+      default_outcome:
+        dest: Quotient part 2
+        feedback:
+        - Oops, that's not right.  Careful; signs can be tricky!
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Simple Expansion:
     content:
@@ -365,31 +351,28 @@ states:
         &amp;quot;1&amp;quot;\"></oppia-noninteractive-math>, respectively, format\
         \ your answer as the string: a,b,c,d (without spaces).</div>"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: More General Expansion
+          feedback:
+          - Good!  Now let's look at a slightly more general expansion.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1,-6,-1,30
+          name: Equals
       customization_args:
         placeholder:
           value: ''
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 1,-6,-1,30
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: More General Expansion
-          feedback:
-          - Good!  Now let's look at a slightly more general expansion.
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Simple Expansion
-          feedback:
-          - Sorry, try again.  Remember to format it exactly as shown.
-          param_changes: []
+      default_outcome:
+        dest: Simple Expansion
+        feedback:
+        - Sorry, try again.  Remember to format it exactly as shown.
+        param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Start:
     content:
@@ -398,18 +381,16 @@ states:
         \ raw_latex-with-value=\"&amp;quot;(a + b)(c + d) = ac + ad + bc + bd&amp;quot;\"\
         ></oppia-noninteractive-math>.<br>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Simple Expansion
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Simple Expansion
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Theorem:
     content:
@@ -428,19 +409,18 @@ states:
         \ raw_latex-with-value=\"&amp;quot;c_1 = -(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;\"\
         ></oppia-noninteractive-math></div>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback:
-          - Congrats!  We may use this theorem later on to prove something even more
-            interesting...
-          param_changes: []
+      default_outcome:
+        dest: END
+        feedback:
+        - Congrats!  We may use this theorem later on to prove something even more
+          interesting...
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
+states_schema_version: 4
 tags: []

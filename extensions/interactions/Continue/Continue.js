@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractiveContinue', [
         $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj($attrs.buttonTextWithValue);
 
         $scope.submitAnswer = function() {
-          $scope.$parent.$parent.submitAnswer('(' + $scope.buttonText + ')', 'submit');
+          $scope.$parent.$parent.submitAnswer('(' + $scope.buttonText + ')');
         };
       }]
     };

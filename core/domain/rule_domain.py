@@ -27,12 +27,6 @@ import feconf
 import jinja_utils
 
 
-AND_RULE_TYPE = 'and_rule'
-OR_RULE_TYPE = 'or_rule'
-NOT_RULE_TYPE = 'not_rule'
-DEFAULT_RULE_TYPE = 'default'
-ATOMIC_RULE_TYPE = 'atomic'
-
 # TODO(sll): In the frontend, use the rule descriptions as the single source
 # of truth for the params.
 
@@ -81,14 +75,6 @@ def get_description_strings_for_obj_type(obj_type):
    }
 
 
-def is_generic(obj_type, rule_name):
-    """Checks whether this rule is labelled generic"""
-    rule_list = get_rules_for_obj_type(obj_type)
-    for rule_type in rule_list:
-        if rule_type.__name__ == rule_name:
-            return rule_type.is_generic
-
-
 def get_param_list(description):
     """Get a parameter list from the rule description."""
     param_list = []
@@ -125,8 +111,6 @@ class Rule(object):
     # Description of the rule, e.g. "is equal to {{x|Int}}". Should be
     # overridden by subclasses.
     description = ''
-    # Flags a rule as generic or not.
-    is_generic = False
 
     _PARAMS = None
     _fs = None
@@ -178,147 +162,22 @@ class Rule(object):
         return self._evaluate(self.subject_type.normalize(subject))
 
 
-def get_rule_description(definition, param_specs, answer_type):
-    """Gets the description of a rule based on a rule-spec definition dict.
+def evaluate_rule(rule_spec, answer_type, context_params, answer, fs):
+    """Evaluates a rule spec using context_params. Returns a boolean."""
+    all_rule_classes = get_rules_for_obj_type(answer_type)
+    rule = next(r for r in all_rule_classes
+                if r.__name__ == rule_spec.name)
 
-    param_specs is the param specifications list for the exploration.
+    param_list = []
+    param_defns = get_param_list(rule.description)
+    for (param_name, obj_cls) in param_defns:
+        parsed_param = rule_spec.inputs[param_name]
+        if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
+            parsed_param = jinja_utils.parse_string(
+                parsed_param, context_params, autoescape=False)
+        normalized_param = obj_cls.normalize(parsed_param)
+        param_list.append(normalized_param)
 
-    answer_type is a str denoting the type of the reader's answer.
-
-    Here is a sample definition in YAML form which represents the rule
-    'if answer < 5 and (has_seen_before == True or answer > 2) and (
-        not answer == 3)'.
-
-    rule_type: and_rule
-    children:
-    - rule_type: atomic
-      name: LessThan
-      subject: answer
-      inputs:
-        x: 5
-    - rule_type: or_rule
-      children:
-      - rule_type: atomic
-        name: Equals
-        subject: has_seen_before
-        inputs:
-          x: True
-      - rule_type: atomic
-        name: GreaterThan
-        subject: answer
-        inputs:
-          x: 2
-    - rule_type: not_rule
-      child:
-      - rule_type: atomic
-        name: Equals
-        subject: answer
-        inputs:
-          x: 3
-    """
-    if 'rule_type' not in definition:
-        raise Exception('No rule type specified when constructing rule.')
-
-    elif definition['rule_type'] == DEFAULT_RULE_TYPE:
-        return 'Default'
-
-    elif definition['rule_type'] == ATOMIC_RULE_TYPE:
-        if definition['subject'] == 'answer':
-            subject_type = answer_type
-        else:
-            subject_type = param_specs[definition['subject']].obj_type
-
-        all_rule_classes = get_rules_for_obj_type(subject_type)
-
-        rule = next(r for r in all_rule_classes
-                    if r.__name__ == definition['name'])
-        return rule.description
-
-    elif definition['rule_type'] == AND_RULE_TYPE:
-        return ' and '.join([
-            get_rule_description(child_dict, param_specs, answer_type)
-            for child_dict in definition['children']
-        ])
-
-    elif definition['rule_type'] == OR_RULE_TYPE:
-        return ' or '.join([
-            get_rule_description(child_dict, param_specs, answer_type)
-            for child_dict in definition['children']
-        ])
-
-    elif definition['rule_type'] == NOT_RULE_TYPE:
-        # Put 'not' after the first word.
-        description = get_rule_description(
-            definition['child'], param_specs, answer_type)
-        words = description.split()
-        words.insert(1, 'not')
-        return ' '.join(words)
-
-    else:
-        raise Exception('Unrecognized rule type %s' % definition['rule_type'])
-
-
-def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
-                  fs):
-    """Evaluates a rule definition using context_params. Returns a boolean."""
-
-    if 'rule_type' not in definition:
-        raise Exception('No rule type specified when constructing rule.')
-
-    elif definition['rule_type'] == DEFAULT_RULE_TYPE:
-        return True
-
-    elif definition['rule_type'] == ATOMIC_RULE_TYPE:
-        subject_name = definition['subject']
-
-        if subject_name == 'answer':
-            subject_type = answer_type
-        else:
-            subject_type = param_specs[subject_name].obj_type
-
-        all_rule_classes = get_rules_for_obj_type(subject_type)
-        rule = next(r for r in all_rule_classes
-                    if r.__name__ == definition['name'])
-
-        param_list = []
-        param_defns = get_param_list(rule.description)
-        for (param_name, obj_cls) in param_defns:
-            parsed_param = definition['inputs'][param_name]
-            if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
-                parsed_param = jinja_utils.parse_string(
-                    parsed_param, context_params, autoescape=False)
-            normalized_param = obj_cls.normalize(parsed_param)
-            param_list.append(normalized_param)
-
-        if subject_name == 'answer':
-            subject = answer
-        else:
-            subject = context_params[subject_name]
-
-        constructed_rule = rule(*param_list)
-        constructed_rule.set_fs(fs)
-        return constructed_rule.eval(subject)
-
-    elif definition['rule_type'] == AND_RULE_TYPE:
-        for child_dict in definition['children']:
-            if not evaluate_rule(
-                    child_dict, param_specs, answer_type, context_params,
-                    answer):
-                return False
-        return True
-
-    elif definition['rule_type'] == OR_RULE_TYPE:
-        for child_dict in definition['children']:
-            if evaluate_rule(
-                    child_dict, param_specs, answer_type, context_params,
-                    answer):
-                return True
-        return False
-
-    elif definition['rule_type'] == NOT_RULE_TYPE:
-        return (not evaluate_rule(
-            definition['child'], param_specs, answer_type, context_params,
-            answer))
-
-    else:
-        raise Exception('Unrecognized rule type %s' % definition['rule_type'])
+    constructed_rule = rule(*param_list)
+    constructed_rule.set_fs(fs)
+    return constructed_rule.eval(answer)

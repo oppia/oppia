@@ -45,11 +45,12 @@ describe('Sidebar state name controller', function() {
             value: 'First State Content'
           }],
           interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              feedback: [],
+              param_changes: []
+            }
           },
           param_changes: []
         },
@@ -59,11 +60,12 @@ describe('Sidebar state name controller', function() {
             value: 'Second State Content'
           }],
           interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              feedback: [],
+              param_changes: []
+            }
           },
           param_changes: []
         },
@@ -73,11 +75,12 @@ describe('Sidebar state name controller', function() {
             value: 'This is some content.'
           }],
           interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              feedback: [],
+              param_changes: []
+            }
           },
           param_changes: [{
             name: 'comparison',

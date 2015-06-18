@@ -252,12 +252,15 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
       }
     }
     for (var stateName in states) {
-      var handlers = states[stateName].interaction.handlers;
-      for (var h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
-        for (var i = 0; i < ruleSpecs.length; i++) {
-          adjMatrix[stateIds[stateName]][stateIds[ruleSpecs[i].dest]] = true;
-        }
+      var interaction = states[stateName].interaction;
+      var groups = interaction.answer_groups;
+      for (var h = 0; h < groups.length; h++) {
+        var dest = groups[h].outcome.dest;
+        adjMatrix[stateIds[stateName]][stateIds[dest]] = true;
+      }
+      if (interaction.default_outcome) {
+        var defaultDest = interaction.default_outcome.dest;
+        adjMatrix[stateIds[stateName]][stateIds[defaultDest]] = true;
       }
     }
     return adjMatrix;

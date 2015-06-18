@@ -23,7 +23,6 @@ from extensions.rules import base
 
 class Equals(base.NormalizedStringRule):
     description = 'is equal to {{x|NormalizedString}}'
-    is_generic = False
 
     def _evaluate(self, subject):
         return subject.lower() == self.x.lower()
@@ -32,7 +31,6 @@ class Equals(base.NormalizedStringRule):
 class CaseSensitiveEquals(base.NormalizedStringRule):
     description = (
         'is equal to {{x|NormalizedString}}, taking case into account')
-    is_generic = False
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -40,7 +38,6 @@ class CaseSensitiveEquals(base.NormalizedStringRule):
 
 class StartsWith(base.NormalizedStringRule):
     description = 'starts with {{x|NormalizedString}}'
-    is_generic = True
 
     def _evaluate(self, subject):
         return subject.lower().startswith(self.x.lower())
@@ -48,7 +45,6 @@ class StartsWith(base.NormalizedStringRule):
 
 class Contains(base.NormalizedStringRule):
     description = 'contains {{x|NormalizedString}}'
-    is_generic = True
 
     def _evaluate(self, subject):
         return subject.lower().find(self.x.lower()) != -1
@@ -58,7 +54,6 @@ class FuzzyEquals(base.NormalizedStringRule):
     description = (
         'is equal to {{x|NormalizedString}}, misspelled by at most '
         'one character')
-    is_generic = False
 
     def _evaluate(self, subject):
         if subject.lower() == self.x.lower():

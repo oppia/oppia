@@ -26,8 +26,7 @@ class MusicNotesInput(base.BaseInteraction):
         'staff.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'MusicPhrase'}]
+    _submit_handler = base.SubmitAnswerHandler('MusicPhrase')
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',

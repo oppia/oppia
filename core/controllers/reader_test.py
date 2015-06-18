@@ -222,8 +222,8 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         # Viewer submits answer '0'
-        exploration_dict = self.submit_answer(EXP_ID, state_name_1, '0')
-        state_name_2 = exploration_dict['state_name']
+        result_dict = self.submit_answer(EXP_ID, state_name_1, '0')
+        state_name_2 = result_dict['state_name']
 
         # Viewer gives 2nd feedback
         self.post_json(
@@ -250,13 +250,13 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
             'a': param_domain.ParamSpec('UnicodeString'),
             'b': param_domain.ParamSpec('UnicodeString'),
         }
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             {}, [independent_pc, dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
 
         # Jinja string evaluation fails gracefully on dependencies that do not
         # exist.
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             {}, [dependent_pc, independent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
 
@@ -273,13 +273,13 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
         }
 
         old_params = {}
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             old_params, [independent_pc, dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
         self.assertEqual(old_params, {})
 
         old_params = {'a': 'secondValue'}
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             old_params, [dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
         self.assertEqual(old_params, {'a': 'secondValue'})
@@ -287,7 +287,7 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
         # Jinja string evaluation fails gracefully on dependencies that do not
         # exist.
         old_params = {}
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             old_params, [dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'b': ''})
         self.assertEqual(old_params, {})

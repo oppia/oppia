@@ -106,9 +106,10 @@ oppia.controller('StateInteraction', [
       $scope.stateName, stateData.interaction.customization_args,
       stateData.interaction, 'widget_customization_args');
 
-    $rootScope.$broadcast('initializeHandlers', {
+    $rootScope.$broadcast('initializeAnswerGroups', {
       'interactionId': stateData.interaction.id,
-      'handlers': stateData.interaction.handlers
+      'answerGroups': stateData.interaction.answer_groups,
+      'defaultOutcome': stateData.interaction.default_outcome,
     });
 
     _updateInteractionPreviewAndAnswerChoices();

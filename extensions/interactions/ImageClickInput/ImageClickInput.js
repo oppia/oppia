@@ -79,7 +79,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.$parent.$parent.submitAnswer({
             clickPosition: [$scope.mouseX, $scope.mouseY],
             clickedRegions: $scope.currentlyHoveredRegions
-          }, 'submit');
+          });
         };
       }]
     };

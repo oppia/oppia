@@ -41,21 +41,19 @@ INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 
 
-class AnswerHandlerUnitTests(test_utils.GenericTestBase):
-    """Test the AnswerHandler domain object."""
+class SubmitAnswerHandlerUnitTests(test_utils.GenericTestBase):
+    """Test the SubmitAnswerHandler domain object."""
 
     def test_rules_property(self):
         """Test that answer_handler.rules behaves as expected."""
-        answer_handler = base.AnswerHandler('submit', 'Null')
-        self.assertEqual(answer_handler.name, 'submit')
+        answer_handler = base.SubmitAnswerHandler('Null')
         self.assertEqual(answer_handler.rules, [])
 
-        answer_handler = base.AnswerHandler(
-            'submit', 'NonnegativeInt')
+        answer_handler = base.SubmitAnswerHandler('NonnegativeInt')
         self.assertEqual(len(answer_handler.rules), 1)
 
         with self.assertRaisesRegexp(Exception, 'not a valid object class'):
-            base.AnswerHandler('submit', 'FakeObjType')
+            base.SubmitAnswerHandler('FakeObjType')
 
 
 class InteractionUnitTests(test_utils.GenericTestBase):
@@ -151,8 +149,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
         _INTERACTION_CONFIG_SCHEMA = [
             ('name', basestring), ('display_mode', basestring),
-            ('description', basestring), ('_handlers', list),
-            ('_customization_arg_specs', list)]
+            ('description', basestring), ('_customization_arg_specs', list)]
 
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -265,24 +262,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
 
-            # Check that at least one handler exists.
-            self.assertTrue(
-                len(interaction.handlers),
-                msg='Interaction %s has no handlers defined' % interaction_id)
+            # Check that the submit handler exists.
+            self.assertIsNotNone(interaction._submit_handler)
 
-            for handler in interaction._handlers:
-                HANDLER_KEYS = ['name', 'obj_type']
-                self.assertItemsEqual(HANDLER_KEYS, handler.keys())
-                self.assertTrue(isinstance(handler['name'], basestring))
-                # Check that the obj_type corresponds to a valid object class.
-                obj_services.Registry.get_object_class_by_type(
-                    handler['obj_type'])
-
-            # Check that all handler names are unique.
-            names = [handler.name for handler in interaction.handlers]
-            self.assertEqual(
-                len(set(names)), len(names),
-                'Interaction %s has duplicate handler names' % interaction_id)
+            handler = interaction._submit_handler
+            # Check that the obj_type corresponds to a valid object class.
+            obj_services.Registry.get_object_class_by_type(handler.obj_type)
 
             self._validate_customization_arg_specs(
                 interaction._customization_arg_specs)

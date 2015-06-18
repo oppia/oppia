@@ -6,37 +6,47 @@ language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 7
 skin_customizations:
   panels_contents: {}
 states:
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
+    param_changes: []
   Estimate 100:
     content:
     - type: text
       value: What is 10 times 10?
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 100.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Numeric input
           feedback:
           - Yes! So 11 times 11 must be bigger. Let's try again.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Estimate 100
-          feedback:
-          - No; try again. Remember, multiplication by ten can be done by just adding
-            a zero at the end.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 100.0
+          name: Equals
+      customization_args: {}
+      default_outcome:
+        dest: Estimate 100
+        feedback:
+        - No; try again. Remember, multiplication by ten can be done by just adding
+          a zero at the end.
+        param_changes: []
       id: NumericInput
+      triggers: []
     param_changes: []
   Finding Helsinki:
     content:
@@ -47,38 +57,20 @@ states:
         and probably in its capital, Helsinki. Can you find Helsinki on a map of the
         world?</div>
     interaction:
-      customization_args:
-        latitude:
-          value: 60.1708
-        longitude:
-          value: 24.9375
-        zoom:
-          value: 2
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              d: 110.0
-              p:
-              - 60.1708
-              - 24.9375
-            name: Within
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Things you can do
           feedback:
           - Hooray, you found it!
           param_changes: []
-        - definition:
-            inputs:
-              d: 1100.0
-              p:
-              - 60.1708
-              - 24.9375
-            name: Within
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            d: 110.0
+            p:
+            - 60.1708
+            - 24.9375
+          name: Within
+      - outcome:
           dest: Finding Helsinki
           feedback:
           - Close, but not quite. Helsinki is on the south coast of Finland; try looking
@@ -86,13 +78,27 @@ states:
           - That's not too far, but you can get closer! Try looking on the south coast
             of Finland.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Finding Helsinki
-          feedback:
-          - That is rather far away! Try zooming into Finland.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            d: 1100.0
+            p:
+            - 60.1708
+            - 24.9375
+          name: Within
+      customization_args:
+        latitude:
+          value: 60.1708
+        longitude:
+          value: 24.9375
+        zoom:
+          value: 2
+      default_outcome:
+        dest: Finding Helsinki
+        feedback:
+        - That is rather far away! Try zooming into Finland.
+        param_changes: []
       id: InteractiveMap
+      triggers: []
     param_changes: []
   Numeric input:
     content:
@@ -101,98 +107,90 @@ states:
         ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>?</div><div><br></div>"
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 121.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Finding Helsinki
           feedback:
           - 'Yes, that''s correct: 11 times 11 is 121.'
           param_changes: []
-        - definition:
-            inputs:
-              x: 121.0
-            name: IsLessThan
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 121.0
+          name: Equals
+      - outcome:
           dest: Estimate 100
           feedback:
           - Nope. Let's make a quick estimate.
           param_changes: []
-        - definition:
-            inputs:
-              tol: 9.0
-              x: 121.0
-            name: IsWithinTolerance
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 121.0
+          name: IsLessThan
+      - outcome:
           dest: Numeric input
           feedback:
           - You are actually very close. Think about the last digit of the answer;
             what must it be? Then you should be able to get it in one or two more
             goes.
           param_changes: []
-        - definition:
-            inputs:
-              x: 121.0
-            name: IsGreaterThan
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            tol: 9.0
+            x: 121.0
+          name: IsWithinTolerance
+      - outcome:
           dest: Numeric input
           feedback:
           - That's too high! Try guessing lower.
           param_changes: []
-        - definition:
-            inputs:
-              x: 121.0
-            name: IsLessThan
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 121.0
+          name: IsGreaterThan
+      - outcome:
           dest: Numeric input
           feedback:
           - That's not large enough. Try guessing higher?
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Numeric input
-          feedback:
-          - If you got here, something's gone a bit wrong with this exploration. Sorry
-            about that. If you're wondering, the answer is 121.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 121.0
+          name: IsLessThan
+      customization_args: {}
+      default_outcome:
+        dest: Numeric input
+        feedback:
+        - If you got here, something's gone a bit wrong with this exploration. Sorry
+          about that. If you're wondering, the answer is 121.
+        param_changes: []
       id: NumericInput
+      triggers: []
     param_changes: []
   Things you can do:
     content:
     - type: text
-      value: That's a very quick sample of Oppia. For more sample explorations, check
-        out the gallery .<div><br></div><div>If you want to add custom question types,
-        or run your own instance of Oppia, have a look at our code site:</div><div>&nbsp;
-        &nbsp;&nbsp;<br></div>&nbsp; &nbsp;&nbsp;<oppia-noninteractive-link open_link_in_same_window-with-value=""
-        url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link><div><br></div><div>You
-        can also create new explorations, like this one, by clicking on the "Create
-        a new exploration" button in the gallery.</div><br><div>We hope you enjoy
-        using Oppia. If you have feedback, let us know! You can find our discussion
-        forum at&nbsp;<oppia-noninteractive-link open_link_in_same_window-with-value=""
-        url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>.</div>
+      value: "That's a very quick sample of Oppia. For more sample explorations, check\
+        \ out the gallery .<div><br></div><div>If you want to add custom question\
+        \ types, or run your own instance of Oppia, have a look at our code site:</div><div>\_\
+        \ \_\_<br></div>\_ \_\_<oppia-noninteractive-link open_link_in_same_window-with-value=\"\
+        \" url-with-value=\"&amp;quot;https://code.google.com/p/oppia/&amp;quot;\"\
+        ></oppia-noninteractive-link><div><br></div><div>You can also create new explorations,\
+        \ like this one, by clicking on the \"Create a new exploration\" button in\
+        \ the gallery.</div><br><div>We hope you enjoy using Oppia. If you have feedback,\
+        \ let us know! You can find our discussion forum at\_<oppia-noninteractive-link\
+        \ open_link_in_same_window-with-value=\"\" url-with-value=\"&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;\"\
+        ></oppia-noninteractive-link>.</div>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Welcome!:
     content:
@@ -203,44 +201,40 @@ states:
         url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link>.<br><br>But
         first, do you know where the name 'Oppia' comes from?<br><br>
     interaction:
+      answer_groups:
+      - outcome:
+          dest: What language
+          feedback:
+          - Yes!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          name: Equals
+      - outcome:
+          dest: Welcome!
+          feedback:
+          - Actually, I don't know of any such characters, so I must confess to making
+            that choice up. Have another go?
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          name: Equals
       customization_args:
         choices:
           value:
           - It's translated from a different language.
           - It's a nonsense word that someone made up.
           - It's the name of a popular cartoon character.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: What language
-          feedback:
-          - Yes!
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Welcome!
-          feedback:
-          - Actually, I don't know of any such characters, so I must confess to making
-            that choice up. Have another go?
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: What language
-          feedback:
-          - Hm, it certainly looks like it! But it's actually a word from a different
-            language.
-          param_changes: []
+      default_outcome:
+        dest: What language
+        feedback:
+        - Hm, it certainly looks like it! But it's actually a word from a different
+          language.
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   What language:
     content:
@@ -255,32 +249,19 @@ states:
         2&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;Oppia is a Finnish word.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
         3&amp;quot;}]"></oppia-noninteractive-tabs><br>
     interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: greek
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: What language
           feedback:
           - That's a pretty good guess. Several Greek words end with 'ia', such as
             'thexia' and 'paralia'. But Oppia is not a Greek word, though it's from
             a country that's not too far away. Try again?
           param_changes: []
-        - definition:
-            inputs:
-              x: roman
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: greek
+          name: Equals
+      - outcome:
           dest: What language
           feedback:
           - There is indeed an ancient Roman law named Lex Oppia, which was instituted
@@ -290,12 +271,11 @@ states:
             this is admittedly a factual question which not many people will know
             the answer to.)
           param_changes: []
-        - definition:
-            inputs:
-              x: latin
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: roman
+          name: Contains
+      - outcome:
           dest: What language
           feedback:
           - There is indeed an ancient Roman law named Lex Oppia, which was instituted
@@ -305,44 +285,40 @@ states:
             this is admittedly a factual question which not many people will know
             the answer to.)
           param_changes: []
-        - definition:
-            inputs:
-              x: Swedish
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: latin
+          name: Contains
+      - outcome:
           dest: What language
           feedback:
           - That's not it, alas. But you're very close! Oppia is indeed a Nordic word,
             but it's not from Sweden.
           param_changes: []
-        - definition:
-            inputs:
-              x: translate oppia
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: Swedish
+          name: Equals
+      - outcome:
           dest: What language
           feedback:
           - 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into a
             search engine, such as Google.'
           param_changes: []
-        - definition:
-            inputs:
-              x: finish
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: translate oppia
+          name: Contains
+      - outcome:
           dest: What language
           feedback:
           - Not quite; that's actually the opposite of 'start'. Check your spelling!
           param_changes: []
-        - definition:
-            inputs:
-              x: finnish
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: finish
+          name: Equals
+      - outcome:
           dest: Numeric input
           feedback:
           - 'Yes! Oppia is the Finnish word for learn. As you can see, you''re not
@@ -351,55 +327,50 @@ states:
             even write your own types of questions. Here is a question that takes
             numeric input:'
           param_changes: []
-        - definition:
-            inputs:
-              x: finnish
-            name: FuzzyEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: finnish
+          name: Equals
+      - outcome:
           dest: What language
           feedback:
           - I think your spelling isn't quite right; you might want to check it.
           param_changes: []
-        - definition:
-            inputs:
-              x: 'yes'
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: finnish
+          name: FuzzyEquals
+      - outcome:
           dest: What language
           feedback:
           - Great, glad to hear that. Which language is it?
           param_changes: []
-        - definition:
-            inputs:
-              x: German
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 'yes'
+          name: Equals
+      - outcome:
           dest: What language
           feedback:
           - Nein! Ahem... no, it's not German. But it's a European language. From
             a place that's colder than Germany. Have another go?
           param_changes: []
-        - definition:
-            inputs:
-              x: French
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: German
+          name: Contains
+      - outcome:
           dest: What language
           feedback:
           - 'Mais non! Well, no, it''s not French. But it''s pretty close. Here, I''ll
             give you a hint: Oppia is a word from one of the Scandinavian countries.
             Can you guess which one?'
           param_changes: []
-        - definition:
-            inputs:
-              x: suomi
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: French
+          name: Contains
+      - outcome:
           dest: Numeric input
           feedback:
           - 'Yes! Suomi is Finnish for Finnish and Oppia is the Finnish word for learn.
@@ -408,35 +379,32 @@ states:
             strings, and so on. You can even write your own types of questions. Here
             is a question that takes numeric input:'
           param_changes: []
-        - definition:
-            inputs:
-              x: Finland
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: suomi
+          name: Equals
+      - outcome:
           dest: What language
           feedback:
           - Finland is a country. But what language do they speak there?<br>
           - That's very close! But we're looking for a language rather than the name
             of a country.<br>
           param_changes: []
-        - definition:
-            inputs:
-              x: Norway
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: Finland
+          name: Equals
+      - outcome:
           dest: What language
           feedback:
           - You're close! Try heading east...<br>
           - It is indeed a Nordic language, but one a little different to Norwegian.<br>
           param_changes: []
-        - definition:
-            inputs:
-              x: Sweden
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: Norway
+          name: Contains
+      - outcome:
           dest: What language
           feedback:
           - <span><span><span>That's not it, alas. But you're very close! Oppia is
@@ -444,16 +412,26 @@ states:
           - Try a little further East.... And remember we're looking for a language
             rather than the name of a country.<br>
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: What language
-          feedback:
-          - Sorry, nope, we didn't get it from {{answer}}. But you can find out lots
-            of things on the Web. Why not try doing a search for [translate oppia]
-            on your favorite search engine?
-          - Sorry, nope, we didn't get it from {{answer}}. Here's a hint, though.
-            It's a European language you're looking for.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Sweden
+          name: Contains
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: What language
+        feedback:
+        - Sorry, nope, we didn't get it from {{answer}}. But you can find out lots
+          of things on the Web. Why not try doing a search for [translate oppia] on
+          your favorite search engine?
+        - Sorry, nope, we didn't get it from {{answer}}. Here's a hint, though. It's
+          a European language you're looking for.
+        param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
+states_schema_version: 4
 tags: []

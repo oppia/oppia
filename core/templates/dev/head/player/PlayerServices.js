@@ -87,20 +87,18 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
 }]);
 
 // A service that, given an answer, classifies it and returns the corresponding
-// ruleSpec.
+// answerGroup.
 oppia.factory('answerClassificationService', [
     '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
   var _USE_CLIENT_SIDE_CLASSIFICATION = false;
 
   return {
     // Returns a promise with the corresponding ruleSpec.
-    getMatchingRuleSpec: function(explorationId, expParamSpecs, oldState, handler, answer) {
+    getMatchingClassificationResult: function(explorationId, oldState, answer) {
       if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
         var classifyUrl = '/explorehandler/classify/' + explorationId;
         return $http.post(classifyUrl, {
-          exp_param_specs: expParamSpecs,
           old_state: oldState,
-          handler: handler,
           params: learnerParamsService.getAllParams(),
           answer: answer
         });
@@ -202,7 +200,7 @@ oppia.factory('oppiaPlayerService', [
 
   var _onStateTransitionProcessed = function(
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
-      handler, successCallback) {
+      successCallback) {
     var oldStateName = _currentStateName;
     var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
 
@@ -435,7 +433,7 @@ oppia.factory('oppiaPlayerService', [
       }
       return ($('<div>').append(el)).html();
     },
-    submitAnswer: function(answer, handler, successCallback) {
+    submitAnswer: function(answer, successCallback) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -443,28 +441,29 @@ oppia.factory('oppiaPlayerService', [
       answerIsBeingProcessed = true;
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
-      answerClassificationService.getMatchingRuleSpec(
-        _explorationId, _exploration.param_specs, oldState, handler, answer
-      ).success(function(ruleSpec) {
+      answerClassificationService.getMatchingClassificationResult(
+        _explorationId, oldState, answer
+      ).success(function(classifyResult) {
+        var outcome = classifyResult['outcome'];
+
         if (!_editorPreviewMode) {
           var answerRecordingUrl = (
             '/explorehandler/answer_submitted_event/' + _explorationId);
           $http.post(answerRecordingUrl, {
             answer: answer,
-            handler: handler,
             params: learnerParamsService.getAllParams(),
             version: version,
             old_state_name: _currentStateName,
-            rule_spec: ruleSpec
+            rule_spec_string: classifyResult['rule_spec_string']
           });
         }
 
-        var newStateName = ruleSpec.dest;
+        var newStateName = outcome.dest;
 
         // Compute the data for the next state. This may be null if there are
         // malformed expressions.
         var nextStateData = stateTransitionService.getNextStateData(
-          ruleSpec,
+          outcome,
           _exploration.states[newStateName],
           answer);
 
@@ -474,7 +473,7 @@ oppia.factory('oppiaPlayerService', [
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
             nextStateData.question_html, nextStateData.feedback_html,
-            answer, handler, successCallback);
+            answer, successCallback);
         } else {
           answerIsBeingProcessed = false;
           warningsData.addWarning('Expression parsing error.');

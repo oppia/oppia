@@ -26,9 +26,7 @@ class ImageClickInput(base.BaseInteraction):
     description = 'Allows learners to click on regions of an image.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'ClickOnImage'
-    }]
+    _submit_handler = base.SubmitAnswerHandler('ClickOnImage')
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',

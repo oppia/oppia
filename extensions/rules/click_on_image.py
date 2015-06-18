@@ -23,7 +23,6 @@ from extensions.rules import base
 
 class IsInRegion(base.ClickOnImageRule):
     description = 'is in the region {{x|UnicodeString}}'
-    is_generic = False
 
     def _evaluate(self, subject):
         return self.x in subject['clickedRegions']
