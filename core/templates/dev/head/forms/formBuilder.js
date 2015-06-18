@@ -713,6 +713,8 @@ oppia.config(['$provide', function($provide) {
             event.preventDefault();
             var textAngular = this;
 
+            // Move the cursor to be immediately after the clicked widget.
+            // This prevents users from overwriting the widget.
             var elRange = rangy.createRange();
             elRange.setStartAfter($element.get(0));
             elRange.setEndAfter($element.get(0));
