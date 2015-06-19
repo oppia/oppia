@@ -29,6 +29,7 @@ skin_customizations:
         orientation:
           value: vertical
       gadget_id: AdviceBar
+      gadget_name: FinlandAdviceBar
       visible_in_states:
       - Example2
     right:
@@ -42,6 +43,7 @@ skin_customizations:
         orientation:
           value: vertical
       gadget_id: AdviceBar
+      gadget_name: ExampleAdviceBar
       visible_in_states:
       - Example1
     bottom: []

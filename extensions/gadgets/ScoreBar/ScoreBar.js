@@ -22,6 +22,11 @@
 
 oppia.directive('oppiaGadgetScoreBar', [
   'oppiaHtmlEscaper', 'learnerParamsService', function(oppiaHtmlEscaper, learnerParamsService) {
+
+    // Gadget height and width in pixels.
+    var _HEIGHT = 100;
+    var _WIDTH = 250;
+
     return {
       restrict: 'E',
       templateUrl: 'gadget/ScoreBar',
@@ -30,6 +35,37 @@ oppia.directive('oppiaGadgetScoreBar', [
         $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj($attrs.maxValueWithValue);
         $scope.scoreBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj($attrs.paramNameWithValue);
+
+        // @sll: How do we surface available learnerParamsService in a
+        // pulldown menu in the gadget editor view? We looked at how to do
+        // this in gadget_editor.html, but when we got into the details
+        // the only simple option appeared to be adding 1-off code specific to
+        // ScoreBars in gadget_editor.html.
+        //
+        // We considered rolling an entirely new custom html-binding method
+        // where any gadget can specify inputs it requires based on dynamic
+        // values in Angular services, but that seemed too complex to
+        // include in this already-big commit.  Is there a simple solution
+        // we're missing?
+
+        $scope.getWarnings = function() {
+          var params = learnerParamsService.getAllParams()
+          if ($scope.scoreBarParamName in params) {
+            return '';
+          } else {
+            var validationError = $scope.scoreBarParamName + ' is not yet ' +
+            'created as a parameter. Please create the parameter first.';
+            return validationError;
+          }
+        }
+
+        $scope.getHeight = function() {
+          return _HEIGHT;
+        }
+
+        $scope.getWidth = function () {
+          return _WIDTH;
+        }
 
         $scope.getScoreValue = function() {
           return learnerParamsService.getValue($scope.scoreBarParamName);

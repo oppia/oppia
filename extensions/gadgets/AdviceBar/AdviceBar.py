@@ -47,13 +47,13 @@ class AdviceBar(base.BaseGadget):
                     'type': 'dict',
                     'properties': [{
                         'name': 'adviceTitle',
-                        'description': 'Title for the tip.',
+                        'description': 'Tip title (visible on advice bar)',
                         'schema': {
                             'type': 'unicode',
                         },
                     }, {
                         'name': 'adviceHtml',
-                        'description': 'Advice shown on click. (HTML)',
+                        'description': 'Advice content (visible upon click)',
                         'schema': {
                             'type': 'html',
                         },
@@ -61,14 +61,6 @@ class AdviceBar(base.BaseGadget):
                 }
             },
             'default_value': []
-        }, {
-            'name': 'orientation',
-            'description': 'Whether to extend tips horizontally or vertically.',
-            'schema': {
-                'type': 'unicode',
-                'choices': ['horizontal', 'vertical']
-            },
-            'default_value': 'vertical'
         }
     ]
 
@@ -80,11 +72,6 @@ class AdviceBar(base.BaseGadget):
     _FIXED_AXIS_BASE_LENGTH = 100
     _STACKABLE_AXIS_BASE_LENGTH = 150
     _LENGTH_PER_ADVICE_RESOURCE = 100
-
-    # customization_args values that determine whether this AdviceBar should
-    # be extended along a horizontal or vertical axis.
-    _HORIZONTAL_AXIS = 'horizontal'
-    _VERTICAL_AXIS = 'vertical'
 
     def validate(self, customization_args):
         """Ensure AdviceBar retains reasonable config."""
@@ -112,15 +99,7 @@ class AdviceBar(base.BaseGadget):
         Args:
         - customization_args: list of CustomizationArgSpec instances.
         """
-        orientation = customization_args['orientation']['value']
-        if orientation == self._HORIZONTAL_AXIS:
-            return self._STACKABLE_AXIS_BASE_LENGTH + (
-                self._LENGTH_PER_ADVICE_RESOURCE * len(
-                    customization_args['adviceObjects']['value']))
-        elif orientation == self._VERTICAL_AXIS:
-            return self._FIXED_AXIS_BASE_LENGTH
-        else:
-            raise Exception('Unknown gadget orientation: %s' % orientation)
+        return self._FIXED_AXIS_BASE_LENGTH
 
     def get_height(self, customization_args):
         """Returns int representing height in pixels.
@@ -128,12 +107,6 @@ class AdviceBar(base.BaseGadget):
         Args:
         - customization_args: list of CustomizationArgSpec instances.
         """
-        orientation = customization_args['orientation']['value']
-        if orientation == self._VERTICAL_AXIS:
-            return self._STACKABLE_AXIS_BASE_LENGTH + (
-                self._LENGTH_PER_ADVICE_RESOURCE * len(
-                    customization_args['adviceObjects']['value']))
-        elif orientation == self._HORIZONTAL_AXIS:
-            return self._FIXED_AXIS_BASE_LENGTH
-        else:
-            raise Exception('Unknown gadget orientation: %s' % orientation)
+        return self._STACKABLE_AXIS_BASE_LENGTH + (
+            self._LENGTH_PER_ADVICE_RESOURCE * len(
+                customization_args['adviceObjects']['value']))

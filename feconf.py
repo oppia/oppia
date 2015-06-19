@@ -79,10 +79,6 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 # Name (and description) of the default rule.
 DEFAULT_RULE_NAME = 'Default'
 
-# Default valid parameter for instantiating Explorations when explicit
-# skin customizations aren't provided.
-DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
-
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # files.
@@ -118,6 +114,9 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+# A regular expression for alphanumeric characters allowing only one space in between.
+# Ex. 'valid name', 'invalid   name'
+ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 

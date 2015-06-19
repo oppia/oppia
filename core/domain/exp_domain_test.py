@@ -45,7 +45,10 @@ param_changes: []
 param_specs: {}
 schema_version: 6
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
+    left: []
+    right: []
 states:
   %s:
     content:
@@ -109,6 +112,7 @@ skin_customizations:
           title:
             value: The Test Gadget!
         gadget_id: TestGadget
+        gadget_name: ATestGadget
         visible_in_states:
           - New state
           - Second state
@@ -189,6 +193,18 @@ TEST_GADGETS = {
     }
 }
 
+TEST_GADGET_CUSTOMIZATION_ARGS = {
+    'characters': {'value': 2},
+    'floors': {'value': 1},
+    'title': {'value': 'The Test Gadget!'}
+}
+
+TEST_GADGET_DICT = {
+    'gadget_id': 'TestGadget',
+    'gadget_name': 'ATestGadget',
+    'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS,
+    'visible_in_states': ['First state']
+}
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -380,7 +396,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
 
-        invalid_gadget_instance = exp_domain.GadgetInstance('bad_ID', [], {})
+        invalid_gadget_instance = exp_domain.GadgetInstance(
+            'bad_ID', 'aUniqueGadgetName', [], {})
         with self.assertRaisesRegexp(
                  utils.ValidationError,
                  'Unknown gadget with ID bad_ID is not in the registry.'):
@@ -388,7 +405,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
             gadget_instance = exploration.skin_instance.panel_contents_dict[
-            'left'][0]
+                'left'][0]
 
             # Force a GadgetInstance to require certain state names.
             gadget_instance.visible_in_states.extend(['DEF', 'GHI'])
@@ -411,6 +428,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.states['GHI'] = ghi_state
             exploration.validate()
 
+            exploration.skin_instance.panel_contents_dict['right'].append(
+                gadget_instance)
+            with self.assertRaisesRegexp(
+                    utils.ValidationError,
+                    'ATestGadget gadget instance name must be unique.'):
+                exploration.validate()
+            exploration.skin_instance.panel_contents_dict['right'].pop()
+
             gadget_instance.visible_in_states.extend(['GHI'])
             with self.assertRaisesRegexp(
                     utils.ValidationError,
@@ -429,6 +454,75 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'non_existent_panel panel not found in skin conversation_v1'):
                 exploration.validate()
 
+    def test_gadget_name_validation(self):
+        """Test that gadget naming conditions validate properly."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+
+        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
+            gadget_instance = exploration.skin_instance.panel_contents_dict[
+                'left'][0]
+            gadget_instance.validate()
+
+            gadget_instance.name = ''
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget name must not be an empty string.'):
+                gadget_instance.validate()
+
+            gadget_instance.name = 0
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget name must be a string. Received type: int'):
+                gadget_instance.validate()
+
+            gadget_instance.name = 'ASuperLongGadgetNameThatExceedsTheLimit'
+            max_length = exp_domain.GadgetInstance._MAX_GADGET_NAME_LENGTH
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'ASuperLongGadgetNameThatExceedsTheLimit gadget name'
+                     ' exceeds maximum length of %d' % max_length):
+                gadget_instance.validate()
+
+            gadget_instance.name = 'VERYGADGET!'
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget names must be alphanumeric. Spaces are allowed.'
+                     ' Received: VERYGADGET!'):
+                gadget_instance.validate()
+
+            gadget_instance.name = 'Name with \t tab'
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget names must be alphanumeric. Spaces are allowed.'
+                     ' Received: Name with \t tab'):
+                gadget_instance.validate()
+
+            gadget_instance.name = 'Name with \n newline'
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget names must be alphanumeric. Spaces are allowed.'
+                     ' Received: Name with \n newline'):
+                gadget_instance.validate()
+
+            gadget_instance.name = 'Name with   3 space'
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget names must be alphanumeric. Spaces are allowed.'
+                     ' Received: Name with   3 space'):
+                gadget_instance.validate()
+
+            gadget_instance.name = ' untrim whitespace '
+            with self.assertRaisesRegexp(
+                     utils.ValidationError,
+                     'Gadget names must be alphanumeric. Spaces are allowed.'
+                     ' Received:  untrim whitespace '):
+                gadget_instance.validate()
+
+            # Names with spaces and number should pass.
+            gadget_instance.name = 'Space and 1'
+            gadget_instance.validate()
+
     def test_exploration_get_gadget_ids(self):
         """Test that Exploration.get_gadget_ids returns apt results."""
         exploration_without_gadgets = exp_domain.Exploration.from_yaml(
@@ -442,7 +536,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ['TestGadget']
         )
 
-        another_gadget = exp_domain.GadgetInstance('AnotherGadget', [], {})
+        another_gadget = exp_domain.GadgetInstance(
+            'AnotherGadget', 'GadgetUniqueName1', [], {}
+        )
         exploration_with_gadgets.skin_instance.panel_contents_dict[
             'right'].append(another_gadget)
         self.assertEqual(
@@ -804,7 +900,10 @@ param_changes: []
 param_specs: {}
 schema_version: 5
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
+    left: []
+    right: []
 states:
   (untitled state):
     content:
@@ -860,7 +959,10 @@ param_changes: []
 param_specs: {}
 schema_version: 6
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
+    left: []
+    right: []
 states:
   (untitled state):
     content:
@@ -1014,7 +1116,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'param_specs': {},
-            'skin_customizations': feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
+            'skin_customizations': (
+                exp_domain.SkinInstance._default_skin_customizations(
+                    exploration.default_skin)
+            ),
         })
 
 
@@ -1118,6 +1223,60 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertNotIn('END', exploration.states)
 
 
+class GadgetOperationsUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on gadgets."""
+
+    def test_gadget_operations(self):
+        """Test deletion of gadgets."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+
+        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
+            exploration.add_gadget(TEST_GADGET_DICT, 'left')
+
+        self.assertEqual(exploration.skin_instance.panel_contents_dict[
+            'left'][0].id, TEST_GADGET_DICT['gadget_id'])
+        self.assertEqual(exploration.skin_instance.panel_contents_dict[
+            'left'][0].name, TEST_GADGET_DICT['gadget_name'])
+
+        with self.assertRaisesRegexp(
+                ValueError, 'Gadget NotARealGadget does not exist.'):
+            exploration.rename_gadget('NotARealGadget', 'ANewName')
+
+        exploration.rename_gadget(TEST_GADGET_DICT['gadget_name'], 'ANewName')
+        self.assertEqual(exploration.skin_instance.panel_contents_dict[
+            'left'][0].name, 'ANewName')
+
+        # Add another gadget on the right.
+        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
+            exploration.add_gadget(TEST_GADGET_DICT, 'right')
+
+        self.assertEqual(
+            exploration._gadget_names,
+            ['ANewName', 'ATestGadget']
+        )
+
+        with self.assertRaisesRegexp(
+                ValueError, 'Duplicate gadget name: ANewName'):
+            exploration.rename_gadget('ATestGadget', 'ANewName')
+
+        gadget_instance = exploration.get_gadget_instance_by_name('ANewName')
+        self.assertIs(
+            exploration.skin_instance.panel_contents_dict['left'][0],
+            gadget_instance
+        )
+
+        panel_name = exploration._get_panel_name_for_gadget('ANewName')
+        self.assertEqual(panel_name, 'left')
+
+        exploration.delete_gadget('ANewName')
+        self.assertEqual(exploration.skin_instance.panel_contents_dict[
+            'left'], [])
+        with self.assertRaisesRegexp(
+                ValueError, 'Gadget ANewName does not exist.'):
+            exploration.delete_gadget('ANewName')
+
+
 class SkinInstanceUnitTests(test_utils.GenericTestBase):
     """Test methods for SkinInstance."""
 
@@ -1128,11 +1287,9 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
                 'bottom': [],
                 'left': [
                     {
-                        'customization_args': {
-                            'characters': {'value': 2},
-                            'floors': {'value': 1},
-                            'title': {'value': 'The Test Gadget!'}},
+                        'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS,
                         'gadget_id': 'TestGadget',
+                        'gadget_name': 'ATestGadget',
                         'visible_in_states': ['New state', 'Second state']
                     }
                 ],
@@ -1149,6 +1306,12 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skin_instance.get_state_names_required_by_gadgets(),
             ['New state', 'Second state'])
+
+    def test_generation_of_default_skin_customizations(self):
+        """Tests that default skin customizations are created properly."""
+        skin_instance = exp_domain.SkinInstance('conversation_v1')
+        self.assertEqual(skin_instance.panel_contents_dict,
+            {'bottom': [], 'left': [], 'right': []})
 
     def test_conversion_of_skin_to_and_from_dict(self):
         """Tests conversion of SkinInstance to and from dict representations."""
@@ -1224,7 +1387,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
             with self.assertRaisesRegexp(
                     utils.ValidationError,
-                    'Size exceeded: left panel width of 4600 exceeds limit of 100'):
+                    'Size exceeded: left panel width of 4600 exceeds limit of '
+                    '100'):
                 exploration.validate()
 
         # Assert internal validation against CustomizationArgSpecs.
@@ -1239,7 +1403,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict['left'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                "'left' panel expected at most 1 gadget, but 2 gadgets are visible in state 'New state'."):
+                "'left' panel expected at most 1 gadget, but 2 gadgets are "
+                "visible in state 'New state'."):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any
@@ -1263,18 +1428,9 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
             test_gadget_as_dict,
             {
                 'gadget_id': 'TestGadget',
+                'gadget_name': 'ATestGadget',
                 'visible_in_states': ['New state', 'Second state'],
-                'customization_args': {
-                    'title': {
-                        'value': 'The Test Gadget!'
-                    },
-                    'characters': {
-                        'value': 2
-                    },
-                    'floors': {
-                        'value': 1
-                    }
-                }
+                'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS
             }
         )
 
@@ -1287,3 +1443,65 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
             test_gadget_as_instance.customization_args['title']['value'],
             'The Test Gadget!'
         )
+
+
+class GadgetStateSynchronizationUnitTests(test_utils.GenericTestBase):
+    """Tests methods instantiating and validating GadgetInstances."""
+
+    def test_retrieving_affected_gadgets(self):
+        """Test that appropriate gadgets are retrieved."""
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+
+        affected_gadget_instances = (
+            exploration._get_gadget_instances_visible_in_state('Second state')
+        )
+
+        self.assertEqual(len(affected_gadget_instances), 1)
+        self.assertEqual(affected_gadget_instances[0].name, 'ATestGadget')
+
+    def test_gadget_visibility_on_state_rename(self):
+        """Test that gadget visibility is in sync when states are renamed."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+
+        gadget_instance = (
+            exploration._get_gadget_instances_visible_in_state(
+                'Second state')[0])
+
+        self.assertEqual(
+            gadget_instance.visible_in_states,
+            ['New state', 'Second state'])
+
+        exploration.rename_state('Second state', 'new second state')
+
+        self.assertEqual(
+            gadget_instance.visible_in_states,
+            ['New state', 'new second state'])
+
+    def test_gadget_visibility_on_state_deletion(self):
+        """Test that gadget visibility is in sync when states are deleted."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
+
+        gadget_instance = (
+            exploration._get_gadget_instances_visible_in_state(
+                'Second state')[0])
+
+        self.assertEqual(
+            gadget_instance.visible_in_states,
+            ['New state', 'Second state'])
+
+        exploration.delete_state('New state')
+
+        self.assertEqual(
+            gadget_instance.visible_in_states,
+            ['Second state'])
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            "Deleting 'Second state' state leaves 'ATestGadget' gadget "
+            'with no visible states. This is not currently supported and '
+            'should be handled with editor guidance on the front-end.'):
+            exploration.delete_state('Second state')
