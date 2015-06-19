@@ -519,8 +519,8 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-    '$filter', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-    function($filter, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+    '$filter', '$log', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+    function($filter, $log, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
 
   var _RICH_TEXT_COMPONENTS = [];
 
@@ -712,6 +712,15 @@ oppia.config(['$provide', function($provide) {
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
+
+            // Move the cursor to be immediately after the clicked widget.
+            // This prevents users from overwriting the widget.
+            var elRange = rangy.createRange();
+            elRange.setStartAfter($element.get(0));
+            elRange.setEndAfter($element.get(0));
+            var elSelection = rangy.getSelection();
+            elSelection.removeAllRanges();
+            elSelection.addRange(elRange);
             var savedSelection = rangy.saveSelection();
 
             _openCustomizationModal(
