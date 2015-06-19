@@ -153,6 +153,13 @@ p {
   margin: 1.4em 0;
 }
 
+.oppia-long-text-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
 #wrapper {
   min-height: 100%;
   position: relative;
