@@ -40,18 +40,18 @@
 
   <div ng-if="isEditable && ruleEditorIsOpen">
     <form role="form" class="form-inline protractor-test-edit-rule-details" name="editRuleForm">
-      <rule-details-editor rule="rule" outcome="outcome" is-default-rule="isDefaultRule">
+      <rule-details-editor rule="rule" outcome="outcome" is-default-rule="isDefaultRule()">
       </rule-details-editor>
     </form>
 
     <br>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="!isDefaultRule" ng-click="deleteThisRule()">Delete Rule</button>
+      <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
 
       <div class="pull-right">
         <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(!isDefaultRule && !rule.name) || editRuleForm.$invalid || isRuleEmpty(outcome)" ng-click="saveThisRule()">Save Rule</button>
+        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(!isDefaultRule() && !rule.name) || editRuleForm.$invalid || isRuleEmpty(outcome)" ng-click="saveThisRule()">Save Rule</button>
       </div>
 
       <div style="clear: both;"></div>
@@ -64,12 +64,12 @@
     <div class="oppia-rule-details-header">
       <strong>Rule</strong>
     </div>
-    <span ng-if="!isDefaultRule">
-      <rule-description-editor current-rule="rule" is-default-rule="isDefaultRule">
+    <span ng-if="!isDefaultRule()">
+      <rule-description-editor current-rule="rule" is-default-rule="isDefaultRule()">
       </rule-description-editor>
     </span>
 
-    <span ng-if="isDefaultRule">
+    <span ng-if="isDefaultRule()">
       <span ng-if="currentInteractionId === 'Continue'">
         When the button is clicked...
       </span>

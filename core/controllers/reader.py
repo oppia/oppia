@@ -93,7 +93,7 @@ def require_playable(handler):
 def classify(exp_id, state, answer, params):
     """Normalize the answer and classify it among the answer groups of the given
     state. Returns a dict with the following keys:
-        'outcome': The AnswerOutcome of the answer group matched.
+        'outcome': The InteractionOutcome of the answer group matched.
         'rule_spec_string': A descriptive string representation of the rule
             matched.
     When the default rule is matched, outcome is the default_outcome of the
@@ -297,6 +297,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             exploration_id, version, old_state_name, rule_spec_string,
             old_interaction_instance.get_stats_log_html(
                 old_interaction.customization_args, normalized_answer))
+        self.render_json({})
 
 
 class StateHitEventHandler(base.BaseHandler):

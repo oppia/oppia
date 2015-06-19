@@ -127,7 +127,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
           if ($scope.isEditable) {
-            if (!$scope.isDefaultRule) {
+            if (!$scope.isDefaultRule()) {
               $scope.ruleNameMemento = angular.copy($scope.rule.name);
               $scope.ruleInputsMemento = angular.copy($scope.rule.inputs);
             } else {
@@ -158,7 +158,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
         $scope.cancelThisEdit = function() {
           $scope.ruleEditorIsOpen = false;
-          if (!$scope.isDefaultRule) {
+          if (!$scope.isDefaultRule()) {
             $scope.rule.name = angular.copy($scope.ruleNameMemento);
             $scope.rule.inputs = angular.copy($scope.ruleInputsMemento);
           }
@@ -513,7 +513,7 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
 
       $scope.init = function() {
         // Select a default rule name, if one isn't already selected.
-        if (!$scope.isDefaultRule && $scope.currentRule.name === null) {
+        if (!$scope.isDefaultRule() && $scope.currentRule.name === null) {
           var ruleNamesToDescriptions = INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions;
           for (var ruleName in ruleNamesToDescriptions) {
             if ($scope.currentRule.name === null || ruleName < $scope.currentRule.name) {

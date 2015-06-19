@@ -76,9 +76,6 @@ DEFAULT_INIT_STATE_NAME = 'First State'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
-# Name (and description) of the default rule.
-DEFAULT_RULE_NAME = 'Default'
-
 # Default valid parameter for instantiating Explorations when explicit
 # skin customizations aren't provided.
 DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}

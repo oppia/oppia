@@ -174,8 +174,7 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(json_response, expect_errors=False)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
-                  expected_status_int=200, upload_files=None,
-                  expect_response=True):
+                  expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -186,11 +185,8 @@ class TestBase(unittest.TestCase):
             upload_files=upload_files)
 
         self.assertEqual(json_response.status_int, expected_status_int)
-        if expect_response:
-            return self._parse_json_response(
-                json_response, expect_errors=expect_errors)
-        else:
-            return None
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def put_json(self, url, payload, csrf_token=None, expect_errors=False,
                  expected_status_int=200):
@@ -354,7 +350,7 @@ class TestBase(unittest.TestCase):
                 'version': exploration.version,
                 'old_state_name': state_name,
                 'rule_spec_string': classify_result['rule_spec_string']
-            }, expect_response=False
+            }
         )
 
         # Now the next state's data must be calculated.
