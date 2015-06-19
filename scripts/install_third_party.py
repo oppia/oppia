@@ -173,29 +173,34 @@ UI_BOOTSTRAP_FILES = [
     for suffix in ['js', 'min.js']]
 
 MATERIAL_DESIGN_ICONS_REV = '1.0.1'
+MATERIAL_DESIGN_ICONS_URL_PREFIX = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s' %
+    MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_ACTION_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/action/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
+    '%s/action/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
 MATERIAL_DESIGN_ICONS_COMMUNICATION_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/communication/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
+    '%s/communication/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
 MATERIAL_DESIGN_ICONS_CONTENT_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/content/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
+    '%s/content/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
+MATERIAL_DESIGN_ICONS_FILE_URL = (
+    '%s/file/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
 MATERIAL_DESIGN_ICONS_NAVIGATION_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/navigation/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
+    '%s/navigation/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
 MATERIAL_DESIGN_ICONS_SOCIAL_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/social/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
+    '%s/social/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR,
     'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICON_ACTION_FILES = ['ic_info_black_48dp.png', 'ic_help_black_48dp.png', 'ic_home_black_48dp.png']
+MATERIAL_DESIGN_ICON_ACTION_FILES = [
+    'ic_info_black_48dp.png', 'ic_help_black_48dp.png',
+    'ic_home_black_48dp.png']
 MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
-MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
+MATERIAL_DESIGN_ICON_CONTENT_FILES = [
+    'ic_link_black_48dp.png', 'ic_save_black_48dp.png']
+MATERIAL_DESIGN_ICON_FILE_FILES = ['ic_cloud_upload_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
-    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png', 'ic_close_black_48dp.png']
+    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png',
+    'ic_close_black_48dp.png']
 MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png']
 
 # Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
@@ -252,6 +257,9 @@ download_files(
 download_files(
     MATERIAL_DESIGN_ICONS_CONTENT_URL, MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_CONTENT_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_FILE_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_FILE_FILES)
 download_files(
     MATERIAL_DESIGN_ICONS_NAVIGATION_URL, MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_NAVIGATION_FILES)

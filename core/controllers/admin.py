@@ -86,6 +86,8 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
+        demo_exploration_ids = [
+            ind for ind in enumerate(feconf.DEMO_EXPLORATIONS)]
         demo_explorations = [
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
@@ -124,6 +126,7 @@ class AdminPage(base.BaseHandler):
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
             'demo_explorations': demo_explorations,
+            'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),

@@ -222,6 +222,8 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           if (stateData[stateIds[change.state_name]].stateProperty == STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[change.state_name]].stateProperty = STATE_PROPERTY_CHANGED;
           }
+        } else if (change.cmd == 'migrate_states_schema_to_latest_version') {
+          // Nothing to display to the user for a migration change.
         } else if (change.cmd != 'AUTO_revert_version_number' && change.cmd != 'edit_exploration_property') {
           throw new Error('Invalid change command: ' + change.cmd);
         }
@@ -269,8 +271,6 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
    */
   function _compareLinks(v1States, originalStateIds, v2States, newestStateIds) {
     links = [];
-    originalStateIds[END_DEST] = _generateNewId();
-    newestStateIds[END_DEST] = _maxId;
     var adjMatrixV1 = _getAdjMatrix(v1States, originalStateIds, _maxId);
     var adjMatrixV2 = _getAdjMatrix(v2States, newestStateIds, _maxId);
 
@@ -376,6 +376,25 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           }
         }
 
+        // Track whether terminal nodes in v1 or v2
+        // TODO(bhenning): could show changes to terminal nodes in diff
+        var finalStateIds = [];
+        for (var stateId in statesData) {
+          var oldState = v1States[statesData[stateId].originalStateName];
+          var newState = v2States[statesData[stateId].newestStateName];
+          var oldStateIsTerminal = false;
+          var newStateIsTerminal = false;
+          if (oldState) {
+            oldStateIsTerminal = (oldState.interaction.id == 'EndExploration');
+          }
+          if (newState) {
+            newStateIsTerminal = (newState.interaction.id == 'EndExploration');
+          }
+          if (oldStateIsTerminal || newStateIsTerminal) {
+            finalStateIds.push(stateId);
+          }
+        }
+
         var links = _compareLinks(v1States, originalStateIds, v2States, stateIds);
 
         return {
@@ -383,7 +402,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           'links': links,
           'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
           'v2InitStateId': stateIds[response.v2Data.data.init_state_name],
-          'endStateId': stateIds[END_DEST]
+          'finalStateIds': finalStateIds
         };
       });
     }

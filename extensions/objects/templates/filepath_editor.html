@@ -6,12 +6,7 @@
   }
 </style>
 
-<div ng-if="!hasExplorationId()">
-  Warning: The file picker does not work outside the context of an exploration.
-</div>
-
-<div ng-if="hasExplorationId()" ng-model="localValue"
-     ui-validate="'validate($value)'">
+<div ng-model="localValue" ui-validate="'validate($value)'">
   <div ng-show="!imageUploaderIsActive">
     <div ng-if="!filepathsLoaded">
       <span class="text-align: center; width: 50px;">

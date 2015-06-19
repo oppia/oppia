@@ -3,6 +3,71 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v2.0.0.rc.3 (11 Jun 2015)
+-------------------------
+Sitewide frontend changes:
+* Add a new rich-text editor based on textAngular. Deprecate the previous jWysiwyg rich-text editor.
+* Update page titles to list the page name before the site name.
+* Add a link to the home page in the left sidebar.
+
+Splash/gallery page:
+* Change the width of the category input field in the exploration creation modal to 100%.
+* Fix a bug which caused recently-updated explorations to not show higher in the gallery.
+* Ensure that gallery rankings are never negative.
+
+Learner page:
+* Make cards have a width of 95%, so that they show up properly on small screens.
+
+Editor page:
+* Use icons for save/publish buttons in the exploration editor if the window width is small.
+* Rename the 'Add Interaction' button to 'Add Interaction / End Conversation'.
+* Fix a grammatical error in some rule warning messages.
+* Amend the "path to end state" error message to reflect the fact that there is no longer an explicit END state.
+* Increase the line spacing in the customization dialogs for both interactions and RTE extensions.
+* Arrange state names in the rule destination selector in the order that they appear in the state graph.
+* Reset float input fields when the rule containing them is changed.
+* Fix issue 764: do not show unhandled answers for the Continue interaction.
+* Fix preformatting text having inconsistent wrapping in the popup dialog for long unhandled answers.
+* In the editor settings tab, use a category dropdown similar to the modal in the gallery page.
+* In the history tab, use grids to display the commit history, and display the commit time in localized format.
+* Fix issue 789: in the feedback tab, clear the input field after a new message is submitted.
+
+'My Explorations' page:
+* Include published exploration that subsequently become community-owned.
+* Fix issue 724: add a realtime model for feedback analytics.
+
+Rich-text editor extensions:
+* Prevent recursive nesting of the 'collapsible' and 'tabs' RTE extensions.
+* Image: allow alt text to be specified.
+
+Interactions:
+* EndExploration: do not show a blank card in iframed mode (issue 804).
+* ImageClickInput: center the image and make it look clickable.
+* NumericInput: fix a bug where 0 was not accepted as an answer.
+* InteractiveMap: use a map (instead of latitude/longitude fields) to specify rule location.
+* SetInput: fix set input display not showing up in the rule editor, and add a warning for duplicates.
+
+Infrastructure:
+* Implement a generic exploration migration system.
+* In the exploration backend, remove the pseudo END state and add a placeholder field for state triggers.
+* Upgrade the version of the Google App Engine development SDK to v1.9.19.
+* Upgrade the version of ui-bootstrap to v0.13.0.
+* Amend the deployment script to support deployment to App Engine instances within a particular domain.
+* Add a storage model for completion events, and record completion events in this model instead of the one for MaybeLeave events. Add a migration job to migrate existing completion events from MaybeLeave to the new model.
+
+Analytics:
+* Fix some errors in the StatisticsAggregator computation.
+
+Integrations:
+* Fix issue 167: Add instructions and an XML file to support embedding of explorations in Google Sites pages.
+
+Demo explorations:
+* Update the schema versions for the demo explorations.
+
+Security:
+* Add a layer of HTML cleansing before loading an exploration.
+
+
 v2.0.0.rc.2 (24 Apr 2015)
 -------------------------
 Splash/gallery page:

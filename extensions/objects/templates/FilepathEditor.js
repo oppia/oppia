@@ -13,11 +13,11 @@
 // limitations under the License.
 
 
-// This directive is always editable. No 'save' button needs to be clicked.
+// This directive can only be used in the context of an exploration.
 
-oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, warningsData) {
-  // Editable filepath directive. This can only be used in the context of an
-  // exploration.
+oppia.directive('filepathEditor', [
+    '$compile', '$http', '$sce', 'warningsData', 'explorationContextService',
+    function($compile, $http, $sce, warningsData, explorationContextService) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
@@ -36,24 +36,11 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
         $scope.imageUploaderIsActive = false;
       });
 
-      $scope.explorationId = $rootScope.explorationId;
+      $scope.explorationId = explorationContextService.getExplorationId();
 
       $scope.validate = function(localValue) {
         return localValue.label && localValue.label.length > 0;
       };
-
-      $scope.hasExplorationId = function() {
-        if ($scope.explorationId === null || $scope.explorationId === undefined) {
-          return false;
-        }
-        return true;
-      };
-
-      if (!$scope.explorationId) {
-        warningsData.addWarning(
-          'The file picker can only be used in the context of an exploration.');
-        return;
-      }
 
       $scope.$watch('localValue.label', function(newValue, oldValue) {
         if (newValue) {
@@ -166,4 +153,4 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       });
     }
   };
-});
+}]);

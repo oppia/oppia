@@ -53,8 +53,11 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
-# The id and name for the final state of an exploration.
-END_DEST = 'END'
+# The current version of the exploration states blob schema. If any backward-
+# incompatible changes are made to the states blob schema in the data store,
+# this version number must be changed and the exploration migration job
+# executed.
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 3
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
@@ -296,10 +299,11 @@ EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
 EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
-# The values for these two event types should be left as-is for backwards
+# The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
+EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'

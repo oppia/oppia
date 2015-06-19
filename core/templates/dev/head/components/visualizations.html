@@ -38,8 +38,8 @@
       -o-transition: all 0.15s;
       transition: all 0.15s;
     }
-    .oppia-graph-viz .node rect.end-node {
-      fill: green;
+    .oppia-graph-viz .node rect.terminal-node {
+      fill: green; /* terminal nodes are green to signify them */
     }
     .oppia-graph-viz .node rect.bad-node {
       fill: #F35F55;
@@ -110,9 +110,8 @@
                   </text>
                 </g>
                 <g ng-if="highlightStates && isStateFlagged(node.id)">
-                  <rect ng-click="onClickFunction(node.id)" class="highlight"
+                  <rect ng-click="onClickFunction(node.id)" class="highlight clickable"
                         width="22" height="22" ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                        ng-class="{clickable: node.id != 'END'}"
                         ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"

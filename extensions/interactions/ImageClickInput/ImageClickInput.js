@@ -21,7 +21,8 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$rootScope', '$sce', 'oppiaHtmlEscaper', function($rootScope, $sce, oppiaHtmlEscaper) {
+  '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
+  function($sce, oppiaHtmlEscaper, explorationContextService) {
     return {
       restrict: 'E',
       scope: {},
@@ -34,7 +35,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
         $scope.imageUrl = (
           $scope.filepath ?
           $sce.trustAsResourceUrl(
-            '/imagehandler/' + $rootScope.explorationId + '/' +
+            '/imagehandler/' + explorationContextService.getExplorationId() + '/' +
             encodeURIComponent($scope.filepath)) :
           null);
         $scope.mouseX = 0;

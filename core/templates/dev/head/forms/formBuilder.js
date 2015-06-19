@@ -490,33 +490,82 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
   };
 }]);
 
+oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
+  var _EXTENSION_SELECTOR = '[class^=oppia-noninteractive-]';
 
-// Add RTE extensions to textAngular toolbar options.
-oppia.config(['$provide', function($provide) {
-  $provide.decorator('taOptions', [
-      '$delegate', '$modal', '$filter', '$timeout',
-      'taRegisterTool', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
-      function(
-        taOptions, $modal, $filter, $timeout,
-        taRegisterTool, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
+  return function(html) {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
 
-    taOptions.disableSanitizer = true;
-    taOptions.classes.textEditor = 'form-control oppia-rte-content';
-    taOptions.toolbar = [
-      ['bold', 'italics', 'underline'],
-      ['ol', 'ul'],
-      []
-    ];
-    taOptions.setup.textEditorSetup = function($element) {
-      $timeout(function() {
-        $element.trigger('focus');
-      });
-    };
+    // Save the unsanitized extensions.
+    var unsanitizedExtensions = $(wrapper).find(_EXTENSION_SELECTOR);
 
-    var _RICH_TEXT_COMPONENTS = [];
+    wrapper.innerHTML = $sanitize(wrapper.innerHTML);
+    var sanitizedExtensions = $(wrapper).find(_EXTENSION_SELECTOR);
+    for (var i = 0; i < sanitizedExtensions.length; i++) {
+      var el = sanitizedExtensions[i];
+      var attrs = unsanitizedExtensions[i].attributes;
+      for (var j = 0; j < attrs.length; j++) {
+        var attr = attrs[j];
+        // Reinstate the sanitized widget attributes.
+        if (attr.name.indexOf('-with-value') !== -1 && !el.hasAttribute(attr.name)) {
+          el.setAttribute(attr.name, attr.value);
+        }
+      }
+    }
 
+    return wrapper.innerHTML;
+  }
+}]);
+
+oppia.factory('rteHelperService', [
+    '$filter', '$log', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+    function($filter, $log, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+
+  var _RICH_TEXT_COMPONENTS = [];
+
+  Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
+    _RICH_TEXT_COMPONENTS.push({
+      backendName: RTE_COMPONENT_SPECS[componentId].backend_name,
+      customizationArgSpecs: angular.copy(
+        RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
+      name: RTE_COMPONENT_SPECS[componentId].frontend_name,
+      iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
+      isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+      tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
+    });
+  });
+
+  var _createCustomizationArgDictFromAttrs = function(attrs) {
+    var customizationArgsDict = {};
+    for (var i = 0; i < attrs.length; i++) {
+      var attr = attrs[i];
+      if (attr.name == 'class' || attr.name == 'src' || attr.name == '_moz_resizing') {
+        continue;
+      }
+      var separatorLocation = attr.name.indexOf('-with-value');
+      if (separatorLocation === -1) {
+        $log.error('RTE Error: invalid customization attribute ' + attr.name);
+        continue;
+      }
+      var argName = attr.name.substring(0, separatorLocation);
+      customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
+    }
+    return customizationArgsDict;
+  };
+
+  return {
+    createCustomizationArgDictFromAttrs: function(attrs) {
+      return _createCustomizationArgDictFromAttrs(attrs);
+    },
+    createToolbarIcon: function(componentDefn) {
+      var el = $('<img/>');
+      el.attr('src', componentDefn.iconDataUrl);
+      el.addClass('oppia-rte-toolbar-image');
+      return el.get(0);
+    },
     // Returns a DOM node.
-    var createRteElement = function(componentDefn, customizationArgsDict) {
+    createRteElement: function(componentDefn, customizationArgsDict) {
       var el = $('<img/>');
       el.attr('src', componentDefn.iconDataUrl);
       el.addClass('oppia-noninteractive-' + componentDefn.name);
@@ -528,42 +577,88 @@ oppia.config(['$provide', function($provide) {
       }
 
       return el.get(0);
+    },
+    // Replace <oppia-noninteractive> tags with <img> tags.
+    convertHtmlToRte: function(html) {
+      var elt = $('<div>' + html + '</div>');
+      var that = this;
+
+      _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+          return that.createRteElement(
+            componentDefn, _createCustomizationArgDictFromAttrs(this.attributes));
+        });
+      });
+
+      return elt.html();
+    },
+    // Replace <img> tags with <oppia-noninteractive> tags.
+    convertRteToHtml: function(rte) {
+      var elt = $('<div>' + rte + '</div>');
+
+      _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+        elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
+          var jQueryElt = $('<' + this.className + '/>');
+          for (var i = 0; i < this.attributes.length; i++) {
+            var attr = this.attributes[i];
+            if (attr.name !== 'class' && attr.name !== 'src') {
+              jQueryElt.attr(attr.name, attr.value);
+            }
+          }
+          return jQueryElt.get(0);
+        });
+      });
+
+      return elt.html();
+    },
+    getRichTextComponents: function() {
+      return angular.copy(_RICH_TEXT_COMPONENTS);
+    }
+  };
+}]);
+
+// Add RTE extensions to textAngular toolbar options.
+oppia.config(['$provide', function($provide) {
+  $provide.decorator('taOptions', [
+      '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
+      'rteHelperService',
+      function(
+        taOptions, $modal, $timeout, focusService, taRegisterTool,
+        rteHelperService) {
+
+    taOptions.disableSanitizer = true;
+    taOptions.classes.textEditor = 'form-control oppia-rte-content';
+    taOptions.setup.textEditorSetup = function($element) {
+      $timeout(function() {
+        $element.trigger('focus');
+      });
     };
 
-    var createCustomizationArgDictFromAttrs = function(attrs) {
-      var customizationArgsDict = {};
-      for (var i = 0; i < attrs.length; i++) {
-        var attr = attrs[i];
-        if (attr.name == 'class' || attr.name == 'src') {
-          continue;
-        }
-        var separatorLocation = attr.name.indexOf('-with-value');
-        if (separatorLocation === -1) {
-          $log.error('RTE Error: invalid customization attribute ' + attr.name);
-          continue;
-        }
-        var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
-      }
-      return customizationArgsDict;
-    };
-
-    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-      RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
-      RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
-      RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
-      _RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
-    });
-
-    //refocusFn is a function that restores focus to the text editor after exiting the modal, and moves the cursor
-    //back to where it was before the modal was opened
-    var _openCustomizationModal = function(customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback, onDismissCallback, refocusFn) {
+    // refocusFn is a function that restores focus to the text editor after
+    // exiting the modal, and moves the cursor back to where it was before the
+    // modal was opened
+    var _openCustomizationModal = function(
+        customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+        onDismissCallback, refocusFn) {
       var modalDialog = $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
         resolve: {},
-        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        controller: [
+            '$scope', '$modalInstance', '$timeout',
+            function($scope, $modalInstance, $timeout) {
           $scope.customizationArgSpecs = customizationArgSpecs;
+
+          // Without this code, the focus will remain in the background RTE
+          // even after the modal loads. This switches the focus to a temporary
+          // field in the modal which is then removed from the DOM.
+          // TODO(sll): Make this switch to the first input field in the modal
+          // instead.
+          $scope.modalIsLoading = true;
+          focusService.setFocus('tmpFocusPoint');
+          $timeout(function() {
+            $scope.modalIsLoading = false;
+          });
 
           $scope.tmpCustomizationArgs = [];
           for (var i = 0; i < customizationArgSpecs.length; i++) {
@@ -601,27 +696,40 @@ oppia.config(['$provide', function($provide) {
       modalDialog.result['finally'](refocusFn);
     }
 
-    _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-      var buttonDisplay = createRteElement(componentDefn, {});
+    rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
+      var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
 
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
-        tooltiptext: componentDefn.name.charAt(0).toUpperCase() + componentDefn.name.slice(1),
+        tooltiptext: (
+          componentDefn.name.charAt(0).toUpperCase() +
+          componentDefn.name.slice(1)),
         onElementSelect: {
           element: 'img',
           filter: function(elt) {
-            return elt.hasClass('oppia-noninteractive-' + componentDefn.frontend_name);
+            return elt.hasClass('oppia-noninteractive-' + componentDefn.name);
           },
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
+
+            // Move the cursor to be immediately after the clicked widget.
+            // This prevents users from overwriting the widget.
+            var elRange = rangy.createRange();
+            elRange.setStartAfter($element.get(0));
+            elRange.setEndAfter($element.get(0));
+            var elSelection = rangy.getSelection();
+            elSelection.removeAllRanges();
+            elSelection.addRange(elRange);
             var savedSelection = rangy.saveSelection();
 
             _openCustomizationModal(
-              componentDefn.customization_arg_specs,
-              createCustomizationArgDictFromAttrs($element[0].attributes),
+              componentDefn.customizationArgSpecs,
+              rteHelperService.createCustomizationArgDictFromAttrs(
+                $element[0].attributes),
               function(customizationArgsDict) {
-                var el = createRteElement(componentDefn, customizationArgsDict);
+                var el = rteHelperService.createRteElement(
+                  componentDefn, customizationArgsDict);
                 $element[0].parentNode.replaceChild(el, $element[0]);
                 textAngular.$editor().updateTaBindtaTextElement();
               },
@@ -637,21 +745,25 @@ oppia.config(['$provide', function($provide) {
         action: function() {
           var textAngular = this;
           var savedSelection = rangy.saveSelection();
-          textAngular.$editor().wrapSelection('insertHtml', '<span class="insertionPoint"></span>');
+          textAngular.$editor().wrapSelection(
+            'insertHtml', '<span class="insertionPoint"></span>');
 
           _openCustomizationModal(
-            componentDefn.customization_arg_specs,
+            componentDefn.customizationArgSpecs,
             {},
             function(customizationArgsDict) {
-              var el = createRteElement(componentDefn, customizationArgsDict);
-              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              var el = rteHelperService.createRteElement(
+                componentDefn, customizationArgsDict);
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector(
+                '.insertionPoint');
               var parent = insertionPoint.parentNode;
               parent.replaceChild(el, insertionPoint);
               textAngular.$editor().updateTaBindtaTextElement();
             },
             function() {
               // Clean up the insertion point if no widget was inserted.
-              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector('.insertionPoint');
+              var insertionPoint = textAngular.$editor().displayElements.text[0].querySelector(
+                '.insertionPoint');
               if (insertionPoint !== null) {
                 insertionPoint.remove();
               }
@@ -659,133 +771,67 @@ oppia.config(['$provide', function($provide) {
             function() {
               textAngular.$editor().displayElements.text[0].focus();
               rangy.restoreSelection(savedSelection);
-            });
+            }
+          );
         }
       });
-
-      taOptions.toolbar[2].push(componentDefn.name);
     });
 
     return taOptions;
   }]);
 }]);
 
-oppia.directive('textAngularRte', ['$filter', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
-  function($filter, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
+oppia.directive('textAngularRte', [
+    '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
+    function($filter, oppiaHtmlEscaper, rteHelperService) {
   return {
     restrict: 'E',
     scope: {
       htmlContent: '=',
       uiConfig: '&'
     },
-    template: '<div text-angular="" ta-toolbar="<[toolbarOptions]>" ta-paste="stripFormatting($html)" ng-model="tempContent"></div>',
+    template: (
+      '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
+      '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
+      '</div>'),
     controller: ['$scope', '$log', function($scope, $log) {
-      // adapted from http://stackoverflow.com/a/6899999
-      $scope.stripFormatting = function(html) {
-        var tmpNode = document.createElement('div');
-        tmpNode.innerHTML = html;
-        return tmpNode.innerText;
-      };
+      var toolbarOptions = [
+        ['bold', 'italics', 'underline'],
+        ['ol', 'ul'],
+        []
+      ];
 
-      $scope._RICH_TEXT_COMPONENTS = [];
-      Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-        RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
-        RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
-        RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
-        RTE_COMPONENT_SPECS[componentId].isComplex = RTE_COMPONENT_SPECS[componentId].is_complex;
-        $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
-      });
-
-      var toolbarOptions = [['bold', 'italics', 'underline'], ['ol', 'ul'], []];
-      $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-        if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions && componentDefn.isComplex)) {
+      rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
+        if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions &&
+            componentDefn.isComplex)) {
           toolbarOptions[2].push(componentDefn.name);
         }
       });
-      $scope.toolbarOptions = JSON.stringify(toolbarOptions);
+      $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
-      var createCustomizationArgDictFromAttrs = function(attrs) {
-        var customizationArgsDict = {};
-        for (var i = 0; i < attrs.length; i++) {
-          var attr = attrs[i];
-          if (attr.name == 'class' || attr.name == 'src') {
-            continue;
-          }
-          var separatorLocation = attr.name.indexOf('-with-value');
-          if (separatorLocation === -1) {
-            $log.error('RTE Error: invalid customization attribute ' + attr.name);
-            continue;
-          }
-          var argName = attr.name.substring(0, separatorLocation);
-          customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
-        }
-        return customizationArgsDict;
+      var _convertHtmlToRte = function(html) {
+        return rteHelperService.convertHtmlToRte(html);
       };
 
-      // Replace <oppia-noninteractive> tags with <img> tags.
-      $scope.convertHtmlToRte = function(html) {
-        var elt = $('<div>' + html + '</div>');
-
-        $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-            return createRteElement(
-              componentDefn, createCustomizationArgDictFromAttrs(this.attributes));
-          });
-        });
-
-        return elt.html();
-      };
-
-      var createRteElement = function(componentDefn, customizationArgsDict) {
-        var el = $('<img/>');
-        el.attr('src', componentDefn.iconDataUrl);
-        el.addClass('oppia-noninteractive-' + componentDefn.name);
-
-        for (var attrName in customizationArgsDict) {
-          el.attr(
-          $filter('camelCaseToHyphens')(attrName) + '-with-value',
-          oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
-        }
-
-        var domNode = el.get(0);
-        return domNode;
-      };
-
-      // Replace <img> tags with <oppia-noninteractive> tags.
-      $scope.convertRteToHtml = function(rte) {
-        var elt = $('<div>' + rte + '</div>');
-
-        $scope._RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          elt.find('img.oppia-noninteractive-' + componentDefn.name).replaceWith(function() {
-            var jQueryElt = $('<' + this.className + '/>');
-            for (var i = 0; i < this.attributes.length; i++) {
-              var attr = this.attributes[i];
-              if (attr.name !== 'class' && attr.name !== 'src') {
-                jQueryElt.attr(attr.name, attr.value);
-              }
-            }
-            return jQueryElt.get(0);
-          });
-        });
-
-        return elt.html();
+      $scope.stripFormatting = function(html) {
+        return $filter('sanitizeHtmlForRte')(html);
       };
 
       $scope.init = function() {
-        $scope.tempContent = $scope.convertHtmlToRte($scope.htmlContent);
+        $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
       };
 
       $scope.init();
 
       $scope.$watch('tempContent', function(newVal, oldVal) {
-        $scope.htmlContent = $scope.convertRteToHtml(newVal);
+        $scope.htmlContent = rteHelperService.convertRteToHtml(newVal);
       });
 
       // It is possible for the content of the RTE to be changed externally,
       // e.g. if there are several RTEs in a list, and one is deleted.
       $scope.$watch('htmlContent', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-          $scope.tempContent = $scope.convertHtmlToRte(newVal);
+          $scope.tempContent = _convertHtmlToRte(newVal);
         }
       });
     }],
@@ -1281,9 +1327,6 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
   };
 }]);
 
-// TODO(sll): The 'Cancel' button should revert the text in the HTML box to its
-// original state.
-// TODO(sll): The RTE extensions in the RTE do not work.
 oppia.directive('schemaBasedHtmlEditor', [function() {
   return {
     scope: {

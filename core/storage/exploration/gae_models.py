@@ -83,6 +83,9 @@ class ExplorationModel(base_models.VersionedModel):
         default=feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
         indexed=False)
 
+    # The version of the states blob schema.
+    states_schema_version = ndb.IntegerProperty(
+        required=True, default=0, indexed=True)
     # The name of the initial state of this exploration.
     init_state_name = ndb.StringProperty(required=True, indexed=False)
     # A dict representing the states of this exploration. This dict should
