@@ -145,8 +145,14 @@ SHARDING=true
 SHARD_INSTANCES=5
 for i in "$@"
 do
+# Match each space-separated argument passed to the shell file to a separate
+# case label, based on a pattern. E.g. Match to -sharding=*, where the asterisk
+# refers to any characters following the equals sign, other than whitespace.
 case $i in
   -sharding=*)
+  # Extract the value right of the equal sign by substringing the $i variable
+  # at the equal sign. 
+  # http://tldp.org/LDP/abs/html/string-manipulation.html
   SHARDING="${i#*=}"
   shift
   ;;
