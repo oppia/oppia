@@ -32,6 +32,7 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rating_services
+from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
@@ -529,3 +530,22 @@ class RatingHandler(base.BaseHandler):
             self.user_id, exploration_id, user_rating)
         self.render_json({})
 
+
+class RecommendationsHandler(base.BaseHandler):
+    """Provides recommendations to be displayed at the end of explorations."""
+
+    def get(self):
+        """Handles GET requests."""
+        exploration_id = self.request.get('id')
+
+        try:
+            exp_recommendations = (
+                recommendations_services.get_exploration_recommendations(
+                    exploration_id))
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        self.values.update({
+            'exp_recommendations': exp_recommendations
+        })
+        self.render_json(self.values)

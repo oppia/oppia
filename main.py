@@ -264,6 +264,9 @@ urls = [
     get_redirect_route(
         r'/explorehandler/rating/<exploration_id>',
         reader.RatingHandler, 'rating_handler'),
+    get_redirect_route(
+        r'/explorehandler/recommendations',
+        reader.RecommendationsHandler, 'recommendations_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

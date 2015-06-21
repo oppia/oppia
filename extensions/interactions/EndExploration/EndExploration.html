@@ -1,12 +1,26 @@
 <script type="text/ng-template" id="interaction/EndExploration">
-  <div ng-if="recommendedExplorationIds.length > 0">
+  <div ng-if="authorRecommendedExplorationIds.length > 0">
+    Try these explorations next:
+    <ul>
+      <li ng-repeat="expId in authorRecommendedExplorationIds track by $index">
+        <a ng-href="/explore/<[expId]>" target="<[isIframed ? '_blank' : '_self']>" ng-if="authorRecommendedExplorationSummaries[$index]">
+          <[authorRecommendedExplorationSummaries[$index].title]>
+        </a>
+        <span style="color: red;" ng-if="!authorRecommendedExplorationSummaries[$index]">
+          <strong>Error:</strong> no published exploration found with ID '<[expId]>'
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <div ng-if="systemRecommendedExplorationIds.length > 0">
     Other explorations you might enjoy:
     <ul>
-      <li ng-repeat="expId in recommendedExplorationIds track by $index">
-        <a ng-href="/explore/<[expId]>" target="<[isIframed ? '_blank' : '_self']>" ng-if="recommendedExplorationSummaries[$index]">
-          <[recommendedExplorationSummaries[$index].title]>
+      <li ng-repeat="expId in systemRecommendedExplorationIds track by $index">
+        <a ng-href="/explore/<[expId]>" target="<[isIframed ? '_blank' : '_self']>" ng-if="systemRecommendedExplorationSummaries[$index]">
+          <[systemRecommendedExplorationSummaries[$index].title]>
         </a>
-        <span style="color: red;" ng-if="!recommendedExplorationSummaries[$index]">
+        <span style="color: red;" ng-if="!systemRecommendedExplorationSummaries[$index]">
           <strong>Error:</strong> no published exploration found with ID '<[expId]>'
         </span>
       </li>

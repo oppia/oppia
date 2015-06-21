@@ -26,24 +26,69 @@ oppia.directive('oppiaInteractiveEndExploration', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/EndExploration',
-      controller: ['$scope', '$http', '$attrs', 'urlService', function($scope, $http, $attrs, urlService) {
+      controller: [
+          '$scope', '$http', '$attrs', 'urlService',
+          'explorationContextService', 'PAGE_CONTEXT',
+          function(
+            $scope, $http, $attrs, urlService, explorationContextService,
+            PAGE_CONTEXT) {
         $scope.isIframed = urlService.isIframed();
 
-        $scope.recommendedExplorationIds = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.authorRecommendedExplorationIds = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.recommendedExplorationIdsWithValue);
 
-        $scope.recommendedExplorationSummaries = [];
-        if ($scope.recommendedExplorationIds.length > 0) {
+        $scope.authorRecommendedExplorationSummaries = [];
+        if ($scope.authorRecommendedExplorationIds.length > 0) {
           $http({
             method: 'GET',
             url: '/explorationsummarieshandler/data',
             params: {
-              stringified_exp_ids: JSON.stringify($scope.recommendedExplorationIds)
+              stringified_exp_ids: JSON.stringify($scope.authorRecommendedExplorationIds)
             }
           }).success(function(data) {
-            $scope.recommendedExplorationSummaries = data.summaries;
+            $scope.authorRecommendedExplorationSummaries = data.summaries;
           });
         }
+
+        var explorationId = explorationContextService.getExplorationId();
+        $http({
+          method: 'GET',
+          url: '/explorehandler/recommendations?id=' + explorationId
+        }).success(function(data) {
+          var allRecommendedExplorationIds = data.exp_recommendations;
+          $scope.systemRecommendedExplorationIds = [];
+
+          var MAX_RECOMMENDATIONS = 4;
+
+          var remainingRecommendedExplorationIds =
+            angular.copy(allRecommendedExplorationIds);
+          for (var i = 0; i < allRecommendedExplorationIds.length; i++) {
+            var randomIndex = Math.floor(
+              Math.random() * remainingRecommendedExplorationIds.length);
+            var randomRecommendationId =
+              remainingRecommendedExplorationIds[randomIndex];
+            if ($scope.authorRecommendedExplorationIds.indexOf(randomRecommendationId) == -1) {
+              $scope.systemRecommendedExplorationIds.push(randomRecommendationId);
+            }
+            remainingRecommendedExplorationIds.splice(randomIndex, 1);
+
+            if ($scope.systemRecommendedExplorationIds.length >= MAX_RECOMMENDATIONS) {
+              break;
+            }
+          }
+
+          if ($scope.systemRecommendedExplorationIds.length > 0) {
+            $http({
+              method: 'GET',
+              url: '/explorationsummarieshandler/data',
+              params: {
+                stringified_exp_ids: JSON.stringify($scope.systemRecommendedExplorationIds)
+              }
+            }).success(function(data) {
+              $scope.systemRecommendedExplorationSummaries = data.summaries;
+            });
+          }
+        });
       }]
     };
   }
