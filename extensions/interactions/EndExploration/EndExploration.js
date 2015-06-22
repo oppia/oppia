@@ -53,28 +53,28 @@ oppia.directive('oppiaInteractiveEndExploration', [
         var explorationId = explorationContextService.getExplorationId();
         $http({
           method: 'GET',
-          url: '/explorehandler/recommendations?id=' + explorationId
+          url: '/explorehandler/recommendations/' + explorationId
         }).success(function(data) {
-          var allRecommendedExplorationIds = data.exp_recommendations;
+          var allRecommendedExplorationIds = data.recommended_exp_ids;
           $scope.systemRecommendedExplorationIds = [];
+
+          var filteredRecommendationExplorationIds =
+              allRecommendedExplorationIds.filter(function(value) {
+            return ($scope.authorRecommendedExplorationIds.indexOf(value) == -1);
+          });
 
           var MAX_RECOMMENDATIONS = 4;
 
-          var remainingRecommendedExplorationIds =
-            angular.copy(allRecommendedExplorationIds);
-          for (var i = 0; i < allRecommendedExplorationIds.length; i++) {
+          var filteredRecommendationsSize = filteredRecommendationExplorationIds.length;
+          for (var i = 0; i < Math.min(filteredRecommendationsSize, MAX_RECOMMENDATIONS); i++) {
             var randomIndex = Math.floor(
-              Math.random() * remainingRecommendedExplorationIds.length);
+              Math.random() * filteredRecommendationExplorationIds.length);
             var randomRecommendationId =
-              remainingRecommendedExplorationIds[randomIndex];
+              filteredRecommendationExplorationIds[randomIndex];
             if ($scope.authorRecommendedExplorationIds.indexOf(randomRecommendationId) == -1) {
               $scope.systemRecommendedExplorationIds.push(randomRecommendationId);
             }
-            remainingRecommendedExplorationIds.splice(randomIndex, 1);
-
-            if ($scope.systemRecommendedExplorationIds.length >= MAX_RECOMMENDATIONS) {
-              break;
-            }
+            filteredRecommendationExplorationIds.splice(randomIndex, 1);
           }
 
           if ($scope.systemRecommendedExplorationIds.length > 0) {

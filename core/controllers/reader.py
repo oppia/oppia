@@ -534,18 +534,12 @@ class RatingHandler(base.BaseHandler):
 class RecommendationsHandler(base.BaseHandler):
     """Provides recommendations to be displayed at the end of explorations."""
 
-    def get(self):
+    @require_playable
+    def get(self, exploration_id):
         """Handles GET requests."""
-        exploration_id = self.request.get('id')
-
-        try:
-            exp_recommendations = (
-                recommendations_services.get_exploration_recommendations(
-                    exploration_id))
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-
         self.values.update({
-            'exp_recommendations': exp_recommendations
+            'recommended_exp_ids': (
+                recommendations_services
+                .get_exploration_recommendations(exploration_id))
         })
         self.render_json(self.values)

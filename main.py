@@ -265,7 +265,7 @@ urls = [
         r'/explorehandler/rating/<exploration_id>',
         reader.RatingHandler, 'rating_handler'),
     get_redirect_route(
-        r'/explorehandler/recommendations',
+        r'/explorehandler/recommendations/<exploration_id>',
         reader.RecommendationsHandler, 'recommendations_handler'),
 
     get_redirect_route(
