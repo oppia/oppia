@@ -194,7 +194,7 @@ describe('Change list service', function() {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState1');
       var gadget_dict = {
-        "gadget_id": "AdviceBar",
+        "gadget_type": "AdviceBar",
         "gadget_name": "AdviceBar 1",
         "customization_args": {
           "adviceObjects": {
@@ -218,7 +218,7 @@ describe('Change list service', function() {
         },{
           cmd: 'add_gadget',
           gadget_dict: {
-            "gadget_id": "AdviceBar",
+            "gadget_type": "AdviceBar",
             "gadget_name": "AdviceBar 1",
             "customization_args": {
               "adviceObjects": {

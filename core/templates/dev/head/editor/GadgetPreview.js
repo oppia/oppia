@@ -2,7 +2,7 @@ oppia.directive('oppiaGadgetPreview', function() {
   return {
     restrict: 'E',
     scope: {
-      gadgetId: '&',
+      gadgetType: '&',
       gadgetName: '&',
       gadgetCustomizationArgs: '&',
       showInStates: '&'
@@ -16,7 +16,7 @@ oppia.directive('oppiaGadgetPreview', function() {
         gadgetNameElem.addClass('oppia-gadget-name');
 
         var el = $(
-          '<oppia-gadget-' + $filter('camelCaseToHyphens')($scope.gadgetId()) + '>');
+          '<oppia-gadget-' + $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
         el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
           el, $scope.gadgetCustomizationArgs());
         var gadgetContent = $('<div>').addClass('oppia-gadget-content');

@@ -21,11 +21,22 @@
 //Service for handling all gadget validation.
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
-    function($filter, warningsData, validatorsService, editorContextService) {
+    'explorationSkinService',
+    function($filter, warningsData, validatorsService, editorContextService,
+      explorationSkinService) {
   var gadgetValidator = {};
   var AXIS_HORIZONTAL = 'horizontal';
   var AXIS_VERTICAL = 'vertical';
-  var _PANEL_SPECS = GLOBALS.SKIN_PANELS_PROPERTIES;
+  var _skin = 'conversation_v1'; // explorationSkinService.displayed;
+  // TODO(vjoisar): Vishal, I got explorationSkinService to initialize
+  // with the current skin_id when ExplorationEditor.js initializes,
+  // but somehow gadgetValidationService is getting called before the
+  // value is available resulting in _skin being undefined. When you
+  // incorporate
+  // 
+  // Here's a temporary debugging line we'll want to delete when solved:
+  // console.log('Skin is ' + _skin);
+  var _PANEL_SPECS = GLOBALS.SKIN_SPECS[_skin];
   var _MAX_GADGET_NAME_LENGTH = 50;
 
   /**

@@ -22,7 +22,7 @@
         </span>
         <div class='oppia-gadget-preview-container' ng-click="openCustomizeGadgetModal(gadgets[gadgetName])">
           <oppia-gadget-preview
-            gadget-id="gadgets[gadgetName].gadget_id"
+            gadget-type="gadgets[gadgetName].gadget_type"
             gadget-customization-args="gadgets[gadgetName].customization_args"
             show-in-states="gadgets[gadgetName].visible_in_states"
             gadget-name="gadgetName" style="pointer-events: none;">
@@ -38,22 +38,22 @@
 
 <script type="text/ng-template" id="modals/customizeGadget">
   <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
-    <h3 ng-if="!gadgetData.gadgetId">
+    <h3 ng-if="!gadgetData.gadgetType">
       Insert a gadget
     </h3>
-    <h3 ng-if="gadgetData.gadgetId">
+    <h3 ng-if="gadgetData.gadgetType">
       Customize Gadget (<[gadgetData.gadgetName]>)
     </h3>
   </div>
   <div class="modal-body">
-    <div ng-if="!gadgetData.gadgetId" ng-cloak>
+    <div ng-if="!gadgetData.gadgetType" ng-cloak>
       <span class="oppia-gadget-tile"
             ng-repeat="(key, gadget) in ALLOWED_GADGETS"
             ng-click="onChangeGadgetId(key)">
         <[key]>
       </span>
     </div>
-    <div ng-if="gadgetData.gadgetId" class="customization-editor">
+    <div ng-if="gadgetData.gadgetType" class="customization-editor">
       <div ng-show="!editingGadget" class="gadget-name-panel">
         <label>Gadget Name</label>
         <input ng-disabled="editingGadget" ng-model="gadgetData.gadgetName" />
@@ -95,7 +95,7 @@
   <div class="modal-footer">
     <button ng-show="!editingGadget" class="btn btn-default" style="float: left;"
             ng-click="returnToGadgetSelector()"
-            ng-if="gadgetData.gadgetId">
+            ng-if="gadgetData.gadgetType">
         Back
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>

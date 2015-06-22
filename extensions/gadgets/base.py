@@ -48,7 +48,7 @@ class BaseGadget(object):
     _dependency_ids = []
 
     @property
-    def id(self):
+    def type(self):
         return self.__class__.__name__
 
     @property
@@ -77,9 +77,9 @@ class BaseGadget(object):
         once the necessary attributes are supplied.
         """
         js_directives = utils.get_file_contents(os.path.join(
-            feconf.GADGETS_DIR, self.id, '%s.js' % self.id))
+            feconf.GADGETS_DIR, self.type, '%s.js' % self.type))
         html_templates = utils.get_file_contents(os.path.join(
-            feconf.GADGETS_DIR, self.id, '%s.html' % self.id))
+            feconf.GADGETS_DIR, self.type, '%s.html' % self.type))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
     def get_width(self, customization_args):
@@ -108,7 +108,7 @@ class BaseGadget(object):
         provided.
         """
         result = {
-            'id': self.id,
+            'type': self.type,
             'name': self.name,
             'description': self.description,
             'customization_arg_specs': [{

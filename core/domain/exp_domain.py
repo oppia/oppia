@@ -114,11 +114,11 @@ class ExplorationChange(object):
         - 'delete_state' (with state_name)
         - 'edit_state_property' (with state_name, property_name, new_value and,
             optionally, old_value)
-        - add_gadget(with gadget_dict and panel_name)
-        - rename_gadget(with old_gadget_name and new_gadget_name)
-        - delete_gadget(with gadget_name)
-        - edit_gadget_property(with gadget_name, property_name, new_value, and
-            optionally, old_value)
+        - 'add_gadget' (with gadget_dict and panel_name)
+        - 'rename_gadget' (with old_gadget_name and new_gadget_name)
+        - 'delete_gadget' (with gadget_name)
+        - 'edit_gadget_property' (with gadget_name, property_name, new_value,
+            and optionally, old_value)
         - 'edit_exploration_property' (with property_name, new_value and,
             optionally, old_value)
         - 'migrate_states_schema' (with from_version and to_version)
@@ -618,10 +618,10 @@ class GadgetInstance(object):
 
     _MAX_GADGET_NAME_LENGTH = 20
 
-    def __init__(self, gadget_id, gadget_name,
+    def __init__(self, gadget_type, gadget_name,
                  visible_in_states, customization_args):
         # Backend ID referring to the gadget's type in gadget registry.
-        self.id = gadget_id
+        self.type = gadget_type
 
         # Author-facing unique name to distinguish instances in the Editor UI.
         self.name = gadget_name
@@ -635,7 +635,7 @@ class GadgetInstance(object):
     @property
     def gadget(self):
         """Gadget spec for validation and derived properties below."""
-        return gadget_registry.Registry.get_gadget_by_id(self.id)
+        return gadget_registry.Registry.get_gadget_by_type(self.type)
 
     @property
     def width(self):
@@ -681,7 +681,9 @@ class GadgetInstance(object):
             self.gadget
         except KeyError:
             raise utils.ValidationError(
-                'Unknown gadget with ID %s is not in the registry.' % self.id)
+                'Unknown gadget with type %s is not in the registry.' % (
+                    self.type)
+            )
 
         self._validate_gadget_name(self.name)
 
@@ -693,7 +695,7 @@ class GadgetInstance(object):
             for arg_name in unknown_customization_arguments:
                 logging.warning(
                     'Gadget %s does not support customization arg %s.'
-                    % (self.id, arg_name))
+                    % (self.type, arg_name))
             del self.customization_args[arg_name]
 
         self.gadget.validate(self.customization_args)
@@ -711,14 +713,14 @@ class GadgetInstance(object):
                 if count > 1]
             raise utils.ValidationError(
                 '%s specifies visibility repeatedly for state%s: %s' % (
-                    self.id,
+                    self.type,
                     's' if len(redundant_visible_states) > 1 else '',
                     ', '.join(redundant_visible_states)))
 
     def to_dict(self):
         """Returns GadgetInstance data represented in dict form."""
         return {
-            'gadget_id': self.id,
+            'gadget_type': self.type,
             'gadget_name': self.name,
             'visible_in_states': self.visible_in_states,
             'customization_args': self._get_full_customization_args(),
@@ -728,7 +730,7 @@ class GadgetInstance(object):
     def from_dict(cls, gadget_dict):
         """Returns GadgetInstance constructed from dict data."""
         return GadgetInstance(
-            gadget_dict['gadget_id'],
+            gadget_dict['gadget_type'],
             gadget_dict['gadget_name'],
             gadget_dict['visible_in_states'],
             gadget_dict['customization_args'])
@@ -737,7 +739,7 @@ class GadgetInstance(object):
         """Updates the GadgetInstance's customization arguments."""
         self.customization_args = customization_args
 
-    def update_visibility(self, visible_in_states):
+    def update_visible_in_states(self, visible_in_states):
         """Updates the GadgetInstance's visibility in different states."""
         self.visible_in_states = visible_in_states
 
@@ -758,21 +760,27 @@ class GadgetInstance(object):
 class SkinInstance(object):
     """Domain object for a skin instance."""
 
-    def __init__(self, skin_id, skin_customizations=None):
+    def __init__(self, skin_id, skin_customizations):
+        """Initializes SkinInstance with any customizations provided.
+
+        If no customizations are necessary, skin_customizations may be set to
+        None, in which case defaults will be generated that provide empty
+        gadget panels for each panel specified in the skin.
+        """
         self.skin_id = skin_id
         # panel_contents_dict has gadget_panel_name strings as keys and
         # lists of GadgetInstance instances as values.
         self.panel_contents_dict = {}
 
         if skin_customizations is None:
-            skin_customizations = SkinInstance._default_skin_customizations(
-                skin_id
+            skin_customizations = (
+                SkinInstance._get_default_skin_customizations(skin_id)
             )
 
         for panel_name, gdict_list in skin_customizations[
                 'panels_contents'].iteritems():
             self.panel_contents_dict[panel_name] = [GadgetInstance(
-                gdict['gadget_id'], gdict['gadget_name'],
+                gdict['gadget_type'], gdict['gadget_name'],
                 gdict['visible_in_states'], gdict['customization_args']
             ) for gdict in gdict_list]
 
@@ -782,11 +790,11 @@ class SkinInstance(object):
         return skins_services.Registry.get_skin_by_id(self.skin_id)
 
     @staticmethod
-    def _default_skin_customizations(skin_id):
+    def _get_default_skin_customizations(skin_id):
         """Generates default skin customizations when none are specified."""
         skin = skins_services.Registry.get_skin_by_id(skin_id)
         panels_contents = {
-            panel_name: [] for panel_name in skin.panels_properties.keys()
+            panel_name: [] for panel_name in skin.panels_properties
         }
         return {'panels_contents': panels_contents}
 
@@ -1629,7 +1637,7 @@ class Exploration(object):
                     if rule.dest == old_state_name:
                         rule.dest = new_state_name
 
-        self._update_gadget_visibility_for_renamed_state(
+        self._update_gadget_visibilities_for_renamed_state(
             old_state_name, new_state_name)
 
     def delete_state(self, state_name):
@@ -1652,13 +1660,13 @@ class Exploration(object):
 
         del self.states[state_name]
 
-        self._update_gadget_visibility_for_deleted_state(state_name)
+        self._update_gadget_visibilities_for_deleted_state(state_name)
 
     # Methods relating to gadgets.
     def add_gadget(self, gadget_dict, panel_name):
         """Adds a gadget to the associated panel."""
         gadget_instance = GadgetInstance(
-            gadget_dict['gadget_id'], gadget_dict['gadget_name'],
+            gadget_dict['gadget_type'], gadget_dict['gadget_name'],
             gadget_dict['visible_in_states'],
             gadget_dict['customization_args'])
 
@@ -1667,10 +1675,10 @@ class Exploration(object):
 
     def rename_gadget(self, old_gadget_name, new_gadget_name):
         """Renames the given gadget."""
-        if old_gadget_name not in self._gadget_names:
+        if old_gadget_name not in self.get_all_gadget_names():
             raise ValueError('Gadget %s does not exist.' % old_gadget_name)
         if (old_gadget_name != new_gadget_name and
-                new_gadget_name in self._gadget_names):
+                new_gadget_name in self.get_all_gadget_names()):
             raise ValueError('Duplicate gadget name: %s' % new_gadget_name)
 
         if old_gadget_name == new_gadget_name:
@@ -1683,38 +1691,48 @@ class Exploration(object):
 
     def delete_gadget(self, gadget_name):
         """Deletes the given gadget."""
-        if gadget_name not in self._gadget_names:
+        if gadget_name not in self.get_all_gadget_names():
             raise ValueError('Gadget %s does not exist.' % gadget_name)
 
         panel_name = self._get_panel_name_for_gadget(gadget_name)
         gadget_index = None
         for index in range(len(
-            self.skin_instance.panel_contents_dict[panel_name])):
+                self.skin_instance.panel_contents_dict[panel_name])):
             if self.skin_instance.panel_contents_dict[
                     panel_name][index].name == gadget_name:
                 gadget_index = index
                 break
+        assert gadget_index != None
         del self.skin_instance.panel_contents_dict[panel_name][gadget_index]
 
     def get_gadget_instance_by_name(self, gadget_name):
         """Returns the GadgetInstance with the given name."""
-        for panel_name in self.skin_instance.panel_contents_dict.iterkeys():
-            for gadget_instance in self.skin_instance.panel_contents_dict[
-                panel_name]:
+        for gadget_instances in (
+                self.skin_instance.panel_contents_dict.itervalues()):
+            for gadget_instance in gadget_instances:
                 if gadget_instance.name == gadget_name:
                     return gadget_instance
         raise ValueError('Gadget %s does not exist.' % gadget_name)
 
+    def get_all_gadget_names(self):
+        """Convenience method to query against current gadget names."""
+        gadget_names = set()
+        for gadget_instances in (
+                self.skin_instance.panel_contents_dict.itervalues()):
+            for gadget_instance in gadget_instances:
+                gadget_names.add(gadget_instance.name)
+        return sorted(gadget_names)
+
     def _get_panel_name_for_gadget(self, gadget_name):
         """Returns the panel name for the given GadgetInstance."""
-        for panel_name in self.skin_instance.panel_contents_dict.iterkeys():
-            for gadget_instance in self.skin_instance.panel_contents_dict[
-            panel_name]:
+        for panel_name, gadget_instances in (
+                self.skin_instance.panel_contents_dict.iteritems()):
+            for gadget_instance in gadget_instances:
                 if gadget_instance.name == gadget_name:
                     return panel_name
         raise ValueError('Gadget %s does not exist.' % gadget_name)
 
-    def _update_gadget_visibility_for_renamed_state(
+    def _update_gadget_visibilities_for_renamed_state(
             self, old_state_name, new_state_name):
         """Updates the visible_in_states property for gadget instances
         visible in the renamed state."""
@@ -1722,13 +1740,13 @@ class Exploration(object):
             self._get_gadget_instances_visible_in_state(old_state_name))
 
         for gadget_instance in affected_gadget_instances:
-            # Order within visible_in_states does not effect functionality.
+            # Order within visible_in_states does not affect functionality.
             # It's sorted purely for deterministic testing.
             gadget_instance.visible_in_states.remove(old_state_name)
             gadget_instance.visible_in_states.append(new_state_name)
             gadget_instance.visible_in_states.sort()
 
-    def _update_gadget_visibility_for_deleted_state(self, state_name):
+    def _update_gadget_visibilities_for_deleted_state(self, state_name):
         """Updates the visible_in_states property for gadget instances
         visible in the deleted state."""
         affected_gadget_instances = (
@@ -1748,30 +1766,13 @@ class Exploration(object):
     def _get_gadget_instances_visible_in_state(self, state_name):
         """Helper function to retrieve gadget instances visible in
         a given state."""
-        gadget_instances = []
-        for gadget_instance in self._gadget_instances:
-            if state_name in gadget_instance.visible_in_states:
-                gadget_instances.append(gadget_instance)
-        return gadget_instances
-
-    @property
-    def _gadget_names(self):
-        """Convenience method to query against current gadget names."""
-        gadget_names = set()
-        for panel_name in self.skin_instance.panel_contents_dict.iterkeys():
-            for gadget_instance in self.skin_instance.panel_contents_dict[
-                    panel_name]:
-                gadget_names.add(gadget_instance.name)
-        return sorted(gadget_names)
-
-    @property
-    def _gadget_instances(self):
-        """Convenience method to query against current gadget instances."""
-        gadget_instances = []
+        visible_gadget_instances = []
         for gadget_instances_list in (
                 self.skin_instance.panel_contents_dict.itervalues()):
-            gadget_instances.extend(gadget_instances_list)
-        return gadget_instances
+            for gadget_instance in gadget_instances_list:
+                if state_name in gadget_instance.visible_in_states:
+                    visible_gadget_instances.append(gadget_instance)
+        return visible_gadget_instances
 
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
@@ -1975,9 +1976,15 @@ class Exploration(object):
         exploration_dict['tags'] = exploration_dict['skill_tags']
         del exploration_dict['skill_tags']
 
+        _OLD_DEFAULT_SKIN_CUSTOMIZATIONS = {
+            'panels_contents': {
+                'bottom': [],
+                'left': [],
+                'right': []
+            }
+        }
         exploration_dict['skin_customizations'] = (
-            SkinInstance._default_skin_customizations(
-                exploration_dict['default_skin']))
+            _OLD_DEFAULT_SKIN_CUSTOMIZATIONS)
 
         return exploration_dict
 
@@ -2100,13 +2107,13 @@ class Exploration(object):
             'title': self.title,
         }
 
-    def get_gadget_ids(self):
-        """Get all gadget ids used in this exploration."""
+    def get_gadget_types(self):
+        """Get all gadget types used in this exploration."""
         result = set()
         for gadget_instances_list in (
                 self.skin_instance.panel_contents_dict.itervalues()):
             result.update([
-                gadget_instance.id for gadget_instance
+                gadget_instance.type for gadget_instance
                 in gadget_instances_list])
         return sorted(result)
 

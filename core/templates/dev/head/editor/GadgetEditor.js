@@ -70,7 +70,7 @@ oppia.controller('GadgetEditor', [
     * @param {gadgetEditData=} An Dict that contains existing data required when
     *                          editing a gadget of following type.
     *             gadgetEditData = {
-    *               'gadget_id' : value,
+    *               'gadget_type' : value,
     *               'gadget_name' : value,
     *               'customization_args' : value,
     *               'visible_in_states' : value
@@ -100,8 +100,8 @@ oppia.controller('GadgetEditor', [
           $scope.GADGET_SPECS = GADGET_SPECS;
           $scope.availablePanels = Object.keys(explorationGadgetsService.getPanels());
 
-          var _loadSchemaForm = function(gadgetId) {
-            var gadgetSpec = GADGET_SPECS[gadgetId];
+          var _loadSchemaForm = function(gadgetType) {
+            var gadgetSpec = GADGET_SPECS[gadgetType];
             $scope.customizationArgSpecs = gadgetSpec.customization_arg_specs;
             for (var i = 0; i < $scope.customizationArgSpecs.length; i++) {
                 var argName = $scope.customizationArgSpecs[i].name;
@@ -121,7 +121,7 @@ oppia.controller('GadgetEditor', [
           //TODO(sll/anuzis/vjoisar): Decide to change all keys to be compatible
           //    with the backend to avoid key conversions.
           $scope.gadgetData = {
-            gadgetId: '',
+            gadgetType: '',
             gadgetName: '',
             panelName: 'left',
             customizationArgs: {},
@@ -130,20 +130,20 @@ oppia.controller('GadgetEditor', [
           if (gadgetEditData) {
             $scope.editingGadget = true;
             $scope.gadgetData = {
-              gadgetId: gadgetEditData.gadget_id,
+              gadgetType: gadgetEditData.gadget_type,
               gadgetName: gadgetEditData.gadget_name,
               customizationArgs: gadgetEditData.customization_args,
               visibleInStates: gadgetEditData.visible_in_states
             };
 
-            _loadSchemaForm(gadgetEditData.gadget_id);
+            _loadSchemaForm(gadgetEditData.gadget_type);
           }
 
           $scope.explorationStates =
             Object.keys(explorationStatesService.getStates());
 
           $scope.onChangeGadgetId = function(newGadgetId) {
-            $scope.gadgetData.gadgetId = newGadgetId;
+            $scope.gadgetData.gadgetType = newGadgetId;
             $scope.gadgetData.gadgetName = (
               explorationGadgetsService.getUniqueGadgetName(newGadgetId)
             );
@@ -166,7 +166,7 @@ oppia.controller('GadgetEditor', [
 
           $scope.returnToGadgetSelector = function() {
             $scope.gadgetData = {
-              gadgetId: '',
+              gadgetType: '',
               gadgetName: '',
               panelName: '',
               customizationArgs: {},

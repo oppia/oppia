@@ -2164,7 +2164,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         {
             'cmd': 'add_gadget',
             'gadget_dict': {
-                'gadget_id': 'AdviceBar',
+                'gadget_type': 'AdviceBar',
                 'visible_in_states': ['First State renamed'],
                 'customization_args': {
                     'adviceObjects': {
@@ -2180,47 +2180,6 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 'gadget_name': 'AdviceBar'
             },
             'panel_name': 'left'
-        }
-    ]
-
-    CHANGE_LIST_FOUR_DELETE_ONLY = [
-        {
-            'cmd': 'delete_gadget',
-            'gadget_name': 'AdviceBar'
-        }
-    ]
-
-    CHANGE_LIST_FOUR_EDIT_ONLY = [
-        {
-            'new_value': {
-                'adviceObjects': {
-                    'value': [{
-                        'adviceTitle': 'b',
-                        'adviceHtml': '<p>cG</p>'
-                    }]
-                },
-                'title': {
-                    'value': 'a'
-                }
-            },
-            'old_value': {
-                'adviceObjects': {
-                    'value': [{
-                        'adviceTitle': 'b',
-                        'adviceHtml': '<p>c</p>'
-                    }]
-                },
-                'title': {'value': 'a'}
-            },
-            'cmd': 'edit_gadget_property',
-            'gadget_name': 'AdviceBar',
-            'property_name': 'gadget_customization_args'
-        }, {
-            'new_value': ['First State renamed'],
-            'old_value': ['First State renamed'],
-            'cmd': 'edit_gadget_property',
-            'gadget_name': 'AdviceBar',
-            'property_name': 'gadget_visibility'
         }
     ]
 
@@ -2265,7 +2224,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         {
             'cmd': 'add_gadget',
             'gadget_dict': {
-                'gadget_id': 'AdviceBar',
+                'gadget_type': 'AdviceBar',
                 'visible_in_states': ['First State renamed'],
                 'customization_args': {
                     'adviceObjects': {

@@ -66,7 +66,7 @@ oppia.directive('oppiaGadgetAdviceBar', [
         // We considered something akin to a front-end gadget Registry that
         // would have a record of approved gadgets (similar to feconf.py)
         // and which directories to retrieve their constants from based
-        // on gadgetId, but that didn't seem trivial to implement this
+        // on gadgetType, but that didn't seem trivial to implement this
         // afternoon. Any suggestions on how to validate gadget width/height
         // keeping files cleanly decoupled in each gadget's directory?
         //

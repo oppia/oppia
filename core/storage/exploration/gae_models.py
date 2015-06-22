@@ -20,7 +20,6 @@ __author__ = 'Sean Lip'
 
 import datetime
 
-from core.domain import exp_domain
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
@@ -80,11 +79,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     # Schema storing specifications of the contents of any gadget panels,
     # along with associated customizations for each gadget instance.
-    skin_customizations = ndb.JsonProperty(
-        default=exp_domain.SkinInstance._default_skin_customizations(
-            'conversation_v1'
-        ),
-        indexed=False)
+    skin_customizations = ndb.JsonProperty(required=True, indexed=False)
 
     # The version of the states blob schema.
     states_schema_version = ndb.IntegerProperty(

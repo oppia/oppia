@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="components/gadgetPanel">
   <div ng-repeat="gadgetSpec in panelContents()">
-    <oppia-gadget gadget-id="gadgetSpec.gadget_id" gadget-customization-args="gadgetSpec.customization_args" show-in-states="gadgetSpec.visible_in_states">
+    <oppia-gadget gadget-type="gadgetSpec.gadget_type" gadget-customization-args="gadgetSpec.customization_args" show-in-states="gadgetSpec.visible_in_states">
     </oppia-gadget>
   </div>
 </script>

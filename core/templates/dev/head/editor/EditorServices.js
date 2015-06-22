@@ -613,6 +613,20 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+// A data service that stores the current exploration skin so that it can be
+// displayed and edited in multiple places in the UI.
+oppia.factory('explorationSkinService', [
+    'explorationPropertyService', '$filter', 'validatorsService',
+    function(explorationPropertyService, $filter, validatorsService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'skin';
+  child._normalize = $filter('normalizeWhitespace');
+  child._isValid = function(value) {
+    return validatorsService.isValidEntityName(value, true);
+  };
+  return child;
+}]);
+
 // A data service that stores tags for the exploration.
 oppia.factory('explorationTagsService', [
     'explorationPropertyService',
@@ -948,11 +962,11 @@ oppia.factory('explorationGadgetsService', [
     $log.info(gadgetName + ' gadget does not exist in any panel.');
   };
 
-  var _generateUniqueGadgetName = function(gadgetId) {
-    if (!_gadgets.hasOwnProperty(gadgetId)) {
-      return gadgetId;
+  var _generateUniqueGadgetName = function(gadgetType) {
+    if (!_gadgets.hasOwnProperty(gadgetType)) {
+      return gadgetType;
     } else {
-      var baseGadgetName = gadgetId;
+      var baseGadgetName = gadgetType;
       var uniqueInteger = 2;
       var generatedGadgetName = baseGadgetName + uniqueInteger;
       while (_gadgets.hasOwnProperty(generatedGadgetName)) {
@@ -1053,7 +1067,7 @@ oppia.factory('explorationGadgetsService', [
   var _changeToBackendCompatibleDict = function(gadgetData) {
       // Convert to backend property names.
       var backendDict = {};
-      backendDict.gadget_id = gadgetData.gadgetId;
+      backendDict.gadget_type = gadgetData.gadgetType;
       backendDict.visible_in_states = gadgetData.visibleInStates;
       backendDict.gadget_name = gadgetData.gadgetName;
       backendDict.customization_args = (gadgetData.customizationArgs);
@@ -1088,8 +1102,8 @@ oppia.factory('explorationGadgetsService', [
 
       return canAdd;
     },
-    getUniqueGadgetName: function(gadgetId) {
-      return _generateUniqueGadgetName(gadgetId);
+    getUniqueGadgetName: function(gadgetType) {
+      return _generateUniqueGadgetName(gadgetType);
     },
     getGadgets: function() {
       return angular.copy(_gadgets);

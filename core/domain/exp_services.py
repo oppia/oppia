@@ -49,6 +49,10 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
+# Constants used to initialize EntityChangeListSummarizer
+BASE_ENTITY_STATE = 'state'
+BASE_ENTITY_GADGET = 'gadget'
+
 def _migrate_states_schema(versioned_exploration_states):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
@@ -480,7 +484,7 @@ def apply_change_list(exploration_id, change_list):
                     change.gadget_name)
                 if (change.property_name ==
                         exp_domain.GADGET_PROPERTY_VISIBILITY):
-                    gadget_instance.update_visibility(change.new_value)
+                    gadget_instance.update_visible_in_states(change.new_value)
                 elif (change.property_name ==
                         exp_domain.GADGET_PROPERTY_CUST_ARGS):
                     gadget_instance.update_customization_args(
@@ -530,94 +534,95 @@ class EntityChangeListSummarizer(object):
     entity type.
     """
 
-    def __init__(self, base_entity_name, original_entity_names, changes):
+    def __init__(self, base_entity_type):
         """
         Args:
-        - base_entity_name: string. Name of the base entity (e.g. 'state')
-        - original_entity_names: a list of strings representing original names
-        - changes: list of ExplorationChange instances.
+        - base_entity_type: string. Type of the base entity (e.g. 'state')
         """
-        self.base_name = base_entity_name
+        self.base_type = base_entity_type
 
         # a list of added entity names.
-        self.added = []
+        self.added_entities = []
 
         # a list of deleted entity names.
-        self.deleted = []
+        self.deleted_entities = []
 
-        # changed: a list of entity names. This indicates that the
-        # entity has changed but we do not know what the changes are. This
-        # can happen for complicated operations like removing an entity
-        # and later adding a new entity with the same name as the removed
-        # one.
-        self.changed = []
+        # a list of entity names. This indicates that the entity has changed
+        # but we do not know what the changes are. This can happen for
+        # complicated operations like removing an entity and later adding a
+        # new entity with the same name as the removed one.
+        self.changed_entities = []
 
         # property_changes: a dict, where each key is an entity's name, and
         # the corresponding values are dicts; the keys of these dicts
         # represent properties of the entity, and the corresponding values
-        # are dicts with keys old_value and new_value. If an entity name
-        # is changed, this is listed as a property name change under the
-        # old entity name in the outer dict.
+        # are dicts with keys old_value and new_value. If an entity's 'name'
+        # property is changed, this is listed as a property name change under
+        # the old entity name in the outer dict.
         self.property_changes = {}
 
-        self._process_changes(original_entity_names, changes)
+    @property
+    def add_entity_cmd(self):
+        return 'add_%s' % self.base_type
 
     @property
-    def add_entity(self):
-        return 'add_' + self.base_name
+    def rename_entity_cmd(self):
+        return 'rename_%s' % self.base_type
 
     @property
-    def rename_entity(self):
-        return 'rename_' + self.base_name
+    def delete_entity_cmd(self):
+        return 'delete_%s' % self.base_type
 
     @property
-    def delete_entity(self):
-        return 'delete_' + self.base_name
-
-    @property
-    def edit_entity_property(self):
-        return 'edit_' + self.base_name + '_property'
+    def edit_entity_property_cmd(self):
+        return 'edit_%s_property' % self.base_type
 
     @property
     def entity_name(self):
-        return self.base_name + '_name'
+        return '%s_name' % self.base_type
 
     @property
     def new_entity_name(self):
-        return 'new_' + self.base_name + '_name'
+        return 'new_%s_name' % self.base_type
 
     @property
     def old_entity_name(self):
-        return 'old_' + self.base_name + '_name'
+        return 'old_%s_name' % self.base_type
 
-    def _process_changes(self, original_entity_names, changes):
-        """Process changes."""
+    def process_changes(self, original_entity_names, changes):
+        """Processes the changes, making results available in each of the
+        initialized data structures of the EntityChangeListSummarizer.
+
+        Args:
+        - original_entity_names: a list of strings representing the names of
+          the individual entities before any of the changes in the change list
+          have been made.
+        - changes: list of ExplorationChange instances.
+        """
+
+        # original_names helps keep track of entity names as they're added,
+        # renamed, and deleted.
         original_names = {name: name for name in original_entity_names}
 
         for change in changes:
-            try:
+            if change.cmd == self.add_entity_cmd:
                 entity_name = getattr(change, self.entity_name)
-            except AttributeError:
-                # The change is a rename command, which uses explicit
-                # old_entity_name and new_entity_names instead.
-                pass
-            if change.cmd == self.add_entity:
-                if entity_name in self.changed:
+                if entity_name in self.changed_entities:
                     continue
-                elif entity_name in self.deleted:
-                    self.changed.append(entity_name)
+                elif entity_name in self.deleted_entities:
+                    self.changed_entities.append(entity_name)
                     del self.property_changes[entity_name]
-                    self.deleted.remove(entity_name)
+                    self.deleted_entities.remove(entity_name)
                 else:
-                    self.added.append(entity_name)
+                    self.added_entities.append(entity_name)
                     original_names[entity_name] = entity_name
-            elif change.cmd == self.rename_entity:
+            elif change.cmd == self.rename_entity_cmd:
                 new_entity_name = getattr(change, self.new_entity_name)
                 old_entity_name = getattr(change, self.old_entity_name)
                 orig_name = original_names[old_entity_name]
                 original_names[new_entity_name] = orig_name
 
-                if orig_name in self.changed:
+                if orig_name in self.changed_entities:
                     continue
 
                 if orig_name not in self.property_changes:
@@ -628,17 +633,19 @@ class EntityChangeListSummarizer(object):
                     }
                 self.property_changes[orig_name]['name']['new_value'] = (
                     new_entity_name)
-            elif change.cmd == self.delete_entity:
+            elif change.cmd == self.delete_entity_cmd:
+                entity_name = getattr(change, self.entity_name)
                 orig_name = original_names[entity_name]
-                if orig_name in self.changed:
+                if orig_name in self.changed_entities:
                     continue
-                elif orig_name in self.added:
-                    self.added.remove(orig_name)
+                elif orig_name in self.added_entities:
+                    self.added_entities.remove(orig_name)
                 else:
-                    self.deleted.append(orig_name)
-            elif change.cmd == self.edit_entity_property:
+                    self.deleted_entities.append(orig_name)
+            elif change.cmd == self.edit_entity_property_cmd:
+                entity_name = getattr(change, self.entity_name)
                 orig_name = original_names[entity_name]
-                if orig_name in self.changed:
+                if orig_name in self.changed_entities:
                     continue
 
                 property_name = change.property_name
@@ -682,8 +689,6 @@ def get_summary_of_change_list(base_exploration, change_list):
         - 4 'state' and 'gadget' change lists per data structures defined
           in EntityChangeListSummarizer
     """
-    # TODO(sll): This really needs tests, especially the diff logic. Probably
-    # worth comparing with the actual changed exploration.
 
     # TODO(anuzis): need to capture changes in gadget positioning
     # between and within panels when we expand support for these actions.
@@ -697,11 +702,15 @@ def get_summary_of_change_list(base_exploration, change_list):
 
     # State changes
     state_change_summarizer = EntityChangeListSummarizer(
-        'state', exploration.states.keys(), changes)
+        BASE_ENTITY_STATE)
+    state_change_summarizer.process_changes(
+        exploration.states.keys(), changes)
 
     # Gadget changes
     gadget_change_summarizer = EntityChangeListSummarizer(
-        'gadget', exploration._gadget_names, changes)
+        BASE_ENTITY_GADGET)
+    gadget_change_summarizer.process_changes(
+        exploration.get_all_gadget_names(), changes)
 
     # Exploration changes
     exploration_property_changes = {}
@@ -730,13 +739,13 @@ def get_summary_of_change_list(base_exploration, change_list):
     return {
         'exploration_property_changes': exploration_property_changes,
         'state_property_changes': state_change_summarizer.property_changes,
-        'changed_states': state_change_summarizer.changed,
-        'added_states': state_change_summarizer.added,
-        'deleted_states': state_change_summarizer.deleted,
+        'changed_states': state_change_summarizer.changed_entities,
+        'added_states': state_change_summarizer.added_entities,
+        'deleted_states': state_change_summarizer.deleted_entities,
         'gadget_property_changes': gadget_change_summarizer.property_changes,
-        'changed_gadgets': gadget_change_summarizer.changed,
-        'added_gadgets': gadget_change_summarizer.added,
-        'deleted_gadgets': gadget_change_summarizer.deleted
+        'changed_gadgets': gadget_change_summarizer.changed_entities,
+        'added_gadgets': gadget_change_summarizer.added_entities,
+        'deleted_gadgets': gadget_change_summarizer.deleted_entities
     }
 
 

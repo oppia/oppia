@@ -195,19 +195,17 @@ class ExplorationPage(EditorHandler):
             interaction_registry.Registry.get_validators_html(
                 interaction_ids))
 
-        gadget_ids = gadget_registry.Registry.get_all_gadget_ids()
+        gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_ids))
+            gadget_registry.Registry.get_gadget_html(gadget_types))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
 
-        skin_panels_properties = skins_services.Registry.get_skin_by_id(
-            exploration.default_skin).panels_properties
-
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'SKIN_SPECS': skins_services.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(exploration_id),
@@ -247,7 +245,6 @@ class ExplorationPage(EditorHandler):
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
-            'SKIN_PANELS_PROPERTIES': skin_panels_properties,
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
@@ -277,6 +274,7 @@ class ExplorationHandler(EditorHandler):
 
         editor_dict = {
             'category': exploration.category,
+            'default_skin_id': exploration.default_skin,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,
@@ -299,7 +297,6 @@ class ExplorationHandler(EditorHandler):
         if feconf.SHOW_SKIN_CHOOSER:
             editor_dict['all_skin_ids'] = (
                 skins_services.Registry.get_all_skin_ids())
-            editor_dict['default_skin_id'] = exploration.default_skin
 
         return editor_dict
 
