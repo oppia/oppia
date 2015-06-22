@@ -539,7 +539,7 @@ class RecommendationsHandler(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'recommended_exp_ids': (
-                recommendations_services
-                .get_exploration_recommendations(exploration_id))
+                recommendations_services.get_exploration_recommendations(
+                    exploration_id))
         })
         self.render_json(self.values)

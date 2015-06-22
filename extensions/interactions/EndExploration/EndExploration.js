@@ -71,9 +71,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
               Math.random() * filteredRecommendationExplorationIds.length);
             var randomRecommendationId =
               filteredRecommendationExplorationIds[randomIndex];
-            if ($scope.authorRecommendedExplorationIds.indexOf(randomRecommendationId) == -1) {
-              $scope.systemRecommendedExplorationIds.push(randomRecommendationId);
-            }
+            $scope.systemRecommendedExplorationIds.push(randomRecommendationId);
             filteredRecommendationExplorationIds.splice(randomIndex, 1);
           }
 
