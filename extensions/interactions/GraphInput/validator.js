@@ -21,7 +21,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     'WARNING_TYPES', 'baseInteractionValidationService',
     function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
     if (customizationArgs.graph.value.vertices.length > 50) {
@@ -47,7 +47,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
 
     warningsList = warningsList.concat(
       baseInteractionValidationService.getAllRuleSpecsWarnings(
-        ruleSpecs, stateName));
+        answerGroups, defaultOutcome, stateName));
 
     return warningsList;
   };

@@ -24,8 +24,10 @@ class SetInput(base.BaseInteraction):
     description = 'Allows learners to enter an unordered set of strings.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
-    _submit_handler = base.SubmitAnswerHandler('SetOfUnicodeString')
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
     _customization_arg_specs = []
+
+    def __init__(self):
+        self.answer_type = 'SetOfUnicodeString'

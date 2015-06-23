@@ -25,7 +25,7 @@ states:
         rule_specs:
         - inputs:
             x: adios
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: END
           feedback: []
@@ -33,7 +33,7 @@ states:
         rule_specs:
         - inputs:
             x: "adi\xF3s"
-          name: Contains
+          rule_type: Contains
       customization_args:
         placeholder:
           value: ''
@@ -61,7 +61,7 @@ states:
         rule_specs:
         - inputs:
             x: '0'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Colores
           feedback:
@@ -70,7 +70,7 @@ states:
         rule_specs:
         - inputs:
             x: '1'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Adios
           feedback:
@@ -79,7 +79,7 @@ states:
         rule_specs:
         - inputs:
             x: '2'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Colores
           feedback:
@@ -88,7 +88,7 @@ states:
         rule_specs:
         - inputs:
             x: '3'
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -126,7 +126,7 @@ states:
         rule_specs:
         - inputs:
             x: what is your name?
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Me llamo
           feedback:
@@ -137,7 +137,7 @@ states:
         rule_specs:
         - inputs:
             x: what do you call yourself?
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -182,7 +182,7 @@ states:
         rule_specs:
         - inputs:
             x: hola!
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Me llamo
           feedback: []
@@ -190,7 +190,7 @@ states:
         rule_specs:
         - inputs:
             x: hola
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Hola
           feedback:
@@ -199,7 +199,7 @@ states:
         rule_specs:
         - inputs:
             x: hola
-          name: FuzzyEquals
+          rule_type: FuzzyEquals
       customization_args:
         placeholder:
           value: ''
@@ -227,7 +227,7 @@ states:
         rule_specs:
         - inputs:
             x: me llamo es
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Supermercado
           feedback: []
@@ -235,7 +235,7 @@ states:
         rule_specs:
         - inputs:
             x: me llamo
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Supermercado
           feedback: []
@@ -243,7 +243,7 @@ states:
         rule_specs:
         - inputs:
             x: mi nombre es
-          name: StartsWith
+          rule_type: StartsWith
       customization_args:
         placeholder:
           value: ''
@@ -270,7 +270,7 @@ states:
         rule_specs:
         - inputs:
             x: my name is
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Como meaning
           feedback:
@@ -279,7 +279,7 @@ states:
         rule_specs:
         - inputs:
             x: i am called
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Como meaning
           feedback:
@@ -288,7 +288,7 @@ states:
         rule_specs:
         - inputs:
             x: i call myself
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -321,7 +321,7 @@ states:
         rule_specs:
         - inputs:
             x: '0'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Supermercado
           feedback:
@@ -331,7 +331,7 @@ states:
         rule_specs:
         - inputs:
             x: '1'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Colores
           feedback:
@@ -340,7 +340,7 @@ states:
         rule_specs:
         - inputs:
             x: '2'
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:

@@ -37,7 +37,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: First State
           feedback:
@@ -46,7 +46,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -79,7 +79,7 @@ states:
         rule_specs:
         - inputs:
             x: '1'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -92,7 +92,7 @@ states:
         rule_specs:
         - inputs:
             x: '2'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -104,7 +104,7 @@ states:
         rule_specs:
         - inputs:
             x: '3'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -117,7 +117,7 @@ states:
         rule_specs:
         - inputs:
             x: '4'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -131,7 +131,7 @@ states:
         rule_specs:
         - inputs:
             x: '5'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -143,7 +143,7 @@ states:
         rule_specs:
         - inputs:
             x: '6'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -155,7 +155,7 @@ states:
         rule_specs:
         - inputs:
             x: '7'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -168,7 +168,7 @@ states:
         rule_specs:
         - inputs:
             x: '8'
-          name: IsInRegion
+          rule_type: IsInRegion
       - outcome:
           dest: First State
           feedback:
@@ -180,7 +180,7 @@ states:
         rule_specs:
         - inputs:
             x: '9'
-          name: IsInRegion
+          rule_type: IsInRegion
       customization_args:
         highlightRegionsOnHover:
           value: false

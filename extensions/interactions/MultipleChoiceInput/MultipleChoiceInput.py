@@ -25,7 +25,6 @@ class MultipleChoiceInput(base.BaseInteraction):
         'Allows learners to select one of a list of multiple-choice options.')
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _submit_handler = base.SubmitAnswerHandler('NonnegativeInt')
 
     _customization_arg_specs = [{
         'name': 'choices',
@@ -48,3 +47,6 @@ class MultipleChoiceInput(base.BaseInteraction):
         },
         'default_value': ['Sample multiple-choice answer'],
     }]
+
+    def __init__(self):
+        self.answer_type = 'NonnegativeInt'

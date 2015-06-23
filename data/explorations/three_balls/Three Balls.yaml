@@ -32,7 +32,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback: []
@@ -40,7 +40,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -90,7 +90,7 @@ states:
         rule_specs:
         - inputs:
             x: 24.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Final challenge
           feedback:
@@ -100,7 +100,7 @@ states:
         rule_specs:
         - inputs:
             x: 0.0
-          name: IsLessThanOrEqualTo
+          rule_type: IsLessThanOrEqualTo
       - outcome:
           dest: Final challenge
           feedback:
@@ -120,7 +120,7 @@ states:
         - inputs:
             a: 18.0
             b: 23.0
-          name: IsInclusivelyBetween
+          rule_type: IsInclusivelyBetween
       - outcome:
           dest: Final challenge
           feedback:
@@ -137,7 +137,7 @@ states:
         rule_specs:
         - inputs:
             x: 24.0
-          name: IsGreaterThan
+          rule_type: IsGreaterThan
       - outcome:
           dest: Final challenge
           feedback:
@@ -147,7 +147,7 @@ states:
         rule_specs:
         - inputs:
             x: 6.0
-          name: IsLessThan
+          rule_type: IsLessThan
       - outcome:
           dest: Final challenge
           feedback:
@@ -157,7 +157,7 @@ states:
         rule_specs:
         - inputs:
             x: 6.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Final challenge
           feedback:
@@ -170,7 +170,7 @@ states:
         rule_specs:
         - inputs:
             x: 12.0
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Final challenge
@@ -200,7 +200,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Introspection
           feedback:
@@ -210,7 +210,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -259,7 +259,7 @@ states:
         rule_specs:
         - inputs:
             x: 2F1
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Final challenge
           feedback:
@@ -270,7 +270,7 @@ states:
         rule_specs:
         - inputs:
             x: 2*F1
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Final challenge
           feedback:
@@ -281,7 +281,7 @@ states:
         rule_specs:
         - inputs:
             x: F1*2
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Final challenge
           feedback:
@@ -292,7 +292,7 @@ states:
         rule_specs:
         - inputs:
             x: 2 * F1
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Final challenge
           feedback:
@@ -303,7 +303,7 @@ states:
         rule_specs:
         - inputs:
             x: F1 * 2
-          name: Contains
+          rule_type: Contains
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -343,7 +343,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -375,7 +375,7 @@ states:
         rule_specs:
         - inputs:
             x: 6.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Intro
           feedback:
@@ -387,7 +387,7 @@ states:
         rule_specs:
         - inputs:
             x: 0.0
-          name: IsLessThanOrEqualTo
+          rule_type: IsLessThanOrEqualTo
       customization_args: {}
       default_outcome:
         dest: Not 6
@@ -419,7 +419,7 @@ states:
         rule_specs:
         - inputs:
             x: ''
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -460,7 +460,7 @@ states:
             - ryb
             - ybr
             - yrb
-          name: HasElementsIn
+          rule_type: HasElementsIn
       - outcome:
           dest: Not 6
           feedback:
@@ -477,7 +477,7 @@ states:
             - RYB
             - YBR
             - YRB
-          name: HasElementsNotIn
+          rule_type: HasElementsNotIn
       - outcome:
           dest: Not 6
           feedback:
@@ -489,7 +489,7 @@ states:
             x:
             - RBY
             - RYB
-          name: OmitsElementsIn
+          rule_type: OmitsElementsIn
       - outcome:
           dest: Not 6
           feedback:
@@ -503,7 +503,7 @@ states:
             x:
             - YBR
             - YRB
-          name: OmitsElementsIn
+          rule_type: OmitsElementsIn
       - outcome:
           dest: Not 6
           feedback:
@@ -515,7 +515,7 @@ states:
             x:
             - BRY
             - BYR
-          name: OmitsElementsIn
+          rule_type: OmitsElementsIn
       - outcome:
           dest: Found all the ways
           feedback: []
@@ -529,7 +529,7 @@ states:
             - RYB
             - YBR
             - YRB
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Not 6
@@ -567,7 +567,7 @@ states:
         rule_specs:
         - inputs:
             x: 2.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Two balls
           feedback:
@@ -586,7 +586,7 @@ states:
         rule_specs:
         - inputs:
             x: 4.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Two balls
           feedback:
@@ -599,7 +599,7 @@ states:
         rule_specs:
         - inputs:
             x: 0.0
-          name: IsLessThanOrEqualTo
+          rule_type: IsLessThanOrEqualTo
       - outcome:
           dest: Two balls
           feedback:
@@ -608,7 +608,7 @@ states:
         rule_specs:
         - inputs:
             x: 1.0
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Two balls
@@ -637,7 +637,7 @@ states:
         rule_specs:
         - inputs:
             x: permutation
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: END
           feedback:
@@ -650,7 +650,7 @@ states:
         rule_specs:
         - inputs:
             x: factorial
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: END
           feedback:
@@ -663,7 +663,7 @@ states:
         rule_specs:
         - inputs:
             x: 3!
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: END
           feedback:
@@ -676,7 +676,7 @@ states:
         rule_specs:
         - inputs:
             x: 3*2*1
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: END
           feedback:
@@ -689,7 +689,7 @@ states:
         rule_specs:
         - inputs:
             x: 3x2x1
-          name: Contains
+          rule_type: Contains
       customization_args:
         placeholder:
           value: Type your answer here.

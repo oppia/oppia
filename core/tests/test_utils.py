@@ -292,8 +292,10 @@ class TestBase(unittest.TestCase):
         # If an end state name is provided, add terminal node with that name
         if end_state_name is not None:
             exploration.add_states([end_state_name])
-            exploration.states[end_state_name].update_interaction_id(
-                'EndExploration')
+            end_state = exploration.states[end_state_name]
+            end_state.update_interaction_id('EndExploration')
+            end_state.interaction.default_outcome = None
+
             # Link first state to ending state (to maintain validity)
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
@@ -326,7 +328,11 @@ class TestBase(unittest.TestCase):
         """Submits an answer as an exploration player and returns the
         corresponding dict. This function has strong parallels to code in
         PlayerServices.js which has the non-test code to perform the same
-        functionality.
+        functionality. This is replicated here so backend tests may utilize the
+        functionality of PlayerServices.js without being able to access it.
+
+        TODO(bhenning): Replicate this in an integration test to protect against
+        code skew here.
         """
         if params is None:
             params = {}

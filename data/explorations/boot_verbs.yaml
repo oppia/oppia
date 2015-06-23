@@ -40,7 +40,7 @@ states:
         rule_specs:
         - inputs:
             x: juego
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: boot verb
           feedback:
@@ -50,7 +50,7 @@ states:
         rule_specs:
         - inputs:
             x: jugo
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -77,7 +77,7 @@ states:
         rule_specs:
         - inputs:
             x: juego
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -112,7 +112,7 @@ states:
         rule_specs:
         - inputs:
             x: jueg
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -123,7 +123,7 @@ states:
         rule_specs:
         - inputs:
             x: juego
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -151,7 +151,7 @@ states:
         rule_specs:
         - inputs:
             x: yo
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -181,7 +181,7 @@ states:
         rule_specs:
         - inputs:
             x: -o
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: boot verb
           feedback:
@@ -191,7 +191,7 @@ states:
         rule_specs:
         - inputs:
             x: o
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''

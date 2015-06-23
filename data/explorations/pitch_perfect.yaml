@@ -23,7 +23,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-3
           feedback: []
@@ -31,7 +31,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-1
           feedback: []
@@ -39,7 +39,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback: []
@@ -47,7 +47,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -77,7 +77,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -87,7 +87,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -96,7 +96,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -105,7 +105,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -135,7 +135,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -144,7 +144,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -153,7 +153,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -162,7 +162,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -193,7 +193,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -202,7 +202,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -211,7 +211,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -221,7 +221,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -255,7 +255,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -264,7 +264,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Choice from Melody-2
           feedback:
@@ -273,7 +273,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -282,7 +282,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -313,7 +313,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -322,7 +322,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -331,7 +331,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -340,7 +340,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -370,7 +370,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -379,7 +379,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -388,7 +388,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -397,7 +397,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -431,7 +431,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -440,7 +440,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -449,7 +449,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: END
           feedback:
@@ -458,7 +458,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -514,7 +514,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: B4
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -526,7 +526,7 @@ states:
         rule_specs:
         - inputs:
             k: 2
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -546,7 +546,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: B4
-          name: IsEqualToExceptFor
+          rule_type: IsEqualToExceptFor
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -566,7 +566,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: -4
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -586,7 +586,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: -2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -606,7 +606,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: 1
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -626,7 +626,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: 3
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -646,7 +646,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: 5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -665,7 +665,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: 8
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-1
           feedback:
@@ -684,7 +684,7 @@ states:
                 num: 1
               readableNoteName: B4
             y: 10
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       customization_args:
         initialSequence:
           value: []
@@ -735,7 +735,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: D5
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -747,7 +747,7 @@ states:
         rule_specs:
         - inputs:
             k: 2
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -767,7 +767,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: D5
-          name: IsEqualToExceptFor
+          rule_type: IsEqualToExceptFor
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -787,7 +787,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -9
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -807,7 +807,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -827,7 +827,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -847,7 +847,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -867,7 +867,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -887,7 +887,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 3
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-2
           feedback:
@@ -907,7 +907,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       customization_args:
         initialSequence:
           value: []
@@ -958,7 +958,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: A4
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Interval Trainer-3
           feedback:
@@ -970,7 +970,7 @@ states:
         rule_specs:
         - inputs:
             k: 2
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Interval Trainer-3
           feedback:
@@ -992,7 +992,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: A4
-          name: IsEqualToExceptFor
+          rule_type: IsEqualToExceptFor
       - outcome:
           dest: Interval Trainer-3
           feedback:
@@ -1012,7 +1012,7 @@ states:
                 num: 1
               readableNoteName: A4
             y: 2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-3
           feedback:
@@ -1032,7 +1032,7 @@ states:
                 num: 1
               readableNoteName: A4
             y: 5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-3
           feedback:
@@ -1052,7 +1052,7 @@ states:
                 num: 1
               readableNoteName: A4
             y: 7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Interval Trainer-3
           feedback:
@@ -1073,7 +1073,7 @@ states:
                 num: 1
               readableNoteName: A4
             y: 12
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       customization_args:
         initialSequence:
           value: []
@@ -1130,7 +1130,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: C5
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -1140,7 +1140,7 @@ states:
         rule_specs:
         - inputs:
             k: 3
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -1151,7 +1151,7 @@ states:
         - inputs:
             a: 1
             b: 2
-          name: HasLengthInclusivelyBetween
+          rule_type: HasLengthInclusivelyBetween
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -1175,7 +1175,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: C5
-          name: IsEqualToExceptFor
+          rule_type: IsEqualToExceptFor
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -1198,7 +1198,7 @@ states:
                 num: 1
               readableNoteName: C5
             y: -5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Melody Trainer-1
           feedback:
@@ -1224,7 +1224,7 @@ states:
                 num: 1
               readableNoteName: C5
             y: 5
-          name: IsTranspositionOfExceptFor
+          rule_type: IsTranspositionOfExceptFor
       customization_args:
         initialSequence:
           value: []
@@ -1291,7 +1291,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: C5
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Melody Trainer-2
           feedback:
@@ -1303,7 +1303,7 @@ states:
         rule_specs:
         - inputs:
             k: 5
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Melody Trainer-2
           feedback:
@@ -1314,7 +1314,7 @@ states:
         - inputs:
             a: 1
             b: 4
-          name: HasLengthInclusivelyBetween
+          rule_type: HasLengthInclusivelyBetween
       - outcome:
           dest: Melody Trainer-2
           feedback:
@@ -1346,7 +1346,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: C5
-          name: IsEqualToExceptFor
+          rule_type: IsEqualToExceptFor
       - outcome:
           dest: Melody Trainer-2
           feedback:
@@ -1379,7 +1379,7 @@ states:
                 num: 1
               readableNoteName: C5
             y: -5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Melody Trainer-2
           feedback:
@@ -1412,7 +1412,7 @@ states:
                 num: 1
               readableNoteName: C5
             y: -7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Melody Trainer-2
           feedback:
@@ -1447,7 +1447,7 @@ states:
                 num: 1
               readableNoteName: C5
             y: 5
-          name: IsTranspositionOfExceptFor
+          rule_type: IsTranspositionOfExceptFor
       customization_args:
         initialSequence:
           value: []
@@ -1511,7 +1511,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: D5
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1523,7 +1523,7 @@ states:
         rule_specs:
         - inputs:
             k: 1
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1539,7 +1539,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -12
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1553,7 +1553,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1567,7 +1567,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 3
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1581,7 +1581,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1595,7 +1595,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: 7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1609,7 +1609,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1623,7 +1623,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -3
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1637,7 +1637,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1651,7 +1651,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1665,7 +1665,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -9
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1679,7 +1679,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -10
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-1
           feedback:
@@ -1693,7 +1693,7 @@ states:
                 num: 1
               readableNoteName: D5
             y: -14
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       customization_args:
         initialSequence:
           value: []
@@ -1735,7 +1735,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: F4
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1747,7 +1747,7 @@ states:
         rule_specs:
         - inputs:
             k: 1
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1763,7 +1763,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 12
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1777,7 +1777,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: -1
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1791,7 +1791,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: -3
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1805,7 +1805,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: -5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1819,7 +1819,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1833,7 +1833,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 4
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1847,7 +1847,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 6
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1861,7 +1861,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1875,7 +1875,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 9
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1889,7 +1889,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 11
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1903,7 +1903,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 14
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-2
           feedback:
@@ -1917,7 +1917,7 @@ states:
                 num: 1
               readableNoteName: F4
             y: 16
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       customization_args:
         initialSequence:
           value: []
@@ -1960,7 +1960,7 @@ states:
                 den: 1
                 num: 1
               readableNoteName: A5
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -1972,7 +1972,7 @@ states:
         rule_specs:
         - inputs:
             k: 1
-          name: IsLongerThan
+          rule_type: IsLongerThan
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -1988,7 +1988,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -12
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2002,7 +2002,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -2
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2016,7 +2016,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -4
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2030,7 +2030,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -5
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2044,7 +2044,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -7
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2058,7 +2058,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -9
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2072,7 +2072,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -10
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2086,7 +2086,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -14
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2100,7 +2100,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -16
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2114,7 +2114,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -17
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2128,7 +2128,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -19
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       - outcome:
           dest: Pitch Trainer-3
           feedback:
@@ -2142,7 +2142,7 @@ states:
                 num: 1
               readableNoteName: A5
             y: -21
-          name: IsTranspositionOf
+          rule_type: IsTranspositionOf
       customization_args:
         initialSequence:
           value: []

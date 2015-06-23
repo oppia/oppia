@@ -86,12 +86,12 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
   };
 }]);
 
-// Filter that returns true iff a ruleSpec has a self-loop and no feedback.
-oppia.filter('isRuleSpecConfusing', [function() {
-  return function(ruleSpec, currentStateName) {
+// Filter that returns true iff an outcome has a self-loop and no feedback.
+oppia.filter('isOutcomeConfusing', [function() {
+  return function(outcome, currentStateName) {
     return (
-      ruleSpec.dest === currentStateName &&
-      !ruleSpec.feedback.some(function(feedbackItem) {
+      outcome.dest === currentStateName &&
+      !outcome.feedback.some(function(feedbackItem) {
         return feedbackItem.trim().length > 0;
       })
     );
@@ -116,10 +116,10 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
     }
 
     var description = INTERACTION_SPECS[interactionId].rule_descriptions[
-      rule.name];
+      rule.rule_type];
     if (!description) {
       console.error(
-        'Cannot find description for rule ' + rule.name +
+        'Cannot find description for rule ' + rule.rule_type +
         ' for interaction ' + interactionId);
       return '';
     }

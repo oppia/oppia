@@ -32,7 +32,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Coefficient signs WA1
           feedback:
@@ -42,7 +42,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Coefficient signs WA1
           feedback:
@@ -51,7 +51,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Coefficient signs WA2
           feedback:
@@ -60,7 +60,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -98,7 +98,7 @@ states:
         rule_specs:
         - inputs:
             x: -12.0
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Coefficient signs WA1
@@ -129,7 +129,7 @@ states:
         rule_specs:
         - inputs:
             x: 12.0
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Coefficient signs WA2
@@ -167,7 +167,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -205,7 +205,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -241,7 +241,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -284,7 +284,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -318,7 +318,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -360,7 +360,7 @@ states:
         rule_specs:
         - inputs:
             x: 1,-6,-1,30
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''

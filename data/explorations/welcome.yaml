@@ -37,7 +37,7 @@ states:
         rule_specs:
         - inputs:
             x: 100.0
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Estimate 100
@@ -69,7 +69,7 @@ states:
             p:
             - 60.1708
             - 24.9375
-          name: Within
+          rule_type: Within
       - outcome:
           dest: Finding Helsinki
           feedback:
@@ -84,7 +84,7 @@ states:
             p:
             - 60.1708
             - 24.9375
-          name: Within
+          rule_type: Within
       customization_args:
         latitude:
           value: 60.1708
@@ -116,7 +116,7 @@ states:
         rule_specs:
         - inputs:
             x: 121.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Estimate 100
           feedback:
@@ -125,7 +125,7 @@ states:
         rule_specs:
         - inputs:
             x: 121.0
-          name: IsLessThan
+          rule_type: IsLessThan
       - outcome:
           dest: Numeric input
           feedback:
@@ -137,7 +137,7 @@ states:
         - inputs:
             tol: 9.0
             x: 121.0
-          name: IsWithinTolerance
+          rule_type: IsWithinTolerance
       - outcome:
           dest: Numeric input
           feedback:
@@ -146,7 +146,7 @@ states:
         rule_specs:
         - inputs:
             x: 121.0
-          name: IsGreaterThan
+          rule_type: IsGreaterThan
       - outcome:
           dest: Numeric input
           feedback:
@@ -155,7 +155,7 @@ states:
         rule_specs:
         - inputs:
             x: 121.0
-          name: IsLessThan
+          rule_type: IsLessThan
       customization_args: {}
       default_outcome:
         dest: Numeric input
@@ -210,7 +210,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Welcome!
           feedback:
@@ -220,7 +220,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -260,7 +260,7 @@ states:
         rule_specs:
         - inputs:
             x: greek
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: What language
           feedback:
@@ -274,7 +274,7 @@ states:
         rule_specs:
         - inputs:
             x: roman
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: What language
           feedback:
@@ -288,7 +288,7 @@ states:
         rule_specs:
         - inputs:
             x: latin
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: What language
           feedback:
@@ -298,7 +298,7 @@ states:
         rule_specs:
         - inputs:
             x: Swedish
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: What language
           feedback:
@@ -308,7 +308,7 @@ states:
         rule_specs:
         - inputs:
             x: translate oppia
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: What language
           feedback:
@@ -317,7 +317,7 @@ states:
         rule_specs:
         - inputs:
             x: finish
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Numeric input
           feedback:
@@ -330,7 +330,7 @@ states:
         rule_specs:
         - inputs:
             x: finnish
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: What language
           feedback:
@@ -339,7 +339,7 @@ states:
         rule_specs:
         - inputs:
             x: finnish
-          name: FuzzyEquals
+          rule_type: FuzzyEquals
       - outcome:
           dest: What language
           feedback:
@@ -348,7 +348,7 @@ states:
         rule_specs:
         - inputs:
             x: 'yes'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: What language
           feedback:
@@ -358,7 +358,7 @@ states:
         rule_specs:
         - inputs:
             x: German
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: What language
           feedback:
@@ -369,7 +369,7 @@ states:
         rule_specs:
         - inputs:
             x: French
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Numeric input
           feedback:
@@ -382,7 +382,7 @@ states:
         rule_specs:
         - inputs:
             x: suomi
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: What language
           feedback:
@@ -393,7 +393,7 @@ states:
         rule_specs:
         - inputs:
             x: Finland
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: What language
           feedback:
@@ -403,7 +403,7 @@ states:
         rule_specs:
         - inputs:
             x: Norway
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: What language
           feedback:
@@ -415,7 +415,7 @@ states:
         rule_specs:
         - inputs:
             x: Sweden
-          name: Contains
+          rule_type: Contains
       customization_args:
         placeholder:
           value: ''

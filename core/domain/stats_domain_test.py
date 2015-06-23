@@ -86,7 +86,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('user_id', exp)
 
         rule = exp_domain.RuleSpec.from_dict({
-            'name': 'LessThan',
+            'rule_type': 'LessThan',
             'inputs': {'x': 5}
         })
         rule_str = rule.stringify_classified_rule()

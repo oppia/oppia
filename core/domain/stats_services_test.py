@@ -180,12 +180,12 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             'eid', 'fake@user.com', end_state_name='End')
         exp = exp_services.get_exploration_by_id('eid')
 
-        not_default_rule_spec = exp_domain.RuleSpec({}, 'NotDefault')
+        not_default_rule_spec = exp_domain.RuleSpec('Equals', {'x': 'Text'})
         init_interaction = exp.init_state.interaction
         init_interaction.answer_groups.append(exp_domain.AnswerGroup(
-            exp_domain.InteractionOutcome(exp.init_state_name, [], {}),
-            rule_specs=[not_default_rule_spec]))
-        init_interaction.default_outcome = exp_domain.InteractionOutcome(
+            exp_domain.Outcome(exp.init_state_name, [], {}),
+            [not_default_rule_spec]))
+        init_interaction.default_outcome = exp_domain.Outcome(
             'End', [], {})
         exp_services._save_exploration('fake@user.com', exp, '', [])
 

@@ -55,7 +55,7 @@ states:
         rule_specs:
         - inputs:
             x: 23.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: First Question
           feedback:
@@ -67,7 +67,7 @@ states:
         - inputs:
             a: 22.0
             b: 24.0
-          name: IsInclusivelyBetween
+          rule_type: IsInclusivelyBetween
       - outcome:
           dest: First Question
           feedback:
@@ -79,7 +79,7 @@ states:
         rule_specs:
         - inputs:
             x: 8.0
-          name: Equals
+          rule_type: Equals
       customization_args: {}
       default_outcome:
         dest: Numbers for first question
@@ -108,7 +108,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -138,7 +138,7 @@ states:
         - inputs:
             x:
             - '10'
-          name: HasElementsIn
+          rule_type: HasElementsIn
       - outcome:
           dest: Numbers for first question
           feedback:
@@ -152,7 +152,7 @@ states:
         - inputs:
             x:
             - '0'
-          name: HasElementsIn
+          rule_type: HasElementsIn
       - outcome:
           dest: First Question
           feedback:
@@ -166,7 +166,7 @@ states:
             - '5'
             - '6'
             - '9'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Numbers for first question
           feedback:
@@ -176,7 +176,7 @@ states:
         - inputs:
             x:
             - '5'
-          name: OmitsElementsIn
+          rule_type: OmitsElementsIn
       - outcome:
           dest: Numbers for first question
           feedback:
@@ -189,7 +189,7 @@ states:
             - '3'
             - '6'
             - '9'
-          name: OmitsElementsIn
+          rule_type: OmitsElementsIn
       - outcome:
           dest: Numbers for first question
           feedback:
@@ -205,7 +205,7 @@ states:
             - '4'
             - '7'
             - '8'
-          name: HasElementsIn
+          rule_type: HasElementsIn
       customization_args: {}
       default_outcome:
         dest: Numbers for first question
@@ -235,7 +235,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -266,7 +266,7 @@ states:
           param_changes: []
         rule_specs:
         - inputs: {}
-          name: ResultsInError
+          rule_type: ResultsInError
       - outcome:
           dest: Second Question Sample Answer
           feedback:
@@ -275,7 +275,7 @@ states:
         rule_specs:
         - inputs:
             x: '233168'
-          name: OutputEquals
+          rule_type: OutputEquals
       - outcome:
           dest: Second Question Coding
           feedback:
@@ -286,7 +286,7 @@ states:
         rule_specs:
         - inputs:
             x: '234168'
-          name: OutputEquals
+          rule_type: OutputEquals
       - outcome:
           dest: Second Question Coding
           feedback:
@@ -301,7 +301,7 @@ states:
         rule_specs:
         - inputs:
             x: '266333'
-          name: OutputEquals
+          rule_type: OutputEquals
       - outcome:
           dest: Second Question Coding
           feedback:
@@ -312,7 +312,7 @@ states:
         rule_specs:
         - inputs:
             x: '23'
-          name: OutputEquals
+          rule_type: OutputEquals
       - outcome:
           dest: Second Question Coding
           feedback:
@@ -323,7 +323,7 @@ states:
         rule_specs:
         - inputs:
             x: '33165'
-          name: OutputEquals
+          rule_type: OutputEquals
       - outcome:
           dest: Second Question Coding
           feedback:
@@ -334,7 +334,7 @@ states:
         rule_specs:
         - inputs:
             x: '499500'
-          name: OutputEquals
+          rule_type: OutputEquals
       - outcome:
           dest: Second Question Coding
           feedback:
@@ -345,7 +345,7 @@ states:
         rule_specs:
         - inputs:
             x: ''
-          name: OutputEquals
+          rule_type: OutputEquals
       customization_args:
         language:
           value: python
@@ -423,7 +423,7 @@ states:
         rule_specs:
         - inputs:
             x: 233168.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Second Question Straight Answer
           feedback:
@@ -441,7 +441,7 @@ states:
         rule_specs:
         - inputs:
             x: 2300.0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Second Question Straight Answer
           feedback:
@@ -452,7 +452,7 @@ states:
         rule_specs:
         - inputs:
             x: 23.0
-          name: IsLessThan
+          rule_type: IsLessThan
       customization_args: {}
       default_outcome:
         dest: Second Question Coding

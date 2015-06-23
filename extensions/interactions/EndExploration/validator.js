@@ -20,11 +20,6 @@
 oppia.filter('oppiaInteractiveEndExplorationValidator', [function() {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
-    var warningsList = [];
-
-    // Note that, in order to conform to the other interactions, this
-    // interaction has only one rule, but it is never used.
-
-    return warningsList;
+    return [];
   };
 }]);

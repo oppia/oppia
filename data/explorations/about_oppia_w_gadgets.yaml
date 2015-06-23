@@ -71,7 +71,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Credits
           feedback: []
@@ -79,7 +79,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Site License
           feedback: []
@@ -87,7 +87,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -127,7 +127,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Credits
           feedback: []
@@ -135,7 +135,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Site License
           feedback: []
@@ -143,7 +143,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -210,7 +210,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: So what can I tell you
           feedback: []
@@ -218,7 +218,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Site License
           feedback: []
@@ -226,7 +226,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -311,7 +311,7 @@ states:
             p:
             - 0.0
             - 0.0
-          name: Within
+          rule_type: Within
       customization_args:
         latitude:
           value: 0
@@ -389,7 +389,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Contact
           feedback: []
@@ -397,7 +397,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: So what can I tell you
           feedback: []
@@ -405,7 +405,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -433,7 +433,7 @@ states:
         rule_specs:
         - inputs:
             x: 1
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: End Card
           feedback: []
@@ -441,7 +441,7 @@ states:
         rule_specs:
         - inputs:
             x: 3
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Example1
           feedback: []
@@ -449,7 +449,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Contribute
           feedback: []
@@ -457,7 +457,7 @@ states:
         rule_specs:
         - inputs:
             x: 2
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:

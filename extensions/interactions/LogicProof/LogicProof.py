@@ -27,7 +27,6 @@ class LogicProof(base.BaseInteraction):
         'Allows learners to write proofs for simple logical statements.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['logic_proof', 'codemirror']
-    _submit_handler = base.SubmitAnswerHandler('CheckedProof')
 
     _customization_arg_specs = [{
         'name': 'question',
@@ -52,3 +51,6 @@ class LogicProof(base.BaseInteraction):
             'default_proof_string': ''
         },
     }]
+
+    def __init__(self):
+        self.answer_type = 'CheckedProof'

@@ -20,8 +20,8 @@
 oppia.filter('oppiaInteractiveSetInputValidator', [
     'baseInteractionValidationService', function(baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     return baseInteractionValidationService.getAllRuleSpecsWarnings(
-      ruleSpecs, stateName);
+      answerGroups, defaultOutcome, stateName);
   };
 }]);

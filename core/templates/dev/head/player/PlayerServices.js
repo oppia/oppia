@@ -443,8 +443,8 @@ oppia.factory('oppiaPlayerService', [
 
       answerClassificationService.getMatchingClassificationResult(
         _explorationId, oldState, answer
-      ).success(function(classifyResult) {
-        var outcome = classifyResult['outcome'];
+      ).success(function(classificationResult) {
+        var outcome = classificationResult.outcome;
 
         if (!_editorPreviewMode) {
           var answerRecordingUrl = (
@@ -454,7 +454,7 @@ oppia.factory('oppiaPlayerService', [
             params: learnerParamsService.getAllParams(),
             version: version,
             old_state_name: _currentStateName,
-            rule_spec_string: classifyResult['rule_spec_string']
+            rule_spec_string: classificationResult.rule_spec_string
           });
         }
 

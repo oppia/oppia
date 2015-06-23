@@ -326,8 +326,9 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # job.
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, 'title', 'category')
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'EndExploration')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('EndExploration')
+        init_state.interaction.default_outcome = None
         exp_services.save_new_exploration(self.ALBERT_ID, exploration)
         self.assertEqual(
             exploration.states_schema_version,

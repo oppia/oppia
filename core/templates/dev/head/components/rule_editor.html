@@ -51,7 +51,7 @@
 
       <div class="pull-right">
         <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(!isDefaultRule() && !rule.name) || editRuleForm.$invalid || isRuleEmpty(outcome)" ng-click="saveThisRule()">Save Rule</button>
+        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(!isDefaultRule() && !rule.rule_type) || editRuleForm.$invalid || isSelfLoopWithNoFeedback(outcome)" ng-click="saveThisRule()">Save Rule</button>
       </div>
 
       <div style="clear: both;"></div>
@@ -136,7 +136,7 @@
 
 <script type="text/ng-template" id="rules/ruleDescriptionEditor">
   <form class="form-inline" role="form">
-    <rule-type-selector class="protractor-test-rule-description" local-value="currentRule.name" on-selection-change="onSelectNewRuleType">
+    <rule-type-selector class="protractor-test-rule-description" local-value="currentRule.rule_type" on-selection-change="onSelectNewRuleType">
     </rule-type-selector>
 
     <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px; width: 100%;">

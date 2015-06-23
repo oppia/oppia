@@ -1332,20 +1332,16 @@ oppia.factory('explorationWarningsService', [
     for (var stateName in _states) {
       var interaction = _states[stateName].interaction;
       if (interaction.id) {
-        console.log('get warnings for ' + interaction.id);
-        console.log(interaction);
         var validatorName = 'oppiaInteractive' + _states[stateName].interaction.id + 'Validator';
-        for (var i = 0; i < interaction.answer_groups.length; ++i) {
-          var group = interaction.answer_groups[i];
-          var interactionWarnings = $filter(validatorName)(
-            stateName, interaction.customization_args, group.rule_specs);
+        var interactionWarnings = $filter(validatorName)(
+          stateName, interaction.customization_args, interaction.answer_groups,
+          interaction.default_outcome);
 
-          for (var j = 0; j < interactionWarnings.length; j++) {
-            _warningsList.push({
-              type: interactionWarnings[j].type,
-              message: 'In \'' + stateName + '\', ' + interactionWarnings[j].message
-            });
-          }
+        for (var j = 0; j < interactionWarnings.length; j++) {
+          _warningsList.push({
+            type: interactionWarnings[j].type,
+            message: 'In \'' + stateName + '\', ' + interactionWarnings[j].message
+          });
         }
       }
     }

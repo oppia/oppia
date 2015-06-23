@@ -26,7 +26,6 @@ class MusicNotesInput(base.BaseInteraction):
         'staff.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
-    _submit_handler = base.SubmitAnswerHandler('MusicPhrase')
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
@@ -45,3 +44,6 @@ class MusicNotesInput(base.BaseInteraction):
         },
         'default_value': [],
     }]
+
+    def __init__(self):
+        self.answer_type = 'MusicPhrase'

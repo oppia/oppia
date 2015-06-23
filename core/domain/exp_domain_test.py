@@ -254,19 +254,181 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # default outcome must point to a valid state.
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
-        default_outcome.dest = 'DEF'
+        default_outcome.dest = exploration.init_state_name
         init_state.interaction.answer_groups.append(
             exp_domain.AnswerGroup.from_dict({
-                'outcome': default_outcome.to_dict(),
+                'outcome': {
+                    'dest': exploration.init_state_name,
+                    'feedback': ['Feedback'],
+                    'param_changes': [],
+                },
                 'rule_specs': [{
-                    'inputs': {},
-                    'name': 'Nondefault'
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
                 }]
             })
         )
-        default_outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        interaction = init_state.interaction
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
+        answer_group.outcome.dest = 'DEF'
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'destination DEF is not a valid'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'TextInput')
+        answer_group.outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+        rule_spec.inputs = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'RuleSpec \'Contains\' is missing inputs'):
+            exploration.validate()
+
+        rule_spec.inputs = 'Inputs string'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected inputs to be a dict'):
+            exploration.validate()
+
+        rule_spec.inputs = { 'x': 'Test' }
+        rule_spec.rule_type = 'FakeRuleType'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Unrecognized rule type'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        rule_spec.rule_type = 'Contains'
+        exploration.validate()
+
+        # Validate Outcome.
+        outcome = answer_group.outcome
+        destination = exploration.init_state_name
+        outcome.dest = None
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Every outcome should have a destination.'):
+            exploration.validate()
+
+        outcome.dest = { 'Test' }
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected outcome dest to be a string'):
+            exploration.validate()
+
+        outcome.dest = destination
+        outcome.feedback = 'Feedback'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected outcome feedback to be a list'):
+            exploration.validate()
+
+        outcome.feedback = [15]
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected outcome feedback item to be a string'):
+            exploration.validate()
+
+        outcome.feedback = ['Feedback']
+        exploration.validate()
+
+        outcome.param_changes = 'Changes'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected outcome param_changes to be a list'):
+            exploration.validate()
+
+        outcome.param_changes = []
+        exploration.validate()
+
+        # Validate InteractionInstance.
+        interaction.id = 15
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected interaction id to be a string'):
+            exploration.validate()
+
+        interaction.id = 'SomeInteractionTypeThatDoesNotExist'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid interaction id'):
+            exploration.validate()
+
+        interaction.id = 'TextInput'
+        exploration.validate()
+
+        interaction.customization_args = []
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected customization args to be a dict'):
+            exploration.validate()
+        
+        interaction.customization_args = { 15: '' }
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid customization arg name'):
+            exploration.validate()
+
+        interaction.customization_args = { 'placeholder': '' }
+        exploration.validate()
+
+        interaction.answer_groups = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected answer groups to be a list'):
+            exploration.validate()
+
+        interaction.answer_groups = answer_groups
+        interaction.id = 'EndExploration'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Terminal interactions must not have a default outcome.'):
+            exploration.validate()
+
+        interaction.id = 'TextInput'
+        interaction.default_outcome = None
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Non-terminal interactions must have a default outcome.'):
+            exploration.validate()
+
+        interaction.id = 'EndExploration'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Terminal interactions must not have any answer groups.'):
+            exploration.validate()
+
+        # Valid: terminal interaction without a def. outcome or answer groups.
+        interaction.answer_groups = []
+        exploration.validate()
+
+        interaction.triggers = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected triggers to be a list'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        interaction.id = 'TextInput'
+        interaction.answer_groups = answer_groups
+        interaction.default_outcome = default_outcome
+        interaction.triggers = []
+        exploration.validate()
+
+        # Validate AnswerGroup.
+        answer_group.rule_specs = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected answer group rules to be a list'):
+            exploration.validate()
+
+        answer_group.rule_specs = []
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'There must be at least one rule for each answer group.'):
             exploration.validate()
 
         exploration.states = {
@@ -275,7 +437,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
-
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -320,8 +481,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', 'Title', 'Category')
         exploration.objective = 'Objective'
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'EndExploration')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('EndExploration')
+        init_state.interaction.default_outcome = None
         exploration.validate()
 
         exploration.tags = 'this should be a list'
@@ -1009,7 +1171,7 @@ states:
         rule_specs:
         - inputs:
             x: InputString
-          name: Equals
+          rule_type: Equals
       customization_args:
         placeholder:
           value: ''
@@ -1235,9 +1397,12 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.validate(strict=True)
 
         # Renaming the node to something other than 'END' and giving it an
-        # EndExploration is enough to validate it
+        # EndExploration is enough to validate it, though it cannot have a
+        # default outcome or answer groups.
         exploration.rename_state('END', 'AnotherEnd')
-        exploration.states['AnotherEnd'].update_interaction_id('EndExploration')
+        another_end_state = exploration.states['AnotherEnd']
+        another_end_state.update_interaction_id('EndExploration')
+        another_end_state.interaction.default_outcome = None
         exploration.validate(strict=True)
 
         # Name it back for final tests

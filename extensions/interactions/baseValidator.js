@@ -20,12 +20,12 @@ oppia.factory('baseInteractionValidationService', [
     '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
 
   return {
-    getNonDefaultRuleSpecsWarnings: function(ruleSpecs, stateName) {
+    getNonDefaultRuleSpecsWarnings: function(answerGroups, defaultOutcome, stateName) {
       var partialWarningsList = [];
 
-      // This does not check the last ('default') rule.
-      for (var i = 0; i < ruleSpecs.length - 1; i++) {
-        if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
+      // This does not check the default outcome.
+      for (var i = 0; i < answerGroups.length; i++) {
+        if ($filter('isOutcomeConfusing')(answerGroups[i].outcome, stateName)) {
           partialWarningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
@@ -36,9 +36,9 @@ oppia.factory('baseInteractionValidationService', [
       }
       return partialWarningsList;
     },
-    getDefaultRuleSpecsWarnings: function(ruleSpecs, stateName) {
+    getDefaultRuleSpecsWarnings: function(answerGroups, defaultOutcome, stateName) {
       var partialWarningsList = [];
-      if ($filter('isRuleSpecConfusing')(ruleSpecs[ruleSpecs.length - 1], stateName)) {
+      if ($filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
         partialWarningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
@@ -47,10 +47,10 @@ oppia.factory('baseInteractionValidationService', [
       }
       return partialWarningsList;
     },
-    getAllRuleSpecsWarnings: function(ruleSpecs, stateName) {
+    getAllRuleSpecsWarnings: function(answerGroups, defaultOutcome, stateName) {
       return (
-        this.getNonDefaultRuleSpecsWarnings(ruleSpecs, stateName).concat(
-          this.getDefaultRuleSpecsWarnings(ruleSpecs, stateName)));
+        this.getNonDefaultRuleSpecsWarnings(answerGroups, defaultOutcome, stateName).concat(
+          this.getDefaultRuleSpecsWarnings(answerGroups, defaultOutcome, stateName)));
     }
   }
 }]);

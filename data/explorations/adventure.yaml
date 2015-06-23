@@ -36,7 +36,7 @@ states:
         rule_specs:
         - inputs:
             x: pick
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: picking
           feedback: []
@@ -44,7 +44,7 @@ states:
         rule_specs:
         - inputs:
             x: flower
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Fork
           feedback:
@@ -53,7 +53,7 @@ states:
         rule_specs:
         - inputs:
             x: southeast
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Fork
           feedback:
@@ -62,7 +62,7 @@ states:
         rule_specs:
         - inputs:
             x: se
-          name: StartsWith
+          rule_type: StartsWith
       customization_args:
         placeholder:
           value: ''
@@ -106,7 +106,7 @@ states:
         rule_specs:
         - inputs:
             x: northeast
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Clearing
           feedback:
@@ -115,7 +115,7 @@ states:
         rule_specs:
         - inputs:
             x: northwest
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Troll
           feedback:
@@ -124,7 +124,7 @@ states:
         rule_specs:
         - inputs:
             x: ne
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Clearing
           feedback:
@@ -133,7 +133,7 @@ states:
         rule_specs:
         - inputs:
             x: nw
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Fork
           feedback:
@@ -144,7 +144,7 @@ states:
         rule_specs:
         - inputs:
             x: back
-          name: Contains
+          rule_type: Contains
       customization_args:
         placeholder:
           value: ''
@@ -175,7 +175,7 @@ states:
         rule_specs:
         - inputs:
             x: '{{numcoins}}'
-          name: Equals
+          rule_type: Equals
       - outcome:
           dest: Rainbow
           feedback:
@@ -184,7 +184,7 @@ states:
         rule_specs:
         - inputs:
             x: 10.0
-          name: IsGreaterThan
+          rule_type: IsGreaterThan
       - outcome:
           dest: Rainbow
           feedback:
@@ -193,7 +193,7 @@ states:
         rule_specs:
         - inputs:
             x: 1.0
-          name: IsLessThan
+          rule_type: IsLessThan
       - outcome:
           dest: Rainbow
           feedback:
@@ -202,7 +202,7 @@ states:
         rule_specs:
         - inputs:
             x: '{{numcoins}}'
-          name: IsGreaterThan
+          rule_type: IsGreaterThan
       - outcome:
           dest: Rainbow
           feedback:
@@ -211,7 +211,7 @@ states:
         rule_specs:
         - inputs:
             x: '{{numcoins}}'
-          name: IsLessThan
+          rule_type: IsLessThan
       customization_args: {}
       default_outcome:
         dest: Rainbow
@@ -237,7 +237,7 @@ states:
         rule_specs:
         - inputs:
             x: 0
-          name: Equals
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -282,7 +282,7 @@ states:
         rule_specs:
         - inputs:
             x: southwest
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Fork
           feedback:
@@ -291,7 +291,7 @@ states:
         rule_specs:
         - inputs:
             x: sw
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Troll
           feedback:
@@ -300,7 +300,7 @@ states:
         rule_specs:
         - inputs:
             x: use nothing
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Troll
           feedback:
@@ -309,7 +309,7 @@ states:
         rule_specs:
         - inputs:
             x: nothing
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Troll
           feedback:
@@ -318,7 +318,7 @@ states:
         rule_specs:
         - inputs:
             x: '{{Weapon}}'
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: pre-rainbow
           feedback:
@@ -328,7 +328,7 @@ states:
         rule_specs:
         - inputs:
             x: '{{sneezeitem}}'
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: END
           feedback:
@@ -339,7 +339,7 @@ states:
         rule_specs:
         - inputs:
             x: '{{payitem}}'
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Troll
           feedback:
@@ -348,7 +348,7 @@ states:
         rule_specs:
         - inputs:
             x: use
-          name: StartsWith
+          rule_type: StartsWith
       - outcome:
           dest: Troll
           feedback:
@@ -357,7 +357,7 @@ states:
         rule_specs:
         - inputs:
             x: troll
-          name: Contains
+          rule_type: Contains
       - outcome:
           dest: Troll
           feedback:
@@ -366,7 +366,7 @@ states:
         rule_specs:
         - inputs:
             x: toll
-          name: Contains
+          rule_type: Contains
       customization_args:
         placeholder:
           value: ''

@@ -21,7 +21,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
     if (!customizationArgs.imageAndRegions.value.imagePath) {
@@ -75,24 +75,26 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
 
     warningsList = warningsList.concat(
       baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
-        ruleSpecs, stateName));
+        answerGroups, defaultOutcome, stateName));
 
     // Check that each rule refers to a valid region string.
-    for (var i = 0; i < ruleSpecs.length - 1; i++) {
-      if (ruleSpecs[i].definition.name === 'IsInRegion') {
-        var label = ruleSpecs[i].definition.inputs.x;
-        if (seenRegionStrings.indexOf(label) === -1) {
-          warningsList.push({
-          type: WARNING_TYPES.CRITICAL,
-          message: (
-            'the region label \'' + label + '\' in rule ' + String(i + 1) + ' is invalid.')
-          });
+    for (var i = 0; i < answerGroups.length; i++) {
+      var ruleSpecs = answerGroups[i].rule_specs;
+      for (var j = 0; j < ruleSpecs.length; j++) {
+        if (ruleSpecs[j].rule_type === 'IsInRegion') {
+          var label = ruleSpecs[j].inputs.x;
+          if (seenRegionStrings.indexOf(label) === -1) {
+            warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'the region label \'' + label + '\' in rule ' + String(i + 1) + ' is invalid.')
+            });
+          }
         }
       }
     }
 
-    var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-    if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
+    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (
