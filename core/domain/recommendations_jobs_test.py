@@ -78,11 +78,13 @@ class ExplorationRecommendationsAggregatorUnitTests(
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
                     'exp_id_1'))
-            self.assertEqual(recommendations, ['exp_id_4', 'exp_id_2'])
+            self.assertEqual(
+                recommendations, ['exp_id_4', 'exp_id_2', 'exp_id_3'])
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
                     'exp_id_4'))
-            self.assertEqual(recommendations, ['exp_id_1', 'exp_id_2'])
+            self.assertEqual(
+                recommendations, ['exp_id_1', 'exp_id_2', 'exp_id_3'])
 
     def test_recommendations_after_changes_in_rights(self):
         with self.swap(

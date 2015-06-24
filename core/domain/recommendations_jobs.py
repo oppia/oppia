@@ -76,7 +76,7 @@ class ExplorationRecommendationsMRJobManager(
 
         # Note: There is a threshold so that bad recommendations will be
         # discarded even if an exploration has few similar explorations.
-        SIMILARITY_SCORE_THRESHOLD = 4.0
+        SIMILARITY_SCORE_THRESHOLD = 3.0
 
         exp_summary_id = item.id
         exp_summaries_dict = (
