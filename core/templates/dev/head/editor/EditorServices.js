@@ -210,8 +210,6 @@ oppia.factory('changeListService', [
     'gadget_customization_args': true
   }
 
-  // Private Methods
-
   return {
     _addChange: function(changeDict) {
       if ($rootScope.loadingMessage) {
@@ -343,7 +341,6 @@ oppia.factory('changeListService', [
      * @param {string} panelName The panel where the gadget is being added.
      */
     addGadget: function(gadgetData, panelName) {
-
       this._addChange({
         cmd: CMD_ADD_GADGET,
         gadget_dict: gadgetData,
@@ -372,7 +369,6 @@ oppia.factory('changeListService', [
      * @param {string} gadgetName Unique name of the gadget to delete.
      */
     deleteGadget: function(gadgetName) {
-      console.log('deleteGadget initiated for: ' + gadgetName);
       this._addChange({
         cmd: CMD_DELETE_GADGET,
         gadget_name: gadgetName
@@ -715,7 +711,7 @@ oppia.factory('explorationStatesService', [
       if (!validatorsService.isValidStateName(newStateName, true)) {
         return;
       }
-      if (!!_states.hasOwnProperty(newStateName)) {
+      if (_states.hasOwnProperty(newStateName)) {
         warningsData.addWarning('A state with this name already exists.');
         return;
       }
@@ -952,7 +948,6 @@ oppia.factory('explorationGadgetsService', [
   // that gadgets are displayed in panels that contain multiple gadgets.
   var _panels = null;
 
-  // Private methods
   var _getPanelNameFromGadgetName = function(gadgetName) {
     for (var panelName in _panels) {
       if (_panels[panelName].indexOf(gadgetName) != -1 ) {
@@ -965,7 +960,8 @@ oppia.factory('explorationGadgetsService', [
   var _generateUniqueGadgetName = function(gadgetType) {
     if (!_gadgets.hasOwnProperty(gadgetType)) {
       return gadgetType;
-    } else {
+    }
+    else {
       var baseGadgetName = gadgetType;
       var uniqueInteger = 2;
       var generatedGadgetName = baseGadgetName + uniqueInteger;
@@ -977,7 +973,6 @@ oppia.factory('explorationGadgetsService', [
     }
   };
 
-
   var _getAllGadgetsInstancesForPanel = function(panelName) {
     var panelGadgets = [];
     var gadgetsInCurrentPanel = _panels[panelName];
@@ -986,6 +981,7 @@ oppia.factory('explorationGadgetsService', [
     }
     return panelGadgets;
   };
+
   /**
   * Returns a JS object whose keys are state names, and whose corresponding
   * values are lists of gadget instances representing the gadgets visible in
@@ -995,7 +991,7 @@ oppia.factory('explorationGadgetsService', [
     var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panelName);
     var visibilityMap = {};
     for (var i = 0; i < gadgetInstanceList.length; i++) {
-      var gadgetInstance = gadgetInstanceList[i];
+      var gadgetInstance = angular.copy(gadgetInstanceList[i]);
       for(var j = 0; j < gadgetInstance.visible_in_states.length; j++) {
         var stateName = gadgetInstance.visible_in_states[j]
         if(visibilityMap[stateName]) {
@@ -1017,92 +1013,66 @@ oppia.factory('explorationGadgetsService', [
       return false;
     }
     return (
-      // TODO(vjoisar): implement validatorsService.isValidGadgetName
       gadgetValidationService.isValidGadgetName(newGadgetName, showWarnings));
   };
 
-  var _formatGadgetsData = function(panelsContents) {
-    gadgetsData = {};
+  /**
+  * Convert the backend representation of the skin's panel contents to a panel
+  * and a gadget dict. The panel dict has keys that are panel names and the
+  * values are list of gadget names present in that panel. The gadget dict has
+  * keys that are gadget names and the values are dicts representing the data
+  * for the gadget.
+  */
+  var _initGadgetsAndPanelsData = function(panelsContents) {
+    //initializing to empty objects.
+    _panels = {};
+    _gadgets = {};
     for (var panelName in panelsContents) {
-      for (var i = 0; i < panelsContents[panelName].length; i++) {
-        var gadgetName = panelsContents[panelName][i].gadget_name;
-        gadgetsData[gadgetName] = panelsContents[panelName][i];
-      }
-    }
-    return gadgetsData;
-  };
-
-  var _formatPanelsData = function(panelsContents) {
-    panelsData = {};
-    for (var panelName in panelsContents) {
-      panelsData[panelName] = [];
+      _panels[panelName] = [];
       // Append the name of each gadget instance in the panel.
       for (var i = 0; i < panelsContents[panelName].length; i++) {
-        panelsData[panelName].push(
+        _panels[panelName].push(
           panelsContents[panelName][i].gadget_name
         );
+        var gadgetName = panelsContents[panelName][i].gadget_name;
+        _gadgets[gadgetName] = angular.copy(panelsContents[panelName][i]);
       }
     }
-    return panelsData;
   };
-
-  var _validate = function() {
-    // Validates configuration and fit of all gadgets and panels.
-    var isValid = false;
-    for (var panelName in _panels) {
-      isValid = _validatePanel(panelName);
-    }
-    return isValid;
-  };
-
-  var _validatePanel = function(panelName) {
-    // Validates fit and internal validity of all gadgets in a panel.
-    // Returns boolean.
-    // TODO(vjoisar): Implement.
-
-    var visibilityMap = _getGadgetsVisibilityMap(panelName);
-    return gadgetValidationService.validatePanel(panelName, visibilityMap);
-  };
-
-  var _changeToBackendCompatibleDict = function(gadgetData) {
-      // Convert to backend property names.
-      var backendDict = {};
-      backendDict.gadget_type = gadgetData.gadgetType;
-      backendDict.visible_in_states = gadgetData.visibleInStates;
-      backendDict.gadget_name = gadgetData.gadgetName;
-      backendDict.customization_args = (gadgetData.customizationArgs);
-      return backendDict;
-  }
 
   return {
-    init: function(skin_customizations_data) {
+    init: function(skinCustomizationsData) {
       // Data structure initialization.
-      var panelsContents = skin_customizations_data.panels_contents;
-      _gadgets = _formatGadgetsData(panelsContents);
-      _panels = _formatPanelsData(panelsContents);
-      var isValid = _validate();
-      if(!isValid) {
-        //warningsData.addWarning('Panel validation failed');
+      if (!skinCustomizationsData.hasOwnProperty('panels_contents')) {
+        $log.info('Initialization falied. Panel contents was not provided');
         return;
+      }
+      _initGadgetsAndPanelsData(skinCustomizationsData.panels_contents);
+      var isValid = false;
+      for (var panelName in _panels) {
+        var visibilityMap = _getGadgetsVisibilityMap(panelName);
+        isValid = gadgetValidationService.validatePanel(panelName, visibilityMap);
+        if (!isValid) {
+          return;
+        }
       }
       $log.info('Initializing ' + Object.keys(_gadgets).length + ' gadget(s).');
       $log.info('Initializing ' + Object.keys(_panels).length + ' panel(s).');
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
     },
-    //Confirms if a panel can accept a new gadget considering it's capacity
-    //and the gadget's size requirements given its customization arguments.
+    // Confirms if a panel can accept a new gadget considering its capacity
+    // and the gadget's size requirements given its customization arguments.
     canAddGadgetTo: function(panelName, gadgetData) {
       var visibilityMap = _getGadgetsVisibilityMap(panelName);
-      var backendDictGadgetData = _changeToBackendCompatibleDict(gadgetData);
-      var canAdd = _isNewGadgetNameValid(backendDictGadgetData.gadget_name, true);
+      var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name, true);
       if(canAdd) {
         canAdd = gadgetValidationService.canAddGadget(
-          panelName, backendDictGadgetData, visibilityMap);
+          panelName, gadgetData, visibilityMap);
       }
 
       return canAdd;
     },
-    getUniqueGadgetName: function(gadgetType) {
+    getNewUniqueGadgetName: function(gadgetType) {
       return _generateUniqueGadgetName(gadgetType);
     },
     getGadgets: function() {
@@ -1110,9 +1080,6 @@ oppia.factory('explorationGadgetsService', [
     },
     getPanels: function() {
       return angular.copy(_panels);
-    },
-    getGadget: function(gadgetName) {
-      return angular.copy(_gadgets[gadgetName]);
     },
     /**
      * Updates a gadget's visibility and/or customization args using
@@ -1125,60 +1092,54 @@ oppia.factory('explorationGadgetsService', [
      * @param {object} newGadgetData Updated data for the gadget.
      */
     updateGadget: function(newGadgetData) {
-      newBackendCompatibleGadgetData = _changeToBackendCompatibleDict(newGadgetData);
+      var gadgetName = newGadgetData.gadget_name;
 
-      var gadgetName = newBackendCompatibleGadgetData.gadget_name;
-
-      if (!_gadgets.hasOwnProperty[gadgetName]) {
+      if (!_gadgets.hasOwnProperty(gadgetName)) {
         $log.info('Attempted to update a non-existent gadget: ' + gadgetName);
-        $log.info('Call renameGadget separately for gadgetName changes.');
+        return;
       }
+
       var currentGadgetData = _gadgets[gadgetName];
 
       // TODO(vjoisar): Karma tests. Needs to detect deep inequality.
-      if (currentGadgetData.customization_args !=
-          newBackendCompatibleGadgetData.customization_args) {
+      if (angular.equals(currentGadgetData.customization_args,
+          newGadgetData.customization_args)) {
         $log.info('Updating customization args for gadget: ' + gadgetName);
         changeListService.editGadgetProperty(
           gadgetName,
           'gadget_customization_args',
-          newBackendCompatibleGadgetData.customization_args,
+          newGadgetData.customization_args,
           currentGadgetData.customization_args
         );
       }
-      if (currentGadgetData.visible_in_states !=
-          newBackendCompatibleGadgetData.visible_in_states) {
+      if (angular.equals(currentGadgetData.visible_in_states,
+          newGadgetData.visible_in_states)) {
         $log.info('Updating visibility for gadget: ' + gadgetName);
         changeListService.editGadgetProperty(
           gadgetName,
           'gadget_visibility',
-          newBackendCompatibleGadgetData.visible_in_states,
+          newGadgetData.visible_in_states,
           currentGadgetData.visible_in_states
         );
       }
-      _gadgets[gadgetName] = angular.copy(newBackendCompatibleGadgetData);
+      _gadgets[gadgetName] = angular.copy(newGadgetData);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
     },
     addGadget: function(gadgetData, panelName) {
 
-      if(!_panels[panelName]) {
-        $log.info('Attempted to add to non-existent panel: ' + panelName);
+      if(!_panels.hasOwnProperty(panelName)) {
+        $log.info('Attempted to add to a non-existent panel: ' + panelName);
         return;
       }
 
-      /*
-        To avoid mismatched dict keys in _gadgets
-      */
-      backendCompatibleGadgetData = _changeToBackendCompatibleDict(gadgetData);
-
-      if(!!_gadgets.hasOwnProperty(backendCompatibleGadgetData.gadget_name)){
+      if(_gadgets.hasOwnProperty(gadgetData.gadget_name)){
         $log.info('Gadget with this name already exists.');
         return;
       }
-      _gadgets[backendCompatibleGadgetData.gadget_name] = backendCompatibleGadgetData;
-      _panels[panelName].push(backendCompatibleGadgetData.gadget_name);
+      _gadgets[gadgetData.gadget_name] = gadgetData;
+      _panels[panelName].push(gadgetData.gadget_name);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
-      changeListService.addGadget(backendCompatibleGadgetData, panelName);
+      changeListService.addGadget(gadgetData, panelName);
     },
     deleteGadget: function(deleteGadgetName) {
       warningsData.clear();
@@ -1216,7 +1177,6 @@ oppia.factory('explorationGadgetsService', [
       }).result.then(function(deleteGadgetName) {
         // Update _gadgets
         delete _gadgets[deleteGadgetName];
-
         // Update _panels
         var hostPanel = _getPanelNameFromGadgetName(deleteGadgetName);
         var gadgetIndex = _panels[hostPanel].indexOf(deleteGadgetName);
@@ -1232,7 +1192,7 @@ oppia.factory('explorationGadgetsService', [
       if (!_isNewGadgetNameValid(newGadgetName, true)) {
         return;
       }
-      if (!!_gadgets.hasOwnProperty(newGadgetName)) {
+      if (_gadgets.hasOwnProperty(newGadgetName)) {
         warningsData.addWarning('A gadget with this name already exists.');
         return;
       }
@@ -1251,36 +1211,6 @@ oppia.factory('explorationGadgetsService', [
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
 
       changeListService.renameGadget(oldGadgetName, newGadgetName);
-    },
-    moveGadgetBetweenPanels: function(gadgetName, sourcePanel, destPanel) {
-      // Move a gadget instance from sourcePanel to destPanel.
-
-      if (!_panels[sourcePanel].hasOwnProperty[gadgetName]) {
-        var logString = 'Attempted to move ' + gadgetName + ' gadget from ' +
-          sourcePanel + ' where it did not exist.';
-        $log.info(logString);
-      }
-
-      // Move gadget preserving original position data.
-      var sourceIndex = _panels[sourcePanel].indexOf(gadgetName);
-      _panels[sourcePanel].splice(sourceIndex, 1);
-      _panels[destPanel].push(gadgetName);
-
-      // Check validity of gadget at destination.
-      if (!_validatePanel(destPanel)) {
-        // Restore gadget to original position in source panel.
-        _panels[sourcePanel].splice(sourceIndex, 0, gadgetName);
-        _panels[destPanel].pop();
-      }
-    },
-    getGadgetNamesInPanel: function(panelName) {
-      if (!_panels.hasOwnProperty(panelName)) {
-        var logString = 'Attempted to retrieve contents of non-existent' +
-          ' panel: ' + panelName;
-        $log.info(logString);
-        return;
-      }
-      return angular.copy(_panels[panelName]);
     }
   };
 }]);

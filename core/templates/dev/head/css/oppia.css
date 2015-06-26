@@ -1925,13 +1925,13 @@ div#ng-curtain {
 
 /* Styles for gadget panels and editor. */
 .oppia-gadget-tile {
+  border: 1px solid #aaa;
+  border-radius: 5px;
   cursor: pointer;
   display: inline-block;
   margin: 5px;
-  border: 1px solid #aaa;
   vertical-align: top;
   width: 30%;
-  border-radius: 5px;
 }
 .oppia-gadget-tile:hover {
   border: 2px solid #05A69A;
@@ -1939,30 +1939,30 @@ div#ng-curtain {
 
 .oppia-right-editor-gadget-panel,
 .oppia-left-editor-gadget-panel,
-.oppia-bottom-editor-gadget-panel{
+.oppia-bottom-editor-gadget-panel {
   background: #636363;
+  color: #fff;
   position: fixed;
   top: 100px;
   width: 140px;
-  color: #fff;
 }
 
-.oppia-bottom-editor-gadget-panel{
-  margin-bottom: 5%;
-  top: auto;
+.oppia-bottom-editor-gadget-panel {
   bottom: 0;
   left: 50%;
+  margin-bottom: 5%;
   max-height: 100px;
+  top: auto;
 }
 
-.oppia-right-editor-gadget-panel{
+.oppia-right-editor-gadget-panel {
   margin-right: 30%;
   right: 0;
 }
 
-.oppia-left-editor-gadget-panel{
-  margin-left: 5%;
+.oppia-left-editor-gadget-panel {
   left: 0;
+  margin-left: 5%;
 }
 
 .oppia-gadget-delete-icon,
@@ -1979,40 +1979,40 @@ div#ng-curtain {
 }
 
 .oppia-gadget-edit-icon {
-  right: 0;
   color: #636363;
-  position: absolute;
-  top: 80%;
   /*TODO(vjoisar):to be changed after finalised specs */
   display: none;
+  position: absolute;
+  right: 0;
+  top: 80%;
 }
-.oppia-gadget-content{
+.oppia-gadget-content {
   background: #fff;
 }
 
 .oppia-gadget-name {
   color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-size: small;
   height: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.oppia-gadget-hidden{
+.oppia-gadget-hidden {
   border: 1px dotted #fff;
 }
-.oppia-gadget-hidden .oppia-gadget-name{
+.oppia-gadget-hidden .oppia-gadget-name {
   opacity: 0.5;
 }
-.oppia-gadget-hidden .oppia-gadget-content{
+.oppia-gadget-hidden .oppia-gadget-content {
   display: none;
 }
 
 .oppia-rename-gadget-form {
+  color: rgba(0, 0, 0, 0.73);
   position: absolute;
   width: 230px;
-  color: initial;
 }
 
 .oppia-gadget-preview-container {

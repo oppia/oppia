@@ -189,49 +189,48 @@ describe('Change list service', function() {
       expect(cls.getChangeList()).toEqual([]);
     })
 
-    //gadgets Test...
-    it('should correctly add a gadget', function(){
+    it('should correctly add a gadget', function() {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState1');
-      var gadget_dict = {
-        "gadget_type": "AdviceBar",
-        "gadget_name": "AdviceBar 1",
-        "customization_args": {
-          "adviceObjects": {
-            "value": [{
-                "adviceHtml": "<p>Tips</p>",
-                "adviceTitle": "R-Tip"
-              }]
+      var gadgetDict = {
+        'gadget_type': 'AdviceBar',
+        'gadget_name': 'AdviceBar 1',
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>Tips</p>',
+              'adviceTitle': 'R-Tip'
+            }]
           },
-          "title": {
-            "value": "Tips"
+          'title': {
+            'value': 'Tips'
           }
         },
-        "visible_in_states":["newState1"]
+        'visible_in_states': ['newState1']
       };
-      var panel_name = 'left';
-      cls.addGadget(gadget_dict, panel_name);
+      var panelName = 'left';
+      cls.addGadget(gadgetDict, panelName);
       expect(cls.getChangeList()).toEqual([
         {
           cmd: 'add_state',
           state_name: 'newState1'
-        },{
+        }, {
           cmd: 'add_gadget',
           gadget_dict: {
-            "gadget_type": "AdviceBar",
-            "gadget_name": "AdviceBar 1",
-            "customization_args": {
-              "adviceObjects": {
-                "value": [{
-                    "adviceHtml": "<p>Tips</p>",
-                    "adviceTitle": "R-Tip"
-                  }]
+            'gadget_type': 'AdviceBar',
+            'gadget_name': 'AdviceBar 1',
+            'customization_args': {
+              'adviceObjects': {
+                'value': [{
+                  'adviceHtml': '<p>Tips</p>',
+                  'adviceTitle': 'R-Tip'
+                }]
               },
-              "title": {
-                "value": "Tips"
+              'title': {
+                'value': 'Tips'
               }
             },
-            "visible_in_states":["newState1"]
+            'visible_in_states': ['newState1']
           },
           panel_name: 'left'
         }
@@ -259,41 +258,31 @@ describe('Change list service', function() {
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
     });
 
-    it('should correctly delete a gadget', function() {
-      expect(cls.getChangeList()).toEqual([]);
-      cls.deleteGadget('gadgetName');
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'delete_gadget',
-        gadget_name: 'gadgetName'
-      }]);
-      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-    });
-
     it('should correctly edit gadget customization args', function() {
       expect(cls.getChangeList()).toEqual([]);
       var oldCustomizationArgs = {
-        "customization_args": {
-          "adviceObjects": {
-            "value": [{
-                "adviceHtml": "<p>Html Data</p>",
-                "adviceTitle": "advice tip name"
-              }]
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>Html Data</p>',
+              'adviceTitle': 'advice tip name'
+            }]
           },
-          "title": {
-            "value": "main Title"
+          'title': {
+            'value': 'main Title'
           }
         }
       };
       var newCustomizationArgs = {
-        "customization_args": {
-          "adviceObjects": {
-            "value": [{
-                "adviceHtml": "<p>New Html Data</p>",
-                "adviceTitle": "New advice tip name"
-              }]
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>New Html Data</p>',
+              'adviceTitle': 'New advice tip name'
+            }]
           },
-          "title": {
-            "value": "New main Title"
+          'title': {
+            'value': 'New main Title'
           }
         }
       };
@@ -308,28 +297,28 @@ describe('Change list service', function() {
         gadget_name: 'gadgetName',
         property_name: 'gadget_customization_args',
         new_value: {
-          "customization_args": {
-            "adviceObjects": {
-              "value": [{
-                  "adviceHtml": "<p>New Html Data</p>",
-                  "adviceTitle": "New advice tip name"
-                }]
+          'customization_args': {
+            'adviceObjects': {
+              'value': [{
+                'adviceHtml': '<p>New Html Data</p>',
+                'adviceTitle': 'New advice tip name'
+              }]
             },
-            "title": {
-              "value": "New main Title"
+            'title': {
+              'value': 'New main Title'
             }
           }
         },
         old_value: {
-          "customization_args": {
-            "adviceObjects": {
-              "value": [{
-                  "adviceHtml": "<p>Html Data</p>",
-                  "adviceTitle": "advice tip name"
-                }]
+          'customization_args': {
+            'adviceObjects': {
+              'value': [{
+                'adviceHtml': '<p>Html Data</p>',
+                'adviceTitle': 'advice tip name'
+              }]
             },
-            "title": {
-              "value": "main Title"
+            'title': {
+              'value': 'main Title'
             }
           }
         }
@@ -340,11 +329,11 @@ describe('Change list service', function() {
     it('should correctly edit a gadget visibility property', function() {
       expect(cls.getChangeList()).toEqual([]);
       var oldVisibilityProp = ['old_state_name'];
-      var newCustomizationArgs = ['new state name'];
+      var newVisibilityProp = ['new state name'];
       cls.editGadgetProperty(
         'gadgetName',
         'gadget_visibility',
-        newCustomizationArgs,
+        newVisibilityProp,
         oldVisibilityProp
       );
       expect(cls.getChangeList()).toEqual([{
