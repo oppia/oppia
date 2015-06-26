@@ -95,6 +95,6 @@
   </div>
 
   <div>
-    <button ng-click="resetGame()">Reset</button>
+    <button class="btn btn-default" ng-class="{'btn-disabled': moveLog.length === 0}" ng-disabled="moveLog.length === 0" ng-click="resetGame()">Reset</button>
   </div>
 </script>

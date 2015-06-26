@@ -58,6 +58,21 @@ oppia.directive('snapshotsSkin', [function() {
         $scope.transcriptIndex++;
       };
 
+      $scope.areAnyGadgetsVisibleInActiveState = function() {
+        var activeStateName = oppiaPlayerService.getActiveStateName();
+        var areGadgetsVisible = false;
+        for (var panelName in $scope.gadgetPanelsContents) {
+          for (var i = 0; i < $scope.gadgetPanelsContents[panelName].length; i++) {
+            if ($scope.gadgetPanelsContents[panelName][i].visible_in_states.indexOf(
+                  activeStateName) !== -1) {
+              areGadgetsVisible = true;
+              break;
+            }
+          }
+        }
+        return areGadgetsVisible;
+      };
+
       $scope.initializePage = function() {
         $scope.transcript = [];
         $scope.transcriptIndex = -1;
