@@ -48,9 +48,9 @@ oppia.directive('oppiaGadget', function() {
       $scope.gadgetHtml = ($('<div>').append(el)).html();
 
       $scope.$watch(function() {
-        return oppiaPlayerService.getCurrentStateName();
-      }, function(currentStateName) {
-        $scope.isVisible = $scope.showInStates().indexOf(currentStateName) !== -1;
+        return oppiaPlayerService.getActiveStateName();
+      }, function(activeStateName) {
+        $scope.isVisible = $scope.showInStates().indexOf(activeStateName) !== -1;
       });
     }]
   };

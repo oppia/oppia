@@ -169,6 +169,7 @@ oppia.factory('oppiaPlayerService', [
   learnerParamsService.init({});
   var stateHistory = [];
   var _currentStateName = null;
+  var _activeStateIndex = -1;
   var answerIsBeingProcessed = false;
   var _viewerHasEditingRights = false;
 
@@ -181,6 +182,7 @@ oppia.factory('oppiaPlayerService', [
     learnerParamsService.init(newParams);
     _currentStateName = newStateName;
     stateHistory.push(_currentStateName);
+    _activeStateIndex++;
   };
 
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
@@ -395,6 +397,17 @@ oppia.factory('oppiaPlayerService', [
     getExplorationTitle: function() {
       return _exploration.title;
     },
+    getActiveStateName: function() {
+      return stateHistory[_activeStateIndex];
+    },
+    flipBackwards: function() {
+      _activeStateIndex--;
+    },
+    flipForwards: function() {
+      _activeStateIndex++;
+    },
+    // This is the latest state name, the one that is last in the sequence and
+    // is waiting for input.
     getCurrentStateName: function() {
       return _currentStateName;
     },

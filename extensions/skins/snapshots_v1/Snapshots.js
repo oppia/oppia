@@ -41,10 +41,12 @@ oppia.directive('snapshotsSkin', [function() {
 
       $scope.goToPreviousCard = function() {
         $scope.transcriptIndex--;
+        oppiaPlayerService.flipBackwards();
       };
 
       $scope.goToNextCard = function() {
         $scope.transcriptIndex++;
+        oppiaPlayerService.flipForwards();
       };
 
       var _addNewElementToTranscript = function(stateName, contentHtml) {

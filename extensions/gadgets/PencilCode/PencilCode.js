@@ -21,24 +21,68 @@
  */
 
 oppia.directive('oppiaGadgetPencilCode', [
-  'oppiaHtmlEscaper', 'learnerParamsService', function(oppiaHtmlEscaper, learnerParamsService) {
+  'oppiaHtmlEscaper', 'learnerParamsService', 'oppiaPlayerService',
+  function(oppiaHtmlEscaper, learnerParamsService, oppiaPlayerService) {
     return {
       restrict: 'E',
       templateUrl: 'gadget/PencilCode',
       controller: ['$scope', '$element', function ($scope, $element) {
+
         var hasLoadingCompleted = false;
-        // A copy of the value set via parameters, so that the gadget can be
-        // reset when needed.
-        $scope.newValueCached = '';
+        // A copy of the initial value for the currently-active state, so that
+        // the gadget can be reset when needed.
+        $scope.currentInitialValue = '';
+
+        // This assumes a single panel called 'main' that contains at most
+        // one gadget of this type.
+        var statesContainingGadget = [];
+        var panelsContents = oppiaPlayerService.getGadgetPanelsContents();
+        for (var panelName in panelsContents) {
+          for (var i = 0; i < panelsContents[panelName].length; i++) {
+            if (panelsContents[panelName][i].gadget_id === 'PencilCode') {
+              statesContainingGadget = angular.copy(
+                panelsContents[panelName][i].visible_in_states);
+              break;
+            }
+          }
+        }
+
+        var initialCodeCache = {};
+        var lastSeenCodeCache = {};
 
         $scope.$watch(function() {
-          return learnerParamsService.getValue('PencilCode0initialCode');
-        }, function(newValue, oldValue) {
-          $scope.newValueCached = newValue;
-          if (hasLoadingCompleted) {
-            $scope.resetGadget(newValue);
-          } else {
-            $scope.doInitialLoad(newValue);
+          return oppiaPlayerService.getActiveStateName();
+        }, function(newStateName, oldStateName) {
+          if (statesContainingGadget.indexOf(oldStateName) !== -1) {
+            lastSeenCodeCache[oldStateName] = pce.getCode();
+          }
+
+          if (statesContainingGadget.indexOf(newStateName) !== -1) {
+            var valueToChangeTo = null;
+            var firstTimeSeen = null;
+
+            if (initialCodeCache.hasOwnProperty(newStateName)) {
+              valueToChangeTo = lastSeenCodeCache[newStateName];
+              firstTimeSeen = false;
+              $scope.currentInitialValue = initialCodeCache[newStateName];
+            } else {
+              valueToChangeTo = learnerParamsService.getValue(
+                'PencilCode0initialCode');
+              firstTimeSeen = true;
+              initialCodeCache[newStateName] = valueToChangeTo;
+              lastSeenCodeCache[newStateName] = valueToChangeTo;
+              $scope.currentInitialValue = valueToChangeTo;
+            }
+
+            if (valueToChangeTo !== pce.getCode()) {
+              if (hasLoadingCompleted) {
+                pce.setCode(valueToChangeTo);
+                // TODO(sll): begin a new run if autoplay functionality is
+                // desired. Make sure the previous run is stopped first.
+              } else {
+                $scope.doInitialLoad(valueToChangeTo);
+              }
+            }
           }
         });
 
