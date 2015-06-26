@@ -26,6 +26,8 @@ class AdviceBar(base.BaseGadget):
 
     name = 'AdviceBar'
     description = 'Allows learners to receive advice from predefined tips.'
+    height_px = 300
+    width_px = 100
     _dependency_ids = []
 
     _customization_arg_specs = [
@@ -68,11 +70,6 @@ class AdviceBar(base.BaseGadget):
     _MAX_TIP_COUNT = 3
     _MIN_TIP_COUNT = 1
 
-    # Constants for calculation of height and width.
-    _FIXED_AXIS_BASE_LENGTH = 100
-    _STACKABLE_AXIS_BASE_LENGTH = 150
-    _LENGTH_PER_ADVICE_RESOURCE = 100
-
     def validate(self, customization_args):
         """Ensure AdviceBar retains reasonable config."""
         tip_count = len(customization_args['adviceObjects']['value'])
@@ -86,27 +83,3 @@ class AdviceBar(base.BaseGadget):
                 'AdviceBar requires at least %d tips, found %s.' % (
                     self._MIN_TIP_COUNT,
                     tip_count))
-
-    def _stackable_length_for_instance(self, advice_bar_instance):
-        """Returns int representing the stackable axis length."""
-        return self._STACKABLE_AXIS_BASE_LENGTH + (
-            self._LENGTH_PER_ADVICE_RESOURCE * len(
-                advice_bar_instance.resource_count))
-
-    def get_width(self, customization_args):
-        """Returns int representing width in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        return self._FIXED_AXIS_BASE_LENGTH
-
-    def get_height(self, customization_args):
-        """Returns int representing height in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        return self._STACKABLE_AXIS_BASE_LENGTH + (
-            self._LENGTH_PER_ADVICE_RESOURCE * len(
-                customization_args['adviceObjects']['value']))

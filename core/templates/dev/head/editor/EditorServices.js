@@ -1101,7 +1101,6 @@ oppia.factory('explorationGadgetsService', [
 
       var currentGadgetData = _gadgets[gadgetName];
 
-      // TODO(vjoisar): Karma tests. Needs to detect deep inequality.
       if (angular.equals(currentGadgetData.customization_args,
           newGadgetData.customization_args)) {
         $log.info('Updating customization args for gadget: ' + gadgetName);

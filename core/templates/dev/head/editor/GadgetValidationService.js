@@ -21,33 +21,18 @@
 //Service for handling all gadget validation.
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
-    'explorationSkinService',
+    'explorationSkinService', 'GADGET_SPECS',
     function($filter, warningsData, validatorsService, editorContextService,
-      explorationSkinService) {
+      explorationSkinService, GADGET_SPECS) {
   var gadgetValidator = {};
   var AXIS_HORIZONTAL = 'horizontal';
   var AXIS_VERTICAL = 'vertical';
-  // TODO(anuzis): Vishal, I got explorationSkinService to initialize
-  // with the current skin_id when ExplorationEditor.js initializes,
-  // but somehow gadgetValidationService is getting called before the
-  // value is available resulting in _skin being undefined. When you
-  // incorporate
-
-  // @anuzis: Need more context for what has changed and why do we need all
-  // skins now? I don't see anything in UI to change a skin. Putting
-  // this todo back to you. Lets discuss on this more. One possible solution
-  // written below should do what you are looking for
-  // which is a private method to get the panelspec when needed. That way
-  // explorationSkinService.displayed is available and will not be undefined.
+  var VALID_AXIS_OPTIONS = [AXIS_HORIZONTAL, AXIS_VERTICAL];
 
   var _getPanelSpecs = function (panelName) {
-    // @anuzis: For debug. Remove if not needed.
-    console.log('Skin is ' + explorationSkinService.displayed);
     return GLOBALS.SKIN_SPECS[explorationSkinService.displayed][panelName];
   };
 
-  // Here's a temporary debugging line we'll want to delete when solved:
-  // console.log('Skin is ' + _skin);
   var _MAX_GADGET_NAME_LENGTH = 50;
 
   /**
@@ -60,13 +45,19 @@ oppia.factory('gadgetValidationService', [
   return {
     validatePanel: function(panelName, visibilityMap) {
       var currentPanelSpec = _getPanelSpecs(panelName);
-      //TODO(anuzis/vjoisar): Implement api to get height and width of a gadget.
-      var GADGET_WIDTH = 100;
-      var GADGET_HEIGHT = 100;
+      var stackableAxis = currentPanelSpec.stackable_axis;
 
+      // Fail early for unrecognized axis. This error should never reach
+      // the front-end, but is flagged here for defense-in-depth.
+      if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
+        var warningText = 'Unrecognized axis: ' + stackableAxis + ' for ' +
+          panelName + ' panel.';
+        warningsData.addWarning(warningText);
+        console.log('VALID AXIS:' + VALID_AXIS_OPTIONS);
+        return false;
+      }
       for (var stateNameAsKey in visibilityMap) {
         var gadgetInstances = visibilityMap[stateNameAsKey];
-
         if (gadgetInstances.length > currentPanelSpec.max_gadgets) {
           var warningText =  panelName + ' panel expects at most ' +
             currentPanelSpec.max_gadgets +  ', but ' + gadgetInstances.length +
@@ -76,34 +67,47 @@ oppia.factory('gadgetValidationService', [
         }
 
         var totalWidth = 0, totalHeight = 0;
-
-        if (currentPanelSpec.stackable_axis == AXIS_VERTICAL) {
+        if (stackableAxis == AXIS_VERTICAL) {
+          // Factor in pixel buffer between gadgets, if multiple gadgets share
+          // a panel in the same state.
           totalHeight += currentPanelSpec.pixels_between_gadgets * (
             gadgetInstances.length - 1);
-          totalHeight += GADGET_HEIGHT * gadgetInstances.length;
-          totalWidth = GADGET_WIDTH;
+
+          // Factor in sizes of each gadget.
+          for (var i = 0; i < gadgetInstances.length; i++) {
+            var gadgetType = gadgetInstances[i].gadget_type;
+            totalHeight += GADGET_SPECS[gadgetType].height_px;
+
+            // If this is the widest gadget, it sets the width.
+            if (GADGET_SPECS[gadgetType].width_px > totalWidth) {
+              totalWidth = GADGET_SPECS[gadgetType].width_px;
+            }
+          }
         }
-        else if (currentPanelSpec.stackable_axis == AXIS_HORIZONTAL) {
+        else if (stackableAxis == AXIS_HORIZONTAL) {
           totalWidth += currentPanelSpec.pixels_between_gadgets * (
             gadgetInstances.length - 1);
-          totalWidth += GADGET_WIDTH * gadgetInstances.length;
-          totalHeight = GADGET_HEIGHT;
-        }
-        else {
-          var warningText = 'Unrecognized axis for ' + panelName + ' panel.';
-          warningsData.addWarning(warningText);
-          return false;
+
+          for (var i = 0; i < gadgetInstances.length; i++) {
+            var gadgetType = gadgetInstances[i].gadget_type;
+            totalWidth += GADGET_SPECS[gadgetType].width_px;
+
+            // If this is the tallest gadget, it sets the height.
+            if (GADGET_SPECS[gadgetType].height_px > totalHeight) {
+              totalHeight = GADGET_SPECS[gadgetType].height_px;
+            }
+          }
         }
         if (currentPanelSpec.width < totalWidth) {
           var warningText = 'Size exceeded: ' + panelName + ' panel width of ' +
-            totalWidth + ' exceeds limit of ' + currentPanelSpec.width;
+            totalWidth + ' exceeds limit of ' + currentPanelSpec.width  + '.';
           warningsData.addWarning(warningText);
           return false;
         }
         else if (currentPanelSpec.height < totalHeight) {
           var warningText = 'Size exceeded: ' + panelName +
             ' panel height of ' + totalHeight + ' exceeds limit of ' +
-            currentPanelSpec.height;
+            currentPanelSpec.height + '.';
           warningsData.addWarning(warningText);
           return false;
         }
