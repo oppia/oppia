@@ -31,7 +31,7 @@ oppia.controller('ExplorationEditor', [
   'explorationData', 'editorContextService', 'explorationTitleService',
   'explorationCategoryService', 'explorationGadgetsService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationSkinService',
+  'explorationRightsService', 'explorationSkinIdService',
   'explorationInitStateNameService', 'explorationTagsService',
   'editabilityService', 'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
@@ -42,7 +42,7 @@ oppia.controller('ExplorationEditor', [
     explorationData,  editorContextService, explorationTitleService,
     explorationCategoryService, explorationGadgetsService,
     explorationObjectiveService, explorationLanguageCodeService,
-    explorationRightsService, explorationSkinService,
+    explorationRightsService, explorationSkinIdService,
     explorationInitStateNameService, explorationTagsService,
     editabilityService, explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
@@ -96,7 +96,7 @@ oppia.controller('ExplorationEditor', [
       explorationStatesService.init(data.states);
 
       explorationTitleService.init(data.title);
-      explorationSkinService.init(data.default_skin_id);
+      explorationSkinIdService.init(data.default_skin_id);
       explorationCategoryService.init(data.category);
       explorationGadgetsService.init(data.skin_customizations);
       explorationObjectiveService.init(data.objective);
@@ -107,21 +107,15 @@ oppia.controller('ExplorationEditor', [
       explorationParamChangesService.init(data.param_changes || []);
 
       $scope.explorationTitleService = explorationTitleService;
-      $scope.explorationSkinService = explorationSkinService;
+      $scope.explorationSkinIdService = explorationSkinIdService;
       $scope.explorationCategoryService = explorationCategoryService;
       $scope.explorationGadgetsService = explorationGadgetsService;
       $scope.explorationObjectiveService = explorationObjectiveService;
       $scope.explorationRightsService = explorationRightsService;
       $scope.explorationInitStateNameService = explorationInitStateNameService;
 
-      // @sll/vjoisar: It appears the below default_skin_id is barely used.
-      // I'm not quite sure how to replace it with the new
-      // explorationSkinService, or if we should leave this as is until skin
-      // capabilities are expanded in the future. Any suggestions? -Michael
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
-      $scope.defaultSkinId = data.default_skin_id;
-      $scope.allSkinIds = data.all_skin_ids;
 
       $scope.currentUser = data.user;
       $scope.currentVersion = data.version;

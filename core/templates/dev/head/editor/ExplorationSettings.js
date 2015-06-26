@@ -24,13 +24,13 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', 'CATEGORY_LIST', function(
+    'explorationWarningsService', 'explorationSkinIdService', 'CATEGORY_LIST', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService, CATEGORY_LIST) {
+      explorationWarningsService, explorationSkinIdService, CATEGORY_LIST) {
 
   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -42,6 +42,7 @@ oppia.controller('ExplorationSettings', [
   }
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+  $scope.ALL_SKIN_IDS = Object.keys(GLOBALS.SKIN_SPECS);
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -62,6 +63,7 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationInitStateNameService = explorationInitStateNameService;
     $scope.explorationParamSpecsService = explorationParamSpecsService;
     $scope.explorationParamChangesService = explorationParamChangesService;
+    $scope.explorationSkinIdService = explorationSkinIdService;
 
     explorationData.getData().then(function(data) {
       $scope.refreshSettingsTab();
@@ -139,14 +141,11 @@ oppia.controller('ExplorationSettings', [
     explorationWarningsService.updateWarnings();
   };
 
-  // TODO(sll): Modify this so that it works correctly when discarding changes
-  // to the default skin id.
-  $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
-    if (oldValue !== undefined && !angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty(
-        'default_skin_id', newValue, oldValue);
-    }
-  });
+  $scope.saveExplorationSkinId = function() {
+    // TODO(sll): This should first change the panel specifications to match
+    // the new skin.
+    explorationSkinIdService.saveDisplayedValue();
+  };
 
   /********************************************
   * Methods for rights management.

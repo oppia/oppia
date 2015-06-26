@@ -294,10 +294,6 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
         }
 
-        if feconf.SHOW_SKIN_CHOOSER:
-            editor_dict['all_skin_ids'] = (
-                skins_services.Registry.get_all_skin_ids())
-
         return editor_dict
 
     def get(self, exploration_id):

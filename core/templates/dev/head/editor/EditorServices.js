@@ -609,16 +609,15 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
-// A data service that stores the current exploration skin so that it can be
-// displayed and edited in multiple places in the UI.
-oppia.factory('explorationSkinService', [
+// A data service that stores the current exploration skin ID so that it
+// can be displayed and edited in multiple places in the UI.
+oppia.factory('explorationSkinIdService', [
     'explorationPropertyService', '$filter', 'validatorsService',
     function(explorationPropertyService, $filter, validatorsService) {
   var child = Object.create(explorationPropertyService);
-  child.propertyName = 'skin';
-  child._normalize = $filter('normalizeWhitespace');
+  child.propertyName = 'default_skin_id';
   child._isValid = function(value) {
-    return validatorsService.isValidEntityName(value, true);
+    return GLOBALS.SKIN_SPECS.hasOwnProperty(value);
   };
   return child;
 }]);

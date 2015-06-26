@@ -21,34 +21,17 @@
 //Service for handling all gadget validation.
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
-    'explorationSkinService',
+    'explorationSkinIdService',
     function($filter, warningsData, validatorsService, editorContextService,
-      explorationSkinService) {
-  var gadgetValidator = {};
+      explorationSkinIdService) {
   var AXIS_HORIZONTAL = 'horizontal';
   var AXIS_VERTICAL = 'vertical';
-  // TODO(anuzis): Vishal, I got explorationSkinService to initialize
-  // with the current skin_id when ExplorationEditor.js initializes,
-  // but somehow gadgetValidationService is getting called before the
-  // value is available resulting in _skin being undefined. When you
-  // incorporate
-
-  // @anuzis: Need more context for what has changed and why do we need all
-  // skins now? I don't see anything in UI to change a skin. Putting
-  // this todo back to you. Lets discuss on this more. One possible solution
-  // written below should do what you are looking for
-  // which is a private method to get the panelspec when needed. That way
-  // explorationSkinService.displayed is available and will not be undefined.
-
-  var _getPanelSpecs = function (panelName) {
-    // @anuzis: For debug. Remove if not needed.
-    console.log('Skin is ' + explorationSkinService.displayed);
-    return GLOBALS.SKIN_SPECS[explorationSkinService.displayed][panelName];
-  };
-
-  // Here's a temporary debugging line we'll want to delete when solved:
-  // console.log('Skin is ' + _skin);
   var _MAX_GADGET_NAME_LENGTH = 50;
+
+  var _getPanelSpecs = function(panelName) {
+    return GLOBALS.SKIN_SPECS[
+      explorationSkinIdService.savedMemento][panelName];
+  };
 
   /**
   * Validates if the gadget/s fit the panel size accross all states.
