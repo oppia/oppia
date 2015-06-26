@@ -24,6 +24,7 @@ class Continue(base.BaseInteraction):
     description = 'A simple \'go to next state\' button.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
+    answer_type = 'Null'
 
     _customization_arg_specs = [{
         'name': 'buttonText',
@@ -33,6 +34,3 @@ class Continue(base.BaseInteraction):
         },
         'default_value': 'Continue',
     }]
-
-    def __init__(self):
-        self.answer_type = 'Null'

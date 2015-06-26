@@ -42,15 +42,16 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-# TODO(bhenning): Logged exploration changes for 'widget_handlers' need to be
-# migrated to 'answer_groups' and 'default_outcome'.
+# TODO(bhenning): Prior to July 2015, exploration changes involving rules were
+# logged using the key 'widget_handlers'. These need to be migrated to
+# 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
-# These two properties kept for legacy purposes; not used anymore.
+# These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 
@@ -68,8 +69,9 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
-# This represents the stringified version of a 'default rule.' This is for
-# answer logging purposes.
+# This represents the stringified version of a 'default rule.' This is to be
+# used as an identifier for the default rule when storing which rule an answer
+# was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
 
 
@@ -248,12 +250,29 @@ class RuleSpec(object):
                       (key, val) in self.inputs.iteritems()]
         return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
-    def validate(self, rule_params):
+    def validate(self, rule_params_list, exp_param_specs_dict):
+        """Validates the state of a RuleSpec value object. It ensures the inputs
+        dict does not refer to any non-existent parameters and that it contains
+        values for all the parameters the rule expects.
+
+        Args:
+            rule_params_list: A list of parameters used by the rule represented
+                by this RuleSpec instance, to be used to validate the inputs of
+                this RuleSpec. Each element of the list represents a single
+                parameter and is a tuple with two elements:
+                    0: The name (string) of the parameter.
+                    1: The typed object instance for that paramter (e.g. Real).
+            exp_param_specs_dict: A dict of specified parameters used in this
+                exploration. Keys are parameter names and values are ParamSpec
+                value objects with an object type property (obj_type). RuleSpec
+                inputs may have a parameter value which refers to one of these
+                exploration parameters.
+        """
         if not isinstance(self.inputs, dict):
             raise utils.ValidationError(
                 'Expected inputs to be a dict, received %s' % self.inputs)
         input_key_set = set(self.inputs.keys())
-        param_names_set = set([rp[0] for rp in rule_params])
+        param_names_set = set([rp[0] for rp in rule_params_list])
         leftover_input_keys = input_key_set - param_names_set
         leftover_param_names = param_names_set - input_key_set
 
@@ -268,6 +287,32 @@ class RuleSpec(object):
             raise utils.ValidationError(
                 'RuleSpec \'%s\' is missing inputs: %s'
                 % (self.rule_type, leftover_param_names))
+
+        rule_params_dict = {rp[0]: rp[1] for rp in rule_params_list}
+        for (param_name, param_value) in self.inputs.iteritems():
+            param_obj = rule_params_dict[param_name]
+            # Validate the parameter type given the value.
+            if (isinstance(param_value, str) or
+                    isinstance(param_value, unicode)) and '{{' in param_value:
+                # Value refers to a parameter spec. Cross-validate the type of
+                # the parameter spec with the rule parameter.
+                start_brace_index = param_value.index('{{') + 2
+                end_brace_index = param_value.index('}}')
+                param_spec_name = param_value[start_brace_index:end_brace_index]
+                if param_spec_name not in exp_param_specs_dict:
+                    raise utils.ValidationError(
+                        'RuleSpec \'%s\' has an input with name \'%s\' which '
+                        'refers to an unknown parameter within the '
+                        'exploration: %s' % (
+                            self.rule_type, param_name, param_spec_name))
+                # TODO(bhenning): The obj_type of the param_spec
+                # (exp_param_specs_dict[param_spec_name]) should be validated
+                # to be the same as param_obj.__name__ to ensure the rule spec
+                # can accept the type of the parameter.
+            else:
+                # Otherwise, a simple parameter value needs to be normalizable
+                # by the parameter object in order to be valid.
+                param_obj.normalize(param_value)
 
 
 class Outcome(object):
@@ -366,7 +411,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
 
-    def validate(self, obj_type):
+    def validate(self, obj_type, exp_param_specs_dict):
         # Rule validation.
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
@@ -384,11 +429,12 @@ class AnswerGroup(object):
                     r for r in all_rule_classes
                     if r.__name__ == rule_spec.rule_type)
             except StopIteration:
-                raise utils.ValidationError('Unrecognized rule type: %s'
-                    % rule_spec.rule_type)
+                raise utils.ValidationError(
+                    'Unrecognized rule type: %s' % rule_spec.rule_type)
 
             rule_spec.validate(
-                rule_domain.get_param_list(rule_class.description))
+                rule_domain.get_param_list(rule_class.description),
+                exp_param_specs_dict)
 
         self.outcome.validate()
 
@@ -478,7 +524,7 @@ class InteractionInstance(object):
             outcomes.append(self.default_outcome)
         return outcomes
 
-    def validate(self):
+    def validate(self, exp_param_specs_dict):
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
@@ -538,7 +584,7 @@ class InteractionInstance(object):
             interaction_registry.Registry.get_interaction_by_id(
                 self.id).answer_type)
         for answer_group in self.answer_groups:
-            answer_group.validate(obj_type)
+            answer_group.validate(obj_type, exp_param_specs_dict)
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -758,7 +804,7 @@ class State(object):
             interaction.answer_groups, interaction.default_outcome,
             interaction.triggers)
 
-    def validate(self, allow_null_interaction):
+    def validate(self, exp_param_specs_dict, allow_null_interaction):
         if not isinstance(self.content, list):
             raise utils.ValidationError(
                 'Expected state content to be a list, received %s'
@@ -780,7 +826,7 @@ class State(object):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
-            self.interaction.validate()
+            self.interaction.validate(exp_param_specs_dict)
 
     def update_content(self, content_list):
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -1194,6 +1240,7 @@ class Exploration(object):
         for state_name in self.states:
             self._require_valid_state_name(state_name)
             self.states[state_name].validate(
+                self.param_specs,
                 allow_null_interaction=not strict)
 
         if self.states_schema_version is None:
@@ -1506,8 +1553,8 @@ class Exploration(object):
         # state, and change the name appropriately.
         for other_state_name in self.states:
             other_state = self.states[other_state_name]
-            other_all_outcomes = other_state.interaction.get_all_outcomes()
-            for outcome in other_all_outcomes:
+            other_outcomes = other_state.interaction.get_all_outcomes()
+            for outcome in other_outcomes:
                 if outcome.dest == old_state_name:
                     outcome.dest = new_state_name
 
@@ -1652,7 +1699,7 @@ class Exploration(object):
             answer_groups = []
             default_outcome = None
             for handler in interaction['handlers']:
-                # Ensure the name is submit.
+                # Ensure the name is 'submit'.
                 if 'name' in handler and handler['name'] != 'submit':
                     raise utils.ExplorationConversionError(
                         'Error: Can only convert rules with a name '
@@ -1680,7 +1727,7 @@ class Exploration(object):
                     if ('subject' in rule_spec['definition'] and
                             rule_spec['definition']['subject'] != 'answer'):
                         raise utils.ExplorationConversionError(
-                            'Error: Can only convert rules with an answer '
+                            'Error: Can only convert rules with an \'answer\' '
                             'subject in states v3 to v4 conversion process. '
                             'Encountered subject: %s'
                             % rule_spec['definition']['subject'])
@@ -1852,7 +1899,8 @@ class Exploration(object):
         exploration_dict['states'] = cls._convert_states_v2_dict_to_v3_dict(
             exploration_dict['states'])
 
-        # The exploration is now at states schema version 3.
+        # Update the states schema version to reflect the above conversions to
+        # the states dict.
         exploration_dict['states_schema_version'] = 3
 
         return exploration_dict
@@ -1866,7 +1914,8 @@ class Exploration(object):
         exploration_dict['states'] = cls._convert_states_v3_dict_to_v4_dict(
             exploration_dict['states'])
 
-        # The exploration is now at states schema version 4.
+        # Update the states schema version to reflect the above conversions to
+        # the states dict.
         exploration_dict['states_schema_version'] = 4
 
         return exploration_dict

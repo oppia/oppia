@@ -20,7 +20,7 @@ oppia.factory('baseInteractionValidationService', [
     '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
 
   return {
-    getNonDefaultRuleSpecsWarnings: function(answerGroups, defaultOutcome, stateName) {
+    getAnswerGroupWarnings: function(answerGroups, stateName) {
       var partialWarningsList = [];
 
       // This does not check the default outcome.
@@ -29,28 +29,30 @@ oppia.factory('baseInteractionValidationService', [
           partialWarningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'please specify what Oppia should do in rule ' +
+              'please specify what Oppia should do in answer group ' +
               String(i + 1) + '.')
           });
         }
       }
       return partialWarningsList;
     },
-    getDefaultRuleSpecsWarnings: function(answerGroups, defaultOutcome, stateName) {
+    getDefaultOutcomeWarnings: function(defaultOutcome, stateName) {
       var partialWarningsList = [];
-      if ($filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+      if (defaultOutcome &&
+          $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
         partialWarningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please add a rule to cover what should happen in the general case.')
+            'please add feedback for the user if they are to return to the ' +
+            'same state again.')
         });
       }
       return partialWarningsList;
     },
-    getAllRuleSpecsWarnings: function(answerGroups, defaultOutcome, stateName) {
+    getAllOutcomeWarnings: function(answerGroups, defaultOutcome, stateName) {
       return (
-        this.getNonDefaultRuleSpecsWarnings(answerGroups, defaultOutcome, stateName).concat(
-          this.getDefaultRuleSpecsWarnings(answerGroups, defaultOutcome, stateName)));
+        this.getAnswerGroupWarnings(answerGroups, stateName).concat(
+          this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));
     }
   }
 }]);

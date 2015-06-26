@@ -55,6 +55,9 @@ oppia.factory('rulesService', [
 
   var _answerGroupsMemento = null;
   var _defaultOutcomeMemento = null;
+  // Represents the current selected answer group, starting at index 0. If the
+  // index equal to the number of answer groups (answerGroups.length), then it
+  // is referring to the default outcome.
   var _activeGroupIndex = null;
   var _activeRuleIndex = null;
   var _answerGroups = null;

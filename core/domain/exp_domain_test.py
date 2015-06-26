@@ -299,14 +299,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'Expected inputs to be a dict'):
             exploration.validate()
 
-        rule_spec.inputs = { 'x': 'Test' }
+        rule_spec.inputs = {'x': 'Test'}
         rule_spec.rule_type = 'FakeRuleType'
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Unrecognized rule type'):
             exploration.validate()
 
-        # Restore a valid exploration.
+        rule_spec.inputs = {'x': 15}
         rule_spec.rule_type = 'Contains'
+        with self.assertRaisesRegexp(
+                Exception, 'Expected unicode string, received 15'):
+            exploration.validate()
+
+        rule_spec.inputs = {'x': '{{ExampleParam}}'}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'RuleSpec \'Contains\' has an input '
+                'with name \'x\' which refers to an unknown parameter within '
+                'the exploration: ExampleParam'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
+            'UnicodeString')
         exploration.validate()
 
         # Validate Outcome.
@@ -318,7 +332,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'Every outcome should have a destination.'):
             exploration.validate()
 
-        outcome.dest = { 'Test' }
+        # Try setting the outcome destination to something other than a string.
+        outcome.dest = 15
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected outcome dest to be a string'):
             exploration.validate()
@@ -369,12 +384,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'Expected customization args to be a dict'):
             exploration.validate()
         
-        interaction.customization_args = { 15: '' }
+        interaction.customization_args = {15: ''}
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid customization arg name'):
             exploration.validate()
 
-        interaction.customization_args = { 'placeholder': '' }
+        interaction.customization_args = {'placeholder': ''}
         exploration.validate()
 
         interaction.answer_groups = {}
@@ -402,7 +417,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'Terminal interactions must not have any answer groups.'):
             exploration.validate()
 
-        # Valid: terminal interaction without a def. outcome or answer groups.
+        # A terminal interaction without a default outcome or answer group is
+        # valid. This resets the exploration back to a valid state.
         interaction.answer_groups = []
         exploration.validate()
 
@@ -456,7 +472,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         exploration.param_specs = {
-            '@': param_domain.ParamSpec.from_dict({'obj_type': 'Int'})
+            '@': param_domain.ParamSpec.from_dict({'obj_type': 'UnicodeString'})
         }
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Only parameter names with characters'):
@@ -464,7 +480,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.param_specs = {
             'notAParamSpec': param_domain.ParamSpec.from_dict(
-                {'obj_type': 'Int'})
+                {'obj_type': 'UnicodeString'})
         }
         exploration.validate()
 

@@ -26,6 +26,7 @@ class GraphInput(base.BaseInteraction):
     description = 'Allows learners to create and manipulate graphs.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
+    answer_type = 'Graph'
 
     _customization_arg_specs = [{
         'name': 'graph',
@@ -111,6 +112,3 @@ class GraphInput(base.BaseInteraction):
         },
         'default_value': False
     }]
-
-    def __init__(self):
-        self.answer_type = 'Graph'

@@ -119,13 +119,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.answerChoices = rulesService.getAnswerChoices();
         $scope.currentInteractionId = stateInteractionIdService.savedMemento;
 
-        $scope.resetMementos = function() {
+        var resetMementos = function() {
           $scope.ruleTypeMemento = null;
           $scope.ruleInputsMemento = null;
-         $scope.ruleFeedbackMemento = null;
-         $scope.ruleDestMemento = null;
+          $scope.ruleFeedbackMemento = null;
+          $scope.ruleDestMemento = null;
         };
-        $scope.resetMementos();
+        resetMementos();
 
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
@@ -151,7 +151,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.$broadcast('saveRuleDetails');
           // TODO(sll): Add more validation prior to saving.
           $scope.ruleEditorIsOpen = false;
-          $scope.resetMementos();
+          resetMementos();
           $scope.saveRule();
         };
         $scope.cancelThisEdit = function() {
@@ -162,7 +162,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
           $scope.outcome.feedback = angular.copy($scope.ruleFeedbackMemento);
           $scope.outcome.dest = angular.copy($scope.ruleDestMemento);
-          $scope.resetMementos();
+          resetMementos();
         };
         $scope.deleteThisRule = function() {
           $scope.deleteRule();

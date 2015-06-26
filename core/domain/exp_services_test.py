@@ -285,7 +285,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
         exploration.param_specs = {
-            'theParameter': param_domain.ParamSpec('Int')}
+            'theParameter': param_domain.ParamSpec('UnicodeString')}
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         retrieved_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -300,7 +300,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
         exploration.param_specs = {
-            'theParameter': param_domain.ParamSpec('Int')}
+            'theParameter': param_domain.ParamSpec('UnicodeString')}
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         # change title and category
@@ -749,7 +749,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_param_changes(self):
         """Test updating of param_changes."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exploration.param_specs = {'myParam': param_domain.ParamSpec('Int')}
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')}
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
@@ -776,7 +777,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exploration.param_specs = {'myParam': param_domain.ParamSpec('Int')}
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')}
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         self.param_changes[0]['generator_id'] = 'fake'

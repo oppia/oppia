@@ -24,6 +24,7 @@ class InteractiveMap(base.BaseInteraction):
     description = 'Allows learners to specify a position on a world map.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['google_maps']
+    answer_type = 'CoordTwoDim'
 
     _customization_arg_specs = [{
         'name': 'latitude',
@@ -61,6 +62,3 @@ class InteractiveMap(base.BaseInteraction):
         },
         'default_value': 0.0,
     }]
-
-    def __init__(self):
-        self.answer_type = 'CoordTwoDim'

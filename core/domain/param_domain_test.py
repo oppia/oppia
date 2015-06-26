@@ -26,6 +26,23 @@ import utils
 class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
+    def test_param_spec_validation(self):
+        """Test validation of param specs."""
+        param_spec = param_domain.ParamSpec('FakeType')
+        with self.assertRaisesRegexp(
+                TypeError, '\'FakeType\' is not a valid object class.'):
+            param_spec.validate()
+
+        param_spec.obj_type = 'Real'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Only \'UnicodeString\' is the '
+                'supported object type for parameters, not: Real'):
+            param_spec.validate()
+
+        # Restore a valid parameter spec.
+        param_spec.obj_type = 'UnicodeString'
+        param_spec.validate()
+
     def test_param_change_validation(self):
         """Test validation of parameter changes."""
         # Raise an error because the name is invalid.

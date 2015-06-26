@@ -48,13 +48,16 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
         """Test that interaction.rules behaves as expected."""
         interaction = base.BaseInteraction()
         interaction.answer_type = 'Null'
+        interaction.normalize_answer('15')
         self.assertEqual(interaction.rules, [])
 
         interaction.answer_type = 'NonnegativeInt'
         self.assertEqual(len(interaction.rules), 1)
+        interaction.normalize_answer('15')
 
         with self.assertRaisesRegexp(Exception, 'not a valid object class'):
             interaction.answer_type = 'FakeObjType'
+            interaction.normalize_answer('15')
 
 
 class InteractionUnitTests(test_utils.GenericTestBase):

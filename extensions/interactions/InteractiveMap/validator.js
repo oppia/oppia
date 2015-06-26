@@ -24,14 +24,26 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    if (customizationArgs.latitude.value < -90 || customizationArgs.latitude.value > 90) {
+    if (!customizationArgs.latitude) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please provide a customization argument for latitude.'
+      });
+    } else if (customizationArgs.latitude.value < -90 ||
+        customizationArgs.latitude.value > 90) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'please pick a starting latitude between -90 and 90.'
       });
     }
 
-    if (customizationArgs.longitude.value < -180 || customizationArgs.longitude.value > 180) {
+    if (!customizationArgs.longitude) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please provide a customization argument for longitude.'
+      });
+    } else if (customizationArgs.longitude.value < -180 ||
+        customizationArgs.longitude.value > 180) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'please pick a starting longitude between -180 and 180.'
@@ -45,7 +57,8 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
           if (ruleSpecs[j].inputs.d < 0) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
-              message: 'please ensure that all the rules refer to valid distances.'
+              message: 'please ensure that rule ' + String(j + 1) +
+                ' in group ' + String(i + 1) + ' refers to a valid distance.'
             });
           }
         }
@@ -53,7 +66,7 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getAllRuleSpecsWarnings(
+      baseInteractionValidationService.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;

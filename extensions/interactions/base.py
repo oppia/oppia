@@ -83,8 +83,9 @@ class BaseInteraction(object):
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
-    _answer_type = None
-    _answer_class = None
+    # The type of answer (as a string) accepted by this interaction, e.g.
+    # 'CodeEvaluation'.
+    answer_type = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -103,24 +104,15 @@ class BaseInteraction(object):
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
 
-    def get_answer_type(self):
-        return self._answer_type
-
-    def set_answer_type(self, value):
-        self._answer_type = value
-        self._answer_class = obj_services.Registry.get_object_class_by_type(
-            value)
-
-    answer_type = property(get_answer_type, set_answer_type)
-
     @property
     def rules(self):
-        return rule_domain.get_rules_for_obj_type(self._answer_type)
+        return rule_domain.get_rules_for_obj_type(self.answer_type)
 
     def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""
-        if self._answer_class:
-            return self._answer_class.normalize(answer)
+        if self.answer_type:
+            return obj_services.Registry.get_object_class_by_type(
+                self.answer_type).normalize(answer)
 
         raise Exception(
             'No answer type initialized for interaction %s' %
@@ -192,7 +184,7 @@ class BaseInteraction(object):
         # type for this interaction.
         result['rule_descriptions'] = (
             rule_domain.get_description_strings_for_obj_type(
-                self._answer_type))
+                self.answer_type))
 
         return result
 

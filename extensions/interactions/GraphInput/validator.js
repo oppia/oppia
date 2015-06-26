@@ -24,21 +24,40 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    if (customizationArgs.graph.value.vertices.length > 50) {
+    if (!customizationArgs.graph) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'a customization argument for the graph should be provided.'
+      });
+    } else if (customizationArgs.graph.value.vertices.length > 50) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'note that only graphs with at most 50 nodes are supported.'
       });
     }
 
-    if (!customizationArgs.graph.value.isWeighted && customizationArgs.canEditEdgeWeight.value) {
+    if (!customizationArgs.canEditEdgeWeight) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'a customization argument for \'canEditEdgeWeight\' should ' +
+          'be provided.'
+      });
+    } else if (!customizationArgs.graph.value.isWeighted &&
+        customizationArgs.canEditEdgeWeight.value) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'the learner cannot edit edge weights for an unweighted graph.'
       });
     }
 
-    if (!customizationArgs.graph.value.isLabeled && customizationArgs.canEditVertexLabel.value) {
+    if (!customizationArgs.canEditVertexLabel) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'a customization argument for \'canEditVertexLabel\' should ' +
+          'be provided.'
+      });
+    } else if (!customizationArgs.graph.value.isLabeled &&
+        customizationArgs.canEditVertexLabel.value) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'the learner cannot edit vertex labels for an unlabeled graph.'
@@ -46,7 +65,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getAllRuleSpecsWarnings(
+      baseInteractionValidationService.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;

@@ -24,6 +24,7 @@ class TextInput(base.BaseInteraction):
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
+    answer_type = 'NormalizedString'
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
@@ -55,6 +56,3 @@ class TextInput(base.BaseInteraction):
         },
         'default_value': 1,
     }]
-
-    def __init__(self):
-        self.answer_type = 'NormalizedString'

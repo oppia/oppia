@@ -24,20 +24,27 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    var numChoices = customizationArgs.choices.value.length;
-
+    var numChoices;
     var areAnyChoicesEmpty = false;
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
-    for (var i = 0; i < customizationArgs.choices.value.length; i++) {
-      var choice = customizationArgs.choices.value[i];
-      if (choice.trim().length === 0) {
-        areAnyChoicesEmpty = true;
+    if (!customizationArgs.choices) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please provide a customization argument for choices.'
+      });
+    } else {
+      numChoices = customizationArgs.choices.value.length;
+      for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+        var choice = customizationArgs.choices.value[i];
+        if (choice.trim().length === 0) {
+          areAnyChoicesEmpty = true;
+        }
+        if (seenChoices.indexOf(choice) !== -1) {
+          areAnyChoicesDuplicated = true;
+        }
+        seenChoices.push(choice);
       }
-      if (seenChoices.indexOf(choice) !== -1) {
-        areAnyChoicesDuplicated = true;
-      }
-      seenChoices.push(choice);
     }
 
     if (areAnyChoicesEmpty) {
@@ -57,23 +64,32 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
     for (var i = 0; i < answerGroups.length; i++) {
       var ruleSpecs = answerGroups[i].rule_specs;
       for (var j = 0; j < ruleSpecs.length; j++) {
-        if (ruleSpecs[j].rule_type === 'Equals' &&
-            uniqueRuleChoices.indexOf(ruleSpecs[j].inputs.x) === -1) {
+        var inputIndex = uniqueRuleChoices.indexOf(ruleSpecs[j].inputs.x);
+        if (ruleSpecs[j].rule_type === 'Equals' && inputIndex === -1) {
           uniqueRuleChoices.push(ruleSpecs[j].inputs.x);
         }
 
+        if (inputIndex !== -1) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+              String(i + 1) + ' is not equaling the same multiple choice ' +
+              'option as another rule.'
+          });
+        }
         if (ruleSpecs[j].inputs.x >= numChoices) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
-            message: 'please ensure that each rule corresponds to a valid choice.'
+            message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+              String(i + 1) + ' refers to a valid choice.'
           });
         }
       }
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
-        answerGroups, defaultOutcome, stateName));
+      baseInteractionValidationService.getAnswerGroupWarnings(
+        answerGroups, stateName));
 
     // Only require a default rule if some choices have not been taken care of by rules.
     if (uniqueRuleChoices.length < numChoices) {
