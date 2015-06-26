@@ -26,6 +26,8 @@ class TestGadget(base.BaseGadget):
 
     name = 'TestGadget'
     description = 'Tests base gadget validation internals.'
+    height_px = 50
+    width_px = 60
     _dependency_ids = []
 
     _customization_arg_specs = [
@@ -38,28 +40,16 @@ class TestGadget(base.BaseGadget):
             'default_value': ''
         }, {
             'name': 'floors',
-            'description': 'A test attribute that helps increase height.',
+            'description': 'A test attribute of the gadget.',
             'schema': {
                 'type': 'int',
             },
             'default_value': 1
-        }, {
-            'name': 'characters',
-            'description': 'A test attribute that helps increase width.',
-            'schema': {
-                'type': 'int',
-            },
-            'default_value': 2
         }
     ]
 
-    # This TestGadget tests having a dynamic height and width based on the
-    # number of 'floors' and 'characters' it has in its customization args.
-    # These attributes don't represent anything beyond their role in
-    # calculating the gadget's dimentions.
+    # The TestGadget should not have more than 3 floors.
     _MAX_FLOORS = 3
-    _PIXEL_HEIGHT_PER_FLOOR = 50
-    _PIXEL_WIDTH_PER_CHARACTER = 30
 
     def validate(self, customization_args):
         """Ensure TestGadget validates a proper config."""
@@ -69,21 +59,3 @@ class TestGadget(base.BaseGadget):
                 'TestGadgets are limited to %d floors, found %d.' % (
                     self._MAX_FLOORS,
                     floors))
-
-    def get_width(self, customization_args):
-        """Returns int representing width in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        characters = customization_args['characters']['value']
-        return characters * self._PIXEL_WIDTH_PER_CHARACTER
-
-    def get_height(self, customization_args):
-        """Returns int representing height in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        floors = customization_args['floors']['value']
-        return floors * self._PIXEL_HEIGHT_PER_FLOOR

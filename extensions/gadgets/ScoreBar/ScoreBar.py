@@ -25,6 +25,8 @@ class ScoreBar(base.BaseGadget):
 
     name = 'ScoreBar'
     description = 'A visual score bar that can represent progress or success.'
+    height_px = 100
+    width_px = 250
     _dependency_ids = []
 
     _customization_arg_specs = [
@@ -53,16 +55,3 @@ class ScoreBar(base.BaseGadget):
             'default_value': ''
         }
     ]
-
-    # Constants for height and width.
-    # Static placeholders for now.
-    _HEIGHT = 100
-    _WIDTH = 250
-
-    def get_width(self, customization_args):
-        """Returns integer representing width in pixels."""
-        return self._WIDTH
-
-    def get_height(self, customization_args):
-        """Returns integer representing height in pixels."""
-        return self._HEIGHT

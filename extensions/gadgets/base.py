@@ -39,6 +39,10 @@ class BaseGadget(object):
     name = ''
     # A description of the gadget. Overridden in subclasses.
     description = ''
+    # Height of the gadget in pixels.
+    height_px = 0
+    # Width of the gadget in pixels.
+    width_px = 0
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -82,23 +86,6 @@ class BaseGadget(object):
             feconf.GADGETS_DIR, self.type, '%s.html' % self.type))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
-    def get_width(self, customization_args):
-        """Returns an integer representing the gadget's width in pixels.
-
-        Some gadgets might not require data from customization args to
-        calculate width and height, but the method requires passing args
-        for consistency.
-
-        Example:
-        - An AdviceBar's height and width will change depending on how many
-        tips it contains.
-        """
-        raise NotImplementedError('Subclasses must override this method.')
-
-    def get_height(self, customization_args):
-        """Returns an integer representing the gadget's height in pixels."""
-        raise NotImplementedError('Subclasses must override this method.')
-
     def validate(self, customization_args):
         """Subclasses may override to perform additional validation."""
         pass
@@ -110,6 +97,8 @@ class BaseGadget(object):
         result = {
             'type': self.type,
             'name': self.name,
+            'height_px': self.height_px,
+            'width_px': self.width_px,
             'description': self.description,
             'customization_arg_specs': [{
                 'name': ca_spec.name,

@@ -106,7 +106,8 @@ class GadgetUnitTests(test_utils.GenericTestBase):
 
         gadget_dict = gadget.to_dict()
         self.assertItemsEqual(gadget_dict.keys(), [
-            'type', 'name', 'description', 'customization_arg_specs',])
+            'type', 'name', 'height_px', 'width_px', 'description',
+            'customization_arg_specs',])
         self.assertEqual(gadget_dict['type'], TEST_GADGET_TYPE)
         self.assertEqual(gadget_dict['customization_arg_specs'], [
             {
@@ -118,18 +119,11 @@ class GadgetUnitTests(test_utils.GenericTestBase):
                 'default_value': ''
             }, {
                 'name': 'floors',
-                'description': 'A test attribute that helps increase height.',
+                'description': 'A test attribute of the gadget.',
                 'schema': {
                     'type': 'int',
                 },
                 'default_value': 1
-            }, {
-                'name': 'characters',
-                'description': 'A test attribute that helps increase width.',
-                'schema': {
-                    'type': 'int',
-                },
-                'default_value': 2
             }])
 
     def test_default_gadgets_are_valid(self):
@@ -137,6 +131,7 @@ class GadgetUnitTests(test_utils.GenericTestBase):
 
         _GADGET_CONFIG_SCHEMA = [
             ('name', basestring), ('description', basestring),
+            ('height_px', int), ('width_px', int),
             ('_customization_arg_specs', list)]
 
         for gadget_type in feconf.ALLOWED_GADGETS:
@@ -209,6 +204,11 @@ class GadgetUnitTests(test_utils.GenericTestBase):
             # Check that the specified gadget type is the same as the class
             # name.
             self.assertTrue(gadget_type, gadget.__class__.__name__)
+
+            # Check that height and width have been overridden with positive
+            # values.
+            self.assertGreater(gadget.height_px, 0)
+            self.assertGreater(gadget.width_px, 0)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.

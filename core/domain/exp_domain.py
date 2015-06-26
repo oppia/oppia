@@ -640,12 +640,12 @@ class GadgetInstance(object):
     @property
     def width(self):
         """Width in pixels."""
-        return self.gadget.get_width(self.customization_args)
+        return self.gadget.width_px
 
     @property
     def height(self):
         """Height in pixels."""
-        return self.gadget.get_height(self.customization_args)
+        return self.gadget.height_px
 
     @staticmethod
     def _validate_gadget_name(gadget_name):

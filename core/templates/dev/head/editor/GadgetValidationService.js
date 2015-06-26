@@ -21,11 +21,12 @@
 //Service for handling all gadget validation.
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
-    'explorationSkinIdService',
+    'explorationSkinIdService', 'GADGET_SPECS',
     function($filter, warningsData, validatorsService, editorContextService,
-      explorationSkinIdService) {
+      explorationSkinIdService, GADGET_SPECS) {
   var AXIS_HORIZONTAL = 'horizontal';
   var AXIS_VERTICAL = 'vertical';
+  var VALID_AXIS_OPTIONS = [AXIS_HORIZONTAL, AXIS_VERTICAL];
   var _MAX_GADGET_NAME_LENGTH = 50;
 
   var _getPanelSpecs = function(panelName) {
@@ -43,13 +44,18 @@ oppia.factory('gadgetValidationService', [
   return {
     validatePanel: function(panelName, visibilityMap) {
       var currentPanelSpec = _getPanelSpecs(panelName);
-      //TODO(anuzis/vjoisar): Implement api to get height and width of a gadget.
-      var GADGET_WIDTH = 100;
-      var GADGET_HEIGHT = 100;
+      var stackableAxis = currentPanelSpec.stackable_axis;
 
+      // Fail early for unrecognized axis. This error should never reach
+      // the front-end, but is flagged here for defense-in-depth.
+      if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
+        var warningText = 'Unrecognized axis: ' + stackableAxis + ' for ' +
+          panelName + ' panel.';
+        warningsData.addWarning(warningText);
+        return false;
+      }
       for (var stateNameAsKey in visibilityMap) {
         var gadgetInstances = visibilityMap[stateNameAsKey];
-
         if (gadgetInstances.length > currentPanelSpec.max_gadgets) {
           var warningText =  panelName + ' panel expects at most ' +
             currentPanelSpec.max_gadgets +  ', but ' + gadgetInstances.length +
@@ -59,34 +65,47 @@ oppia.factory('gadgetValidationService', [
         }
 
         var totalWidth = 0, totalHeight = 0;
-
-        if (currentPanelSpec.stackable_axis == AXIS_VERTICAL) {
+        if (stackableAxis == AXIS_VERTICAL) {
+          // Factor in pixel buffer between gadgets, if multiple gadgets share
+          // a panel in the same state.
           totalHeight += currentPanelSpec.pixels_between_gadgets * (
             gadgetInstances.length - 1);
-          totalHeight += GADGET_HEIGHT * gadgetInstances.length;
-          totalWidth = GADGET_WIDTH;
+
+          // Factor in sizes of each gadget.
+          for (var i = 0; i < gadgetInstances.length; i++) {
+            var gadgetType = gadgetInstances[i].gadget_type;
+            totalHeight += GADGET_SPECS[gadgetType].height_px;
+
+            // If this is the widest gadget, it sets the width.
+            if (GADGET_SPECS[gadgetType].width_px > totalWidth) {
+              totalWidth = GADGET_SPECS[gadgetType].width_px;
+            }
+          }
         }
-        else if (currentPanelSpec.stackable_axis == AXIS_HORIZONTAL) {
+        else if (stackableAxis == AXIS_HORIZONTAL) {
           totalWidth += currentPanelSpec.pixels_between_gadgets * (
             gadgetInstances.length - 1);
-          totalWidth += GADGET_WIDTH * gadgetInstances.length;
-          totalHeight = GADGET_HEIGHT;
-        }
-        else {
-          var warningText = 'Unrecognized axis for ' + panelName + ' panel.';
-          warningsData.addWarning(warningText);
-          return false;
+
+          for (var i = 0; i < gadgetInstances.length; i++) {
+            var gadgetType = gadgetInstances[i].gadget_type;
+            totalWidth += GADGET_SPECS[gadgetType].width_px;
+
+            // If this is the tallest gadget, it sets the height.
+            if (GADGET_SPECS[gadgetType].height_px > totalHeight) {
+              totalHeight = GADGET_SPECS[gadgetType].height_px;
+            }
+          }
         }
         if (currentPanelSpec.width < totalWidth) {
           var warningText = 'Size exceeded: ' + panelName + ' panel width of ' +
-            totalWidth + ' exceeds limit of ' + currentPanelSpec.width;
+            totalWidth + ' exceeds limit of ' + currentPanelSpec.width  + '.';
           warningsData.addWarning(warningText);
           return false;
         }
         else if (currentPanelSpec.height < totalHeight) {
           var warningText = 'Size exceeded: ' + panelName +
             ' panel height of ' + totalHeight + ' exceeds limit of ' +
-            currentPanelSpec.height;
+            currentPanelSpec.height + '.';
           warningsData.addWarning(warningText);
           return false;
         }

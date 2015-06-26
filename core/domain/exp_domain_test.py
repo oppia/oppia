@@ -1393,8 +1393,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         # a panel's capacity.
         with self.swap(
             test_gadget_instance.gadget,
-            '_PIXEL_WIDTH_PER_CHARACTER',
-            2300):
+            'width_px',
+            4600):
 
             with self.assertRaisesRegexp(
                     utils.ValidationError,
