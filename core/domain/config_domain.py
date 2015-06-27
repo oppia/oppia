@@ -204,17 +204,38 @@ def update_moderator_ids():
     return moderator_ids
 
 
+def update_editor_ids():
+    """Refresh the list of editor user_ids based on the emails entered."""
+    editor_emails_config = Registry.get_config_property('editor_emails')
+    if not editor_emails_config:
+        return []
+
+    editor_ids = []
+    for email in editor_emails_config.value:
+        user_id = user_services.get_user_id_from_email(email)
+        if user_id is not None:
+            editor_ids.append(user_id)
+        else:
+            raise Exception('Bad editor email: %s' % email)
+    return editor_ids
+
+
 ADMIN_IDS = ComputedProperty(
     'admin_ids', SET_OF_STRINGS_SCHEMA, 'Admin ids', update_admin_ids)
 MODERATOR_IDS = ComputedProperty(
     'moderator_ids', SET_OF_STRINGS_SCHEMA, 'Moderator ids',
     update_moderator_ids)
+EDITOR_IDS = ComputedProperty(
+    'editor_ids', SET_OF_STRINGS_SCHEMA, 'Editor ids', update_editor_ids)
 
 ADMIN_EMAILS = ConfigProperty(
     'admin_emails', SET_OF_STRINGS_SCHEMA, 'Email addresses of admins', [])
 MODERATOR_EMAILS = ConfigProperty(
     'moderator_emails', SET_OF_STRINGS_SCHEMA, 'Email addresses of moderators',
     [])
+EDITOR_EMAILS = ConfigProperty(
+    'editor_emails', SET_OF_STRINGS_SCHEMA, 'Email addresses of editors', [])
+
 BANNED_USERNAMES = ConfigProperty(
     'banned_usernames',
     SET_OF_STRINGS_SCHEMA,

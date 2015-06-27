@@ -160,6 +160,7 @@ class ExplorationPage(EditorHandler):
 
     EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
+    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
         exploration = exp_services.get_exploration_by_id(

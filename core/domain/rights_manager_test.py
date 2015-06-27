@@ -59,6 +59,15 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_delete('1'))
 
+        self.signup_non_editor('f@example.com', 'F')
+        self.user_id_f = self.get_user_id_from_email('f@example.com')
+
+        self.assertTrue(rights_manager.Actor(self.user_id_f).can_play('1'))
+        self.assertTrue(rights_manager.Actor(self.user_id_f).can_view('1'))
+        self.assertFalse(rights_manager.Actor(self.user_id_f).can_edit('1'))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_f).can_delete('1'))
+
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
@@ -110,7 +119,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_admin).can_play(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_view(self.EXP_ID))
-        self.assertFalse(
+        self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_edit(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_delete(self.EXP_ID))

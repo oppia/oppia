@@ -175,10 +175,7 @@ def get_new_exploration_id():
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user may edit an exploration by checking
     the given domain object."""
-    return user_id is not None and (
-        user_id in exp_summary.editor_ids
-        or user_id in exp_summary.owner_ids
-        or exp_summary.community_owned)
+    return rights_manager.Actor(user_id).can_edit(exp_summary.id)
 
 
 # Query methods.

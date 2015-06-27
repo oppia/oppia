@@ -283,15 +283,9 @@ class Actor(object):
         return self.can_play(exploration_id)
 
     def can_edit(self, exploration_id):
-        # TODO(sll): Add a check here for whether a user is banned or not,
-        # rather than having this check in the controller.
-        exp_rights = get_exploration_rights(exploration_id)
-        return (
-            self.has_explicit_editing_rights(exploration_id) or (
-                self.is_moderator() and
-                exp_rights.status != EXPLORATION_STATUS_PRIVATE
-            )
-        )
+        return self.is_moderator() or (
+            self.has_explicit_editing_rights(exploration_id) and
+            self.user_id in config_domain.EDITOR_IDS.value)
 
     def can_accept_submitted_change(self, exploration_id):
         return self.can_edit(exploration_id)

@@ -250,6 +250,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.EDITOR_ID, exploration)
         rights_manager.publish_exploration(self.EDITOR_ID, NEW_EXP_ID)
 
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % NEW_EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
@@ -270,6 +271,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             feconf.FEEDBACK_THREAD_URL_PREFIX, NEW_EXP_ID,
             threadlist[0]['thread_id']))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
+        self.logout()
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
         # Create a thread for others to post to.

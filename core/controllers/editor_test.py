@@ -70,11 +70,9 @@ class EditorTest(BaseEditorControllerTest):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Check that non-editors can access, but not edit, the editor page.
+        # Check that non-editors cannot access the editor page.
         response = self.testapp.get('/create/0')
-        self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Oppia!', response.body)
-        self.assert_cannot_edit(response.body)
+        self.assertEqual(response.status_int, 302)
 
         # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
@@ -670,8 +668,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
-        self.assert_cannot_edit(response.body)
+        self.assertEqual(response.status_int, 401)
 
         # Joe logs out.
         self.logout()
@@ -749,11 +746,10 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         self.logout()
 
-        # Check that viewer can access editor page but cannot edit.
+        # Check that viewer cannot access editor page.
         self.login(self.VIEWER_EMAIL)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
-        self.assert_cannot_edit(response.body)
+        self.assertEqual(response.status_int, 401)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.

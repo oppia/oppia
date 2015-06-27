@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import copy
 import datetime
 import os
 import re
@@ -203,10 +204,11 @@ class TestBase(unittest.TestCase):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
 
-    def signup(self, email, username):
-        """Complete the signup process for the user with the given username."""
+    def signup_non_editor(self, email, username):
+        """Complete the signup process for the user with the given username
+        but do not register them as an editor in the admin UI.
+        """
         self.login(email)
-
         response = self.testapp.get(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -218,8 +220,12 @@ class TestBase(unittest.TestCase):
             })
         })
         self.assertEqual(response.status_int, 200)
-
         self.logout()
+
+    def signup(self, email, username):
+        """Complete the signup process for the user with the given username."""
+        self.signup_non_editor(email, username)
+        self.add_editor([email])
 
     def set_admins(self, admin_emails):
         """Set the ADMIN_EMAILS property."""
@@ -249,6 +255,30 @@ class TestBase(unittest.TestCase):
             'action': 'save_config_properties',
             'new_config_property_values': {
                 config_domain.MODERATOR_EMAILS.name: moderator_emails,
+            }
+        }, csrf_token)
+        self.logout()
+
+        self._restore_stashed_user_env()
+
+    def add_editor(self, editor_emails):
+        """Add editors emails to the EDITOR_EMAILS property."""
+        self._stash_current_user_env()
+
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        new_editor_emails = copy.deepcopy(
+            config_domain.EDITOR_EMAILS.value)
+        for email in editor_emails:
+            if email not in new_editor_emails:
+                new_editor_emails.append(email)
+
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.EDITOR_EMAILS.name: new_editor_emails,
             }
         }, csrf_token)
         self.logout()
