@@ -56,6 +56,7 @@ oppia.directive('ruleTypeSelector', [function() {
 
       if (!$scope.localValue) {
         $scope.localValue = choices[choices.length - 1].id;
+        $scope.onSelectionChange()($scope.localValue);
       }
 
       var select2Node = $element[0].firstChild;

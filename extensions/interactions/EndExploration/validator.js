@@ -17,9 +17,27 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveEndExplorationValidator', [function() {
+oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
+    function(WARNING_TYPES) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
-    return [];
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
+    var warningsList = [];
+
+    if (answerGroups.length != 0) {
+      warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'please make sure end exploration interactions do not have ' +
+          'any answer groups.'
+      });
+    }
+    if (defaultOutcome) {
+      warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'please make sure end exploration interactions do not have ' +
+          'a default outcome.'
+      });
+    }
+
+    return warningsList;
   };
 }]);

@@ -22,25 +22,23 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+    var warningsList = (
+      baseInteractionValidationService.validateCustomizationArguments(
+        customizationArgs, [
+        'imageAndRegions.value.imagePath',
+        'imageAndRegions.value.labeledRegions']));
 
-    if (!customizationArgs.imageAndRegions) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please provide a customization argument describing the ' +
-          'image and regions.'
-      });
-    } else if (!customizationArgs.imageAndRegions.value.imagePath) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please add an image for the learner to click on.'
-      });
-    }
+    if (warningsList.length == 0) {
+      if (!customizationArgs.imageAndRegions.value.imagePath) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'please add an image for the learner to click on.'
+        });
+      }
 
-    var areAnyRegionStringsEmpty = false;
-    var areAnyRegionStringsDuplicated = false;
-    var seenRegionStrings = [];
-    if (customizationArgs.imageAndRegions) {
+      var areAnyRegionStringsEmpty = false;
+      var areAnyRegionStringsDuplicated = false;
+      var seenRegionStrings = [];
       if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,

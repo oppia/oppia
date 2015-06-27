@@ -22,32 +22,26 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
     function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+    var warningsList = (
+      baseInteractionValidationService.validateCustomizationArguments(
+        customizationArgs, ['latitude.value', 'longitude.value']));
 
-    if (!customizationArgs.latitude) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please provide a customization argument for latitude.'
-      });
-    } else if (customizationArgs.latitude.value < -90 ||
-        customizationArgs.latitude.value > 90) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please pick a starting latitude between -90 and 90.'
-      });
-    }
+    if (warningsList.length == 0) {
+      if (customizationArgs.latitude.value < -90 ||
+          customizationArgs.latitude.value > 90) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'please pick a starting latitude between -90 and 90.'
+        });
+      }
 
-    if (!customizationArgs.longitude) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please provide a customization argument for longitude.'
-      });
-    } else if (customizationArgs.longitude.value < -180 ||
-        customizationArgs.longitude.value > 180) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please pick a starting longitude between -180 and 180.'
-      });
+      if (customizationArgs.longitude.value < -180 ||
+          customizationArgs.longitude.value > 180) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'please pick a starting longitude between -180 and 180.'
+        });
+      }
     }
 
     for (var i = 0; i < answerGroups.length; i++) {

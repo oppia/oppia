@@ -332,7 +332,7 @@ class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding classification result, which is a dict containing
     two keys:
-        'outcome': The Outcome of the answer group matched.
+        'outcome': A dict representing the outcome of the answer group matched.
         'rule_spec_string': A descriptive string representation of the rule
             matched.
     """

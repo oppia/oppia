@@ -158,13 +158,6 @@ oppia.factory('rulesService', [
     changeActiveGroupIndex: function(newIndex) {
       _activeGroupIndex = newIndex;
     },
-    getActiveRule: function() {
-      if (_answerGroups) {
-        return _answerGroups[_activeGroupIndex];
-      } else {
-        return null;
-      }
-    },
     deleteActiveRule: function() {
       if (!window.confirm('Are you sure you want to delete this rule?')) {
         return false;
@@ -357,14 +350,6 @@ oppia.controller('StateRules', [
       $scope.changeActiveGroupIndex(ui.item.index());
       $rootScope.$broadcast('externalSave');
     }
-  };
-
-  $scope.isActiveRuleEditorShown = function() {
-    var activeRule = rulesService.getActiveRule();
-    return activeRule && stateInteractionIdService.savedMemento && (
-      activeRule.definition.rule_type !== 'default' ||
-      activeRule.dest !== editorContextService.getActiveStateName() ||
-      activeRule.feedback.length > 0);
   };
 
   $scope.deleteActiveRule = function() {

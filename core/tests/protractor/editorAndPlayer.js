@@ -488,7 +488,7 @@ describe('Exploration history', function() {
       10: {text: '    rule_specs:', highlighted: true},
       11: {text: '    - inputs:', highlighted: true},
       12: {text: '        x: 6.0', highlighted: true},
-      13: {text: '      name: Equals', highlighted: true},
+      13: {text: '      rule_type: Equals', highlighted: true},
       14: {text: '  customization_args: {}', highlighted: false},
       15: {text: '  default_outcome:', highlighted: false},
       16: {text: '    dest: first', highlighted: true},

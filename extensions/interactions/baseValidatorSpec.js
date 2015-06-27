@@ -15,6 +15,14 @@
 /**
  * @fileoverview Unit tests for all interaction validators.
  *
+ * NOTE TO DEVELOPERS: Many of the exploration validators simply defer their
+ * validation to the baseValidator. As a result, they require no additional
+ * testing. You will see some test suites in this file which simply have a
+ * single test for the validator along the lines of "it should be able to
+ * perform basic validation." These simple tests are to ensure the policy of the
+ * validator is to defer validation to the baseValidator, since it has its own
+ * tests to ensure it is working properly.
+ *
  * @author bhenning@google.com (Ben Henning)
  */
 
@@ -60,6 +68,7 @@ describe('Interaction validator', function() {
         goodAnswerGroups, currentState);
       expect(warnings).toEqual([]);
     });
+
     it('should have a warning for an answer group with a confusing outcome',
         function() {
       var answerGroups = [
@@ -73,16 +82,18 @@ describe('Interaction validator', function() {
         'message': 'please specify what Oppia should do in answer group 2.'
       }]);
     });
+
     it('should not have any warnings for a non-confusing default outcome',
         function() {
-
-      var warnings = warnings = bivs.getDefaultOutcomeWarnings(
+      var warnings = bivs.getDefaultOutcomeWarnings(
         goodOutcomeDest, currentState);
       expect(warnings).toEqual([]);
-      warnings = warnings = bivs.getDefaultOutcomeWarnings(
+
+      warnings = bivs.getDefaultOutcomeWarnings(
         goodOutcomeFeedback, currentState);
       expect(warnings).toEqual([]);
     });
+
     it('should have a warning for a confusing default outcome', function() {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
       expect(warnings).toEqual([{
@@ -91,11 +102,13 @@ describe('Interaction validator', function() {
           'to the same state again.'
       }]);
     });
+
     it('should not have any warnings for no answer groups and a null default ' +
         'outcome.', function() {
       var warnings = bivs.getAllOutcomeWarnings([], null, currentState)
       expect(warnings).toEqual([]);
     });
+
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
@@ -120,12 +133,52 @@ describe('Interaction validator', function() {
     });
   });
 
+  describe('customizationValidator', function() {
+    it('should have no warnings for no fields', function() {
+      var warnings = bivs.validateCustomizationArguments({}, []);
+      expect(warnings).toEqual([]);
+    });
+
+    it('should provide warnings for a missing top-level field', function() {
+      var warnings = bivs.validateCustomizationArguments({}, ['levelone']);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: levelone'
+      }]);
+    });
+
+    it('should provide warnings for missing fields beyond the top level, but ' +
+        'not below a missing field', function() {
+      var customArgs = {
+        'first': {
+          'more': {
+            'details': 'Text'
+          }
+        }, 'second': {
+          'value': 15
+        }
+      };
+      var warnings = bivs.validateCustomizationArguments(customArgs, [
+        'first.more.details', 'second.value.subvalue', 'third.more']);
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: ' +
+          'second.value.subvalue'
+      });
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: third'
+      });
+    });
+  });
+
   describe('oppiaInteractiveCodeReplValidator', function() {
     var validator;
 
     beforeEach(function() {
       validator = filter('oppiaInteractiveCodeReplValidator');
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
@@ -144,6 +197,7 @@ describe('Interaction validator', function() {
         }
       };
     });
+
     it('should expect a non-empty button text customization argument',
         function() {
       var warnings = validator(
@@ -161,10 +215,11 @@ describe('Interaction validator', function() {
       warnings = validator(currentState, {}, [], goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'a customization argument for button text should be ' +
-          'provided.'
+        'message': 'Expected customization arguments to have property: ' +
+          'buttonText'
       }]);
     });
+
     it('should expect no answer groups', function() {
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
@@ -175,6 +230,7 @@ describe('Interaction validator', function() {
           'interaction.'
       }]);
     });
+
     it('should expect a non-confusing and non-null default outcome',
         function() {
       var warnings = validator(currentState, customizationArguments, [], null);
@@ -192,22 +248,31 @@ describe('Interaction validator', function() {
     beforeEach(function() {
       validator = filter('oppiaInteractiveEndExplorationValidator');
     });
-    it('should never have warnings for valid answer groups and default ' +
-        'outcome', function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+
+    it('should not have warnings for no answer groups or no default outcome',
+        function() {
+      var warnings = validator(currentState, {}, [], null);
       expect(warnings).toEqual([]);
     });
-    it('should never have warnings for invalid answer groups or default ' +
-        'outcome', function() {
-      var badAnswerGroups = [
+
+    it('should have warnings for any answer groups or default outcome',
+        function() {
+      var answerGroups = [
         createAnswerGroup(goodOutcomeDest),
-        createAnswerGroup(badOutcome),
+        createAnswerGroup(goodOutcomeFeedback),
         createAnswerGroup(badOutcome),
       ];
-      var warnings = validator(
-        currentState, {}, badAnswerGroups, badOutcome);
-      expect(warnings).toEqual([]);
+      var warnings = validator(currentState, {}, answerGroups, badOutcome);
+      expect(warnings).toEqual([{
+          'type': WARNING_TYPES.ERROR,
+          'message': 'please make sure end exploration interactions do not ' +
+            'have any answer groups.'
+        }, {
+          'type': WARNING_TYPES.ERROR,
+          'message': 'please make sure end exploration interactions do not ' +
+            'have a default outcome.'
+        }
+      ]);
     });
   });
 
@@ -232,30 +297,33 @@ describe('Interaction validator', function() {
         }
       };
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([]);
     });
+
     it('should expect graph and edit customization arguments', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-          'type': WARNING_TYPES.CRITICAL,
-          'message': 'a customization argument for the graph should be' +
-            ' provided.'
-        }, {
-          'type': WARNING_TYPES.CRITICAL,
-          'message': 'a customization argument for \'canEditEdgeWeight\' ' +
-            'should be provided.'
-        }, {
-          'type': WARNING_TYPES.CRITICAL,
-          'message': 'a customization argument for \'canEditVertexLabel\' ' +
-            'should be provided.'
-        }
-      ]);
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: graph'
+      });
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: ' +
+          'canEditEdgeWeight'
+      });
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: ' +
+          'canEditVertexLabel'
+      });
     });
+
     it('should expect no more than 50 vertices in the graph customization ' +
         'argument', function() {
       customizationArguments.graph.value.vertices = new Array(51);
@@ -267,6 +335,7 @@ describe('Interaction validator', function() {
         'message': 'note that only graphs with at most 50 nodes are supported.'
       }]);
     });
+
     it('should verify edge weight edit permissions make sense', function() {
       customizationArguments.graph.value.isWeighted = false;
       customizationArguments.canEditEdgeWeight.value = true;
@@ -279,6 +348,7 @@ describe('Interaction validator', function() {
           'graph.'
       }]);
     });
+
     it('should verify vertex label edit permissions make sense', function() {
       customizationArguments.graph.value.isLabeled = false;
       customizationArguments.canEditVertexLabel.value = true;
@@ -320,6 +390,7 @@ describe('Interaction validator', function() {
         }])
       ];
     });
+
     it('should expect a customization argument for image and regions',
         function() {
       goodAnswerGroups[0].rule_specs = [];
@@ -327,10 +398,11 @@ describe('Interaction validator', function() {
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please provide a customization argument describing the ' +
-          'image and regions.'
+        'message': 'Expected customization arguments to have property: ' +
+          'imageAndRegions'
       }]);
     });
+
     it('should expect an image path customization argument', function() {
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
@@ -346,6 +418,7 @@ describe('Interaction validator', function() {
         'message': 'please add an image for the learner to click on.'
       }]);
     });
+
     it('should expect labeled regions with non-empty, unique, and ' +
         'alphanumeric labels', function() {
       var regions = customizationArguments.imageAndRegions.value.labeledRegions;
@@ -387,6 +460,7 @@ describe('Interaction validator', function() {
         'message': 'please specify at least one image region to click on.'
       }]);
     });
+
     it('should expect rule types to reference valid region labels', function() {
       goodAnswerGroups[0].rule_specs[0].inputs.x = 'FakeLabel';
       var warnings = validator(
@@ -398,6 +472,7 @@ describe('Interaction validator', function() {
           'invalid.'
       }]);
     });
+
     it('should expect a non-confusing and non-null default outcome',
         function() {
       var warnings = validator(currentState, customizationArguments, [], null);
@@ -440,25 +515,28 @@ describe('Interaction validator', function() {
         ])
       ];
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([]);
     });
+
     it('should expect latitudes and longitude customization arguments',
         function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-          'type': WARNING_TYPES.CRITICAL,
-          'message': 'please provide a customization argument for latitude.'
-        }, {
-          'type': WARNING_TYPES.CRITICAL,
-          'message': 'please provide a customization argument for longitude.'
-        }
-      ]);
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: latitude'
+      });
+      expect(warnings).toContain({
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'Expected customization arguments to have property: longitude'
+      });
     });
+
     it('should expect latitudes and longitudes within [-90, 90] and ' +
         '[-180, 180], respectively', function() {
       customizationArguments.latitude.value = -120;
@@ -489,6 +567,7 @@ describe('Interaction validator', function() {
         }
       ]);
     });
+
     it('should expect all rule types to refer to positive distances',
         function() {
       goodAnswerGroups[0].rule_specs[0].inputs.d = -90;
@@ -515,11 +594,13 @@ describe('Interaction validator', function() {
     beforeEach(function() {
       validator = filter('oppiaInteractiveLogicProofValidator');
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([]);
     });
+
     it('should not have warnings for a confusing default outcome', function() {
       var warnings = validator(currentState, {}, [], badOutcome);
       expect(warnings).toEqual([]);
@@ -551,20 +632,23 @@ describe('Interaction validator', function() {
         ])
       ];
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([]);
     });
+
     it('should expect a choices customization argument', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please provide a customization argument for choices.'
+        'message': 'Expected customization arguments to have property: choices'
       }]);
     });
+
     it('should expect non-empty and unique choices', function() {
       customizationArguments.choices.value[0] = '';
       var warnings = validator(
@@ -584,6 +668,7 @@ describe('Interaction validator', function() {
         'message': 'please ensure the choices are unique.'
       }]);
     });
+
     it('should validate answer group rules refer to valid choices only once',
         function() {
       goodAnswerGroups[0].rule_specs[0].inputs.x = 2;
@@ -607,6 +692,7 @@ describe('Interaction validator', function() {
           'multiple choice option as another rule.'
       }]);
     });
+
     it('should expect a non-confusing and non-null default outcome only when ' +
         'not all choices are covered by rules', function() {
       var warnings = validator(
@@ -641,6 +727,7 @@ describe('Interaction validator', function() {
     beforeEach(function() {
       validator = filter('oppiaInteractiveMusicNotesInputValidator');
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
@@ -654,6 +741,7 @@ describe('Interaction validator', function() {
     beforeEach(function() {
       validator = filter('oppiaInteractiveNumericInputValidator');
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
@@ -667,6 +755,7 @@ describe('Interaction validator', function() {
     beforeEach(function() {
       validator = filter('oppiaInteractiveSetInputValidator');
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
@@ -680,6 +769,7 @@ describe('Interaction validator', function() {
     beforeEach(function() {
       validator = filter('oppiaInteractiveTextInputValidator');
     });
+
     it('should be able to perform basic validation', function() {
       var warnings = validator(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);

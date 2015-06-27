@@ -23,7 +23,7 @@
               </div>
             </a>
 
-            <div ng-if="activeGroupIndex === $index && isActiveRuleEditorShown">
+            <div ng-if="activeGroupIndex === $index">
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
                   <rule-editor rule="group.rule_specs[0]" outcome="group.outcome" is-default-rule="false" save-rule="saveActiveRule(group.rule_specs[0], group.outcome)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
@@ -48,7 +48,7 @@
               </span>
             </a>
 
-            <div ng-if="activeGroupIndex === answerGroups.length && isActiveRuleEditorShown">
+            <div ng-if="activeGroupIndex === answerGroups.length">
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
                   <rule-editor rule="null" outcome="defaultOutcome" is-default-rule="true" save-rule="saveDefaultRule(defaultOutcome)" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">

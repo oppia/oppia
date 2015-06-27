@@ -17,17 +17,17 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveContinueValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveContinueValidator', [
+    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+    function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
-
-    if (!customizationArgs.buttonText) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'a customization argument for button text should be provided.'
-      });
-    } else if (customizationArgs.buttonText.value.length === 0) {
+    var warningsList = (
+      baseInteractionValidationService.validateCustomizationArguments(
+        customizationArgs, ['buttonText.value']));
+    
+    if (warningsList.length == 0 &&
+        customizationArgs.buttonText.value.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'the button text should not be empty.'

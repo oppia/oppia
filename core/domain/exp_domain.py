@@ -251,9 +251,9 @@ class RuleSpec(object):
         return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
     def validate(self, rule_params_list, exp_param_specs_dict):
-        """Validates the state of a RuleSpec value object. It ensures the inputs
-        dict does not refer to any non-existent parameters and that it contains
-        values for all the parameters the rule expects.
+        """Validates a RuleSpec value object. It ensures the inputs dict does
+        not refer to any non-existent parameters and that it contains values for
+        all the parameters the rule expects.
 
         Args:
             rule_params_list: A list of parameters used by the rule represented
@@ -292,8 +292,7 @@ class RuleSpec(object):
         for (param_name, param_value) in self.inputs.iteritems():
             param_obj = rule_params_dict[param_name]
             # Validate the parameter type given the value.
-            if (isinstance(param_value, str) or
-                    isinstance(param_value, unicode)) and '{{' in param_value:
+            if isinstance(param_value, basestring) and '{{' in param_value:
                 # Value refers to a parameter spec. Cross-validate the type of
                 # the parameter spec with the rule parameter.
                 start_brace_index = param_value.index('{{') + 2
@@ -906,15 +905,18 @@ class State(object):
         self.interaction.answer_groups = interaction_answer_groups
 
     def update_interaction_default_outcome(self, default_outcome_dict):
-        if not isinstance(default_outcome_dict, dict):
-            raise Exception(
-                'Expected default_outcome_dict to be a dict, received %s'
-                % default_outcome_dict)
-        self.interaction.default_outcome = Outcome.from_dict(
-            default_outcome_dict)
-        self.interaction.default_outcome.feedback = [
-            html_cleaner.clean(feedback)
-            for feedback in self.interaction.default_outcome.feedback]
+        if default_outcome_dict:
+            if not isinstance(default_outcome_dict, dict):
+                raise Exception(
+                    'Expected default_outcome_dict to be a dict, received %s'
+                    % default_outcome_dict)
+            self.interaction.default_outcome = Outcome.from_dict(
+                default_outcome_dict)
+            self.interaction.default_outcome.feedback = [
+                html_cleaner.clean(feedback)
+                for feedback in self.interaction.default_outcome.feedback]
+        else:
+            self.interaction.default_outcome = None
 
     def to_dict(self):
         return {

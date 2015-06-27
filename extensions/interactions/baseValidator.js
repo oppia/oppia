@@ -20,6 +20,67 @@ oppia.factory('baseInteractionValidationService', [
     '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
 
   return {
+    // Fields is an array of qualified strings used to verify the structure of
+    // customizationArguments. For instance, fields may have 'choices' and
+    // 'choices.value'. Warnings will be returned if choices or choices.value
+    // are not defined within customization arguments.
+    validateCustomizationArguments: function(customizationArguments, fields) {
+      var warningsList = [];
+
+      // Build a structure which customizationArguments should match.
+      var validationStructure = {};
+      for (var i = 0; i < fields.length; i++) {
+        var propertyNames = fields[i].split('.');
+        var substructure = validationStructure;
+        for (var j = 0; j < propertyNames.length; j++) {
+          var propertyName = propertyNames[j];
+          if (!substructure[propertyName]) {
+            substructure[propertyName] = {};
+          }
+          substructure = substructure[propertyName];
+        }
+      }
+
+      // Now validate the customizationArguments tree top-down.
+      var upcomingStructures = [{
+        'structure': customizationArguments,
+        'expectedStructure': validationStructure
+      }];
+      var upcomingDescriptorStrings = [''];
+
+      while (upcomingStructures.length > 0) {
+        var nextValidation = upcomingStructures.pop();
+        var nextDescriptor = upcomingDescriptorStrings.pop();
+        var substructure = nextValidation.structure;
+        var expectedStructure = nextValidation.expectedStructure;
+        var expectedChildren = Object.keys(expectedStructure);
+
+        for (var i = 0; i < expectedChildren.length; i++) {
+          var expectedChild = expectedChildren[i];
+          var childDescriptor = expectedChild;
+          if (nextDescriptor.length > 0) {
+            childDescriptor = nextDescriptor + '.' + childDescriptor;
+          }
+
+          if (substructure instanceof Object &&
+              expectedChild in substructure) {
+            upcomingStructures.push({
+              'structure': substructure[expectedChild],
+              'expectedStructure': expectedStructure[expectedChild]
+            });
+            upcomingDescriptorStrings.push(childDescriptor);
+          } else {
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'Expected customization arguments to have property: ' +
+                childDescriptor
+            });
+          }
+        }
+      }
+
+      return warningsList;
+    },
     getAnswerGroupWarnings: function(answerGroups, stateName) {
       var partialWarningsList = [];
 

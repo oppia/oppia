@@ -22,18 +22,15 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+    var warningsList = (
+      baseInteractionValidationService.validateCustomizationArguments(
+        customizationArgs, ['choices.value']));
 
     var numChoices;
     var areAnyChoicesEmpty = false;
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
-    if (!customizationArgs.choices) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please provide a customization argument for choices.'
-      });
-    } else {
+    if (warningsList.length == 0) {
       numChoices = customizationArgs.choices.value.length;
       for (var i = 0; i < customizationArgs.choices.value.length; i++) {
         var choice = customizationArgs.choices.value[i];
@@ -60,29 +57,30 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
       });
     }
 
-    var uniqueRuleChoices = [];
+    var selectedEqualsChoices = [];
     for (var i = 0; i < answerGroups.length; i++) {
       var ruleSpecs = answerGroups[i].rule_specs;
       for (var j = 0; j < ruleSpecs.length; j++) {
-        var inputIndex = uniqueRuleChoices.indexOf(ruleSpecs[j].inputs.x);
-        if (ruleSpecs[j].rule_type === 'Equals' && inputIndex === -1) {
-          uniqueRuleChoices.push(ruleSpecs[j].inputs.x);
-        }
-
-        if (inputIndex !== -1) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'please ensure rule ' + String(j + 1) + ' in group ' +
-              String(i + 1) + ' is not equaling the same multiple choice ' +
-              'option as another rule.'
-          });
-        }
-        if (ruleSpecs[j].inputs.x >= numChoices) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'please ensure rule ' + String(j + 1) + ' in group ' +
-              String(i + 1) + ' refers to a valid choice.'
-          });
+        if (ruleSpecs[j].rule_type === 'Equals') {
+          var choicePreviouslySelected = (
+            selectedEqualsChoices.indexOf(ruleSpecs[j].inputs.x) !== -1);
+          if (!choicePreviouslySelected) {
+            selectedEqualsChoices.push(ruleSpecs[j].inputs.x);
+          } else {
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+                String(i + 1) + ' is not equaling the same multiple choice ' +
+                'option as another rule.'
+            });
+          }
+          if (ruleSpecs[j].inputs.x >= numChoices) {
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+                String(i + 1) + ' refers to a valid choice.'
+            });
+          }
         }
       }
     }
@@ -92,7 +90,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
         answerGroups, stateName));
 
     // Only require a default rule if some choices have not been taken care of by rules.
-    if (uniqueRuleChoices.length < numChoices) {
+    if (selectedEqualsChoices.length < numChoices) {
       if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,
