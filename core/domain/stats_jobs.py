@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import json
 
 from core import jobs
 from core.platform import models
@@ -343,48 +344,6 @@ class StatisticsMRJobManager(
         stats_models.ExplorationAnnotationsModel.create(
             exp_id, str(version), num_starts, num_completions,
             state_hit_counts)
-
-
-class CompletionEventsMigrator(jobs.BaseMapReduceJobManager):
-    """This one-off job finds all (MaybeLeave, 'END') events and converts them
-    to actual completion events instead. It is idempotent.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.MaybeLeaveExplorationEventLogEntryModel]
-
-    @staticmethod
-    def map(item):
-        def _migrate_in_transaction():
-            # Create a replacement CompletionEventLogEntryModel.
-            new_item_id = (
-                stats_models.CompleteExplorationEventLogEntryModel.get_new_event_entity_id(
-                    item.exploration_id, item.session_id))
-            complete_event_entity = stats_models.CompleteExplorationEventLogEntryModel(
-                id=new_item_id,
-                event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                exploration_id=item.exploration_id,
-                exploration_version=item.exploration_version,
-                state_name=item.state_name,
-                session_id=item.session_id,
-                client_time_spent_in_secs=item.client_time_spent_in_secs,
-                params=item.params,
-                play_type=item.play_type,
-                last_updated=item.last_updated,
-                created_on=item.created_on,
-                deleted=item.deleted)
-            complete_event_entity.put()
-
-            # Delete the old MaybeLeaveEventLogEntryModel.
-            item.delete()
-
-        if item.state_name == 'END':
-            transaction_services.run_in_transaction(_migrate_in_transaction)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
 
 
 class StatisticsAudit(jobs.BaseMapReduceJobManager):

@@ -47,8 +47,11 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         'lib', 'webob_0_9'),
     os.path.join(CURR_DIR, 'third_party', 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'html5lib-python-0.95'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.0.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.17.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.17.0'),
+    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.7.1'),
 ]
 
 _PARSER = argparse.ArgumentParser()

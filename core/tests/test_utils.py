@@ -362,6 +362,7 @@ class AppEngineTestBase(TestBase):
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
+        self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_urlfetch_stub()
