@@ -22,46 +22,43 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = (
-      baseInteractionValidationService.validateCustomizationArguments(
-        customizationArgs, [
-        'imageAndRegions.value.imagePath',
-        'imageAndRegions.value.labeledRegions']));
+    var warningsList = [];
 
-    if (warningsList.length == 0) {
-      if (!customizationArgs.imageAndRegions.value.imagePath) {
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['imageAndRegions']);
+
+    if (!customizationArgs.imageAndRegions.value.imagePath) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please add an image for the learner to click on.'
+      });
+    }
+
+    var areAnyRegionStringsEmpty = false;
+    var areAnyRegionStringsDuplicated = false;
+    var seenRegionStrings = [];
+    if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
+      warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'please specify at least one image region to click on.'
+      });
+    }
+
+    for (var i = 0; i < customizationArgs.imageAndRegions.value.labeledRegions.length; i++) {
+      var regionLabel = customizationArgs.imageAndRegions.value.labeledRegions[i].label;
+
+      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
+      if (regionLabel.trim().length === 0) {
+        areAnyRegionStringsEmpty = true;
+      } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: 'please add an image for the learner to click on.'
+          message: 'the image region strings should consist of characters from [A-Za-z0-9].'
         });
-      }
-
-      var areAnyRegionStringsEmpty = false;
-      var areAnyRegionStringsDuplicated = false;
-      var seenRegionStrings = [];
-      if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: 'please specify at least one image region to click on.'
-        });
-      }
-
-      for (var i = 0; i < customizationArgs.imageAndRegions.value.labeledRegions.length; i++) {
-        var regionLabel = customizationArgs.imageAndRegions.value.labeledRegions[i].label;
-
-        var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
-        if (regionLabel.trim().length === 0) {
-          areAnyRegionStringsEmpty = true;
-        } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'the image region strings should consist of characters from [A-Za-z0-9].'
-          });
-        } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
-          areAnyRegionStringsDuplicated = true;
-        } else {
-          seenRegionStrings.push(regionLabel);
-        }
+      } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
+        areAnyRegionStringsDuplicated = true;
+      } else {
+        seenRegionStrings.push(regionLabel);
       }
     }
 

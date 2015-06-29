@@ -22,26 +22,24 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = (
-      baseInteractionValidationService.validateCustomizationArguments(
-        customizationArgs, ['choices.value']));
+    var warningsList = [];
 
-    var numChoices;
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['choices']);
+
     var areAnyChoicesEmpty = false;
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
-    if (warningsList.length == 0) {
-      numChoices = customizationArgs.choices.value.length;
-      for (var i = 0; i < customizationArgs.choices.value.length; i++) {
-        var choice = customizationArgs.choices.value[i];
-        if (choice.trim().length === 0) {
-          areAnyChoicesEmpty = true;
-        }
-        if (seenChoices.indexOf(choice) !== -1) {
-          areAnyChoicesDuplicated = true;
-        }
-        seenChoices.push(choice);
+    var numChoices = customizationArgs.choices.value.length;
+    for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+      var choice = customizationArgs.choices.value[i];
+      if (choice.trim().length === 0) {
+        areAnyChoicesEmpty = true;
       }
+      if (seenChoices.indexOf(choice) !== -1) {
+        areAnyChoicesDuplicated = true;
+      }
+      seenChoices.push(choice);
     }
 
     if (areAnyChoicesEmpty) {

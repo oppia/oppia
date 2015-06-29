@@ -22,12 +22,12 @@ oppia.filter('oppiaInteractiveContinueValidator', [
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = (
-      baseInteractionValidationService.validateCustomizationArguments(
-        customizationArgs, ['buttonText.value']));
+    var warningsList = [];
+
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['buttonText']);
     
-    if (warningsList.length == 0 &&
-        customizationArgs.buttonText.value.length === 0) {
+    if (customizationArgs.buttonText.value.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'the button text should not be empty.'

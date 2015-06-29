@@ -39,6 +39,19 @@ describe('Interaction validator', function() {
     return {'rule_specs': ruleSpecs, 'outcome': outcome};
   };
 
+  var requireCustomizationArguments = function(customizationArgs, argNames) {
+    return function() {
+      bivs.requireCustomizationArguments(customizationArgs, argNames);
+    };
+  };
+
+  var validate = function(
+      validator, stateName, customizationArgs, answerGroups, defaultOutcome) {
+    return function() {
+      validator(stateName, customizationArgs, answerGroups, defaultOutcome);
+    };
+  };
+
   beforeEach(function() {
     module('oppia');
   });
@@ -134,41 +147,20 @@ describe('Interaction validator', function() {
   });
 
   describe('customizationValidator', function() {
-    it('should have no warnings for no fields', function() {
-      var warnings = bivs.validateCustomizationArguments({}, []);
-      expect(warnings).toEqual([]);
+    it('should not throw for no arguments', function() {
+      bivs.requireCustomizationArguments({}, []);
     });
 
-    it('should provide warnings for a missing top-level field', function() {
-      var warnings = bivs.validateCustomizationArguments({}, ['levelone']);
-      expect(warnings).toEqual([{
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: levelone'
-      }]);
+    it('should throw a warning for a missing top-level field', function() {
+      expect(requireCustomizationArguments({}, ['levelone'])).toThrow(
+        'Expected customization arguments to have property: levelone');
     });
 
-    it('should provide warnings for missing fields beyond the top level, but ' +
-        'not below a missing field', function() {
-      var customArgs = {
-        'first': {
-          'more': {
-            'details': 'Text'
-          }
-        }, 'second': {
-          'value': 15
-        }
-      };
-      var warnings = bivs.validateCustomizationArguments(customArgs, [
-        'first.more.details', 'second.value.subvalue', 'third.more']);
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: ' +
-          'second.value.subvalue'
-      });
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: third'
-      });
+    it('should throw warnings for multiple missing top-level fields',
+        function() {
+      var expectedArgs = ['first', 'second'];
+      expect(requireCustomizationArguments({}, expectedArgs)).toThrow(
+        'Expected customization arguments to have properties: first, second');
     });
   });
 
@@ -212,12 +204,9 @@ describe('Interaction validator', function() {
         'message': 'the button text should not be empty.'
       }]);
 
-      warnings = validator(currentState, {}, [], goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: ' +
-          'buttonText'
-      }]);
+      expect(validate(
+        validator, currentState, {}, [], goodDefaultOutcome)).toThrow(
+          'Expected customization arguments to have property: buttonText');
     });
 
     it('should expect no answer groups', function() {
@@ -306,22 +295,11 @@ describe('Interaction validator', function() {
     });
 
     it('should expect graph and edit customization arguments', function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: graph'
-      });
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: ' +
-          'canEditEdgeWeight'
-      });
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: ' +
-          'canEditVertexLabel'
-      });
+      expect(validate(
+        validator, currentState, {}, goodAnswerGroups,
+        goodDefaultOutcome)).toThrow(
+          'Expected customization arguments to have properties: graph, ' +
+            'canEditEdgeWeight, canEditVertexLabel');
     });
 
     it('should expect no more than 50 vertices in the graph customization ' +
@@ -394,13 +372,10 @@ describe('Interaction validator', function() {
     it('should expect a customization argument for image and regions',
         function() {
       goodAnswerGroups[0].rule_specs = [];
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: ' +
-          'imageAndRegions'
-      }]);
+      expect(validate(
+        validator, currentState, {}, goodAnswerGroups,
+        goodDefaultOutcome)).toThrow(
+          'Expected customization arguments to have property: imageAndRegions');
     });
 
     it('should expect an image path customization argument', function() {
@@ -523,18 +498,13 @@ describe('Interaction validator', function() {
       expect(warnings).toEqual([]);
     });
 
-    it('should expect latitudes and longitude customization arguments',
+    it('should expect latitude and longitude customization arguments',
         function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: latitude'
-      });
-      expect(warnings).toContain({
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: longitude'
-      });
+      expect(validate(
+        validator, currentState, {}, goodAnswerGroups,
+        goodDefaultOutcome)).toThrow(
+          'Expected customization arguments to have properties: latitude, ' +
+            'longitude');
     });
 
     it('should expect latitudes and longitudes within [-90, 90] and ' +
@@ -641,12 +611,10 @@ describe('Interaction validator', function() {
     });
 
     it('should expect a choices customization argument', function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        'type': WARNING_TYPES.CRITICAL,
-        'message': 'Expected customization arguments to have property: choices'
-      }]);
+      expect(validate(
+        validator, currentState, {}, goodAnswerGroups,
+        goodDefaultOutcome)).toThrow(
+          'Expected customization arguments to have property: choices');
     });
 
     it('should expect non-empty and unique choices', function() {
