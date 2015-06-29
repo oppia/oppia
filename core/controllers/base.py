@@ -273,6 +273,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.values['is_admin'] = self.is_admin
         self.values['is_super_admin'] = self.is_super_admin
 
+        self.values['languages_supported'] = (
+            config_domain.LANGUAGES_SUPPORTED.value)
+
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
