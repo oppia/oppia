@@ -33,8 +33,8 @@ oppia.directive('oppiaInteractiveEndExploration', [
             $scope, $http, $attrs, urlService, explorationContextService,
             PAGE_CONTEXT) {
         $scope.isIframed = urlService.isIframed();
-        $scope.editorPreviewMode =
-          (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+        $scope.isInEditorPreviewMode = (
+          explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
 
         $scope.authorRecommendedExplorationIds = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.recommendedExplorationIdsWithValue);

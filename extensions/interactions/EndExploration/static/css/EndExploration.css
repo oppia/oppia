@@ -1,0 +1,35 @@
+.oppia-end-exploration-recommendation-card {
+  background-color: rgb(255,255,255);
+  font-family: 'Roboto';
+  max-width: 120px;
+  padding: 0;
+  text-align: center;
+}
+
+.oppia-end-exploration-recommendation-image {
+  height: 120px;
+  width: 120px;
+}
+
+.oppia-end-exploration-recommendation-title {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1));
+  color: #333;
+  font-size: 1.25em;
+  height: 30%;
+  margin-top: -8%;
+  padding-bottom: 1%;
+  padding-top: 1%;
+  position: relative;
+  text-align: center;
+}
+
+.oppia-end-exploration-recommendation-introduction {
+  font-size: 1.25em;
+  padding: 10px;
+}
+
+.oppia-end-exploration-gallery-button {
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-top: 20px;
+}

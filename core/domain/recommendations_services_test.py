@@ -95,6 +95,10 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 0.1,0.1,0.6,0.5,0.3,0.6,0.7,0.2,0.5,0.3,0.2,0.4,0.2,0.1,0.2,0.4,0.8,0.1,0.1,0.3,0.4,0.6,0.4,0.5,0.1,0.1,0.3,1.0,0.3
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
 
+    def test_validate_default_similarities(self):
+        recommendations_services._validate_topic_similarities(
+            recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING)
+
     def test_update_topic_similarities(self):
         recommendations_services.update_topic_similarities(
             'Art,Biology,Chemistry\n'

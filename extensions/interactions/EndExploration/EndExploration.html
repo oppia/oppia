@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" href="/extensions/interactions/EndExploration/static/css/EndExploration.css">
+
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="authorRecommendedExplorationIds.length > 0">
     <span class="oppia-end-exploration-recommendation-introduction">
@@ -18,7 +20,7 @@
     </div>
   </div>
 
-  <div ng-if="systemRecommendedExplorationIds.length > 0 && !editorPreviewMode" style="padding-top: 15px;">
+  <div ng-if="systemRecommendedExplorationIds.length > 0 && !isInEditorPreviewMode" style="padding-top: 15px;">
     <span class="oppia-end-exploration-recommendation-introduction">
       Other explorations you might enjoy:
     </span>

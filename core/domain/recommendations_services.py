@@ -156,17 +156,16 @@ def get_topic_similarities_as_csv():
     return output.getvalue()
 
 
-def update_topic_similarities(data):
-    """Updates all topic similarity pairs given by data, which should be a
-    string of comma-separated values.
+def _validate_topic_similarities(data):
+    """Validates topic similarities given by data, which should be a string
+    of comma-separated values.
 
     The first line of data should be a list of topic names. The next lines
     should be a symmetric adjacency matrix of similarities, which are floats
     between 0.0 and 1.0.
 
-    The topic names should belong to the current list of topics, but they need
-    not include every current topic. If a topic name is not in the data, its
-    similarities remain as the previous value or the default."""
+    This function checks whether topics belong in the current list of
+    known topics, and if the adjacency matrix is valid."""
 
     data = data.splitlines()
     data = list(csv.reader(data))
@@ -200,18 +199,36 @@ def update_topic_similarities(data):
                 raise ValueError('Expected similarity to be between 0.0 and '
                                  '1.0, received %s' % similarity)
 
-            topic_similarities_values[row_ind][col_ind] = similarity
-
     for row_ind in range(topics_length):
         for col_ind in range(topics_length):
             if (topic_similarities_values[row_ind][col_ind] !=
                     topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')
 
+
+def update_topic_similarities(data):
+    """Updates all topic similarity pairs given by data, which should be a
+    string of comma-separated values.
+
+    The first line of data should be a list of topic names. The next lines
+    should be a symmetric adjacency matrix of similarities, which are floats
+    between 0.0 and 1.0.
+
+    The topic names should belong to the current list of topics, but they need
+    not include every current topic. If a topic name is not in the data, its
+    similarities remain as the previous value or the default."""
+
+    _validate_topic_similarities(data)
+
+    data = data.splitlines()
+    data = list(csv.reader(data))
+    topics_list = data[0]
+    topic_similarities_values = data[1:]
+
     topic_similarities_dict = get_topic_similarities_dict()
     for row_ind, topic_1 in enumerate(topics_list):
         for col_ind, topic_2 in enumerate(topics_list):
-            topic_similarities_dict[topic_1][topic_2] = (
+            topic_similarities_dict[topic_1][topic_2] = float(
                 topic_similarities_values[row_ind][col_ind])
 
     save_topic_similarities(topic_similarities_dict)
