@@ -6,12 +6,12 @@
   text-align: center;
 }
 
-.oppia-end-exploration-recommendation-card a:hover{
+.oppia-end-exploration-recommendation-card a:hover {
   text-decoration: none;
 }
 
 .oppia-end-exploration-recommendation-card:hover {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 
 .oppia-end-exploration-recommendation-image {
@@ -33,12 +33,9 @@
 
 .oppia-end-exploration-recommendation-introduction {
   font-size: 1.25em;
-  padding: 10px;
-  padding-top: 20px;
+  padding: 20px 10px 10px 10px;
 }
 
 .oppia-end-exploration-gallery-button {
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-top: 20px;
+  padding: 20px 10px 10px 0;
 }

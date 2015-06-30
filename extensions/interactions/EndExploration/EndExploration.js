@@ -69,8 +69,8 @@ oppia.directive('oppiaInteractiveEndExploration', [
           authorRecommendationsDeferred.resolve();
         }
 
-        authorRecommendationsPromise.then(function() {
-          if (!$scope.isInEditorPreviewMode) {
+        if (!$scope.isInEditorPreviewMode) {
+          authorRecommendationsPromise.then(function() {
             var explorationId = explorationContextService.getExplorationId();
             $http({
               method: 'GET',
@@ -81,13 +81,15 @@ oppia.directive('oppiaInteractiveEndExploration', [
 
               var filteredRecommendationExplorationIds =
                   allRecommendedExplorationIds.filter(function(value) {
-                return (authorRecommendedExplorationIds.indexOf(value) == -1);
+                return ($scope.recommendedExplorationIds.indexOf(value) == -1);
               });
 
-              var maxRecommendations = 8 - authorRecommendedExplorationIds.length;
+              var MAX_RECOMMENDATIONS = 8;
+              var maxSystemRecommendations = MAX_RECOMMENDATIONS -
+                $scope.recommendedExplorationIds.length;
 
               var filteredRecommendationsSize = filteredRecommendationExplorationIds.length;
-              for (var i = 0; i < Math.min(filteredRecommendationsSize, maxRecommendations); i++) {
+              for (var i = 0; i < Math.min(filteredRecommendationsSize, maxSystemRecommendations); i++) {
                 var randomIndex = Math.floor(
                   Math.random() * filteredRecommendationExplorationIds.length);
                 var randomRecommendationId =
@@ -111,8 +113,8 @@ oppia.directive('oppiaInteractiveEndExploration', [
                 });
               }
             });
-          }
-        });
+          });
+        }
       }]
     };
   }
