@@ -18,7 +18,7 @@
  * @author vjoisar@google.com (Vishal Joisar)
  */
 
-//Service for handling all gadget validation.
+// Service for handling all gadget validation.
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
     'explorationSkinIdService', 'GADGET_SPECS',
@@ -34,21 +34,21 @@ oppia.factory('gadgetValidationService', [
       explorationSkinIdService.savedMemento][panelName];
   };
 
-  /**
-  * Checks that, for each state, all visible gadgets fit within the panel.
-  * @param {string} panelName, The panel name for the panel being validated.
-  * @param {object} visibilityMap, object with state as key and list of visible
-  *     gadget data as its value for a panel.
-  * @return {bool} true if everything is ok, false otherwise
-  */
   return {
-    validatePanel: function(panelName, visibilityMap) {
+    /**
+    * Checks if all visible gadgets fit within the given panel for each state.
+    * @param {string} panelName, The panel name for the panel being validated.
+    * @param {object} visibilityMap, object with state as key and list of
+    *     visible gadget data as its value for a panel.
+    * @return {bool} true if everything is ok, false otherwise
+    */
+    validatePanel: function(panelName, visibilityMap, showWarnings) {
       var currentPanelSpec = _getPanelSpecs(panelName);
       var stackableAxis = currentPanelSpec.stackable_axis;
 
       // Fail early for unrecognized axis. This error should never reach
       // the front-end, but is flagged here for defense-in-depth.
-      if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
+      if (showWarnings && VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
         var warningText = 'Unrecognized axis: ' + stackableAxis + ' for ' +
           panelName + ' panel.';
         warningsData.addWarning(warningText);
@@ -56,7 +56,8 @@ oppia.factory('gadgetValidationService', [
       }
       for (var stateName in visibilityMap) {
         var gadgetInstances = visibilityMap[stateName];
-        if (gadgetInstances.length > currentPanelSpec.max_gadgets) {
+        if (showWarnings &&
+            gadgetInstances.length > currentPanelSpec.max_gadgets) {
           var warningText =  panelName + ' panel expects at most ' +
             currentPanelSpec.max_gadgets +  ', but ' + gadgetInstances.length +
             ' are visible in state ' + stateName + '.'
@@ -82,8 +83,7 @@ oppia.factory('gadgetValidationService', [
               totalWidth = GADGET_SPECS[gadgetType].width_px;
             }
           }
-        }
-        else if (stackableAxis == AXIS_HORIZONTAL) {
+        } else if (stackableAxis == AXIS_HORIZONTAL) {
           totalWidth += currentPanelSpec.pixels_between_gadgets * (
             gadgetInstances.length - 1);
 
@@ -97,13 +97,13 @@ oppia.factory('gadgetValidationService', [
             }
           }
         }
-        if (currentPanelSpec.width < totalWidth) {
+
+        if (showWarnings && (currentPanelSpec.width < totalWidth)) {
           var warningText = 'Size exceeded: ' + panelName + ' panel width of ' +
             totalWidth + ' exceeds limit of ' + currentPanelSpec.width  + '.';
           warningsData.addWarning(warningText);
           return false;
-        }
-        else if (currentPanelSpec.height < totalHeight) {
+        } else if (showWarnings && (currentPanelSpec.height < totalHeight)) {
           var warningText = 'Size exceeded: ' + panelName +
             ' panel height of ' + totalHeight + ' exceeds limit of ' +
             currentPanelSpec.height + '.';
@@ -125,11 +125,9 @@ oppia.factory('gadgetValidationService', [
         return false;
       }
 
-      if (input.length > _MAX_GADGET_NAME_LENGTH) {
-        if (showWarnings) {
-          warningsData.addWarning(
-            'State names should be at most 50 characters long.');
-        }
+      if (showWarnings && input.length > _MAX_GADGET_NAME_LENGTH) {
+        warningsData.addWarning(
+          'State names should be at most 50 characters long.');
         return false;
       }
 
@@ -145,21 +143,28 @@ oppia.factory('gadgetValidationService', [
      * @param {boolean} showWarnings Whether to show warnings in the butterbar.
      * @return {boolean} True if the gadget can be added, false otherwise.
      */
-    canAddGadget: function(
-          panelName, gadgetData, visibilityMap, showWarnings) {
+    canAddGadget: function(panelName, gadgetData, visibilityMap, showWarnings) {
       var currentPanelSpec = _getPanelSpecs(panelName);
       for(var i = 0; i < gadgetData.visible_in_states.length; i++) {
         var stateName = gadgetData.visible_in_states[i];
         var gadgetInstances = visibilityMap[stateName] || [];
-        //Adding 1 to length to see if new gadget can be added or not.
-        //Doesn't check for width or height for now.
-        //TODO(vjoisar):Make it check for gadget's width and height.
-        if (gadgetInstances.length + 1 > currentPanelSpec.max_gadgets) {
+        // Adding 1 to length to see if new gadget can be added or not.
+        if (showWarnings &&
+            gadgetInstances.length + 1 > currentPanelSpec.max_gadgets) {
           var warningText =  'The ' + panelName +
             ' gadget panel can only have ' + currentPanelSpec.max_gadgets +
-            ' gadget' + (currentPanelSpec.max_gadgets>1 ? 's' : '') +
+            ' gadget' + (currentPanelSpec.max_gadgets > 1 ? 's' : '') +
             ' visible at a time.';
           warningsData.addWarning(warningText);
+          return false;
+        }
+        // If the gadget can be added by count, see if it fits by size.
+        if (!visibilityMap[stateName]) {
+          visibilityMap[stateName] = [];
+        }
+        visibilityMap[stateName].push(gadgetData);
+        if (!this.validatePanel(panelName, visibilityMap, showWarnings)) {
+          // Warning should be added by validatePanel.
           return false;
         }
       }

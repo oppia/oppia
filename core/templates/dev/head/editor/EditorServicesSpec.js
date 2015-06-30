@@ -477,6 +477,36 @@ describe('Exploration rights service', function() {
   });
 });
 
+describe('New exploration gadgets service', function() {
+  beforeEach(module('oppia'));
+
+  describe('New exploration gadgets service', function() {
+    var egs = null;
+    var mockWarningsData;
+
+    beforeEach(function() {
+      mockWarningsData = {
+        addWarning: function(warning) {}
+      };
+      module(function($provide) {
+        $provide.value('warningsData', mockWarningsData)
+      });
+      spyOn(mockWarningsData, 'addWarning');
+    });
+
+    beforeEach(inject(function($injector) {
+      egs = $injector.get('explorationGadgetsService');
+    }));
+    it('should detect invalid data passed for initialization', function() {
+      egs.init({'wrongObjectKey': 'value'});
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Gadget Initialization failed. Panel contents were not provided');
+    });
+    //@sll: To write tests for other functions, do we need to mock all the
+    //  services it is dependant on?
+  });
+});
+
 describe('New state template service', function() {
   beforeEach(module('oppia'));
 

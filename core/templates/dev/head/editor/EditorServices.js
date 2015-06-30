@@ -959,8 +959,7 @@ oppia.factory('explorationGadgetsService', [
   var _generateUniqueGadgetName = function(gadgetType) {
     if (!_gadgets.hasOwnProperty(gadgetType)) {
       return gadgetType;
-    }
-    else {
+    } else {
       var baseGadgetName = gadgetType;
       var uniqueInteger = 2;
       var generatedGadgetName = baseGadgetName + uniqueInteger;
@@ -1023,7 +1022,6 @@ oppia.factory('explorationGadgetsService', [
   * for the gadget.
   */
   var _initGadgetsAndPanelsData = function(panelsContents) {
-    //initializing to empty objects.
     _panels = {};
     _gadgets = {};
     for (var panelName in panelsContents) {
@@ -1043,14 +1041,17 @@ oppia.factory('explorationGadgetsService', [
     init: function(skinCustomizationsData) {
       // Data structure initialization.
       if (!skinCustomizationsData.hasOwnProperty('panels_contents')) {
-        $log.info('Initialization falied. Panel contents was not provided');
+        warningsData.addWarning(
+          'Gadget Initialization failed. Panel contents were not provided');
         return;
       }
       _initGadgetsAndPanelsData(skinCustomizationsData.panels_contents);
       var isValid = false;
       for (var panelName in _panels) {
         var visibilityMap = _getGadgetsVisibilityMap(panelName);
-        isValid = gadgetValidationService.validatePanel(panelName, visibilityMap);
+        isValid = gadgetValidationService.validatePanel(
+          panelName, visibilityMap, true);
+        // validatePanel(...) should have added the warning to warningsData.
         if (!isValid) {
           return;
         }
@@ -1062,13 +1063,14 @@ oppia.factory('explorationGadgetsService', [
     // Confirms if a panel can accept a new gadget considering its capacity
     // and the gadget's size requirements given its customization arguments.
     canAddGadgetTo: function(panelName, gadgetData) {
+      var showWarnings = true;
       var visibilityMap = _getGadgetsVisibilityMap(panelName);
-      var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name, true);
+      var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name, showWarnings);
+
       if(canAdd) {
         canAdd = gadgetValidationService.canAddGadget(
-          panelName, gadgetData, visibilityMap);
+          panelName, gadgetData, visibilityMap, showWarnings);
       }
-
       return canAdd;
     },
     getNewUniqueGadgetName: function(gadgetType) {
@@ -1088,10 +1090,12 @@ oppia.factory('explorationGadgetsService', [
      * Use this method in conjunction with renameGadget and
      * moveGadgetBetweenPanels if those aspects need to be changed as well.
      *
-     * @param {object} newGadgetData Updated data for the gadget.
+     * @param {object} gadgetName The name of gadget being updated.
+     * @param {object} newCustomizationArgs new customization data for the gadget.
+     * @param {object} newVisibleInStates new state visibility list for the gadget.
      */
-    updateGadget: function(newGadgetData) {
-      var gadgetName = newGadgetData.gadget_name;
+    updateGadget: function(
+      gadgetName, newCustomizationArgs, newVisibleInStates) {
 
       if (!_gadgets.hasOwnProperty(gadgetName)) {
         $log.info('Attempted to update a non-existent gadget: ' + gadgetName);
@@ -1100,27 +1104,30 @@ oppia.factory('explorationGadgetsService', [
 
       var currentGadgetData = _gadgets[gadgetName];
 
-      if (angular.equals(currentGadgetData.customization_args,
-          newGadgetData.customization_args)) {
+      if (!angular.equals(currentGadgetData.customization_args,
+          newCustomizationArgs)) {
         $log.info('Updating customization args for gadget: ' + gadgetName);
         changeListService.editGadgetProperty(
           gadgetName,
           'gadget_customization_args',
-          newGadgetData.customization_args,
+          newCustomizationArgs,
           currentGadgetData.customization_args
         );
       }
-      if (angular.equals(currentGadgetData.visible_in_states,
-          newGadgetData.visible_in_states)) {
+      if (!angular.equals(currentGadgetData.visible_in_states,
+          newVisibleInStates)) {
         $log.info('Updating visibility for gadget: ' + gadgetName);
         changeListService.editGadgetProperty(
           gadgetName,
           'gadget_visibility',
-          newGadgetData.visible_in_states,
+          newVisibleInStates,
           currentGadgetData.visible_in_states
         );
       }
-      _gadgets[gadgetName] = angular.copy(newGadgetData);
+
+      // Updating the _gadgets dict.
+      currentGadgetData.customization_args = angular.copy(newCustomizationArgs);
+      currentGadgetData.visible_in_states = angular.copy(newVisibleInStates);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
     },
     addGadget: function(gadgetData, panelName) {

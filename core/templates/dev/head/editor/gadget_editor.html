@@ -2,23 +2,30 @@
   <span style="font-size: 16px;">
     <strong>Gadgets</strong>
   </span>
-  <md-card style="background-color: white; margin: 20px 0px; padding: 10px 10px;">
-    <button type="button" class="btn btn-default btn-xs oppia-add-gadget-button protractor-test-open-add-gadget-modal" ng-click="addNewGadget()">
+  <md-card style="background: white; margin: 20px 0px; padding: 10px 10px;">
+    <button type="button" class="btn btn-default btn-xs oppia-add-gadget-button"
+            ng-click="addNewGadget()">
       Insert Gadget
     </button>
   </md-card>
   <div ng-show="gadgets">
-    <div ng-repeat="(panelName, panelContents) in panels" class="oppia-<[panelName]>-editor-gadget-panel">
+    <div ng-repeat="(panelName, panelContents) in panels"
+         class="oppia-<[panelName]>-editor-gadget-panel">
       <div ng-repeat="gadgetName in panelContents">
         <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
-          class="glyphicon glyphicon-remove oppia-gadget-delete-icon">
+              class="glyphicon glyphicon-remove oppia-gadget-delete-icon">
         </span>
-        <span title="Rename <[gadgetName]>" ng-click="onOpenGadgetNameEditor(gadgetName)"
+        <span title="Rename <[gadgetName]>"
+              ng-click="onOpenGadgetNameEditor(gadgetName)"
               class="glyphicon glyphicon-pencil oppia-gadget-rename-icon">
         </span>
-        <span ng-show="currentGadgetName == gadgetName" class="oppia-rename-gadget-form">
-          <input type="text" ng-model="tmpGadgetName">
-          <button class="btn btn-default btn-sm" ng-click="renameGadget(tmpGadgetName)">Done</button>
+        <span ng-show="originalNameForRenamedGadget == gadgetName"
+              class="oppia-rename-gadget-form">
+          <input type="text" ng-model="newNameForRenamedGadget">
+          <button class="btn btn-default btn-sm"
+                  ng-click="renameGadget(newNameForRenamedGadget)">
+            Done
+          </button>
         </span>
         <div class="oppia-gadget-preview-container"
              ng-click="editGadget(gadgetName)">
@@ -50,7 +57,7 @@
     <div ng-if="!gadgetDict.gadget_type" ng-cloak>
       <span class="oppia-gadget-tile"
             ng-repeat="(gadgetType, gadget) in ALLOWED_GADGETS"
-            ng-click="onChangeGadgetId(gadgetType)">
+            ng-click="onChangeGadgetType(gadgetType)">
         <[gadgetType]>
       </span>
     </div>
@@ -62,7 +69,8 @@
       <div ng-show="!isEditingGadget" class="gadget-layout-panel">
         <label class="oppia-gadget-customization-label">Layout</label>
         <select ng-options="panelName for panelName in availablePanels"
-                ng-model="gadgetDict.panel_name" style="text-transform: capitalize;">
+                ng-model="gadgetDict.panel_name"
+                style="text-transform: capitalize;">
         </select>
       </div>
       <div class="gadget-state-visibility-panel">
@@ -79,7 +87,8 @@
           <em>
             There are no customization options available.
             <br><br>
-            To use this gadget, click 'Save Gadget'.</em>
+            To use this gadget, click 'Save Gadget'.
+          </em>
         </div>
 
         <div ng-repeat="customizationArgSpec in customizationArgSpecs">
@@ -87,8 +96,10 @@
             <[customizationArgSpec.description]>
           </div>
           <div>
-            <schema-based-editor schema="customizationArgSpec.schema"
-                                 local-value="gadgetDict.customization_args[customizationArgSpec.name].value" >
+            <schema-based-editor
+              schema="customizationArgSpec.schema"
+              local-value="gadgetDict.customization_args[
+                customizationArgSpec.name].value">
             </schema-based-editor>
             <div style="margin-bottom: 15px;"></div>
           </div>
@@ -99,8 +110,8 @@
 
 
   <div class="modal-footer">
-    <button ng-show="!isEditingGadget" class="btn btn-default" style="float: left;"
-            ng-click="returnToGadgetSelector()">
+    <button ng-show="!isEditingGadget" class="btn btn-default"
+            ng-click="returnToGadgetSelector()" style="float: left;">
       Back
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
