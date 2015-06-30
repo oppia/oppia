@@ -17,13 +17,21 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveEndExplorationValidator', [function() {
+oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
+    function(WARNING_TYPES) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, ruleSpecs) {
     var warningsList = [];
 
     // Note that, in order to conform to the other interactions, this
     // interaction has only one rule, but it is never used.
+
+    if (customizationArgs.recommendedExplorationIds.value.length > 8) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'at most 8 explorations can be recommended.'
+      });
+    }
 
     return warningsList;
   };
