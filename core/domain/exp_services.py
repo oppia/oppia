@@ -50,8 +50,9 @@ CMD_CREATE_NEW = 'create_new'
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
 # Constants used to initialize EntityChangeListSummarizer
-BASE_ENTITY_STATE = 'state'
-BASE_ENTITY_GADGET = 'gadget'
+_BASE_ENTITY_STATE = 'state'
+_BASE_ENTITY_GADGET = 'gadget'
+
 
 def _migrate_states_schema(versioned_exploration_states):
     """Holds the responsibility of performing a step-by-step, sequential update
@@ -534,60 +535,60 @@ class EntityChangeListSummarizer(object):
     entity type.
     """
 
-    def __init__(self, base_entity_type):
+    def __init__(self, entity_type):
         """
         Args:
-        - base_entity_type: string. Type of the base entity (e.g. 'state')
+        - entity_type: string. Type of the base entity (e.g. 'state')
         """
-        self.base_type = base_entity_type
+        self.entity_type = entity_type
 
-        # a list of added entity names.
+        # A list of added entity names.
         self.added_entities = []
 
-        # a list of deleted entity names.
+        # A list of deleted entity names.
         self.deleted_entities = []
 
-        # a list of entity names. This indicates that the entity has changed
+        # A list of entity names. This indicates that the entity has changed
         # but we do not know what the changes are. This can happen for
         # complicated operations like removing an entity and later adding a
         # new entity with the same name as the removed one.
         self.changed_entities = []
 
-        # property_changes: a dict, where each key is an entity's name, and
-        # the corresponding values are dicts; the keys of these dicts
-        # represent properties of the entity, and the corresponding values
-        # are dicts with keys old_value and new_value. If an entity's 'name'
-        # property is changed, this is listed as a property name change under
-        # the old entity name in the outer dict.
+        # A dict, where each key is an entity's name, and the corresponding
+        # values are dicts; the keys of these dicts represent properties of
+        # the entity, and the corresponding values are dicts with keys
+        # old_value and new_value. If an entity's 'name' property is changed,
+        # this is listed as a property name change under the old entity name
+        # in the outer dict.
         self.property_changes = {}
 
     @property
     def add_entity_cmd(self):
-        return 'add_%s' % self.base_type
+        return 'add_%s' % self.entity_type
 
     @property
     def rename_entity_cmd(self):
-        return 'rename_%s' % self.base_type
+        return 'rename_%s' % self.entity_type
 
     @property
     def delete_entity_cmd(self):
-        return 'delete_%s' % self.base_type
+        return 'delete_%s' % self.entity_type
 
     @property
     def edit_entity_property_cmd(self):
-        return 'edit_%s_property' % self.base_type
+        return 'edit_%s_property' % self.entity_type
 
     @property
     def entity_name(self):
-        return '%s_name' % self.base_type
+        return '%s_name' % self.entity_type
 
     @property
     def new_entity_name(self):
-        return 'new_%s_name' % self.base_type
+        return 'new_%s_name' % self.entity_type
 
     @property
     def old_entity_name(self):
-        return 'old_%s_name' % self.base_type
+        return 'old_%s_name' % self.entity_type
 
     def process_changes(self, original_entity_names, changes):
         """Processes the changes, making results available in each of the
@@ -601,7 +602,8 @@ class EntityChangeListSummarizer(object):
         """
 
         # original_names helps keep track of entity names as they're added,
-        # renamed, and deleted.
+        # renamed, and deleted. When an entity is renamed, its new name is
+        # added as a key with its original name as the value.
         original_names = {name: name for name in original_entity_names}
 
         for change in changes:
@@ -702,13 +704,13 @@ def get_summary_of_change_list(base_exploration, change_list):
 
     # State changes
     state_change_summarizer = EntityChangeListSummarizer(
-        BASE_ENTITY_STATE)
+        _BASE_ENTITY_STATE)
     state_change_summarizer.process_changes(
         exploration.states.keys(), changes)
 
     # Gadget changes
     gadget_change_summarizer = EntityChangeListSummarizer(
-        BASE_ENTITY_GADGET)
+        _BASE_ENTITY_GADGET)
     gadget_change_summarizer.process_changes(
         exploration.get_all_gadget_names(), changes)
 

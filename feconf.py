@@ -116,9 +116,6 @@ XSSI_PREFIX = ')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # A regular expression for alphanumeric words separated by single spaces.
 # Ex.: 'valid name', 'another valid name', 'invalid   name'.
-#
-# TODO(anuzis): modify to allow multiple words separated by single spaces,
-#     verify this forbids leading and trailing spaces.
 ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'

@@ -805,7 +805,7 @@ class SkinInstance(object):
         # A list to validate each gadget_instance.name is unique.
         gadget_instance_names = []
 
-        for panel_name, gadget_instances_list in (
+        for panel_name, gadget_instances in (
                 self.panel_contents_dict.iteritems()):
 
             # Validate existence of panels in the skin.
@@ -816,10 +816,10 @@ class SkinInstance(object):
                 )
 
             # Validate gadgets fit each skin panel.
-            self.skin.validate_panel(panel_name, gadget_instances_list)
+            self.skin.validate_panel(panel_name, gadget_instances)
 
             # Validate gadget internal attributes.
-            for gadget_instance in gadget_instances_list:
+            for gadget_instance in gadget_instances:
                 gadget_instance.validate()
                 if gadget_instance.name in gadget_instance_names:
                     raise utils.ValidationError(
@@ -854,8 +854,8 @@ class SkinInstance(object):
         """Returns a list of strings representing State names required by
         GadgetInstances in this skin."""
         state_names = set()
-        for gadget_instances_list in self.panel_contents_dict.values():
-            for gadget_instance in gadget_instances_list:
+        for gadget_instances in self.panel_contents_dict.values():
+            for gadget_instance in gadget_instances:
                 for state_name in gadget_instance.visible_in_states:
                     state_names.add(state_name)
 
@@ -1766,9 +1766,9 @@ class Exploration(object):
         """Helper function to retrieve gadget instances visible in
         a given state."""
         visible_gadget_instances = []
-        for gadget_instances_list in (
+        for gadget_instances in (
                 self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances_list:
+            for gadget_instance in gadget_instances:
                 if state_name in gadget_instance.visible_in_states:
                     visible_gadget_instances.append(gadget_instance)
         return visible_gadget_instances
@@ -2109,11 +2109,11 @@ class Exploration(object):
     def get_gadget_types(self):
         """Get all gadget types used in this exploration."""
         result = set()
-        for gadget_instances_list in (
+        for gadget_instances in (
                 self.skin_instance.panel_contents_dict.itervalues()):
             result.update([
                 gadget_instance.type for gadget_instance
-                in gadget_instances_list])
+                in gadget_instances])
         return sorted(result)
 
     def get_interaction_ids(self):
