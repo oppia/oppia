@@ -1702,7 +1702,6 @@ class Exploration(object):
                     panel_name][index].name == gadget_name:
                 gadget_index = index
                 break
-        assert gadget_index != None
         del self.skin_instance.panel_contents_dict[panel_name][gadget_index]
 
     def get_gadget_instance_by_name(self, gadget_name):

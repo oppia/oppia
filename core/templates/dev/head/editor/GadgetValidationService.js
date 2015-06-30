@@ -35,7 +35,7 @@ oppia.factory('gadgetValidationService', [
   };
 
   /**
-  * Validates if the gadget/s fit the panel size accross all states.
+  * Checks that, for each state, all visible gadgets fit within the panel.
   * @param {string} panelName, The panel name for the panel being validated.
   * @param {object} visibilityMap, object with state as key and list of visible
   *     gadget data as its value for a panel.
@@ -54,17 +54,18 @@ oppia.factory('gadgetValidationService', [
         warningsData.addWarning(warningText);
         return false;
       }
-      for (var stateNameAsKey in visibilityMap) {
-        var gadgetInstances = visibilityMap[stateNameAsKey];
+      for (var stateName in visibilityMap) {
+        var gadgetInstances = visibilityMap[stateName];
         if (gadgetInstances.length > currentPanelSpec.max_gadgets) {
           var warningText =  panelName + ' panel expects at most ' +
             currentPanelSpec.max_gadgets +  ', but ' + gadgetInstances.length +
-            ' are visible in state ' + stateNameAsKey + '.'
+            ' are visible in state ' + stateName + '.'
           warningsData.addWarning(warningText);
           return false;
         }
 
-        var totalWidth = 0, totalHeight = 0;
+        var totalWidth = 0;
+        var totalHeight = 0;
         if (stackableAxis == AXIS_VERTICAL) {
           // Factor in pixel buffer between gadgets, if multiple gadgets share
           // a panel in the same state.
@@ -144,7 +145,8 @@ oppia.factory('gadgetValidationService', [
      * @param {boolean} showWarnings Whether to show warnings in the butterbar.
      * @return {boolean} True if the gadget can be added, false otherwise.
      */
-    canAddGadget: function(panelName, gadgetData, visibilityMap, showWarnings) {
+    canAddGadget: function(
+          panelName, gadgetData, visibilityMap, showWarnings) {
       var currentPanelSpec = _getPanelSpecs(panelName);
       for(var i = 0; i < gadgetData.visible_in_states.length; i++) {
         var stateName = gadgetData.visible_in_states[i];
