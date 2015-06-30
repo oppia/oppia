@@ -26,7 +26,7 @@ oppia.factory('baseInteractionValidationService', [
     requireCustomizationArguments: function(customizationArguments, argNames) {
       var missingArgs = [];
       for (var i = 0; i < argNames.length; i++) {
-        if (!(argNames[i] in customizationArguments)) {
+        if (!customizationArguments.hasOwnProperty(argNames[i])) {
           missingArgs.push(argNames[i]);
         }
       }

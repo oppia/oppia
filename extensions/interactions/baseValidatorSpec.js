@@ -39,19 +39,6 @@ describe('Interaction validator', function() {
     return {'rule_specs': ruleSpecs, 'outcome': outcome};
   };
 
-  var requireCustomizationArguments = function(customizationArgs, argNames) {
-    return function() {
-      bivs.requireCustomizationArguments(customizationArgs, argNames);
-    };
-  };
-
-  var validate = function(
-      validator, stateName, customizationArgs, answerGroups, defaultOutcome) {
-    return function() {
-      validator(stateName, customizationArgs, answerGroups, defaultOutcome);
-    };
-  };
-
   beforeEach(function() {
     module('oppia');
   });
@@ -152,14 +139,17 @@ describe('Interaction validator', function() {
     });
 
     it('should throw a warning for a missing top-level field', function() {
-      expect(requireCustomizationArguments({}, ['levelone'])).toThrow(
-        'Expected customization arguments to have property: levelone');
+      expect(function() {
+        bivs.requireCustomizationArguments({}, ['levelone']);
+      }).toThrow('Expected customization arguments to have property: levelone');
     });
 
     it('should throw warnings for multiple missing top-level fields',
         function() {
       var expectedArgs = ['first', 'second'];
-      expect(requireCustomizationArguments({}, expectedArgs)).toThrow(
+      expect(function() {
+        bivs.requireCustomizationArguments({}, expectedArgs);
+      }).toThrow(
         'Expected customization arguments to have properties: first, second');
     });
   });
@@ -204,9 +194,10 @@ describe('Interaction validator', function() {
         'message': 'the button text should not be empty.'
       }]);
 
-      expect(validate(
-        validator, currentState, {}, [], goodDefaultOutcome)).toThrow(
-          'Expected customization arguments to have property: buttonText');
+      expect(function() {
+        validator(currentState, {}, [], goodDefaultOutcome);
+      }).toThrow(
+        'Expected customization arguments to have property: buttonText');
     });
 
     it('should expect no answer groups', function() {
@@ -295,11 +286,10 @@ describe('Interaction validator', function() {
     });
 
     it('should expect graph and edit customization arguments', function() {
-      expect(validate(
-        validator, currentState, {}, goodAnswerGroups,
-        goodDefaultOutcome)).toThrow(
-          'Expected customization arguments to have properties: graph, ' +
-            'canEditEdgeWeight, canEditVertexLabel');
+      expect(function () {
+        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      }).toThrow('Expected customization arguments to have properties: ' +
+        'graph, canEditEdgeWeight, canEditVertexLabel');
     });
 
     it('should expect no more than 50 vertices in the graph customization ' +
@@ -372,10 +362,10 @@ describe('Interaction validator', function() {
     it('should expect a customization argument for image and regions',
         function() {
       goodAnswerGroups[0].rule_specs = [];
-      expect(validate(
-        validator, currentState, {}, goodAnswerGroups,
-        goodDefaultOutcome)).toThrow(
-          'Expected customization arguments to have property: imageAndRegions');
+      expect(function () {
+        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      }).toThrow(
+        'Expected customization arguments to have property: imageAndRegions');
     });
 
     it('should expect an image path customization argument', function() {
@@ -500,11 +490,10 @@ describe('Interaction validator', function() {
 
     it('should expect latitude and longitude customization arguments',
         function() {
-      expect(validate(
-        validator, currentState, {}, goodAnswerGroups,
-        goodDefaultOutcome)).toThrow(
-          'Expected customization arguments to have properties: latitude, ' +
-            'longitude');
+      expect(function() {
+        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      }).toThrow('Expected customization arguments to have properties: ' +
+        'latitude, longitude');
     });
 
     it('should expect latitudes and longitudes within [-90, 90] and ' +
@@ -611,10 +600,9 @@ describe('Interaction validator', function() {
     });
 
     it('should expect a choices customization argument', function() {
-      expect(validate(
-        validator, currentState, {}, goodAnswerGroups,
-        goodDefaultOutcome)).toThrow(
-          'Expected customization arguments to have property: choices');
+      expect(function() {
+        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      }).toThrow('Expected customization arguments to have property: choices');
     });
 
     it('should expect non-empty and unique choices', function() {
