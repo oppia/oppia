@@ -121,40 +121,21 @@ oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
-    'extensionTagAssemblerService', 'INTERACTION_SPECS',
+    'extensionTagAssemblerService', 'INTERACTION_SPECS', 'explorationContextService',
+    'PAGE_CONTEXT',
     function(
       $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
-      extensionTagAssemblerService, INTERACTION_SPECS) {
+      extensionTagAssemblerService, INTERACTION_SPECS, explorationContextService,
+      PAGE_CONTEXT) {
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
   var _NULL_INTERACTION_HTML = (
     '<span style="color: red;"><strong>Error</strong>: No interaction specified.</span>');
 
-  // Note that both of these do not get set for the Karma unit tests.
-  var _explorationId = null;
-  var _editorPreviewMode = null;
-  // The pathname should be one of the following:
-  //   -   /explore/{exploration_id}
-  //   -   /create/{exploration_id}
-  var pathnameArray = window.location.pathname.split('/');
-  for (var i = 0; i < pathnameArray.length; i++) {
-    if (pathnameArray[i] === 'explore') {
-      _explorationId = pathnameArray[i + 1];
-      _editorPreviewMode = false;
-      break;
-    } else if (pathnameArray[i] === 'create') {
-      _explorationId = pathnameArray[i + 1];
-      _editorPreviewMode = true;
-      break;
-    }
-  }
-
+  var _explorationId = explorationContextService.getExplorationId();
+  var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _introCardImageUrl = null;
-
-  // The following line is needed for image displaying to work, since the image
-  // URLs refer to $rootScope.explorationId.
-  $rootScope.explorationId = _explorationId;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (

@@ -597,7 +597,7 @@ class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, sum([int(value) for value in values]))
+        yield [key, sum([int(value) for value in values])]
 
 
 class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):

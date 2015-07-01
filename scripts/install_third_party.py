@@ -457,7 +457,7 @@ download_and_unzip_files(
 
 # Download all the tar files.
 
-GAE_MAPREDUCE_REV = '1.9.0.0'
+GAE_MAPREDUCE_REV = '1.9.17.0'
 GAE_MAPREDUCE_ROOT_NAME = 'gae-mapreduce-%s' % GAE_MAPREDUCE_REV
 GAE_MAPREDUCE_TAR_URL = (
     'https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/'
@@ -465,16 +465,43 @@ GAE_MAPREDUCE_TAR_URL = (
 GAE_MAPREDUCE_TAR_ROOT_NAME = 'GoogleAppEngineMapReduce-%s' % GAE_MAPREDUCE_REV
 GAE_MAPREDUCE_TARGET_ROOT_NAME = GAE_MAPREDUCE_ROOT_NAME
 
-GAE_CLOUD_STORAGE_REV = '1.9.0.0'
+GAE_CLOUD_STORAGE_REV = '1.9.15.0'
 GAE_CLOUD_STORAGE_ROOT_NAME = 'gae-cloud-storage-%s' % GAE_CLOUD_STORAGE_REV
 GAE_CLOUD_STORAGE_TAR_URL = (
     'https://pypi.python.org/packages/source/G/'
     'GoogleAppEngineCloudStorageClient/'
     'GoogleAppEngineCloudStorageClient-%s.tar.gz' % GAE_CLOUD_STORAGE_REV)
 GAE_CLOUD_STORAGE_TAR_ROOT_NAME = (
-    'GoogleAppEngineCloudStorageClient-%s' % GAE_MAPREDUCE_REV)
+    'GoogleAppEngineCloudStorageClient-%s' % GAE_CLOUD_STORAGE_REV)
 GAE_CLOUD_STORAGE_TARGET_ROOT_NAME = GAE_CLOUD_STORAGE_ROOT_NAME
 
+GAE_PIPELINE_REV = '1.9.17.0'
+GAE_PIPELINE_ROOT_NAME = 'gae-pipeline-%s' % GAE_PIPELINE_REV
+GAE_PIPELINE_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/'
+    'GoogleAppEnginePipeline/GoogleAppEnginePipeline-%s.tar.gz'
+    '#md5=9fe87b281f4b0a7c110534df4e61b6ec' % GAE_PIPELINE_REV)
+GAE_PIPELINE_TAR_ROOT_NAME = (
+    'GoogleAppEnginePipeline-%s' % GAE_PIPELINE_REV)
+GAE_PIPELINE_TARGET_ROOT_NAME = GAE_PIPELINE_ROOT_NAME
+
+GRAPHY_REV = '1.0.0'
+GRAPHY_ROOT_NAME = 'graphy-%s' % GRAPHY_REV
+GRAPHY_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/'
+    'Graphy/Graphy-%s.tar.gz#md5=390b4f9194d81d0590abac90c8b717e0'
+    % GRAPHY_REV)
+GRAPHY_TAR_ROOT_NAME = 'Graphy-%s' % GRAPHY_REV
+GRAPHY_TARGET_ROOT_NAME = GRAPHY_ROOT_NAME
+
+SIMPLEJSON_REV = '3.7.1'
+SIMPLEJSON_ROOT_NAME = 'simplejson-%s' % SIMPLEJSON_REV
+SIMPLEJSON_TAR_URL = (
+    'https://pypi.python.org/packages/source/s/'
+    'simplejson/simplejson-%s.tar.gz#md5=c76c2d11b87e9fb501bd0b2b72091653'
+    % SIMPLEJSON_REV)
+SIMPLEJSON_TAR_ROOT_NAME = 'simplejson-%s' % SIMPLEJSON_REV
+SIMPLEJSON_TARGET_ROOT_NAME = SIMPLEJSON_ROOT_NAME
 
 download_and_untar_files(
     GAE_MAPREDUCE_TAR_URL, THIRD_PARTY_DIR,
@@ -482,6 +509,15 @@ download_and_untar_files(
 download_and_untar_files(
     GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
     GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
+download_and_untar_files(
+    GAE_PIPELINE_TAR_URL, THIRD_PARTY_DIR,
+    GAE_PIPELINE_TAR_ROOT_NAME, GAE_PIPELINE_TARGET_ROOT_NAME)
+download_and_untar_files(
+    GRAPHY_TAR_URL, THIRD_PARTY_DIR,
+    GRAPHY_TAR_ROOT_NAME, GRAPHY_TARGET_ROOT_NAME)
+download_and_untar_files(
+    SIMPLEJSON_TAR_URL, THIRD_PARTY_DIR,
+    SIMPLEJSON_TAR_ROOT_NAME, SIMPLEJSON_TARGET_ROOT_NAME)
 
 MIDI_JS_REV = '2ef687b47e5f478f1506b47238f3785d9ea8bd25'
 MIDI_JS_ZIP_URL = (

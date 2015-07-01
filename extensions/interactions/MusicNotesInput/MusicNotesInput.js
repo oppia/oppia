@@ -152,7 +152,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // Sets grid positions and initializes the view after staff has loaded.
         setTimeout(function() {
           $scope.init();
-        }, 300);
+        }, 1000);
 
         // When page is resized, all notes are removed from sequence and staff
         // and then repainted in their new corresponding positions.
