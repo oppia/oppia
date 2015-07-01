@@ -22,6 +22,7 @@ from core.domain import exp_jobs
 from core.domain import stats_jobs
 from core.domain import user_jobs
 from core.domain import feedback_jobs
+from core.domain import recommendations_jobs
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -41,7 +42,8 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     exp_jobs.SearchRanker,
     stats_jobs.StatisticsAggregator,
     user_jobs.DashboardRecentUpdatesAggregator,
-    feedback_jobs.FeedbackAnalyticsAggregator]
+    feedback_jobs.FeedbackAnalyticsAggregator,
+    recommendations_jobs.ExplorationRecommendationsAggregator]
 
 
 class ContinuousComputationEventDispatcher(object):

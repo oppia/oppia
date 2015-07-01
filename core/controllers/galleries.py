@@ -119,12 +119,6 @@ class GalleryHandler(base.BaseHandler):
             exp_services.get_exploration_summaries_matching_query(
                 query_string, cursor=search_cursor))
 
-        def _get_intro_card_color(category):
-            return (
-                feconf.CATEGORIES_TO_COLORS[category] if
-                category in feconf.CATEGORIES_TO_COLORS else
-                feconf.DEFAULT_COLOR)
-
         # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
         # individual lookups. Note that this will depend on user_id.
         explorations_list = [{
@@ -137,9 +131,7 @@ class GalleryHandler(base.BaseHandler):
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
             'community_owned': exp_summary.community_owned,
-            'thumbnail_image_url': (
-                '/images/gallery/exploration_background_%s_small.png' %
-                _get_intro_card_color(exp_summary.category)),
+            'thumbnail_image_url': exp_summary.thumbnail_image_url,
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
                 user_id=self.user_id),
@@ -275,6 +267,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
                     exp_summary.exploration_model_last_updated),
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
+                'thumbnail_image_url': exp_summary.thumbnail_image_url,
             }) for exp_summary in exp_summaries]
         })
         self.render_json(self.values)

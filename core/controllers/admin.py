@@ -26,6 +26,7 @@ from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import recommendations_services
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -213,6 +214,9 @@ class AdminHandler(base.BaseHandler):
                     if klass.__name__ == computation_type:
                         klass.stop_computation(self.user_id)
                         break
+            elif self.payload.get('action') == 'upload_topic_similarities':
+                data = self.payload.get('data')
+                recommendations_services.update_topic_similarities(data)
 
             self.render_json({})
         except Exception as e:
@@ -232,3 +236,15 @@ class AdminJobOutput(base.BaseHandler):
         self.render_json({
             'output': jobs.get_job_output(job_id)
         })
+
+
+class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+    """Retrieves topic similarity data for download."""
+
+    @require_super_admin
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/csv'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=topic_similarities.csv')
+        self.response.write(
+            recommendations_services.get_topic_similarities_as_csv())
