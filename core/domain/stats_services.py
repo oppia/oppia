@@ -57,7 +57,12 @@ def get_state_rules_stats(exploration_id, state_name):
     rule_keys = []
     for group in state.interaction.answer_groups:
         for rule in group.rule_specs:
-            rule_keys.append((_OLD_SUBMIT_HANDLER_NAME, expstr(rule)))
+            rule_keys.append((
+                _OLD_SUBMIT_HANDLER_NAME, rule.stringify_classified_rule()))
+
+    if state.interaction.default_outcome:
+        rule_keys.append((
+            _OLD_SUBMIT_HANDLER_NAME, exp_domain.DEFAULT_RULESPEC_STR))
 
     answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
         exploration_id, [{
