@@ -985,7 +985,18 @@ pre.oppia-pre-wrapped-text {
   margin-right: 5px;
 }
 
+span.oppia-nested-link {
+  color: #0844aa;
+  cursor: pointer;
+}
+
+span.oppia-nested-link:hover {
+  color: #3f2c76;
+  text-decoration: underline;
+}
+
 .oppia-add-interaction-button,
+.oppia-add-response-button,
 .oppia-add-rule-button {
   background-color: rgba(5,140,166,0.9);
   border: 0;
@@ -999,6 +1010,9 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-interaction-button:active,
 .oppia-add-interaction-button:focus,
 .oppia-add-interaction-button:hover,
+.oppia-add-response-button:active,
+.oppia-add-response-button:focus,
+.oppia-add-response-button:hover,
 .oppia-add-rule-button:active,
 .oppia-add-rule-button:focus,
 .oppia-add-rule-button:hover {
@@ -1052,8 +1066,19 @@ pre.oppia-pre-wrapped-text {
   top: 10px;
   width: 20px;
 }
+.oppia-delete-response-button,
+.oppia-delete-rule-button {
+  cursor: pointer;
+  opacity: 0.5;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 20px;
+}
 .oppia-delete-interaction-button:hover,
-.oppia-close-popover-button:hover {
+.oppia-close-popover-button:hover,
+.oppia-delete-response-button:hover,
+.oppia-delete-rule-button:hover {
   opacity: 1;
 }
 

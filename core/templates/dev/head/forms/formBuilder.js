@@ -580,6 +580,10 @@ oppia.factory('rteHelperService', [
     },
     // Replace <oppia-noninteractive> tags with <img> tags.
     convertHtmlToRte: function(html) {
+      if (!html) {
+        return html;
+      }
+
       var elt = $('<div>' + html + '</div>');
       var that = this;
 
@@ -594,6 +598,10 @@ oppia.factory('rteHelperService', [
     },
     // Replace <img> tags with <oppia-noninteractive> tags.
     convertRteToHtml: function(rte) {
+      if (!rte) {
+        return rte;
+      }
+
       var elt = $('<div>' + rte + '</div>');
 
       _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {

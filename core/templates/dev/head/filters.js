@@ -101,15 +101,12 @@ oppia.filter('isOutcomeConfusing', [function() {
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 // Note that this returns an HTML string to accommodate the case of multiple-choice
 // input and image-click input.
-// TODO(bhenning): This needs to be generalized for N rules in a group. It
-// should probably just accept a single rule, as it did before.
 oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
-  return function(group, interactionId, choices) {
-    if (!group) {
+  return function(rule, interactionId, choices) {
+    if (!rule) {
       return '';
     }
 
-    var rule = group.rule_specs[0];
     if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
@@ -183,7 +180,7 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       description = description.replace(PATTERN, ' ');
       finalDescription = finalDescription.replace(PATTERN, replacementText);
     }
-    return 'Answer ' + finalDescription;
+    return finalDescription;
   };
 }]);
 
@@ -203,7 +200,7 @@ oppia.filter('normalizeWhitespace', [function() {
   };
 }]);
 
-oppia.filter('convertRuleChoiceToPlainText', [function() {
+oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
     strippedText = strippedText.trim();
