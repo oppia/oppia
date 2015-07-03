@@ -143,14 +143,14 @@
                               {% endif %}
                             </div>
                           </a>
-                          <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                          <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                             <li>
-                              <a href="/my_explorations">
+                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
                                 My Explorations
                               </a>
                             </li>
                             <li>
-                              <a href="/notifications_dashboard">
+                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
                                 Notifications
                                 <span ng-if="numUnseenNotifications > 0">
                                   (<[numUnseenNotifications]>)
@@ -158,25 +158,25 @@
                               </a>
                             </li>
                             <li>
-                              <a href="/preferences">Preferences</a>
+                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">Preferences</a>
                             </li>
 
                             {% if is_moderator %}
                               <li>
-                                <a href="/moderator" target="_blank">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
                                   Moderator Page
                                 </a>
                               </li>
                             {% endif %}
                             {% if is_super_admin %}
                               <li>
-                                <a href="/admin" target="_blank">
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
                                   Admin Page
                                 </a>
                               </li>
                             {% endif %}
                             <li>
-                              <a href="{{logout_url}}">Logout</a>
+                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
                             </li>
                           </ul>
                         </li>
