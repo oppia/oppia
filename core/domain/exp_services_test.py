@@ -1049,7 +1049,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_type': 'create',
             'version_number': 1
         }, snapshots_metadata[0])
-        self.assertIn('created_on', snapshots_metadata[0])
+        self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Publish the exploration. This does not affect the exploration version
         # history.
@@ -1070,7 +1070,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_type': 'create',
             'version_number': 1
         }, snapshots_metadata[0])
-        self.assertIn('created_on', snapshots_metadata[0])
+        self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Modify the exploration. This affects the exploration version history.
         change_list = [{
@@ -1084,7 +1084,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 2)
-        self.assertIn('created_on', snapshots_metadata[0])
+        self.assertIn('created_on_ms', snapshots_metadata[0])
         self.assertDictContainsSubset({
             'commit_cmds': change_list,
             'committer_id': self.OWNER_ID,
@@ -1105,8 +1105,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 1
         }, snapshots_metadata[-2])
         self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+            snapshots_metadata[-1]['created_on_ms'],
+            snapshots_metadata[-2]['created_on_ms'])
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
@@ -1152,8 +1152,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 1
         }, snapshots_metadata[-3])
         self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+            snapshots_metadata[-1]['created_on_ms'],
+            snapshots_metadata[-2]['created_on_ms'])
 
     def test_versioning_with_add_and_delete_states(self):
         exploration = self.save_new_valid_exploration(
@@ -1186,11 +1186,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 3)
         self.assertDictContainsSubset(
-            commit_dict_3, snapshots_metadata[-1])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[-2])
-        self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+            commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        for ind in range(len(snapshots_metadata) - 1):
+            self.assertLess(
+                snapshots_metadata[ind]['created_on_ms'],
+                snapshots_metadata[ind + 1]['created_on_ms'])
 
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
@@ -1210,15 +1211,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 4)
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[-1])
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[-2])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[-3])
-        self.assertGreaterEqual(
-            snapshots_metadata[0]['created_on'],
-            snapshots_metadata[1]['created_on'])
-        self.assertGreaterEqual(
-            snapshots_metadata[1]['created_on'],
-            snapshots_metadata[2]['created_on'])
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        for ind in range(len(snapshots_metadata) - 1):
+            self.assertLess(
+                snapshots_metadata[ind]['created_on_ms'],
+                snapshots_metadata[ind + 1]['created_on_ms'])
 
         # The final exploration should have exactly one state.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1272,8 +1271,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             commit_dict_4, snapshots_metadata[-1])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[-2])
         self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+            snapshots_metadata[-1]['created_on_ms'],
+            snapshots_metadata[-2]['created_on_ms'])
 
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
@@ -2259,7 +2258,7 @@ tags: []
 
         self.process_and_flush_pending_tasks()
 
-        # Verify the latest version of the exploration has the most up-to-date  
+        # Verify the latest version of the exploration has the most up-to-date
         # states schema version.
         exploration_model = exp_models.ExplorationModel.get(
             _EXP_ID, strict=True, version=None)
@@ -2327,8 +2326,8 @@ tags: []
             commit_dict_5, snapshots_metadata[-1])
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[-2])
         self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+            snapshots_metadata[-1]['created_on_ms'],
+            snapshots_metadata[-2]['created_on_ms'])
 
         # Ensure that if a converted, then reverted, then converted exploration
         # is saved, it will be the up-to-date version within the datastore.

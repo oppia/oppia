@@ -33,6 +33,58 @@ import feconf
 search_services = models.Registry.import_search_services()
 
 
+VERSION_0_STATES_DICT = {
+    feconf.DEFAULT_INIT_STATE_NAME: {
+        'content': [{'type': 'text', 'value': ''}],
+        'param_changes': [],
+        'interaction': {
+            'customization_args': {},
+            'id': None,
+            'handlers': [{
+                'name': 'submit',
+                'rule_specs': [{
+                    'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                    'feedback': [],
+                    'param_changes': [],
+                    'definition': {'rule_type': 'default'}
+                }]
+            }]
+        }
+    }
+}
+
+
+def save_new_exp_with_states_schema_v0(exp_id, user_id, title):
+    """Saves a new default exploration with a default version 0 states
+    dictionary.
+    """
+    exp_model = exp_models.ExplorationModel(
+        id=exp_id,
+        category='category',
+        title=title,
+        objective='',
+        language_code='en',
+        tags=[],
+        blurb='',
+        author_notes='',
+        default_skin='conversation_v1',
+        skin_customizations={'panels_contents': {}},
+        states_schema_version=0,
+        init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+        states=VERSION_0_STATES_DICT,
+        param_specs={},
+        param_changes=[]
+    )
+    rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+    commit_message  ='New exploration created with title \'%s\'.' % title
+    exp_model.commit(user_id, commit_message, [{
+        'cmd': 'create_new',
+        'title': 'title',
+        'category': 'category',
+    }])
+
+
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
@@ -288,26 +340,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
     VALID_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
-
-    VERSION_0_STATES_DICT = {
-        feconf.DEFAULT_INIT_STATE_NAME: {
-            'content': [{'type': 'text', 'value': ''}],
-            'param_changes': [],
-            'interaction': {
-                'customization_args': {},
-                'id': None,
-                'handlers': [{
-                    'name': 'submit',
-                    'rule_specs': [{
-                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                        'feedback': [],
-                        'param_changes': [],
-                        'definition': {'rule_type': 'default'}
-                    }]
-                }]
-            }
-        }
-    }
+    EXP_TITLE = 'title'
 
     def setUp(self):
         super(ExplorationMigrationJobTest, self).setUp()
@@ -353,34 +386,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         failure for a default exploration (of states schema version 0), due to
         the exploration having a null interaction ID in its initial state.
         """
-        # Save new default exploration with a default version 0 states
-        # dictionary. This will be used to test default exploration migration,
-        # which includes ensuring the job does not have a validation failure for
-        # an exploration with a null interaction ID.
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category='category',
-            title='title',
-            objective='',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, self.ALBERT_ID)
-        exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
+        save_new_exp_with_states_schema_v0(
+            self.NEW_EXP_ID, self.ALBERT_ID, self.EXP_TITLE)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
@@ -395,39 +402,14 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Ensure the states structure within the exploration was changed.
         self.assertNotEqual(
-            updated_exp.to_dict()['states'],
-            self.VERSION_0_STATES_DICT)
+            updated_exp.to_dict()['states'], VERSION_0_STATES_DICT)
 
     def test_migration_job_skips_deleted_explorations(self):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        # Save new default exploration with a default version 0 states
-        # dictionary.
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category='category',
-            title='title',
-            objective='',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, self.ALBERT_ID)
-        exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
+        save_new_exp_with_states_schema_v0(
+            self.NEW_EXP_ID, self.ALBERT_ID, self.EXP_TITLE)
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.

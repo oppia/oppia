@@ -101,9 +101,6 @@ PATH_MAP = {
     '/third_party/static': os.path.join('third_party', 'static'),
 }
 
-# Format string for displaying datetimes in the UI.
-HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M UTC'
-
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
 # underscores when displayed as part of a URL or key. The other conventions
