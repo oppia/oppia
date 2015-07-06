@@ -116,9 +116,6 @@ class RecentUpdatesMRJobManager(
                 activity_model.id,
                 [latest_manual_commit_version],
                 allow_deleted=True)[0]
-            last_updated_ms = utils.get_time_in_millisecs(
-                activity_model.last_updated)
-
             while metadata_obj['committer_id'] == feconf.MIGRATION_BOT_USER_ID:
                 latest_manual_commit_version -= 1
                 metadata_obj = (
@@ -126,14 +123,13 @@ class RecentUpdatesMRJobManager(
                         activity_model.id,
                         [latest_manual_commit_version],
                         allow_deleted=True)[0])
-                last_updated_ms = metadata_obj['created_on_ms']
 
             yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'activity_id': activity_model.id,
                 'activity_title': activity_model.title,
                 'author_id': metadata_obj['committer_id'],
-                'last_updated_ms': last_updated_ms,
+                'last_updated_ms': metadata_obj['created_on_ms'],
                 'subject': (
                     feconf.COMMIT_MESSAGE_EXPLORATION_DELETED
                     if activity_model.deleted
