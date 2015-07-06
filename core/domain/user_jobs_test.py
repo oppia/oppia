@@ -21,7 +21,6 @@ __author__ = 'Sean Lip'
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs
-from core.domain import exp_jobs_test
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager

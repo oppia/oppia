@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import datetime
 import os
 import StringIO
@@ -2105,25 +2106,7 @@ tags: []
             skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: {
-                    'content': [{'type': 'text', 'value': ''}],
-                    'param_changes': [],
-                    'interaction': {
-                        'customization_args': {},
-                        'handlers': [{
-                            'name': 'submit',
-                            'rule_specs': [{
-                                'dest': 'END',
-                                'feedback': [],
-                                'param_changes': [],
-                                'definition': {'rule_type': 'default'}
-                            }]
-                        }],
-                        'id': 'Continue'
-                    }
-                }
-            },
+            states=self.VERSION_0_STATES_DICT,
             param_specs={},
             param_changes=[]
         )
@@ -2173,26 +2156,6 @@ tags: []
         as exp_services.get_exploration_by_id as it skips many steps which
         include the conversion pipeline (which is crucial to this test).
         """
-
-        def _create_v0_default_state_dict(dest_state_name):
-            return {
-                'content': [{'type': 'text', 'value': ''}],
-                'param_changes': [],
-                'interaction': {
-                    'customization_args': {},
-                    'handlers': [{
-                        'name': 'submit',
-                        'rule_specs': [{
-                            'dest': dest_state_name,
-                            'feedback': [],
-                            'param_changes': [],
-                            'definition': {'rule_type': 'default'}
-                        }]
-                    }],
-                    'id': 'Continue'
-                }
-            }
-
         _EXP_ID = 'exp_id2'
 
         # Create a exploration with states schema version 0.
@@ -2209,10 +2172,7 @@ tags: []
             skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: (
-                    _create_v0_default_state_dict('END'))
-            },
+            states=copy.deepcopy(self.VERSION_0_STATES_DICT),
             param_specs={},
             param_changes=[]
         )
@@ -2238,7 +2198,8 @@ tags: []
         # In version 3, a new state is added.
         exploration_model = exp_models.ExplorationModel.get(
             _EXP_ID, strict=True, version=None)
-        new_state = _create_v0_default_state_dict('END')
+        new_state = copy.deepcopy(
+            self.VERSION_0_STATES_DICT[feconf.DEFAULT_INIT_STATE_NAME])
         new_state['interaction']['id'] = 'TextInput'
         exploration_model.states['New state'] = new_state
 
@@ -2366,25 +2327,7 @@ tags: []
             skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: {
-                    'content': [{'type': 'text', 'value': ''}],
-                    'param_changes': [],
-                    'interaction': {
-                        'customization_args': {},
-                        'id': 'Continue',
-                        'handlers': [{
-                            'name': 'submit',
-                            'rule_specs': [{
-                                'dest': 'END',
-                                'feedback': [],
-                                'param_changes': [],
-                                'definition': {'rule_type': 'default'}
-                            }]
-                        }],
-                    }
-                }
-            },
+            states=self.VERSION_0_STATES_DICT,
             param_specs={},
             param_changes=[]
         )
@@ -2401,6 +2344,6 @@ tags: []
         self.assertEqual(exploration.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-        # The converted exploration should be up-to-date and properly converted.
+        # The converted exploration should be up-to-date and properly
+        # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-

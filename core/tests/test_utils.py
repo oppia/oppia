@@ -92,11 +92,11 @@ class TestBase(unittest.TestCase):
             'param_changes': [],
             'interaction': {
                 'customization_args': {},
-                'id': None,
+                'id': 'Continue',
                 'handlers': [{
                     'name': 'submit',
                     'rule_specs': [{
-                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                        'dest': 'END',
                         'feedback': [],
                         'param_changes': [],
                         'definition': {'rule_type': 'default'}
