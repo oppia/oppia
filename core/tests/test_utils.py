@@ -343,7 +343,7 @@ class TestBase(unittest.TestCase):
             id=exp_id,
             category='category',
             title=title,
-            objective='',
+            objective='Old objective',
             language_code='en',
             tags=[],
             blurb='',

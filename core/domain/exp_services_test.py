@@ -2093,30 +2093,8 @@ tags: []
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.
-        old_exp_model = exp_models.ExplorationModel(
-            id=self.OLD_EXP_ID,
-            category='Old Category',
-            title='Old Title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(
-            self.OLD_EXP_ID, self.ALBERT_ID)
-        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'Old Title',
-            'category': 'Old Category',
-        }])
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            self.OLD_EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
@@ -2159,29 +2137,8 @@ tags: []
         _EXP_ID = 'exp_id2'
 
         # Create a exploration with states schema version 0.
-        old_exp_model = exp_models.ExplorationModel(
-            id=_EXP_ID,
-            category='Old Category',
-            title='Old Title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=copy.deepcopy(self.VERSION_0_STATES_DICT),
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(_EXP_ID, self.ALBERT_ID)
-        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'Old Title',
-            'category': 'Old Category',
-        }])
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Load the exploration without using the conversion pipeline. All of
         # these changes are to happen on an exploration with states schema
@@ -2314,33 +2271,11 @@ tags: []
 
         # Create a exploration with states schema version 0 and an old states
         # blob.
-        old_exp_model = exp_models.ExplorationModel(
-            id=_EXP_ID,
-            category='Old Category',
-            title='Old Title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(_EXP_ID, self.ALBERT_ID)
-        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'Old Title',
-            'category': 'Old Category',
-        }])
-
-        exploration = exp_services.get_exploration_by_id(_EXP_ID)
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Ensure the exploration was converted.
+        exploration = exp_services.get_exploration_by_id(_EXP_ID)
         self.assertEqual(exploration.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
