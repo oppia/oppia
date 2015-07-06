@@ -138,6 +138,11 @@ ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 # app before setting this to True. If ADMIN_EMAIL_ADDRESS is not that of an
 # app owner, email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_ADMIN = False
+# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
+# app before setting this to True. Emails will be sent from
+# ADMIN_EMAIL_ADDRESS. If ADMIN_EMAIL_ADDRESS is not that of an app owner,
+# email messages from this user cannot be sent.
+CAN_SEND_EMAILS_TO_USERS = False
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576

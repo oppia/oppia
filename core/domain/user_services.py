@@ -116,6 +116,15 @@ def is_username_taken(username):
         UserSettings.normalize_username(username))
 
 
+def get_email_from_user_id(user_id):
+    """Gets the email from a given user_id.
+
+    Raises an Exception if the user is not found.
+    """
+    user_settings = get_user_settings(user_id)
+    return user_settings.email
+
+
 def get_email_from_username(username):
     """Gets the email for a given username.
 

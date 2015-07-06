@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 
 from core import counters
+from core.domain import html_cleaner
 import feconf
 
 from google.appengine.api import app_identity
@@ -31,7 +32,7 @@ def send_mail_to_admin(sender, subject, body):
 
     Args:
       - sender: str. the email address of the sender, usually in the form
-          'SENDER NAME <EMAIL@ADDRESS.com>.
+          'SENDER NAME <EMAIL@ADDRESS.com>'.
       - subject: str. The subject line of the email.
       - body: str. The plaintext body of the email.
     """
@@ -46,3 +47,40 @@ def send_mail_to_admin(sender, subject, body):
 
         mail.send_mail(sender, feconf.ADMIN_EMAIL_ADDRESS, subject, body)
         counters.EMAILS_SENT.inc()
+
+
+def send_mail(
+        sender_email, recipient_email, subject, body_html):
+    """Sends an email. The client is responsible for recording any audit logs.
+
+    Args:
+      - sender_email: the email address of the sender.
+      - recipient_email: str. the email address of the recipient.
+      - subject: str. The subject line of the email.
+      - body_html: str. The HTML body of the email. Must fit in a datastore
+          entity.
+
+    Raises:
+      Exception: if the configuration in feconf.py forbids emails from being
+        sent.
+      ValueError: if 'sender_email' or 'recipient_email' is invalid, according
+        to App Engine.
+      (and possibly other exceptions, due to mail.send_mail() failures)
+    """
+    for email in (sender_email, recipient_email):
+        if not mail.is_email_valid(email):
+            raise ValueError('Malformed email address: %s' % email)
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        raise Exception('This app cannot send emails to users.')
+
+    if not mail.is_email_valid(sender_email):
+        raise Exception(
+            'Malformed sender email address: %s' % sender_email)
+    if not mail.is_email_valid(recipient_email):
+        raise Exception(
+            'Malformed recipient email address: %s' % recipient_email)
+
+    plaintext_body = html_cleaner.strip_html_tags(body_html)
+    mail.send_mail(
+      sender_email, recipient_email, subject, plaintext_body, html=body_html)
