@@ -601,9 +601,10 @@ class EntityChangeListSummarizer(object):
         - changes: list of ExplorationChange instances.
         """
 
-        # original_names helps keep track of entity names as they're added,
-        # renamed, and deleted. When an entity is renamed, its new name is
-        # added as a key with its original name as the value.
+        # original_names is a dict whose keys are the current state names, and
+        # whose values are the names of these states before any changes were
+        # applied. It is used to keep track of identities of states throughout
+        # the sequence of changes.
         original_names = {name: name for name in original_entity_names}
 
         for change in changes:
@@ -623,6 +624,7 @@ class EntityChangeListSummarizer(object):
                 old_entity_name = getattr(change, self.old_entity_name)
                 orig_name = original_names[old_entity_name]
                 original_names[new_entity_name] = orig_name
+                del original_names[old_entity_name]
 
                 if orig_name in self.changed_entities:
                     continue
@@ -638,6 +640,8 @@ class EntityChangeListSummarizer(object):
             elif change.cmd == self.delete_entity_cmd:
                 entity_name = getattr(change, self.entity_name)
                 orig_name = original_names[entity_name]
+                del original_names[entity_name]
+                
                 if orig_name in self.changed_entities:
                     continue
                 elif orig_name in self.added_entities:
