@@ -132,15 +132,17 @@ def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
 
 # Committer id for system actions.
-ADMIN_COMMITTER_ID = 'admin'
+SYSTEM_COMMITTER_ID = 'admin'
+SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
-# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
-# app before setting this to True. If ADMIN_EMAIL_ADDRESS is not that of an
-# app owner, email messages from this user cannot be sent.
+# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
+# correspond to owners of the app before setting this to True. If
+# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
+# address cannot be sent.
 CAN_SEND_EMAILS_TO_ADMIN = False
-# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
+# Ensure that SYSTEM_EMAIL_ADDRESS is valid and corresponds to an owner of the
 # app before setting this to True. Emails will be sent from
-# ADMIN_EMAIL_ADDRESS. If ADMIN_EMAIL_ADDRESS is not that of an app owner,
+# SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
 # email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_USERS = False
 

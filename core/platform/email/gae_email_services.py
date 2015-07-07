@@ -26,12 +26,10 @@ from google.appengine.api import app_identity
 from google.appengine.api import mail
 
 
-def send_mail_to_admin(sender, subject, body):
+def send_mail_to_admin(subject, body):
     """Enqueues a 'send email' request with the GAE mail service.
 
     Args:
-      - sender: str. the email address of the sender, usually in the form
-          'SENDER NAME <EMAIL@ADDRESS.com>'.
       - subject: str. The subject line of the email.
       - body: str. The plaintext body of the email.
     """
@@ -44,7 +42,9 @@ def send_mail_to_admin(sender, subject, body):
         app_id = app_identity.get_application_id()
         body = '(Sent from %s)\n\n%s' % (app_id, body)
 
-        mail.send_mail(sender, feconf.ADMIN_EMAIL_ADDRESS, subject, body)
+        mail.send_mail(
+            feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, subject,
+            body)
         counters.EMAILS_SENT.inc()
 
 

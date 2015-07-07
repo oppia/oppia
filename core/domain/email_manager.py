@@ -57,6 +57,9 @@ EMAIL_FOOTER = config_domain.ConfigProperty(
     'The footer to append to all outgoing emails. (This should include an '
     'unsubscribe link.)',
     'You can unsubscribe from these emails from the Preferences page.')
+# NOTE TO DEVELOPERS: post-signup emails will not be sent if this placeholder
+# is left unmodified. If this policy changes, the deployment instructions at
+# https://code.google.com/p/oppia/wiki/DeployingOppia should be updated.
 SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
     'signup_email_content', EMAIL_CONTENT_SCHEMA,
     'Content of email sent after a new user signs up. (The email body should '
@@ -68,9 +71,9 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
 
 
 SENDER_VALIDATORS = {
-    email_models.INTENT_SIGNUP: (lambda x: x == feconf.ADMIN_COMMITTER_ID),
+    email_models.INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     email_models.INTENT_DAILY_BATCH: (
-        lambda x: x == feconf.ADMIN_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     email_models.INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
     email_models.INTENT_PUBLICIZE_EXPLORATION: (
@@ -111,11 +114,11 @@ def _send_email(
 
     def _send_email_in_transaction():
         email_services.send_mail(
-            feconf.ADMIN_EMAIL_ADDRESS, recipient_email, email_subject,
-            plaintext_body, email_html_body)
+            feconf.SYSTEM_EMAIL_ADDRESS, recipient_email,
+            email_subject, plaintext_body, email_html_body)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email,
-            sender_id, feconf.ADMIN_EMAIL_ADDRESS,
+            sender_id, feconf.SYSTEM_EMAIL_ADDRESS,
             intent, email_subject, email_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
@@ -144,5 +147,5 @@ def send_post_signup_email(user_id):
         EMAIL_FOOTER.value)
 
     _send_email(
-        user_id, feconf.ADMIN_COMMITTER_ID, email_models.INTENT_SIGNUP,
+        user_id, feconf.SYSTEM_COMMITTER_ID, email_models.INTENT_SIGNUP,
         email_subject, email_body)

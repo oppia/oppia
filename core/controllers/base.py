@@ -516,7 +516,7 @@ class CsrfTokenManager(object):
 
         # Initialize to random value.
         config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, CSRF_SECRET.name,
+            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod

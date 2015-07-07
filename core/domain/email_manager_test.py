@@ -42,7 +42,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
 
     def test_sender_id_validation(self):
         sender_ids_to_test = [
-            feconf.ADMIN_COMMITTER_ID, self.ADMIN_ID, self.MODERATOR_ID,
+            feconf.SYSTEM_COMMITTER_ID, self.ADMIN_ID, self.MODERATOR_ID,
             self.EDITOR_ID]
 
         # These are given in the order of user_ids_to_test.
@@ -72,13 +72,13 @@ class EmailRightsTest(test_utils.GenericTestBase):
         # Also test null and invalid intent strings.
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
-                '', feconf.ADMIN_COMMITTER_ID)
+                '', feconf.SYSTEM_COMMITTER_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
                 '', self.ADMIN_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
-                'invalid_intent', feconf.ADMIN_COMMITTER_ID)
+                'invalid_intent', feconf.SYSTEM_COMMITTER_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
                 'invalid_intent', self.ADMIN_ID)
@@ -204,7 +204,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
-            self.assertEqual(messages[0].sender, feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages[0].sender, feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
             self.assertEqual(messages[0].subject, 'Welcome!')
             self.assertEqual(
@@ -317,9 +317,9 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.ADMIN_COMMITTER_ID)
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
-                sent_email_model.sender_email, feconf.ADMIN_EMAIL_ADDRESS)
+                sent_email_model.sender_email, feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, email_models.INTENT_SIGNUP)
             self.assertEqual(

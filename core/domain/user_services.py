@@ -173,9 +173,11 @@ def get_users_settings(user_ids):
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
     for ind, model in enumerate(user_settings_models):
-        if user_ids[ind] == feconf.ADMIN_COMMITTER_ID:
+        if user_ids[ind] == feconf.SYSTEM_COMMITTER_ID:
             result.append(UserSettings(
-                'admin', email=feconf.ADMIN_EMAIL_ADDRESS, username='admin',
+                feconf.SYSTEM_COMMITTER_ID,
+                email=feconf.SYSTEM_EMAIL_ADDRESS,
+                username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow(),
                 last_started_state_editor_tutorial=None,
             ))
@@ -312,7 +314,7 @@ def get_human_readable_user_ids(user_ids):
             logging.error('User id %s not known in list of user_ids %s' % (
                 user_ids[ind], user_ids))
             raise Exception('User not found.')
-        elif user_settings.user_id == feconf.ADMIN_COMMITTER_ID:
+        elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
             usernames.append('admin')
         elif user_settings.username:
             usernames.append(user_settings.username)
