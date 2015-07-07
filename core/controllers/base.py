@@ -111,6 +111,17 @@ SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
     'Links and icon filenames for the social media buttons in the sidebar.',
     default_value=[])
 
+DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
+    'disabled_explorations', {
+        'type': 'list',
+        'items': {
+            'type': 'unicode'
+        }
+    },
+    'IDs of explorations which should not be displayable in neither the '
+    'learner nor editor views',
+    [])
+
 
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""

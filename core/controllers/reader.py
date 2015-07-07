@@ -155,6 +155,11 @@ class ExplorationPage(base.BaseHandler):
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
+        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+            self.render_template(
+                'error/disabled_exploration.html', iframe_restriction=None)
+            return
+
         version = self.request.get('v')
         if not version:
             # The default value for a missing parameter seems to be ''.

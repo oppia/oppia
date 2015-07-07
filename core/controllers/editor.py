@@ -162,6 +162,11 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
+        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+            self.render_template(
+                'error/disabled_exploration.html', iframe_restriction=None)
+            return
+
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
         if (exploration is None or
