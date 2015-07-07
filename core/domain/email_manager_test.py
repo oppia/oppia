@@ -148,8 +148,12 @@ class SignupEmailTests(test_utils.GenericTestBase):
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-        log_new_error_counter = test_utils.CallCounter(
-            email_manager.log_new_error)
+        logged_errors = []
+
+        def _log_error_for_tests(error_message):
+            logged_errors.append(error_message)
+
+        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
         log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', log_new_error_counter)
 
@@ -168,6 +172,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
             # However, an error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logged_errors[0],
+                'Please ensure that the value for the admin config property '
+                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
+                'emails to be sent.')
 
             # Check that no email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)

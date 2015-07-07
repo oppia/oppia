@@ -23,6 +23,7 @@ import datetime
 import logging
 
 from core.domain import config_domain
+from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -86,11 +87,15 @@ def _require_sender_id_is_valid(intent, sender_id):
         raise Exception('Invalid email intent string: %s' % intent)
     else:
         if not SENDER_VALIDATORS[intent](sender_id):
+            logging.error(
+                'Invalid sender_id %s for email with intent \'%s\'' %
+                (sender_id, intent))
             raise Exception(
                 'Invalid sender_id for email with intent \'%s\'' % intent)
 
 
-def _send_email(recipient_id, sender_id, intent, email_subject, email_body):
+def _send_email(
+        recipient_id, sender_id, intent, email_subject, email_html_body):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -102,15 +107,16 @@ def _send_email(recipient_id, sender_id, intent, email_subject, email_body):
     _require_sender_id_is_valid(intent, sender_id)
 
     recipient_email = user_services.get_email_from_user_id(recipient_id)
+    plaintext_body = html_cleaner.strip_html_tags(email_html_body)
 
     def _send_email_in_transaction():
         email_services.send_mail(
             feconf.ADMIN_EMAIL_ADDRESS, recipient_email, email_subject,
-            email_body)
+            plaintext_body, email_html_body)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email,
             sender_id, feconf.ADMIN_EMAIL_ADDRESS,
-            intent, email_subject, email_body, datetime.datetime.utcnow())
+            intent, email_subject, email_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 

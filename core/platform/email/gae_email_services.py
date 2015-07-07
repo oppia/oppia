@@ -20,7 +20,6 @@ __author__ = 'Sean Lip'
 
 
 from core import counters
-from core.domain import html_cleaner
 import feconf
 
 from google.appengine.api import app_identity
@@ -50,14 +49,18 @@ def send_mail_to_admin(sender, subject, body):
 
 
 def send_mail(
-        sender_email, recipient_email, subject, body_html):
+        sender_email, recipient_email, subject, plaintext_body, html_body):
     """Sends an email. The client is responsible for recording any audit logs.
 
+    In general this function should only be called from
+    email_manager._send_email().
+
     Args:
-      - sender_email: the email address of the sender.
+      - sender_email: str. the email address of the sender.
       - recipient_email: str. the email address of the recipient.
       - subject: str. The subject line of the email.
-      - body_html: str. The HTML body of the email. Must fit in a datastore
+      - plaintext_body: str. The plaintext body of the email.
+      - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
 
     Raises:
@@ -67,20 +70,16 @@ def send_mail(
         to App Engine.
       (and possibly other exceptions, due to mail.send_mail() failures)
     """
-    for email in (sender_email, recipient_email):
-        if not mail.is_email_valid(email):
-            raise ValueError('Malformed email address: %s' % email)
-
     if not feconf.CAN_SEND_EMAILS_TO_USERS:
         raise Exception('This app cannot send emails to users.')
 
     if not mail.is_email_valid(sender_email):
-        raise Exception(
+        raise ValueError(
             'Malformed sender email address: %s' % sender_email)
     if not mail.is_email_valid(recipient_email):
-        raise Exception(
+        raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
 
-    plaintext_body = html_cleaner.strip_html_tags(body_html)
     mail.send_mail(
-      sender_email, recipient_email, subject, plaintext_body, html=body_html)
+        sender_email, recipient_email, subject, plaintext_body, html=html_body)
+    counters.EMAILS_SENT.inc()

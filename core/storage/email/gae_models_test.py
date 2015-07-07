@@ -28,11 +28,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_sent_email_model_instances_are_read_only(self):
         email_models.SentEmailModel.create(
-            'recipient_id', 'recipient@email.com', 'sender@email.com',
-            'welcome', 'Email Subject', 'Email Body',
-            datetime.datetime.utcnow())
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', email_models.INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
 
-        model = email_models.SentEmailModel.get_all()[0]
+        model = email_models.SentEmailModel.get_all().fetch()[0]
         model.recipient_id = 'new_recipient_id'
         with self.assertRaises(Exception):
             model.put()

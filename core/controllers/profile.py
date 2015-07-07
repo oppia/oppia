@@ -176,6 +176,10 @@ class SignupHandler(base.BaseHandler):
         has_previously_registered = (
             user_services.has_user_registered_as_editor(self.user_id))
 
+        if has_previously_registered:
+            self.render_json({})
+            return
+
         if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
             raise self.InvalidInputException(
                 'In order to edit explorations on this site, you will '
