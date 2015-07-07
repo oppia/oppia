@@ -107,15 +107,20 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     scope: {
       rule: '=',
       isEditable: '=',
+      cancelRule: '&',
+      saveRule: '&'
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-        '$scope', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
-        'rulesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
-        function($scope, editorContextService, explorationStatesService, routerService, validatorsService,
-                 rulesService, stateInteractionIdService, INTERACTION_SPECS) {
-
+        '$scope', 'editorContextService', 'explorationStatesService',
+        'routerService', 'validatorsService', 'responsesService',
+        'stateInteractionIdService', 'INTERACTION_SPECS',
+        function(
+          $scope, editorContextService, explorationStatesService, routerService,
+          validatorsService, responsesService, stateInteractionIdService,
+          INTERACTION_SPECS) {
       $scope.currentInteractionId = stateInteractionIdService.savedMemento;
+      $scope.editRuleForm = {};
 
       // This returns the rule description string.
       var _computeRuleDescriptionFragments = function() {
@@ -144,7 +149,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             break;
           }
 
-          var _answerChoices = rulesService.getAnswerChoices();
+          var _answerChoices = responsesService.getAnswerChoices();
 
           if (_answerChoices) {
             // This rule is for a multiple-choice or image-click interaction.
@@ -215,6 +220,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
           tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
         }
+      };
+
+      $scope.cancelThisEdit = function() {
+        $scope.cancelRule();
+      };
+
+      $scope.saveThisRule = function() {
+        $scope.saveRule();
       };
 
       $scope.init = function() {

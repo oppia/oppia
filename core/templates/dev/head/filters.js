@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+var _RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
+
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
@@ -83,6 +85,20 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
     }
     var matchLocation = input.search(pattern);
     return matchLocation === -1 ? input : (input.substring(0, matchLocation));
+  };
+}]);
+
+oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
+  return function(input, characterCount) {
+    input = $filter('normalizeWhitespace')(input);
+    if (input.length <= characterCount) {
+      // String fits within the criteria; no wrapping is necessary.
+      return input;
+    }
+
+    // Replace characters counting backwards from character count with an
+    // ellipsis, then trim the string.
+    return input.substr(0, characterCount - 3).trim() + '...';
   };
 }]);
 
@@ -203,6 +219,7 @@ oppia.filter('normalizeWhitespace', [function() {
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
+    strippedText = strippedText.replace('&nbsp;', ' ');
     strippedText = strippedText.trim();
     if (strippedText.length === 0) {
       return input;
@@ -211,3 +228,60 @@ oppia.filter('convertToPlainText', [function() {
     }
   };
 }]);
+
+oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
+  return function(answerGroup, interactionId, answerChoices, shortenRule) {
+    var summary = '';
+    var outcome = answerGroup.outcome;
+    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+
+    if (answerGroup.rule_specs) {
+      var firstRule = $filter('parameterizeRuleDescription')(
+        answerGroup.rule_specs[0], interactionId, answerChoices);
+      summary = 'Answer ' + firstRule;
+
+      if (hasFeedback && shortenRule) {
+        summary = $filter('wrapTextWithEllipsis')(
+          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+      }
+      summary = '[' + summary + '] ';
+    }
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(outcome.feedback[0]);
+    }
+    return summary;
+  };
+}]);
+
+oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
+  return function(
+      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+    if (!defaultOutcome) {
+      return '';
+    }
+
+    var summary = '';
+    var feedback = defaultOutcome.feedback;
+    var hasFeedback = feedback.length > 0 && feedback[0];
+
+    if (interactionId === 'Continue') {
+      summary = 'When the button is clicked';
+    } else if (answerGroupCount > 0) {
+      summary = 'If the answer is anything else';
+    } else {
+      summary = 'All answers';
+    }
+
+    if (hasFeedback && shortenRule) {
+      summary = $filter('wrapTextWithEllipsis')(
+        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+    }
+    summary = '[' + summary + '] ';
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
+    }
+    return summary;
+  }
+}])

@@ -291,7 +291,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             state_2_1 = exploration.init_state_name
 
             EMPTY_STATE_HIT_COUNTS_DICT = {
-                'First Card': {
+                feconf.DEFAULT_INIT_STATE_NAME: {
                     'total_entry_count': 0,
                     'no_answer_count': 0,
                     'first_entry_count': 0,

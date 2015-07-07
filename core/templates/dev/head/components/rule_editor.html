@@ -1,5 +1,5 @@
 <div style="position: relative;">
-  <form class="form-inline" role="form">
+  <form class="form-inline" role="form" name="ruleEditForm.form">
     <rule-type-selector class="protractor-test-rule-description" local-value="rule.rule_type" on-selection-change="onSelectNewRuleType">
     </rule-type-selector>
 
@@ -22,4 +22,13 @@
       </span>
     </span>
   </form>
+
+  <div class="oppia-rule-save-cancel-buttons">
+  <div class="pull-right">
+    <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
+    <button type="button" class="btn btn-success protractor-test-save-response" ng-disabled="ruleEditForm.form.$invalid" ng-click="saveThisRule()">Save Answer</button>
+  </div>
+
+  <div style="clear: both;"></div>
+</div>
 </div>

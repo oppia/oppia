@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the group, feedback, and outcome editors.
+ * @fileoverview Directives for the group, feedback, and outcome editors.
  *
  * @author bhenning@google.com (Ben Henning)
  */
 
-oppia.directive('groupEditor', ['$log', function($log) {
+oppia.directive('groupEditor', [function() {
   return {
     restrict: 'E',
     scope: {
@@ -29,11 +29,12 @@ oppia.directive('groupEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/group_editor',
     controller: [
-      '$scope', 'stateInteractionIdService', 'rulesService',
-      'editorContextService', 'routerService', 'INTERACTION_SPECS',
+      '$scope', 'stateInteractionIdService', 'responsesService',
+      'editorContextService', 'routerService', 'warningsData',
+      'INTERACTION_SPECS',
       function(
-        $scope, stateInteractionIdService, rulesService, editorContextService,
-        routerService, INTERACTION_SPECS) {
+        $scope, stateInteractionIdService, responsesService,
+        editorContextService, routerService, warningsData, INTERACTION_SPECS) {
 
     var resetMementos = function() {
       $scope.rulesMemento = null;
@@ -42,12 +43,13 @@ oppia.directive('groupEditor', ['$log', function($log) {
     };
     resetMementos();
 
-    $scope.groupEditorIsOpen = false;
+    $scope.feedbackEditorIsOpen = false;
+    $scope.destinationEditorIsOpen = false;
     $scope.activeRuleIndex = -1;
     $scope.editGroupForm = {};
 
     $scope.getAnswerChoices = function() {
-      return rulesService.getAnswerChoices();
+      return responsesService.getAnswerChoices();
     };
     $scope.answerChoices = $scope.getAnswerChoices();
 
@@ -56,7 +58,7 @@ oppia.directive('groupEditor', ['$log', function($log) {
     // interaction's customization arguments.
     // TODO(sll): Remove the need for this watcher, or make it less ad hoc.
     $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-      rulesService.updateAnswerChoices(newAnswerChoices);
+      responsesService.updateAnswerChoices(newAnswerChoices);
       $scope.answerChoices = $scope.getAnswerChoices();
     });
 
@@ -64,48 +66,61 @@ oppia.directive('groupEditor', ['$log', function($log) {
       return stateInteractionIdService.savedMemento;
     };
 
-    $scope.openGroupEditor = function() {
+    $scope.openFeedbackEditor = function() {
       if ($scope.isEditable) {
-        $scope.rulesMemento = angular.copy($scope.rules);
         $scope.outcomeFeedbackMemento = angular.copy($scope.outcome.feedback);
-        $scope.outcomeDestMemento = angular.copy($scope.outcome.dest);
-
-        $scope.groupEditorIsOpen = true;
+        $scope.feedbackEditorIsOpen = true;
         if ($scope.outcome.feedback.length === 0) {
           $scope.outcome.feedback.push('');
         }
       }
     };
 
+    $scope.openDestinationEditor = function() {
+      if ($scope.isEditable) {
+        $scope.outcomeDestMemento = angular.copy($scope.outcome.dest);
+        $scope.destinationEditorIsOpen = true;
+      }
+    };
+
     $scope.saveThisGroup = function() {
       $scope.$broadcast('saveOutcomeDetails');
       // TODO(sll): Add more validation prior to saving.
-      $scope.groupEditorIsOpen = false;
+      $scope.feedbackEditorIsOpen = false;
+      $scope.destinationEditorIsOpen = false;
       resetMementos();
       $scope.saveGroup();
     };
 
-    $scope.cancelThisEdit = function() {
-      $scope.rules = angular.copy($scope.rulesMemento);
+    $scope.cancelThisFeedbackEdit = function() {
       $scope.outcome.feedback = angular.copy($scope.outcomeFeedbackMemento);
-      $scope.outcome.dest = angular.copy($scope.outcomeDestMemento);
-      resetMementos();
-      $scope.changeActiveRuleIndex(-1);
+      $scope.outcomeFeedbackMemento = null;
+      $scope.feedbackEditorIsOpen = false;
+    };
 
-      // Last step is to actually close the editor (to avoid other functions,
-      // such as changeActiveRuleIndex from trying to reopen the editor).
-      $scope.groupEditorIsOpen = false;
+    $scope.cancelThisDestinationEdit = function() {
+      $scope.outcome.dest = angular.copy($scope.outcomeDestMemento);
+      $scope.outcomeDestMemento = null;
+      $scope.destinationEditorIsOpen = false;
     };
 
     $scope.$on('externalSave', function() {
-      if ($scope.groupEditorIsOpen) {
+      if ($scope.feedbackEditorIsOpen &&
+          $scope.editGroupForm.editFeedbackForm.$valid) {
         $scope.saveThisGroup();
+      }
+      if ($scope.destinationEditorIsOpen &&
+          $scope.editGroupForm.editDestForm.$valid) {
+        $scope.saveThisGroup();
+      }
+      if ($scope.isRuleEditorOpen()) {
+        $scope.saveActiveRule();
       }
     });
 
     var getDefaultInputValue = function(varType) {
-      // TODO(bhenning): Typed objects should be required to provide a default
-      // value specific to their type.
+      // TODO(bhenning): Typed objects in the backend should be required to
+      // provide a default value specific for their type.
       switch (varType) {
         default:
         case 'Null':
@@ -183,9 +198,9 @@ oppia.directive('groupEditor', ['$log', function($log) {
     };
 
     $scope.addNewRule = function() {
-      if (!$scope.groupEditorIsOpen) {
-        $scope.openGroupEditor();
-      }
+      // Save the state of the rules before adding a new one (in case the user
+      // cancels the addition).
+      $scope.rulesMemento = angular.copy($scope.rules);
 
       // Build an initial blank set of inputs for the initial rule.
       var interactionId = $scope.getCurrentInteractionId();
@@ -207,7 +222,7 @@ oppia.directive('groupEditor', ['$log', function($log) {
       }
 
       // TODO(bhenning): Should use functionality in ruleEditor.js, but move it
-      // to rulesService in StateRules.js to properly form a new rule.
+      // to responsesService in StateRules.js to properly form a new rule.
       $scope.rules.push({
         'rule_type': ruleType,
         'inputs': inputs,
@@ -216,21 +231,40 @@ oppia.directive('groupEditor', ['$log', function($log) {
     };
 
     $scope.deleteRule = function(index) {
-      if (!$scope.groupEditorIsOpen) {
-        $scope.openGroupEditor();
-      }
-
       $scope.rules.splice(index, 1);
-      $scope.changeActiveRuleIndex(0);
+      $scope.changeActiveRuleIndex(-1);
+      $scope.saveThisGroup();
+
+      if ($scope.rules.length == 0) {
+        warningsData.addWarning('All answer groups must have at least ' +
+          'one rule.');
+      }
+    };
+
+    $scope.cancelActiveRule = function() {
+      $scope.rules = angular.copy($scope.rulesMemento);
+      $scope.rulesMemento = null;
+      $scope.changeActiveRuleIndex(-1);
+    };
+
+    $scope.saveActiveRule = function() {
+      $scope.changeActiveRuleIndex(-1);
+      $scope.saveThisGroup();
     };
 
     $scope.changeActiveRuleIndex = function(newIndex) {
-      if (!$scope.groupEditorIsOpen) {
-        $scope.openGroupEditor();
-      }
+      responsesService.changeActiveRuleIndex(newIndex);
+      $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
+    };
 
-      rulesService.changeActiveRuleIndex(newIndex);
-      $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+    $scope.openRuleEditor = function(index) {
+      // Prepare rules memento since the rule editor is being opened.
+      $scope.rulesMemento = angular.copy($scope.rules);
+      $scope.changeActiveRuleIndex(index);
+    };
+
+    $scope.isRuleEditorOpen = function() {
+      return $scope.activeRuleIndex !== -1;
     };
 
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
@@ -265,24 +299,28 @@ oppia.directive('groupEditor', ['$log', function($log) {
       items: '.oppia-sortable-rule-block',
       tolerance: 'pointer',
       start: function(e, ui) {
-        if (!$scope.groupEditorIsOpen) {
-          $scope.openGroupEditor();
-        }
         $scope.$apply();
+        $scope.saveThisGroup();
         ui.placeholder.height(ui.item.height());
       },
       stop: function(e, ui) {
-        if (!$scope.groupEditorIsOpen) {
-          $scope.openGroupEditor();
-        }
         $scope.$apply();
+        $scope.saveThisGroup();
         $scope.changeActiveRuleIndex(ui.item.index());
       }
     };
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-      if ($scope.groupEditorIsOpen) {
+      if ($scope.feedbackEditorIsOpen &&
+          $scope.editGroupForm.editFeedbackForm.$valid) {
         $scope.saveThisGroup();
+      }
+      if ($scope.destinationEditorIsOpen &&
+          $scope.editGroupForm.editDestForm.$valid) {
+        $scope.saveThisGroup();
+      }
+      if ($scope.isRuleEditorOpen()) {
+        $scope.saveActiveRule();
       }
       $scope.$broadcast('updateAnswerGroupInteractionId');
       $scope.answerChoices = $scope.getAnswerChoices();
@@ -290,11 +328,11 @@ oppia.directive('groupEditor', ['$log', function($log) {
   }]};
 }]);
 
-oppia.directive('outcomeFeedbackEditor', ['$log', function($log) {
+oppia.directive('outcomeFeedbackEditor', [function() {
   return {
     restrict: 'E',
     scope: {
-      outcome: '=',
+      outcome: '='
     },
     templateUrl: 'rules/outcomeFeedbackEditor',
     controller: [
@@ -321,27 +359,24 @@ oppia.directive('outcomeFeedbackEditor', ['$log', function($log) {
   };
 }]);
 
-oppia.directive('outcomeDestinationEditor', ['$log', function($log) {
+oppia.directive('outcomeDestinationEditor', [function() {
   return {
     restrict: 'E',
     scope: {
-      outcome: '=',
+      outcome: '='
     },
     templateUrl: 'rules/outcomeDestinationEditor',
     controller: [
       '$scope', 'editorContextService', 'explorationStatesService',
-      'stateGraphArranger',
+      'stateGraphArranger', 'PLACEHOLDER_OUTCOME_DEST',
       function(
           $scope, editorContextService, explorationStatesService,
-          stateGraphArranger) {
-        // We use a slash because this character is forbidden in a state name.
-        var _PLACEHOLDER_OUTCOME_DEST = '/';
-
+          stateGraphArranger, PLACEHOLDER_OUTCOME_DEST) {
         var lastSetRuleDest = $scope.outcome.dest;
 
         $scope.$on('saveOutcomeDetails', function() {
           // Create new state if specified.
-          if ($scope.outcome.dest == _PLACEHOLDER_OUTCOME_DEST) {
+          if ($scope.outcome.dest == PLACEHOLDER_OUTCOME_DEST) {
             var newStateName = $scope.outcome.newStateName;
             $scope.outcome.dest = newStateName;
             lastSetRuleDest = newStateName;
@@ -355,7 +390,7 @@ oppia.directive('outcomeDestinationEditor', ['$log', function($log) {
         });
 
         $scope.isCreatingNewState = function(outcome) {
-          return outcome.dest == _PLACEHOLDER_OUTCOME_DEST;
+          return outcome.dest == PLACEHOLDER_OUTCOME_DEST;
         };
 
         $scope.destChoices = [];
@@ -416,7 +451,7 @@ oppia.directive('outcomeDestinationEditor', ['$log', function($log) {
           }
 
           $scope.destChoices.push({
-            id: _PLACEHOLDER_OUTCOME_DEST,
+            id: PLACEHOLDER_OUTCOME_DEST,
             text: 'A New Card Called...'
           });
         }, true);

@@ -124,8 +124,8 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   color: red;
 }
 
-.oppia-rule-warning-text {
-  color: red;
+.oppia-confusing-outcome-warning-text {
+  color: rgb(200, 0, 0);
   font-style: italic;
 }
 
@@ -825,14 +825,14 @@ md-card.oppia-gallery-tile {
 
 .oppia-editor-cards-container {
   margin: auto;
-  max-width: 560px;
+  max-width: 700px;
 }
 .oppia-editor-card-with-avatar {
   background: rgb(255,255,255);
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
-  max-width: 560px;
+  max-width: 700px;
   padding: 0;
 }
 
@@ -985,19 +985,22 @@ pre.oppia-pre-wrapped-text {
   margin-right: 5px;
 }
 
-span.oppia-nested-link {
+.oppia-nested-link {
   color: #0844aa;
   cursor: pointer;
 }
 
-span.oppia-nested-link:hover {
+.oppia-nested-link:hover {
   color: #3f2c76;
   text-decoration: underline;
 }
 
+.oppia-answer-header {
+  padding-top: 16px;
+}
+
 .oppia-add-interaction-button,
-.oppia-add-response-button,
-.oppia-add-rule-button {
+.oppia-add-response-button {
   background-color: rgba(5,140,166,0.9);
   border: 0;
   border-radius: 0;
@@ -1012,11 +1015,26 @@ span.oppia-nested-link:hover {
 .oppia-add-interaction-button:hover,
 .oppia-add-response-button:active,
 .oppia-add-response-button:focus,
-.oppia-add-response-button:hover,
+.oppia-add-response-button:hover {
+  background-color: rgba(5,140,166,1);
+  color: white;
+  opacity: 1;
+}
+
+.oppia-add-rule-button {
+  background-color: rgba(165,165,165,0.9);
+  border: 0;
+  border-radius: 0;
+  color: white;
+  opacity: 0.9;
+  padding: 7px;
+  width: 100%;
+}
+
 .oppia-add-rule-button:active,
 .oppia-add-rule-button:focus,
 .oppia-add-rule-button:hover {
-  background-color: rgba(5,140,166,1);
+  background-color: rgba(165,165,165,1);
   color: white;
   opacity: 1;
 }
@@ -1155,6 +1173,25 @@ span.oppia-nested-link:hover {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: -2px;
   z-index: 1;
+}
+
+.oppia-response-header-block {
+  overflow: hidden;
+  padding-left: 24px;
+  white-space: nowrap;
+  width: 640px;
+}
+
+.oppia-response-header {
+  float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 500px;
+}
+
+.oppia-rule-header {
+  color: rgb(120, 120, 120);
 }
 
 .oppia-rule-sort-handle {
