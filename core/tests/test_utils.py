@@ -28,7 +28,9 @@ from core.controllers import reader
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import jinja_utils
@@ -83,6 +85,26 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+
+    VERSION_0_STATES_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: {
+            'content': [{'type': 'text', 'value': ''}],
+            'param_changes': [],
+            'interaction': {
+                'customization_args': {},
+                'id': 'Continue',
+                'handlers': [{
+                    'name': 'submit',
+                    'rule_specs': [{
+                        'dest': 'END',
+                        'feedback': [],
+                        'param_changes': [],
+                        'definition': {'rule_type': 'default'}
+                    }]
+                }]
+            }
+        }
+    }
 
     def _get_unicode_test_string(self, suffix):
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
@@ -304,6 +326,45 @@ class TestBase(unittest.TestCase):
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
+        """Saves a new default exploration with a default version 0 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title=title,
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'%s\'.' % title
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
         """Updates a param dict using the given list of param_changes.
@@ -331,8 +392,8 @@ class TestBase(unittest.TestCase):
         functionality. This is replicated here so backend tests may utilize the
         functionality of PlayerServices.js without being able to access it.
 
-        TODO(bhenning): Replicate this in an integration test to protect against
-        code skew here.
+        TODO(bhenning): Replicate this in an integration test to protect
+        against code skew here.
         """
         if params is None:
             params = {}

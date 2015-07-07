@@ -101,34 +101,46 @@ class RecentUpdatesMRJobManager(
         activity_ids_list = item.activity_ids
         feedback_thread_ids_list = item.feedback_thread_ids
 
-        activities = exp_models.ExplorationModel.get_multi(
+        activity_models = exp_models.ExplorationModel.get_multi(
             activity_ids_list, include_deleted=True)
 
-        for ind, activity in enumerate(activities):
-            if activity is None:
+        for ind, activity_model in enumerate(activity_models):
+            if activity_model is None:
                 logging.error(
                     'Could not find activity %s' % activity_ids_list[ind])
                 continue
 
+            # Find the last commit that is not due to an automatic migration.
+            latest_manual_commit_version = activity_model.version
             metadata_obj = exp_models.ExplorationModel.get_snapshots_metadata(
-                activity.id, [activity.version], allow_deleted=True)[0]
+                activity_model.id,
+                [latest_manual_commit_version],
+                allow_deleted=True)[0]
+            while metadata_obj['committer_id'] == feconf.MIGRATION_BOT_USER_ID:
+                latest_manual_commit_version -= 1
+                metadata_obj = (
+                    exp_models.ExplorationModel.get_snapshots_metadata(
+                        activity_model.id,
+                        [latest_manual_commit_version],
+                        allow_deleted=True)[0])
+
             yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                'activity_id': activity.id,
-                'activity_title': activity.title,
+                'activity_id': activity_model.id,
+                'activity_title': activity_model.title,
                 'author_id': metadata_obj['committer_id'],
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    activity.last_updated),
+                'last_updated_ms': metadata_obj['created_on_ms'],
                 'subject': (
                     feconf.COMMIT_MESSAGE_EXPLORATION_DELETED
-                    if activity.deleted else metadata_obj['commit_message']
+                    if activity_model.deleted
+                    else metadata_obj['commit_message']
                 ),
             })
 
             # If the user subscribes to this activity, he/she is automatically
             # subscribed to all feedback threads for this activity.
-            if not activity.deleted:
-                threads = feedback_services.get_threadlist(activity.id)
+            if not activity_model.deleted:
+                threads = feedback_services.get_threadlist(activity_model.id)
                 for thread in threads:
                     if thread['thread_id'] not in feedback_thread_ids_list:
                         feedback_thread_ids_list.append(thread['thread_id'])

@@ -49,6 +49,7 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
+
 def _migrate_states_schema(versioned_exploration_states):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
@@ -852,8 +853,8 @@ def get_exploration_snapshots_metadata(exploration_id):
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
         following keys: committer_id, commit_message, commit_cmds, commit_type,
-        created_on, version_number. The version numbers are consecutive and in
-        ascending order. There are exploration.version_number items in the
+        created_on_ms, version_number. The version numbers are consecutive and
+        in ascending order. There are exploration.version_number items in the
         returned list.
     """
     exploration = get_exploration_by_id(exploration_id)

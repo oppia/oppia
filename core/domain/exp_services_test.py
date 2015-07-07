@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import datetime
 import os
 import StringIO
@@ -334,8 +335,8 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
             msg='There must be at least one demo exploration.')
 
         # TODO(bhenning): Fix backend functionality needed to properly migrate
-        # these explorations. All demo explorations should be able to be loaded,
-        # validated, and deleted.
+        # these explorations. All demo explorations should be able to be
+        # loaded, validated, and deleted.
         excluded_demo_explorations = ['World Cities']
         for ind in range(len(feconf.DEMO_EXPLORATIONS)):
             start_time = datetime.datetime.utcnow()
@@ -990,7 +991,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(
-                self.EXP_ID)[-1]['commit_message'],
+                self.EXP_ID)[1]['commit_message'],
             'A message')
 
     def test_demand_commit_message(self):
@@ -1049,7 +1050,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_type': 'create',
             'version_number': 1
         }, snapshots_metadata[0])
-        self.assertIn('created_on', snapshots_metadata[0])
+        self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Publish the exploration. This does not affect the exploration version
         # history.
@@ -1070,7 +1071,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_type': 'create',
             'version_number': 1
         }, snapshots_metadata[0])
-        self.assertIn('created_on', snapshots_metadata[0])
+        self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Modify the exploration. This affects the exploration version history.
         change_list = [{
@@ -1084,14 +1085,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 2)
-        self.assertIn('created_on', snapshots_metadata[0])
-        self.assertDictContainsSubset({
-            'commit_cmds': change_list,
-            'committer_id': self.OWNER_ID,
-            'commit_message': 'Changed title.',
-            'commit_type': 'edit',
-            'version_number': 2,
-        }, snapshots_metadata[-1])
+        self.assertIn('created_on_ms', snapshots_metadata[0])
         self.assertDictContainsSubset({
             'commit_cmds': [{
                 'cmd': 'create_new',
@@ -1103,10 +1097,17 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'New exploration created with title \'A title\'.'),
             'commit_type': 'create',
             'version_number': 1
-        }, snapshots_metadata[-2])
-        self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list,
+            'committer_id': self.OWNER_ID,
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
+            'version_number': 2,
+        }, snapshots_metadata[1])
+        self.assertLess(
+            snapshots_metadata[0]['created_on_ms'],
+            snapshots_metadata[1]['created_on_ms'])
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
@@ -1126,20 +1127,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 3)
         self.assertDictContainsSubset({
-            'commit_cmds': new_change_list,
-            'committer_id': 'committer_id_2',
-            'commit_message': 'Second commit.',
-            'commit_type': 'edit',
-            'version_number': 3,
-        }, snapshots_metadata[-1])
-        self.assertDictContainsSubset({
-            'commit_cmds': change_list,
-            'committer_id': self.OWNER_ID,
-            'commit_message': 'Changed title.',
-            'commit_type': 'edit',
-            'version_number': 2,
-        }, snapshots_metadata[-2])
-        self.assertDictContainsSubset({
             'commit_cmds': [{
                 'cmd': 'create_new',
                 'title': 'A title',
@@ -1150,10 +1137,24 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'New exploration created with title \'A title\'.'),
             'commit_type': 'create',
             'version_number': 1
-        }, snapshots_metadata[-3])
-        self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list,
+            'committer_id': self.OWNER_ID,
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
+            'version_number': 2,
+        }, snapshots_metadata[1])
+        self.assertDictContainsSubset({
+            'commit_cmds': new_change_list,
+            'committer_id': 'committer_id_2',
+            'commit_message': 'Second commit.',
+            'commit_type': 'edit',
+            'version_number': 3,
+        }, snapshots_metadata[2])
+        self.assertLess(
+            snapshots_metadata[1]['created_on_ms'],
+            snapshots_metadata[2]['created_on_ms'])
 
     def test_versioning_with_add_and_delete_states(self):
         exploration = self.save_new_valid_exploration(
@@ -1186,11 +1187,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 3)
         self.assertDictContainsSubset(
-            commit_dict_3, snapshots_metadata[-1])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[-2])
-        self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+            commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        for ind in range(len(snapshots_metadata) - 1):
+            self.assertLess(
+                snapshots_metadata[ind]['created_on_ms'],
+                snapshots_metadata[ind + 1]['created_on_ms'])
 
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
@@ -1210,15 +1212,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 4)
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[-1])
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[-2])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[-3])
-        self.assertGreaterEqual(
-            snapshots_metadata[0]['created_on'],
-            snapshots_metadata[1]['created_on'])
-        self.assertGreaterEqual(
-            snapshots_metadata[1]['created_on'],
-            snapshots_metadata[2]['created_on'])
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        for ind in range(len(snapshots_metadata) - 1):
+            self.assertLess(
+                snapshots_metadata[ind]['created_on_ms'],
+                snapshots_metadata[ind + 1]['created_on_ms'])
 
         # The final exploration should have exactly one state.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1268,12 +1268,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 3,
         }
         self.assertEqual(len(snapshots_metadata), 4)
-        self.assertDictContainsSubset(
-            commit_dict_4, snapshots_metadata[-1])
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[-2])
-        self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
+        self.assertLess(
+            snapshots_metadata[2]['created_on_ms'],
+            snapshots_metadata[3]['created_on_ms'])
 
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
@@ -2094,48 +2093,8 @@ tags: []
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.
-        old_exp_model = exp_models.ExplorationModel(
-            id=self.OLD_EXP_ID,
-            category='Old Category',
-            title='Old Title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: {
-                    'content': [{'type': 'text', 'value': ''}],
-                    'param_changes': [],
-                    'interaction': {
-                        'customization_args': {},
-                        'handlers': [{
-                            'name': 'submit',
-                            'rule_specs': [{
-                                'dest': 'END',
-                                'feedback': [],
-                                'param_changes': [],
-                                'definition': {'rule_type': 'default'}
-                            }]
-                        }],
-                        'id': 'Continue'
-                    }
-                }
-            },
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(
-            self.OLD_EXP_ID, self.ALBERT_ID)
-        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'Old Title',
-            'category': 'Old Category',
-        }])
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            self.OLD_EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
@@ -2159,71 +2118,27 @@ tags: []
     def test_migration_then_reversion_maintains_valid_exploration(self):
         """This integration test simulates the behavior of the domain layer
         prior to the introduction of a states schema. In particular, it deals
-        with an exploration that was created before any states schema migrations
-        occur. The exploration is constructed using multiple change lists, then
-        a migration job is run. The test thereafter tests if reverting to a
-        version prior to the migration still maintains a valid exploration. It
-        tests both the exploration domain object and the exploration model
-        stored in the datastore for validity.
+        with an exploration that was created before any states schema
+        migrations occur. The exploration is constructed using multiple change
+        lists, then a migration job is run. The test thereafter tests if
+        reverting to a version prior to the migration still maintains a valid
+        exploration. It tests both the exploration domain object and the
+        exploration model stored in the datastore for validity.
 
         Note: It is important to distinguish between when the test is testing
         the exploration domain versus its model. It is operating at the domain
-        layer when using exp_services.get_exploration_by_id. Otherwise, it loads
-        the model explicitly using exp_models.ExplorationModel.get and then
-        converts it to an exploration domain object for validation using
-        exp_services.get_exploration_from_model. This is NOT the same process as
-        exp_services.get_exploration_by_id as it skips many steps which include
-        the conversion pipeline (which is crucial to this test).
+        layer when using exp_services.get_exploration_by_id. Otherwise, it
+        loads the model explicitly using exp_models.ExplorationModel.get and
+        then converts it to an exploration domain object for validation using
+        exp_services.get_exploration_from_model. This is NOT the same process
+        as exp_services.get_exploration_by_id as it skips many steps which
+        include the conversion pipeline (which is crucial to this test).
         """
-
-        def _create_v0_default_state_dict(dest_state_name):
-            return {
-                'content': [{'type': 'text', 'value': ''}],
-                'param_changes': [],
-                'interaction': {
-                    'customization_args': {},
-                    'handlers': [{
-                        'name': 'submit',
-                        'rule_specs': [{
-                            'dest': dest_state_name,
-                            'feedback': [],
-                            'param_changes': [],
-                            'definition': {'rule_type': 'default'}
-                        }]
-                    }],
-                    'id': 'Continue'
-                }
-            }
-
         _EXP_ID = 'exp_id2'
 
         # Create a exploration with states schema version 0.
-        old_exp_model = exp_models.ExplorationModel(
-            id=_EXP_ID,
-            category='Old Category',
-            title='Old Title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: (
-                    _create_v0_default_state_dict('END'))
-            },
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(_EXP_ID, self.ALBERT_ID)
-        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'Old Title',
-            'category': 'Old Category',
-        }])
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Load the exploration without using the conversion pipeline. All of
         # these changes are to happen on an exploration with states schema
@@ -2240,8 +2155,9 @@ tags: []
         # In version 3, a new state is added.
         exploration_model = exp_models.ExplorationModel.get(
             _EXP_ID, strict=True, version=None)
-        new_state = _create_v0_default_state_dict('END')
-        new_state['interaction']['id'] = 'TextInput';
+        new_state = copy.deepcopy(
+            self.VERSION_0_STATES_DICT[feconf.DEFAULT_INIT_STATE_NAME])
+        new_state['interaction']['id'] = 'TextInput'
         exploration_model.states['New state'] = new_state
 
         # Properly link in the new state to avoid an invalid exploration.
@@ -2259,7 +2175,7 @@ tags: []
 
         self.process_and_flush_pending_tasks()
 
-        # Verify the latest version of the exploration has the most up-to-date  
+        # Verify the latest version of the exploration has the most up-to-date
         # states schema version.
         exploration_model = exp_models.ExplorationModel.get(
             _EXP_ID, strict=True, version=None)
@@ -2323,12 +2239,11 @@ tags: []
         # Ensure the correct commit logs were entered during both migration and
         # reversion. Also, ensure the correct commit command was written during
         # migration.
-        self.assertDictContainsSubset(
-            commit_dict_5, snapshots_metadata[-1])
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[-2])
-        self.assertGreaterEqual(
-            snapshots_metadata[-1]['created_on'],
-            snapshots_metadata[-2]['created_on'])
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
+        self.assertDictContainsSubset(commit_dict_5, snapshots_metadata[4])
+        self.assertLess(
+            snapshots_metadata[3]['created_on_ms'],
+            snapshots_metadata[4]['created_on_ms'])
 
         # Ensure that if a converted, then reverted, then converted exploration
         # is saved, it will be the up-to-date version within the datastore.
@@ -2356,54 +2271,14 @@ tags: []
 
         # Create a exploration with states schema version 0 and an old states
         # blob.
-        old_exp_model = exp_models.ExplorationModel(
-            id=_EXP_ID,
-            category='Old Category',
-            title='Old Title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            default_skin='conversation_v1',
-            skin_customizations={'panels_contents': {}},
-            states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states={
-                feconf.DEFAULT_INIT_STATE_NAME: {
-                    'content': [{'type': 'text', 'value': ''}],
-                    'param_changes': [],
-                    'interaction': {
-                        'customization_args': {},
-                        'id': 'Continue',
-                        'handlers': [{
-                            'name': 'submit',
-                            'rule_specs': [{
-                                'dest': 'END',
-                                'feedback': [],
-                                'param_changes': [],
-                                'definition': {'rule_type': 'default'}
-                            }]
-                        }],
-                    }
-                }
-            },
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(_EXP_ID, self.ALBERT_ID)
-        old_exp_model.commit(self.ALBERT_ID, 'old commit', [{
-            'cmd': 'create_new',
-            'title': 'Old Title',
-            'category': 'Old Category',
-        }])
-
-        exploration = exp_services.get_exploration_by_id(_EXP_ID)
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Ensure the exploration was converted.
+        exploration = exp_services.get_exploration_by_id(_EXP_ID)
         self.assertEqual(exploration.states_schema_version,
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-        # The converted exploration should be up-to-date and properly converted.
+        # The converted exploration should be up-to-date and properly
+        # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-
