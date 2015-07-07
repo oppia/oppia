@@ -164,6 +164,9 @@ oppia.controller('ExplorationEditor', [
       'Click \'Next\' to learn how to use the exploration editor.<br><br> ' +
       'You might also find these resources helpful for creating your exploration: ' +
       '<ul>'+
+      '<li><a href="/editor_tutorial" target="_blank">' +
+      '        Walkthrough of the Oppia Editor' +
+      '</a></li>' +
       '<li><a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">' +
       '        Planning Your Exploration' +
       '</a></li>' +
