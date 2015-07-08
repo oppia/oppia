@@ -833,6 +833,11 @@ oppia.directive('textAngularRte', [
       $scope.init();
 
       $scope.$watch('tempContent', function(newVal, oldVal) {
+        // Sanitizing while a modal is open would delete the markers that
+        // save and restore the cursor's position in the RTE.
+        if (!$scope.isCustomizationModalOpen) {
+          newVal = $filter('sanitizeHtmlForRte')(newVal);
+        }
         $scope.htmlContent = rteHelperService.convertRteToHtml(newVal);
       });
 
@@ -840,14 +845,7 @@ oppia.directive('textAngularRte', [
       // e.g. if there are several RTEs in a list, and one is deleted.
       $scope.$watch('htmlContent', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-          // Sanitizing while a modal is open would delete the markers that
-          // save and restore the cursor's position in the RTE.
-          if ($scope.isCustomizationModalOpen) {
-            $scope.tempContent = _convertHtmlToRte(newVal);
-          } else {
-            $scope.tempContent = _convertHtmlToRte(
-              $filter('sanitizeHtmlForRte')(newVal));
-          }
+          $scope.tempContent = _convertHtmlToRte(newVal);
         }
       });
     }],
