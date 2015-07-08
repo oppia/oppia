@@ -724,7 +724,7 @@ oppia.config(['$provide', function($provide) {
             var savedSelection = rangy.saveSelection();
 
             // Temporarily pauses sanitizer so rangy markers save position
-            textAngular.$editor().$parent.isModalOpen = true;
+            textAngular.$editor().$parent.isCustomizationModalOpen = true;
             _openCustomizationModal(
               componentDefn.customizationArgSpecs,
               rteHelperService.createCustomizationArgDictFromAttrs(
@@ -738,7 +738,7 @@ oppia.config(['$provide', function($provide) {
               function() {},
               function() {
                 // Re-enables the sanitizer now that the modal is closed.
-                textAngular.$editor().$parent.isModalOpen = false;
+                textAngular.$editor().$parent.isCustomizationModalOpen = false;
                 textAngular.$editor().displayElements.text[0].focus();
                 rangy.restoreSelection(savedSelection);
               });
@@ -753,7 +753,7 @@ oppia.config(['$provide', function($provide) {
             'insertHtml', '<span class="insertionPoint"></span>');
 
           // Temporarily pauses sanitizer so rangy markers save position.
-          textAngular.$editor().$parent.isModalOpen = true;
+          textAngular.$editor().$parent.isCustomizationModalOpen = true;
           _openCustomizationModal(
             componentDefn.customizationArgSpecs,
             {},
@@ -776,7 +776,7 @@ oppia.config(['$provide', function($provide) {
             },
             function() {
               // Re-enables the sanitizer now that the modal is closed.
-              textAngular.$editor().$parent.isModalOpen = false;
+              textAngular.$editor().$parent.isCustomizationModalOpen = false;
               textAngular.$editor().displayElements.text[0].focus();
               rangy.restoreSelection(savedSelection);
             }
@@ -803,7 +803,7 @@ oppia.directive('textAngularRte', [
       '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
       '</div>'),
     controller: ['$scope', '$log', function($scope, $log) {
-      $scope.isModalOpen = false;
+      $scope.isCustomizationModalOpen = false;
       var toolbarOptions = [
         ['bold', 'italics', 'underline'],
         ['ol', 'ul'],
@@ -840,7 +840,9 @@ oppia.directive('textAngularRte', [
       // e.g. if there are several RTEs in a list, and one is deleted.
       $scope.$watch('htmlContent', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-          if ($scope.isModalOpen) {
+          // Sanitizing while a modal is open would delete the markers that
+          // save and restore the cursor's position in the RTE.
+          if ($scope.isCustomizationModalOpen) {
             $scope.tempContent = _convertHtmlToRte(newVal);
           } else {
             $scope.tempContent = _convertHtmlToRte(
