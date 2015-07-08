@@ -31,7 +31,6 @@ from core.platform import models
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 import feconf
-import utils
 
 
 # Stub for logging.error(), so that it can be swapped out in tests.
@@ -110,12 +109,12 @@ def _send_email(
     _require_sender_id_is_valid(intent, sender_id)
 
     recipient_email = user_services.get_email_from_user_id(recipient_id)
-    plaintext_body = html_cleaner.strip_html_tags(email_html_body)
+    email_plaintext_body = html_cleaner.strip_html_tags(email_html_body)
 
     def _send_email_in_transaction():
         email_services.send_mail(
             feconf.SYSTEM_EMAIL_ADDRESS, recipient_email,
-            email_subject, plaintext_body, email_html_body)
+            email_subject, email_plaintext_body, email_html_body)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email,
             sender_id, feconf.SYSTEM_EMAIL_ADDRESS,

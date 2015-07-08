@@ -193,9 +193,9 @@ class SignupHandler(base.BaseHandler):
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 
-        # An email is only sent when the user registers for the first time.
-        if (feconf.CAN_SEND_EMAILS_TO_USERS and
-                not has_previously_registered):
+        # Note that an email is only sent when the user registers for the first
+        # time.
+        if feconf.CAN_SEND_EMAILS_TO_USERS:
             email_manager.send_post_signup_email(self.user_id)
 
         self.render_json({})
