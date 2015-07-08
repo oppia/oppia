@@ -88,14 +88,12 @@ class ExpCopiesMRJobManager(
             exploration = exp_domain.Exploration.from_yaml(
                 exp_id, 'Copy', 'Copies', stringified_exp)
             exp_services.save_new_exploration(
-                feconf.ADMIN_COMMITTER_ID,
-                exploration)
+                feconf.SYSTEM_COMMITTER_ID, exploration)
             rights_manager.publish_exploration(
-                feconf.ADMIN_COMMITTER_ID, exp_id)
+                feconf.SYSTEM_COMMITTER_ID, exp_id)
 
 
-## Job to delete all copied explorations
-
+# Job to delete all copied explorations.
 class DeleteExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     pass
@@ -138,9 +136,8 @@ class DeleteExpCopiesMRJobManager(
     def map(item):
         from core.domain import exp_services
         if item.category == 'Copies':
-            exp_services.delete_exploration(feconf.ADMIN_COMMITTER_ID,
-                                            item.id,
-                                            force_deletion=True)
+            exp_services.delete_exploration(
+                feconf.SYSTEM_COMMITTER_ID, item.id, force_deletion=True)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):

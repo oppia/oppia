@@ -217,7 +217,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         response.mustcontain(no=['Upload Exploration'])
 
         config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'allow_yaml_file_upload', True)
+            feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)

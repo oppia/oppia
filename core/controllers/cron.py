@@ -84,8 +84,7 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_subject = 'MapReduce status report'
             email_message = 'All MapReduce jobs are running fine.'
 
-        email_services.send_mail_to_admin(
-            feconf.ADMIN_EMAIL_ADDRESS, email_subject, email_message)
+        email_services.send_mail_to_admin(email_subject, email_message)
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):

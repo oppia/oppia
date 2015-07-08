@@ -641,7 +641,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
         # Ban joe.
         config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'banned_usernames', ['joe'])
+            feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
 
         # Test that Joe is banned. (He can still access the gallery.)
         response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)

@@ -151,7 +151,7 @@ for i in "$@"; do
   case $i in
     --sharding=*)
     # Extract the value right of the equal sign by substringing the $i variable
-    # at the equal sign. 
+    # at the equal sign.
     # http://tldp.org/LDP/abs/html/string-manipulation.html
     SHARDING="${i#*=}"
     # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.

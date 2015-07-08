@@ -77,3 +77,8 @@ def clean(user_submitted_html):
     # TODO(sll): Add a log message if bad HTML is detected.
     return bleach.clean(
         user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
+
+
+def strip_html_tags(html):
+    """Strips all HTML markup from an HTML string."""
+    return bleach.clean(html, tags=[], attributes={}, strip=True)
