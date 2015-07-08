@@ -82,6 +82,11 @@ SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
 def require_playable(handler):
     """Decorator that checks if the user can play the given exploration."""
     def test_can_play(self, exploration_id, **kwargs):
+        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+            self.render_template(
+                'error/disabled_exploration.html', iframe_restriction=None)
+            return
+
         """Checks if the user for the current session is logged in."""
         if rights_manager.Actor(self.user_id).can_play(exploration_id):
             return handler(self, exploration_id, **kwargs)
