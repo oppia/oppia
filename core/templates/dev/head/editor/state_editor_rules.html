@@ -1,4 +1,8 @@
 <div ng-controller="StateRules">
+  <div style="font-size: 16px; margin-top: 35px;" ng-if="getCurrentInteractionId() !== 'Continue'">
+    <strong>Responses</strong>
+  </div>
+
   <md-card class="oppia-editor-card-with-avatar">
     <div class="oppia-editor-card-body">
       <div ng-if="answerGroups.length > 0">
@@ -8,35 +12,35 @@
           ui-sortable documentation for more details. -->
           <!-- Note that adding "track by $index" here seems to mess up the final
           index in the stop() event handler. -->
-          <li ng-repeat="group in answerGroups" ng-class="{'active': activeGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" style="margin-top: 0;">
+          <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" style="margin-top: 0;">
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1">
               <img src="/images/general/drag_dots.png" width="10">
             </span>
-            <a ng-click="changeActiveGroupIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'oppia-rule-tab-active': activeGroupIndex === $index}">
+            <a ng-click="changeActiveAnswerGroupIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
               <div class="oppia-response-header-block">
-                <div ng-attr-title="<[group | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():false]>" class="oppia-response-header">
-                  <[group | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():true]>
+                <div ng-attr-title="<[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():false]>" class="oppia-response-header">
+                  <[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():true]>
                 </div>
                 <span>→</span>
-                <span ng-if="!isOutcomeLooping(group.outcome) && !isCreatingNewState(group.outcome)" ng-click="navigateToState(group.outcome.dest)" class="oppia-nested-link">
-                  <[group.outcome.dest]>
+                <span ng-if="!isOutcomeLooping(answerGroup.outcome) && !isCreatingNewState(answerGroup.outcome)" ng-click="navigateToState(answerGroup.outcome.dest)" class="oppia-nested-link">
+                  <[answerGroup.outcome.dest]>
                 </span>
-                <span ng-if="!isOutcomeLooping(group.outcome) && isCreatingNewState(group.outcome)">
-                  <em ng-if="group.outcome.newStateName">(<[group.outcome.newStateName]>)</em>
-                  <em ng-if="!group.outcome.newStateName">Nowhere yet...</em>
+                <span ng-if="!isOutcomeLooping(answerGroup.outcome) && isCreatingNewState(answerGroup.outcome)">
+                  <em ng-if="answerGroup.outcome.newStateName">(<[answerGroup.outcome.newStateName]>)</em>
+                  <em ng-if="!answerGroup.outcome.newStateName">Nowhere yet...</em>
                 </span>
-                <span ng-if="isOutcomeLooping(group.outcome)">
+                <span ng-if="isOutcomeLooping(answerGroup.outcome)">
                   <em>(remain here)</em>
                 </span>
               </div>
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" class="protractor-test-delete-response oppia-delete-response-button oppia-transition-200" ng-click="deleteGroup($index)">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" class="protractor-test-delete-response oppia-delete-response-button oppia-transition-200" ng-click="deleteAnswerGroup($index)">
             </a>
 
-            <div ng-if="activeGroupIndex === $index">
+            <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
-                  <group-editor rules="group.rule_specs" outcome="group.outcome" save-group="saveActiveGroup(group.rule_specs, group.outcome)" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
-                  </group-editor>
+                  <answer-group-editor rules="answerGroup.rule_specs" outcome="answerGroup.outcome" save-answer-group="saveActiveAnswerGroup(answerGroup.rule_specs, answerGroup.outcome)" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
+                  </answer-group-editor>
                 </div>
               </div>
             </div>
@@ -47,21 +51,21 @@
   </md-card>
   <md-card style="margin: 20px 0px; padding: 0px;">
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
-      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddRuleModal()">
+      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Response
       </button>
     </div>
   </md-card>
 
-  <div style="font-size: 16px; margin-top: 35px;" ng-if="answerGroups.length > 0">
-    <strong>Fallbacks</strong>
+  <div style="font-size: 16px; margin-top: 35px;">
+    <strong>Fallback</strong>
   </div>
   <md-card class="oppia-editor-card-with-avatar">
     <div class="oppia-editor-card-body">
       <div>
         <ul class="nav nav-stacked nav-pills" role="tablist">
-          <li ng-class="{'active': activeGroupIndex === answerGroups.length}" class="oppia-rule-block" style="border-bottom: 1px solid #ccc; margin-top: 0;">
-            <a ng-click="changeActiveGroupIndex(answerGroups.length)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeGroupIndex == answerGroups.length}">
+          <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block" style="border-bottom: 1px solid #ccc; margin-top: 0;">
+            <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
               <div class="oppia-response-header-block">
                 <div ng-attr-title="<[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false]>" class="oppia-response-header">
                   <[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true]>
@@ -80,11 +84,11 @@
               </div>
             </a>
 
-            <div ng-if="activeGroupIndex === answerGroups.length">
+            <div ng-if="activeAnswerGroupIndex === answerGroups.length">
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
-                  <group-editor rule="null" outcome="defaultOutcome" save-group="saveDefaultOutcome(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
-                  </group-editor>
+                  <answer-group-editor rules="null" outcome="defaultOutcome" save-answer-group="saveDefaultOutcome(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
+                  </answer-group-editor>
                 </div>
               </div>
             </div>
@@ -95,13 +99,13 @@
   </md-card>
 </div>
 
-<script type="text/ng-template" id="modals/addRule">
+<script type="text/ng-template" id="modals/addAnswerGroup">
   <div class="modal-header">
     <h3>Add Response</h3>
   </div>
 
   <div class="modal-body">
-    <form name="addGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-outcome-details">
+    <form name="addAnswerGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-outcome-details">
       <div class="oppia-rule-details-header" ng-if="currentInteractionId !== 'Continue'">
         <strong>If the answer provided</strong>
       </div>
@@ -109,7 +113,7 @@
         <strong>When the button</strong>
       </div>
 
-      <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()">
+      <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" editing-rule-inline="false">
       </rule-editor>
 
       <br>
@@ -126,6 +130,6 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewResponse()" ng-disabled="addGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
+    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewResponse()" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
   </div>
 </script>

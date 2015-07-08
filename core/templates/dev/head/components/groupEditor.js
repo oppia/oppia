@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for the group, feedback, and outcome editors.
+ * @fileoverview Directives for the answer group, feedback, and outcome editors.
  *
  * @author bhenning@google.com (Ben Henning)
  */
 
-oppia.directive('groupEditor', [function() {
+oppia.directive('answerGroupEditor', [function() {
   return {
     restrict: 'E',
     scope: {
       rules: '=',
       outcome: '=',
-      saveGroup: '&',
+      saveAnswerGroup: '&',
       isEditable: '='
     },
     templateUrl: 'inline/group_editor',
@@ -36,17 +36,14 @@ oppia.directive('groupEditor', [function() {
         $scope, stateInteractionIdService, responsesService,
         editorContextService, routerService, warningsData, INTERACTION_SPECS) {
 
-    var resetMementos = function() {
-      $scope.rulesMemento = null;
-      $scope.outcomeFeedbackMemento = null;
-      $scope.outcomeDestMemento = null;
-    };
-    resetMementos();
+    $scope.rulesMemento = null;
+    $scope.outcomeFeedbackMemento = null;
+    $scope.outcomeDestMemento = null;
 
     $scope.feedbackEditorIsOpen = false;
     $scope.destinationEditorIsOpen = false;
     $scope.activeRuleIndex = -1;
-    $scope.editGroupForm = {};
+    $scope.editAnswerGroupForm = {};
 
     $scope.getAnswerChoices = function() {
       return responsesService.getAnswerChoices();
@@ -83,13 +80,14 @@ oppia.directive('groupEditor', [function() {
       }
     };
 
-    $scope.saveThisGroup = function() {
+    $scope.saveThisOutcome = function() {
       $scope.$broadcast('saveOutcomeDetails');
       // TODO(sll): Add more validation prior to saving.
       $scope.feedbackEditorIsOpen = false;
       $scope.destinationEditorIsOpen = false;
-      resetMementos();
-      $scope.saveGroup();
+      $scope.outcomeFeedbackMemento = null;
+      $scope.outcomeDestMemento = null;
+      $scope.saveAnswerGroup();
     };
 
     $scope.cancelThisFeedbackEdit = function() {
@@ -106,12 +104,12 @@ oppia.directive('groupEditor', [function() {
 
     $scope.$on('externalSave', function() {
       if ($scope.feedbackEditorIsOpen &&
-          $scope.editGroupForm.editFeedbackForm.$valid) {
-        $scope.saveThisGroup();
+          $scope.editAnswerGroupForm.editFeedbackForm.$valid) {
+        $scope.saveThisOutcome();
       }
       if ($scope.destinationEditorIsOpen &&
-          $scope.editGroupForm.editDestForm.$valid) {
-        $scope.saveThisGroup();
+          $scope.editAnswerGroupForm.editDestForm.$valid) {
+        $scope.saveThisOutcome();
       }
       if ($scope.isRuleEditorOpen()) {
         $scope.saveActiveRule();
@@ -232,8 +230,7 @@ oppia.directive('groupEditor', [function() {
 
     $scope.deleteRule = function(index) {
       $scope.rules.splice(index, 1);
-      $scope.changeActiveRuleIndex(-1);
-      $scope.saveThisGroup();
+      $scope.saveActiveRule();
 
       if ($scope.rules.length == 0) {
         warningsData.addWarning('All answer groups must have at least ' +
@@ -242,23 +239,26 @@ oppia.directive('groupEditor', [function() {
     };
 
     $scope.cancelActiveRule = function() {
-      $scope.rules = angular.copy($scope.rulesMemento);
-      $scope.rulesMemento = null;
-      $scope.changeActiveRuleIndex(-1);
+      $scope.rules.splice(0, $scope.rules.length);
+      for (var i = 0; i < $scope.rulesMemento.length; i++) {
+        $scope.rules.push($scope.rulesMemento[i]);
+      }
+      $scope.saveActiveRule();
     };
 
     $scope.saveActiveRule = function() {
       $scope.changeActiveRuleIndex(-1);
-      $scope.saveThisGroup();
+      $scope.rulesMemento = null;
+      $scope.saveAnswerGroup();
     };
 
     $scope.changeActiveRuleIndex = function(newIndex) {
       responsesService.changeActiveRuleIndex(newIndex);
       $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
+      $scope.saveAnswerGroup();
     };
 
     $scope.openRuleEditor = function(index) {
-      // Prepare rules memento since the rule editor is being opened.
       $scope.rulesMemento = angular.copy($scope.rules);
       $scope.changeActiveRuleIndex(index);
     };
@@ -267,7 +267,16 @@ oppia.directive('groupEditor', [function() {
       return $scope.activeRuleIndex !== -1;
     };
 
+    $scope.isSelfLoop = function(outcome) {
+      return (
+        outcome && outcome.dest === editorContextService.getActiveStateName());
+    };
+
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
+      if (!outcome) {
+        return false;
+      }
+
       var hasFeedback = false;
       for (var i = 0; i < outcome.feedback.length; i++) {
         if (outcome.feedback[i]) {
@@ -276,48 +285,21 @@ oppia.directive('groupEditor', [function() {
         }
       }
 
-      return (
-        outcome.dest === editorContextService.getActiveStateName() &&
-        !hasFeedback);
+      return $scope.isSelfLoop(outcome) && !hasFeedback;
     };
 
     $scope.navigateToOutcomeDest = function() {
       routerService.navigateToMainTab($scope.outcome.dest);
     };
 
-    $scope.isOutcomeConfusing = function() {
-      return (
-        $scope.outcome &&
-        $scope.outcome.feedback.length === 0 &&
-        $scope.outcome.dest === editorContextService.getActiveStateName());
-    };
-
-    $scope.RULE_LIST_SORTABLE_OPTIONS = {
-      axis: 'y',
-      cursor: 'move',
-      handle: '.oppia-rule-sort-handle',
-      items: '.oppia-sortable-rule-block',
-      tolerance: 'pointer',
-      start: function(e, ui) {
-        $scope.$apply();
-        $scope.saveThisGroup();
-        ui.placeholder.height(ui.item.height());
-      },
-      stop: function(e, ui) {
-        $scope.$apply();
-        $scope.saveThisGroup();
-        $scope.changeActiveRuleIndex(ui.item.index());
-      }
-    };
-
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       if ($scope.feedbackEditorIsOpen &&
-          $scope.editGroupForm.editFeedbackForm.$valid) {
-        $scope.saveThisGroup();
+          $scope.editAnswerGroupForm.editFeedbackForm.$valid) {
+        $scope.saveThisOutcome();
       }
       if ($scope.destinationEditorIsOpen &&
-          $scope.editGroupForm.editDestForm.$valid) {
-        $scope.saveThisGroup();
+          $scope.editAnswerGroupForm.editDestForm.$valid) {
+        $scope.saveThisOutcome();
       }
       if ($scope.isRuleEditorOpen()) {
         $scope.saveActiveRule();

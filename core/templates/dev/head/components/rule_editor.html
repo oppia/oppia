@@ -23,12 +23,12 @@
     </span>
   </form>
 
-  <div class="oppia-rule-save-cancel-buttons">
-  <div class="pull-right">
-    <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-    <button type="button" class="btn btn-success protractor-test-save-response" ng-disabled="ruleEditForm.form.$invalid" ng-click="saveThisRule()">Save Answer</button>
-  </div>
+  <div class="oppia-rule-save-cancel-buttons" ng-if="editingRuleInline()">
+    <div class="pull-right">
+      <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-success protractor-test-save-response" ng-disabled="ruleEditForm.form.$invalid" ng-click="saveThisRule()">Save Answer</button>
+    </div>
 
-  <div style="clear: both;"></div>
-</div>
+    <div style="clear: both;"></div>
+  </div>
 </div>

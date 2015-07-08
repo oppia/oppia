@@ -107,6 +107,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     scope: {
       rule: '=',
       isEditable: '=',
+      editingRuleInline: '&',
       cancelRule: '&',
       saveRule: '&'
     },

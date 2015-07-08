@@ -58,21 +58,22 @@ oppia.factory('responsesService', [
   // Represents the current selected answer group, starting at index 0. If the
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
-  var _activeGroupIndex = null;
+  var _activeAnswerGroupIndex = null;
   var _activeRuleIndex = null;
   var _answerGroups = null;
   var _defaultOutcome = null;
   var _answerChoices = null;
 
-  var _saveAnswerGroups = function(newGroups) {
-    var oldGroups = _answerGroupsMemento;
+  var _saveAnswerGroups = function(newAnswerGroups) {
+    var oldAnswerGroups = _answerGroupsMemento;
     var oldDefaultOutcome = _defaultOutcomeMemento;
-    if (newGroups && oldGroups && !angular.equals(newGroups, oldGroups)) {
-      _answerGroups = newGroups;
+    if (newAnswerGroups && oldAnswerGroups &&
+        !angular.equals(newAnswerGroups, oldAnswerGroups)) {
+      _answerGroups = newAnswerGroups;
 
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'answer_groups',
-        angular.copy(newGroups), angular.copy(oldGroups));
+        angular.copy(newAnswerGroups), angular.copy(oldAnswerGroups));
 
       var activeStateName = editorContextService.getActiveStateName();
       var _stateDict = explorationStatesService.getState(activeStateName);
@@ -81,7 +82,7 @@ oppia.factory('responsesService', [
       explorationStatesService.setState(activeStateName, _stateDict);
 
       graphDataService.recompute();
-      _answerGroupsMemento = angular.copy(newGroups);
+      _answerGroupsMemento = angular.copy(newAnswerGroups);
     }
   };
 
@@ -119,7 +120,7 @@ oppia.factory('responsesService', [
       _answerGroupsMemento = angular.copy(_answerGroups);
       _defaultOutcomeMemento = angular.copy(
         _defaultOutcome);
-      _activeGroupIndex = 0;
+      _activeAnswerGroupIndex = 0;
       _activeRuleIndex = 0;
     },
     onInteractionIdChanged: function(newInteractionId, callback) {
@@ -153,18 +154,18 @@ oppia.factory('responsesService', [
 
       _answerGroupsMemento = angular.copy(_answerGroups);
       _defaultOutcomeMemento = angular.copy(_defaultOutcome);
-      _activeGroupIndex = 0;
+      _activeAnswerGroupIndex = 0;
       _activeRuleIndex = 0;
 
       if (callback) {
         callback();
       }
     },
-    getActiveGroupIndex: function() {
-      return _activeGroupIndex;
+    getActiveAnswerGroupIndex: function() {
+      return _activeAnswerGroupIndex;
     },
-    changeActiveGroupIndex: function(newIndex) {
-      _activeGroupIndex = newIndex;
+    changeActiveAnswerGroupIndex: function(newIndex) {
+      _activeAnswerGroupIndex = newIndex;
       _activeRuleIndex = 0;
     },
     getActiveRuleIndex: function() {
@@ -176,20 +177,20 @@ oppia.factory('responsesService', [
     getAnswerChoices: function() {
       return angular.copy(_answerChoices);
     },
-    deleteGroup: function(index) {
+    deleteAnswerGroup: function(index) {
       if (!window.confirm('Are you sure you want to delete this response?')) {
         return false;
       }
       _answerGroupsMemento = angular.copy(_answerGroups);
       _answerGroups.splice(index, 1);
       _saveAnswerGroups(_answerGroups);
-      _activeGroupIndex = 0;
+      _activeAnswerGroupIndex = 0;
       return true;
     },
-    saveActiveGroup: function(activeRules, activeOutcome) {
-      var group = _answerGroups[_activeGroupIndex];
-      group.rule_specs = activeRules;
-      group.outcome = activeOutcome;
+    saveActiveAnswerGroup: function(activeRules, activeOutcome) {
+      var answerGroup = _answerGroups[_activeAnswerGroupIndex];
+      answerGroup.rule_specs = activeRules;
+      answerGroup.outcome = activeOutcome;
       _saveAnswerGroups(_answerGroups);
     },
     saveDefaultOutcome: function(outcome) {
@@ -209,8 +210,8 @@ oppia.factory('responsesService', [
     },
     // This registers the change to the handlers in the list of changes, and also
     // updates the states object in explorationStatesService.
-    save: function(newGroups, defaultOutcome) {
-      _saveAnswerGroups(newGroups);
+    save: function(newAnswerGroups, defaultOutcome) {
+      _saveAnswerGroups(newAnswerGroups);
       _saveDefaultOutcome(defaultOutcome);
     }
   };
@@ -227,10 +228,11 @@ oppia.controller('StateRules', [
       PLACEHOLDER_OUTCOME_DEST) {
   $scope.editorContextService = editorContextService;
 
-  $scope.changeActiveGroupIndex = function(newIndex) {
+  $scope.changeActiveAnswerGroupIndex = function(newIndex) {
     $rootScope.$broadcast('externalSave');
-    responsesService.changeActiveGroupIndex(newIndex);
-    $scope.activeGroupIndex = responsesService.getActiveGroupIndex();
+    responsesService.changeActiveAnswerGroupIndex(newIndex);
+    $scope.activeAnswerGroupIndex = (
+      responsesService.getActiveAnswerGroupIndex());
   };
 
   $scope.getCurrentInteractionId = function() {
@@ -245,7 +247,8 @@ oppia.controller('StateRules', [
     responsesService.init(data);
     $scope.answerGroups = responsesService.getAnswerGroups();
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
-    $scope.activeGroupIndex = responsesService.getActiveGroupIndex();
+    $scope.activeAnswerGroupIndex = (
+      responsesService.getActiveAnswerGroupIndex());
     $rootScope.$broadcast('externalSave');
   });
 
@@ -254,28 +257,24 @@ oppia.controller('StateRules', [
     responsesService.onInteractionIdChanged(newInteractionId, function() {
       $scope.answerGroups = responsesService.getAnswerGroups();
       $scope.defaultOutcome = responsesService.getDefaultOutcome();
-      $scope.activeGroupIndex = responsesService.getActiveGroupIndex();
+      $scope.activeAnswerGroupIndex = (
+        responsesService.getActiveAnswerGroupIndex());
     });
   });
 
-  $scope.$on('groupDeleted', function(evt) {
+  $scope.$on('answerGroupDeleted', function(evt) {
     $scope.answerGroups = responsesService.getAnswerGroups();
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
-    $scope.activeGroupIndex = responsesService.getActiveGroupIndex();
+    $scope.activeAnswerGroupIndex = (
+      responsesService.getActiveAnswerGroupIndex());
   });
 
-  $scope.$on('groupSaved', function(evt) {
-    $scope.answerGroups = responsesService.getAnswerGroups();
-    $scope.defaultOutcome = responsesService.getDefaultOutcome();
-    $scope.activeGroupIndex = responsesService.getActiveGroupIndex();
-  });
-
-  $scope.openAddRuleModal = function() {
+  $scope.openAddAnswerGroupModal = function() {
     warningsData.clear();
     $rootScope.$broadcast('externalSave');
 
     $modal.open({
-      templateUrl: 'modals/addRule',
+      templateUrl: 'modals/addAnswerGroup',
       backdrop: true,
       controller: [
           '$scope', '$modalInstance', 'responsesService',
@@ -305,7 +304,7 @@ oppia.controller('StateRules', [
             !hasFeedback);
         };
 
-        $scope.addGroupForm = {};
+        $scope.addAnswerGroupForm = {};
 
         $scope.addNewResponse = function() {
           $scope.$broadcast('saveOutcomeDetails');
@@ -330,7 +329,7 @@ oppia.controller('StateRules', [
       });
       responsesService.save(
         $scope.answerGroups, $scope.defaultOutcome);
-      $scope.changeActiveGroupIndex($scope.answerGroups.length - 1);
+      $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
     });
   };
 
@@ -349,29 +348,27 @@ oppia.controller('StateRules', [
       $scope.$apply();
       responsesService.save(
         $scope.answerGroups, $scope.defaultOutcome);
-      $scope.changeActiveGroupIndex(ui.item.index());
+      $scope.changeActiveAnswerGroupIndex(ui.item.index());
       $rootScope.$broadcast('externalSave');
     }
   };
 
-  $scope.deleteGroup = function(index) {
-    var successfullyDeleted = responsesService.deleteGroup(index);
+  $scope.deleteAnswerGroup = function(index) {
+    var successfullyDeleted = responsesService.deleteAnswerGroup(index);
     if (successfullyDeleted) {
-      $rootScope.$broadcast('groupDeleted');
+      $rootScope.$broadcast('answerGroupDeleted');
     }
   };
 
-  $scope.saveActiveGroup = function(updatedRules, updatedOutcome) {
-    responsesService.saveActiveGroup(updatedRules, updatedOutcome);
-    $rootScope.$broadcast('groupSaved');
+  $scope.saveActiveAnswerGroup = function(updatedRules, updatedOutcome) {
+    responsesService.saveActiveAnswerGroup(updatedRules, updatedOutcome);
   };
 
   $scope.saveDefaultOutcome = function(updatedOutcome) {
     responsesService.saveDefaultOutcome(updatedOutcome);
-    $rootScope.$broadcast('groupSaved');
   };
 
-  $scope.getAnswerChoices = function(group) {
+  $scope.getAnswerChoices = function() {
     return responsesService.getAnswerChoices();
   };
 

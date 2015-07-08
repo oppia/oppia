@@ -580,6 +580,10 @@ oppia.factory('rteHelperService', [
     },
     // Replace <oppia-noninteractive> tags with <img> tags.
     convertHtmlToRte: function(html) {
+      // If an undefined or empty html value is passed in, then the same type of
+      // value should be returned. Without this check,
+      // convertHtmlToRte(undefined) would return 'undefined', which is not
+      // ideal.
       if (!html) {
         return html;
       }
@@ -598,6 +602,10 @@ oppia.factory('rteHelperService', [
     },
     // Replace <img> tags with <oppia-noninteractive> tags.
     convertRteToHtml: function(rte) {
+      // If an undefined or empty rte value is passed in, then the same type of
+      // value should be returned. Without this check,
+      // convertRteToHtml(undefined) would return 'undefined', which is not
+      // ideal.
       if (!rte) {
         return rte;
       }
