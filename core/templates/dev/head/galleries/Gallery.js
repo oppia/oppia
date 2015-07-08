@@ -98,7 +98,7 @@ oppia.factory('searchService', [
       }
     },
     loadMoreData: function(successCallback) {
-       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
+      var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
         _lastQuery + _getSuffixForQuery(_lastSelectedCategories, _lastSelectedLanguageCodes));
 
       if (_searchCursor) {
