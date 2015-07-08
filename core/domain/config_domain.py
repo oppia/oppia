@@ -40,7 +40,9 @@ SET_OF_STRINGS_SCHEMA = {
 class ConfigProperty(object):
     """A property with a name and a default value.
 
-    Deprecated config properties (do not reuse these names):
+    NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
+    these names:
+    - admin_email_address
     - banner_alt_text
     - contribute_gallery_page_announcement
     - editor_page_announcement

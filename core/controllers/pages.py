@@ -30,10 +30,10 @@ ABOUT_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     'about_page_youtube_video_id', {'type': 'unicode'},
     'The (optional) video id for the About page',
     default_value='')
-ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
-    'admin_email_address', {'type': 'unicode'},
-    'The admin email address to display on the About pages',
-    default_value='ADMIN_EMAIL_ADDRESS')
+CONTACT_EMAIL_ADDRESS = config_domain.ConfigProperty(
+    'contact_email_address', {'type': 'unicode'},
+    'The contact email address to display on the About pages',
+    default_value='CONTACT_EMAIL_ADDRESS')
 EMBEDDED_GOOGLE_GROUP_URL = config_domain.ConfigProperty(
     'embedded_google_group_url', {'type': 'unicode'},
     'The URL for the embedded Google Group in the Forum page',
@@ -47,9 +47,6 @@ SITE_NAME = config_domain.ConfigProperty(
     'site_name', {'type': 'unicode'}, 'The site name',
     default_value='SITE_NAME')
 
-# The id of the exploration for the About page.
-_ABOUT_EXPLORATION_ID = '14'
-
 
 class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
@@ -57,13 +54,9 @@ class AboutPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'ABOUT_EXPLORATION_ID': _ABOUT_EXPLORATION_ID,
             'ABOUT_PAGE_YOUTUBE_VIDEO_ID': ABOUT_PAGE_YOUTUBE_VIDEO_ID.value,
-            'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
-            'MODERATOR_REQUEST_FORUM_URL': (
-                editor.MODERATOR_REQUEST_FORUM_URL.value),
+            'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
-            'SITE_NAME': SITE_NAME.value,
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
         self.render_template('pages/about.html')
@@ -75,11 +68,9 @@ class ParticipatePage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
             'MODERATOR_REQUEST_FORUM_URL': (
                 editor.MODERATOR_REQUEST_FORUM_URL.value),
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
-            'SITE_NAME': SITE_NAME.value,
             'nav_mode': feconf.NAV_MODE_PARTICIPATE,
         })
         self.render_template('pages/participate.html')
