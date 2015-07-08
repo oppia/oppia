@@ -118,8 +118,8 @@ DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
             'type': 'unicode'
         }
     },
-    'IDs of explorations which should not be displayable in neither the '
-    'learner nor editor views',
+    'IDs of explorations which should not be displayable in either the '
+    'learner or editor views',
     [])
 
 
