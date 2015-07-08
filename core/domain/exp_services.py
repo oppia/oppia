@@ -600,6 +600,10 @@ class EntityChangeListSummarizer(object):
           have been made.
         - changes: list of ExplorationChange instances.
         """
+        # TODO(sll): Make this method do the same thing as the corresponding
+        # code in the frontend's editor history tab -- or, better still, get
+        # rid of it entirely and use the frontend code to generate change
+        # summaries directly.
 
         # original_names is a dict whose keys are the current state names, and
         # whose values are the names of these states before any changes were
@@ -641,7 +645,7 @@ class EntityChangeListSummarizer(object):
                 entity_name = getattr(change, self.entity_name)
                 orig_name = original_names[entity_name]
                 del original_names[entity_name]
-                
+
                 if orig_name in self.changed_entities:
                     continue
                 elif orig_name in self.added_entities:
