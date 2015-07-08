@@ -835,10 +835,9 @@ oppia.directive('textAngularRte', [
       $scope.$watch('tempContent', function(newVal, oldVal) {
         // Sanitizing while a modal is open would delete the markers that
         // save and restore the cursor's position in the RTE.
-        if (!$scope.isCustomizationModalOpen) {
-          newVal = $filter('sanitizeHtmlForRte')(newVal);
-        }
-        $scope.htmlContent = rteHelperService.convertRteToHtml(newVal);
+        var displayedContent = $scope.isCustomizationModalOpen ? newVal :
+          $filter('sanitizeHtmlForRte')(newVal);
+        $scope.htmlContent = rteHelperService.convertRteToHtml(displayedContent);
       });
 
       // It is possible for the content of the RTE to be changed externally,
