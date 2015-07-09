@@ -6,7 +6,7 @@ language_code: en
 objective: Learn about the world's first community-built personal online tutor
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 7
 skin_customizations:
   panels_contents: {}
 states:
@@ -22,6 +22,31 @@ states:
         \ oppia.org is not a Google product, and Google bears no responsibility for\
         \ the content of this website.</div>"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Contact
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+      - outcome:
+          dest: Credits
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
+          dest: Site License
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -29,43 +54,13 @@ states:
           - How can I contact the creators of Oppia?
           - Can I use the content on this site?
           - I want to go back to my earlier questions.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Contact
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Credits
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Site License
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: About this website
-          feedback:
-          - '...'
-          param_changes: []
+      default_outcome:
+        dest: About this website
+        feedback:
+        - '...'
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Contact:
     content:
@@ -83,49 +78,44 @@ states:
         url-with-value="&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
         you need to contact the admins privately, you can email them at admin@oppia.org.</div>
     interaction:
+      answer_groups:
+      - outcome:
+          dest: So what can I tell you
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+      - outcome:
+          dest: Credits
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
+          dest: Site License
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
       customization_args:
         choices:
           value:
           - So who created this site?
           - Can I use the content on this site?
           - I want to go back to my earlier questions.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: So what can I tell you
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Credits
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Site License
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Contact
-          feedback:
-          - '...'
-          param_changes: []
+      default_outcome:
+        dest: Contact
+        feedback:
+        - '...'
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Contribute:
     content:
@@ -149,18 +139,16 @@ states:
         open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
         url-with-value="&amp;quot;https://code.google.com/p/oppia&amp;quot;"></oppia-noninteractive-link><br></div>
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: So what can I tell you
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: So what can I tell you
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Credits:
     content:
@@ -173,49 +161,57 @@ states:
         and we'd be delighted to help you get started. Feel free to reach out to us
         at the oppia-dev Google Group, or by contacting admin@oppia.org.</div>
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Contact
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
+          dest: So what can I tell you
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+      - outcome:
+          dest: Site License
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
       customization_args:
         choices:
           value:
           - How can I contact the creators of Oppia?
           - Can I use the site content?
           - I want to go back to my earlier questions.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Contact
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: So what can I tell you
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Site License
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Credits
-          feedback:
-          - '...'
-          param_changes: []
+      default_outcome:
+        dest: Credits
+        feedback:
+        - '...'
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
     param_changes: []
   End Card:
     content:
@@ -224,38 +220,34 @@ states:
         \ I hope you'll feel inspired to create a few explorations yourself.\_<div><br></div><div>Have\
         \ fun!</div>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Example1:
     content:
     - type: text
       value: <div>Great question! To demonstrate, can I ask your name?</div>
     interaction:
+      answer_groups: []
       customization_args:
         placeholder:
           value: Type your answer here.
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Example2
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Example2
+        feedback: []
+        param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Example2:
     content:
@@ -266,6 +258,19 @@ states:
         \ for example, let's try using a map.</div><div><br></div><div>Can you find\
         \ Helsinki, Finland on the map?</div>"
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Example3
+          feedback:
+          - Great job, you found it!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            d: 0
+            p:
+            - 0.0
+            - 0.0
+          rule_type: Within
       customization_args:
         latitude:
           value: 0
@@ -273,29 +278,13 @@ states:
           value: 0
         zoom:
           value: 0
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              d: 0
-              p:
-              - 0.0
-              - 0.0
-            name: Within
-            rule_type: atomic
-            subject: answer
-          dest: Example3
-          feedback:
-          - Great job, you found it!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Example3
-          feedback:
-          - Well, not quite, but close enough!
-          param_changes: []
+      default_outcome:
+        dest: Example3
+        feedback:
+        - Well, not quite, but close enough!
+        param_changes: []
       id: InteractiveMap
+      triggers: []
     param_changes: []
   Example3:
     content:
@@ -307,18 +296,16 @@ states:
         \ conversations is fun and easy. You try it for yourself by clicking 'Create\
         \ Exploration' on my home page.</div>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: So what can I tell you
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: So what can I tell you
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   First State:
     content:
@@ -334,18 +321,16 @@ states:
         \ embed them on a webpage, or just share them with your friends-- it\u2019\
         s all up to you. And best of all, I'm completely free!</div>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: So what can I tell you
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: So what can I tell you
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Site License:
     content:
@@ -355,55 +340,83 @@ states:
         open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
         url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></div>
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Credits
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
+          dest: Contact
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+      - outcome:
+          dest: So what can I tell you
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
       customization_args:
         choices:
           value:
           - So who created this site?
           - How can I contact the creators of Oppia?
           - I want to go back to my earlier questions.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Credits
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Contact
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: So what can I tell you
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Site License
-          feedback:
-          - '...'
-          param_changes: []
+      default_outcome:
+        dest: Site License
+        feedback:
+        - '...'
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   So what can I tell you:
     content:
     - type: text
       value: So, what else can I tell you about myself?
     interaction:
+      answer_groups:
+      - outcome:
+          dest: About this website
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+      - outcome:
+          dest: End Card
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+      - outcome:
+          dest: Example1
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
+          dest: Contribute
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -411,51 +424,13 @@ states:
           - What can you tell me about this website?
           - How can I contribute to Oppia?
           - Those were all the questions I had!
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: About this website
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 3
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: End Card
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Example1
-          feedback: []
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Contribute
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: So what can I tell you
-          feedback:
-          - '...'
-          param_changes: []
+      default_outcome:
+        dest: So what can I tell you
+        feedback:
+        - '...'
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
+states_schema_version: 4
 tags: []

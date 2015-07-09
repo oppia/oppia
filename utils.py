@@ -52,6 +52,13 @@ class ValidationError(Exception):
     pass
 
 
+class ExplorationConversionError(Exception):
+    """Error class for when an exploration fails to convert from a certain
+    version to a certain version.
+    """
+    pass
+
+
 def create_enum(*sequential, **names):
     enums = dict(zip(sequential, sequential), **names)
     return type('Enum', (), enums)

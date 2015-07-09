@@ -8,7 +8,7 @@ param_changes: []
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 5
+schema_version: 7
 skin_customizations:
   panels_contents: {}
 states:
@@ -17,18 +17,13 @@ states:
     - type: text
       value: <p>Congratulations, you have finished!</p>
     interaction:
+      answer_groups: []
       customization_args:
         recommendedExplorationIds:
           value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
+      default_outcome: null
       id: EndExploration
+      triggers: []
     param_changes: []
   Final challenge:
     content:
@@ -38,16 +33,8 @@ states:
         possibilities by hand is going to be tedious, but, by now, you''ve learned
         at least one way to calculate this number quickly and accurately.'
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 24.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: END
           feedback:
           - 'Yes, that is correct: the answer is 4 times the number of ways to arrange
@@ -56,24 +43,21 @@ states:
             explicitly, and counting them one by one. If you can find a way to systematically
             approach the problem, you can save yourself a lot of tedious work :-)
           param_changes: []
-        - definition:
-            inputs:
-              x: 0.0
-            name: IsLessThanOrEqualTo
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 24.0
+          rule_type: Equals
+      - outcome:
           dest: Final challenge
           feedback:
           - Ahem. That, I think, is a trick answer, surely? I am pretty sure there's
             at least one way to arrange four balls in a line...
           param_changes: []
-        - definition:
-            inputs:
-              a: 18.0
-              b: 23.0
-            name: IsInclusivelyBetween
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 0.0
+          rule_type: IsLessThanOrEqualTo
+      - outcome:
           dest: Final challenge
           feedback:
           - 'Hmm, that''s close-ish, but not quite. It feels like you may not have
@@ -88,12 +72,12 @@ states:
             missed any. It''s up to you whichever you pick, but you need to get an
             accurate answer!'
           param_changes: []
-        - definition:
-            inputs:
-              x: 24.0
-            name: IsGreaterThan
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            a: 18.0
+            b: 23.0
+          rule_type: IsInclusivelyBetween
+      - outcome:
           dest: Final challenge
           feedback:
           - 'I think you''ve overcounted. This is quite common in counting problems,
@@ -106,18 +90,23 @@ states:
             we''ve developed earlier in the exploration -- it''s much easier, and
             less prone to errors.'
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Final challenge
-          feedback:
-          - Hmm, I don't think so, there are quite a lot more than that. Check your
-            work, and try again.
-          - I think you've missed quite a few! Try and list all the cases systematically.
-            Or, better yet, see if you can use a similar method to the one we've just
-            been developing, so that you can get the answer with just one multiplication
-            :-)
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 24.0
+          rule_type: IsGreaterThan
+      customization_args: {}
+      default_outcome:
+        dest: Final challenge
+        feedback:
+        - Hmm, I don't think so, there are quite a lot more than that. Check your
+          work, and try again.
+        - I think you've missed quite a few! Try and list all the cases systematically.
+          Or, better yet, see if you can use a similar method to the one we've just
+          been developing, so that you can get the answer with just one multiplication
+          :-)
+        param_changes: []
       id: NumericInput
+      triggers: []
     param_changes: []
   Found all the ways:
     content:
@@ -125,41 +114,37 @@ states:
       value: So, you've found that there are six ways to arrange these three balls.<br><br>Is
         that the same as your first guess?
     interaction:
-      customization_args:
-        choices:
-          value:
-          - 'Yes'
-          - 'No'
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Introspection
           feedback:
           - Was it? I think you guessed {{guess}}, but there were actually 6 ways.
           param_changes: []
-        - definition:
-            inputs:
-              x: 1
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
           dest: Introspection
           feedback:
           - Yes, you thought the number of ways was {{guess}}, but it was actually
             6.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Introspection
-          feedback: []
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+      customization_args:
+        choices:
+          value:
+          - 'Yes'
+          - 'No'
+      default_outcome:
+        dest: Introspection
+        feedback: []
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   General Theory:
     content:
@@ -181,84 +166,77 @@ states:
         \ can you write out a similar expression for F2, in terms of F1? Then we'll\
         \ move on to figuring out F4, which starts to become hard to compute manually."
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Final challenge
+          feedback:
+          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
+            and  for each of these 2 ways, there are F1 ways to arrange the other
+            balls.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2F1
+          rule_type: Contains
+      - outcome:
+          dest: Final challenge
+          feedback:
+          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
+            and  for each of these 2 ways, there are F1 ways to arrange the other
+            balls.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2*F1
+          rule_type: Contains
+      - outcome:
+          dest: Final challenge
+          feedback:
+          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
+            and  for each of these 2 ways, there are F1 ways to arrange the other
+            balls.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: F1*2
+          rule_type: Contains
+      - outcome:
+          dest: Final challenge
+          feedback:
+          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
+            and  for each of these 2 ways, there are F1 ways to arrange the other
+            balls.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2 * F1
+          rule_type: Contains
+      - outcome:
+          dest: Final challenge
+          feedback:
+          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
+            and  for each of these 2 ways, there are F1 ways to arrange the other
+            balls.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: F1 * 2
+          rule_type: Contains
       customization_args:
         placeholder:
           value: Type your answer here.
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 2F1
-            name: Contains
-            rule_type: atomic
-            subject: answer
-          dest: Final challenge
-          feedback:
-          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
-            and  for each of these 2 ways, there are F1 ways to arrange the other
-            balls.
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2*F1
-            name: Contains
-            rule_type: atomic
-            subject: answer
-          dest: Final challenge
-          feedback:
-          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
-            and  for each of these 2 ways, there are F1 ways to arrange the other
-            balls.
-          param_changes: []
-        - definition:
-            inputs:
-              x: F1*2
-            name: Contains
-            rule_type: atomic
-            subject: answer
-          dest: Final challenge
-          feedback:
-          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
-            and  for each of these 2 ways, there are F1 ways to arrange the other
-            balls.
-          param_changes: []
-        - definition:
-            inputs:
-              x: 2 * F1
-            name: Contains
-            rule_type: atomic
-            subject: answer
-          dest: Final challenge
-          feedback:
-          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
-            and  for each of these 2 ways, there are F1 ways to arrange the other
-            balls.
-          param_changes: []
-        - definition:
-            inputs:
-              x: F1 * 2
-            name: Contains
-            rule_type: atomic
-            subject: answer
-          dest: Final challenge
-          feedback:
-          - Yes! F2 = 2 * F1, since there are two ways to pick the ball on the left,
-            and  for each of these 2 ways, there are F1 ways to arrange the other
-            balls.
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Final challenge
-          feedback:
-          - Alas, I don't understand the answer you just typed. Was it something like
-            F2 = 2 * F1? If so, you are correct! There are two ways to pick the first
-            ball, and F1 ways to pick the second one. This all works out because F1
-            = 1, so F2 = 2 * 1 = 2.
-          param_changes: []
+      default_outcome:
+        dest: Final challenge
+        feedback:
+        - Alas, I don't understand the answer you just typed. Was it something like
+          F2 = 2 * F1? If so, you are correct! There are two ways to pick the first
+          ball, and F1 ways to pick the second one. This all works out because F1
+          = 1, so F2 = 2 * 1 = 2.
+        param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Guess a generalization:
     content:
@@ -272,32 +250,29 @@ states:
         this reasoning? Do you agree that there are exactly 8 ways to arrange four
         balls of different colours in a line?'
     interaction:
-      customization_args:
-        choices:
-          value:
-          - Yes! It's clearly 8.
-          - No, I don't think it's 8.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Two balls
           feedback:
           - All right! We have an answer. We could check it, I guess, by listing all
             sequences of four balls. But let's do something easier; let's try it with
             just two.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Two balls
-          feedback: []
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      customization_args:
+        choices:
+          value:
+          - Yes! It's clearly 8.
+          - No, I don't think it's 8.
+      default_outcome:
+        dest: Two balls
+        feedback: []
+        param_changes: []
       id: MultipleChoiceInput
+      triggers: []
     param_changes: []
   Intro:
     content:
@@ -305,25 +280,16 @@ states:
       value: '<p>Suppose you were given three balls: one red, one blue, and one yellow.
         How many ways are there to arrange them in a straight line?</p>'
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 6.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: correct but why
           feedback: []
           param_changes: []
-        - definition:
-            inputs:
-              x: 0.0
-            name: IsLessThanOrEqualTo
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 6.0
+          rule_type: Equals
+      - outcome:
           dest: Intro
           feedback:
           - Surely there's at least one? For example, you might have the red ball
@@ -331,12 +297,17 @@ states:
             Now try and find a few more. How many different ways can you find, in
             total?
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Not 6
-          feedback: []
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0.0
+          rule_type: IsLessThanOrEqualTo
+      customization_args: {}
+      default_outcome:
+        dest: Not 6
+        feedback: []
+        param_changes: []
       id: NumericInput
+      triggers: []
     param_changes: []
   Introspection:
     content:
@@ -354,30 +325,27 @@ states:
         \ Write these down here -- you will probably want to refer to them in a future\
         \ exercise, and we'll show your jottings to you again at that point."
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Introspection
+          feedback:
+          - Come on, surely you have something...
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: ''
+          rule_type: Equals
       customization_args:
         placeholder:
           value: Type your answer here.
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: ''
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Introspection
-          feedback:
-          - Come on, surely you have something...
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Guess a generalization
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Guess a generalization
+        feedback: []
+        param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
   Not 6:
     content:
@@ -389,90 +357,83 @@ states:
         \ yellow ball on the right. Can you list all the ways you found?<br><br>\_\
         \ \_\_"
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x:
-              - RYB
-              - BRY
-              - BYR
-              - RBY
-              - YRB
-              - YBR
-            name: HasElementsNotIn
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: Not 6
           feedback:
           - At least one of your list elements seems to be wrong. Can you check and
             make sure that each of them is a three-letter uppercase string that contains
             only the letters 'B', 'R' and 'Y' once each?
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - RBY
-              - RYB
-            name: OmitsElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - RYB
+            - BRY
+            - BYR
+            - RBY
+            - YRB
+            - YBR
+          rule_type: HasElementsNotIn
+      - outcome:
           dest: Not 6
           feedback:
           - You seem to have missed some arrangements with the red ball on the left...
           - Have you considered all arrangements with the red ball on the left?
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - YBR
-              - YRB
-            name: OmitsElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - RBY
+            - RYB
+          rule_type: OmitsElementsIn
+      - outcome:
           dest: Not 6
           feedback:
           - I think you're missing some!
           - Have you found all the arrangements in which there is a yellow ball on
             the left?
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - BRY
-              - BYR
-            name: OmitsElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - YBR
+            - YRB
+          rule_type: OmitsElementsIn
+      - outcome:
           dest: Not 6
           feedback:
           - Have you found all the arrangements with a blue ball on the left?
           - You may have missed a few arrangements with a blue ball on the left...
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - RYB
-              - BRY
-              - BYR
-              - RBY
-              - YRB
-              - YBR
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - BRY
+            - BYR
+          rule_type: OmitsElementsIn
+      - outcome:
           dest: Found all the ways
           feedback: []
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Not 6
-          feedback:
-          - No, try again.
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - RYB
+            - BRY
+            - BYR
+            - RBY
+            - YRB
+            - YBR
+          rule_type: Equals
+      customization_args: {}
+      default_outcome:
+        dest: Not 6
+        feedback:
+        - No, try again.
+        param_changes: []
       id: SetInput
+      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -489,28 +450,19 @@ states:
         way to arrange one ball in a line.<br><br>How about 2 balls? How many ways
         are there to arrange two balls, with different colours, in a line?
     interaction:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 2.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: General Theory
           feedback:
           - Yes! That is correct. If the balls are red and blue, either the red one
             comes first, or the blue one comes first. Once you've picked the first
             one, the other choice is fixed.
           param_changes: []
-        - definition:
-            inputs:
-              x: 4.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 2.0
+          rule_type: Equals
+      - outcome:
           dest: Two balls
           feedback:
           - 'Hm. Might you be thinking that, since the answer for 3 balls is 6, the
@@ -525,12 +477,11 @@ states:
 
             Why not try again? How many ways are there to arrange two balls in a row?'
           param_changes: []
-        - definition:
-            inputs:
-              x: 0.0
-            name: IsLessThanOrEqualTo
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 4.0
+          rule_type: Equals
+      - outcome:
           dest: Two balls
           feedback:
           - Nah, that can't be right :-) There's at least one way to arrange two balls
@@ -539,44 +490,36 @@ states:
             on the left, and the blue one on the right, for instance. That's at least
             one way...
           param_changes: []
-        - definition:
-            inputs:
-              x: 1.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 0.0
+          rule_type: IsLessThanOrEqualTo
+      - outcome:
           dest: Two balls
           feedback:
           - There's at least one more way. Try swapping the balls?
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Two balls
-          feedback:
-          - I think you may have counted something too many times. Try to remember
-            the systematic approach you came up with earlier, and use it here...
-          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1.0
+          rule_type: Equals
+      customization_args: {}
+      default_outcome:
+        dest: Two balls
+        feedback:
+        - I think you may have counted something too many times. Try to remember the
+          systematic approach you came up with earlier, and use it here...
+        param_changes: []
       id: NumericInput
+      triggers: []
     param_changes: []
   correct but why:
     content:
     - type: text
       value: <p>Right! Why do you think it is 6?</p>
     interaction:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: '5'
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: permutation
-            name: Contains
-            rule_type: atomic
-            subject: answer
+      answer_groups:
+      - outcome:
           dest: END
           feedback:
           - Yes, the question is asking for the number of permutations of 3 different
@@ -585,12 +528,11 @@ states:
             that, there are 2 ways to pick the second, and the last choice is forced.
             That's 3 x 2 = 6 ways.
           param_changes: []
-        - definition:
-            inputs:
-              x: factorial
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: permutation
+          rule_type: Contains
+      - outcome:
           dest: END
           feedback:
           - Yes, the question is asking for the number of permutations of 3 different
@@ -599,19 +541,29 @@ states:
             you've done that, there are 2 ways to pick the second, and the last choice
             is forced. That's 3 x 2 = 6 ways.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: correct but why
-          feedback:
-          - 'OK! There are indeed 6 ways to arrange the balls: there are 3 ways to
-            choose the leftmost one, and for each of these, there are 2 ways to choose
-            the second one; the last choice is then forced. This gives 3 x 2 = 6 scenarios.
+        rule_specs:
+        - inputs:
+            x: factorial
+          rule_type: Contains
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: '5'
+      default_outcome:
+        dest: correct but why
+        feedback:
+        - 'OK! There are indeed 6 ways to arrange the balls: there are 3 ways to choose
+          the leftmost one, and for each of these, there are 2 ways to choose the
+          second one; the last choice is then forced. This gives 3 x 2 = 6 scenarios.
 
 
-            If you do a quick search for the words ''permutation'' or ''factorial''
-            on the Internet, you''ll also be able to find more information about this
-            topic. See if you can figure out what the answer for 4 balls is!'
-          param_changes: []
+          If you do a quick search for the words ''permutation'' or ''factorial''
+          on the Internet, you''ll also be able to find more information about this
+          topic. See if you can figure out what the answer for 4 balls is!'
+        param_changes: []
       id: TextInput
+      triggers: []
     param_changes: []
+states_schema_version: 4
 tags: []

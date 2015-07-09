@@ -27,8 +27,7 @@ class LogicProof(base.BaseInteraction):
         'Allows learners to write proofs for simple logical statements.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['logic_proof', 'codemirror']
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'CheckedProof'}]
+    answer_type = 'CheckedProof'
 
     _customization_arg_specs = [{
         'name': 'question',

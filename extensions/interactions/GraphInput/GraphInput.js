@@ -34,7 +34,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
         $scope.submitGraph = function() {
           // angular.copy needed to strip $$hashkey from the graph
-          $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph), 'submit');
+          $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph));
         };
         $scope.resetGraph = function() {
           updateGraphFromJSON($attrs.graphWithValue);

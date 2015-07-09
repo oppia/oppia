@@ -106,62 +106,6 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class InteractionMigrationJobManager(jobs.BaseMapReduceJobManager):
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        from core.domain import exp_domain
-        from core.domain import exp_services
-
-        if item.deleted:
-            return
-
-        exp = exp_services.get_exploration_from_model(item)
-
-        change_list = []
-        for state_name, state in exp.states.iteritems():
-            if state.interaction.id == 'InteractiveMap':
-                old_value = {}
-                for handler in state.interaction.handlers:
-                    handler_dict = handler.to_dict()
-                    old_value[handler_dict['name']] = (
-                        handler_dict['rule_specs'])
-
-                new_value = copy.deepcopy(old_value)
-                for handler in new_value['submit']:
-                    if handler['definition']['rule_type'] != 'default':
-                        handler['definition']['inputs']['d'] *= 110
-
-                change_list.append({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': 'widget_handlers',
-                    'state_name': state_name,
-                    'old_value': old_value,
-                    'new_value': new_value,
-                })
-
-        if change_list:
-            yield (item.id, 'started')
-            try:
-                exp_services.update_exploration(
-                    feconf.MIGRATION_BOT_USERNAME, item.id, change_list,
-                    'Convert distances in rules for world map to kilometers.')
-                yield (item.id, 'completed')
-            except utils.ValidationError as e:
-                if 'An objective must be specified' in str(e):
-                    yield ('ERROR-OBJECTIVE', item.id)
-                else:
-                    raise
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class SearchRankerRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     pass

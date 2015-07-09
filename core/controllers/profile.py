@@ -18,6 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.controllers import pages
+from core.domain import email_manager
 from core.domain import user_services
 import feconf
 import utils
@@ -172,6 +173,13 @@ class SignupHandler(base.BaseHandler):
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
 
+        has_previously_registered = (
+            user_services.has_user_registered_as_editor(self.user_id))
+
+        if has_previously_registered:
+            self.render_json({})
+            return
+
         if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
             raise self.InvalidInputException(
                 'In order to edit explorations on this site, you will '
@@ -179,15 +187,16 @@ class SignupHandler(base.BaseHandler):
         else:
             user_services.record_agreement_to_terms(self.user_id)
 
-        if user_services.get_username(self.user_id):
-            # A username has already been set for this user.
-            self.render_json({})
-            return
+        if not user_services.get_username(self.user_id):
+            try:
+                user_services.set_username(self.user_id, username)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
 
-        try:
-            user_services.set_username(self.user_id, username)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        # Note that an email is only sent when the user registers for the first
+        # time.
+        if feconf.CAN_SEND_EMAILS_TO_USERS:
+            email_manager.send_post_signup_email(self.user_id)
 
         self.render_json({})
 

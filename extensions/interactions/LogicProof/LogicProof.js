@@ -180,7 +180,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             submission.displayed_message = '';
             submission.displayed_proof = $scope.displayProof($scope.proofString);
           }
-          $scope.$parent.$parent.submitAnswer(submission, 'submit');
+          $scope.$parent.$parent.submitAnswer(submission);
         };
 
         $scope.showHelp = function() {

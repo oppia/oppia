@@ -54,7 +54,7 @@ oppia.directive('oppiaInteractiveSetInput', [
             $scope.errorMessage = 'Oops, it looks like your set has duplicates!';
           } else {
             $scope.errorMessage = '';
-            $scope.$parent.$parent.submitAnswer(answer, 'submit');
+            $scope.$parent.$parent.submitAnswer(answer);
           }
         };
       }]

@@ -43,7 +43,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 6
+schema_version: 7
 skin_customizations:
   panels_contents: {}
 states:
@@ -52,15 +52,12 @@ states:
     - type: text
       value: ''
     interaction:
+      answer_groups: []
       customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: %s
+        feedback: []
+        param_changes: []
       id: null
       triggers: []
     param_changes: []
@@ -69,19 +66,16 @@ states:
     - type: text
       value: ''
     interaction:
+      answer_groups: []
       customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: New state
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: New state
+        feedback: []
+        param_changes: []
       id: null
       triggers: []
     param_changes: []
-states_schema_version: 3
+states_schema_version: 4
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -96,7 +90,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 6
+schema_version: 7
 skin_customizations:
   panels_contents:
     bottom: []
@@ -119,19 +113,16 @@ states:
     - type: text
       value: ''
     interaction:
+      answer_groups: []
       customization_args:
         placeholder:
           value: ''
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: %s
+        feedback: []
+        param_changes: []
       id: TextInput
       triggers: []
     param_changes: []
@@ -140,19 +131,16 @@ states:
     - type: text
       value: ''
     interaction:
+      answer_groups: []
       customization_args:
         placeholder:
           value: ''
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: New state
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: New state
+        feedback: []
+        param_changes: []
       id: TextInput
       triggers: []
     param_changes: []
@@ -161,23 +149,20 @@ states:
     - type: text
       value: ''
     interaction:
+      answer_groups: []
       customization_args:
         placeholder:
           value: ''
         rows:
           value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Second state
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Second state
+        feedback: []
+        param_changes: []
       id: TextInput
       triggers: []
     param_changes: []
-states_schema_version: 3
+states_schema_version: 4
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -256,10 +241,210 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'the exploration\'s initial state name initname.'):
             exploration.validate()
 
+        # Test whether a default outcome to a non-existing state is invalid.
         exploration.states = {exploration.init_state_name: new_state}
-
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'destination ABC is not a valid'):
+            exploration.validate()
+
+        # Ensure an invalid destination can also be detected for answer groups.
+        # Note: The state must keep its default_outcome, otherwise it will
+        # trigger a validation error for non-terminal states needing to have a
+        # default outcome. To validate the outcome of the answer group, this
+        # default outcome must point to a valid state.
+        init_state = exploration.states[exploration.init_state_name]
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest = exploration.init_state_name
+        init_state.interaction.answer_groups.append(
+            exp_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': exploration.init_state_name,
+                    'feedback': ['Feedback'],
+                    'param_changes': [],
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }]
+            })
+        )
+        exploration.validate()
+
+        interaction = init_state.interaction
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
+        answer_group.outcome.dest = 'DEF'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'destination DEF is not a valid'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'TextInput')
+        answer_group.outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+        rule_spec.inputs = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'RuleSpec \'Contains\' is missing inputs'):
+            exploration.validate()
+
+        rule_spec.inputs = 'Inputs string'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected inputs to be a dict'):
+            exploration.validate()
+
+        rule_spec.inputs = {'x': 'Test'}
+        rule_spec.rule_type = 'FakeRuleType'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Unrecognized rule type'):
+            exploration.validate()
+
+        rule_spec.inputs = {'x': 15}
+        rule_spec.rule_type = 'Contains'
+        with self.assertRaisesRegexp(
+                Exception, 'Expected unicode string, received 15'):
+            exploration.validate()
+
+        rule_spec.inputs = {'x': '{{ExampleParam}}'}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'RuleSpec \'Contains\' has an input '
+                'with name \'x\' which refers to an unknown parameter within '
+                'the exploration: ExampleParam'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
+            'UnicodeString')
+        exploration.validate()
+
+        # Validate Outcome.
+        outcome = answer_group.outcome
+        destination = exploration.init_state_name
+        outcome.dest = None
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Every outcome should have a destination.'):
+            exploration.validate()
+
+        # Try setting the outcome destination to something other than a string.
+        outcome.dest = 15
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected outcome dest to be a string'):
+            exploration.validate()
+
+        outcome.dest = destination
+        outcome.feedback = 'Feedback'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected outcome feedback to be a list'):
+            exploration.validate()
+
+        outcome.feedback = [15]
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected outcome feedback item to be a string'):
+            exploration.validate()
+
+        outcome.feedback = ['Feedback']
+        exploration.validate()
+
+        outcome.param_changes = 'Changes'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected outcome param_changes to be a list'):
+            exploration.validate()
+
+        outcome.param_changes = []
+        exploration.validate()
+
+        # Validate InteractionInstance.
+        interaction.id = 15
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected interaction id to be a string'):
+            exploration.validate()
+
+        interaction.id = 'SomeInteractionTypeThatDoesNotExist'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid interaction id'):
+            exploration.validate()
+
+        interaction.id = 'TextInput'
+        exploration.validate()
+
+        interaction.customization_args = []
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected customization args to be a dict'):
+            exploration.validate()
+        
+        interaction.customization_args = {15: ''}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid customization arg name'):
+            exploration.validate()
+
+        interaction.customization_args = {'placeholder': ''}
+        exploration.validate()
+
+        interaction.answer_groups = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected answer groups to be a list'):
+            exploration.validate()
+
+        interaction.answer_groups = answer_groups
+        interaction.id = 'EndExploration'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Terminal interactions must not have a default outcome.'):
+            exploration.validate()
+
+        interaction.id = 'TextInput'
+        interaction.default_outcome = None
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Non-terminal interactions must have a default outcome.'):
+            exploration.validate()
+
+        interaction.id = 'EndExploration'
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Terminal interactions must not have any answer groups.'):
+            exploration.validate()
+
+        # A terminal interaction without a default outcome or answer group is
+        # valid. This resets the exploration back to a valid state.
+        interaction.answer_groups = []
+        exploration.validate()
+
+        interaction.triggers = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected triggers to be a list'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        interaction.id = 'TextInput'
+        interaction.answer_groups = answer_groups
+        interaction.default_outcome = default_outcome
+        interaction.triggers = []
+        exploration.validate()
+
+        # Validate AnswerGroup.
+        answer_group.rule_specs = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected answer group rules to be a list'):
+            exploration.validate()
+
+        answer_group.rule_specs = []
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'There must be at least one rule for each answer group.'):
             exploration.validate()
 
         exploration.states = {
@@ -268,7 +453,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
-
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -288,7 +472,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         exploration.param_specs = {
-            '@': param_domain.ParamSpec.from_dict({'obj_type': 'Int'})
+            '@': param_domain.ParamSpec.from_dict({'obj_type': 'UnicodeString'})
         }
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Only parameter names with characters'):
@@ -296,7 +480,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.param_specs = {
             'notAParamSpec': param_domain.ParamSpec.from_dict(
-                {'obj_type': 'Int'})
+                {'obj_type': 'UnicodeString'})
         }
         exploration.validate()
 
@@ -313,8 +497,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', 'Title', 'Category')
         exploration.objective = 'Objective'
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'EndExploration')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('EndExploration')
+        init_state.interaction.default_outcome = None
         exploration.validate()
 
         exploration.tags = 'this should be a list'
@@ -518,19 +703,13 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                 'value': u''
             }],
             'interaction': {
+                'answer_groups': [],
                 'customization_args': {},
-                'handlers': [{
-                    'name': u'submit',
-                    'rule_specs': [{
-                        'definition': {
-                            u'rule_type': u'default'
-                        },
-                        'dest': 'New state',
-                        'feedback': [],
-                        'param_changes': [],
-
-                    }]
-                }],
+                'default_outcome': {
+                    'dest': 'New state',
+                    'feedback': [],
+                    'param_changes': [],
+                },
                 'id': None,
                 'triggers': [],
             },
@@ -615,6 +794,15 @@ states:
     - name: submit
       rule_specs:
       - definition:
+          inputs:
+            x: InputString
+          name: Equals
+          rule_type: atomic
+        dest: END
+        feedback:
+          - Correct!
+        param_changes: []
+      - definition:
           rule_type: default
         dest: (untitled state)
         feedback: []
@@ -657,6 +845,15 @@ states:
       handlers:
       - name: submit
         rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
         - definition:
             rule_type: default
           dest: (untitled state)
@@ -709,6 +906,15 @@ states:
       handlers:
       - name: submit
         rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
         - definition:
             rule_type: default
           dest: (untitled state)
@@ -765,6 +971,15 @@ states:
       - name: submit
         rule_specs:
         - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
             rule_type: default
           dest: (untitled state)
           feedback: []
@@ -819,6 +1034,15 @@ states:
       handlers:
       - name: submit
         rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
         - definition:
             rule_type: default
           dest: (untitled state)
@@ -876,6 +1100,15 @@ states:
       - name: submit
         rule_specs:
         - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
             rule_type: default
           dest: (untitled state)
           feedback: []
@@ -927,7 +1160,82 @@ states_schema_version: 3
 tags: []
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V6
+    YAML_CONTENT_V7 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 7
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+states_schema_version: 4
+tags: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V7
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -965,6 +1273,12 @@ tags: []
             'eid', 'A title', 'A category', self.YAML_CONTENT_V6)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v7(self):
+        """Test direct loading from a v7 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V7)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -985,17 +1299,12 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 }],
                 'interaction': {
                     'customization_args': {},
-                    'handlers': [{
-                        'name': 'submit',
-                        'rule_specs': [{
-                            'definition': {
-                                'rule_type': 'default',
-                            },
-                            'dest': dest_name,
-                            'feedback': [],
-                            'param_changes': [],
-                        }],
-                    }],
+                    'answer_groups': [],
+                    'default_outcome': {
+                        'dest': dest_name,
+                        'feedback': [],
+                        'param_changes': [],
+                    },
                     'id': None,
                     'triggers': [],
                 },
@@ -1087,10 +1396,9 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.rename_state('State 2', 'END')
 
         # Ensure the other states are connected to END
-        exploration.states['Renamed state'].interaction.handlers[
-            0].rule_specs[0].dest = 'State 2'
-        exploration.states['State 2'].interaction.handlers[
-            0].rule_specs[0].dest = 'END'
+        exploration.states[
+            'Renamed state'].interaction.default_outcome.dest = 'State 2'
+        exploration.states['State 2'].interaction.default_outcome.dest = 'END'
 
         # Ensure the other states have interactions
         exploration.states['Renamed state'].update_interaction_id('TextInput')
@@ -1105,9 +1413,12 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.validate(strict=True)
 
         # Renaming the node to something other than 'END' and giving it an
-        # EndExploration is enough to validate it
+        # EndExploration is enough to validate it, though it cannot have a
+        # default outcome or answer groups.
         exploration.rename_state('END', 'AnotherEnd')
-        exploration.states['AnotherEnd'].update_interaction_id('EndExploration')
+        another_end_state = exploration.states['AnotherEnd']
+        another_end_state.update_interaction_id('EndExploration')
+        another_end_state.interaction.default_outcome = None
         exploration.validate(strict=True)
 
         # Name it back for final tests

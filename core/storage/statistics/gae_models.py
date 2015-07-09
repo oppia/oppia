@@ -30,6 +30,9 @@ from google.appengine.ext import ndb
 
 MAX_ANSWER_HASH_LEN = 100
 
+# TODO(bhenning): Everything is handler name submit; therefore, it is
+# pointless and should be removed.
+_OLD_SUBMIT_HANDLER_NAME = 'submit'
 
 def hash_answer(answer):
     return utils.convert_to_hash(answer, MAX_ANSWER_HASH_LEN)
@@ -89,11 +92,10 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     answers = ndb.JsonProperty(indexed=False)
 
     @classmethod
-    def get_or_create(cls, exploration_id, state_name, handler_name, rule_str):
+    def get_or_create(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
         return cls.get_or_create_multi(exploration_id, [{
             'state_name': state_name,
-            'handler_name': handler_name,
             'rule_str': rule_str
         }])[0]
 
@@ -108,12 +110,12 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         Args:
             exploration_id: the exploration id
             rule_data: a list of dicts, each with the following keys:
-                (state_name, handler_name, rule_str).
+                (state_name, rule_str).
         """
         # TODO(sll): Use a hash instead to disambiguate.
         entity_ids = ['.'.join([
             exploration_id, datum['state_name'],
-            datum['handler_name'], datum['rule_str']
+            _OLD_SUBMIT_HANDLER_NAME, datum['rule_str']
         ])[:490] for datum in rule_data]
 
         entity_keys = [cls._get_entity_key(exploration_id, entity_id)
@@ -485,19 +487,17 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
 
 def process_submitted_answer(
-        exploration_id, exploration_version, state_name, handler_name,
-        rule, answer):
+        exploration_id, exploration_version, state_name,
+        rule_spec_string, answer):
     """Adds an answer to the answer log for the rule it hits.
 
     Args:
         exploration_id: the exploration id
         state_name: the state name
-        handler_name: a string representing the handler name (e.g., 'submit')
-        rule: the rule
         answer: an HTML string representation of the answer
     """
     answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, handler_name, str(rule))
+        exploration_id, state_name, rule_spec_string)
     if answer in answer_log.answers:
         answer_log.answers[answer] += 1
     else:
@@ -512,19 +512,18 @@ def process_submitted_answer(
 
 
 def resolve_answers(
-        exploration_id, state_name, handler_name, rule_str, answers):
+        exploration_id, state_name, rule_str, answers):
     """Resolves selected answers for the given rule.
 
     Args:
         exploration_id: the exploration id
         state_name: the state name
-        handler_name: a string representing the handler name (e.g., 'submit')
         rule_str: a string representation of the rule
         answers: a list of HTML string representations of the resolved answers
     """
     assert isinstance(answers, list)
     answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, handler_name, rule_str)
+        exploration_id, state_name, rule_str)
 
     for answer in answers:
         if answer not in answer_log.answers:
@@ -532,7 +531,7 @@ def resolve_answers(
                 'Answer %s not found in answer log for rule %s of exploration '
                 '%s, state %s, handler %s' % (
                     answer, rule_str, exploration_id, state_name,
-                    handler_name))
+                    _OLD_SUBMIT_HANDLER_NAME))
         else:
             del answer_log.answers[answer]
     answer_log.put()

@@ -21,8 +21,11 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     'WARNING_TYPES', 'baseInteractionValidationService',
     function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
+
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
 
     if (customizationArgs.graph.value.vertices.length > 50) {
       warningsList.push({
@@ -31,14 +34,16 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
       });
     }
 
-    if (!customizationArgs.graph.value.isWeighted && customizationArgs.canEditEdgeWeight.value) {
+    if (!customizationArgs.graph.value.isWeighted &&
+        customizationArgs.canEditEdgeWeight.value) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'the learner cannot edit edge weights for an unweighted graph.'
       });
     }
 
-    if (!customizationArgs.graph.value.isLabeled && customizationArgs.canEditVertexLabel.value) {
+    if (!customizationArgs.graph.value.isLabeled &&
+        customizationArgs.canEditVertexLabel.value) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'the learner cannot edit vertex labels for an unlabeled graph.'
@@ -46,8 +51,8 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getAllRuleSpecsWarnings(
-        ruleSpecs, stateName));
+      baseInteractionValidationService.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
 
     return warningsList;
   };

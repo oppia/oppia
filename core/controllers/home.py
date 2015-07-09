@@ -141,6 +141,9 @@ class MyExplorationsHandler(base.BaseHandler):
         explorations_list = []
 
         for exp_summary in subscribed_summaries:
+            if exp_summary is None:
+                continue
+
             feedback_thread_analytics = feedback_services.get_thread_analytics(
                 exp_summary.id)
             explorations_list.append({

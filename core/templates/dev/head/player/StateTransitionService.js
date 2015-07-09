@@ -182,10 +182,10 @@ oppia.factory('stateTransitionService', [
       }
     },
     // Returns null when failed to evaluate.
-    getNextStateData: function(ruleSpec, newState, answer) {
+    getNextStateData: function(outcome, newState, answer) {
       var oldParams = learnerParamsService.getAllParams();
       oldParams.answer = answer;
-      var feedback = makeFeedback(ruleSpec.feedback, [oldParams]);
+      var feedback = makeFeedback(outcome.feedback, [oldParams]);
       if (feedback === null) {
         return null;
       }
@@ -197,9 +197,7 @@ oppia.factory('stateTransitionService', [
         return null;
       }
 
-      var question = (
-        newState ? makeQuestion(newState, [newParams, {answer: 'answer'}]) :
-        'Congratulations, you have finished!');
+      var question = makeQuestion(newState, [newParams, {answer: 'answer'}]);
       if (question === null) {
         return null;
       }
@@ -208,7 +206,6 @@ oppia.factory('stateTransitionService', [
       // TODO(sll): Remove the 'answer' key from newParams.
       newParams.answer = answer;
       return {
-        finished: ruleSpec.dest === 'END',
         params: newParams,
         feedback_html: feedback,
         question_html: question

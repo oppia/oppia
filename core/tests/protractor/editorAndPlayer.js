@@ -480,66 +480,56 @@ describe('Exploration history', function() {
       2: {text: '- type: text', highlighted: false},
       3: {text: '  value: <p>enter 6 to continue</p>', highlighted: true},
       4: {text: 'interaction:', highlighted: false},
-      5: {text: '  customization_args: {}', highlighted: false},
-      6: {text: '  handlers:', highlighted: false},
-      7: {text: '  - name: submit', highlighted: false},
-      8: {text: '    rule_specs:', highlighted: false},
-      9: {text: '    - definition:', highlighted: false},
-      10: {text: '        inputs:', highlighted: true},
-      11: {text: '          x: 6.0', highlighted: true},
-      12: {text: '        name: Equals', highlighted: true},
-      13: {text: '        rule_type: atomic', highlighted: true},
-      14: {text: '        subject: answer', highlighted: true},
-      15: {text: '      dest: second', highlighted: true},
-      16: {text: '      feedback: []', highlighted: true},
-      17: {text: '      param_changes: []', highlighted: true},
-      18: {text: '    - definition:', highlighted: true},
-      19: {text: '        rule_type: default', highlighted: false},
-      20: {text: '      dest: first', highlighted: true},
-      21: {text: '      feedback: []', highlighted: false},
-      22: {text: '      param_changes: []', highlighted: false},
-      23: {text: '  id: NumericInput', highlighted: true},
-      24: {text: '  triggers: []', highlighted: false},
-      25: {text: 'param_changes: []', highlighted: false},
-      26: {text: ' ', highlighted: false}
+      5: {text: '  answer_groups:', highlighted: true},
+      6: {text: '  - outcome:', highlighted: true},
+      7: {text: '      dest: second', highlighted: true},
+      8: {text: '      feedback: []', highlighted: true},
+      9: {text: '      param_changes: []', highlighted: true},
+      10: {text: '    rule_specs:', highlighted: true},
+      11: {text: '    - inputs:', highlighted: true},
+      12: {text: '        x: 6.0', highlighted: true},
+      13: {text: '      rule_type: Equals', highlighted: true},
+      14: {text: '  customization_args: {}', highlighted: false},
+      15: {text: '  default_outcome:', highlighted: false},
+      16: {text: '    dest: first', highlighted: true},
+      17: {text: '    feedback: []', highlighted: false},
+      18: {text: '    param_changes: []', highlighted: false},
+      19: {text: '  id: NumericInput', highlighted: true},
+      20: {text: '  triggers: []', highlighted: false},
+      21: {text: 'param_changes: []', highlighted: false},
+      22: {text: ' ', highlighted: false}
     };
     var VERSION_2_STATE_1_CONTENTS = {
       1: {text: 'content:', highlighted: false},
       2: {text: '- type: text', highlighted: false},
       3: {text: '  value: \'\'', highlighted: true},
       4: {text: 'interaction:', highlighted: false},
-      5: {text: '  customization_args: {}', highlighted: false},
-      6: {text: '  handlers:', highlighted: false},
-      7: {text: '  - name: submit', highlighted: false},
-      8: {text: '    rule_specs:', highlighted: false},
+      5: {text: '  answer_groups: []', highlighted: true},
+      6: {text: '  customization_args: {}', highlighted: false},
+      7: {text: '  default_outcome:', highlighted: false},
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      9: {text: '    - definition:', highlighted: true},
-      10: {text: '        rule_type: default', highlighted: false},
-      11: {text: '      dest: First State', highlighted: true},
-      12: {text: '      feedback: []', highlighted: false},
-      13: {text: '      param_changes: []', highlighted: false},
-      14: {text: '  id: null', highlighted: true},
-      15: {text: '  triggers: []', highlighted: false},
-      16: {text: 'param_changes: []', highlighted: false},
-      17: {text: ' ', highlighted: false}
+      8: {text: '    dest: First State', highlighted: true},
+      9: {text: '    feedback: []', highlighted: false},
+      10: {text: '    param_changes: []', highlighted: false},
+      11: {text: '  id: null', highlighted: true},
+      12: {text: '  triggers: []', highlighted: false},
+      13: {text: 'param_changes: []', highlighted: false},
+      14: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
       '- type: text\n' +
       '  value: <p>this is state 2</p>\n' +
       'interaction:\n' +
+      '  answer_groups: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value: Continue\n' +
-      '  handlers:\n' +
-      '  - name: submit\n' +
-      '    rule_specs:\n' +
-      '    - definition:\n' +
-      '        rule_type: default\n' +
-      '      dest: final state\n' +
-      '      feedback: []\n' +
-      '      param_changes: []\n' +
+      '  default_outcome:\n' +
+      '    dest: final state\n' +
+      '    feedback: []\n' +
+      '    param_changes: []\n' +
       '  id: Continue\n' +
       '  triggers: []\n' +
       'param_changes: []\n' +

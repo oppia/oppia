@@ -49,6 +49,7 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
+
 def _migrate_states_schema(versioned_exploration_states):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
@@ -97,6 +98,12 @@ def _migrate_states_schema(versioned_exploration_states):
         exp_domain.Exploration.update_states_v2_to_v3_from_model(
             versioned_exploration_states)
         exploration_states_schema_version = 3
+
+    # Check for conversion to v4.
+    if exploration_states_schema_version == 3:
+        exp_domain.Exploration.update_states_v3_to_v4_from_model(
+            versioned_exploration_states)
+        exploration_states_schema_version = 4
 
 
 # Repository GET methods.
@@ -467,7 +474,14 @@ def apply_change_list(exploration_id, change_list):
                         change.new_value)
                 elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
-                    state.update_interaction_handlers(change.new_value)
+                    raise utils.InvalidInputException(
+                        'Editing interaction handlers is no longer supported')
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    state.update_interaction_answer_groups(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                    state.update_interaction_default_outcome(change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -839,8 +853,8 @@ def get_exploration_snapshots_metadata(exploration_id):
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
         following keys: committer_id, commit_message, commit_cmds, commit_type,
-        created_on, version_number. The version numbers are consecutive and in
-        ascending order. There are exploration.version_number items in the
+        created_on_ms, version_number. The version numbers are consecutive and
+        in ascending order. There are exploration.version_number items in the
         returned list.
     """
     exploration = get_exploration_by_id(exploration_id)
@@ -1047,7 +1061,7 @@ def delete_demo(exploration_id):
                      'does not exist.' % exploration_id)
     else:
         delete_exploration(
-            feconf.ADMIN_COMMITTER_ID, exploration_id, force_deletion=True)
+            feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
 def load_demo(exploration_id):
@@ -1071,14 +1085,14 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.ADMIN_COMMITTER_ID, yaml_content, title, category,
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
         exploration_id, assets_list)
 
     rights_manager.publish_exploration(
-        feconf.ADMIN_COMMITTER_ID, exploration_id)
+        feconf.SYSTEM_COMMITTER_ID, exploration_id)
     # Release ownership of all explorations.
     rights_manager.release_ownership(
-        feconf.ADMIN_COMMITTER_ID, exploration_id)
+        feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])
 

@@ -17,13 +17,37 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveEndExplorationValidator', [function() {
+oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
+    'baseInteractionValidationService',
+    function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    // Note that, in order to conform to the other interactions, this
-    // interaction has only one rule, but it is never used.
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['recommendedExplorationIds']);
+
+    if (answerGroups.length != 0) {
+      warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'please make sure end exploration interactions do not have ' +
+          'any answer groups.'
+      });
+    }
+    if (defaultOutcome) {
+      warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'please make sure end exploration interactions do not have ' +
+          'a default outcome.'
+      });
+    }
+
+    if (customizationArgs.recommendedExplorationIds.value.length > 8) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'at most 8 explorations can be recommended.'
+      });
+    }
 
     return warningsList;
   };

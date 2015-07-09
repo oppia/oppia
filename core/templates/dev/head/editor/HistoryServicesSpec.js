@@ -220,11 +220,11 @@ describe('Compare versions service', function() {
             'type': 'text',
             'value': statesDetails[stateName].contentStr
           }],
-          'interaction': {'handlers': [{ 'rule_specs': []}]}
+          'interaction': {'answer_groups': []}
         };
-        newStateData.interaction.handlers[0].rule_specs =
+        newStateData.interaction.answer_groups =
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {
-            return {'dest': ruleDestName};
+            return {'outcome': {'dest': ruleDestName}};
           });
         statesData.states[stateName] = newStateData;
       }

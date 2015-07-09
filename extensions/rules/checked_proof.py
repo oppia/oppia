@@ -22,7 +22,6 @@ from extensions.rules import base
 
 class Correct(base.CheckedProofRule):
     description = 'is correct'
-    is_generic = False
 
     def _evaluate(self, subject):
         return subject.get('correct')
@@ -30,7 +29,6 @@ class Correct(base.CheckedProofRule):
 
 class NotCorrect(base.CheckedProofRule):
     description = 'is not correct'
-    is_generic = False
 
     def _evaluate(self, subject):
         return not subject.get('correct')
@@ -38,7 +36,6 @@ class NotCorrect(base.CheckedProofRule):
 
 class NotCorrectByCategory(base.CheckedProofRule):
     description = 'is not correct due to {{c|LogicErrorCategory}}'
-    is_generic = False
 
     def _evaluate(self, subject):
         return (not subject.get('correct')) and (

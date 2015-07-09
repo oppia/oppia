@@ -87,20 +87,18 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
 }]);
 
 // A service that, given an answer, classifies it and returns the corresponding
-// ruleSpec.
+// answerGroup.
 oppia.factory('answerClassificationService', [
     '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
   var _USE_CLIENT_SIDE_CLASSIFICATION = false;
 
   return {
     // Returns a promise with the corresponding ruleSpec.
-    getMatchingRuleSpec: function(explorationId, expParamSpecs, oldState, handler, answer) {
+    getMatchingClassificationResult: function(explorationId, oldState, answer) {
       if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
         var classifyUrl = '/explorehandler/classify/' + explorationId;
         return $http.post(classifyUrl, {
-          exp_param_specs: expParamSpecs,
           old_state: oldState,
-          handler: handler,
           params: learnerParamsService.getAllParams(),
           answer: answer
         });
@@ -123,40 +121,21 @@ oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
-    'extensionTagAssemblerService', 'INTERACTION_SPECS',
+    'extensionTagAssemblerService', 'INTERACTION_SPECS', 'explorationContextService',
+    'PAGE_CONTEXT',
     function(
       $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
-      extensionTagAssemblerService, INTERACTION_SPECS) {
+      extensionTagAssemblerService, INTERACTION_SPECS, explorationContextService,
+      PAGE_CONTEXT) {
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
   var _NULL_INTERACTION_HTML = (
     '<span style="color: red;"><strong>Error</strong>: No interaction specified.</span>');
 
-  // Note that both of these do not get set for the Karma unit tests.
-  var _explorationId = null;
-  var _editorPreviewMode = null;
-  // The pathname should be one of the following:
-  //   -   /explore/{exploration_id}
-  //   -   /create/{exploration_id}
-  var pathnameArray = window.location.pathname.split('/');
-  for (var i = 0; i < pathnameArray.length; i++) {
-    if (pathnameArray[i] === 'explore') {
-      _explorationId = pathnameArray[i + 1];
-      _editorPreviewMode = false;
-      break;
-    } else if (pathnameArray[i] === 'create') {
-      _explorationId = pathnameArray[i + 1];
-      _editorPreviewMode = true;
-      break;
-    }
-  }
-
+  var _explorationId = explorationContextService.getExplorationId();
+  var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _introCardImageUrl = null;
-
-  // The following line is needed for image displaying to work, since the image
-  // URLs refer to $rootScope.explorationId.
-  $rootScope.explorationId = _explorationId;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
@@ -202,7 +181,7 @@ oppia.factory('oppiaPlayerService', [
 
   var _onStateTransitionProcessed = function(
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
-      handler, successCallback) {
+      successCallback) {
     var oldStateName = _currentStateName;
     var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
 
@@ -435,7 +414,7 @@ oppia.factory('oppiaPlayerService', [
       }
       return ($('<div>').append(el)).html();
     },
-    submitAnswer: function(answer, handler, successCallback) {
+    submitAnswer: function(answer, successCallback) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -443,28 +422,29 @@ oppia.factory('oppiaPlayerService', [
       answerIsBeingProcessed = true;
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
-      answerClassificationService.getMatchingRuleSpec(
-        _explorationId, _exploration.param_specs, oldState, handler, answer
-      ).success(function(ruleSpec) {
+      answerClassificationService.getMatchingClassificationResult(
+        _explorationId, oldState, answer
+      ).success(function(classificationResult) {
+        var outcome = classificationResult.outcome;
+
         if (!_editorPreviewMode) {
           var answerRecordingUrl = (
             '/explorehandler/answer_submitted_event/' + _explorationId);
           $http.post(answerRecordingUrl, {
             answer: answer,
-            handler: handler,
             params: learnerParamsService.getAllParams(),
             version: version,
             old_state_name: _currentStateName,
-            rule_spec: ruleSpec
+            rule_spec_string: classificationResult.rule_spec_string
           });
         }
 
-        var newStateName = ruleSpec.dest;
+        var newStateName = outcome.dest;
 
         // Compute the data for the next state. This may be null if there are
         // malformed expressions.
         var nextStateData = stateTransitionService.getNextStateData(
-          ruleSpec,
+          outcome,
           _exploration.states[newStateName],
           answer);
 
@@ -474,7 +454,7 @@ oppia.factory('oppiaPlayerService', [
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
             nextStateData.question_html, nextStateData.feedback_html,
-            answer, handler, successCallback);
+            answer, successCallback);
         } else {
           answerIsBeingProcessed = false;
           warningsData.addWarning('Expression parsing error.');

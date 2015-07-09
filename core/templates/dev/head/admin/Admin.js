@@ -22,6 +22,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
   $scope.adminJobOutputUrl = '/adminjoboutput';
+  $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
   $scope.configProperties = {};
 
   $scope.showJobOutput = false;
@@ -252,5 +253,26 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
+  };
+
+  $scope.uploadTopicSimilaritiesFile = function() {
+    var file = document.getElementById('topicSimilaritiesFile').files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var data = e.target.result;
+      $http.post($scope.adminHandlerUrl, {
+        action: 'upload_topic_similarities',
+        data: data
+      }).success(function(data) {
+        $scope.message = 'Topic similarities uploaded successfully.';
+      }).error(function(errorResponse) {
+        $scope.message = 'Server error: ' + errorResponse.error;
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  $scope.downloadTopicSimilaritiesFile = function() {
+    window.location.href = $scope.adminTopicsCsvDownloadHandlerUrl;
   };
 }]);

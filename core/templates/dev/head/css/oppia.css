@@ -153,6 +153,13 @@ p {
   margin: 1.4em 0;
 }
 
+.oppia-long-text-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
 #wrapper {
   min-height: 100%;
   position: relative;
@@ -1005,6 +1012,15 @@ pre.oppia-pre-wrapped-text {
   background-color: rgba(5,140,166,1);
   color: white;
   opacity: 1;
+}
+
+/* Workaround to ensure that single-line paragraphs comprising multiple-choice
+   options are displayed inline. */
+.oppia-multiple-choice-rule p {
+  display: inline;
+}
+.oppia-multiple-choice-rule p::before {
+  content: ' ';
 }
 
 .oppia-interaction-tile {

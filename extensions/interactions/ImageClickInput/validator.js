@@ -21,8 +21,11 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
+
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['imageAndRegions']);
 
     if (!customizationArgs.imageAndRegions.value.imagePath) {
       warningsList.push({
@@ -31,6 +34,9 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       });
     }
 
+    var areAnyRegionStringsEmpty = false;
+    var areAnyRegionStringsDuplicated = false;
+    var seenRegionStrings = [];
     if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
@@ -38,26 +44,22 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       });
     }
 
-    var areAnyRegionStringsEmpty = false;
-    var areAnyRegionStringsDuplicated = false;
-    var seenRegionStrings = [];
     for (var i = 0; i < customizationArgs.imageAndRegions.value.labeledRegions.length; i++) {
       var regionLabel = customizationArgs.imageAndRegions.value.labeledRegions[i].label;
 
+      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
       if (regionLabel.trim().length === 0) {
         areAnyRegionStringsEmpty = true;
-      }
-      var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
-      if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
+      } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
           message: 'the image region strings should consist of characters from [A-Za-z0-9].'
         });
-      }
-      if (seenRegionStrings.indexOf(regionLabel) !== -1) {
+      } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
         areAnyRegionStringsDuplicated = true;
+      } else {
+        seenRegionStrings.push(regionLabel);
       }
-      seenRegionStrings.push(regionLabel);
     }
 
     if (areAnyRegionStringsEmpty) {
@@ -74,25 +76,28 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
-        ruleSpecs, stateName));
+      baseInteractionValidationService.getAnswerGroupWarnings(
+        answerGroups, stateName));
 
     // Check that each rule refers to a valid region string.
-    for (var i = 0; i < ruleSpecs.length - 1; i++) {
-      if (ruleSpecs[i].definition.name === 'IsInRegion') {
-        var label = ruleSpecs[i].definition.inputs.x;
-        if (seenRegionStrings.indexOf(label) === -1) {
-          warningsList.push({
-          type: WARNING_TYPES.CRITICAL,
-          message: (
-            'the region label \'' + label + '\' in rule ' + String(i + 1) + ' is invalid.')
-          });
+    for (var i = 0; i < answerGroups.length; i++) {
+      var ruleSpecs = answerGroups[i].rule_specs;
+      for (var j = 0; j < ruleSpecs.length; j++) {
+        if (ruleSpecs[j].rule_type === 'IsInRegion') {
+          var label = ruleSpecs[j].inputs.x;
+          if (seenRegionStrings.indexOf(label) === -1) {
+            warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'the region label \'' + label + '\' in rule ' + String(j + 1) +
+              ' in group ' + String(i + 1) + ' is invalid.')
+            });
+          }
         }
       }
     }
 
-    var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-    if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
+    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (

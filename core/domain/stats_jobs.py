@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import json
 
 from core import jobs
 from core.platform import models
@@ -345,43 +346,102 @@ class StatisticsMRJobManager(
             state_hit_counts)
 
 
-class CompletionEventsMigrator(jobs.BaseMapReduceJobManager):
-    """This one-off job finds all (MaybeLeave, 'END') events and converts them
-    to actual completion events instead. It is idempotent.
-    """
+class StatisticsAudit(jobs.BaseMapReduceJobManager):
+
+    _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.MaybeLeaveExplorationEventLogEntryModel]
+        return [
+            stats_models.ExplorationAnnotationsModel,
+            stats_models.StateCounterModel]
 
     @staticmethod
     def map(item):
-        def _migrate_in_transaction():
-            # Create a replacement CompletionEventLogEntryModel.
-            new_item_id = (
-                stats_models.CompleteExplorationEventLogEntryModel.get_new_event_entity_id(
-                    item.exploration_id, item.session_id))
-            complete_event_entity = stats_models.CompleteExplorationEventLogEntryModel(
-                id=new_item_id,
-                event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                exploration_id=item.exploration_id,
-                exploration_version=item.exploration_version,
-                state_name=item.state_name,
-                session_id=item.session_id,
-                client_time_spent_in_secs=item.client_time_spent_in_secs,
-                params=item.params,
-                play_type=item.play_type,
-                last_updated=item.last_updated,
-                created_on=item.created_on,
-                deleted=item.deleted)
-            complete_event_entity.put()
+        if isinstance(item, stats_models.StateCounterModel):
+            if item.first_entry_count < 0:
+                yield (
+                    StatisticsAudit._STATE_COUNTER_ERROR_KEY,
+                    'Less than 0: %s %d' % (item.key, item.first_entry_count))
+        # Older versions of ExplorationAnnotations didn't store exp_id
+        # This is short hand for making sure we get ones updated most recently
+        elif item.exploration_id is None:
+            return
 
-            # Delete the old MaybeLeaveEventLogEntryModel.
-            item.delete()
-
-        if item.state_name == 'END':
-            transaction_services.run_in_transaction(_migrate_in_transaction)
+        yield (item.exploration_id, {
+            'version': item.version,
+            'starts': item.num_starts,
+            'completions': item.num_completions,
+            'state_hit': item.state_hit_counts
+        })
 
     @staticmethod
-    def reduce(key, values):
-        yield (key, values)
+    def reduce(key, stringified_values):
+        if key == StatisticsAudit._STATE_COUNTER_ERROR_KEY:
+            for value_str in stringified_values:
+                yield (value_str,)
+            return
+
+        # If the code reaches this point, we are looking at values that
+        # correspond to each version of a particular exploration.
+
+        # These variables correspond to the _ALL_VERSIONS_STRING version.
+        all_starts = 0
+        all_completions = 0
+        all_state_hit = collections.defaultdict(int)
+
+        # These variables correspond to the sum of counts for all other
+        # versions besides _ALL_VERSIONS_STRING.
+        sum_starts = 0
+        sum_completions = 0
+        sum_state_hit = collections.defaultdict(int)
+
+        for value_str in stringified_values:
+            value = ast.literal_eval(value_str)
+            if value['starts'] < 0:
+                yield (
+                    'Negative start count: exp_id:%s version:%s starts:%s' %
+                    (key, value['version'], value['starts']),)
+
+            if value['completions'] < 0:
+                yield (
+                    'Negative completion count: exp_id:%s version:%s '
+                    'completions:%s' %
+                    (key, value['version'], value['completions']),)
+
+            if value['completions'] > value['starts']:
+                yield ('Completions > starts: exp_id:%s version:%s %s>%s' % (
+                    key, value['version'], value['completions'],
+                    value['starts']),)
+
+            if value['version'] == _ALL_VERSIONS_STRING:
+                all_starts = value['starts']
+                all_completions = value['completions']
+                for (state_name, counts) in value['state_hit'].iteritems():
+                    all_state_hit[state_name] = counts['first_entry_count']
+            else:
+                sum_starts += value['starts']
+                sum_completions += value['completions']
+                for (state_name, counts) in value['state_hit'].iteritems():
+                    sum_state_hit[state_name] += counts['first_entry_count']
+
+        if sum_starts != all_starts:
+            yield ('Non-all != all for starts: exp_id:%s sum: %s all: %s'
+                % (key, sum_starts, all_starts),)
+        if sum_completions != all_completions:
+            yield ('Non-all != all for completions: exp_id:%s sum: %s all: %s'
+                % (key, sum_completions, all_completions),)
+
+        for state_name in all_state_hit:
+            if (state_name not in sum_state_hit and
+                    all_state_hit[state_name] != 0):
+                yield (
+                    'state hit count not same exp_id:%s state:%s, '
+                    'all:%s sum: null' % (
+                        key, state_name, all_state_hit[state_name]),)
+            elif all_state_hit[state_name] != sum_state_hit[state_name]:
+                yield (
+                    'state hit count not same exp_id: %s state: %s '
+                    'all: %s sum:%s' % (
+                        key, state_name, all_state_hit[state_name],
+                        sum_state_hit[state_name]),)

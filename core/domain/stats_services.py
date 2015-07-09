@@ -35,14 +35,13 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     return {
         answer: count for (answer, count) in
         stats_domain.StateRuleAnswerLog.get(
-            exploration_id, state_name, feconf.SUBMIT_HANDLER_NAME,
-            exp_domain.DEFAULT_RULESPEC_STR
+            exploration_id, state_name, exp_domain.DEFAULT_RULESPEC_STR
         ).get_top_answers(3)
     }
 
 
 def get_state_rules_stats(exploration_id, state_name):
-    """Gets statistics for the handlers and rules of this state.
+    """Gets statistics for the answer groups and rules of this state.
 
     Returns:
         A dict, keyed by the string '{HANDLER_NAME}.{RULE_STR}', whose
@@ -52,15 +51,22 @@ def get_state_rules_stats(exploration_id, state_name):
     exploration = exp_services.get_exploration_by_id(exploration_id)
     state = exploration.states[state_name]
 
+    # TODO(bhenning): Everything is handler name submit; therefore, it is
+    # pointless and should be removed.
+    _OLD_SUBMIT_HANDLER_NAME = 'submit'
     rule_keys = []
-    for handler in state.interaction.handlers:
-        for rule in handler.rule_specs:
-            rule_keys.append((handler.name, str(rule)))
+    for group in state.interaction.answer_groups:
+        for rule in group.rule_specs:
+            rule_keys.append((
+                _OLD_SUBMIT_HANDLER_NAME, rule.stringify_classified_rule()))
+
+    if state.interaction.default_outcome:
+        rule_keys.append((
+            _OLD_SUBMIT_HANDLER_NAME, exp_domain.DEFAULT_RULESPEC_STR))
 
     answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
         exploration_id, [{
             'state_name': state_name,
-            'handler_name': rule_key[0],
             'rule_str': rule_key[1]
         } for rule_key in rule_keys])
 
@@ -86,7 +92,6 @@ def get_state_improvements(exploration_id, exploration_version):
     default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
         exploration_id, [{
             'state_name': state_name,
-            'handler_name': feconf.SUBMIT_HANDLER_NAME,
             'rule_str': exp_domain.DEFAULT_RULESPEC_STR
         } for state_name in state_names])
 
@@ -113,8 +118,8 @@ def get_state_improvements(exploration_id, exploration_version):
         eligible_flags = []
         state = exploration.states[state_name]
         if (default_count > threshold and
-                state.interaction.handlers[0].default_rule_spec.dest
-                == state_name):
+                state.interaction.default_outcome is not None and
+                state.interaction.default_outcome.dest == state_name):
             eligible_flags.append({
                 'rank': default_count,
                 'improve_type': IMPROVE_TYPE_DEFAULT})

@@ -41,21 +41,23 @@ INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 
 
-class AnswerHandlerUnitTests(test_utils.GenericTestBase):
-    """Test the AnswerHandler domain object."""
+class InteractionAnswerUnitTests(test_utils.GenericTestBase):
+    """Test the answer object and type properties of an interaction object."""
 
     def test_rules_property(self):
-        """Test that answer_handler.rules behaves as expected."""
-        answer_handler = base.AnswerHandler('submit', 'Null')
-        self.assertEqual(answer_handler.name, 'submit')
-        self.assertEqual(answer_handler.rules, [])
+        """Test that interaction.rules behaves as expected."""
+        interaction = base.BaseInteraction()
+        interaction.answer_type = 'Null'
+        interaction.normalize_answer('15')
+        self.assertEqual(interaction.rules, [])
 
-        answer_handler = base.AnswerHandler(
-            'submit', 'NonnegativeInt')
-        self.assertEqual(len(answer_handler.rules), 1)
+        interaction.answer_type = 'NonnegativeInt'
+        self.assertEqual(len(interaction.rules), 1)
+        interaction.normalize_answer('15')
 
         with self.assertRaisesRegexp(Exception, 'not a valid object class'):
-            base.AnswerHandler('submit', 'FakeObjType')
+            interaction.answer_type = 'FakeObjType'
+            interaction.normalize_answer('15')
 
 
 class InteractionUnitTests(test_utils.GenericTestBase):
@@ -123,8 +125,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
-            'handler_specs', 'customization_arg_specs', 'is_terminal',
-            'rule_descriptions'])
+            'customization_arg_specs', 'is_terminal', 'rule_descriptions'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -151,8 +152,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
         _INTERACTION_CONFIG_SCHEMA = [
             ('name', basestring), ('display_mode', basestring),
-            ('description', basestring), ('_handlers', list),
-            ('_customization_arg_specs', list)]
+            ('description', basestring), ('_customization_arg_specs', list)]
 
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -265,24 +265,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
 
-            # Check that at least one handler exists.
-            self.assertTrue(
-                len(interaction.handlers),
-                msg='Interaction %s has no handlers defined' % interaction_id)
-
-            for handler in interaction._handlers:
-                HANDLER_KEYS = ['name', 'obj_type']
-                self.assertItemsEqual(HANDLER_KEYS, handler.keys())
-                self.assertTrue(isinstance(handler['name'], basestring))
-                # Check that the obj_type corresponds to a valid object class.
-                obj_services.Registry.get_object_class_by_type(
-                    handler['obj_type'])
-
-            # Check that all handler names are unique.
-            names = [handler.name for handler in interaction.handlers]
-            self.assertEqual(
-                len(set(names)), len(names),
-                'Interaction %s has duplicate handler names' % interaction_id)
+            # Check that the obj_type corresponds to a valid object class.
+            obj_services.Registry.get_object_class_by_type(
+                interaction.answer_type)
 
             self._validate_customization_arg_specs(
                 interaction._customization_arg_specs)

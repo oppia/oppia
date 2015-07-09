@@ -21,39 +21,46 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
     'WARNING_TYPES', 'baseInteractionValidationService',
     function(WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    if (customizationArgs.latitude.value < -90 || customizationArgs.latitude.value > 90) {
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['latitude', 'longitude']);
+
+    if (customizationArgs.latitude.value < -90 ||
+        customizationArgs.latitude.value > 90) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'please pick a starting latitude between -90 and 90.'
       });
     }
 
-    if (customizationArgs.longitude.value < -180 || customizationArgs.longitude.value > 180) {
+    if (customizationArgs.longitude.value < -180 ||
+        customizationArgs.longitude.value > 180) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
         message: 'please pick a starting longitude between -180 and 180.'
       });
     }
 
-    var numRuleSpecs = ruleSpecs.length;
-
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if (ruleSpecs[i].definition.name === 'Within' || ruleSpecs[i].definition.name === 'NotWithin') {
-        if (ruleSpecs[i].definition.inputs.d < 0) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'please ensure that all the rules refer to valid distances.'
-          });
+    for (var i = 0; i < answerGroups.length; i++) {
+      var ruleSpecs = answerGroups[i].rule_specs;
+      for (var j = 0; j < ruleSpecs.length; j++) {
+        if (ruleSpecs[j].rule_type === 'Within' || ruleSpecs[j].rule_type === 'NotWithin') {
+          if (ruleSpecs[j].inputs.d < 0) {
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'please ensure that rule ' + String(j + 1) +
+                ' in group ' + String(i + 1) + ' refers to a valid distance.'
+            });
+          }
         }
       }
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getAllRuleSpecsWarnings(
-        ruleSpecs, stateName));
+      baseInteractionValidationService.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
 
     return warningsList;
   };

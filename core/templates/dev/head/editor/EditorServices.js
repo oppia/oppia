@@ -194,7 +194,8 @@ oppia.factory('changeListService', [
   var ALLOWED_STATE_BACKEND_NAMES = {
     'widget_customization_args': true,
     'widget_id': true,
-    'widget_handlers': true,
+    'answer_groups': true,
+    'default_outcome': true,
     'state_name': true,
     'content': true,
     'param_changes': true
@@ -672,12 +673,16 @@ oppia.factory('explorationStatesService', [
       }).result.then(function(deleteStateName) {
         delete _states[deleteStateName];
         for (var otherStateName in _states) {
-          var handlers = _states[otherStateName].interaction.handlers;
-          for (var i = 0; i < handlers.length; i++) {
-            for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-              if (handlers[i].rule_specs[j].dest === deleteStateName) {
-                handlers[i].rule_specs[j].dest = otherStateName;
-              }
+          var interaction = _states[otherStateName].interaction;
+          var groups = interaction.answer_groups;
+          for (var i = 0; i < groups.length; i++) {
+            if (groups[i].outcome.dest === deleteStateName) {
+              groups[i].outcome.dest = otherStateName;
+            }
+          }
+          if (interaction.default_outcome) {
+            if (interaction.default_outcome.dest === deleteStateName) {
+              interaction.default_outcome.dest = otherStateName;
             }
           }
         }
@@ -710,12 +715,16 @@ oppia.factory('explorationStatesService', [
       delete _states[oldStateName];
 
       for (var otherStateName in _states) {
-        var handlers = _states[otherStateName].interaction.handlers;
-        for (var i = 0; i < handlers.length; i++) {
-          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === oldStateName) {
-              handlers[i].rule_specs[j].dest = newStateName;
-            }
+        var interaction = _states[otherStateName].interaction;
+        var groups = interaction.answer_groups;
+        for (var i = 0; i < groups.length; i++) {
+          if (groups[i].outcome.dest === oldStateName) {
+            groups[i].outcome.dest = newStateName;
+          }
+        }
+        if (interaction.default_outcome) {
+          if (interaction.default_outcome.dest === oldStateName) {
+            interaction.default_outcome.dest = newStateName;
           }
         }
       }
@@ -850,11 +859,7 @@ oppia.factory('newStateTemplateService', [function() {
     // NB: clients should ensure that the desired state name is valid.
     getNewStateTemplate: function(newStateName) {
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.interaction.handlers.forEach(function(handler) {
-        handler.rule_specs.forEach(function(ruleSpec) {
-          ruleSpec.dest = newStateName;
-        });
-      });
+      newStateTemplate.interaction.default_outcome.dest = newStateName;
       return newStateTemplate;
     }
   };
@@ -868,23 +873,26 @@ oppia.factory('computeGraphService', ['INTERACTION_SPECS', function(INTERACTION_
     var links = [];
     var finalStateIds = [];
     for (var stateName in states) {
-      if (states[stateName].interaction.id &&
-          INTERACTION_SPECS[states[stateName].interaction.id].is_terminal) {
+      var interaction = states[stateName].interaction;
+      if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
         finalStateIds.push(stateName);
       }
 
       nodes[stateName] = stateName;
 
-      if (states[stateName].interaction.id) {
-        var handlers = states[stateName].interaction.handlers;
-        for (var h = 0; h < handlers.length; h++) {
-          var ruleSpecs = handlers[h].rule_specs;
-          for (i = 0; i < ruleSpecs.length; i++) {
-            links.push({
-              source: stateName,
-              target: ruleSpecs[i].dest,
-            });
-          }
+      if (interaction.id) {
+        var groups = interaction.answer_groups;
+        for (var h = 0; h < groups.length; h++) {
+          links.push({
+            source: stateName,
+            target: groups[h].outcome.dest,
+          });
+        }
+        if (interaction.default_outcome) {
+          links.push({
+            source: stateName,
+            target: interaction.default_outcome.dest,
+          });
         }
       }
     }
@@ -1131,20 +1139,18 @@ oppia.factory('explorationWarningsService', [
     });
 
     // Finally, the rule feedback strings are evaluated.
-    state.interaction.handlers.forEach(function(handler) {
-      handler.rule_specs.forEach(function(ruleSpec) {
-        for (var k = 0; k < ruleSpec.feedback.length; k++) {
-          expressionInterpolationService.getParamsFromString(
-              ruleSpec.feedback[k]).forEach(function(paramName) {
-            result.push({
-              action: PARAM_ACTION_GET,
-              paramName: paramName,
-              source: PARAM_SOURCE_FEEDBACK,
-              sourceInd: k
-            });
+    state.interaction.answer_groups.forEach(function(group) {
+      for (var k = 0; k < group.outcome.feedback.length; k++) {
+        expressionInterpolationService.getParamsFromString(
+            group.outcome.feedback[k]).forEach(function(paramName) {
+          result.push({
+            action: PARAM_ACTION_GET,
+            paramName: paramName,
+            source: PARAM_SOURCE_FEEDBACK,
+            sourceInd: k
           });
-        }
-      });
+        });
+      }
     });
 
     return result;
@@ -1324,17 +1330,17 @@ oppia.factory('explorationWarningsService', [
 
     var _states = explorationStatesService.getStates();
     for (var stateName in _states) {
-      if (_states[stateName].interaction.id) {
+      var interaction = _states[stateName].interaction;
+      if (interaction.id) {
         var validatorName = 'oppiaInteractive' + _states[stateName].interaction.id + 'Validator';
         var interactionWarnings = $filter(validatorName)(
-          stateName,
-          _states[stateName].interaction.customization_args,
-          _states[stateName].interaction.handlers[0].rule_specs);
+          stateName, interaction.customization_args, interaction.answer_groups,
+          interaction.default_outcome);
 
-        for (var i = 0; i < interactionWarnings.length; i++) {
+        for (var j = 0; j < interactionWarnings.length; j++) {
           _warningsList.push({
-            type: interactionWarnings[i].type,
-            message: 'In \'' + stateName + '\', ' + interactionWarnings[i].message
+            type: interactionWarnings[j].type,
+            message: 'In \'' + stateName + '\', ' + interactionWarnings[j].message
           });
         }
       }

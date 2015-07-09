@@ -20,12 +20,12 @@
 oppia.filter('oppiaInteractiveLogicProofValidator', [
     'baseInteractionValidationService', function(baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
-        ruleSpecs, stateName));
+      baseInteractionValidationService.getAnswerGroupWarnings(
+        answerGroups, stateName));
 
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.

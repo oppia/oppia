@@ -162,6 +162,11 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
+        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+            self.render_template(
+                'error/disabled_exploration.html', iframe_restriction=None)
+            return
+
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
         if (exploration is None or
@@ -480,7 +485,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
         if 'resolved_answers' in self.payload:
             event_services.DefaultRuleAnswerResolutionEventHandler.record(
-                exploration_id, state_name, 'submit', resolved_answers)
+                exploration_id, state_name, resolved_answers)
 
         self.render_json({})
 
@@ -570,7 +575,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
         # Patch `snapshots` to use the editor's display name.
         for snapshot in snapshots:
-            if snapshot['committer_id'] != feconf.ADMIN_COMMITTER_ID:
+            if snapshot['committer_id'] != feconf.SYSTEM_COMMITTER_ID:
                 snapshot['committer_id'] = user_services.get_username(
                     snapshot['committer_id'])
 

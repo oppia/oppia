@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block subtitle %}
+  Disabled Exploration
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="oppia-content">
+    <br>
+
+    <div class="oppia-wide-panel">
+      <div class="oppia-wide-panel-content protractor-test-error-container">
+        <h1>Disabled Exploration</h1>
+        <br>
+        <p>
+          Sorry, but the exploration you clicked on is currently disabled.
+          Please try again later.
+        </p>
+        <p>
+          The best thing to do now is probably to return to the <a href="/">home page</a>. However, if this issue recurs, and you think it
+          shouldn't, please let us know on our <a href="https://code.google.com/p/oppia/issues/list" target="_blank">issue tracker</a>. Sorry about this.
+        </p>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

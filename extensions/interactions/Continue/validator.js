@@ -17,11 +17,16 @@
  * the interaction.
  */
 
-oppia.filter('oppiaInteractiveContinueValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
+oppia.filter('oppiaInteractiveContinueValidator', [
+    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+    function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['buttonText']);
+    
     if (customizationArgs.buttonText.value.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
@@ -29,21 +34,14 @@ oppia.filter('oppiaInteractiveContinueValidator', ['$filter', 'WARNING_TYPES', f
       });
     }
 
-    if (ruleSpecs.length === 0) {
+    if (answerGroups.length > 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please specify what Oppia should do after the button is clicked.'
+        message: 'only the default outcome is necessary for a continue interaction.'
       });
     }
 
-    if (ruleSpecs.length > 1) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please use only one rule.'
-      });
-    }
-
-    if ($filter('isRuleSpecConfusing')(ruleSpecs[0], stateName)) {
+    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: 'please specify what Oppia should do after the button is clicked.'

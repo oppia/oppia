@@ -308,7 +308,7 @@ class ReaderViewLoadTest(object):
         url = '%s/explorehandler/transition/%s/%s' % (
             self.host, self.exp_id, urllib.quote(self.last_state_name))
         body = self._post_json(url, {
-            'answer': answer, 'handler': 'submit', 'params': self.last_params,
+            'answer': answer, 'params': self.last_params,
             'state_history': self.state_history,
         })
 

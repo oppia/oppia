@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 from core import jobs_registry
 from core.domain import exp_domain
+from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
@@ -74,6 +75,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
         }
 
+    def _get_most_recent_snapshot_created_on_ms(self, exp_id):
+        most_recent_snapshot = exp_services.get_exploration_snapshots_metadata(
+            exp_id)[-1]
+        return most_recent_snapshot['created_on_ms']
+
     def test_basic_computation(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -84,8 +90,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
-            expected_last_updated_ms = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_ID).last_updated)
+            expected_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -94,11 +100,89 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 1)
             self.process_and_flush_pending_tasks()
 
-            self.assertEqual(
+            recent_notifications = (
                 ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1],
-                [self._get_expected_exploration_created_dict(
-                    USER_ID, EXP_ID, EXP_TITLE, expected_last_updated_ms)])
+                    USER_ID)[1])
+            self.assertEqual(len(recent_notifications), 1)
+            self.assertEqual(
+                recent_notifications[0],
+                self._get_expected_exploration_created_dict(
+                    USER_ID, EXP_ID, EXP_TITLE, expected_last_updated_ms))
+
+    def test_basic_computation_ignores_automated_commits(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            EXP_ID = 'eid'
+            EXP_TITLE = 'title'
+            USER_ID = 'user_id'
+            ANOTHER_USER_ID = 'another_user_id'
+
+            self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
+
+            # Confirm that the exploration is at version 1.
+            exploration = exp_services.get_exploration_by_id(EXP_ID)
+            self.assertEqual(exploration.version, 1)
+
+            v1_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+
+            # Start migration job on all explorations, including this one.
+            job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
+            exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            # Confirm that the exploration is at version 2.
+            exploration = exp_services.get_exploration_by_id(EXP_ID)
+            self.assertEqual(exploration.version, 2)
+
+            v2_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+
+            # Run the aggregator.
+            ModifiedRecentUpdatesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
+            ModifiedRecentUpdatesAggregator.stop_computation(USER_ID)
+
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
+            self.assertEqual(len(recent_notifications), 1)
+            self.assertEqual(recent_notifications[0],
+                self._get_expected_exploration_created_dict(
+                    USER_ID, EXP_ID, EXP_TITLE, v1_last_updated_ms))
+            self.assertLess(
+                recent_notifications[0]['last_updated_ms'], v2_last_updated_ms)
+
+            # Another user makes a commit; this one should now show up in the
+            # original user's dashboard.
+            exp_services.update_exploration(
+                ANOTHER_USER_ID, EXP_ID, [], 'Update exploration')
+            v3_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+
+            ModifiedRecentUpdatesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
+
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
+            self.assertEqual([{
+                'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                'last_updated_ms': v3_last_updated_ms,
+                'activity_id': EXP_ID,
+                'activity_title': EXP_TITLE,
+                'author_id': ANOTHER_USER_ID,
+                'subject': 'Update exploration',
+            }], recent_notifications)
 
     def test_basic_computation_with_an_update_after_creation(self):
         with self.swap(
@@ -115,8 +199,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # original user's dashboard.
             exp_services.update_exploration(
                 ANOTHER_USER_ID, EXP_ID, [], 'Update exploration')
-            expected_last_updated_ms = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_ID).last_updated)
+            expected_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -147,8 +231,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
-            last_updated_ms_before_deletion = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_ID).last_updated)
+            last_updated_ms_before_deletion = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
             exp_services.delete_exploration(USER_ID, EXP_ID)
 
             ModifiedRecentUpdatesAggregator.start_computation()
@@ -193,8 +277,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 EXP_1_ID, self.EDITOR_ID, title=EXP_1_TITLE,
                 category='Category')
-            exp1_last_updated_ms = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_1_ID).last_updated)
+
+            exp1_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_1_ID))
 
             # User gives feedback on it.
             feedback_services.create_thread(
@@ -208,8 +293,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 EXP_2_ID, self.EDITOR_ID, title=EXP_2_TITLE,
                 category='Category')
-            exp2_last_updated_ms = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_2_ID).last_updated)
+            exp2_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_2_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -259,8 +344,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User A creates an exploration.
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
-            exp_last_updated_ms = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_ID).last_updated)
+            exp_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
@@ -325,8 +410,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User A creates an exploration.
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
-            exp_last_updated_ms = utils.get_time_in_millisecs(
-                exp_services.get_exploration_by_id(EXP_ID).last_updated)
+            exp_last_updated_ms = (
+                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
 
             # User B starts a feedback thread.
             feedback_services.create_thread(

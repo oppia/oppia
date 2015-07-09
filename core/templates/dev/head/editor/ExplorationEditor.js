@@ -33,7 +33,7 @@ oppia.controller('ExplorationEditor', [
   'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache',
+  'explorationWarningsService', '$templateCache', 'explorationContextService',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -43,7 +43,7 @@ oppia.controller('ExplorationEditor', [
     explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
-    explorationWarningsService, $templateCache) {
+    explorationWarningsService, $templateCache, explorationContextService) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
@@ -53,14 +53,7 @@ oppia.controller('ExplorationEditor', [
    *********************************************************/
   $rootScope.loadingMessage = 'Loading';
 
-  // The pathname should be: .../create/{exploration_id}
-  var _pathnameArray = $window.location.pathname.split('/');
-  $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
-  // The exploration id needs to be attached to the root scope in order for
-  // the file picker RTE component to work. (Note that an alternative approach
-  // might also be to replicate this URL-based calculation in the file picker
-  // RTE component.)
-  $rootScope.explorationId = $scope.explorationId;
+  $scope.explorationId = explorationContextService.getExplorationId();
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
@@ -171,6 +164,9 @@ oppia.controller('ExplorationEditor', [
       'Click \'Next\' to learn how to use the exploration editor.<br><br> ' +
       'You might also find these resources helpful for creating your exploration: ' +
       '<ul>'+
+      '<li><a href="/editor_tutorial" target="_blank">' +
+      '        Walkthrough of the Oppia Editor' +
+      '</a></li>' +
       '<li><a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">' +
       '        Planning Your Exploration' +
       '</a></li>' +
@@ -572,7 +568,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'content': 'Content',
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
-              'widget_handlers': 'Rules'
+              'answer_groups': 'Answer groups',
+              'default_outcome': 'Default outcome'
             }
 
             // An ordered list of state properties that determines the order in which
@@ -582,7 +579,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             // TODO(sll): Implement this fully. Currently there is no sorting.
             $scope.ORDERED_STATE_PROPERTIES = [
               'name', 'param_changes', 'content', 'widget_id',
-              'widget_customization_args', 'widget_handlers'
+              'widget_customization_args', 'answer_groups', 'default_outcome'
             ];
 
             $scope.explorationChangesExist = !$.isEmptyObject(

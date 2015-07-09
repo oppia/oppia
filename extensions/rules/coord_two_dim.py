@@ -27,7 +27,6 @@ RADIUS_OF_EARTH = 6371.0
 
 class Within(base.CoordTwoDimRule):
     description = 'is within {{d|Real}} km of {{p|CoordTwoDim}}'
-    is_generic = False
 
     def _evaluate(self, subject):
         lat1 = math.radians(self.p[0])
@@ -48,7 +47,6 @@ class Within(base.CoordTwoDimRule):
 
 class NotWithin(base.CoordTwoDimRule):
     description = 'is not within {{d|Real}} km of {{p|CoordTwoDim}}'
-    is_generic = True
 
     def _evaluate(self, subject):
         return not Within(self.d, self.p)._evaluate(subject)

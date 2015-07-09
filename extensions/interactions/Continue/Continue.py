@@ -24,8 +24,7 @@ class Continue(base.BaseInteraction):
     description = 'A simple \'go to next state\' button.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Null'}]
+    answer_type = 'Null'
 
     _customization_arg_specs = [{
         'name': 'buttonText',

@@ -316,15 +316,37 @@ var _createStateAsDestination = function(bodyElem, destinationName) {
 //   dialog as part of adding this rule.
 var addRule = function(interactionId, feedbackInstructions, destStateName,
     createState, ruleName) {
-  element(by.css('.protractor-test-open-add-rule-modal')).click();
+  // Default rules just need to be modified, not added.
+  var isDefaultRule = (ruleName === 'Default');
+
+  if (!isDefaultRule) {
+    element(by.css('.protractor-test-open-add-rule-modal')).click();
+  } else {
+    // First, select the tab.
+    element(by.css('.protractor-test-default-rule-tab')).isPresent().then(function(isVisible) {
+      // If there is only one rule, no tabs are shown, so we don't have to click
+      // anything.
+      if (isVisible) {
+        element(by.css('.protractor-test-default-rule-tab')).click();
+      }
+    });
+    // Then, open up the editor for that rule.
+    element(by.css('.protractor-test-edit-rule')).click();
+  }
   general.waitForSystem();
 
-  var ruleElement = element(by.css('.protractor-test-add-rule-details'));
-  var args = [ruleElement, interactionId];
-  for (var i = 4; i < arguments.length; i++) {
-    args.push(arguments[i]);
+  var ruleElement = element(by.css(
+    !isDefaultRule ? '.protractor-test-add-rule-details'
+    : '.protractor-test-edit-rule-details'));
+
+  // Only alter the rule description if it's non-default.
+  if (!isDefaultRule) {
+    var args = [ruleElement, interactionId];
+    for (var i = 4; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    _selectRule.apply(null, args);
   }
-  _selectRule.apply(null, args);
 
   if (feedbackInstructions) {
     _setRuleFeedback(ruleElement, 0, feedbackInstructions)
@@ -337,7 +359,11 @@ var addRule = function(interactionId, feedbackInstructions, destStateName,
     _setRuleDest(ruleElement, destStateName);
   }
 
-  element(by.css('.protractor-test-add-new-rule')).click();
+  if (!isDefaultRule) {
+    element(by.css('.protractor-test-add-new-rule')).click();
+  } else {
+    element(by.css('.protractor-test-save-rule')).click();
+  }
   general.waitForSystem();
 };
 
@@ -360,7 +386,7 @@ var RuleEditor = function(ruleNum) {
     element.all(by.css('.protractor-test-rule-body')).last() :
     element.all(by.css('.protractor-test-rule-body')).get(ruleNum);
   // The clickable well is not shown if the rule editor is already open.
-  bodyElem.all(by.css('.protractor-test-edit-rule')).then(function(buttons) {
+  bodyElem.all(by.css('.protractor-test-edit-rule-button')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
     } else if (buttons.length !== 0) {

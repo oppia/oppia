@@ -338,15 +338,11 @@ describe('New state template service', function() {
             rows: {value: 1},
             placeholder: {value: 'Type your answer here.'}
           },
-          handlers: [{
-            name: 'submit',
-            rule_specs: [{
-              dest: '(untitled state)',
-              definition: {rule_type: 'default'},
-              feedback: [],
-              param_changes: []
-            }],
-          }],
+          default_outcome: {
+            dest: '(untitled state)',
+            feedback: [],
+            param_changes: []
+          },
           id: 'TextInput'
         },
         param_changes: [],
@@ -363,15 +359,11 @@ describe('New state template service', function() {
             rows: {value: 1},
             placeholder: {value: 'Type your answer here.'}
           },
-          handlers: [{
-            name: 'submit',
-            rule_specs: [{
-              dest: NEW_STATE_NAME,
-              definition: {rule_type: 'default'},
-              feedback: [],
-              param_changes: []
-            }]
-          }],
+          default_outcome: {
+            dest: NEW_STATE_NAME,
+            feedback: [],
+            param_changes: []
+          },
           id: 'TextInput'
         },
         param_changes: [],

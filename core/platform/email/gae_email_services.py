@@ -26,12 +26,10 @@ from google.appengine.api import app_identity
 from google.appengine.api import mail
 
 
-def send_mail_to_admin(sender, subject, body):
+def send_mail_to_admin(subject, body):
     """Enqueues a 'send email' request with the GAE mail service.
 
     Args:
-      - sender: str. the email address of the sender, usually in the form
-          'SENDER NAME <EMAIL@ADDRESS.com>.
       - subject: str. The subject line of the email.
       - body: str. The plaintext body of the email.
     """
@@ -44,5 +42,44 @@ def send_mail_to_admin(sender, subject, body):
         app_id = app_identity.get_application_id()
         body = '(Sent from %s)\n\n%s' % (app_id, body)
 
-        mail.send_mail(sender, feconf.ADMIN_EMAIL_ADDRESS, subject, body)
+        mail.send_mail(
+            feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, subject,
+            body)
         counters.EMAILS_SENT.inc()
+
+
+def send_mail(
+        sender_email, recipient_email, subject, plaintext_body, html_body):
+    """Sends an email. The client is responsible for recording any audit logs.
+
+    In general this function should only be called from
+    email_manager._send_email().
+
+    Args:
+      - sender_email: str. the email address of the sender.
+      - recipient_email: str. the email address of the recipient.
+      - subject: str. The subject line of the email.
+      - plaintext_body: str. The plaintext body of the email.
+      - html_body: str. The HTML body of the email. Must fit in a datastore
+          entity.
+
+    Raises:
+      Exception: if the configuration in feconf.py forbids emails from being
+        sent.
+      ValueError: if 'sender_email' or 'recipient_email' is invalid, according
+        to App Engine.
+      (and possibly other exceptions, due to mail.send_mail() failures)
+    """
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        raise Exception('This app cannot send emails to users.')
+
+    if not mail.is_email_valid(sender_email):
+        raise ValueError(
+            'Malformed sender email address: %s' % sender_email)
+    if not mail.is_email_valid(recipient_email):
+        raise ValueError(
+            'Malformed recipient email address: %s' % recipient_email)
+
+    mail.send_mail(
+        sender_email, recipient_email, subject, plaintext_body, html=html_body)
+    counters.EMAILS_SENT.inc()

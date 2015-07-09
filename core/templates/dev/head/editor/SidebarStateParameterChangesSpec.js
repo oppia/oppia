@@ -44,7 +44,7 @@ describe('state parameter changes controller', function() {
           }],
           interaction: {
             id: 'TextInput',
-            handlers: [{
+            answer_groups: [{
               rule_specs: [{
                 dest: 'Second State'
               }]
@@ -59,7 +59,7 @@ describe('state parameter changes controller', function() {
           }],
           interaction: {
             id: 'TextInput',
-            handlers: [{
+            answer_groups: [{
               rule_specs: [{
                 dest: 'Second State'
               }]
@@ -74,7 +74,7 @@ describe('state parameter changes controller', function() {
           }],
           interaction: {
             id: 'TextInput',
-            handlers: [{
+            answer_groups: [{
               rule_specs: [{
                 dest: 'Second State'
               }]

@@ -20,6 +20,9 @@
 #
 # Run this script from the oppia root folder:
 #   bash scripts/run_js_integration_tests.sh
+# Optional arguments:
+#   --sharding=true/false Disables/Enables parallelization of protractor tests.
+#   --shardInstances=# Sets the number of parallel browsers to open while sharding.
 # The root folder MUST be named 'oppia'.
 # It runs integration tests.
 
@@ -136,5 +139,39 @@ if [ -d "../protractor-screenshots" ]; then
   rm -r ../protractor-screenshots
 fi
 
+# Parse additional command line arguments that may be passed to protractor.
+# Credit: http://stackoverflow.com/questions/192249
+SHARDING=true
+SHARD_INSTANCES=5
+for i in "$@"; do
+  # Match each space-separated argument passed to the shell file to a separate
+  # case label, based on a pattern. E.g. Match to -sharding=*, where the
+  # asterisk refers to any characters following the equals sign, other than
+  # whitespace.
+  case $i in
+    --sharding=*)
+    # Extract the value right of the equal sign by substringing the $i variable
+    # at the equal sign.
+    # http://tldp.org/LDP/abs/html/string-manipulation.html
+    SHARDING="${i#*=}"
+    # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
+    shift
+    ;;
+
+    --shardInstances=*)
+    SHARD_INSTANCES="${i#*=}"
+    shift
+    ;;
+
+    *)
+    echo Error: Unknown command line option: $i
+    ;;
+  esac
+done
+
+if [ "$SHARDING" = false ] ; then
+  SHARD_INSTANCES=1
+fi
+
 # Run the integration tests.
-$NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+$NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES

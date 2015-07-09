@@ -31,16 +31,14 @@ class EndExploration(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_terminal = True
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Null'
-    }]
+    answer_type = 'Null'
 
     _customization_arg_specs = [{
         'name': 'recommendedExplorationIds',
         'description': (
-            'IDs of explorations to recommend to the learner. (The ID of an '
-            'exploration is the string of characters appearing after '
-            '\'/explore/\' in the URL bar.)'),
+            'IDs of explorations to recommend to the learner (maximum of 8). '
+            '(The ID of an exploration is the string of characters appearing '
+            'after \'/explore/\' in the URL bar.)'),
         'schema': {
             'type': 'list',
             'items': {

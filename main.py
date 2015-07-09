@@ -154,6 +154,8 @@ urls = [
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
+        r'/editor_tutorial', pages.EditorTutorialPage, 'editor_tutorial_page'),
+    get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(
         r'/site_guidelines', pages.ParticipatePage,
@@ -167,6 +169,10 @@ urls = [
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
     get_redirect_route(
         r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output'),
+    get_redirect_route(
+        r'/admintopicscsvdownloadhandler',
+        admin.AdminTopicsCsvDownloadHandler,
+        'admin_topics_csv_download_handler'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
@@ -260,6 +266,9 @@ urls = [
     get_redirect_route(
         r'/explorehandler/rating/<exploration_id>',
         reader.RatingHandler, 'rating_handler'),
+    get_redirect_route(
+        r'/explorehandler/recommendations/<exploration_id>',
+        reader.RecommendationsHandler, 'recommendations_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

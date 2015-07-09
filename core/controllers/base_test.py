@@ -184,7 +184,7 @@ class EscapingTest(test_utils.GenericTestBase):
         def get(self):
             """Handles GET requests."""
             self.values.update({
-                'ADMIN_EMAIL_ADDRESS': ['<[angular_tag]>'],
+                'CONTACT_EMAIL_ADDRESS': ['<[angular_tag]>'],
                 'SITE_FORUM_URL': 'x{{51 * 3}}y',
             })
             self.render_template('pages/about.html')

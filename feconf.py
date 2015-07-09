@@ -57,7 +57,7 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 3
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 4
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
@@ -75,9 +75,6 @@ FEEDBACK_TAB_PAGE_SIZE = 20
 DEFAULT_INIT_STATE_NAME = 'First State'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
-
-# Name (and description) of the default rule.
-DEFAULT_RULE_NAME = 'Default'
 
 # Default valid parameter for instantiating Explorations when explicit
 # skin customizations aren't provided.
@@ -103,9 +100,6 @@ PATH_MAP = {
     '/lib/static': os.path.join('lib', 'static'),
     '/third_party/static': os.path.join('third_party', 'static'),
 }
-
-# Format string for displaying datetimes in the UI.
-HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M UTC'
 
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
@@ -135,12 +129,19 @@ def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
 
 # Committer id for system actions.
-ADMIN_COMMITTER_ID = 'admin'
+SYSTEM_COMMITTER_ID = 'admin'
+SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
-# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
-# app before setting this to True. If ADMIN_EMAIL_ADDRESS is not that of an
-# app owner, email messages from this user cannot be sent.
+# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
+# correspond to owners of the app before setting this to True. If
+# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
+# address cannot be sent.
 CAN_SEND_EMAILS_TO_ADMIN = False
+# Ensure that SYSTEM_EMAIL_ADDRESS is valid and corresponds to an owner of the
+# app before setting this to True. Emails will be sent from
+# SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
+# email messages from this user cannot be sent.
+CAN_SEND_EMAILS_TO_USERS = False
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
@@ -324,9 +325,6 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# The name for the default handler of an interaction.
-SUBMIT_HANDLER_NAME = 'submit'
-
 # Default color
 COLOR_TEAL = 'teal'
 # Social sciences
@@ -372,6 +370,9 @@ CATEGORIES_TO_COLORS = {
     'Statistics': COLOR_SHARKFIN,
     'Welcome': COLOR_TEAL,
 }
+
+# A sorted list of default categories.
+DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -453,3 +454,7 @@ ALL_LANGUAGE_CODES = [{
 }, {
     'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
 }]
+
+# Defaults for topic similarities
+DEFAULT_TOPIC_SIMILARITY = 0.5
+SAME_TOPIC_SIMILARITY = 1.0

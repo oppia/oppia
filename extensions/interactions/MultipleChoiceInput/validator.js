@@ -21,14 +21,16 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
     '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
   // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    var numChoices = customizationArgs.choices.value.length;
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['choices']);
 
     var areAnyChoicesEmpty = false;
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
+    var numChoices = customizationArgs.choices.value.length;
     for (var i = 0; i < customizationArgs.choices.value.length; i++) {
       var choice = customizationArgs.choices.value[i];
       if (choice.trim().length === 0) {
@@ -53,30 +55,41 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
       });
     }
 
-    var numRuleSpecs = ruleSpecs.length;
-    var uniqueRuleChoices = [];
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if (ruleSpecs[i].definition.name === 'Equals' &&
-          uniqueRuleChoices.indexOf(ruleSpecs[i].definition.inputs.x) === -1) {
-        uniqueRuleChoices.push(ruleSpecs[i].definition.inputs.x);
-      }
-
-      if (ruleSpecs[i].definition.inputs.x >= numChoices) {
-        warningsList.push({
-          type: WARNING_TYPES.CRITICAL,
-          message: 'please ensure that each rule corresponds to a valid choice.'
-        });
+    var selectedEqualsChoices = [];
+    for (var i = 0; i < answerGroups.length; i++) {
+      var ruleSpecs = answerGroups[i].rule_specs;
+      for (var j = 0; j < ruleSpecs.length; j++) {
+        if (ruleSpecs[j].rule_type === 'Equals') {
+          var choicePreviouslySelected = (
+            selectedEqualsChoices.indexOf(ruleSpecs[j].inputs.x) !== -1);
+          if (!choicePreviouslySelected) {
+            selectedEqualsChoices.push(ruleSpecs[j].inputs.x);
+          } else {
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+                String(i + 1) + ' is not equaling the same multiple choice ' +
+                'option as another rule.'
+            });
+          }
+          if (ruleSpecs[j].inputs.x >= numChoices) {
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+                String(i + 1) + ' refers to a valid choice.'
+            });
+          }
+        }
       }
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
-        ruleSpecs, stateName));
+      baseInteractionValidationService.getAnswerGroupWarnings(
+        answerGroups, stateName));
 
     // Only require a default rule if some choices have not been taken care of by rules.
-    if (uniqueRuleChoices.length < numChoices) {
-      var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-      if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
+    if (selectedEqualsChoices.length < numChoices) {
+      if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (

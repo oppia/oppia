@@ -6,7 +6,7 @@ language_code: en
 objective: Learn how to model objects as graphs
 param_changes: []
 param_specs: {}
-schema_version: 5
+schema_version: 7
 skin_customizations:
   panels_contents: {}
 states:
@@ -18,18 +18,16 @@ states:
         <div><br></div><div>Maybe from now on you'll start seeing graphs all over\
         \ the place!\_</div>"
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Bosses question:
     content:
@@ -40,6 +38,54 @@ states:
         this as a graph, with a directed edge from an employee to his or her immediate
         superior.</div></div>'
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Bosses correct
+          feedback:
+          - Well done!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 0
+                src: 1
+                weight: 1
+              - dst: 0
+                src: 2
+                weight: 1
+              - dst: 2
+                src: 5
+                weight: 1
+              - dst: 1
+                src: 4
+                weight: 1
+              - dst: 1
+                src: 3
+                weight: 1
+              isDirected: true
+              isLabeled: true
+              isWeighted: false
+              vertices:
+              - label: Irene
+                x: 156.59375
+                y: 43.0
+              - label: John
+                x: 126.59375
+                y: 99.0
+              - label: George
+                x: 220.59375
+                y: 92.0
+              - label: Fred
+                x: 103.59375
+                y: 163.0
+              - label: Hannah
+                x: 163.59375
+                y: 163.0
+              - label: Kevin
+                x: 218.59375
+                y: 162.0
+          rule_type: IsIsomorphicTo
       customization_args:
         canAddEdge:
           value: true
@@ -80,64 +126,13 @@ states:
             - label: Kevin
               x: 265.09375
               y: 100
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              g:
-                edges:
-                - dst: 0
-                  src: 1
-                  weight: 1
-                - dst: 0
-                  src: 2
-                  weight: 1
-                - dst: 2
-                  src: 5
-                  weight: 1
-                - dst: 1
-                  src: 4
-                  weight: 1
-                - dst: 1
-                  src: 3
-                  weight: 1
-                isDirected: true
-                isLabeled: true
-                isWeighted: false
-                vertices:
-                - label: Irene
-                  x: 156.59375
-                  y: 43.0
-                - label: John
-                  x: 126.59375
-                  y: 99.0
-                - label: George
-                  x: 220.59375
-                  y: 92.0
-                - label: Fred
-                  x: 103.59375
-                  y: 163.0
-                - label: Hannah
-                  x: 163.59375
-                  y: 163.0
-                - label: Kevin
-                  x: 218.59375
-                  y: 162.0
-            name: IsIsomorphicTo
-            rule_type: atomic
-            subject: answer
-          dest: Bosses correct
-          feedback:
-          - Well done!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Bosses question
-          feedback:
-          - Not exactly... try again!
-          param_changes: []
+      default_outcome:
+        dest: Bosses question
+        feedback:
+        - Not exactly... try again!
+        param_changes: []
       id: GraphInput
+      triggers: []
     param_changes: []
   Cities correct:
     content:
@@ -152,18 +147,16 @@ states:
         In mathematician-speak, this would be a "directed graph", since every edge
         has a direction.</div><div><br></div><div>Let's give this a try now!</div>
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Bosses question
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Bosses question
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Cities question:
     content:
@@ -175,6 +168,51 @@ states:
         from Berlin.</li></ul><div>(Note: On the graph, don''t put "km" on the edges,
         just put the number)</div></div>'
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Cities correct
+          feedback:
+          - Excellent!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 1
+                src: 0
+                weight: 344
+              - dst: 0
+                src: 2
+                weight: 932
+              - dst: 1
+                src: 2
+                weight: 878
+              - dst: 3
+                src: 1
+                weight: 1054
+              - dst: 0
+                src: 3
+                weight: 1265
+              - dst: 2
+                src: 3
+                weight: 1871
+              isDirected: false
+              isLabeled: true
+              isWeighted: true
+              vertices:
+              - label: London
+                x: 158.59375
+                y: 45.0
+              - label: Paris
+                x: 227.59375
+                y: 197.0
+              - label: Berlin
+                x: 218.59375
+                y: 64.0
+              - label: Madrid
+                x: 99.59375
+                y: 177.0
+          rule_type: IsIsomorphicTo
       customization_args:
         canAddEdge:
           value: true
@@ -209,61 +247,26 @@ states:
             - label: Berlin
               x: 491.09375
               y: 119
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              g:
-                edges:
-                - dst: 1
-                  src: 0
-                  weight: 344
-                - dst: 0
-                  src: 2
-                  weight: 932
-                - dst: 1
-                  src: 2
-                  weight: 878
-                - dst: 3
-                  src: 1
-                  weight: 1054
-                - dst: 0
-                  src: 3
-                  weight: 1265
-                - dst: 2
-                  src: 3
-                  weight: 1871
-                isDirected: false
-                isLabeled: true
-                isWeighted: true
-                vertices:
-                - label: London
-                  x: 158.59375
-                  y: 45.0
-                - label: Paris
-                  x: 227.59375
-                  y: 197.0
-                - label: Berlin
-                  x: 218.59375
-                  y: 64.0
-                - label: Madrid
-                  x: 99.59375
-                  y: 177.0
-            name: IsIsomorphicTo
-            rule_type: atomic
-            subject: answer
-          dest: Cities correct
-          feedback:
-          - Excellent!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Cities question
-          feedback:
-          - Not quite, try again!
-          param_changes: []
+      default_outcome:
+        dest: Cities question
+        feedback:
+        - Not quite, try again!
+        param_changes: []
       id: GraphInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
     param_changes: []
   Friends correct:
     content:
@@ -276,18 +279,16 @@ states:
         a graph is a "weighted graph", since each edge has a "weight" number.</div><div><br></div><div>Let's
         give this a try!</div>
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Cities question
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Cities question
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
   Friends question:
     content:
@@ -299,6 +300,80 @@ states:
         Emily<br></li><li>Emily is friends with Alice and David<br></li></ul></div><div>Try
         to model the friendships as a graph!</div>'
     interaction:
+      answer_groups:
+      - outcome:
+          dest: Friends correct
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 1
+                src: 0
+                weight: 1
+              - dst: 0
+                src: 2
+                weight: 1
+              - dst: 4
+                src: 0
+                weight: 1
+              - dst: 3
+                src: 4
+                weight: 1
+              - dst: 2
+                src: 3
+                weight: 1
+              isDirected: false
+              isLabeled: true
+              isWeighted: false
+              vertices:
+              - label: Alice
+                x: 68.09375
+                y: 91
+              - label: Bob
+                x: 128.09375
+                y: 124
+              - label: Charlie
+                x: 114.09375
+                y: 189
+              - label: David
+                x: 45.09375
+                y: 206
+              - label: Emily
+                x: 17.09375
+                y: 161
+          rule_type: IsIsomorphicTo
+      - outcome:
+          dest: Friends question
+          feedback:
+          - Did you forget to add new edges?
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges: []
+              isDirected: false
+              isLabeled: true
+              isWeighted: false
+              vertices:
+              - label: Alice
+                x: 115.09375
+                y: 85
+              - label: Bob
+                x: 184.09375
+                y: 110
+              - label: Charlie
+                x: 164.09375
+                y: 156
+              - label: David
+                x: 109.09375
+                y: 185
+              - label: Emily
+                x: 80.09375
+                y: 138
+          rule_type: IsIsomorphicTo
       customization_args:
         canAddEdge:
           value: true
@@ -336,91 +411,13 @@ states:
             - label: Alice
               x: 320.59375
               y: 57
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              g:
-                edges:
-                - dst: 1
-                  src: 0
-                  weight: 1
-                - dst: 0
-                  src: 2
-                  weight: 1
-                - dst: 4
-                  src: 0
-                  weight: 1
-                - dst: 3
-                  src: 4
-                  weight: 1
-                - dst: 2
-                  src: 3
-                  weight: 1
-                isDirected: false
-                isLabeled: true
-                isWeighted: false
-                vertices:
-                - label: Alice
-                  x: 68.09375
-                  y: 91
-                - label: Bob
-                  x: 128.09375
-                  y: 124
-                - label: Charlie
-                  x: 114.09375
-                  y: 189
-                - label: David
-                  x: 45.09375
-                  y: 206
-                - label: Emily
-                  x: 17.09375
-                  y: 161
-            name: IsIsomorphicTo
-            rule_type: atomic
-            subject: answer
-          dest: Friends correct
-          feedback:
-          - Correct!
-          param_changes: []
-        - definition:
-            inputs:
-              g:
-                edges: []
-                isDirected: false
-                isLabeled: true
-                isWeighted: false
-                vertices:
-                - label: Alice
-                  x: 115.09375
-                  y: 85
-                - label: Bob
-                  x: 184.09375
-                  y: 110
-                - label: Charlie
-                  x: 164.09375
-                  y: 156
-                - label: David
-                  x: 109.09375
-                  y: 185
-                - label: Emily
-                  x: 80.09375
-                  y: 138
-            name: IsIsomorphicTo
-            rule_type: atomic
-            subject: answer
-          dest: Friends question
-          feedback:
-          - Did you forget to add new edges?
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Friends question
-          feedback:
-          - Not quite... Let's try again!
-          param_changes: []
+      default_outcome:
+        dest: Friends question
+        feedback:
+        - Not quite... Let's try again!
+        param_changes: []
       id: GraphInput
+      triggers: []
     param_changes: []
   Introduction:
     content:
@@ -435,17 +432,16 @@ states:
         this simplicity, graphs are useful for modeling all kinds of real world behavior.
         Not convinced? Let''s take a look at some things that graphs can model...</div>'
     interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Friends question
-          feedback: []
-          param_changes: []
+      default_outcome:
+        dest: Friends question
+        feedback: []
+        param_changes: []
       id: Continue
+      triggers: []
     param_changes: []
+states_schema_version: 4
 tags: []

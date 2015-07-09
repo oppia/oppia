@@ -85,7 +85,8 @@ oppia.controller('ExplorationHistory', [
         for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
           $scope.explorationVersionMetadata[explorationSnapshots[i].version_number] = {
             'committerId': explorationSnapshots[i].committer_id,
-            'createdOn': explorationSnapshots[i].created_on,
+            'createdOnStr': oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+              explorationSnapshots[i].created_on_ms),
             'commitMessage': explorationSnapshots[i].commit_message,
             'versionNumber': explorationSnapshots[i].version_number
           };
@@ -407,10 +408,6 @@ oppia.controller('ExplorationHistory', [
         location.reload();
       });
     });
-  };
-
-  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 }]);
 

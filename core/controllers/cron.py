@@ -24,7 +24,7 @@ email_services = models.Registry.import_email_services()
 import feconf
 import utils
 
-from mapreduce.lib.pipeline import pipeline
+from pipeline import pipeline
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -84,8 +84,7 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_subject = 'MapReduce status report'
             email_message = 'All MapReduce jobs are running fine.'
 
-        email_services.send_mail_to_admin(
-            feconf.ADMIN_EMAIL_ADDRESS, email_subject, email_message)
+        email_services.send_mail_to_admin(email_subject, email_message)
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):

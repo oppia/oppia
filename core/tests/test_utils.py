@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import copy
 import datetime
 import os
 import re
@@ -27,10 +28,14 @@ from core.controllers import reader
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import jinja_utils
 import main
+import utils
 
 import inspect
 import json
@@ -80,6 +85,26 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+
+    VERSION_0_STATES_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: {
+            'content': [{'type': 'text', 'value': ''}],
+            'param_changes': [],
+            'interaction': {
+                'customization_args': {},
+                'id': 'Continue',
+                'handlers': [{
+                    'name': 'submit',
+                    'rule_specs': [{
+                        'dest': 'END',
+                        'feedback': [],
+                        'param_changes': [],
+                        'definition': {'rule_type': 'default'}
+                    }]
+                }]
+            }
+        }
+    }
 
     def _get_unicode_test_string(self, suffix):
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
@@ -289,28 +314,126 @@ class TestBase(unittest.TestCase):
         # If an end state name is provided, add terminal node with that name
         if end_state_name is not None:
             exploration.add_states([end_state_name])
-            exploration.states[end_state_name].update_interaction_id(
-                'EndExploration')
+            end_state = exploration.states[end_state_name]
+            end_state.update_interaction_id('EndExploration')
+            end_state.interaction.default_outcome = None
+
             # Link first state to ending state (to maintain validity)
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
-            init_interaction.handlers[0].rule_specs[0].dest = end_state_name
+            init_interaction.default_outcome.dest = end_state_name
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
+        """Saves a new default exploration with a default version 0 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title=title,
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'%s\'.' % title
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
+    def get_updated_param_dict(
+            self, param_dict, param_changes, exp_param_specs):
+        """Updates a param dict using the given list of param_changes.
+
+        Note that the list of parameter changes is ordered. Parameter
+        changes later in the list may depend on parameter changes that have
+        been set earlier in the same list.
+        """
+        new_param_dict = copy.deepcopy(param_dict)
+        for pc in param_changes:
+            try:
+                obj_type = exp_param_specs[pc.name].obj_type
+            except:
+                raise Exception('Parameter %s not found' % pc.name)
+            new_param_dict[pc.name] = pc.get_normalized_value(
+                obj_type, new_param_dict)
+        return new_param_dict
+
     def submit_answer(
             self, exploration_id, state_name, answer,
-            params=None, handler_name=feconf.SUBMIT_HANDLER_NAME,
-            exploration_version=None):
+            params=None, exploration_version=None):
         """Submits an answer as an exploration player and returns the
-        corresponding dict.
+        corresponding dict. This function has strong parallels to code in
+        PlayerServices.js which has the non-test code to perform the same
+        functionality. This is replicated here so backend tests may utilize the
+        functionality of PlayerServices.js without being able to access it.
+
+        TODO(bhenning): Replicate this in an integration test to protect
+        against code skew here.
         """
         if params is None:
             params = {}
-        return reader.submit_answer_in_tests(
-            exploration_id, state_name, answer, params, handler_name,
-            exploration_version)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+
+        # First, the answer must be classified.
+        classify_result = self.post_json(
+            '/explorehandler/classify/%s' % exploration_id, {
+                'old_state': exploration.states[state_name].to_dict(),
+                'params': params,
+                'answer': answer
+            }
+        )
+
+        # Next, ensure the submission is recorded.
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
+                'answer': answer,
+                'params': params,
+                'version': exploration.version,
+                'old_state_name': state_name,
+                'rule_spec_string': classify_result['rule_spec_string']
+            }
+        )
+
+        # Now the next state's data must be calculated.
+        outcome = classify_result['outcome']
+        new_state = exploration.states[outcome['dest']]
+        params['answer'] = answer
+        new_params = self.get_updated_param_dict(
+            params, new_state.param_changes, exploration.param_specs)
+
+        return {
+            'feedback_html': jinja_utils.parse_string(
+                utils.get_random_choice(outcome['feedback'])
+                if outcome['feedback'] else '', params),
+            'question_html': new_state.content[0].to_html(new_params),
+            'state_name': outcome['dest']
+        }
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -362,6 +485,7 @@ class AppEngineTestBase(TestBase):
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
+        self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_urlfetch_stub()

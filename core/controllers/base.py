@@ -111,6 +111,17 @@ SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
     'Links and icon filenames for the social media buttons in the sidebar.',
     default_value=[])
 
+DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
+    'disabled_explorations', {
+        'type': 'list',
+        'items': {
+            'type': 'unicode'
+        }
+    },
+    'IDs of explorations which should not be displayable in either the '
+    'learner or editor views',
+    [])
+
 
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
@@ -516,7 +527,7 @@ class CsrfTokenManager(object):
 
         # Initialize to random value.
         config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, CSRF_SECRET.name,
+            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod
