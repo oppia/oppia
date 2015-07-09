@@ -17,77 +17,75 @@
  * the interaction.
  */
 
- oppia.filter('oppiaInteractiveItemSelectionInputValidator', ['$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
-   // Returns a list of warnings.
-   return function(stateName, customizationArgs, ruleSpecs) {
-     var warningsList = [];
+oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
+    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+    function($filter, WARNING_TYPES, baseInteractionValidationService) {
+  // Returns a list of warnings.
+  return function(stateName, customizationArgs, ruleSpecs) {
+    var warningsList = [];
 
-     var numItems = customizationArgs.items.value.length;
+    var numItems = customizationArgs.items.value.length;
 
-     var areAnyItemsEmpty = false;
-     var areAnyItemsDuplicated = false;
-     var seenItems = [];
-     for (var i = 0; i < customizationArgs.items.value.length; i++) {
-       var choice = customizationArgs.items.value[i];
-       if (choice.trim().length === 0) {
-         areAnyItemsEmpty = true;
-       }
-       if (seenItems.indexOf(choice) !== -1) {
-         areAnyItemsDuplicated = true;
-       }
-       seenItems.push(choice);
-     }
+    var areAnyItemsEmpty = false;
+    var areAnyItemsDuplicated = false;
+    var seenItems = [];
+    for (var i = 0; i < customizationArgs.items.value.length; i++) {
+      var item = customizationArgs.items.value[i];
+      if (item.trim().length === 0) {
+        areAnyItemsEmpty = true;
+      }
+      if (seenItems.indexOf(item) !== -1) {
+        areAnyItemsDuplicated = true;
+      }
+      seenItems.push(item);
+    }
 
-     if (areAnyItemsEmpty) {
-       warningsList.push({
-         type: WARNING_TYPES.CRITICAL,
-         message: 'please ensure the items are nonempty.'
-       });
-     }
-     if (areAnyItemsDuplicated) {
-       warningsList.push({
-         type: WARNING_TYPES.CRITICAL,
-         message: 'please ensure the items are unique.'
-       });
-     }
+    if (areAnyItemsEmpty) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure the items are nonempty.'
+      });
+    }
+    if (areAnyItemsDuplicated) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure the items are unique.'
+      });
+    }
 
-     var numRuleSpecs = ruleSpecs.length;
-     var uniqueRuleItems = [];
-     for (var i = 0; i < numRuleSpecs - 1; i++) {
-       if (ruleSpecs[i].definition.name === 'Equals' &&
-           uniqueRuleItems.indexOf(ruleSpecs[i].definition.inputs.x) === -1) {
-         uniqueRuleItems.push(ruleSpecs[i].definition.inputs.x);
-       }
+    var numRuleSpecs = ruleSpecs.length;
+    var uniqueRuleItems = [];
+    for (var i = 0; i < numRuleSpecs - 1; i++) {
+      if (ruleSpecs[i].definition.name === 'Equals' &&
+          uniqueRuleItems.indexOf(ruleSpecs[i].definition.inputs.x) === -1) {
+        uniqueRuleItems.push(ruleSpecs[i].definition.inputs.x);
+      }
 
-       if (ruleSpecs[i].definition.inputs.x >= numItems) {
-         warningsList.push({
-           type: WARNING_TYPES.CRITICAL,
-           message: 'please ensure that each rule corresponds to a valid choice.'
-         });
-       }
+      // TODO: Complete after implemention of Rules
+      // if (ruleSpecs[i].definition.inputs.x >= numItems) {
+      //   warningsList.push({
+      //     type: WARNING_TYPES.CRITICAL,
+      //     message: 'please ensure that each rule corresponds to a valid item.'
+      //   });
+      // }
+    }
 
-       if ($filter('isRuleSpecConfusing')(ruleSpecs[i], stateName)) {
-         warningsList.push({
-           type: WARNING_TYPES.ERROR,
-           message: (
-             'please specify what Oppia should do in rules ' +
-             String(i + 1) + '.')
-         });
-       }
-     }
+    warningsList = warningsList.concat(
+      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
+        ruleSpecs, stateName));
 
-     // Only require a default rule if some items have not been taken care of by rules.
-     if (uniqueRuleItems.length < numItems) {
-       var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-       if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
-         warningsList.push({
-           type: WARNING_TYPES.ERROR,
-           message: (
-             'please add a rule to cover what should happen in the general case.')
-         });
-       }
-     }
+    // Only require a default rule if some items have not been taken care of by rules.
+    if (uniqueRuleItems.length < numItems) {
+      var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
+      if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'please add a rule to cover what should happen in the general case.')
+        });
+      }
+    }
 
-     return warningsList;
-   };
- }]);
+    return warningsList;
+  };
+}]);

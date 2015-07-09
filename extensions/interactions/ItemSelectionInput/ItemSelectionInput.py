@@ -30,6 +30,13 @@ class ItemSelectionInput(base.BaseInteraction):
     }]
 
     _customization_arg_specs = [{
+        'name': 'selection_count',
+        'description': 'Number of selections the student can make',
+        'schema': {
+            'type': 'int'
+        },
+        'default_value': 1,
+    }, {
         'name': 'items',
         'description': 'Items for selection',
         'schema': {

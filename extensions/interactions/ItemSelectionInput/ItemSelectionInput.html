@@ -1,13 +1,13 @@
 <script type="text/ng-template" id="interaction/ItemSelectionInput">
-  <div class="item-selection-form-container">
-    <form ng-submit="submitAnswer()">
-        <label ng-repeat="item in items">
-            <input type="checkbox" ng-model="answer[item]" ng-click="toggleSelection(item)">
-                <span angular-html-bind="item"></span>
-        </label>
-      </br><button ng-click="submitAnswer()">Submit</button>
-    </form>
-  </div>
+  <form ng-submit="submitAnswer()">
+    <div class="checkbox" ng-repeat="item in items">
+      <label>
+        <input type="checkbox" ng-model="studentSelections[item]">
+        <span angular-html-bind="item"></span>
+      </label>
+    </div>
+    <md-button class="md-button-success" ng-click="submitAnswer()">Submit</md-button>
+  </form>
 </script>
 
 <script type="text/ng-template" id="response/ItemSelectionInput">

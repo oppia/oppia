@@ -22,7 +22,7 @@ from extensions.rules import base
 
 
 class Equals(base.SetOfHtmlStringRule):
-    description = "is equal to {{x|SetOfHtmlString}}"
+    description = 'is equal to {{x|SetOfHtmlString}}'
     is_generic = False
 
     def _evaluate(self, subject):
