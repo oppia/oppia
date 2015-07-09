@@ -25,9 +25,7 @@ class ItemSelectionInput(base.BaseInteraction):
         'Allows learners to select various options.')
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'SetOfHtmlString'
-    }]
+    answer_type = 'SetOfHtmlString'
 
     _customization_arg_specs = [{
         'name': 'selection_count',
