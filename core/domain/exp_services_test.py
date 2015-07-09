@@ -377,7 +377,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: %d
 skin_customizations:
   panels_contents: {}
 states:
@@ -396,8 +396,8 @@ states:
         dest: %s
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   New state:
     content:
@@ -414,14 +414,17 @@ states:
         dest: New state
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: %d
 tags: []
 """ % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME))
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = (
 """author_notes: ''
@@ -432,7 +435,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: %d
 skin_customizations:
   panels_contents: {}
 states:
@@ -451,8 +454,8 @@ states:
         dest: %s
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Renamed state:
     content:
@@ -469,14 +472,17 @@ states:
         dest: Renamed state
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: %d
 tags: []
 """ % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME))
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
@@ -576,8 +582,8 @@ interaction:
     dest: %s
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -597,8 +603,8 @@ interaction:
     dest: New state
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """)
     }
@@ -619,8 +625,8 @@ interaction:
     dest: Renamed state
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """)
     }
@@ -2045,7 +2051,7 @@ language_code: en
 objective: Old objective
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: %d
 skin_customizations:
   panels_contents: {}
 states:
@@ -2059,8 +2065,8 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   %s:
     content:
@@ -2075,13 +2081,15 @@ states:
         dest: END
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
 states_schema_version: %d
 tags: []
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
     def setUp(self):

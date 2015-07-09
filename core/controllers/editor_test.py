@@ -261,8 +261,8 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """),
         "State B": ("""content:
@@ -279,8 +279,8 @@ interaction:
     dest: State B
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
@@ -297,8 +297,8 @@ interaction:
     dest: %s
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -318,8 +318,8 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
+  fallbacks: []
   id: TextInput
-  triggers: []
 param_changes: []
 """)
 
