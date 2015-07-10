@@ -560,7 +560,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             // For reasons of backwards compatibility, the following keys
             // should not be changed.
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
-              'name': 'State name',
+              'name': 'Card name',
               'param_changes': 'Parameter changes',
               'content': 'Content',
               'widget_id': 'Interaction type',

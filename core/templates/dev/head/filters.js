@@ -236,8 +236,9 @@ oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
     var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
 
     if (answerGroup.rule_specs) {
-      var firstRule = $filter('parameterizeRuleDescription')(
-        answerGroup.rule_specs[0], interactionId, answerChoices);
+      var firstRule = $filter('convertToPlainText')(
+        $filter('parameterizeRuleDescription')(
+          answerGroup.rule_specs[0], interactionId, answerChoices));
       summary = 'Answer ' + firstRule;
 
       if (hasFeedback && shortenRule) {

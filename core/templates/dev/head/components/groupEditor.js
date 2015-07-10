@@ -24,7 +24,9 @@ oppia.directive('answerGroupEditor', [function() {
     scope: {
       rules: '=',
       outcome: '=',
-      saveAnswerGroup: '&',
+      saveAnswerGroupFeedback: '&',
+      saveAnswerGroupRules: '&',
+      saveAnswerGroupDest: '&',
       isEditable: '='
     },
     templateUrl: 'inline/group_editor',
@@ -80,14 +82,20 @@ oppia.directive('answerGroupEditor', [function() {
       }
     };
 
-    $scope.saveThisOutcome = function() {
-      $scope.$broadcast('saveOutcomeDetails');
+    $scope.saveThisFeedback = function() {
+      $scope.$broadcast('saveOutcomeFeedbackDetails');
       // TODO(sll): Add more validation prior to saving.
       $scope.feedbackEditorIsOpen = false;
-      $scope.destinationEditorIsOpen = false;
       $scope.outcomeFeedbackMemento = null;
+      $scope.saveAnswerGroupFeedback();
+    };
+
+    $scope.saveThisDestination = function() {
+      $scope.$broadcast('saveOutcomeDestDetails');
+      // TODO(sll): Add more validation prior to saving.
+      $scope.destinationEditorIsOpen = false;
       $scope.outcomeDestMemento = null;
-      $scope.saveAnswerGroup();
+      $scope.saveAnswerGroupDest();
     };
 
     $scope.cancelThisFeedbackEdit = function() {
@@ -105,11 +113,11 @@ oppia.directive('answerGroupEditor', [function() {
     $scope.$on('externalSave', function() {
       if ($scope.feedbackEditorIsOpen &&
           $scope.editAnswerGroupForm.editFeedbackForm.$valid) {
-        $scope.saveThisOutcome();
+        $scope.saveThisFeedback();
       }
       if ($scope.destinationEditorIsOpen &&
           $scope.editAnswerGroupForm.editDestForm.$valid) {
-        $scope.saveThisOutcome();
+        $scope.saveThisDestination();
       }
       if ($scope.isRuleEditorOpen()) {
         $scope.saveActiveRule();
@@ -249,16 +257,20 @@ oppia.directive('answerGroupEditor', [function() {
     $scope.saveActiveRule = function() {
       $scope.changeActiveRuleIndex(-1);
       $scope.rulesMemento = null;
-      $scope.saveAnswerGroup();
+      $scope.saveAnswerGroupRules();
     };
 
     $scope.changeActiveRuleIndex = function(newIndex) {
       responsesService.changeActiveRuleIndex(newIndex);
       $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
-      $scope.saveAnswerGroup();
+      $scope.saveAnswerGroupRules();
     };
 
     $scope.openRuleEditor = function(index) {
+      if (!$scope.isEditable) {
+        // The rule editor may not be opened in a read-only editor view.
+        return;
+      }
       $scope.rulesMemento = angular.copy($scope.rules);
       $scope.changeActiveRuleIndex(index);
     };
@@ -295,11 +307,11 @@ oppia.directive('answerGroupEditor', [function() {
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       if ($scope.feedbackEditorIsOpen &&
           $scope.editAnswerGroupForm.editFeedbackForm.$valid) {
-        $scope.saveThisOutcome();
+        $scope.saveThisFeedback();
       }
       if ($scope.destinationEditorIsOpen &&
           $scope.editAnswerGroupForm.editDestForm.$valid) {
-        $scope.saveThisOutcome();
+        $scope.saveThisDestination();
       }
       if ($scope.isRuleEditorOpen()) {
         $scope.saveActiveRule();
@@ -322,7 +334,7 @@ oppia.directive('outcomeFeedbackEditor', [function() {
       function($scope) {
         $scope.OUTCOME_FEEDBACK_SCHEMA = {type: 'html'};
 
-        $scope.$on('saveOutcomeDetails', function() {
+        $scope.$on('saveOutcomeFeedbackDetails', function() {
           // Remove null feedback.
           var nonemptyFeedback = [];
           for (var i = 0; i < $scope.outcome.feedback.length; i++) {
@@ -356,7 +368,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
           stateGraphArranger, PLACEHOLDER_OUTCOME_DEST) {
         var lastSetRuleDest = $scope.outcome.dest;
 
-        $scope.$on('saveOutcomeDetails', function() {
+        $scope.$on('saveOutcomeDestDetails', function() {
           // Create new state if specified.
           if ($scope.outcome.dest == PLACEHOLDER_OUTCOME_DEST) {
             var newStateName = $scope.outcome.newStateName;

@@ -108,7 +108,8 @@ oppia.factory('responsesService', [
   };
 
   return {
-    // The 'data' arg is a list of interaction handlers for the currently-active state.
+    // The 'data' arg is a list of interaction handlers for the currently-active
+    // state.
     init: function(data) {
       answerGroupsCache.reset();
 
@@ -187,13 +188,27 @@ oppia.factory('responsesService', [
       _activeAnswerGroupIndex = 0;
       return true;
     },
-    saveActiveAnswerGroup: function(activeRules, activeOutcome) {
+    updateActiveAnswerGroup: function(updates) {
       var answerGroup = _answerGroups[_activeAnswerGroupIndex];
-      answerGroup.rule_specs = activeRules;
-      answerGroup.outcome = activeOutcome;
+      if (updates.rules) {
+        answerGroup.rule_specs = updates.rules;
+      }
+      if (updates.feedback) {
+        answerGroup.outcome.feedback = updates.feedback;
+      }
+      if (updates.dest) {
+        answerGroup.outcome.dest = updates.dest;
+      }
       _saveAnswerGroups(_answerGroups);
     },
-    saveDefaultOutcome: function(outcome) {
+    updateDefaultOutcome: function(updates) {
+      var outcome = _defaultOutcome;
+      if (updates.feedback) {
+        outcome.feedback = updates.feedback;
+      }
+      if (updates.dest) {
+        outcome.dest = updates.dest;
+      }
       _saveDefaultOutcome(outcome);
     },
     // Updates answer choices when the interaction requires it -- for example,
@@ -208,8 +223,8 @@ oppia.factory('responsesService', [
     getDefaultOutcome: function() {
       return angular.copy(_defaultOutcome);
     },
-    // This registers the change to the handlers in the list of changes, and also
-    // updates the states object in explorationStatesService.
+    // This registers the change to the handlers in the list of changes, and
+    // also updates the states object in explorationStatesService.
     save: function(newAnswerGroups, defaultOutcome) {
       _saveAnswerGroups(newAnswerGroups);
       _saveDefaultOutcome(defaultOutcome);
@@ -307,7 +322,8 @@ oppia.controller('StateRules', [
         $scope.addAnswerGroupForm = {};
 
         $scope.addNewResponse = function() {
-          $scope.$broadcast('saveOutcomeDetails');
+          $scope.$broadcast('saveOutcomeFeedbackDetails');
+          $scope.$broadcast('saveOutcomeDestDetails');
           $modalInstance.close({
             'tmpRule': $scope.tmpRule,
             'tmpOutcome': $scope.tmpOutcome
@@ -360,12 +376,28 @@ oppia.controller('StateRules', [
     }
   };
 
-  $scope.saveActiveAnswerGroup = function(updatedRules, updatedOutcome) {
-    responsesService.saveActiveAnswerGroup(updatedRules, updatedOutcome);
+  $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
+    responsesService.updateActiveAnswerGroup({
+      'feedback': updatedOutcome.feedback
+    });
   };
 
-  $scope.saveDefaultOutcome = function(updatedOutcome) {
-    responsesService.saveDefaultOutcome(updatedOutcome);
+  $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
+    responsesService.updateActiveAnswerGroup({'dest': updatedOutcome.dest});
+  };
+
+  $scope.saveActiveAnswerGroupRules = function(updatedRules) {
+    responsesService.updateActiveAnswerGroup({'rules': updatedRules});
+  };
+
+  $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
+    responsesService.updateDefaultOutcome({
+      'feedback': updatedOutcome.feedback
+    });
+  };
+
+  $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
+    responsesService.updateDefaultOutcome({'dest': updatedOutcome.dest});
   };
 
   $scope.getAnswerChoices = function() {

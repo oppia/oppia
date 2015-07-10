@@ -1116,8 +1116,14 @@ pre.oppia-pre-wrapped-text {
   padding: 7px 15px;
   width: 100%;
 }
+.nav-pills > li > a.oppia-rule-tab-disabled {
+  cursor: default;
+}
 .nav-pills > li:hover > a.oppia-rule-tab {
   background: rgba(0,0,0,0.1);
+}
+.nav-pills > li:hover > a.oppia-rule-tab-disabled {
+  background: rgba(0,0,0,0.05);
 }
 .nav-pills > li.active > a.oppia-rule-tab-active {
   background: rgba(5,140,166,0.1);

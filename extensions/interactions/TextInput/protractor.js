@@ -35,10 +35,27 @@ var expectInteractionDetailsToMatch = function(elem, placeholderText, heightOfBo
 };
 
 var submitAnswer = function(elem, answer) {
-  elem.element(by.tagName('oppia-interactive-text-input')).
-    element(by.tagName('textarea')).sendKeys(answer);
-  elem.element(by.tagName('oppia-interactive-text-input')).
-    element(by.tagName('button')).click();
+  // Try to get the text area element. If it doesn't exist, try input instead.
+  // They are different depending on the height of the box.
+  var textInputElem = elem.element(by.tagName('oppia-interactive-text-input'));
+  var textAreaElem = textInputElem.element(by.tagName('textarea'));
+  var inputElem = textInputElem.element(by.tagName('input'));
+  textAreaElem.isPresent().then(function(present) {
+    if (present) {
+      textAreaElem.sendKeys(answer);
+      textInputElem.element(by.tagName('button')).click();
+    } else {
+      // This must be chained in here due to the textInputElem possibly being
+      // invisible after the longer text area submits, causing the instantiation
+      // of this promise object to throw a validation error due to it referring
+      // to an element which does not exist.
+      inputElem.isPresent().then(function(present) {
+        if (present) {
+          inputElem.sendKeys(answer + '\n');
+        }
+      });
+    }
+  });
 };
 
 var answerObjectType = 'NormalizedString';

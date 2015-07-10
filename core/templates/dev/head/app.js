@@ -224,7 +224,7 @@ oppia.factory('validatorsService', [
       }
       return true;
     },
-    // NB: this does not check whether the state name already exists in the
+    // NB: this does not check whether the card name already exists in the
     // states dict.
     isValidStateName: function(input, showWarnings) {
       if (!this.isValidEntityName(input, showWarnings)) {
@@ -234,7 +234,7 @@ oppia.factory('validatorsService', [
       if (input.length > 50) {
         if (showWarnings) {
           warningsData.addWarning(
-            'State names should be at most 50 characters long.');
+            'Card names should be at most 50 characters long.');
         }
         return false;
       }
