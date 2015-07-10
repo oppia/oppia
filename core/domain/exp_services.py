@@ -105,6 +105,12 @@ def _migrate_states_schema(versioned_exploration_states):
             versioned_exploration_states)
         exploration_states_schema_version = 4
 
+    # Check for conversion to v5.
+    if exploration_states_schema_version == 4:
+        exp_domain.Exploration.update_states_v4_to_v5_from_model(
+            versioned_exploration_states)
+        exploration_states_schema_version = 5
+
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -119,10 +125,10 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     """Returns an Exploration domain object given an exploration model loaded
     from the datastore.
 
-    If run_conversion is True, then the exploration's states schema version will
-    be checked against the current states schema version. If they do not match,
-    the exploration will be automatically updated to the latest states schema
-    version.
+    If run_conversion is True, then the exploration's states schema version
+    will be checked against the current states schema version. If they do not
+    match, the exploration will be automatically updated to the latest states
+    schema version.
 
     IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should never be
     False. This option is only used for testing that the states schema version

@@ -63,7 +63,8 @@ class AdviceBar(base.BaseGadget):
             'default_value': []
         }, {
             'name': 'orientation',
-            'description': 'Whether to extend tips horizontally or vertically.',
+            'description': (
+                'Whether to extend tips horizontally or vertically.'),
             'schema': {
                 'type': 'unicode',
                 'choices': ['horizontal', 'vertical']

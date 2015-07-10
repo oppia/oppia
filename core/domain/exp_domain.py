@@ -35,6 +35,7 @@ from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import skins_services
+from core.domain import trigger_registry
 import feconf
 import jinja_utils
 import utils
@@ -73,6 +74,80 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # used as an identifier for the default rule when storing which rule an answer
 # was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
+
+
+def _get_full_customization_args(customization_args, ca_specs):
+    """Populates the given customization_args dict with default values
+    if any of the expected customization_args are missing.
+    """
+    for ca_spec in ca_specs:
+        if ca_spec.name not in customization_args:
+            customization_args[ca_spec.name] = {
+                'value': ca_spec.default_value
+            }
+    return customization_args
+
+
+def _validate_customization_args_and_values(
+        item_name, item_type, customization_args,
+        ca_specs_to_validate_against):
+    """Validates the given `customization_args` dict against the specs set out
+    in `ca_specs_to_validate_against`.
+
+    The item_name is either 'interaction', 'gadget' or 'trigger', and the
+    item_type is the id/type of the interaction/gadget/trigger, respectively.
+    These strings are used to populate any error messages that arise during
+    validation.
+
+    Note that this may modify the given customization_args dict, if it has
+    extra or missing keys.
+    """
+    ca_spec_names = [
+        ca_spec.name for ca_spec in ca_specs_to_validate_against]
+
+    if not isinstance(customization_args, dict):
+        raise utils.ValidationError(
+            'Expected customization args to be a dict, received %s'
+            % customization_args)
+
+    # Validate and clean up the customization args.
+
+    # Populate missing keys with the default values.
+    customization_args = _get_full_customization_args(
+        customization_args, ca_specs_to_validate_against)
+
+    # Remove extra keys.
+    extra_args = []
+    for (arg_name, arg_value) in customization_args.iteritems():
+        if not isinstance(arg_name, basestring):
+            raise utils.ValidationError(
+                'Invalid customization arg name: %s' % arg_name)
+        if arg_name not in ca_spec_names:
+            extra_args.append(arg_name)
+            logging.warning(
+                '%s %s does not support customization arg %s.'
+                % (item_name.capitalize(), item_type, arg_name))
+    for extra_arg in extra_args:
+        del customization_args[extra_arg]
+
+    # Check that each value has the correct type.
+    for ca_spec in ca_specs_to_validate_against:
+        try:
+            schema_utils.normalize_against_schema(
+                customization_args[ca_spec.name]['value'],
+                ca_spec.schema)
+        except Exception as e:
+            # TODO(sll): Raise an actual exception here if parameters are not
+            # involved. (If they are, can we get sample values for the state
+            # context parameters?)
+            """
+            logging.error(
+                'Validation error for customization arg %s: value %s does not '
+                'match schema %s.' % (
+                    ca_spec.name,
+                    unicode(customization_args[ca_spec.name]['value']),
+                    ca_spec.schema))
+            """
 
 
 class ExplorationChange(object):
@@ -252,8 +327,8 @@ class RuleSpec(object):
 
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
-        not refer to any non-existent parameters and that it contains values for
-        all the parameters the rule expects.
+        not refer to any non-existent parameters and that it contains values
+        for all the parameters the rule expects.
 
         Args:
             rule_params_list: A list of parameters used by the rule represented
@@ -279,8 +354,8 @@ class RuleSpec(object):
         # Check if there are input keys which are not rule parameters.
         if leftover_input_keys:
             logging.warning(
-                'RuleSpec \'%s\' has inputs which are not recognized parameter '
-                'names: %s' % (self.rule_type, leftover_input_keys))
+                'RuleSpec \'%s\' has inputs which are not recognized '
+                'parameter names: %s' % (self.rule_type, leftover_input_keys))
 
         # Check if there are missing parameters.
         if leftover_param_names:
@@ -297,7 +372,8 @@ class RuleSpec(object):
                 # the parameter spec with the rule parameter.
                 start_brace_index = param_value.index('{{') + 2
                 end_brace_index = param_value.index('}}')
-                param_spec_name = param_value[start_brace_index:end_brace_index]
+                param_spec_name = param_value[
+                    start_brace_index:end_brace_index]
                 if param_spec_name not in exp_param_specs_dict:
                     raise utils.ValidationError(
                         'RuleSpec \'%s\' has an input with name \'%s\' which '
@@ -385,9 +461,9 @@ class Outcome(object):
 class AnswerGroup(object):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
-    rules are ORed together. Answer groups may also support fuzzy/implicit rules
-    that involve soft matching of answers to a set of training data and/or
-    example answers dictated by the creator.
+    rules are ORed together. Answer groups may also support fuzzy/implicit
+    rules that involve soft matching of answers to a set of training data
+    and/or example answers dictated by the creator.
     """
     def to_dict(self):
         return {
@@ -438,43 +514,102 @@ class AnswerGroup(object):
         self.outcome.validate()
 
 
+class TriggerInstance(object):
+    """Value object representing a trigger.
+
+    A trigger refers to a condition that may arise during a learner
+    playthrough, such as a certain number of loop-arounds on the current state,
+    or a certain amount of time having elapsed.
+    """
+    def __init__(self, trigger_type, customization_args):
+        # A string denoting the type of trigger.
+        self.trigger_type = trigger_type
+        # Customization args for the trigger. This is a dict: the keys and
+        # values are the names of the customization_args for this trigger
+        # type, and the corresponding values for this instance of the trigger,
+        # respectively. The values consist of standard Python/JSON data types
+        # (i.e. strings, ints, booleans, dicts and lists, but not objects).
+        self.customization_args = customization_args
+
+    def to_dict(self):
+        return {
+            'trigger_type': self.trigger_type,
+            'customization_args': self.customization_args,
+        }
+
+    @classmethod
+    def from_dict(cls, trigger_dict):
+        return cls(
+            trigger_dict['trigger_type'],
+            trigger_dict['customization_args'])
+
+    def validate(self):
+        if not isinstance(self.trigger_type, basestring):
+            raise utils.ValidationError(
+                'Expected trigger type to be a string, received %s' %
+                self.trigger_type)
+
+        try:
+            trigger = trigger_registry.Registry.get_trigger(self.trigger_type)
+        except KeyError:
+            raise utils.ValidationError(
+                'Unknown trigger type: %s' % self.trigger_type)
+
+        # Verify that the customization args are valid.
+        _validate_customization_args_and_values(
+            'trigger', self.trigger_type, self.customization_args,
+            trigger.customization_arg_specs)
+
+
+class Fallback(object):
+    """Value object representing a fallback.
+
+    A fallback consists of a trigger and an outcome. When the trigger is
+    satisfied, the user flow is rerouted to the given outcome.
+    """
+    def __init__(self, trigger, outcome):
+        self.trigger = trigger
+        self.outcome = outcome
+
+    def to_dict(self):
+        return {
+            'trigger': self.trigger.to_dict(),
+            'outcome': self.outcome.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, fallback_dict):
+        return cls(
+            TriggerInstance.from_dict(fallback_dict['trigger']),
+            Outcome.from_dict(fallback_dict['outcome']))
+
+    def validate(self):
+        self.trigger.validate()
+        self.outcome.validate()
+
+
 class InteractionInstance(object):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
     _DEFAULT_INTERACTION_ID = None
 
-    def _get_full_customization_args(self):
-        """Populates the customization_args dict of the interaction with
-        default values, if any of the expected customization_args are missing.
-        """
-        full_customization_args_dict = copy.deepcopy(self.customization_args)
-
-        interaction = interaction_registry.Registry.get_interaction_by_id(
-            self.id)
-        for ca_spec in interaction.customization_arg_specs:
-            if ca_spec.name not in full_customization_args_dict:
-                full_customization_args_dict[ca_spec.name] = {
-                    'value': ca_spec.default_value
-                }
-        return full_customization_args_dict
-
     def to_dict(self):
-        interaction_dict = {
+        return {
             'id': self.id,
             'customization_args': (
-                {} if self.id is None
-                else self._get_full_customization_args()),
-            'answer_groups': [
-                group.to_dict()
-                for group in self.answer_groups],
+                {} if self.id is None else
+                _get_full_customization_args(
+                    self.customization_args,
+                    interaction_registry.Registry.get_interaction_by_id(
+                        self.id).customization_arg_specs)),
+            'answer_groups': [group.to_dict() for group in self.answer_groups],
             'default_outcome': (
                 self.default_outcome.to_dict()
                 if self.default_outcome is not None
                 else None),
-            'triggers': self.triggers,
+            'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
         }
-        return interaction_dict
 
     @classmethod
     def from_dict(cls, interaction_dict):
@@ -486,11 +621,12 @@ class InteractionInstance(object):
             interaction_dict['customization_args'],
             [AnswerGroup.from_dict(h)
              for h in interaction_dict['answer_groups']],
-            default_outcome_dict, interaction_dict['triggers'])
+            default_outcome_dict,
+            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']])
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-            default_outcome, triggers):
+            default_outcome, fallbacks):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -498,11 +634,9 @@ class InteractionInstance(object):
         # values are dicts with a single key, 'value', whose corresponding
         # value is the value of the customization arg.
         self.customization_args = customization_args
-        # Answer groups.
         self.answer_groups = answer_groups
         self.default_outcome = default_outcome
-        # TODO(sll): Create Trigger class.
-        self.triggers = copy.deepcopy(triggers)
+        self.fallbacks = fallbacks
 
     @property
     def is_terminal(self):
@@ -534,36 +668,9 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        customization_arg_names = [
-            ca_spec.name for ca_spec in interaction.customization_arg_specs]
-
-        if not isinstance(self.customization_args, dict):
-            raise utils.ValidationError(
-                'Expected customization args to be a dict, received %s'
-                % self.customization_args)
-
-        # Validate and clean up the customization args.
-        extra_args = []
-        for (arg_name, arg_value) in self.customization_args.iteritems():
-            if not isinstance(arg_name, basestring):
-                raise utils.ValidationError(
-                    'Invalid customization arg name: %s' % arg_name)
-            if arg_name not in customization_arg_names:
-                extra_args.append(arg_name)
-                logging.warning(
-                    'Interaction %s does not support customization arg %s.'
-                    % (self.id, arg_name))
-        for extra_arg in extra_args:
-            del self.customization_args[extra_arg]
-
-        try:
-            interaction.validate_customization_arg_values(
-                self.customization_args)
-        except Exception:
-            # TODO(sll): Raise an exception here if parameters are not
-            # involved. (If they are, can we get sample values for the state
-            # context parameters?)
-            pass
+        _validate_customization_args_and_values(
+            'interaction', self.id, self.customization_args,
+            interaction.customization_arg_specs)
 
         if not isinstance(self.answer_groups, list):
             raise utils.ValidationError(
@@ -587,13 +694,12 @@ class InteractionInstance(object):
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
-        # TODO(sll): Update trigger validation.
-        if not isinstance(self.triggers, list):
+        if not isinstance(self.fallbacks, list):
             raise utils.ValidationError(
-                'Expected triggers to be a list, received %s'
-                % self.triggers)
-        if self.triggers:
-            raise utils.ValidationError('Expected empty triggers list.')
+                'Expected fallbacks to be a list, received %s'
+                % self.fallbacks)
+        for fallback in self.fallbacks:
+            fallback.validate()
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
@@ -639,17 +745,11 @@ class GadgetInstance(object):
             raise utils.ValidationError(
                 'Unknown gadget with ID %s is not in the registry.' % self.id)
 
-        unknown_customization_arguments = set(
-            self.customization_args.iterkeys()) - set(
-                [customization_arg.name for customization_arg
-                 in self.gadget.customization_arg_specs])
-        if unknown_customization_arguments:
-            for arg_name in unknown_customization_arguments:
-                logging.warning(
-                    'Gadget %s does not support customization arg %s.'
-                    % (self.id, arg_name))
-            del self.customization_args[arg_name]
+        _validate_customization_args_and_values(
+            'gadget', self.id, self.customization_args,
+            self.gadget.customization_arg_specs)
 
+        # Do additional per-gadget validation on the customization args.
         self.gadget.validate(self.customization_args)
 
         if self.visible_in_states == []:
@@ -674,7 +774,9 @@ class GadgetInstance(object):
         return {
             'gadget_id': self.id,
             'visible_in_states': self.visible_in_states,
-            'customization_args': self._get_full_customization_args(),
+            'customization_args': _get_full_customization_args(
+                self.customization_args,
+                self.gadget.customization_arg_specs),
         }
 
     @classmethod
@@ -684,19 +786,6 @@ class GadgetInstance(object):
             gadget_dict['gadget_id'],
             gadget_dict['visible_in_states'],
             gadget_dict['customization_args'])
-
-    def _get_full_customization_args(self):
-        """Populates the customization_args dict of the gadget with
-        default values, if any of the expected customization_args are missing.
-        """
-        full_customization_args_dict = copy.deepcopy(self.customization_args)
-
-        for ca_spec in self.gadget.customization_arg_specs:
-            if ca_spec.name not in full_customization_args_dict:
-                full_customization_args_dict[ca_spec.name] = {
-                    'value': ca_spec.default_value
-                }
-        return full_customization_args_dict
 
 
 class SkinInstance(object):
@@ -786,7 +875,7 @@ class State(object):
             'feedback': [],
             'param_changes': [],
         },
-        'triggers': [],
+        'fallbacks': [],
     }
 
     def __init__(self, content, param_changes, interaction):
@@ -801,7 +890,7 @@ class State(object):
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
-            interaction.triggers)
+            interaction.fallbacks)
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         if not isinstance(self.content, list):
@@ -917,6 +1006,15 @@ class State(object):
                 for feedback in self.interaction.default_outcome.feedback]
         else:
             self.interaction.default_outcome = None
+
+    def update_interaction_fallbacks(self, fallbacks_list):
+        if not isinstance(fallbacks_list, list):
+            raise Exception(
+                'Expected fallbacks_list to be a list, received %s'
+                % fallbacks_list)
+        self.interaction.fallbacks = [
+            Fallback.from_dict(fallback_dict)
+            for fallback_dict in fallbacks_list]
 
     def to_dict(self):
         return {
@@ -1035,8 +1133,8 @@ class Exploration(object):
             cls, exploration_dict,
             exploration_version=0, exploration_created_on=None,
             exploration_last_updated=None):
-        # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and from
-        # an ExplorationModel/dictionary MUST be exhaustive and complete.
+        # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
+        # from an ExplorationModel/dictionary MUST be exhaustive and complete.
         exploration = cls.create_default_exploration(
             exploration_dict['id'],
             exploration_dict['title'],
@@ -1102,7 +1200,7 @@ class Exploration(object):
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
-                idict['triggers'])
+                [Fallback.from_dict(f) for f in idict['fallbacks']])
 
             exploration.states[state_name] = state
 
@@ -1619,8 +1717,8 @@ class Exploration(object):
         # links other states have to an implicit 'END' state. Otherwise, if no
         # states refer to a state called 'END', no new state will be introduced
         # since it would be isolated from all other states in the graph and
-        # create additional warnings for the user. If they were not referring to
-        # an 'END' state before, then they would only be receiving warnings
+        # create additional warnings for the user. If they were not referring
+        # to an 'END' state before, then they would only be receiving warnings
         # about not being able to complete the exploration. The introduction of
         # a real END state would produce additional warnings (state cannot be
         # reached from other states, etc.)
@@ -1663,7 +1761,6 @@ class Exploration(object):
                             'param_changes': []
                         }]
                     }],
-                    'triggers': []
                 },
                 'param_changes': []
             }
@@ -1774,6 +1871,23 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v4_dict_to_v5_dict(cls, states_dict):
+        """Converts from version 4 to 5. Version 5 removes the triggers list
+        within interactions, and replaces it with a fallbacks list.
+
+        Note that the states_dict being passed in is modified in-place.
+        """
+        # Ensure all states interactions have a fallbacks list.
+        for (state_name, sdict) in states_dict.iteritems():
+            interaction = sdict['interaction']
+            if 'triggers' in interaction:
+                del interaction['triggers']
+            if 'fallbacks' not in interaction:
+                interaction['fallbacks'] = []
+
+        return states_dict
+
+    @classmethod
     def update_states_v0_to_v1_from_model(cls, versioned_exploration_states):
         """Converts from states schema version 0 to 1 of the states blob
         contained in the versioned exploration states dict provided.
@@ -1825,11 +1939,24 @@ class Exploration(object):
             versioned_exploration_states['states'])
         versioned_exploration_states['states'] = converted_states
 
+    @classmethod
+    def update_states_v4_to_v5_from_model(cls, versioned_exploration_states):
+        """Converts from states schema version 4 to 5 of the states blob
+        contained in the versioned exploration states dict provided.
+
+        Note that the versioned_exploration_states being passed in is modified
+        in-place.
+        """
+        versioned_exploration_states['states_schema_version'] = 5
+        converted_states = cls._convert_states_v4_dict_to_v5_dict(
+            versioned_exploration_states['states'])
+        versioned_exploration_states['states'] = converted_states
+
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 7
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 8
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -1922,6 +2049,20 @@ class Exploration(object):
 
         return exploration_dict
 
+    @classmethod
+    def _convert_v7_dict_to_v8_dict(cls, exploration_dict):
+        """Converts a v7 exploration dict into a v8 exploration dict."""
+        exploration_dict['schema_version'] = 8
+
+        # Ensure this exploration is up-to-date with states schema v5.
+        exploration_dict['states'] = cls._convert_states_v4_dict_to_v5_dict(
+            exploration_dict['states'])
+
+        # Update the states schema version to reflect the above conversions to
+        # the states dict.
+        exploration_dict['states_schema_version'] = 5
+
+        return exploration_dict
 
     @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
@@ -1940,8 +2081,8 @@ class Exploration(object):
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1, v2, v3 and v4 YAML files at '
-                'present.')
+                'Sorry, we can only process v1 to v%s YAML files at '
+                'present.' % cls.CURRENT_EXPLORATION_SCHEMA_VERSION)
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
@@ -1971,6 +2112,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v6_dict_to_v7_dict(
                 exploration_dict)
             exploration_schema_version = 7
+
+        if exploration_schema_version == 7:
+            exploration_dict = cls._convert_v7_dict_to_v8_dict(
+                exploration_dict)
+            exploration_schema_version = 8
 
         exploration_dict['id'] = exploration_id
         exploration_dict['title'] = title

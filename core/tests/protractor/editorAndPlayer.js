@@ -494,8 +494,8 @@ describe('Exploration history', function() {
       16: {text: '    dest: first', highlighted: true},
       17: {text: '    feedback: []', highlighted: false},
       18: {text: '    param_changes: []', highlighted: false},
-      19: {text: '  id: NumericInput', highlighted: true},
-      20: {text: '  triggers: []', highlighted: false},
+      19: {text: '  fallbacks: []', highlighted: false},
+      20: {text: '  id: NumericInput', highlighted: true},
       21: {text: 'param_changes: []', highlighted: false},
       22: {text: ' ', highlighted: false}
     };
@@ -512,8 +512,8 @@ describe('Exploration history', function() {
       8: {text: '    dest: First State', highlighted: true},
       9: {text: '    feedback: []', highlighted: false},
       10: {text: '    param_changes: []', highlighted: false},
-      11: {text: '  id: null', highlighted: true},
-      12: {text: '  triggers: []', highlighted: false},
+      11: {text: '  fallbacks: []', highlighted: false},
+      12: {text: '  id: null', highlighted: true},
       13: {text: 'param_changes: []', highlighted: false},
       14: {text: ' ', highlighted: false}
     };
@@ -530,8 +530,8 @@ describe('Exploration history', function() {
       '    dest: final state\n' +
       '    feedback: []\n' +
       '    param_changes: []\n' +
+      '  fallbacks: []\n' +
       '  id: Continue\n' +
-      '  triggers: []\n' +
       'param_changes: []\n' +
       ' ';
 
