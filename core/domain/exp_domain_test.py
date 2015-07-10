@@ -72,7 +72,16 @@ states:
         dest: New state
         feedback: []
         param_changes: []
-      fallbacks: []
+      fallbacks:
+      - outcome:
+          dest: New state
+          feedback: []
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 42
+          trigger_type: NthResubmission
       id: null
     param_changes: []
 states_schema_version: %d
@@ -830,6 +839,24 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['New state'])
         self.assertEqual(len(exploration.states), 2)
 
+        exploration.states['New state'].update_interaction_fallbacks([{
+            'trigger': {
+                'trigger_type': 'NthResubmission',
+                'customization_args': {
+                    'num_submits': {
+                        'value': 42,
+                    },
+                },
+            },
+            'outcome': {
+                'dest': 'New state',
+                'feedback': [],
+                'param_changes': [],
+            },
+        }])
+
+        exploration.validate()
+
         yaml_content = exploration.to_yaml()
         self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
@@ -861,7 +888,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         yaml_content = exploration_without_gadgets.to_yaml()
         self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
-
     def test_yaml_import_and_export_with_gadgets(self):
         """Test from_yaml() and to_yaml() methods including gadgets."""
 
@@ -874,6 +900,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         sample_yaml_as_dict = utils.dict_from_yaml(
             SAMPLE_YAML_CONTENT_WITH_GADGETS)
         self.assertEqual(generated_yaml_as_dict, sample_yaml_as_dict)
+
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""

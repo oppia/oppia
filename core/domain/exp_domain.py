@@ -100,7 +100,7 @@ def _validate_customization_args_and_values(
     validation.
 
     Note that this may modify the given customization_args dict, if it has
-    extra keys. This will only log an error, but not raise an Exception.
+    extra or missing keys.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -521,7 +521,6 @@ class TriggerInstance(object):
     playthrough, such as a certain number of loop-arounds on the current state,
     or a certain amount of time having elapsed.
     """
-
     def __init__(self, trigger_type, customization_args):
         # A string denoting the type of trigger.
         self.trigger_type = trigger_type
@@ -623,7 +622,7 @@ class InteractionInstance(object):
             [AnswerGroup.from_dict(h)
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
-            interaction_dict['fallbacks'])
+            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']])
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
@@ -1201,7 +1200,7 @@ class Exploration(object):
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
-                idict['fallbacks'])
+                [Fallback.from_dict(f) for f in idict['fallbacks']])
 
             exploration.states[state_name] = state
 
@@ -1762,7 +1761,6 @@ class Exploration(object):
                             'param_changes': []
                         }]
                     }],
-                    'fallbacks': []
                 },
                 'param_changes': []
             }

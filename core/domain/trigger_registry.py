@@ -48,7 +48,8 @@ class Registry(object):
         """Gets a trigger by its type.
 
         Refreshes once if the trigger is not found; subsequently, throws a
-        KeyError."""
+        KeyError.
+        """
         if trigger_type not in cls._triggers_dict:
             cls._refresh()
 

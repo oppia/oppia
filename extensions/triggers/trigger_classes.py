@@ -32,7 +32,6 @@ class BaseTrigger(object):
     This class is not meant to be user-editable. The only methods on it should
     be get()-type methods.
     """
-
     # Customization arg specifications for the trigger, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
