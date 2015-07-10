@@ -182,7 +182,10 @@ def _clear_login_cookies(response_headers):
     for cookie_name in ['ACSID', 'SACSID']:
         cookie = Cookie.SimpleCookie()
         cookie[cookie_name] = ''
-        cookie[cookie_name]['expires'] = ONE_DAY_AGO_IN_SECS
+        cookie[cookie_name]['expires'] = (
+            datetime.datetime.utcnow() +
+            datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
+        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
         response_headers.add_header(*cookie.output().split(': ', 1))
 
 
