@@ -114,7 +114,7 @@ oppia.factory('stateTransitionService', [
 
   // Evaluate feedback.
   var makeFeedback = function(feedbacks, envs) {
-    var feedbackHtml = feedbacks.length > 0 ? randomFromArray(feedbacks) : '';
+    var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
     return expressionInterpolationService.processHtml(feedbackHtml, envs);
   };
 

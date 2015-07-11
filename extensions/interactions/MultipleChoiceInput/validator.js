@@ -93,7 +93,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please add a rule to cover what should happen in the general case.')
+            'please clarify the default outcome so it less confusing to the user.')
         });
       }
     }

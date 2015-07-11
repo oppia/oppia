@@ -187,7 +187,7 @@ oppia.controller('ExplorationEditor', [
     heading: 'Content',
     text: (
       'An Oppia exploration is a one-on-one conversation that is divided ' +
-      'into several \'states\'. A state consists of Oppia asking a question, and the ' +
+      'into several \'cards\'. A card consists of Oppia asking a question, and the ' +
       'learner responding.<br><br>' +
       'This is where you can tell Oppia what to say to the learner at the beginning.'),
     placement: 'right'
@@ -208,7 +208,7 @@ oppia.controller('ExplorationEditor', [
       'After telling Oppia what to say, choose how you want the learner to respond by ' +
       'selecting an <b>interaction type</b>.' +
       'Then, based on the learner\'s response, you can tell Oppia how to reply by ' +
-      'creating a <b>rule</b>.')
+      'creating a <b>response</b>.')
   }, {
     type: 'function',
     fn: function(isGoingForward) {
@@ -547,7 +547,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
               'default_skin_id': 'Default skin',
-              'init_state_name': 'First state'
+              'init_state_name': 'First card'
             };
 
             // For reasons of backwards compatibility, the following keys
@@ -563,12 +563,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             // For reasons of backwards compatibility, the following keys
             // should not be changed.
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
-              'name': 'State name',
+              'name': 'Card name',
               'param_changes': 'Parameter changes',
               'content': 'Content',
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
-              'answer_groups': 'Answer groups',
+              'answer_groups': 'Responses',
               'default_outcome': 'Default outcome'
             }
 

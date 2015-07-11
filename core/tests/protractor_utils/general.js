@@ -67,7 +67,7 @@ var ADMIN_URL_SUFFIX = '/admin';
 var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
-var FIRST_STATE_DEFAULT_NAME = 'First State';
+var FIRST_STATE_DEFAULT_NAME = 'First Card';
 
 
 var _getExplorationId = function(currentUrlPrefix) {

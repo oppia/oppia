@@ -22,7 +22,9 @@
 #   bash scripts/run_js_integration_tests.sh
 # Optional arguments:
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
-#   --shardInstances=# Sets the number of parallel browsers to open while sharding.
+#   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
+# Sharding must be disabled (either by passing in false to --sharding or 1 to
+# --sharding-instances) if running any tests in isolation (iit or ddescribe).
 # The root folder MUST be named 'oppia'.
 # It runs integration tests.
 
@@ -158,7 +160,7 @@ for i in "$@"; do
     shift
     ;;
 
-    --shardInstances=*)
+    --sharding-instances=*)
     SHARD_INSTANCES="${i#*=}"
     shift
     ;;
@@ -169,9 +171,13 @@ for i in "$@"; do
   esac
 done
 
-if [ "$SHARDING" = false ] ; then
-  SHARD_INSTANCES=1
+# Run the integration tests. The conditional is used to run protractor without
+# any sharding parameters if it is disabled. This helps with isolated tests.
+# Isolated tests do not work properly unless no sharding parameters are passed
+# in at all.
+# TODO(bhenning): Figure out if this is a bug with protractor.
+if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+else
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES
 fi
-
-# Run the integration tests.
-$NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES
