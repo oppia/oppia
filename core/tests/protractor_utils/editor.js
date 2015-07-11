@@ -90,10 +90,12 @@ var setStateName = function(name) {
   general.waitForSystem();
 };
 
+var _getStateName = function() {
+  return element(by.css('.protractor-test-state-name-container')).getText();
+};
+
 var expectCurrentStateToBe = function(name) {
-  expect(
-    element(by.css('.protractor-test-state-name-container')).getText()
-  ).toMatch(name);
+  expect(getStateName()).toMatch(name);
 };
 
 // CONTENT
@@ -294,12 +296,19 @@ var _setOutcomeDest = function(destEditorElem, destName, createDest) {
     destEditorElem.element(by.css('.protractor-test-dest-bubble'));
 
   var targetOption = createDest ? _OPTION_CREATE_NEW : destName;
-  destinationElement.element(
-    by.cssContainingText('option', targetOption)).click();
+  _getStateName().then(function(name) {
+    if (name == destName) {
+      // Looping, change the target option.
+      targetOption = '(try again)';
+    }
 
-  if (createDest) {
-    element(by.css('.protractor-test-add-state-input')).sendKeys(destName);
-  }
+    destinationElement.element(
+      by.cssContainingText('option', targetOption)).click();
+
+    if (createDest) {
+      element(by.css('.protractor-test-add-state-input')).sendKeys(destName);
+    }
+  });
 };
 
 // This clicks the "add new rule" button and then selects the rule type and

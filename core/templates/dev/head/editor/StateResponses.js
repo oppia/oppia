@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for rules corresponding to a state's interaction.
+ * @fileoverview Controllers for responses corresponding to a state's
+ * interaction and answer groups.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -233,7 +234,7 @@ oppia.factory('responsesService', [
 }]);
 
 
-oppia.controller('StateRules', [
+oppia.controller('StateResponses', [
     '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
     'editorContextService', 'warningsData', 'responsesService', 'routerService',
     'PLACEHOLDER_OUTCOME_DEST',

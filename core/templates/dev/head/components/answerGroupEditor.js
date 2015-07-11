@@ -29,7 +29,7 @@ oppia.directive('answerGroupEditor', [function() {
       onSaveAnswerGroupDest: '&',
       isEditable: '='
     },
-    templateUrl: 'inline/group_editor',
+    templateUrl: 'inline/answer_group_editor',
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
       'editorContextService', 'routerService', 'warningsData',
@@ -226,7 +226,7 @@ oppia.directive('answerGroupEditor', [function() {
       }
 
       // TODO(bhenning): Should use functionality in ruleEditor.js, but move it
-      // to responsesService in StateRules.js to properly form a new rule.
+      // to responsesService in StateResponses.js to properly form a new rule.
       $scope.rules.push({
         'rule_type': ruleType,
         'inputs': inputs,
@@ -365,8 +365,6 @@ oppia.directive('outcomeDestinationEditor', [function() {
           $scope, editorContextService, explorationStatesService,
           stateGraphArranger, PLACEHOLDER_OUTCOME_DEST) {
 
-        $scope.reloadingDestinations = false;
-
         $scope.$on('saveOutcomeDestDetails', function() {
           // Create new state if specified.
           if ($scope.outcome.dest == PLACEHOLDER_OUTCOME_DEST) {
@@ -376,7 +374,6 @@ oppia.directive('outcomeDestinationEditor', [function() {
 
             explorationStatesService.addState(newStateName, null);
           }
-          $scope.reloadingDestinations = true;
         });
 
         $scope.isCreatingNewState = function(outcome) {

@@ -370,8 +370,8 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
-  <script type="text/ng-template" id="inline/group_editor">
-    {% include 'components/group_editor.html' %}
+  <script type="text/ng-template" id="inline/answer_group_editor">
+    {% include 'components/answer_group_editor.html' %}
   </script>
 
   {% include 'components/exploration_embed_button.html' %}
@@ -402,7 +402,7 @@
     {{ include_js_file('editor/SidebarStateName.js') }}
     {{ include_js_file('editor/SidebarStateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
-    {{ include_js_file('editor/StateRules.js') }}
+    {{ include_js_file('editor/StateResponses.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/StateInteraction.js') }}
@@ -410,7 +410,7 @@
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
-    {{ include_js_file('components/groupEditor.js') }}
+    {{ include_js_file('components/answerGroupEditor.js') }}
 
     {% for skin_js_url in skin_js_urls %}
       {{ include_skins_js_file(skin_js_url) }}
