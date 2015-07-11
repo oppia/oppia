@@ -101,15 +101,19 @@ oppia.directive('ruleTypeSelector', [function() {
 }]);
 
 
+// This directive controls an editor for selecting the type and input parameters
+// to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
+// respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
+// buttons only show up if 'isEditingRuleInline' is true.
 oppia.directive('ruleEditor', ['$log', function($log) {
   return {
     restrict: 'E',
     scope: {
       rule: '=',
       isEditable: '=',
-      editingRuleInline: '&',
-      cancelRule: '&',
-      saveRule: '&'
+      isEditingRuleInline: '&',
+      onCancelRuleEdit: '&',
+      onSaveRule: '&'
     },
     templateUrl: 'inline/rule_editor',
     controller: [
@@ -224,11 +228,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       };
 
       $scope.cancelThisEdit = function() {
-        $scope.cancelRule();
+        $scope.onCancelRuleEdit();
       };
 
       $scope.saveThisRule = function() {
-        $scope.saveRule();
+        $scope.onSaveRule();
       };
 
       $scope.init = function() {

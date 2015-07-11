@@ -30,7 +30,7 @@
                   <em ng-if="!answerGroup.outcome.newStateName">Nowhere yet...</em>
                 </span>
                 <span ng-if="isOutcomeLooping(answerGroup.outcome)">
-                  <em>(remain here)</em>
+                  <em>(try again)</em>
                 </span>
               </div>
               <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" ng-if="editabilityService.isEditable()" class="protractor-test-delete-response oppia-delete-response-button oppia-transition-200" ng-click="deleteAnswerGroup($index)">
@@ -39,7 +39,7 @@
             <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
-                  <answer-group-editor rules="answerGroup.rule_specs" outcome="answerGroup.outcome" save-answer-group-feedback="saveActiveAnswerGroupFeedback(answerGroup.outcome)" save-answer-group-dest="saveActiveAnswerGroupDest(answerGroup.outcome)" save-answer-group-rules="saveActiveAnswerGroupRules(answerGroup.rule_specs)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
+                  <answer-group-editor rules="answerGroup.rule_specs" outcome="answerGroup.outcome" on-save-answer-group-feedback="saveActiveAnswerGroupFeedback(answerGroup.outcome)" on-save-answer-group-dest="saveActiveAnswerGroupDest(answerGroup.outcome)" on-save-answer-group-rules="saveActiveAnswerGroupRules(answerGroup.rule_specs)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
               </div>
@@ -79,7 +79,7 @@
                   <em ng-if="!defaultOutcome.newStateName">Nowhere yet...</em>
                 </span>
                 <span ng-if="isOutcomeLooping(defaultOutcome)">
-                  <em>(remain here)</em>
+                  <em>(try again)</em>
                 </span>
               </div>
             </a>
@@ -87,7 +87,7 @@
             <div ng-if="activeAnswerGroupIndex === answerGroups.length">
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
-                  <answer-group-editor rules="null" outcome="defaultOutcome" save-answer-group-feedback="saveDefaultOutcomeFeedback(defaultOutcome)" save-answer-group-dest="saveDefaultOutcomeDest(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
+                  <answer-group-editor rules="null" outcome="defaultOutcome" on-save-answer-group-feedback="saveDefaultOutcomeFeedback(defaultOutcome)" on-save-answer-group-dest="saveDefaultOutcomeDest(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
               </div>
@@ -106,19 +106,16 @@
 
   <div class="modal-body">
     <form name="addAnswerGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-response-details">
-      <div class="oppia-rule-details-header" ng-if="currentInteractionId !== 'Continue'">
-        <strong>If the answer provided</strong>
-      </div>
-      <div class="oppia-rule-details-header" ng-if="currentInteractionId === 'Continue'">
-        <strong>When the button</strong>
+      <div class="oppia-rule-details-header">
+        <strong>If the answer provided...</strong>
       </div>
 
-      <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" editing-rule-inline="false">
+      <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" is-editing-rule-inline="false">
       </rule-editor>
 
       <br>
 
-      <outcome-feedback-editor outcome="tmpOutcome">
+      <outcome-feedback-editor feedback="tmpOutcome.feedback">
       </outcome-feedback-editor>
 
       <br>

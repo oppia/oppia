@@ -24,9 +24,9 @@ oppia.directive('answerGroupEditor', [function() {
     scope: {
       rules: '=',
       outcome: '=',
-      saveAnswerGroupFeedback: '&',
-      saveAnswerGroupRules: '&',
-      saveAnswerGroupDest: '&',
+      onSaveAnswerGroupFeedback: '&',
+      onSaveAnswerGroupRules: '&',
+      onSaveAnswerGroupDest: '&',
       isEditable: '='
     },
     templateUrl: 'inline/group_editor',
@@ -84,18 +84,16 @@ oppia.directive('answerGroupEditor', [function() {
 
     $scope.saveThisFeedback = function() {
       $scope.$broadcast('saveOutcomeFeedbackDetails');
-      // TODO(sll): Add more validation prior to saving.
       $scope.feedbackEditorIsOpen = false;
       $scope.outcomeFeedbackMemento = null;
-      $scope.saveAnswerGroupFeedback();
+      $scope.onSaveAnswerGroupFeedback();
     };
 
     $scope.saveThisDestination = function() {
       $scope.$broadcast('saveOutcomeDestDetails');
-      // TODO(sll): Add more validation prior to saving.
       $scope.destinationEditorIsOpen = false;
       $scope.outcomeDestMemento = null;
-      $scope.saveAnswerGroupDest();
+      $scope.onSaveAnswerGroupDest();
     };
 
     $scope.cancelThisFeedbackEdit = function() {
@@ -120,7 +118,7 @@ oppia.directive('answerGroupEditor', [function() {
         $scope.saveThisDestination();
       }
       if ($scope.isRuleEditorOpen()) {
-        $scope.saveActiveRule();
+        $scope.saveRules();
       }
     });
 
@@ -238,32 +236,32 @@ oppia.directive('answerGroupEditor', [function() {
 
     $scope.deleteRule = function(index) {
       $scope.rules.splice(index, 1);
-      $scope.saveActiveRule();
+      $scope.saveRules();
 
       if ($scope.rules.length == 0) {
-        warningsData.addWarning('All answer groups must have at least ' +
-          'one rule.');
+        warningsData.addWarning(
+          'All answer groups must have at least one rule.');
       }
     };
 
-    $scope.cancelActiveRule = function() {
+    $scope.cancelActiveRuleEdit = function() {
       $scope.rules.splice(0, $scope.rules.length);
       for (var i = 0; i < $scope.rulesMemento.length; i++) {
         $scope.rules.push($scope.rulesMemento[i]);
       }
-      $scope.saveActiveRule();
+      $scope.saveRules();
     };
 
-    $scope.saveActiveRule = function() {
+    $scope.saveRules = function() {
       $scope.changeActiveRuleIndex(-1);
       $scope.rulesMemento = null;
-      $scope.saveAnswerGroupRules();
+      $scope.onSaveAnswerGroupRules();
     };
 
     $scope.changeActiveRuleIndex = function(newIndex) {
       responsesService.changeActiveRuleIndex(newIndex);
       $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
-      $scope.saveAnswerGroupRules();
+      $scope.onSaveAnswerGroupRules();
     };
 
     $scope.openRuleEditor = function(index) {
@@ -314,7 +312,7 @@ oppia.directive('answerGroupEditor', [function() {
         $scope.saveThisDestination();
       }
       if ($scope.isRuleEditorOpen()) {
-        $scope.saveActiveRule();
+        $scope.saveRules();
       }
       $scope.$broadcast('updateAnswerGroupInteractionId');
       $scope.answerChoices = $scope.getAnswerChoices();
@@ -326,7 +324,7 @@ oppia.directive('outcomeFeedbackEditor', [function() {
   return {
     restrict: 'E',
     scope: {
-      outcome: '='
+      feedback: '='
     },
     templateUrl: 'rules/outcomeFeedbackEditor',
     controller: [
@@ -337,8 +335,8 @@ oppia.directive('outcomeFeedbackEditor', [function() {
         $scope.$on('saveOutcomeFeedbackDetails', function() {
           // Remove null feedback.
           var nonemptyFeedback = [];
-          for (var i = 0; i < $scope.outcome.feedback.length; i++) {
-            var feedback = $scope.outcome.feedback[i];
+          for (var i = 0; i < $scope.feedback.length; i++) {
+            var feedback = $scope.feedback[i];
             if (feedback) {
               feedback = feedback.trim();
             }
@@ -346,7 +344,7 @@ oppia.directive('outcomeFeedbackEditor', [function() {
               nonemptyFeedback.push(feedback);
             }
           }
-          $scope.outcome.feedback = nonemptyFeedback;
+          $scope.feedback = nonemptyFeedback;
         });
       }
     ]
@@ -366,19 +364,17 @@ oppia.directive('outcomeDestinationEditor', [function() {
       function(
           $scope, editorContextService, explorationStatesService,
           stateGraphArranger, PLACEHOLDER_OUTCOME_DEST) {
-        var lastSetRuleDest = $scope.outcome.dest;
+
+        $scope.reloadingDestinations = false;
 
         $scope.$on('saveOutcomeDestDetails', function() {
           // Create new state if specified.
           if ($scope.outcome.dest == PLACEHOLDER_OUTCOME_DEST) {
             var newStateName = $scope.outcome.newStateName;
             $scope.outcome.dest = newStateName;
-            lastSetRuleDest = newStateName;
             delete $scope.outcome['newStateName'];
 
             explorationStatesService.addState(newStateName, null);
-          } else {
-            lastSetRuleDest = $scope.outcome.dest;
           }
           $scope.reloadingDestinations = true;
         });
@@ -396,7 +392,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
           // new state.
           $scope.destChoices = [{
             id: _currentStateName,
-            text: _currentStateName + ' ⟳'
+            text: '(try again)'
           }];
 
           // Arrange the remaining states based on their order in the state graph.

@@ -23,6 +23,8 @@
 # Optional arguments:
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
+# Sharding must be disabled (either by passing in false to --sharding or 1 to
+# --sharding-instances) if running any tests in isolation (iit or ddescribe).
 # The root folder MUST be named 'oppia'.
 # It runs integration tests.
 

@@ -415,9 +415,7 @@ var ResponseEditor = function(responseNum) {
       // Begin editing destination.
       element(by.css('.protractor-test-open-outcome-dest-editor')).click();
 
-      var expectedOptionTexts = [
-        stateNames[0] + ' ⟳'
-      ].concat(stateNames.slice(1));
+      var expectedOptionTexts = ['(try again)'].concat(stateNames.slice(1));
 
       // Create new option always at the end of the list.
       expectedOptionTexts.push(_OPTION_CREATE_NEW);

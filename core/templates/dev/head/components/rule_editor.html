@@ -23,7 +23,7 @@
     </span>
   </form>
 
-  <div class="oppia-rule-save-cancel-buttons" ng-if="editingRuleInline()">
+  <div class="oppia-rule-save-cancel-buttons" ng-if="isEditingRuleInline()">
     <div class="pull-right">
       <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
       <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="ruleEditForm.form.$invalid" ng-click="saveThisRule()">Save Answer</button>

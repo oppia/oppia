@@ -90,15 +90,19 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
 
 oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
   return function(input, characterCount) {
-    input = $filter('normalizeWhitespace')(input);
-    if (input.length <= characterCount) {
-      // String fits within the criteria; no wrapping is necessary.
+    if (typeof input == 'string' || input instanceof String) {
+      input = $filter('normalizeWhitespace')(input);
+      if (input.length <= characterCount || characterCount < 3) {
+        // String fits within the criteria; no wrapping is necessary.
+        return input;
+      }
+
+      // Replace characters counting backwards from character count with an
+      // ellipsis, then trim the string.
+      return input.substr(0, characterCount - 3).trim() + '...';
+    } else {
       return input;
     }
-
-    // Replace characters counting backwards from character count with an
-    // ellipsis, then trim the string.
-    return input.substr(0, characterCount - 3).trim() + '...';
   };
 }]);
 

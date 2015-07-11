@@ -51,7 +51,7 @@ oppia.constant('CATEGORY_LIST', [
 ]);
 
 // We use a slash because this character is forbidden in a state name.
-oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/')
+oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 
 
 // Global utility methods.

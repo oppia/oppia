@@ -27,14 +27,14 @@
 
   <div ng-if="isEditable && feedbackEditorIsOpen">
     <form role="form" class="form-inline protractor-test-edit-outcome-feedback" name="editAnswerGroupForm.editFeedbackForm">
-      <outcome-feedback-editor outcome="outcome">
+      <outcome-feedback-editor feedback="outcome.feedback">
       </outcome-feedback-editor>
     </form>
 
     <div class="oppia-rule-save-cancel-buttons">
       <div class="pull-right">
         <button type="button" class="btn btn-default" ng-click="cancelThisFeedbackEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-outcome-feedback" ng-disabled="editAnswerGroupForm.editFeedbackForm.$invalid || isSelfLoopWithNoFeedback(outcome)" ng-click="saveThisFeedback()">Save Feedback</button>
+        <button type="button" class="btn btn-success protractor-test-save-outcome-feedback" ng-disabled="editAnswerGroupForm.editFeedbackForm.$invalid" ng-click="saveThisFeedback()">Save Feedback</button>
       </div>
 
       <div style="clear: both;"></div>
@@ -53,7 +53,7 @@
       index in the stop() event handler. -->
       <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
         <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" href="#" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
-          <div class="oppia-rule-header" style="overflow: hidden; padding-left: 0px; text-overflow: ellipsis; white-space: nowrap;">
+          <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
             <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== activeRuleIndex">
               <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
@@ -70,7 +70,7 @@
         <div ng-if="activeRuleIndex === $index">
           <div class="oppia-editor-card-section">
             <div class="oppia-rule-body-container">
-              <rule-editor rule="rule" is-editable="isEditable" editing-rule-inline="true" cancel-rule="cancelActiveRule()", save-rule="saveActiveRule()" class="protractor-test-answer-body">
+              <rule-editor rule="rule" is-editable="isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="cancelActiveRuleEdit()" on-save-rule="saveRules()" class="protractor-test-answer-body">
               </rule-editor>
             </div>
           </div>
@@ -94,14 +94,14 @@
         </div>
 
         <div ng-if="outcome.dest !== getActiveStateName()">
-          <strong>And goes to card...</strong>
+          <strong>And afterwards, direct the learner to...</strong>
           <span ng-if="!isSelfLoop(outcome)" class="oppia-rule-dest-link" style="position: relative;">
             <a ng-click="navigateToOutcomeDest()">
               <[outcome.dest]>
             </a>
           </span>
           <span ng-if="isSelfLoop(outcome)" class="oppia-rule-dest-link" style="position: relative;">
-            <[outcome.dest]> ⟳
+            (try again)
           </span>
           <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Destination"></span>
         </div>
@@ -118,7 +118,7 @@
     <div class="oppia-rule-save-cancel-buttons">
       <div class="pull-right">
         <button type="button" class="btn btn-default protractor-test-cancel-outcome-dest" ng-click="cancelThisDestinationEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-outcome-dest" ng-disabled="editAnswerGroupForm.editDestForm.$invalid || isSelfLoopWithNoFeedback(outcome)" ng-click="saveThisDestination()">Save Destination</button>
+        <button type="button" class="btn btn-success protractor-test-save-outcome-dest" ng-disabled="editAnswerGroupForm.editDestForm.$invalid" ng-click="saveThisDestination()">Save Destination</button>
       </div>
 
       <div style="clear: both;"></div>
@@ -129,13 +129,13 @@
 <script type="text/ng-template" id="rules/outcomeFeedbackEditor">
   <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
     <div class="oppia-rule-details-header">
-      <strong>Oppia should tell the learner...</strong>
+      <strong>Oppia tells the learner...</strong>
     </div>
-    <span ng-if="outcome.feedback.length == 0">
+    <span ng-if="feedback.length == 0">
       <em>No feedback specified.</em>
     </span>
 
-    <schema-based-editor schema="OUTCOME_FEEDBACK_SCHEMA" local-value="outcome.feedback[0]">
+    <schema-based-editor schema="OUTCOME_FEEDBACK_SCHEMA" local-value="feedback[0]">
     </schema-based-editor>
   </div>
 </script>
@@ -143,7 +143,7 @@
 <script type="text/ng-template" id="rules/outcomeDestinationEditor">
   <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
     <div class="oppia-rule-details-header">
-      <strong>After Oppia responds, direct the learner to...</strong>
+      <strong>And afterwards, direct the learner to...</strong>
     </div>
     <div class="form-group" style="font-size: 1.1em;">
       <span ng-if="!reloadingDestinations">

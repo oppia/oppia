@@ -1198,6 +1198,10 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-rule-header {
   color: rgb(120, 120, 120);
+  overflow: hidden;
+  padding-left: 0px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .oppia-rule-sort-handle {
