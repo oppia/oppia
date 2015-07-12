@@ -82,10 +82,10 @@ describe('Signup controller', function() {
 
     it('should show warning if no username provided', function($http) {
       scope.updateWarningText('');
-      expect(scope.warningText).toEqual('Please enter a username.');
+      expect(scope.warningText).toEqual('Please choose a username.');
 
       scope.submitPrerequisitesForm(false);
-      expect(scope.warningText).toEqual('Please enter a username.');
+      expect(scope.warningText).toEqual('Please choose a username.');
     });
 
     it('should show warning if username is too long', function($http) {

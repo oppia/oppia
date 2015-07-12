@@ -46,26 +46,34 @@ EMAIL_CONTENT_SCHEMA = {
     }, {
         'name': 'html_body',
         'schema': {
-            'type': 'html',
+            'type': 'unicode',
+            'ui_config': {
+                'rows': 20,
+            }
         }
     }],
 }
 
+EMAIL_SENDER_NAME = config_domain.ConfigProperty(
+    'email_sender_name', {'type': 'unicode'},
+    'The sender name for outgoing emails.', 'Site Admin')
 EMAIL_FOOTER = config_domain.ConfigProperty(
-    'email_footer', {'type': 'html'},
-    'The footer to append to all outgoing emails. (This should include an '
-    'unsubscribe link.)',
-    'You can unsubscribe from these emails from the Preferences page.')
+    'email_footer', {'type': 'unicode', 'ui_config': {'rows': 5}},
+    'The footer to append to all outgoing emails. (This should be written in '
+    'HTML and include an unsubscribe link.)',
+    'You can unsubscribe from these emails from the '
+    '<a href="https://www.example.com">Preferences</a> page.')
 # NOTE TO DEVELOPERS: post-signup emails will not be sent if this placeholder
 # is left unmodified. If this policy changes, the deployment instructions at
 # https://code.google.com/p/oppia/wiki/DeployingOppia should be updated.
 SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
     'signup_email_content', EMAIL_CONTENT_SCHEMA,
     'Content of email sent after a new user signs up. (The email body should '
-    'not include a salutation or footer.)',
+    'be written with HTML and not include a salutation or footer.) These '
+    'emails are only sent if the functionality is enabled in feconf.py.',
     {
         'subject': 'THIS IS A PLACEHOLDER.',
-        'html_body': 'THIS IS A PLACEHOLDER AND SHOULD BE REPLACED.'
+        'html_body': 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.',
     })
 
 
@@ -109,16 +117,27 @@ def _send_email(
     _require_sender_id_is_valid(intent, sender_id)
 
     recipient_email = user_services.get_email_from_user_id(recipient_id)
-    email_plaintext_body = html_cleaner.strip_html_tags(email_html_body)
+    cleaned_html_body = html_cleaner.clean(email_html_body)
+    if cleaned_html_body != email_html_body:
+        log_new_error(
+            'Original email HTML body does not match cleaned HTML body:\n'
+            'Original:\n%s\n\nCleaned:\n%s\n' %
+            (email_html_body, cleaned_html_body))
+        return
+
+    raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
+        '<br>', '\n').replace('</p><p>', '</p>\n<p>')
+    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     def _send_email_in_transaction():
+        sender_email = '%s <%s>' % (
+            EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
         email_services.send_mail(
-            feconf.SYSTEM_EMAIL_ADDRESS, recipient_email,
-            email_subject, email_plaintext_body, email_html_body)
+            sender_email, recipient_email, email_subject,
+            cleaned_plaintext_body, cleaned_html_body)
         email_models.SentEmailModel.create(
-            recipient_id, recipient_email,
-            sender_id, feconf.SYSTEM_EMAIL_ADDRESS,
-            intent, email_subject, email_html_body, datetime.datetime.utcnow())
+            recipient_id, recipient_email, sender_id, sender_email, intent,
+            email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 
@@ -129,18 +148,17 @@ def send_post_signup_email(user_id):
     The caller is responsible for ensuring that emails are allowed to be sent
     to users (i.e. feconf.CAN_SEND_EMAILS_TO_USERS is True).
     """
-    if SIGNUP_EMAIL_CONTENT.value == SIGNUP_EMAIL_CONTENT.default_value:
-        log_new_error(
-            'Please ensure that the value for the admin config property '
-            'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup emails '
-            'to be sent.')
-        return
+    for key, content in SIGNUP_EMAIL_CONTENT.value.iteritems():
+        if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
+            log_new_error(
+                'Please ensure that the value for the admin config property '
+                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
+                'emails to be sent.')
+            return
 
     user_settings = user_services.get_user_settings(user_id)
     email_subject = SIGNUP_EMAIL_CONTENT.value['subject']
-    # The newlines are to ensure that the plaintext email displays properly if
-    # the HTML is stripped out.
-    email_body = 'Hi %s,<br>\n<br>\n%s<br>\n<br>\n%s' % (
+    email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         user_settings.username,
         SIGNUP_EMAIL_CONTENT.value['html_body'],
         EMAIL_FOOTER.value)

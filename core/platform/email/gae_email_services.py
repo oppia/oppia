@@ -56,7 +56,8 @@ def send_mail(
     email_manager._send_email().
 
     Args:
-      - sender_email: str. the email address of the sender.
+      - sender_email: str. the email address of the sender. This should be in
+          the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
       - recipient_email: str. the email address of the recipient.
       - subject: str. The subject line of the email.
       - plaintext_body: str. The plaintext body of the email.
