@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import exp_services
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -143,3 +144,69 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
             'can only have alphanumeric characters', response_dict['error'])
 
         self.logout()
+
+
+class EmailPreferencesTests(test_utils.GenericTestBase):
+
+    def test_user_not_setting_email_prefs_on_signup(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'abc', 'agreed_to_terms': True},
+            csrf_token=csrf_token)
+
+        # The email update preference should be whatever the setting in feconf
+        # is.
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
+            self.assertEqual(
+                user_services.get_email_preferences(self.EDITOR_ID),
+                {'can_receive_email_updates': True})
+        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
+            self.assertEqual(
+                user_services.get_email_preferences(self.EDITOR_ID),
+                {'can_receive_email_updates': False})
+
+    def test_user_allowing_emails_on_signup(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'abc', 'agreed_to_terms': True,
+             'can_receive_email_updates': True},
+            csrf_token=csrf_token)
+
+        # The email update preference should be True in all cases.
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
+            self.assertEqual(
+                user_services.get_email_preferences(self.EDITOR_ID),
+                {'can_receive_email_updates': True})
+        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
+            self.assertEqual(
+                user_services.get_email_preferences(self.EDITOR_ID),
+                {'can_receive_email_updates': True})
+
+    def test_user_disallowing_emails_on_signup(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'abc', 'agreed_to_terms': True,
+             'can_receive_email_updates': False},
+            csrf_token=csrf_token)
+
+        # The email update preference should be False in all cases.
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
+            self.assertEqual(
+                user_services.get_email_preferences(self.EDITOR_ID),
+                {'can_receive_email_updates': False})
+        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
+            self.assertEqual(
+                user_services.get_email_preferences(self.EDITOR_ID),
+                {'can_receive_email_updates': False})

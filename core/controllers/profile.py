@@ -177,7 +177,8 @@ class SignupHandler(base.BaseHandler):
         """Handles POST requests."""
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
-        can_receive_email_updates = self.payload.get('can_receive_email_updates')
+        can_receive_email_updates = self.payload.get(
+            'can_receive_email_updates')
 
         has_previously_registered = (
             user_services.has_user_registered_as_editor(self.user_id))

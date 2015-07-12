@@ -345,10 +345,10 @@ def update_email_preferences(user_id, can_receive_email_updates):
 
     If no UserEmailPreferencesModel exists for this user, a new one will
     be created.
-    """ 
+    """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
-    if email_preferences_model is None: 
+    if email_preferences_model is None:
         email_preferences_model = user_models.UserEmailPreferencesModel(
             id=user_id)
 
