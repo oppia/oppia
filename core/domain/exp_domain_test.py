@@ -43,7 +43,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: %d
 skin_customizations:
   panels_contents: {}
 states:
@@ -58,8 +58,8 @@ states:
         dest: %s
         feedback: []
         param_changes: []
+      fallbacks: []
       id: null
-      triggers: []
     param_changes: []
   New state:
     content:
@@ -72,14 +72,26 @@ states:
         dest: New state
         feedback: []
         param_changes: []
+      fallbacks:
+      - outcome:
+          dest: New state
+          feedback: []
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 42
+          trigger_type: NthResubmission
       id: null
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: %d
 tags: []
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
 SAMPLE_YAML_CONTENT_WITH_GADGETS = (
 """author_notes: ''
@@ -90,7 +102,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: %d
 skin_customizations:
   panels_contents:
     bottom: []
@@ -123,8 +135,8 @@ states:
         dest: %s
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   New state:
     content:
@@ -141,8 +153,8 @@ states:
         dest: New state
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Second state:
     content:
@@ -159,14 +171,17 @@ states:
         dest: Second state
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: %d
 tags: []
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
 TEST_GADGETS = {
     'TestGadget': {
@@ -383,7 +398,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError,
                 'Expected customization args to be a dict'):
             exploration.validate()
-        
+
         interaction.customization_args = {15: ''}
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid customization arg name'):
@@ -422,16 +437,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.answer_groups = []
         exploration.validate()
 
-        interaction.triggers = {}
+        interaction.fallbacks = {}
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected triggers to be a list'):
+                utils.ValidationError, 'Expected fallbacks to be a list'):
             exploration.validate()
 
         # Restore a valid exploration.
         interaction.id = 'TextInput'
         interaction.answer_groups = answer_groups
         interaction.default_outcome = default_outcome
-        interaction.triggers = []
+        interaction.fallbacks = []
         exploration.validate()
 
         # Validate AnswerGroup.
@@ -472,7 +487,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         exploration.param_specs = {
-            '@': param_domain.ParamSpec.from_dict({'obj_type': 'UnicodeString'})
+            '@': param_domain.ParamSpec.from_dict({
+                'obj_type': 'UnicodeString'
+            })
         }
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Only parameter names with characters'):
@@ -484,12 +501,103 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
+    def test_fallbacks_validation(self):
+        """Test validation of state fallbacks."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', 'Title', 'Category')
+        exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.interaction.triggers = ['element']
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        base_outcome = {
+            'dest': exploration.init_state_name,
+            'feedback': [],
+            'param_changes': [],
+        }
+
+        init_state.update_interaction_fallbacks([{
+            'trigger': {
+                'trigger_type': 'FakeTriggerName',
+                'customization_args': {
+                    'num_submits': {
+                        'value': 42,
+                    },
+                },
+            },
+            'outcome': base_outcome,
+        }])
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected empty triggers list.'):
+                utils.ValidationError, 'Unknown trigger type'):
             exploration.validate()
-        init_state.interaction.triggers = []
+
+        with self.assertRaises(KeyError):
+            init_state.update_interaction_fallbacks([{
+                'trigger': {
+                    'trigger_type': 'NthResubmission',
+                    'customization_args': {
+                        'num_submits': {
+                            'value': 42,
+                        },
+                    },
+                },
+                'outcome': {},
+            }])
+
+        init_state.update_interaction_fallbacks([{
+            'trigger': {
+                'trigger_type': 'NthResubmission',
+                'customization_args': {},
+            },
+            'outcome': base_outcome,
+        }])
+        # Default values for the customization args will be added silently.
+        exploration.validate()
+        self.assertEqual(len(init_state.interaction.fallbacks), 1)
+        self.assertEqual(
+            init_state.interaction.fallbacks[0].trigger.customization_args,
+            {
+                'num_submits': {
+                    'value': 3,
+                }
+            })
+
+        init_state.update_interaction_fallbacks([{
+            'trigger': {
+                'trigger_type': 'NthResubmission',
+                'customization_args': {
+                    'num_submits': {
+                        'value': 42,
+                    },
+                    'bad_key_that_will_get_stripped_silently': {
+                        'value': 'unused_value',
+                    }
+                },
+            },
+            'outcome': base_outcome,
+        }])
+        # Unused customization arg keys will be stripped silently.
+        exploration.validate()
+        self.assertEqual(len(init_state.interaction.fallbacks), 1)
+        self.assertEqual(
+            init_state.interaction.fallbacks[0].trigger.customization_args,
+            {
+                'num_submits': {
+                    'value': 42,
+                }
+            })
+
+        init_state.update_interaction_fallbacks([{
+            'trigger': {
+                'trigger_type': 'NthResubmission',
+                'customization_args': {
+                    'num_submits': {
+                        'value': 2,
+                    },
+                },
+            },
+            'outcome': base_outcome,
+        }])
         exploration.validate()
 
     def test_tag_validation(self):
@@ -599,7 +707,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             gadget_instance.visible_in_states.extend(['GHI'])
             with self.assertRaisesRegexp(
                     utils.ValidationError,
-                    'TestGadget specifies visibility repeatedly for state: GHI'):
+                    'TestGadget specifies visibility repeatedly for state: '
+                    'GHI'):
                 exploration.validate()
 
             # Remove duplicate state.
@@ -611,7 +720,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
             with self.assertRaisesRegexp(
                     utils.ValidationError,
-                    'non_existent_panel panel not found in skin conversation_v1'):
+                    'non_existent_panel panel not found in skin '
+                    'conversation_v1'):
                 exploration.validate()
 
     def test_exploration_get_gadget_ids(self):
@@ -623,7 +733,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration_with_gadgets = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
         self.assertEqual(
-            exploration_with_gadgets.get_gadget_ids(), 
+            exploration_with_gadgets.get_gadget_ids(),
             ['TestGadget']
         )
 
@@ -631,7 +741,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration_with_gadgets.skin_instance.panel_contents_dict[
             'right'].append(another_gadget)
         self.assertEqual(
-            exploration_with_gadgets.get_gadget_ids(), 
+            exploration_with_gadgets.get_gadget_ids(),
             ['AnotherGadget', 'TestGadget']
         )
 
@@ -710,8 +820,8 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'feedback': [],
                     'param_changes': [],
                 },
+                'fallbacks': [],
                 'id': None,
-                'triggers': [],
             },
             'param_changes': [],
         }
@@ -728,6 +838,24 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             EXP_ID, 'A title', 'A category')
         exploration.add_states(['New state'])
         self.assertEqual(len(exploration.states), 2)
+
+        exploration.states['New state'].update_interaction_fallbacks([{
+            'trigger': {
+                'trigger_type': 'NthResubmission',
+                'customization_args': {
+                    'num_submits': {
+                        'value': 42,
+                    },
+                },
+            },
+            'outcome': {
+                'dest': 'New state',
+                'feedback': [],
+                'param_changes': [],
+            },
+        }])
+
+        exploration.validate()
 
         yaml_content = exploration.to_yaml()
         self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
@@ -760,7 +888,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         yaml_content = exploration_without_gadgets.to_yaml()
         self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
-
     def test_yaml_import_and_export_with_gadgets(self):
         """Test from_yaml() and to_yaml() methods including gadgets."""
 
@@ -773,6 +900,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         sample_yaml_as_dict = utils.dict_from_yaml(
             SAMPLE_YAML_CONTENT_WITH_GADGETS)
         self.assertEqual(generated_yaml_as_dict, sample_yaml_as_dict)
+
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
@@ -1235,7 +1363,82 @@ states_schema_version: 4
 tags: []
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V7
+    YAML_CONTENT_V8 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 8
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      id: EndExploration
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+states_schema_version: 5
+tags: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V8
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1279,6 +1482,12 @@ tags: []
             'eid', 'A title', 'A category', self.YAML_CONTENT_V7)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v8(self):
+        """Test direct loading from a v8 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V8)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -1305,8 +1514,8 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'feedback': [],
                         'param_changes': [],
                     },
+                    'fallbacks': [],
                     'id': None,
-                    'triggers': [],
                 },
                 'param_changes': [],
             }
@@ -1535,7 +1744,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
             with self.assertRaisesRegexp(
                     utils.ValidationError,
-                    'Size exceeded: left panel width of 4600 exceeds limit of 100'):
+                    'Size exceeded: left panel width of 4600 exceeds limit of '
+                    '100'):
                 exploration.validate()
 
         # Assert internal validation against CustomizationArgSpecs.
@@ -1550,7 +1760,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict['left'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                "'left' panel expected at most 1 gadget, but 2 gadgets are visible in state 'New state'."):
+                '\'left\' panel expected at most 1 gadget, but 2 gadgets are '
+                'visible in state \'New state\'.'):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any

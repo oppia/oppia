@@ -1285,7 +1285,7 @@ oppia.factory('explorationWarningsService', [
       _warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (
-          'Please add interactions for these states: ' +
+          'Please add interactions for these cards: ' +
           statesWithoutInteractionIds.join(', ') + '.')
       });
     }
@@ -1298,7 +1298,7 @@ oppia.factory('explorationWarningsService', [
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'The following state(s) are unreachable: ' +
+            'The following card(s) are unreachable: ' +
             unreachableStateNames.join(', ') + '.')
         });
       } else {
@@ -1309,7 +1309,7 @@ oppia.factory('explorationWarningsService', [
         if (deadEndStates.length) {
           var deadEndStatesString = null;
           if (deadEndStates.length === 1) {
-            deadEndStatesString = 'the following state: ' + deadEndStates[0];
+            deadEndStatesString = 'the following card: ' + deadEndStates[0];
           } else {
             deadEndStatesString = 'each of: ' + deadEndStates.join(', ');
           }

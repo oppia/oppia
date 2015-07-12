@@ -36,13 +36,13 @@ var DESCRIPTIONS = {
   MusicPhrase: {
     Equals: 'is equal to {{x|MusicPhrase}}',
     IsLongerThan: 'has more than {{k|NonnegativeInt}} notes',
-    HasLengthInclusivelyBetween: 'has between {{a|NonnegativeInt}} and ' + 
+    HasLengthInclusivelyBetween: 'has between {{a|NonnegativeInt}} and ' +
       '{{b|NonnegativeInt}} notes, inclusive',
-    IsEqualToExceptFor: 'is equal to {{x|MusicPhrase}} except for ' + 
+    IsEqualToExceptFor: 'is equal to {{x|MusicPhrase}} except for ' +
       '{{k|NonnegativeInt}} notes',
-    IsTranspositionOf: 'is a transposition of {{x|MusicPhrase}} by {{y|Int}} ' + 
+    IsTranspositionOf: 'is a transposition of {{x|MusicPhrase}} by {{y|Int}} ' +
       'semitones',
-    IsTranspositionOfExceptFor: 'is a transposition of {{x|MusicPhrase}} by ' + 
+    IsTranspositionOfExceptFor: 'is a transposition of {{x|MusicPhrase}} by ' +
       '{{y|Int}} semitones except for {{k|NonnegativeInt}} notes'
   },
   NonnegativeInt: {
@@ -50,11 +50,11 @@ var DESCRIPTIONS = {
   },
   NormalizedString: {
     Equals: 'is equal to {{x|NormalizedString}}',
-    CaseSensitiveEquals: 'is equal to {{x|NormalizedString}}, taking case ' + 
+    CaseSensitiveEquals: 'is equal to {{x|NormalizedString}}, taking case ' +
       'into account',
     StartsWith: 'starts with {{x|NormalizedString}}',
     Contains: 'contains {{x|NormalizedString}}',
-    FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by at most one ' + 
+    FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by at most one ' +
       'character'
   },
   Real: {
@@ -81,7 +81,7 @@ var DESCRIPTIONS = {
       'account',
     StartsWith: 'starts with {{x|UnicodeString}}',
     Contains: 'contains {{x|UnicodeString}}',
-    MatchesBase64EncodedFile: 'has same content as the file located at ' + 
+    MatchesBase64EncodedFile: 'has same content as the file located at ' +
       '{{filepath|UnicodeString}}'
   }
 };
@@ -95,7 +95,7 @@ var getDescription = function(objectName, ruleName) {
 
   if (DESCRIPTIONS.hasOwnProperty(objectName)) {
     if (DESCRIPTIONS[objectName].hasOwnProperty(ruleName)) {
-      return 'Answer ' + DESCRIPTIONS[objectName][ruleName];
+      return DESCRIPTIONS[objectName][ruleName];
     } else {
       throw Error('Unknown rule: ' + ruleName);
     }

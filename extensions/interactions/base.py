@@ -118,15 +118,6 @@ class BaseInteraction(object):
             'No answer type initialized for interaction %s' %
             (self.name))
 
-    def validate_customization_arg_values(self, customization_args):
-        """Validates customization arg values. The input is a dict whose
-        keys are the names of the customization args.
-        """
-        for ca_spec in self.customization_arg_specs:
-            schema_utils.normalize_against_schema(
-                customization_args[ca_spec.name]['value'],
-                ca_spec.schema)
-
     @property
     def _stats_log_template(self):
         """The template for reader responses in the stats log."""

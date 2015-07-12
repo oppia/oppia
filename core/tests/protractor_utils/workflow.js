@@ -59,7 +59,7 @@ var createAndPublishExploration = function(name, category, objective, language) 
   createExploration(name, category);
   editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
-  editor.addRule('TextInput', null, 'final state', true, 'Default');
+  editor.setDefaultOutcome(null, 'final state', true);
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);

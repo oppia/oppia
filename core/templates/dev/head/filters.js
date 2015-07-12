@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+var _RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
+
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
@@ -86,6 +88,24 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
   };
 }]);
 
+oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
+  return function(input, characterCount) {
+    if (typeof input == 'string' || input instanceof String) {
+      input = $filter('normalizeWhitespace')(input);
+      if (input.length <= characterCount || characterCount < 3) {
+        // String fits within the criteria; no wrapping is necessary.
+        return input;
+      }
+
+      // Replace characters counting backwards from character count with an
+      // ellipsis, then trim the string.
+      return input.substr(0, characterCount - 3).trim() + '...';
+    } else {
+      return input;
+    }
+  };
+}]);
+
 // Filter that returns true iff an outcome has a self-loop and no feedback.
 oppia.filter('isOutcomeConfusing', [function() {
   return function(outcome, currentStateName) {
@@ -101,15 +121,12 @@ oppia.filter('isOutcomeConfusing', [function() {
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 // Note that this returns an HTML string to accommodate the case of multiple-choice
 // input and image-click input.
-// TODO(bhenning): This needs to be generalized for N rules in a group. It
-// should probably just accept a single rule, as it did before.
 oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
-  return function(group, interactionId, choices) {
-    if (!group) {
+  return function(rule, interactionId, choices) {
+    if (!rule) {
       return '';
     }
 
-    var rule = group.rule_specs[0];
     if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
@@ -183,7 +200,7 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       description = description.replace(PATTERN, ' ');
       finalDescription = finalDescription.replace(PATTERN, replacementText);
     }
-    return 'Answer ' + finalDescription;
+    return finalDescription;
   };
 }]);
 
@@ -203,9 +220,10 @@ oppia.filter('normalizeWhitespace', [function() {
   };
 }]);
 
-oppia.filter('convertRuleChoiceToPlainText', [function() {
+oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
+    strippedText = strippedText.replace('&nbsp;', ' ');
     strippedText = strippedText.trim();
     if (strippedText.length === 0) {
       return input;
@@ -214,3 +232,61 @@ oppia.filter('convertRuleChoiceToPlainText', [function() {
     }
   };
 }]);
+
+oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
+  return function(answerGroup, interactionId, answerChoices, shortenRule) {
+    var summary = '';
+    var outcome = answerGroup.outcome;
+    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+
+    if (answerGroup.rule_specs) {
+      var firstRule = $filter('convertToPlainText')(
+        $filter('parameterizeRuleDescription')(
+          answerGroup.rule_specs[0], interactionId, answerChoices));
+      summary = 'Answer ' + firstRule;
+
+      if (hasFeedback && shortenRule) {
+        summary = $filter('wrapTextWithEllipsis')(
+          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+      }
+      summary = '[' + summary + '] ';
+    }
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(outcome.feedback[0]);
+    }
+    return summary;
+  };
+}]);
+
+oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
+  return function(
+      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+    if (!defaultOutcome) {
+      return '';
+    }
+
+    var summary = '';
+    var feedback = defaultOutcome.feedback;
+    var hasFeedback = feedback.length > 0 && feedback[0];
+
+    if (interactionId === 'Continue') {
+      summary = 'When the button is clicked';
+    } else if (answerGroupCount > 0) {
+      summary = 'If the answer is anything else';
+    } else {
+      summary = 'All answers';
+    }
+
+    if (hasFeedback && shortenRule) {
+      summary = $filter('wrapTextWithEllipsis')(
+        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+    }
+    summary = '[' + summary + '] ';
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
+    }
+    return summary;
+  }
+}])

@@ -1,161 +1,34 @@
-<div style="height: 100%;">
-  <div ng-if="!ruleEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this rule, or change its destination' : '']>">
-    <div class="oppia-readonly-rule-tile protractor-test-edit-rule-button oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
-      <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing protractor-test-edit-rule" ng-click="openRuleEditor()">
-        </div>
-
-        <div style="position: relative;">
-          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
-          <span ng-if="isRuleConfusing()">
-            <span class="oppia-rule-warning-text">
-              <span class="glyphicon glyphicon-warning-sign"></span>
-              Please give Oppia something useful to say here.
-            </span>
-          </span>
-          <span ng-if="!isRuleConfusing() && outcome.feedback.length === 0" style="color: #888">
-            <em>No feedback</em>
-          </span>
-          <span ng-if="outcome.feedback.length > 0" style="word-wrap: break-word;">
-            <span angular-html-bind="outcome.feedback[0]"></span>
-            <span ng-if="outcome.feedback.length > 1">
-              <em>
-                (or <span ng-if="outcome.feedback.length > 2">one of </span> <[outcome.feedback.length - 1]> other variation<span ng-if="outcome.feedback.length > 2">s</span>)
-              </em>
-            </span>
-          </span>
-        </div>
-
-        <div style="padding-top: 20px;" ng-if="outcome.dest !== getActiveStateName()">
-          <strong>Destination:</strong>
-          <span class="oppia-rule-dest-link" style="position: relative;">
-            <a ng-click="navigateToRuleDest()">
-              <[outcome.dest]>
-            </a>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div ng-if="isEditable && ruleEditorIsOpen">
-    <form role="form" class="form-inline protractor-test-edit-rule-details" name="editRuleForm">
-      <rule-details-editor rule="rule" outcome="outcome" is-default-rule="isDefaultRule()">
-      </rule-details-editor>
-    </form>
-
-    <br>
-
-    <div class="oppia-rule-save-cancel-buttons">
-      <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
-
-      <div class="pull-right">
-        <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="(!isDefaultRule() && !rule.rule_type) || editRuleForm.$invalid || isSelfLoopWithNoFeedback(outcome)" ng-click="saveThisRule()">Save Rule</button>
-      </div>
-
-      <div style="clear: both;"></div>
-    </div>
-  </div>
-</div>
-
-<script type="text/ng-template" id="rules/ruleDetailsEditor">
-  <div style="position: relative;">
-    <div class="oppia-rule-details-header">
-      <strong>Rule</strong>
-    </div>
-    <span ng-if="!isDefaultRule()">
-      <rule-description-editor current-rule="rule" is-default-rule="isDefaultRule()">
-      </rule-description-editor>
-    </span>
-
-    <span ng-if="isDefaultRule()">
-      <span ng-if="currentInteractionId === 'Continue'">
-        When the button is clicked...
-      </span>
-      <span ng-if="currentInteractionId !== 'Continue'">
-        No other rules apply...
-      </span>
-    </span>
-  </div>
-
-  <br>
-
-  <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
-    <div class="oppia-rule-details-header">
-      <strong>Feedback</strong>
-    </div>
-    <span ng-if="outcome.feedback.length > 1">
-      (<em>Oppia picks one of these at random</em>):
-    </span>
-    <span ng-if="outcome.feedback.length == 0">
-      <em>No feedback specified.</em>
-    </span>
-
-    <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="outcome.feedback">
-    </schema-based-editor>
-  </div>
-
-  <br>
-
-  <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
-    <div class="oppia-rule-details-header">
-      <strong>Destination</strong>
-    </div>
-    <div class="form-group" style="font-size: 1.1em;">
-      <span ng-if="!reloadingDestinations">
-        <select class="form-control" ng-model="outcome.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="width: 200px;">
-        </select>
-      </span>
-    </div>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/addState">
-  <div class="modal-header">
-    <h3>Add New State</h3>
-  </div>
-
-  <div class="modal-body">
-    <form role="form" class="form-inline" ng-submit="submit(newStateName)">
-      <div class="form-group">
-        <input type="text" class="form-control protractor-test-add-state-input" ng-model="newStateName" placeholder="New State Name" focus-on="newStateNameInput">
-      </div>
-    </form>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-add-state-submit"
-            ng-click="submit(newStateName)"
-            ng-disabled="!isNewStateNameValid(newStateName)">
-      Add State
-    </button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="rules/ruleDescriptionEditor">
-  <form class="form-inline" role="form">
-    <rule-type-selector class="protractor-test-rule-description" local-value="currentRule.rule_type" on-selection-change="onSelectNewRuleType">
+<div style="position: relative;">
+  <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
+    <rule-type-selector class="protractor-test-answer-description" local-value="rule.rule_type" on-selection-change="onSelectNewRuleType">
     </rule-type-selector>
 
-    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment" style="margin-right: 5px; width: 100%;">
+    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-answer-description-fragment" style="margin-right: 5px; width: 100%;">
       <span ng-if="item.type == 'select'" style="color: black;">
         <span ng-if="ruleDescriptionChoices.length === 1">
-          "<[ruleDescriptionChoices[0].val|convertRuleChoiceToPlainText|truncate]>"
+          "<[ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
         </span>
         <span ng-if="ruleDescriptionChoices.length !== 1">
-          <select class="form-control" ng-model="currentRule.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
+          <select class="form-control" ng-model="rule.inputs[item.varName]" ng-options="choice.id as (choice.val|convertToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
           </select>
         </span>
       </span>
 
       <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-        <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="currentRule.inputs[item.varName]" style="color: black;"></object-editor>
+        <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="rule.inputs[item.varName]" style="color: black;"></object-editor>
       </span>
       <span ng-if="item.type == 'noneditable'">
         <[item.text]>
       </span>
     </span>
   </form>
-</script>
+
+  <div class="oppia-rule-save-cancel-buttons" ng-if="isEditingRuleInline()">
+    <div class="pull-right">
+      <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="ruleEditForm.form.$invalid" ng-click="saveThisRule()">Save Answer</button>
+    </div>
+
+    <div style="clear: both;"></div>
+  </div>
+</div>

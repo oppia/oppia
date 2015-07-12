@@ -106,16 +106,43 @@ describe('Testing filters', function() {
     expect(filter('{{}}...')).toEqual('{{}}');
   }));
 
+  it('should wrap text with ellipses based on its length', inject(function($filter) {
+    var filter = $filter('wrapTextWithEllipsis');
+
+    expect(filter('', 0)).toEqual('');
+    expect(filter(null, 0)).toEqual(null);
+    expect(filter(undefined, 0)).toEqual(undefined);
+
+    expect(filter('testing', 0)).toEqual('testing');
+    expect(filter('testing', 1)).toEqual('testing');
+    expect(filter('testing', 2)).toEqual('testing');
+    expect(filter('testing', 3)).toEqual('...');
+    expect(filter('testing', 4)).toEqual('t...');
+    expect(filter('testing', 7)).toEqual('testing');
+    expect(filter('Long sentence which goes on and on.', 80)).toEqual(
+      'Long sentence which goes on and on.');
+    expect(filter('Long sentence which goes on and on.', 20)).toEqual(
+      'Long sentence whi...');
+    expect(filter('Sentence     with     long     spacing.', 20)).toEqual(
+      'Sentence with lon...');
+    expect(filter('With space before ellipsis.', 21)).toEqual(
+      'With space before...');
+  }));
+
   it('should correctly normalize whitespace', inject(function($filter) {
     var filter = $filter('normalizeWhitespace');
 
-    expect(filter('a')).toBe('a');
-    expect(filter('a  ')).toBe('a');
-    expect(filter('  a')).toBe('a');
-    expect(filter('  a  ')).toBe('a');
+    expect(filter('')).toEqual('');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
 
-    expect(filter('a  b ')).toBe('a b');
-    expect(filter('  a  b ')).toBe('a b');
-    expect(filter('  ab c ')).toBe('ab c');
+    expect(filter('a')).toEqual('a');
+    expect(filter('a  ')).toEqual('a');
+    expect(filter('  a')).toEqual('a');
+    expect(filter('  a  ')).toEqual('a');
+
+    expect(filter('a  b ')).toEqual('a b');
+    expect(filter('  a  b ')).toEqual('a b');
+    expect(filter('  ab c ')).toEqual('ab c');
   }));
 });

@@ -35,10 +35,10 @@ describe('State editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
     editor.setInteraction('Continue', 'click here');
-    editor.addRule('Continue', null, 'final state', true, 'Default');
+    editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
-    editor.moveToState('final state');
+    editor.moveToState('final card');
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -83,10 +83,10 @@ describe('State editor', function() {
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    editor.addRule('MultipleChoiceInput', null, 'final state', true, 'Default');
+    editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
-    editor.moveToState('final state');
+    editor.moveToState('final card');
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -108,14 +108,13 @@ describe('State editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('some content'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', function(richTextEditor) {
+    editor.addResponse('NumericInput', function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
-    }, 'final state', true, 'IsInclusivelyBetween', -1, 3);
-    editor.addRule('NumericInput',
-      forms.toRichText('out of bounds'), null, false, 'Default');
+    }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+    editor.setDefaultOutcome(forms.toRichText('out of bounds'), null, false);
 
     // Setup a terminating state
-    editor.moveToState('final state');
+    editor.moveToState('final card');
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
@@ -141,39 +140,38 @@ describe('Full exploration editor', function() {
     users.login('user4@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.setStateName('state 1');
-    editor.setContent(forms.toRichText('this is state 1'));
+    editor.setStateName('card 1');
+    editor.setContent(forms.toRichText('this is card 1'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', null, 'final state', true, 'Equals', 21);
-    editor.RuleEditor(0).createNewStateAndSetDestination('state 2');
+    editor.addResponse('NumericInput', null, 'final card', true, 'Equals', 21);
+    editor.ResponseEditor(0).setDestination('card 2', true);
 
-    editor.moveToState('state 2');
+    editor.moveToState('card 2');
     editor.setContent(forms.toRichText(
-      'this is state 2 with previous answer {{answer}}'));
+      'this is card 2 with previous answer {{answer}}'));
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addRule('MultipleChoiceInput', null, 'state 1', false,
+    editor.addResponse('MultipleChoiceInput', null, 'card 1', false,
       'Equals', 'return');
-    editor.addRule('MultipleChoiceInput', null, 'final state',
-      false, 'Default');
+    editor.setDefaultOutcome(null, 'final card', false);
 
     // Setup a terminating state
-    editor.moveToState('final state');
+    editor.moveToState('final card');
     editor.setInteraction('EndExploration');
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('this is state 1'));
+    player.expectContentToMatch(forms.toRichText('this is card 1'));
     player.submitAnswer('NumericInput', 19);
     player.submitAnswer('NumericInput', 21);
     player.expectContentToMatch(forms.toRichText(
-      'this is state 2 with previous answer 21'));
+      'this is card 2 with previous answer 21'));
     player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch(forms.toRichText('this is state 1'));
+    player.expectContentToMatch(forms.toRichText('this is card 1'));
     player.submitAnswer('NumericInput', 21);
     player.expectContentToMatch(forms.toRichText(
-      'this is state 2 with previous answer 21'));
+      'this is card 2 with previous answer 21'));
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
@@ -181,7 +179,7 @@ describe('Full exploration editor', function() {
   });
 
   it('should handle discarding changes, navigation, deleting states, ' +
-      'changing the first state, displaying content, deleting rules and ' +
+      'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', function() {
     users.createUser('user5@example.com', 'user5');
     users.login('user5@example.com');
@@ -190,17 +188,17 @@ describe('Full exploration editor', function() {
     general.getExplorationIdFromEditor().then(function(explorationId) {
 
       // Check discarding of changes
-      editor.setStateName('state1');
-      editor.expectStateNamesToBe(['state1']);
-      editor.setContent(forms.toRichText('state1 content'));
+      editor.setStateName('card1');
+      editor.expectStateNamesToBe(['card1']);
+      editor.setContent(forms.toRichText('card1 content'));
       editor.setInteraction('TextInput');
-      editor.addRule('TextInput', null, 'final state', true, 'Default');
-      editor.RuleEditor('default').createNewStateAndSetDestination('state2');
-      editor.moveToState('state2');
+      editor.setDefaultOutcome(null, 'final card', true);
+      editor.ResponseEditor('default').setDestination('card2', true);
+      editor.moveToState('card2');
       // NOTE: we must move to the state before checking state names to avoid
       // inexplicable failures of the protractor utility that reads state names
       // (the user-visible names are fine either way). See issue 732 for more.
-      editor.expectStateNamesToBe(['final state', 'state1', 'state2']);
+      editor.expectStateNamesToBe(['final card', 'card1', 'card2']);
       editor.setInteraction('EndExploration');
 
       editor.discardChanges();
@@ -210,17 +208,17 @@ describe('Full exploration editor', function() {
 
       // Check deletion of states and changing the first state
       editor.setInteraction('TextInput');
-      editor.addRule('TextInput', null, 'final state', true, 'Default');
-      editor.RuleEditor('default').createNewStateAndSetDestination('second');
+      editor.setDefaultOutcome(null, 'final card', true);
+      editor.ResponseEditor('default').setDestination('second', true);
       editor.moveToState('second');
-      editor.expectStateNamesToBe(['final state', 'first', 'second']);
+      editor.expectStateNamesToBe(['final card', 'first', 'second']);
       editor.expectCurrentStateToBe('second');
-      editor.expectAvailableFirstStatesToBe(['final state', 'first', 'second']);
+      editor.expectAvailableFirstStatesToBe(['final card', 'first', 'second']);
       editor.setFirstState('second');
       editor.moveToState('first');
       editor.deleteState('first');
       editor.expectCurrentStateToBe('second');
-      editor.expectStateNamesToBe(['final state', 'second']);
+      editor.expectStateNamesToBe(['final card', 'second']);
 
       // Check behaviour of the back button
       editor.setObjective('do stuff');
@@ -246,20 +244,19 @@ describe('Full exploration editor', function() {
       editor.setInteraction('NumericInput');
       editor.expectInteractionToMatch('NumericInput');
 
-      // Check deletion of rules
-      editor.addRule('NumericInput', forms.toRichText('Farewell'), null,
-        false, 'Default');
-      editor.RuleEditor('default').
-        expectAvailableDestinationsToBe(['second', 'final state']);
-      editor.RuleEditor('default').setDestination('final state');
-      editor.RuleEditor('default').
-        expectAvailableDestinationsToBe(['second', 'final state']);
-      editor.addRule('NumericInput', null, 'final state', false,
+      // Check deletion of groups
+      editor.setDefaultOutcome(forms.toRichText('Farewell'), null, false);
+      editor.ResponseEditor('default').
+        expectAvailableDestinationsToBe(['second', 'final card']);
+      editor.ResponseEditor('default').setDestination('final card', false);
+      editor.ResponseEditor('default').
+        expectAvailableDestinationsToBe(['second', 'final card']);
+      editor.addResponse('NumericInput', null, 'final card', false,
         'IsGreaterThan', 2);
-      editor.RuleEditor(0).delete();
+      editor.ResponseEditor(0).delete();
 
       // Setup a terminating state
-      editor.moveToState('final state');
+      editor.moveToState('final card');
       editor.setInteraction('EndExploration');
 
       // Check editor preview tab
@@ -269,11 +266,113 @@ describe('Full exploration editor', function() {
       });
       player.expectInteractionToMatch('NumericInput');
       player.submitAnswer('NumericInput', 6);
-      // This checks the previously-deleted rule no longer applies.
+      // This checks the previously-deleted group no longer applies.
       player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
       player.expectExplorationToBeOver();
 
       editor.discardChanges();
+      users.logout();
+    });
+  });
+
+  it('should handle multiple rules in an answer group and also disallow ' +
+      'editing of a read-only exploration', function() {
+    users.createUser('user6@example.com', 'user6');
+    users.createUser('user7@example.com', 'user7');
+    users.login('user6@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      // Create an exploration with multiple groups.
+      editor.setStateName('first card');
+      editor.setContent(forms.toRichText('How are you feeling?'));
+      editor.setInteraction('TextInput');
+      editor.addResponse('TextInput', forms.toRichText('You must be happy!'),
+        'first card', false, 'Equals', 'happy');
+      editor.addResponse('TextInput', forms.toRichText('No being sad!'),
+        'first card', false, 'Contains', 'sad');
+      editor.setDefaultOutcome(forms.toRichText(
+        'Okay, now this is just becoming annoying.'), 'final card', true);
+
+      // Now, add multiple rules to a single answer group.
+      editor.ResponseEditor(0).addRule('TextInput', 'Contains', 'meh');
+      editor.ResponseEditor(0).addRule('TextInput', 'Contains', 'okay');
+
+      // Ensure that the only rule for this group cannot be deleted.
+      editor.ResponseEditor(1).expectCannotDeleteRule(0);
+
+      // Setup a terminating state.
+      editor.moveToState('final card');
+      editor.setInteraction('EndExploration');
+
+      // Save.
+      editor.setObjective('To assess happiness.');
+      editor.saveChanges();
+      workflow.publishExploration();
+
+      // Login as another user and verify that the exploration editor does not
+      // allow the second user to modify the exploration.
+      users.logout();
+      users.login('user7@example.com');
+      general.openEditor(explorationId);
+      editor.exitTutorialIfNecessary();
+
+      // Verify nothing can change with this user.
+      editor.expectInteractionToMatch('TextInput');
+      editor.expectCannotDeleteInteraction();
+      editor.expectCannotAddResponse();
+      editor.expectCannotSaveChanges();
+
+      // Check answer group 1.
+      var responseEditor = editor.ResponseEditor(0);
+      responseEditor.expectCannotSetFeedback();
+      responseEditor.expectCannotSetDestination();
+      responseEditor.expectCannotDeleteResponse();
+      responseEditor.expectCannotAddRule();
+      responseEditor.expectCannotDeleteRule(0);
+      responseEditor.expectCannotDeleteRule(1);
+
+      // Check answer group 2.
+      responseEditor = editor.ResponseEditor(0);
+      responseEditor.expectCannotSetFeedback();
+      responseEditor.expectCannotSetDestination();
+      responseEditor.expectCannotDeleteResponse();
+      responseEditor.expectCannotAddRule();
+      responseEditor.expectCannotDeleteRule(0);
+
+      // Check default outcome.
+      responseEditor = editor.ResponseEditor('default');
+      responseEditor.expectCannotSetFeedback();
+      responseEditor.expectCannotSetDestination();
+
+      // Check editor preview tab to verify multiple rules are working.
+      general.moveToPlayer();
+      player.expectContentToMatch(forms.toRichText('How are you feeling?'));
+      player.expectInteractionToMatch('TextInput');
+
+      player.submitAnswer('TextInput', 'happy');
+      player.expectLatestFeedbackToMatch(
+        forms.toRichText('You must be happy!'));
+
+      player.submitAnswer('TextInput', 'meh, I\'m okay');
+      player.expectLatestFeedbackToMatch(
+        forms.toRichText('You must be happy!'));
+
+      player.submitAnswer('TextInput', 'NO I\'M SAD');
+      player.expectLatestFeedbackToMatch(forms.toRichText('No being sad!'));
+
+      player.submitAnswer('TextInput', 'Fine...I\'m doing okay');
+      player.expectLatestFeedbackToMatch(
+        forms.toRichText('You must be happy!'));
+
+      // Finish the exploration.
+      player.submitAnswer('TextInput', 'Whatever...');
+
+      player.expectLatestFeedbackToMatch(
+        forms.toRichText('Okay, now this is just becoming annoying.'));
+      player.expectExplorationToBeOver();
+
       users.logout();
     });
   });
@@ -395,7 +494,7 @@ describe('Interactions', function() {
     editor.setStateName('first');
     editor.setContent(forms.toRichText('some content'));
 
-    var defaultRuleSet = false;
+    var defaultOutcomeSet = false;
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
@@ -405,15 +504,14 @@ describe('Interactions', function() {
         editor.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        editor.addRule.apply(null, [
+        editor.addResponse.apply(null, [
           interactionId, forms.toRichText('yes'), 'first', false
         ].concat(test.ruleArguments));
 
-        if (!defaultRuleSet) {
-          // The default rule will be preserved for subsequent tests.
-          editor.addRule(
-            interactionId, forms.toRichText('no'), null, false, 'Default');
-          defaultRuleSet = true;
+        if (!defaultOutcomeSet) {
+          // The default outcome will be preserved for subsequent tests.
+          editor.setDefaultOutcome(forms.toRichText('no'), null, false);
+          defaultOutcomeSet = true;
         }
 
         editor.navigateToPreviewTab();
@@ -455,22 +553,22 @@ describe('Exploration history', function() {
 
     // Compare a version to itself (just contains first node)
     editor.expectGraphComparisonOf(1, 1).toBe([
-      {'label': 'First State', 'color': COLOR_UNCHANGED}
+      {'label': general.FIRST_STATE_DEFAULT_NAME, 'color': COLOR_UNCHANGED}
     ], [0, 0, 0]);
 
     // Check renaming state, editing text, editing interactions and adding state
-    editor.moveToState('First State');
+    editor.moveToState(general.FIRST_STATE_DEFAULT_NAME);
     editor.setStateName('first');
     editor.setContent(forms.toRichText('enter 6 to continue'));
     editor.setInteraction('NumericInput');
-    editor.addRule('NumericInput', null, 'second', true, 'Equals', 6);
+    editor.addResponse('NumericInput', null, 'second', true, 'Equals', 6);
     editor.moveToState('second');
-    editor.setContent(forms.toRichText('this is state 2'));
+    editor.setContent(forms.toRichText('this is card 2'));
     editor.setInteraction('Continue');
-    editor.addRule('Continue', null, 'final state', true, 'Default');
+    editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
-    editor.moveToState('final state');
+    editor.moveToState('final card');
     editor.setInteraction('EndExploration');
     editor.moveToState('first');
     editor.saveChanges();
@@ -494,8 +592,8 @@ describe('Exploration history', function() {
       16: {text: '    dest: first', highlighted: true},
       17: {text: '    feedback: []', highlighted: false},
       18: {text: '    param_changes: []', highlighted: false},
-      19: {text: '  id: NumericInput', highlighted: true},
-      20: {text: '  triggers: []', highlighted: false},
+      19: {text: '  fallbacks: []', highlighted: false},
+      20: {text: '  id: NumericInput', highlighted: true},
       21: {text: 'param_changes: []', highlighted: false},
       22: {text: ' ', highlighted: false}
     };
@@ -509,36 +607,39 @@ describe('Exploration history', function() {
       7: {text: '  default_outcome:', highlighted: false},
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      8: {text: '    dest: First State', highlighted: true},
+      8: {
+        text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
+        highlighted: true
+      },
       9: {text: '    feedback: []', highlighted: false},
       10: {text: '    param_changes: []', highlighted: false},
-      11: {text: '  id: null', highlighted: true},
-      12: {text: '  triggers: []', highlighted: false},
+      11: {text: '  fallbacks: []', highlighted: false},
+      12: {text: '  id: null', highlighted: true},
       13: {text: 'param_changes: []', highlighted: false},
       14: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
       '- type: text\n' +
-      '  value: <p>this is state 2</p>\n' +
+      '  value: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value: Continue\n' +
       '  default_outcome:\n' +
-      '    dest: final state\n' +
+      '    dest: final card\n' +
       '    feedback: []\n' +
       '    param_changes: []\n' +
+      '  fallbacks: []\n' +
       '  id: Continue\n' +
-      '  triggers: []\n' +
       'param_changes: []\n' +
       ' ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([
       {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_ADDED},
-      {'label': 'final state', 'color': COLOR_ADDED}
+      {'label': 'final card', 'color': COLOR_ADDED}
     ], [2, 2, 0]);
     editor.expectTextComparisonOf(1, 2, 'first (was: First ...')
       .toBeWithHighlighting(VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
@@ -549,19 +650,19 @@ describe('Exploration history', function() {
     editor.expectGraphComparisonOf(2, 1).toBe([
       {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_ADDED},
-      {'label': 'final state', 'color': COLOR_ADDED}
+      {'label': 'final card', 'color': COLOR_ADDED}
     ], [2, 2, 0]);
 
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
-    editor.RuleEditor(0).setDestination('final state');
+    editor.ResponseEditor(0).setDestination('final card', false);
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 3).toBe([
       {'label': 'first', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_DELETED},
-      {'label': 'final state', 'color': COLOR_UNCHANGED}
+      {'label': 'final card', 'color': COLOR_UNCHANGED}
     ], [3, 1, 2]);
     editor.expectTextComparisonOf(2, 3, 'second')
       .toBe(' ', STATE_2_STRING);
@@ -572,22 +673,22 @@ describe('Exploration history', function() {
     editor.saveChanges();
     editor.expectGraphComparisonOf(3, 4).toBe([
       {'label': 'third (was: first)', 'color': COLOR_RENAMED_UNCHANGED},
-      {'label': 'final state', 'color': COLOR_UNCHANGED}
+      {'label': 'final card', 'color': COLOR_UNCHANGED}
     ], [1, 0, 0]);
 
     // Check re-inserting a deleted state
     editor.moveToState('third');
-    editor.RuleEditor(0).createNewStateAndSetDestination('second');
+    editor.ResponseEditor(0).setDestination('second', true);
     editor.moveToState('second');
-    editor.setContent(forms.toRichText('this is state 2'));
+    editor.setContent(forms.toRichText('this is card 2'));
     editor.setInteraction('Continue');
-    editor.addRule('Continue', null, 'final state', false, 'Default');
+    editor.setDefaultOutcome(null, 'final card', false);
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 5).toBe([
       {'label': 'third (was: first)', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_UNCHANGED},
-      {'label': 'final state', 'color': COLOR_UNCHANGED}
+      {'label': 'final card', 'color': COLOR_UNCHANGED}
     ], [2, 0, 0]);
 
     // Check that reverting works
@@ -596,7 +697,7 @@ describe('Exploration history', function() {
     player.expectContentToMatch(forms.toRichText('enter 6 to continue'));
     player.submitAnswer('NumericInput', 6);
     player.expectExplorationToNotBeOver();
-    player.expectContentToMatch(forms.toRichText('this is state 2'));
+    player.expectContentToMatch(forms.toRichText('this is card 2'));
     player.expectInteractionToMatch('Continue', 'CONTINUE');
     player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
@@ -605,7 +706,7 @@ describe('Exploration history', function() {
     editor.expectGraphComparisonOf(4, 6).toBe([
       {'label': 'first (was: third)', 'color': COLOR_CHANGED},
       {'label': 'second', 'color': COLOR_ADDED},
-      {'label': 'final state', 'color': COLOR_UNCHANGED}
+      {'label': 'final card', 'color': COLOR_UNCHANGED}
     ], [3, 2, 1]);
 
     users.logout();
