@@ -35,6 +35,10 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
     _saveDataItem('user_bio', userBio);
   };
 
+  $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
+    _saveDataItem('can_receive_email_updates', canReceiveEmailUpdates);
+  };
+
   $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
     _saveDataItem('preferred_language_codes', preferredLanguageCodes);
   };
@@ -110,6 +114,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
     $scope.userBio = data.user_bio;
     $scope.preferredLanguageCodes = data.preferred_language_codes;
     $scope.profilePictureDataUrl = data.profile_picture_data_url;
+    $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
     $scope.hasPageLoaded = true;
   });
 }]);

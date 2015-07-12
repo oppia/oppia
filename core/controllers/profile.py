@@ -95,6 +95,8 @@ class PreferencesHandler(base.BaseHandler):
             'preferred_language_codes': user_settings.preferred_language_codes,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
+            'can_receive_email_updates': user_services.get_email_preferences(
+                self.user_id)['can_receive_email_updates'],
         })
         self.render_json(self.values)
 
@@ -110,6 +112,8 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
+        elif update_type == 'can_receive_email_updates':
+            user_services.update_email_preferences(self.user_id, data)
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -147,6 +151,7 @@ class SignupPage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
+            'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
             'SITE_NAME': pages.SITE_NAME.value,
         })
         self.render_template('profile/signup.html')
@@ -172,6 +177,7 @@ class SignupHandler(base.BaseHandler):
         """Handles POST requests."""
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
+        can_receive_email_updates = self.payload.get('can_receive_email_updates')
 
         has_previously_registered = (
             user_services.has_user_registered_as_editor(self.user_id))
@@ -192,6 +198,10 @@ class SignupHandler(base.BaseHandler):
                 user_services.set_username(self.user_id, username)
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
+
+        if can_receive_email_updates is not None:
+            user_services.update_email_preferences(
+                self.user_id, can_receive_email_updates)
 
         # Note that an email is only sent when the user registers for the first
         # time.

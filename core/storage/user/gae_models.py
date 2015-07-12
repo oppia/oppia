@@ -65,6 +65,16 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
 
+class UserEmailPreferencesModel(base_models.BaseModel):
+    """Email preferences for a particular user.
+
+    Instances of this class are keyed by the user id.
+    """
+    # The user's preference for receiving general site updates. This is set to
+    # None if the user has never set a preference.
+    site_updates = ndb.BooleanProperty(indexed=True)
+
+
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
 

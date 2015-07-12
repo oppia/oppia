@@ -142,6 +142,8 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 # SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
 # email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_USERS = False
+# Whether to send email updates to a user who has not specified a preference.
+DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
