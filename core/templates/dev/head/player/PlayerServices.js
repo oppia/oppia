@@ -374,8 +374,9 @@ oppia.factory('oppiaPlayerService', [
           _INTERACTION_DISPLAY_MODE_INLINE);
     },
     isStateTerminal: function(stateName) {
-      return !stateName || INTERACTION_SPECS[
-        _exploration.states[stateName].interaction.id].is_terminal;
+      return stateName && _exploration.states[stateName].interaction.id &&
+        INTERACTION_SPECS[
+          _exploration.states[stateName].interaction.id].is_terminal;
     },
     getRandomSuffix: function() {
       // This is a bit of a hack. When a refresh to a $scope variable happens,

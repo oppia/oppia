@@ -52,7 +52,7 @@
       <!-- Note that adding "track by $index" here seems to mess up the final
       index in the stop() event handler. -->
       <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
-        <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" href="#" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
+        <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
             <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== activeRuleIndex">
@@ -94,7 +94,7 @@
         </div>
 
         <div ng-if="outcome.dest !== getActiveStateName()">
-          <strong>And afterwards, direct the learner to...</strong>
+          <strong>And afterwards, directs the learner to...</strong>
           <span ng-if="!isSelfLoop(outcome)" style="position: relative;">
             <[outcome.dest]>
           </span>
@@ -141,7 +141,7 @@
 <script type="text/ng-template" id="rules/outcomeDestinationEditor">
   <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
     <div class="oppia-rule-details-header">
-      <strong>And afterwards, direct the learner to...</strong>
+      <strong>And afterwards, directs the learner to...</strong>
     </div>
     <div class="form-group" style="font-size: 1.1em;">
       <span>
