@@ -63,6 +63,9 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /i18n
+  static_dir: i18n/
+  secure: always
 - url: /extensions/gadgets/(.*)/static/(.*)
   static_files: extensions/gadgets/\1/static/\2
   upload: extensions/gadgets/(.*)/static/(.*)

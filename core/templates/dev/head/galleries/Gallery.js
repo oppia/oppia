@@ -117,14 +117,19 @@ oppia.factory('searchService', [
 
 oppia.controller('Gallery', [
     '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-    'createExplorationButtonService', 'oppiaDatetimeFormatter', 'oppiaDebouncer',
+    '$translate', '$translatePartialLoader', 'createExplorationButtonService',
+    'oppiaDatetimeFormatter', 'oppiaDebouncer',
     'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService',
     'ratingVisibilityService',
     function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
+      $translate, $translatePartialLoader,
       createExplorationButtonService, oppiaDatetimeFormatter, oppiaDebouncer,
       urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService,
       ratingVisibilityService) {
+
+  $translatePartialLoader.addPart('gallery');
+  $translate.refresh();
 
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
@@ -239,8 +244,12 @@ oppia.controller('Gallery', [
 }]);
 
 oppia.controller('SearchBar', [
-    '$scope', '$rootScope', 'searchService', 'oppiaDebouncer', 'createExplorationButtonService', 'urlService', 'CATEGORY_LIST',
-    function($scope, $rootScope, searchService, oppiaDebouncer, createExplorationButtonService, urlService, CATEGORY_LIST) {
+    '$scope', '$rootScope', '$translate', '$translatePartialLoader',
+    'searchService', 'oppiaDebouncer', 'createExplorationButtonService',
+    'urlService', 'CATEGORY_LIST',
+    function($scope, $rootScope, $translate, $translatePartialLoader,
+      searchService, oppiaDebouncer, createExplorationButtonService,
+      urlService, CATEGORY_LIST) {
 
   $scope.searchIsLoading = false;
   $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {

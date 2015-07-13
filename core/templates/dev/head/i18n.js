@@ -18,17 +18,28 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
-oppia.config(['$translateProvider', function ($translateProvider) {
-  $translateProvider.translations('en', {
-    'GALLERY-TITLE': 'Hi, I\'m Oppia',
-    'GALLERY-SUBTITLE': 'Your personal tutor for ',
-    'GALLERY-SUBTITLE-COLOR-1': 'anything',
-  })
-  $translateProvider.translations('es', {
-    'GALLERY-TITLE': 'Hola, soy Oppia',
-    'GALLERY-SUBTITLE': 'Tu tutor personal para ',
-    'GALLERY-SUBTITLE-COLOR-1': 'lo que quieras',
-  });
-  $translateProvider.preferredLanguage('en');
-  $translateProvider.fallbackLanguage('en');
+oppia.constant('SUPPORTED_LANGUAGES', {
+  'en': 'English',
+  'es': 'Español'
+});
+
+oppia.controller('i18n', [
+  '$scope', '$translate', 'SUPPORTED_LANGUAGES', function($scope, $translate,
+    SUPPORTED_LANGUAGES) {
+    $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+    // Changes the language of the translations.
+    $scope.changeLanguage = function (langCode) {
+      $translate.use(langCode);
+    };
+}]);
+
+oppia.config(['$translateProvider', '$translatePartialLoaderProvider',
+  function ($translateProvider, $translatePartialLoaderProvider) {
+    $translateProvider.useLoader('$translatePartialLoader', {
+      urlTemplate: '/i18n/{part}/{lang}.json'
+    });
+    $translatePartialLoaderProvider.addPart('sidenav');
+    $translatePartialLoaderProvider.addPart('topnav');
+    $translateProvider.preferredLanguage('en');
+    $translateProvider.fallbackLanguage('en');
 }]);

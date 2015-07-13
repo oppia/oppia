@@ -21,19 +21,19 @@
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            href="{{gallery_login_redirect_url}}">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
+          <span translate>GALLERY-CREATE-EXPLORATION</span>
         </a>
       {% else %}
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            ng-click="showCreateExplorationModal()">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
+          <span translate>GALLERY-CREATE-EXPLORATION</span>
         </a>
         {% if allow_yaml_file_upload %}
           <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
              ng-click="showUploadExplorationModal()">
             <span class="oppia-navbar-add-exploration-button-plus">+</span>
-            <span>Upload Exploration</span>
+            <span translate>GALLERY-UPLOAD-EXPLORATION</span>
           </a>
         {% endif %}
       {% endif %}
@@ -56,7 +56,7 @@
     <div dropdown class="dropdown navbar-left oppia-navbar-button-container oppia-gallery-category-selector protractor-test-gallery-category-selector">
       <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak"
               title="<[selectionDetails.categories.description]>" style="max-width: 130px;">
-        <[selectionDetails.categories.summary | truncate:14 ]>
+        <span><[selectionDetails.categories.summary | truncate:14 ]></span>
         <span class="caret"></span>
       </button>
       <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
@@ -128,14 +128,16 @@
 {% block content %}
   <div ng-controller="Gallery" class="oppia-gallery-container">
     <div ng-if="inSplashMode" class="oppia-gallery-banner-container">
-      <div class="oppia-gallery-banner-content" translate="GALLERY-TITLE"></div>
+      <div class="oppia-gallery-banner-content">
+        <span translate>GALLERY-TITLE</span>
+      </div>
       <carousel interval="CAROUSEL_INTERVAL">
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
             <div class="oppia-gallery-banner-tagline">
-              <[ 'GALLERY-SUBTITLE' | translate ]>
-              <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
-                <[slide.topic]>
+              <span translate>GALLERY-SUBTITLE</span>
+              <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link" translate>
+                GALLERY-SUBTITLE-COLOR-<[slide.topic]>
               </a>
             </div>
           </div>

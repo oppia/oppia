@@ -1,8 +1,6 @@
-<footer class="oppia-footer">
-  {% for item in languages_supported %}
-    <a ng-click="changeLanguage('{{item.code}}')">{{ item.name }}</a>
-    {% if not loop.last %}
-      ·
-    {% endif %}
-  {% endfor %}
-</footer>
+<div class="oppia-footer" ng-controller="i18n">
+  <span ng-repeat="(langCode, langName) in SUPPORTED_LANGUAGES">
+    <a ng-click="changeLanguage(langCode)"><[ langName ]></a>
+    <span ng-if="!$last">·</span>
+  </span>
+</div>
