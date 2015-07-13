@@ -66,8 +66,8 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
         'RandomSelector': ['list_of_values'],
       };
       $scope.PREAMBLE_TEXT = {
-        'Copier': 'set to',
-        'RandomSelector': 'pick, at random, one of'
+        'Copier': 'should be changed to',
+        'RandomSelector': 'should be one of'
       };
       $scope.HUMAN_READABLE_ARGS_RENDERERS = {
         'Copier': function(customization_args) {
