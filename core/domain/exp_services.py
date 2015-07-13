@@ -854,7 +854,6 @@ def get_exploration_snapshots_metadata(exploration_id):
 
     Args:
         exploration_id: str. The id of the exploration in question.
-        limit: int. The maximum number of snapshots to return.
 
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
@@ -1194,8 +1193,19 @@ def _get_search_rank(exp_id):
                 summary.ratings[rating_value] *
                 RATING_WEIGHTINGS[rating_value])
 
-    _TIME_NOW = datetime.datetime.utcnow()
-    time_delta_days = int((_TIME_NOW - exploration.last_updated).days)
+    # Iterate backwards through the exploration history metadata until we find
+    # the most recent snapshot that was committed by a human.
+    last_human_update_ms = 0
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    for snapshot_metadata in reversed(snapshots_metadata):
+        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
+            last_human_update_ms = snapshot_metadata['created_on_ms']
+            break
+
+    _TIME_NOW_MS = utils.get_current_time_in_millisecs()
+    _MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
+    time_delta_days = int(
+        (_TIME_NOW_MS - last_human_update_ms) / _MS_IN_ONE_DAY)
     if time_delta_days == 0:
         rank += 80
     elif time_delta_days == 1:

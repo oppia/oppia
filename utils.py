@@ -339,11 +339,7 @@ def get_time_in_millisecs(datetime_obj):
 
 
 def get_current_time_in_millisecs():
-    """Returns time in milliseconds since the Epoch.
-
-    Args:
-      datetime_obj: An object of type datetime.datetime.
-    """
+    """Returns time in milliseconds since the Epoch."""
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
