@@ -331,15 +331,23 @@ oppia.directive('outcomeFeedbackEditor', [function() {
       $scope.OUTCOME_FEEDBACK_SCHEMA = {type: 'html'};
 
       $scope.$on('saveOutcomeFeedbackDetails', function() {
-        // Remove null feedback.
+        // Remove null feedback. If the first element of the feedback is null or
+        // empty, clear the entire feedback array. This is so that if the first
+        // feedback is removed all feedback is thereby removed. Only the first
+        // feedback is usable and editable. This also preserves all feedback
+        // entries after the first if the first is non-empty.
         var nonemptyFeedback = [];
         for (var i = 0; i < $scope.outcome.feedback.length; i++) {
-          var feedback = $scope.outcome.feedback[i];
-          if (feedback) {
-            feedback = feedback.trim();
+          var feedbackStr = $scope.outcome.feedback[i];
+          if (feedbackStr) {
+            feedbackStr = feedbackStr.trim();
           }
-          if (feedback) {
-            nonemptyFeedback.push(feedback);
+          if (feedbackStr) {
+            nonemptyFeedback.push(feedbackStr);
+          }
+          if (!feedbackStr && i == 0) {
+            // If the first feedback is empty, copy no more feedback after.
+            break;
           }
         }
         $scope.outcome.feedback = nonemptyFeedback;
