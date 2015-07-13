@@ -365,15 +365,14 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     'Less than 0: %s %d' % (item.key, item.first_entry_count))
         # Older versions of ExplorationAnnotations didn't store exp_id
         # This is short hand for making sure we get ones updated most recently
-        elif item.exploration_id is None:
-            return
-
-        yield (item.exploration_id, {
-            'version': item.version,
-            'starts': item.num_starts,
-            'completions': item.num_completions,
-            'state_hit': item.state_hit_counts
-        })
+        else:
+            if item.exploration_id is not None:
+                yield (item.exploration_id, {
+                    'version': item.version,
+                    'starts': item.num_starts,
+                    'completions': item.num_completions,
+                    'state_hit': item.state_hit_counts
+                })
 
     @staticmethod
     def reduce(key, stringified_values):
