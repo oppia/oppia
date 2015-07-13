@@ -57,7 +57,9 @@ class ViewProfilePage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
+            'user_username': username,
             'user_bio': user_settings.user_bio,
+            'user_pic_data_url': user_settings.profile_picture_data_url
         })
         self.render_template('profile/profile.html')
 
