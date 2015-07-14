@@ -358,6 +358,8 @@ oppia.controller('StateResponses', [
     });
   };
 
+  $scope.isDraggingActiveAnswerGroup = null;
+
   $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
@@ -368,10 +370,20 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
       $scope.$apply();
       ui.placeholder.height(ui.item.height());
+      $scope.draggedAnswerGroupIndex = ui.item.index();
+
+      // This maintains the current open/close state of the answer group. If an
+      // closed answer group is dragged, keep it closed. If the dragged group is
+      // open, keep it open.
+      $scope.isDraggingActiveAnswerGroup = (
+        ui.item.index() == responsesService.getActiveAnswerGroupIndex());
     },
     stop: function(e, ui) {
       responsesService.save($scope.answerGroups, $scope.defaultOutcome);
-      if (responsesService.getActiveAnswerGroupIndex() != -1) {
+
+      // If the active group is being dragged, make sure its index is changed to
+      // the answer group's new location.
+      if ($scope.isDraggingActiveAnswerGroup) {
         $scope.changeActiveAnswerGroupIndex(ui.item.index());
       }
       $scope.$apply();
