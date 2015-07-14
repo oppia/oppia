@@ -33,6 +33,7 @@ html, body {
 
 .snapshots-skin-card-row-container {
   margin-bottom: 17px;
+  margin-top: 12px;
   table-layout: fixed;
   width: 100%;
 }
@@ -78,12 +79,7 @@ html, body {
    Material Design stylesheet. */
 md-card.snapshots-skin-card {
   background: rgb(255,255,255);
-  margin: 20px auto;
-  margin-top: -5px;
-  max-width: 560px;
-  padding: 40px 60px 27px 22px;
-  position: relative;
-  text-align: left;
+  padding: 18px 24px 24px 24px;
 }
 
 .snapshots-skin-learner-input {

@@ -134,7 +134,7 @@ oppia.directive('snapshotsSkin', [function() {
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
           if (!newStateName) {
-            _addNewElementToTranscript(newStateName, 'Congratulations, you have finished!');
+            _addNewElementToTranscript(newStateName, 'Great job! Continue through the course by clicking on one of the buttons below.');
             $scope.inputTemplate = '';
             messengerService.sendMessage(
               messengerService.EXPLORATION_COMPLETED, null);
