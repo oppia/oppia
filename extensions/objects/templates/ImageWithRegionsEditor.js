@@ -23,7 +23,7 @@ oppia.directive('imageWithRegionsEditor', [
     return {
       link: function(scope, element, attrs) {
         scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+          return OBJECT_EDITOR_TEMPLATES_URL + 'ImageWithRegions';
         };
         $compile(element.contents())(scope);
       },
@@ -46,13 +46,13 @@ oppia.directive('imageWithRegionsEditor', [
           }
         };
 
-        // All coordinates have origin at top-left, 
+        // All coordinates have origin at top-left,
         // increasing in x to the right and increasing in y down
         // Current mouse position in SVG coordinates
-        $scope.mouseX = 0; 
+        $scope.mouseX = 0;
         $scope.mouseY = 0;
         // Original mouse click position for rectangle drawing
-        $scope.originalMouseX = 0; 
+        $scope.originalMouseX = 0;
         $scope.originalMouseY = 0;
         // Original position and dimensions for dragged rectangle
         $scope.originalRectArea = {
@@ -62,9 +62,9 @@ oppia.directive('imageWithRegionsEditor', [
           height: 0
         };
         // Coordinates for currently drawn rectangle (when user is dragging)
-        $scope.rectX = 0; 
+        $scope.rectX = 0;
         $scope.rectY = 0;
-        $scope.rectWidth = 0; 
+        $scope.rectWidth = 0;
         $scope.rectHeight = 0;
 
         // Is user currently drawing a new region?
@@ -72,7 +72,7 @@ oppia.directive('imageWithRegionsEditor', [
         // Is user currently dragging an existing region?
         $scope.userIsCurrentlyDragging = false;
         // Dimensions of original image
-        $scope.originalImageWidth = 0; 
+        $scope.originalImageWidth = 0;
         $scope.originalImageHeight = 0;
         // Is the user preparing to draw a rectangle?
         $scope.regionDrawMode = false;
@@ -87,7 +87,7 @@ oppia.directive('imageWithRegionsEditor', [
             return region.label;
           }
         );
-        
+
         // Calculates the dimensions of the image, assuming that the width
         // of the image is scaled down to fit the svg element if necessary
         var _calculateImageDimensions = function() {
@@ -100,7 +100,7 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.originalImageHeight * scalingRatio);
           return {
             width: displayedImageWidth,
-            height: displayedImageHeight 
+            height: displayedImageHeight
           };
         };
         // Use these two functions to get the calculated image width and height
@@ -160,7 +160,7 @@ oppia.directive('imageWithRegionsEditor', [
             return labelList[index];
           };
         };
-        
+
         function convertCoordsToFraction(coords, dimensions) {
           return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
         }
@@ -169,7 +169,7 @@ oppia.directive('imageWithRegionsEditor', [
         function regionAreaFromCornerAndDimensions(x, y, width, height) {
           return [
             convertCoordsToFraction(
-              [x, y], 
+              [x, y],
               [$scope.getImageWidth(), $scope.getImageHeight()]
             ),
             convertCoordsToFraction(
@@ -183,7 +183,7 @@ oppia.directive('imageWithRegionsEditor', [
             x: area[0][0] * $scope.getImageWidth(),
             y: area[0][1] * $scope.getImageHeight(),
             width: (area[1][0] - area[0][0]) * $scope.getImageWidth(),
-            height: (area[1][1] - area[0][1]) * $scope.getImageHeight() 
+            height: (area[1][1] - area[0][1]) * $scope.getImageHeight()
           };
         }
 
@@ -244,11 +244,11 @@ oppia.directive('imageWithRegionsEditor', [
               var newRegion = {
                 label: newLabel,
                 region: {
-                  regionType: 'Rectangle', 
+                  regionType: 'Rectangle',
                   area: regionAreaFromCornerAndDimensions(
-                    $scope.rectX, 
+                    $scope.rectX,
                     $scope.rectY,
-                    $scope.rectWidth, 
+                    $scope.rectWidth,
                     $scope.rectHeight
                   )
                 }
@@ -274,7 +274,7 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.selectedRegion = index;
             $scope.originalRectArea = cornerAndDimensionsFromRegionArea(
               $scope.$parent.value.labeledRegions[index].region.area
-            ); 
+            );
           }
           $scope.userIsCurrentlyDragging = true;
           selectRegion($scope.hoveredRegion);

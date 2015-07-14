@@ -21,7 +21,7 @@ oppia.directive('setOfUnicodeStringEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'SetOfUnicodeString';
       };
       $compile(element.contents())(scope);
     },

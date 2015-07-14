@@ -20,7 +20,7 @@ oppia.directive('graphEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'Graph';
       };
       $compile(element.contents())(scope);
     },

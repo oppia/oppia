@@ -8,7 +8,7 @@
 
         <div ng-if="activeItem === $index">
           <div novalidate class="oppia-form" name="newParameterForm">
-            <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose or type new" new-choice-regex="^[A-Za-z]+$" width="203px">
+            <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Param name" new-choice-regex="^[A-Za-z]+$" width="153px">
             </select2-dropdown>
 
             <select class="form-control" ng-model="tmpParamChange.generator_id"
