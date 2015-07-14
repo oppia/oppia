@@ -24,12 +24,25 @@ describe('State Interaction controller', function() {
 
     beforeEach(function() {
       module('oppia');
+      // Set a global value for INTERACTION_SPECS that will be used by all the
+      // descendant dependencies.
+      module(function($provide) {
+        $provide.constant('INTERACTION_SPECS', {
+          TextInput: {
+            display_mode: 'inline',
+            is_terminal: false
+          },
+          TerminalInteraction: {
+            display_mode: 'inline',
+            is_terminal: true
+          }
+        });
+      });
     });
 
-    var scope, ecs, cls, ess, siis, scas, idc;
+    var scope, ecs, cls, ess, siis, scas, idc, IS;
 
     beforeEach(inject(function($rootScope, $controller, $injector) {
-
       scope = $rootScope.$new();
       ecs = $injector.get('editorContextService');
       cls = $injector.get('changeListService');
@@ -37,6 +50,7 @@ describe('State Interaction controller', function() {
       siis = $injector.get('stateInteractionIdService');
       scas = $injector.get('stateCustomizationArgsService');
       idc = $injector.get('interactionDetailsCache');
+      IS = $injector.get('INTERACTION_SPECS');
       scope.stateInteractionIdService = siis;
       scope.stateCustomizationArgsService = scas;
       scope.interactionDetailsCache = idc;
@@ -84,12 +98,7 @@ describe('State Interaction controller', function() {
             return true;
           }
         },
-        INTERACTION_SPECS: {
-          TextInput: {
-            display_mode: 'inline',
-            is_terminal: false
-          }
-        }
+        INTERACTION_SPECS: IS
       });
 
       var interactionCtrl = $controller('StateInteraction', {
@@ -105,16 +114,7 @@ describe('State Interaction controller', function() {
         stateInteractionIdService: siis,
         stateCustomizationArgsService: scas,
         interactionDetailsCache: idc,
-        INTERACTION_SPECS: {
-          TextInput: {
-            display_mode: 'inline',
-            is_terminal: false
-          },
-          TerminalInteraction: {
-            display_mode: 'inline',
-            is_terminal: true
-          },
-        }
+        INTERACTION_SPECS: IS
       });
     }));
 

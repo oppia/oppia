@@ -25,14 +25,24 @@ describe('State Editor controller', function() {
 
     beforeEach(function() {
       module('oppia');
+      // Set a global value for INTERACTION_SPECS that will be used by all the
+      // descendant dependencies.
+      module(function($provide) {
+        $provide.constant('INTERACTION_SPECS', {
+          TextInput: {
+            display_mode: 'inline',
+            is_terminal: false
+          }
+        });
+      });
     });
 
     beforeEach(inject(function($rootScope, $controller, $injector) {
-
       scope = $rootScope.$new();
       ecs = $injector.get('editorContextService');
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
+      IS = $injector.get('INTERACTION_SPECS');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
@@ -105,12 +115,7 @@ describe('State Editor controller', function() {
             return true;
           }
         },
-        INTERACTION_SPECS: {
-          TextInput: {
-            display_mode: 'inline',
-            is_terminal: false
-          }
-        }
+        INTERACTION_SPECS: IS
       });
     }));
 

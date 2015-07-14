@@ -365,10 +365,10 @@ oppia.directive('outcomeDestinationEditor', [function() {
     templateUrl: 'rules/outcomeDestinationEditor',
     controller: [
       '$scope', 'editorContextService', 'explorationStatesService',
-      'stateGraphArranger', 'PLACEHOLDER_OUTCOME_DEST',
+      'stateGraphArranger', 'PLACEHOLDER_OUTCOME_DEST', 'focusService',
       function(
           $scope, editorContextService, explorationStatesService,
-          stateGraphArranger, PLACEHOLDER_OUTCOME_DEST) {
+          stateGraphArranger, PLACEHOLDER_OUTCOME_DEST, focusService) {
 
         $scope.$on('saveOutcomeDestDetails', function() {
           // Create new state if specified.
@@ -380,6 +380,12 @@ oppia.directive('outcomeDestinationEditor', [function() {
             explorationStatesService.addState(newStateName, null);
           }
         });
+
+        $scope.onDestSelectorChange = function() {
+          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+            focusService.setFocus('newStateNameInputField');
+          }
+        };
 
         $scope.isCreatingNewState = function(outcome) {
           return outcome.dest == PLACEHOLDER_OUTCOME_DEST;
