@@ -981,10 +981,10 @@ oppia.factory('explorationGadgetsService', [
   };
 
   /**
-  * Returns a JS object whose keys are state names, and whose corresponding
-  * values are lists of gadget instances representing the gadgets visible in
-  * that state for the given panel.
-  */
+   * Returns a JS object whose keys are state names, and whose corresponding
+   * values are lists of gadget instances representing the gadgets visible in
+   * that state for the given panel.
+   */
   var _getGadgetsVisibilityMap = function(panelName) {
     var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panelName);
     var visibilityMap = {};
@@ -1015,12 +1015,12 @@ oppia.factory('explorationGadgetsService', [
   };
 
   /**
-  * Convert the backend representation of the skin's panel contents to a panel
-  * and a gadget dict. The panel dict has keys that are panel names and the
-  * values are list of gadget names present in that panel. The gadget dict has
-  * keys that are gadget names and the values are dicts representing the data
-  * for the gadget.
-  */
+   * Convert the backend representation of the skin's panel contents to a panel
+   * and a gadget dict. The panel dict has keys that are panel names and the
+   * values are list of gadget names present in that panel. The gadget dict has
+   * keys that are gadget names and the values are dicts representing the data
+   * for the gadget.
+   */
   var _initGadgetsAndPanelsData = function(panelsContents) {
     _panels = {};
     _gadgets = {};

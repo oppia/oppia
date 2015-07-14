@@ -33,7 +33,6 @@ oppia.controller('GadgetEditor', [
     return editorContextService.getActiveStateName();
   }, function(currentStateName) {
     $scope.activeStateName = currentStateName;
-    console.log($scope.activeStateName);
   });
 
   $scope.refreshGadgetsInfo = function(){
@@ -86,27 +85,28 @@ oppia.controller('GadgetEditor', [
 
   /**
    * This displays and hides the gadget name editor form.
-   * @param {currentGadgetName=} currentGadgetName the the name of the gadget
+   * @param {string=} currentGadgetName The name of the gadget
    *    that needs to be renamed to display the form.
-   *    Or null if the form is to be hidden.
- */
+   *    Or empty if the form is to be hidden.
+   */
   $scope.configureGadgetNameEditorForm = function(currentGadgetName) {
     // $scope.originalNameForRenamedGadget is null if no gadget is currently
     // being renamed, otherwise it is set to the original name of the gadget
     // currently being renamed. At most one gadget can be renamed at a time.
     // If a new gadget name editor is opened, the previous one is closed and
     // changes are not saved.
-
+    var currentGadgetName = currentGadgetName || '';
     $scope.originalNameForRenamedGadget = currentGadgetName;
     $scope.newNameForRenamedGadget = currentGadgetName;
   };
 
   /**
-   * @param {gadgetEditData} gadgetEditData is a dict representing the gadget
+   * @param {Object} gadgetEditData is a dict representing the gadget
    *    being edited. It has the following keys: gadget_type, gadget_name,
    *    customization_args and visible_in_states.
-   *    If the gadget's type is the empty string (''), this means that the gadget
-   *    type hasn't been defined yet, and the gadget selector should be shown.
+   *    If the gadget's type is an empty string (''), it means no gadget is
+   *    selected, and the gadget selector should be shown.
+   * @param {Function} successCallback Success callback when modal is dismissed.
    */
   var _openCustomizeGadgetModal = function(gadgetDict, successCallback) {
     $modal.open({
@@ -203,7 +203,6 @@ oppia.controller('GadgetEditor', [
 
       }]
     }).result.then(function(gadgetDict) {
-      // call the successCallback set by editGadget or addNewGadget.
       successCallback(gadgetDict);
 
     }, function() {

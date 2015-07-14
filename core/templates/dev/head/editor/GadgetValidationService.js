@@ -34,12 +34,13 @@ oppia.factory('gadgetValidationService', [
 
   return {
     /**
-    * Checks if all visible gadgets fit within the given panel for each state.
-    * @param {string} panelName, The panel name for the panel being validated.
-    * @param {object} visibilityMap, object with state as key and list of
-    *     visible gadget data as its value for a panel.
-    * @return {bool} true if everything is ok, false otherwise
-    */
+     * Checks if all visible gadgets fit within the given panel for each state.
+     * @param {string} panelName, The panel name for the panel being validated.
+     * @param {object} visibilityMap, object with state as key and list of
+     *     visible gadget data as its value for a panel.
+     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
+     * @returns {boolean} true if everything is ok, false otherwise
+     */
     validatePanel: function(panelName, visibilityMap, showWarnings) {
       var showWarnings = !!showWarnings || true;
       var currentPanelSpec = _getPanelSpecs(panelName);
@@ -117,8 +118,8 @@ oppia.factory('gadgetValidationService', [
      * Checks whether gadget name is valid, and displays a warning message
      * if it isn't.
      * @param {string} input The input to be checked.
-     * @param {boolean} showWarnings Whether to show warnings in the butterbar.
-     * @return {boolean} True if the entity name is valid, false otherwise.
+     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
+     * @returns {boolean} True if the entity name is valid, false otherwise.
      */
     isValidGadgetName: function(input, showWarnings) {
       var showWarnings = !!showWarnings || true;
@@ -141,7 +142,8 @@ oppia.factory('gadgetValidationService', [
      * @param {string} gadgetType The type of the gadget being verified.
      * @param {object} customizationArgs The customizations args for the gadget.
      * @param {array} visibleInStates The list where this gadget is visible.
-     * @return {boolean} True if the gadget data is valid, false otherwise.
+     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
+     * @returns {boolean} True if the gadget data is valid, false otherwise.
      */
     isGadgetDataValid: function(
       gadgetType, customizationArgs, visibleInStates, showWarnings) {
@@ -161,8 +163,8 @@ oppia.factory('gadgetValidationService', [
      * @param {object} gadgetData The gadgetData for the gadget being added.
      * @param {object} visibilityMap The gadget dict list for gadgets
      *                 visible in this panel across all states.
-     * @param {boolean} showWarnings Whether to show warnings in the butterbar.
-     * @return {boolean} True if the gadget can be added, false otherwise.
+     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
+     * @returns {boolean} True if the gadget can be added, false otherwise.
      */
     canAddGadget: function(panelName, gadgetData, visibilityMap, showWarnings) {
       var showWarnings = !!showWarnings || true;
@@ -179,8 +181,8 @@ oppia.factory('gadgetValidationService', [
 
       // Check if adding a gadget exceeds the number of gadgets permitted in
       // this panel for the states it is visible.
-      for(var i = 0; i < gadgetData.visible_in_states.length; i++) {
-        var stateName = gadgetData.visible_in_states[i];
+      for(var i = 0; i < visibleInStates.length; i++) {
+        var stateName = visibleInStates[i];
         var gadgetInstances = visibilityMap[stateName] || [];
         // Adding 1 to length to see if new gadget can be added or not.
         if (gadgetInstances.length + 1 > currentPanelSpec.max_gadgets) {

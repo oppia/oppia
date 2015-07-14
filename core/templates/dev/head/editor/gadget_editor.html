@@ -132,9 +132,10 @@
       Back
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <!-- TODO(vjoisar): Make form.schemaForm.$invalid to work. -->
     <button ng-click="save()" class="btn btn-success"
             ng-disabled="!gadgetDict.gadget_type || form.schemaForm.$invalid">
-      <[isEditingGadget? 'Update' : 'Add']> Gadget
+      <[isEditingGadget ? 'Update' : 'Add']> Gadget
     </button>
   </div>
 </script>
