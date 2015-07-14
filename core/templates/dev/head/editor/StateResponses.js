@@ -143,7 +143,8 @@ oppia.factory('responsesService', [
             // schema.
             _defaultOutcome = {
               'feedback': [],
-              'dest': editorContextService.getActiveStateName()
+              'dest': editorContextService.getActiveStateName(),
+              'param_changes': []
             };
           }
         }

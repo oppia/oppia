@@ -275,19 +275,31 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.deleteInteraction = function() {
-    if (!window.confirm('Are you sure you want to delete this interaction? This will also clear all its responses.')) {
-      return false;
-    }
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/deleteInteraction',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.reallyDelete = function() {
+          $modalInstance.close();
+        };
 
-    stateInteractionIdService.displayed = null;
-    stateCustomizationArgsService.displayed = {};
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    }).result.then(function() {
+      stateInteractionIdService.displayed = null;
+      stateCustomizationArgsService.displayed = {};
 
-    stateInteractionIdService.saveDisplayedValue();
-    stateCustomizationArgsService.saveDisplayedValue();
-    $rootScope.$broadcast('onInteractionIdChanged', stateInteractionIdService.savedMemento);
-    _updateStatesDict();
-    graphDataService.recompute();
-    _updateInteractionPreviewAndAnswerChoices();
+      stateInteractionIdService.saveDisplayedValue();
+      stateCustomizationArgsService.saveDisplayedValue();
+      $rootScope.$broadcast('onInteractionIdChanged', stateInteractionIdService.savedMemento);
+      _updateStatesDict();
+      graphDataService.recompute();
+      _updateInteractionPreviewAndAnswerChoices();
+    });
   };
 
   var _updateInteractionPreviewAndAnswerChoices = function() {
