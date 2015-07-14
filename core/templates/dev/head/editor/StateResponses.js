@@ -370,7 +370,6 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
       $scope.$apply();
       ui.placeholder.height(ui.item.height());
-      $scope.draggedAnswerGroupIndex = ui.item.index();
 
       // This maintains the current open/close state of the answer group. If an
       // closed answer group is dragged, keep it closed. If the dragged group is
@@ -385,6 +384,7 @@ oppia.controller('StateResponses', [
       // the answer group's new location.
       if ($scope.isDraggingActiveAnswerGroup) {
         $scope.changeActiveAnswerGroupIndex(ui.item.index());
+        $scope.isDraggingActiveAnswerGroup = null;
       }
       $scope.$apply();
       $rootScope.$broadcast('externalSave');
