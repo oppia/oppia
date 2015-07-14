@@ -502,8 +502,6 @@ describe('New exploration gadgets service', function() {
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Gadget Initialization failed. Panel contents were not provided');
     });
-    //@sll: To write tests for other functions, do we need to mock all the
-    //  services it is dependant on?
   });
 });
 

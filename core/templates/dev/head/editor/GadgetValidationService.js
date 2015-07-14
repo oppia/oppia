@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for a gadget validation.
+ * @fileoverview Service for handling all gadget validation.
  *
  * @author vjoisar@google.com (Vishal Joisar)
  */
-
-// Service for handling all gadget validation.
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
     'explorationSkinIdService', 'GADGET_SPECS',
@@ -43,6 +41,7 @@ oppia.factory('gadgetValidationService', [
     * @return {bool} true if everything is ok, false otherwise
     */
     validatePanel: function(panelName, visibilityMap, showWarnings) {
+      var showWarnings = !!showWarnings || true;
       var currentPanelSpec = _getPanelSpecs(panelName);
       var stackableAxis = currentPanelSpec.stackable_axis;
 
@@ -56,12 +55,13 @@ oppia.factory('gadgetValidationService', [
       }
       for (var stateName in visibilityMap) {
         var gadgetInstances = visibilityMap[stateName];
-        if (showWarnings &&
-            gadgetInstances.length > currentPanelSpec.max_gadgets) {
+        if (gadgetInstances.length > currentPanelSpec.max_gadgets) {
           var warningText =  panelName + ' panel expects at most ' +
             currentPanelSpec.max_gadgets +  ', but ' + gadgetInstances.length +
             ' are visible in state ' + stateName + '.'
-          warningsData.addWarning(warningText);
+          if (showWarnings) {
+            warningsData.addWarning(warningText);
+          }
           return false;
         }
 
@@ -121,16 +121,37 @@ oppia.factory('gadgetValidationService', [
      * @return {boolean} True if the entity name is valid, false otherwise.
      */
     isValidGadgetName: function(input, showWarnings) {
+      var showWarnings = !!showWarnings || true;
       if (!validatorsService.isValidEntityName(input, showWarnings)) {
         return false;
       }
 
-      if (showWarnings && input.length > _MAX_GADGET_NAME_LENGTH) {
-        warningsData.addWarning(
-          'State names should be at most 50 characters long.');
+      if (input.length > _MAX_GADGET_NAME_LENGTH) {
+        if (showWarnings) {
+          warningsData.addWarning(
+            'Gadget name should be at most 50 characters long.');
+        }
         return false;
       }
 
+      return true;
+    },
+    /**
+     * Validate gadget data.
+     * @param {string} gadgetType The panel where the gadget is added.
+     * @param {object} customizationArgs The panel where the gadget is added.
+     * @param {array} visibleInStates The panel where the gadget is added.
+     * @return {boolean} True if the gadget data is valid, false otherwise.
+     */
+    isGadgetDataValid: function(
+      gadgetType, customizationArgs, visibleInStates, showWarnings) {
+      var showWarnings = !!showWarnings || true;
+
+      // It should atleast be visible in one state.
+      if (!visibleInStates.length) {
+        warningsData.addWarning( 'This gadget is not visible in any state.');
+        return false;
+      }
       return true;
     },
     /**
@@ -144,20 +165,34 @@ oppia.factory('gadgetValidationService', [
      * @return {boolean} True if the gadget can be added, false otherwise.
      */
     canAddGadget: function(panelName, gadgetData, visibilityMap, showWarnings) {
+      var showWarnings = !!showWarnings || true;
       var currentPanelSpec = _getPanelSpecs(panelName);
+      var gadgetType = gadgetData.gadget_type;
+      var customizationArgs = gadgetData.customization_args;
+      var visibleInStates = gadgetData.visible_in_states;
+      // Check if gadgetData is valid.
+      // Warning will be displayed by isGadgetDataValid(...)
+      if (!this.isGadgetDataValid(
+               gadgetType, customizationArgs, visibleInStates, showWarnings)) {
+        return false;
+      }
+
+      // Check if it can be added by count.
       for(var i = 0; i < gadgetData.visible_in_states.length; i++) {
         var stateName = gadgetData.visible_in_states[i];
         var gadgetInstances = visibilityMap[stateName] || [];
         // Adding 1 to length to see if new gadget can be added or not.
-        if (showWarnings &&
-            gadgetInstances.length + 1 > currentPanelSpec.max_gadgets) {
+        if (gadgetInstances.length + 1 > currentPanelSpec.max_gadgets) {
           var warningText =  'The ' + panelName +
             ' gadget panel can only have ' + currentPanelSpec.max_gadgets +
             ' gadget' + (currentPanelSpec.max_gadgets > 1 ? 's' : '') +
             ' visible at a time.';
-          warningsData.addWarning(warningText);
+          if (showWarnings) {
+            warningsData.addWarning(warningText);
+          }
           return false;
         }
+
         // If the gadget can be added by count, see if it fits by size.
         if (!visibilityMap[stateName]) {
           visibilityMap[stateName] = [];

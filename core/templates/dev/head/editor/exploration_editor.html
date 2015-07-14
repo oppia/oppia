@@ -330,15 +330,15 @@
       <div ng-show="getTabStatuses().active === 'main'">
         <div class="row">
           <div class="col-lg-9 col-md-9 col-sm-9">
-            {% include 'editor/state_editor.html' %}
+            <div>
+              {% include 'editor/state_editor.html' %}
+              {% include 'editor/gadget_editor.html' %}
+            </div>
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
             <div class="oppia-editor-sidebar hidden-xs hidden-sm">
               <div>
                 {% include 'editor/exploration_graph.html' %}
-              </div>
-              <div>
-                {% include 'editor/gadget_editor.html' %}
               </div>
               <div>
                 {% include 'editor/sidebar_state_parameter_changes.html' %}

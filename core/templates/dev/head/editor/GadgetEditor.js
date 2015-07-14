@@ -29,6 +29,13 @@ oppia.controller('GadgetEditor', [
     $scope.refreshGadgetsInfo();
   });
 
+  $scope.$watch(function() {
+    return editorContextService.getActiveStateName();
+  }, function(currentStateName) {
+    $scope.activeStateName = currentStateName;
+    console.log($scope.activeStateName);
+  });
+
   $scope.refreshGadgetsInfo = function(){
     $scope.gadgets = explorationGadgetsService.getGadgets();
     $scope.panels = explorationGadgetsService.getPanels();
@@ -38,36 +45,31 @@ oppia.controller('GadgetEditor', [
     explorationGadgetsService.deleteGadget(gadgetName);
   };
 
-  // Initializing var successCallback to access it in result.then(...)
-  var successCallback = function() {};
-
-  $scope.addNewGadget = function() {
+  $scope.addNewGadget = function(panelName) {
     // Initializing gadget with default values and backend compatible keys.
     var gadgetData = {
       gadget_type: '',
       gadget_name: '',
-      panel_name: 'left',
+      panel_name: panelName,
       customization_args: {},
       visible_in_states: [editorContextService.getActiveStateName()]
     };
-    successCallback = function(gadgetData) {
-      explorationGadgetsService.addGadget(gadgetData, gadgetData.panel_name);
-    };
-    _openCustomizeGadgetModal(gadgetData);
+    _openCustomizeGadgetModal(gadgetData, function(gadgetData) {
+      explorationGadgetsService.addGadget(gadgetData, panelName);
+    });
   };
 
   $scope.editGadget = function(gadgetName) {
-    // FYI: gadgetData consist of backend compatible keys.
-    var gadgetData = $scope.gadgets[gadgetName];
-    successCallback = function(newGadgetData) {
+    var gadgetData = angular.copy($scope.gadgets[gadgetName]);
+    var successCallback =
+    _openCustomizeGadgetModal(gadgetData, function(newGadgetData) {
       var gadgetName = newGadgetData.gadget_name;
       var newCustomizationArgs = newGadgetData.customization_args;
       var newVisibleInStates = newGadgetData.visible_in_states;
 
       explorationGadgetsService.updateGadget(
         gadgetName, newCustomizationArgs, newVisibleInStates);
-    };
-    _openCustomizeGadgetModal(gadgetData);
+    });
   };
 
   $scope.renameGadget = function(newGadgetName) {
@@ -78,28 +80,35 @@ oppia.controller('GadgetEditor', [
       explorationGadgetsService.renameGadget(
         $scope.originalNameForRenamedGadget, newGadgetName);
     }
-    $scope.originalNameForRenamedGadget = '';
-    $scope.newNameForRenamedGadget = '';
+    // hide the editor form;
+    $scope.configureGadgetNameEditorForm();
   };
 
-  $scope.onOpenGadgetNameEditor = function(currentGadgetName) {
+  /**
+   * This displays and hides the gadget name editor form.
+   * @param {currentGadgetName=} currentGadgetName the the name of the gadget
+   *    that needs to be renamed to display the form.
+   *    Or null if the form is to be hidden.
+ */
+  $scope.configureGadgetNameEditorForm = function(currentGadgetName) {
     // $scope.originalNameForRenamedGadget is null if no gadget is currently
     // being renamed, otherwise it is set to the original name of the gadget
     // currently being renamed. At most one gadget can be renamed at a time.
     // If a new gadget name editor is opened, the previous one is closed and
     // changes are not saved.
-   $scope.originalNameForRenamedGadget = currentGadgetName;
-   $scope.newNameForRenamedGadget = currentGadgetName;
+
+    $scope.originalNameForRenamedGadget = currentGadgetName;
+    $scope.newNameForRenamedGadget = currentGadgetName;
   };
 
   /**
-  * @param {gadgetEditData=} gadgetEditData is a dict representing the gadget
-  *   being edited. It has the following keys: gadget_type, gadget_name,
-  *   customization_args and visible_in_states.
-  *   If the gadget's type is the empty string (''), this means that the gadget
-  *   type hasn't been defined yet, and the gadget selector should be shown.
-  */
-  var _openCustomizeGadgetModal = function(gadgetDict) {
+   * @param {gadgetEditData} gadgetEditData is a dict representing the gadget
+   *    being edited. It has the following keys: gadget_type, gadget_name,
+   *    customization_args and visible_in_states.
+   *    If the gadget's type is the empty string (''), this means that the gadget
+   *    type hasn't been defined yet, and the gadget selector should be shown.
+   */
+  var _openCustomizeGadgetModal = function(gadgetDict, successCallback) {
     $modal.open({
       templateUrl: 'modals/customizeGadget',
       // Clicking outside this modal should not dismiss it.
@@ -111,14 +120,16 @@ oppia.controller('GadgetEditor', [
       },
       controller: [
         '$scope', '$modalInstance', 'explorationStatesService',
-        'explorationGadgetsService', 'gadgetDict', 'GADGET_SPECS',
+        'explorationSkinIdService', 'explorationGadgetsService', 'gadgetDict',
+        'GADGET_SPECS',
         function($scope, $modalInstance, explorationStatesService,
-          explorationGadgetsService, gadgetDict, GADGET_SPECS) {
+          explorationSkinIdService, explorationGadgetsService, gadgetDict,
+          GADGET_SPECS) {
 
         $scope.ALLOWED_GADGETS = GLOBALS.ALLOWED_GADGETS;
         $scope.GADGET_SPECS = GADGET_SPECS;
-        $scope.availablePanels = Object.keys(explorationGadgetsService.getPanels());
-
+        $scope.currentPanelSpec = GLOBALS.SKIN_SPECS[
+          explorationSkinIdService.savedMemento][gadgetDict.panel_name];
         var _initializeCustomizationArgs = function(gadgetType) {
           var gadgetSpec = GADGET_SPECS[gadgetType];
           $scope.customizationArgSpecs = gadgetSpec.customization_arg_specs;
@@ -191,8 +202,9 @@ oppia.controller('GadgetEditor', [
         };
 
       }]
-    }).result.then(function(gadgetDict){
+    }).result.then(function(gadgetDict) {
       // call the successCallback set by editGadget or addNewGadget.
+      console.log(gadgetDict);
       successCallback(gadgetDict);
 
     }, function() {

@@ -1,33 +1,49 @@
 <div ng-controller="GadgetEditor">
-  <span style="font-size: 16px;">
-    <strong>Gadgets</strong>
-  </span>
-  <md-card style="background: white; margin: 20px 0px; padding: 10px 10px;">
-    <button type="button" class="btn btn-default btn-xs oppia-add-gadget-button"
-            ng-click="addNewGadget()">
-      Insert Gadget
-    </button>
-  </md-card>
-  <div ng-show="gadgets">
-    <div ng-repeat="(panelName, panelContents) in panels"
-         class="oppia-<[panelName]>-editor-gadget-panel">
-      <div ng-repeat="gadgetName in panelContents">
+  <div ng-repeat="(panelName, panelContents) in panels"
+       class="oppia-<[panelName]>-editor-gadget-panel">
+    <div class="oppia-insert-gadget-button"
+         ng-click="addNewGadget(panelName)">
+      + Insert Gadget
+    </div>
+
+    <!-- TODO(vjoisar): Hide if no hidden gadgets -->
+    <div class="oppia-gadget-dropdown-toggle">
+      <span class="caret"></span>
+      <div class="oppia-hidden-gadgets-container">
+        <div class="oppia-hidden-gadget" ng-repeat="gadgetName in panelContents"
+             ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) == -1">
+          <div class="oppia-gadget-name"
+               ng-click="editGadget(gadgetName)">
+            <[gadgetName]>
+          </div>
+          <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
+                class="glyphicon glyphicon-remove oppia-gadget-delete-icon">
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-visible-gadgets-container">
+      <div ng-repeat="gadgetName in panelContents"
+           ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) > -1">
         <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
               class="glyphicon glyphicon-remove oppia-gadget-delete-icon">
         </span>
         <span title="Rename <[gadgetName]>"
-              ng-click="onOpenGadgetNameEditor(gadgetName)"
+              ng-click="configureGadgetNameEditorForm(gadgetName)"
               class="glyphicon glyphicon-pencil oppia-gadget-rename-icon">
         </span>
         <span ng-show="originalNameForRenamedGadget == gadgetName"
               class="oppia-rename-gadget-form">
           <input type="text" ng-model="newNameForRenamedGadget">
-          <button class="btn btn-default btn-sm"
+          <button class="btn btn-xs glyphicon glyphicon-ok"
                   ng-click="renameGadget(newNameForRenamedGadget)">
-            Done
+          </button>
+          <button class="btn btn-xs glyphicon glyphicon-remove"
+                  ng-click="configureGadgetNameEditorForm()">
           </button>
         </span>
-        <div class="oppia-gadget-preview-container"
+        <div class="oppia-gadget-preview-container" title="Edit <[gadgetName]>"
              ng-click="editGadget(gadgetName)">
           <oppia-gadget-preview
             gadget-type="gadgets[gadgetName].gadget_type"
@@ -55,27 +71,27 @@
   </div>
   <div class="modal-body">
     <div ng-if="!gadgetDict.gadget_type" ng-cloak>
-      <span class="oppia-gadget-tile"
+      <div class="oppia-gadget-tile"
             ng-repeat="(gadgetType, gadget) in ALLOWED_GADGETS"
-            ng-click="onChangeGadgetType(gadgetType)">
-        <[gadgetType]>
-      </span>
+            ng-click="onChangeGadgetType(gadgetType)"
+            ng-if="GADGET_SPECS[gadgetType].width_px <= currentPanelSpec.width &&
+                   GADGET_SPECS[gadgetType].height_px <= currentPanelSpec.height">
+        <img ng-src="/extensions/gadgets/<[gadgetType]>/static/images/<[gadgetType]>.png">
+        <div class="oppia-gadget-tile-name">
+          <[gadgetType]>
+        </div>
+      </div>
     </div>
-    <div ng-if="gadgetDict.gadget_type" class="customization-editor">
+    <div ng-if="gadgetDict.gadget_type" class="gadget-customization-editor">
       <div ng-show="!isEditingGadget" class="gadget-name-panel">
-        <label>Gadget Name</label>
+        <label class="oppia-gadget-name-label">Gadget Name</label>
         <input ng-disabled="isEditingGadget" ng-model="gadgetDict.gadget_name">
       </div>
-      <div ng-show="!isEditingGadget" class="gadget-layout-panel">
-        <label class="oppia-gadget-customization-label">Layout</label>
-        <select ng-options="panelName for panelName in availablePanels"
-                ng-model="gadgetDict.panel_name"
-                style="text-transform: capitalize;">
-        </select>
-      </div>
       <div class="gadget-state-visibility-panel">
-        <h2 class="oppia-gadget-customization-label">Visible in states</h2>
-        <label class="oppia-gadget-customization-label"
+        <h3 class="oppia-gadget-state-visible-title">
+          In which states should this gadget be visible?
+        </h3>
+        <label class="oppia-gadget-state-visible-input-label"
                ng-repeat="state in allExplorationStateNames">
           <input type="checkbox" ng-click="toggleVisibilityInState(state)"
                  ng-checked="gadgetDict.visible_in_states.indexOf(state) > -1">
@@ -87,7 +103,7 @@
           <em>
             There are no customization options available.
             <br><br>
-            To use this gadget, click 'Save Gadget'.
+            To use this gadget, click '<[isEditingGadget? "Update" : "Add"]> Gadget'.
           </em>
         </div>
 
@@ -110,12 +126,14 @@
 
 
   <div class="modal-footer">
-    <button ng-show="!isEditingGadget" class="btn btn-default"
+    <button ng-if="!isEditingGadget && gadgetDict.gadget_name"
+            class="btn btn-default"
             ng-click="returnToGadgetSelector()" style="float: left;">
       Back
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button ng-click="save()" class="btn btn-success">
+    <button ng-click="save()" class="btn btn-success"
+            ng-disabled="!gadgetDict.gadget_type || form.schemaForm.$invalid">
       <[isEditingGadget? 'Update' : 'Add']> Gadget
     </button>
   </div>

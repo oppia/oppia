@@ -3,7 +3,6 @@
    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
    font-size: 14px;
    height: 74px;
-   margin: 10px auto 30px;
    position: relative;
    width: 378px;
  }
@@ -17,8 +16,8 @@
 }
 
 .title {
+  color: #000;
   position: absolute;
   text-align: center;
-  top: 65px;
   width: 100%;
 }

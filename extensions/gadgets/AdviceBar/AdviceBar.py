@@ -45,6 +45,13 @@ class AdviceBar(base.BaseGadget):
             'description': 'Title and content for each tip.',
             'schema': {
                 'type': 'list',
+                'validators': [{
+                    'id': 'has_length_at_least',
+                    'min_value': 1,
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': 3,
+                }],
                 'items': {
                     'type': 'dict',
                     'properties': [{
@@ -62,7 +69,10 @@ class AdviceBar(base.BaseGadget):
                     }]
                 }
             },
-            'default_value': []
+            'default_value': [{
+                'adviceTitle': 'Tip Title',
+                'adviceHtml': 'Tip Content'
+            }]
         }
     ]
 

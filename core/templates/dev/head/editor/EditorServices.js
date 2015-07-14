@@ -1050,7 +1050,7 @@ oppia.factory('explorationGadgetsService', [
       for (var panelName in _panels) {
         var visibilityMap = _getGadgetsVisibilityMap(panelName);
         isValid = gadgetValidationService.validatePanel(
-          panelName, visibilityMap, true);
+          panelName, visibilityMap);
         // validatePanel(...) should have added the warning to warningsData.
         if (!isValid) {
           return;
@@ -1063,13 +1063,12 @@ oppia.factory('explorationGadgetsService', [
     // Confirms if a panel can accept a new gadget considering its capacity
     // and the gadget's size requirements given its customization arguments.
     canAddGadgetTo: function(panelName, gadgetData) {
-      var showWarnings = true;
       var visibilityMap = _getGadgetsVisibilityMap(panelName);
-      var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name, showWarnings);
+      var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name);
 
       if(canAdd) {
         canAdd = gadgetValidationService.canAddGadget(
-          panelName, gadgetData, visibilityMap, showWarnings);
+          panelName, gadgetData, visibilityMap);
       }
       return canAdd;
     },
@@ -1090,15 +1089,21 @@ oppia.factory('explorationGadgetsService', [
      * Use this method in conjunction with renameGadget and
      * moveGadgetBetweenPanels if those aspects need to be changed as well.
      *
-     * @param {object} gadgetName The name of gadget being updated.
+     * @param {string} gadgetName The name of gadget being updated.
      * @param {object} newCustomizationArgs new customization data for the gadget.
-     * @param {object} newVisibleInStates new state visibility list for the gadget.
+     * @param {array} newVisibleInStates new state visibility list for the gadget.
      */
     updateGadget: function(
       gadgetName, newCustomizationArgs, newVisibleInStates) {
 
       if (!_gadgets.hasOwnProperty(gadgetName)) {
         $log.info('Attempted to update a non-existent gadget: ' + gadgetName);
+        return;
+      }
+
+      // Check if new gadget data is valid. Warning by gadgetValidationService.
+      if (!gadgetValidationService.isGadgetDataValid(
+        gadgetName, newCustomizationArgs, newVisibleInStates)) {
         return;
       }
 

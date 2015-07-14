@@ -29,8 +29,8 @@
     },
     templateUrl: 'editor/gadgetPreview',
     controller: [
-        '$scope', '$filter', 'editorContextService', 'extensionTagAssemblerService',
-        function($scope, $filter, editorContextService, extensionTagAssemblerService) {
+        '$scope', '$filter', 'extensionTagAssemblerService',
+        function($scope, $filter, extensionTagAssemblerService) {
       var _generateHtml = function() {
         var gadgetNameElem = $('<div>').text($scope.gadgetName());
         gadgetNameElem.addClass('oppia-gadget-name');
@@ -52,12 +52,6 @@
           $scope.gadgetHtml = _generateHtml();
         }
       }, true);
-
-      $scope.$watch(function() {
-        return editorContextService.getActiveStateName();
-      }, function(currentStateName) {
-        $scope.isVisible = $scope.visibleInStates().indexOf(currentStateName) !== -1;
-      });
     }]
   };
 });
