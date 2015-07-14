@@ -74,7 +74,7 @@ oppia.directive('oppiaGadgetPencilCode', [
               $scope.currentInitialValue = valueToChangeTo;
             }
 
-            if (valueToChangeTo !== pce.getCode()) {
+            if (!hasLoadingCompleted || valueToChangeTo !== pce.getCode()) {
               if (hasLoadingCompleted) {
                 pce.setCode(valueToChangeTo);
                 // TODO(sll): begin a new run if autoplay functionality is
