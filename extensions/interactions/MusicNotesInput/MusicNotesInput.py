@@ -20,7 +20,7 @@ from extensions.interactions import base
 class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
-    name = 'Music Notes'
+    name = 'Music Notes Input'
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')
