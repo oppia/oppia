@@ -1,10 +1,11 @@
  .gauge {
-   background: url('../images/gauge.png') center no-repeat;
-   font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-   font-size: 14px;
-   height: 74px;
-   position: relative;
-   width: 378px;
+  background: url('../images/gauge.png') center no-repeat;
+  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  height: 74px;
+  margin: 0 auto;
+  position: relative;
+  width: 378px;
  }
 
 .fill {

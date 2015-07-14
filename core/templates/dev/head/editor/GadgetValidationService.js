@@ -138,9 +138,9 @@ oppia.factory('gadgetValidationService', [
     },
     /**
      * Validate gadget data.
-     * @param {string} gadgetType The panel where the gadget is added.
-     * @param {object} customizationArgs The panel where the gadget is added.
-     * @param {array} visibleInStates The panel where the gadget is added.
+     * @param {string} gadgetType The type of the gadget being verified.
+     * @param {object} customizationArgs The customizations args for the gadget.
+     * @param {array} visibleInStates The list where this gadget is visible.
      * @return {boolean} True if the gadget data is valid, false otherwise.
      */
     isGadgetDataValid: function(
@@ -149,7 +149,7 @@ oppia.factory('gadgetValidationService', [
 
       // It should atleast be visible in one state.
       if (!visibleInStates.length) {
-        warningsData.addWarning( 'This gadget is not visible in any state.');
+        warningsData.addWarning('This gadget is not visible in any states.');
         return false;
       }
       return true;
@@ -177,7 +177,8 @@ oppia.factory('gadgetValidationService', [
         return false;
       }
 
-      // Check if it can be added by count.
+      // Check if adding a gadget exceeds the number of gadgets permitted in
+      // this panel for the states it is visible.
       for(var i = 0; i < gadgetData.visible_in_states.length; i++) {
         var stateName = gadgetData.visible_in_states[i];
         var gadgetInstances = visibilityMap[stateName] || [];

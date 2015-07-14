@@ -46,7 +46,7 @@ oppia.controller('GadgetEditor', [
   };
 
   $scope.addNewGadget = function(panelName) {
-    // Initializing gadget with default values and backend compatible keys.
+    // Initializing gadget with default values.
     var gadgetData = {
       gadget_type: '',
       gadget_name: '',
@@ -61,7 +61,7 @@ oppia.controller('GadgetEditor', [
 
   $scope.editGadget = function(gadgetName) {
     var gadgetData = angular.copy($scope.gadgets[gadgetName]);
-    var successCallback =
+
     _openCustomizeGadgetModal(gadgetData, function(newGadgetData) {
       var gadgetName = newGadgetData.gadget_name;
       var newCustomizationArgs = newGadgetData.customization_args;
@@ -204,7 +204,6 @@ oppia.controller('GadgetEditor', [
       }]
     }).result.then(function(gadgetDict) {
       // call the successCallback set by editGadget or addNewGadget.
-      console.log(gadgetDict);
       successCallback(gadgetDict);
 
     }, function() {
