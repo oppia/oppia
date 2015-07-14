@@ -1,10 +1,44 @@
 <div ng-controller="StateResponses">
-  <div style="font-size: 16px; margin-top: 35px;" ng-if="getCurrentInteractionId() !== 'Continue'">
-    <strong>Responses</strong>
+  <div style="font-size: 16px; margin-top: 35px;">
+    <strong>Oppia's Responses</strong>
   </div>
 
   <md-card class="oppia-editor-card-with-avatar">
     <div class="oppia-editor-card-body">
+      <div>
+        <ul class="nav nav-stacked nav-pills" role="tablist">
+          <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
+            <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
+              <div class="oppia-response-header-block">
+                <div ng-attr-title="<[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false]>" class="oppia-response-header">
+                  <[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true]>
+                </div>
+                <span>→</span>
+                <span ng-if="!isOutcomeLooping(defaultOutcome) && !isCreatingNewState(defaultOutcome)" ng-click="navigateToState(defaultOutcome.dest)" class="oppia-nested-link">
+                  <[defaultOutcome.dest]>
+                </span>
+                <span ng-if="!isOutcomeLooping(defaultOutcome) && isCreatingNewState(defaultOutcome)">
+                  <em ng-if="defaultOutcome.newStateName">(<[defaultOutcome.newStateName]>)</em>
+                  <em ng-if="!defaultOutcome.newStateName">Nowhere yet...</em>
+                </span>
+                <span ng-if="isOutcomeLooping(defaultOutcome)">
+                  <em>(try again)</em>
+                </span>
+              </div>
+            </a>
+
+            <div ng-if="activeAnswerGroupIndex === answerGroups.length">
+              <div class="oppia-editor-card-section">
+                <div class="oppia-rule-body-container">
+                  <answer-group-editor rules="null" outcome="defaultOutcome" on-save-answer-group-feedback="saveDefaultOutcomeFeedback(defaultOutcome)" on-save-answer-group-dest="saveDefaultOutcomeDest(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
+                  </answer-group-editor>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
       <div ng-if="answerGroups.length > 0">
         <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="ANSWER_GROUP_LIST_SORTABLE_OPTIONS" ng-model="answerGroups">
           <!-- An HTML element marked ui-sortable should contain only one element,
@@ -16,10 +50,13 @@
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1">
               <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
             </span>
-            <a ng-click="changeActiveAnswerGroupIndex($index)" href="#" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
+            <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
               <div class="oppia-response-header-block">
-                <div ng-attr-title="<[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():false]>" class="oppia-response-header">
-                  <[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():true]>
+                <div class="oppia-response-header">
+                  <span ng-if="$index != activeAnswerGroupIndex" ng-attr-title="<[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():false]>">
+                    <[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():true]>
+                  </span>
+                  <span ng-if="$index == activeAnswerGroupIndex">&nbsp;</span>
                 </div>
                 <span>→</span>
                 <span ng-if="!isOutcomeLooping(answerGroup.outcome) && !isCreatingNewState(answerGroup.outcome)" ng-click="navigateToState(answerGroup.outcome.dest)" class="oppia-nested-link">
@@ -52,49 +89,8 @@
   <md-card style="margin: 20px 0px; padding: 0px;">
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
-        + Add New Response
+        + Add New Oppia Response
       </button>
-    </div>
-  </md-card>
-
-  <div style="font-size: 16px; margin-top: 35px;">
-    <strong>Fallback</strong>
-  </div>
-  <md-card class="oppia-editor-card-with-avatar">
-    <div class="oppia-editor-card-body">
-      <div>
-        <ul class="nav nav-stacked nav-pills" role="tablist">
-          <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block" style="border-bottom: 1px solid #ccc; margin-top: 0;">
-            <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
-              <div class="oppia-response-header-block">
-                <div ng-attr-title="<[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false]>" class="oppia-response-header">
-                  <[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true]>
-                </div>
-                <span>→</span>
-                <span ng-if="!isOutcomeLooping(defaultOutcome) && !isCreatingNewState(defaultOutcome)" ng-click="navigateToState(defaultOutcome.dest)" class="oppia-nested-link">
-                  <[defaultOutcome.dest]>
-                </span>
-                <span ng-if="!isOutcomeLooping(defaultOutcome) && isCreatingNewState(defaultOutcome)">
-                  <em ng-if="defaultOutcome.newStateName">(<[defaultOutcome.newStateName]>)</em>
-                  <em ng-if="!defaultOutcome.newStateName">Nowhere yet...</em>
-                </span>
-                <span ng-if="isOutcomeLooping(defaultOutcome)">
-                  <em>(try again)</em>
-                </span>
-              </div>
-            </a>
-
-            <div ng-if="activeAnswerGroupIndex === answerGroups.length">
-              <div class="oppia-editor-card-section">
-                <div class="oppia-rule-body-container">
-                  <answer-group-editor rules="null" outcome="defaultOutcome" on-save-answer-group-feedback="saveDefaultOutcomeFeedback(defaultOutcome)" on-save-answer-group-dest="saveDefaultOutcomeDest(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
-                  </answer-group-editor>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
     </div>
   </md-card>
 </div>
@@ -107,7 +103,7 @@
   <div class="modal-body">
     <form name="addAnswerGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-response-details">
       <div class="oppia-rule-details-header">
-        <strong>If the answer provided...</strong>
+        <strong>If the learner's answer...</strong>
       </div>
 
       <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" is-editing-rule-inline="false">

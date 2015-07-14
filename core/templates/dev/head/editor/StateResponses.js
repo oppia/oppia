@@ -120,9 +120,8 @@ oppia.factory('responsesService', [
         stateInteractionIdService.savedMemento, _answerGroups);
 
       _answerGroupsMemento = angular.copy(_answerGroups);
-      _defaultOutcomeMemento = angular.copy(
-        _defaultOutcome);
-      _activeAnswerGroupIndex = 0;
+      _defaultOutcomeMemento = angular.copy(_defaultOutcome);
+      _activeAnswerGroupIndex = -1;
       _activeRuleIndex = 0;
     },
     onInteractionIdChanged: function(newInteractionId, callback) {
@@ -156,7 +155,7 @@ oppia.factory('responsesService', [
 
       _answerGroupsMemento = angular.copy(_answerGroups);
       _defaultOutcomeMemento = angular.copy(_defaultOutcome);
-      _activeAnswerGroupIndex = 0;
+      _activeAnswerGroupIndex = -1;
       _activeRuleIndex = 0;
 
       if (callback) {
@@ -167,7 +166,13 @@ oppia.factory('responsesService', [
       return _activeAnswerGroupIndex;
     },
     changeActiveAnswerGroupIndex: function(newIndex) {
-      _activeAnswerGroupIndex = newIndex;
+      // If the current group is being clicked on again, close it.
+      if (newIndex == _activeAnswerGroupIndex) {
+        _activeAnswerGroupIndex = -1;
+      } else {
+        _activeAnswerGroupIndex = newIndex;
+      }
+
       _activeRuleIndex = 0;
     },
     getActiveRuleIndex: function() {
@@ -186,7 +191,7 @@ oppia.factory('responsesService', [
       _answerGroupsMemento = angular.copy(_answerGroups);
       _answerGroups.splice(index, 1);
       _saveAnswerGroups(_answerGroups);
-      _activeAnswerGroupIndex = 0;
+      _activeAnswerGroupIndex = -1;
       return true;
     },
     updateActiveAnswerGroup: function(updates) {
@@ -283,6 +288,10 @@ oppia.controller('StateResponses', [
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
     $scope.activeAnswerGroupIndex = (
       responsesService.getActiveAnswerGroupIndex());
+  });
+
+  $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
+    responsesService.updateAnswerChoices(newAnswerChoices);
   });
 
   $scope.openAddAnswerGroupModal = function() {

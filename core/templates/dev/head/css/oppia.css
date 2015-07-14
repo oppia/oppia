@@ -1002,10 +1002,6 @@ pre.oppia-pre-wrapped-text {
   text-decoration: underline;
 }
 
-.oppia-answer-header {
-  padding-top: 16px;
-}
-
 .oppia-add-interaction-button,
 .oppia-add-response-button {
   background-color: rgba(5,140,166,0.9);
@@ -1136,7 +1132,6 @@ pre.oppia-pre-wrapped-text {
   background: rgba(5,140,166,0.1);
   border-right: 0;
   color: #333;
-  cursor: default;
 }
 
 .oppia-default-rule-tab {

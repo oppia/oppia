@@ -57,7 +57,6 @@ oppia.directive('answerGroupEditor', [function() {
     // interaction's customization arguments.
     // TODO(sll): Remove the need for this watcher, or make it less ad hoc.
     $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-      responsesService.updateAnswerChoices(newAnswerChoices);
       $scope.answerChoices = $scope.getAnswerChoices();
     });
 

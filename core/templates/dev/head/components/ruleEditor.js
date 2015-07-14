@@ -71,14 +71,7 @@ oppia.directive('ruleTypeSelector', [function() {
         allowClear: false,
         width: '350px',
         formatSelection: function(object, container) {
-          if (object.id === 'Default') {
-            return (
-              stateInteractionIdService.savedMemento === 'Continue' ?
-              'is clicked...' :
-              'is anything else...');
-          } else {
-            return $filter('truncateAtFirstEllipsis')(object.text);
-          }
+          return $filter('truncateAtFirstEllipsis')(object.text);
         }
       });
 

@@ -273,7 +273,7 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
     if (interactionId === 'Continue') {
       summary = 'When the button is clicked';
     } else if (answerGroupCount > 0) {
-      summary = 'If the answer is anything else';
+      summary = 'If Oppia doesn\'t understand';
     } else {
       summary = 'All answers';
     }
