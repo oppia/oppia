@@ -370,10 +370,11 @@ oppia.controller('StateResponses', [
       ui.placeholder.height(ui.item.height());
     },
     stop: function(e, ui) {
+      responsesService.save($scope.answerGroups, $scope.defaultOutcome);
+      if (responsesService.getActiveAnswerGroupIndex() != -1) {
+        $scope.changeActiveAnswerGroupIndex(ui.item.index());
+      }
       $scope.$apply();
-      responsesService.save(
-        $scope.answerGroups, $scope.defaultOutcome);
-      $scope.changeActiveAnswerGroupIndex(ui.item.index());
       $rootScope.$broadcast('externalSave');
     }
   };
