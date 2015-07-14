@@ -9,7 +9,7 @@
 
   <div ng-if="interactionId">
     <md-card class="oppia-editor-card-with-avatar">
-      <div class="oppia-editor-card-body">
+      <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section" style="height: 100%;">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" ng-if="editabilityService.isEditable()" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()">
@@ -75,7 +75,7 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed">Back</button>
+    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed">Change Interaction</button>
 
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"

@@ -71,6 +71,12 @@ oppia.controller('StateInteraction', [
 
   $scope.hasLoaded = false;
 
+  $scope.getCurrentInteractionName = function() {
+    return (
+      stateInteractionIdService.savedMemento ?
+      INTERACTION_SPECS[stateInteractionIdService.savedMemento].name : '');
+  };
+
   $scope.doesCurrentInteractionHaveCustomizations = function() {
     var interactionSpec = INTERACTION_SPECS[stateInteractionIdService.savedMemento];
     return interactionSpec && interactionSpec.customization_arg_specs.length > 0;
