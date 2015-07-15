@@ -3,6 +3,7 @@ version: 2-0-0-rc-3
 runtime: python27
 api_version: 1
 threadsafe: false
+instance_class: F4
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
