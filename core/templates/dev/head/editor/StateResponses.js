@@ -186,9 +186,6 @@ oppia.factory('responsesService', [
       return angular.copy(_answerChoices);
     },
     deleteAnswerGroup: function(index) {
-      if (!window.confirm('Are you sure you want to delete this response?')) {
-        return false;
-      }
       _answerGroupsMemento = angular.copy(_answerGroups);
       _answerGroups.splice(index, 1);
       _saveAnswerGroups(_answerGroups);
@@ -391,11 +388,31 @@ oppia.controller('StateResponses', [
     }
   };
 
-  $scope.deleteAnswerGroup = function(index) {
-    var successfullyDeleted = responsesService.deleteAnswerGroup(index);
-    if (successfullyDeleted) {
-      $rootScope.$broadcast('answerGroupDeleted');
-    }
+  $scope.deleteAnswerGroup = function(index, evt) {
+    // Prevent clicking on the delete button from also toggling the display
+    // state of the answer group.
+    evt.stopPropagation();
+
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/deleteAnswerGroup',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.reallyDelete = function() {
+          $modalInstance.close();
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    }).result.then(function() {
+      var successfullyDeleted = responsesService.deleteAnswerGroup(index);
+      if (successfullyDeleted) {
+        $rootScope.$broadcast('answerGroupDeleted');
+      }
+    });
   };
 
   $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
