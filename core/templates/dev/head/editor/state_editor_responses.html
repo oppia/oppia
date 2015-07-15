@@ -41,7 +41,7 @@
 
             <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section">
-                <div class="oppia-rule-body-container">
+                <div class="oppia-rule-body-container protractor-test-response-body-<[$index]>">
                   <answer-group-editor rules="answerGroup.rule_specs" outcome="answerGroup.outcome" on-save-answer-group-feedback="saveActiveAnswerGroupFeedback(answerGroup.outcome)" on-save-answer-group-dest="saveActiveAnswerGroupDest(answerGroup.outcome)" on-save-answer-group-rules="saveActiveAnswerGroupRules(answerGroup.rule_specs)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
@@ -75,7 +75,7 @@
 
             <div ng-if="activeAnswerGroupIndex === answerGroups.length">
               <div class="oppia-editor-card-section">
-                <div class="oppia-rule-body-container">
+                <div class="oppia-rule-body-container protractor-test-response-body-default">
                   <answer-group-editor rules="null" outcome="defaultOutcome" on-save-answer-group-feedback="saveDefaultOutcomeFeedback(defaultOutcome)" on-save-answer-group-dest="saveDefaultOutcomeDest(defaultOutcome)" is-editable="editabilityService.isEditable()" class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
@@ -97,7 +97,7 @@
 </div>
 
 <script type="text/ng-template" id="modals/addAnswerGroup">
-  <div class="modal-header">
+  <div class="modal-header protractor-test-add-response-modal-header">
     <h3>Add Response</h3>
   </div>
 
@@ -123,7 +123,7 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
     <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(true)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
   </div>
