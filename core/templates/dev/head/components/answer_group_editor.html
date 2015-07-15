@@ -1,5 +1,6 @@
 <div style="height: 100%;">
-  <div ng-if="rules.length > 0">
+  <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
+  <div ng-if="rules">
     <strong>
       If the learner's answer...
     </strong>
@@ -41,7 +42,7 @@
     </button>
   </div>
 
-  <br ng-if="rules.length > 0">
+  <br ng-if="rules">
 
   <div ng-if="!feedbackEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this response' : '']>">
     <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
