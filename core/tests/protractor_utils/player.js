@@ -76,13 +76,13 @@ var submitAnswer = function(interactionId, answerData) {
 var expectExplorationToBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
-  ).toEqual('Congratulations, you have finished!');
+  ).toEqual('Great job! Continue through the course by clicking on one of the buttons below.');
 };
 
 var expectExplorationToNotBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
-  ).not.toEqual('Congratulations, you have finished!');
+  ).not.toEqual('Great job! Continue through the course by clicking on one of the buttons below.');
 };
 
 exports.restartExploration = restartExploration;
