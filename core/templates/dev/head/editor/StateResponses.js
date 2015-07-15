@@ -243,11 +243,11 @@ oppia.factory('responsesService', [
 oppia.controller('StateResponses', [
     '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
     'editorContextService', 'warningsData', 'responsesService', 'routerService',
-    'PLACEHOLDER_OUTCOME_DEST',
+    'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
     function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, warningsData, responsesService, routerService,
-      PLACEHOLDER_OUTCOME_DEST) {
+      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
   $scope.editorContextService = editorContextService;
 
   $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -269,6 +269,14 @@ oppia.controller('StateResponses', [
     responsesService.init(data);
     $scope.answerGroups = responsesService.getAnswerGroups();
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
+
+    // If the creator selects the 'Continue' interaction, automatically expand
+    // the default response (which is the 'handle button click' response).
+    // Otherwise, default to having no responses initially selected.
+    if ($scope.getCurrentInteractionId() === 'Continue') {
+      responsesService.changeActiveAnswerGroupIndex(0);
+    }
+
     $scope.activeAnswerGroupIndex = (
       responsesService.getActiveAnswerGroupIndex());
     $rootScope.$broadcast('externalSave');
@@ -279,9 +287,18 @@ oppia.controller('StateResponses', [
     responsesService.onInteractionIdChanged(newInteractionId, function() {
       $scope.answerGroups = responsesService.getAnswerGroups();
       $scope.defaultOutcome = responsesService.getDefaultOutcome();
+
       $scope.activeAnswerGroupIndex = (
         responsesService.getActiveAnswerGroupIndex());
     });
+
+    // Now, open the answer group editor if it is not a 'Continue' or
+    // non-terminal interaction and if an actual interaction is specified
+    // (versus one being deleted).
+    if (newInteractionId && newInteractionId !== 'Continue' &&
+        !INTERACTION_SPECS[newInteractionId].is_terminal) {
+      $scope.openAddAnswerGroupModal();
+    }
   });
 
   $scope.$on('answerGroupDeleted', function(evt) {
@@ -306,6 +323,7 @@ oppia.controller('StateResponses', [
           '$scope', '$modalInstance', 'responsesService',
           'editorContextService', function(
             $scope, $modalInstance, responsesService, editorContextService) {
+
         $scope.tmpRule = {
           rule_type: null,
           inputs: {}
@@ -332,12 +350,14 @@ oppia.controller('StateResponses', [
 
         $scope.addAnswerGroupForm = {};
 
-        $scope.addNewResponse = function() {
+        $scope.saveResponse = function(reopen) {
           $scope.$broadcast('saveOutcomeFeedbackDetails');
           $scope.$broadcast('saveOutcomeDestDetails');
+          // Close the modal and save it afterwards.
           $modalInstance.close({
             'tmpRule': angular.copy($scope.tmpRule),
-            'tmpOutcome': angular.copy($scope.tmpOutcome)
+            'tmpOutcome': angular.copy($scope.tmpOutcome),
+            'reopen': reopen
           });
         };
 
@@ -352,9 +372,13 @@ oppia.controller('StateResponses', [
         'rule_specs': [result.tmpRule],
         'outcome': result.tmpOutcome
       });
-      responsesService.save(
-        $scope.answerGroups, $scope.defaultOutcome);
+      responsesService.save($scope.answerGroups, $scope.defaultOutcome);
       $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
+
+      // After saving it, check if the modal should be reopened right away.
+      if (result.reopen) {
+        $scope.openAddAnswerGroupModal();
+      }
     });
   };
 
