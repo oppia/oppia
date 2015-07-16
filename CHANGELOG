@@ -21,16 +21,16 @@ Editor page:
 * Change the confirmation of deleting a state to use a modal instead of a browser confirmation dialog.
 * Change the confirmation of deleting an answer group to use a modal instead of a browser confirmation dialog.
 * Change the confirmation of deleting an interaction to use a modal instead of a browser confirmation dialog.
-* Update the 'Add Response' (previously called 'Add Rule') modal to allow saving the rule an adding another without the user having to manually reopen the modal.
+* Update the 'Add Response' (previously called 'Add Rule') modal to allow saving the rule and adding another without the user having to manually reopen the modal.
 * Increase the width of the editor cards by 140px.
-* Sanitize content in the Rich Text Editor whenever content changes, as long as interaction modals are not open.
+* Sanitize content in the Rich Text Editor whenever content changes, as long as the rich-text extension customization modal is not open.
 
 Infrastructure:
-* In the exploration backend, introduce an answer group structure which groups together multiple RuleSpecs with a piece of feedback.
-* In the exploration backend, introduce an 'default outcome' structure to replace the concept of a default rule.
+* In the exploration backend, introduce an answer group structure which groups together multiple RuleSpecs with a single piece of feedback.
+* In the exploration backend, introduce a 'default outcome' structure to replace the concept of a default rule.
 * Introduce a recommendation system for recommending similar explorations to a user after they have completed an exploration.
 * Fix issue 839: prevent notifications showing up due to automatic migrations.
-* Update of the gae-mapreduce library to use Cloud Storage instead of the Files API.
+* Update the gae-mapreduce library to use Cloud Storage instead of the Files API.
 * Add backend support for fallbacks/triggers, which allow Oppia to react to learner actions that are not just answer submissions.
 * Add an XBlock for embedding Oppia explorations in courses on the OpenEdX platform.
 
@@ -38,17 +38,17 @@ Administration:
 * Add functionality to disable explorations.
 
 Scripts:
-* Update run_integration_tests.sh script to have arguments for enabling/disabling sharding and setting the number of shards to run.
+* Update the run_integration_tests.sh script to have arguments for enabling/disabling sharding and setting the number of shards to run.
 
 Emails:
-* Introduce an email service with the current functionality of sending emails to a user when he/she signs up.
+* Make it possible to send emails to users when they sign up.
 
 Frontend testing:
-* Improve the testing coverage of the frontend unit tests for interaction validators.
+* Add frontend unit tests for interaction validators.
 
 Sitewide frontend changes:
 * Fix issue 855: display the correct profile pictures and usernames on profile pages.
-* Add functionality to set email preferences.
+* Add functionality allowing users to set email preferences.
 
 
 v2.0.0.rc.3 (11 Jun 2015)
