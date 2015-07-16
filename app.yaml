@@ -8,7 +8,7 @@ instance_class: F4
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
   # Modify the 'version' field above to match this.
-  OPPIA_VERSION: '2.0.0.rc.3'
+  OPPIA_VERSION: '2.0.0.rc.4'
 
 builtins:
 - appstats: on

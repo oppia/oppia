@@ -3,6 +3,54 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v2.0.0.rc.4 (15 Jul 2015)
+-------------------------
+Editor walkthrough page:
+* Add a new walkthrough tutorial which teaches the standard functionality of the editor.
+
+Learner page:
+* Show tiles of recommended explorations for the user to play after they have finished an exploration.
+
+Editor page:
+* Introduce answer groups (called responses) which replace the current rules in the editor.
+* Change the process of creating a new state to use an in-line text field instead of a modal.
+* Change many of the editor headers and button texts to be more conversational and friendly.
+* Rename 'states' to 'cards'.
+* Remove the ability to add varied feedback (only one piece of feedback may be set for a response).
+* Automatically open the Add Response modal after selecting a new interaction type.
+* Change the confirmation of deleting a state to use a modal instead of a browser confirmation dialog.
+* Change the confirmation of deleting an answer group to use a modal instead of a browser confirmation dialog.
+* Change the confirmation of deleting an interaction to use a modal instead of a browser confirmation dialog.
+* Update the 'Add Response' (previously called 'Add Rule') modal to allow saving the rule an adding another without the user having to manually reopen the modal.
+* Increase the width of the editor cards by 140px.
+* Sanitize content in the Rich Text Editor whenever content changes, as long as interaction modals are not open.
+
+Infrastructure:
+* In the exploration backend, introduce an answer group structure which groups together multiple RuleSpecs with a piece of feedback.
+* In the exploration backend, introduce an 'default outcome' structure to replace the concept of a default rule.
+* Introduce a recommendation system for recommending similar explorations to a user after they have completed an exploration.
+* Fix issue 839: prevent notifications showing up due to automatic migrations.
+* Update of the gae-mapreduce library to use Cloud Storage instead of the Files API.
+* Add backend support for fallbacks/triggers, which allow Oppia to react to learner actions that are not just answer submissions.
+* Add an XBlock for embedding Oppia explorations in courses on the OpenEdX platform.
+
+Administration:
+* Add functionality to disable explorations.
+
+Scripts:
+* Update run_integration_tests.sh script to have arguments for enabling/disabling sharding and setting the number of shards to run.
+
+Emails:
+* Introduce an email service with the current functionality of sending emails to a user when he/she signs up.
+
+Frontend testing:
+* Improve the testing coverage of the frontend unit tests for interaction validators.
+
+Sitewide frontend changes:
+* Fix issue 855: display the correct profile pictures and usernames on profile pages.
+* Add functionality to set email preferences.
+
+
 v2.0.0.rc.3 (11 Jun 2015)
 -------------------------
 Sitewide frontend changes:
