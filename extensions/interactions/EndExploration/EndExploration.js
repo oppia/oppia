@@ -36,6 +36,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
         $scope.isInEditorPreviewMode = (
           explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
         $scope.invalidExpIds = [];
+        $scope.recommendedExplorationIds = [];
         $scope.recommendedExplorationSummaries = [];
 
         var authorRecommendationsDeferred = $q.defer();
