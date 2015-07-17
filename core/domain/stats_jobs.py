@@ -32,6 +32,12 @@ from google.appengine.ext import ndb
 
 _NO_SPECIFIED_VERSION_STRING = 'none'
 _ALL_VERSIONS_STRING = 'all'
+# This date represents the date we stopped using StateCounterModel
+# This is here because StateCounterModel did not explicitly record
+# a start event. It only used the hit count for the start state.
+# This means that we need to figure out what the start state was
+# during the StateCounterModel time period so that we can select the
+# correct state hits to count as starts.
 _STATE_COUNTER_CUTOFF_DATE = datetime.datetime(2014, 10, 11, 0, 0, 0)
 
 # States with this name used to be treated as a pseudoend state, but are not
