@@ -200,15 +200,17 @@ class ExplorationPage(EditorHandler):
             interaction_registry.Registry.get_validators_html(
                 interaction_ids))
 
-        gadget_ids = gadget_registry.Registry.get_all_gadget_ids()
+        gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_ids))
+            gadget_registry.Registry.get_gadget_html(gadget_types))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
 
         self.values.update({
+            'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'SKIN_SPECS': skins_services.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(exploration_id),
@@ -240,6 +242,7 @@ class ExplorationPage(EditorHandler):
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
             # This is needed for the exploration preview.
@@ -276,6 +279,7 @@ class ExplorationHandler(EditorHandler):
 
         editor_dict = {
             'category': exploration.category,
+            'default_skin_id': exploration.default_skin,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,
@@ -294,11 +298,6 @@ class ExplorationHandler(EditorHandler):
             'title': exploration.title,
             'version': exploration.version,
         }
-
-        if feconf.SHOW_SKIN_CHOOSER:
-            editor_dict['all_skin_ids'] = (
-                skins_services.Registry.get_all_skin_ids())
-            editor_dict['default_skin_id'] = exploration.default_skin
 
         return editor_dict
 

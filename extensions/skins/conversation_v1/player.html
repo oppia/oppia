@@ -86,6 +86,8 @@
         </div>
       </div>
 
+      <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"></oppia-gadget-panel>
+
       <div class="conversation-skin-supplemental-interaction">
         <div ng-if="!waitingForNewCard && !interactionIsInline && inputTemplate && (!finished || !isIframed)">
           <md-card class="conversation-skin-supplemental-card">
@@ -96,7 +98,6 @@
       </div>
 
       <div ng-if="!waitingForNewCard && finished && isLoggedIn && !isInPreviewMode && !isIframed" class="conversation-skin-final-ratings">
-        <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"></oppia-gadget-panel>
         <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
         <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
           <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">

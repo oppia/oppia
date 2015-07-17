@@ -181,7 +181,7 @@ class ExplorationPage(base.BaseHandler):
         is_iframed = (self.request.get('iframed') == 'true')
 
         # TODO(sll): Cache these computations.
-        gadget_ids = exploration.get_gadget_ids()
+        gadget_types = exploration.get_gadget_types()
         interaction_ids = exploration.get_interaction_ids()
         dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -191,7 +191,7 @@ class ExplorationPage(base.BaseHandler):
                 dependency_ids))
 
         gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_ids))
+            gadget_registry.Registry.get_gadget_html(gadget_types))
 
         interaction_templates = (
             rte_component_registry.Registry.get_html_for_all_components() +

@@ -39,6 +39,10 @@ class BaseGadget(object):
     name = ''
     # A description of the gadget. Overridden in subclasses.
     description = ''
+    # Height of the gadget in pixels.
+    height_px = 0
+    # Width of the gadget in pixels.
+    width_px = 0
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -48,7 +52,7 @@ class BaseGadget(object):
     _dependency_ids = []
 
     @property
-    def id(self):
+    def type(self):
         return self.__class__.__name__
 
     @property
@@ -77,27 +81,10 @@ class BaseGadget(object):
         once the necessary attributes are supplied.
         """
         js_directives = utils.get_file_contents(os.path.join(
-            feconf.GADGETS_DIR, self.id, '%s.js' % self.id))
+            feconf.GADGETS_DIR, self.type, '%s.js' % self.type))
         html_templates = utils.get_file_contents(os.path.join(
-            feconf.GADGETS_DIR, self.id, '%s.html' % self.id))
+            feconf.GADGETS_DIR, self.type, '%s.html' % self.type))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
-
-    def get_width(self, customization_args):
-        """Returns an integer representing the gadget's width in pixels.
-
-        Some gadgets might not require data from customization args to
-        calculate width and height, but the method requires passing args
-        for consistency.
-
-        Example:
-        - An AdviceBar's height and width will change depending on how many
-        tips it contains.
-        """
-        raise NotImplementedError('Subclasses must override this method.')
-
-    def get_height(self, customization_args):
-        """Returns an integer representing the gadget's height in pixels."""
-        raise NotImplementedError('Subclasses must override this method.')
 
     def validate(self, customization_args):
         """Subclasses may override to perform additional validation."""
@@ -108,8 +95,10 @@ class BaseGadget(object):
         provided.
         """
         result = {
-            'id': self.id,
+            'type': self.type,
             'name': self.name,
+            'height_px': self.height_px,
+            'width_px': self.width_px,
             'description': self.description,
             'customization_arg_specs': [{
                 'name': ca_spec.name,

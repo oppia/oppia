@@ -188,6 +188,162 @@ describe('Change list service', function() {
       cls.undoLastChange();
       expect(cls.getChangeList()).toEqual([]);
     })
+
+    it('should correctly add a gadget', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.addState('newState1');
+      var gadgetDict = {
+        'gadget_type': 'AdviceBar',
+        'gadget_name': 'AdviceBar 1',
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>Tips</p>',
+              'adviceTitle': 'R-Tip'
+            }]
+          },
+          'title': {
+            'value': 'Tips'
+          }
+        },
+        'visible_in_states': ['newState1']
+      };
+      var panelName = 'left';
+      cls.addGadget(gadgetDict, panelName);
+      expect(cls.getChangeList()).toEqual([
+        {
+          cmd: 'add_state',
+          state_name: 'newState1'
+        }, {
+          cmd: 'add_gadget',
+          gadget_dict: {
+            'gadget_type': 'AdviceBar',
+            'gadget_name': 'AdviceBar 1',
+            'customization_args': {
+              'adviceObjects': {
+                'value': [{
+                  'adviceHtml': '<p>Tips</p>',
+                  'adviceTitle': 'R-Tip'
+                }]
+              },
+              'title': {
+                'value': 'Tips'
+              }
+            },
+            'visible_in_states': ['newState1']
+          },
+          panel_name: 'left'
+        }
+      ]);
+    });
+
+    it('should correctly rename a gadget', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.renameGadget('oldName', 'newName');
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'rename_gadget',
+        old_gadget_name: 'oldName',
+        new_gadget_name: 'newName'
+      }]);
+      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+    });
+
+    it('should correctly delete a gadget', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.deleteGadget('gadgetName');
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'delete_gadget',
+        gadget_name: 'gadgetName'
+      }]);
+      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+    });
+
+    it('should correctly edit gadget customization args', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      var oldCustomizationArgs = {
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>Html Data</p>',
+              'adviceTitle': 'advice tip name'
+            }]
+          },
+          'title': {
+            'value': 'main Title'
+          }
+        }
+      };
+      var newCustomizationArgs = {
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>New Html Data</p>',
+              'adviceTitle': 'New advice tip name'
+            }]
+          },
+          'title': {
+            'value': 'New main Title'
+          }
+        }
+      };
+      cls.editGadgetProperty(
+        'gadgetName',
+        'gadget_customization_args',
+        newCustomizationArgs,
+        oldCustomizationArgs
+      );
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'edit_gadget_property',
+        gadget_name: 'gadgetName',
+        property_name: 'gadget_customization_args',
+        new_value: {
+          'customization_args': {
+            'adviceObjects': {
+              'value': [{
+                'adviceHtml': '<p>New Html Data</p>',
+                'adviceTitle': 'New advice tip name'
+              }]
+            },
+            'title': {
+              'value': 'New main Title'
+            }
+          }
+        },
+        old_value: {
+          'customization_args': {
+            'adviceObjects': {
+              'value': [{
+                'adviceHtml': '<p>Html Data</p>',
+                'adviceTitle': 'advice tip name'
+              }]
+            },
+            'title': {
+              'value': 'main Title'
+            }
+          }
+        }
+      }]);
+    });
+
+
+    it('should correctly edit a gadget visibility property', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      var oldVisibilityProp = ['old_state_name'];
+      var newVisibilityProp = ['new state name'];
+      cls.editGadgetProperty(
+        'gadgetName',
+        'gadget_visibility',
+        newVisibilityProp,
+        oldVisibilityProp
+      );
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'edit_gadget_property',
+        gadget_name: 'gadgetName',
+        property_name: 'gadget_visibility',
+        new_value: ['new state name'],
+        old_value: ['old_state_name']
+      }]);
+    });
   });
 });
 
@@ -317,6 +473,34 @@ describe('Exploration rights service', function() {
 
       ers.init(['abc'], [], [], 'publicized', '1234', true);
       expect(ers.isCommunityOwned()).toBe(true);
+    });
+  });
+});
+
+describe('New exploration gadgets service', function() {
+  beforeEach(module('oppia'));
+
+  describe('New exploration gadgets service', function() {
+    var egs = null;
+    var mockWarningsData;
+
+    beforeEach(function() {
+      mockWarningsData = {
+        addWarning: function(warning) {}
+      };
+      module(function($provide) {
+        $provide.value('warningsData', mockWarningsData)
+      });
+      spyOn(mockWarningsData, 'addWarning');
+    });
+
+    beforeEach(inject(function($injector) {
+      egs = $injector.get('explorationGadgetsService');
+    }));
+    it('should detect invalid data passed for initialization', function() {
+      egs.init({'wrongObjectKey': 'value'});
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Gadget Initialization failed. Panel contents were not provided');
     });
   });
 });

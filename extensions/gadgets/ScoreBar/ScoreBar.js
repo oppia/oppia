@@ -22,6 +22,7 @@
 
 oppia.directive('oppiaGadgetScoreBar', [
   'oppiaHtmlEscaper', 'learnerParamsService', function(oppiaHtmlEscaper, learnerParamsService) {
+
     return {
       restrict: 'E',
       templateUrl: 'gadget/ScoreBar',
@@ -31,9 +32,22 @@ oppia.directive('oppiaGadgetScoreBar', [
         $scope.scoreBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj($attrs.paramNameWithValue);
 
+        // TODO(anuzis): Update this method to suit the front-end API Sean and
+        // Vishal determine is best when it's decided.
+        $scope.validate = function() {
+          var params = learnerParamsService.getAllParams();
+          if ($scope.scoreBarParamName in params) {
+            return '';
+          } else {
+            var validationError = ($scope.scoreBarParamName + ' is not yet ' +
+              'created as a parameter. Please create the parameter first.');
+            return validationError;
+          }
+        };
+
         $scope.getScoreValue = function() {
           return learnerParamsService.getValue($scope.scoreBarParamName);
-        }
+        };
       }],
     }
   }

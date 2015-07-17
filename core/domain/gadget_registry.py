@@ -26,7 +26,7 @@ import feconf
 class Registry(object):
     """Registry of all gadgets."""
 
-    # Dict mapping gadget ids to instances of the gadgets.
+    # Dict mapping gadget types to instances of the gadgets.
     _gadgets = {}
 
     @classmethod
@@ -50,8 +50,8 @@ class Registry(object):
                 cls._gadgets[clazz.__name__] = clazz()
 
     @classmethod
-    def get_all_gadget_ids(cls):
-        """Get a list of all gadget ids."""
+    def get_all_gadget_types(cls):
+        """Get a list of all gadget types."""
         if len(cls._gadgets) == 0:
             cls._refresh()
         return cls._gadgets.keys()
@@ -64,32 +64,32 @@ class Registry(object):
         return cls._gadgets.values()
 
     @classmethod
-    def get_gadget_by_id(cls, gadget_id):
+    def get_gadget_by_type(cls, gadget_type):
         """Gets a gadget by its id.
 
         Refreshes once if the gadget is not found; subsequently, throws a
         KeyError."""
-        if gadget_id not in cls._gadgets:
+        if gadget_type not in cls._gadgets:
             cls._refresh()
-        return cls._gadgets[gadget_id]
+        return cls._gadgets[gadget_type]
 
     @classmethod
-    def get_gadget_html(cls, gadget_ids):
-        """Returns the HTML bodies for the given list of gadget ids."""
+    def get_gadget_html(cls, gadget_types):
+        """Returns the HTML bodies for the given list of gadget types."""
         return ' \n'.join([
-            cls.get_gadget_by_id(gadget_id).html_body
-            for gadget_id in gadget_ids])
+            cls.get_gadget_by_type(gadget_type).html_body
+            for gadget_type in gadget_types])
 
     @classmethod
-    def get_deduplicated_dependency_ids(cls, gadget_ids):
+    def get_deduplicated_dependency_ids(cls, gadget_types):
         """Return a list of dependency ids for the given gadgets.
 
         Each entry of the resulting list is unique. The list is sorted in no
         particular order.
         """
         result = set([])
-        for gadget_id in gadget_ids:
-            gadget = cls.get_gadget_by_id(gadget_id)
+        for gadget_type in gadget_types:
+            gadget = cls.get_gadget_by_type(gadget_type)
             result.update(gadget.dependency_ids)
         return list(result)
 
@@ -97,6 +97,6 @@ class Registry(object):
     def get_all_specs(cls):
         """Returns a dict containing the full specs of each gadget."""
         return {
-            gadget.id: gadget.to_dict()
+            gadget.type: gadget.to_dict()
             for gadget in cls.get_all_gadgets()
         }

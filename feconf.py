@@ -76,10 +76,6 @@ DEFAULT_INIT_STATE_NAME = 'First Card'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
-# Default valid parameter for instantiating Explorations when explicit
-# skin customizations aren't provided.
-DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
-
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # files.
@@ -112,6 +108,9 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+# A regular expression for alphanumeric words separated by single spaces.
+# Ex.: 'valid name', 'another valid name', 'invalid   name'.
+ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
