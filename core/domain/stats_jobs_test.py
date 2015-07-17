@@ -24,9 +24,11 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,exp_models) = models.Registry.import_models([models.NAMES.statistics, models.NAMES.exploration])
 from core.tests import test_utils
+import datetime
 import feconf
+import time
 
 
 class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
@@ -85,14 +87,19 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
-            exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
-            state = exploration.init_state_name
+            time.sleep(1)
+            stats_jobs._STATE_COUNTER_CUTOFF_DATE = datetime.datetime.now()
+            original_init_state = exploration.init_state_name
+            state = 'New init state'
+            exploration.rename_state(original_init_state, state)
+            exp_services._save_exploration('owner', exploration, '', [])
+            exp_version = 2
             state2 = 'sid2'
 
             self._record_state_hit(exp_id, exp_version, state, 'session1')
             self._record_state_hit(exp_id, exp_version, state, 'session2')
-            self._create_state_counter(exp_id, state, 18)
+            self._create_state_counter(exp_id, original_init_state, 18)
             self._record_state_hit(exp_id, exp_version, state2, 'session1')
             self._create_state_counter(exp_id, state2, 9)
             self.process_and_flush_pending_tasks()
@@ -113,17 +120,21 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             output_model = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
             self.assertEqual(
-                output_model['state_hit_counts'][state]['first_entry_count'],
+                output_model['state_hit_counts'][original_init_state]['first_entry_count'],
                 18)
             self.assertEqual(
                 output_model['state_hit_counts'][state2]['first_entry_count'],
                 9)
+            self.assertEqual(output_model['start_exploration_count'], 18)
 
             output_model = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._ALL_VERSIONS_STRING)
             self.assertEqual(
+                output_model['state_hit_counts'][original_init_state]['first_entry_count'],
+                18)
+            self.assertEqual(
                 output_model['state_hit_counts'][state]['first_entry_count'],
-                20)
+                2)
             self.assertEqual(
                 output_model['state_hit_counts'][state2]['first_entry_count'],
                 10)

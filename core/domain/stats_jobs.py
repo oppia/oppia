@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import datetime
 import json
 
 from core import jobs
@@ -31,6 +32,7 @@ from google.appengine.ext import ndb
 
 _NO_SPECIFIED_VERSION_STRING = 'none'
 _ALL_VERSIONS_STRING = 'all'
+_STATE_COUNTER_CUTOFF_DATE = datetime.datetime(2014, 10, 11, 0, 0, 0)
 
 # States with this name used to be treated as a pseudoend state, but are not
 # anymore. This is kept here until the stats job may be updated to work with
@@ -227,6 +229,17 @@ class StatisticsMRJobManager(
                     exp_id, version=version)
             else:
                 exploration = exp_services.get_exploration_by_id(exp_id)
+		if version == _NO_SPECIFIED_VERSION_STRING:
+                    current_version = exploration.version
+                    snapshot_id = exp_models.ExplorationModel._get_snapshot_id(exp_id, current_version)
+                    exp_snapshot = exp_models.ExplorationSnapshotContentModel.get(snapshot_id)
+                    while (exp_snapshot.last_updated > _STATE_COUNTER_CUTOFF_DATE
+                        and current_version > 1):
+                        current_version -= 1
+                        snapshot_id = exp_models.ExplorationModel._get_snapshot_id(exp_id, current_version)
+                        exp_snapshot = exp_models.ExplorationSnapshotContentModel.get(snapshot_id)
+                    exploration = exp_models.ExplorationModel(id=exp_id)._reconstitute_from_snapshot_id(snapshot_id)
+
         except base_models.BaseModel.EntityNotFoundError:
             return
 
@@ -363,6 +376,7 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                 yield (
                     StatisticsAudit._STATE_COUNTER_ERROR_KEY,
                     'Less than 0: %s %d' % (item.key, item.first_entry_count))
+            return
         # Older versions of ExplorationAnnotations didn't store exp_id
         # This is short hand for making sure we get ones updated most recently
         else:
