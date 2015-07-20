@@ -2017,10 +2017,6 @@ div#ng-curtain {
   text-align: center;
 }
 
-.oppia-gadget-customization-editor .label {
-  color: rgba(0, 0, 0, 0.73);;
-}
-
 .oppia-gadget-customization-editor label {
   font-weight: normal;
 }
@@ -2035,12 +2031,12 @@ div#ng-curtain {
 }
 
 .oppia-bottom-editor-gadget-panel {
-  top: 95%;
   left: 37%;
   max-height: 135px;
   max-width: 400px;
   min-width: 150px;
   position: relative;
+  top: 95%;
 }
 
 .oppia-right-editor-gadget-panel {

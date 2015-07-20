@@ -38,17 +38,15 @@ oppia.factory('gadgetValidationService', [
      * @param {string} panelName, The panel name for the panel being validated.
      * @param {object} visibilityMap, object with state as key and list of
      *     visible gadget data as its value for a panel.
-     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
      * @returns {boolean} true if everything is ok, false otherwise
      */
-    validatePanel: function(panelName, visibilityMap, showWarnings) {
-      var showWarnings = !!showWarnings || true;
+    validatePanel: function(panelName, visibilityMap) {
       var currentPanelSpec = _getPanelSpecs(panelName);
       var stackableAxis = currentPanelSpec.stackable_axis;
 
       // Fail early for unrecognized axis. This error should never reach
       // the front-end, but is flagged here for defense-in-depth.
-      if (showWarnings && VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
+      if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
         var warningText = 'Unrecognized axis: ' + stackableAxis + ' for ' +
           panelName + ' panel.';
         warningsData.addWarning(warningText);
@@ -60,9 +58,7 @@ oppia.factory('gadgetValidationService', [
           var warningText =  panelName + ' panel expects at most ' +
             currentPanelSpec.max_gadgets +  ', but ' + gadgetInstances.length +
             ' are visible in state ' + stateName + '.'
-          if (showWarnings) {
-            warningsData.addWarning(warningText);
-          }
+          warningsData.addWarning(warningText);
           return false;
         }
 
@@ -99,12 +95,12 @@ oppia.factory('gadgetValidationService', [
           }
         }
 
-        if (showWarnings && (currentPanelSpec.width < totalWidth)) {
+        if (currentPanelSpec.width < totalWidth) {
           var warningText = 'Size exceeded: ' + panelName + ' panel width of ' +
             totalWidth + ' exceeds limit of ' + currentPanelSpec.width  + '.';
           warningsData.addWarning(warningText);
           return false;
-        } else if (showWarnings && (currentPanelSpec.height < totalHeight)) {
+        } else if (currentPanelSpec.height < totalHeight) {
           var warningText = 'Size exceeded: ' + panelName +
             ' panel height of ' + totalHeight + ' exceeds limit of ' +
             currentPanelSpec.height + '.';
@@ -118,20 +114,19 @@ oppia.factory('gadgetValidationService', [
      * Checks whether gadget name is valid, and displays a warning message
      * if it isn't.
      * @param {string} input The input to be checked.
-     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
      * @returns {boolean} True if the entity name is valid, false otherwise.
      */
-    isValidGadgetName: function(input, showWarnings) {
-      var showWarnings = !!showWarnings || true;
-      if (!validatorsService.isValidEntityName(input, showWarnings)) {
+    isValidGadgetName: function(input) {
+      if (!validatorsService.isValidEntityName(input)) {
+        warningsData.addWarning(
+          'Gadget name is invalid. Please use a non-empty name consisting of ' +
+          'alphanumeric characters, underscores, spaces and/or hyphens.');
         return false;
       }
 
       if (input.length > _MAX_GADGET_NAME_LENGTH) {
-        if (showWarnings) {
-          warningsData.addWarning(
-            'Gadget name should be at most 50 characters long.');
-        }
+        warningsData.addWarning(
+          'Gadget name should be at most 50 characters long.');
         return false;
       }
 
@@ -142,12 +137,10 @@ oppia.factory('gadgetValidationService', [
      * @param {string} gadgetType The type of the gadget being verified.
      * @param {object} customizationArgs The customizations args for the gadget.
      * @param {array} visibleInStates The list where this gadget is visible.
-     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
      * @returns {boolean} True if the gadget data is valid, false otherwise.
      */
     isGadgetDataValid: function(
-      gadgetType, customizationArgs, visibleInStates, showWarnings) {
-      var showWarnings = !!showWarnings || true;
+      gadgetType, customizationArgs, visibleInStates) {
 
       // It should be visible in at least one state.
       if (!visibleInStates.length) {
@@ -162,13 +155,10 @@ oppia.factory('gadgetValidationService', [
      * @param {string} panelName The panel where the gadget is added.
      * @param {object} gadgetData The gadgetData for the gadget being added.
      * @param {object} visibilityMap The gadget dict list for gadgets
-     *                 visible in this panel across all states.
-     * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
-     *                      If null/undefined defaults to true.
+     *   visible in this panel across all states.
      * @returns {boolean} True if the gadget can be added, false otherwise.
      */
-    canAddGadget: function(panelName, gadgetData, visibilityMap, showWarnings) {
-      var showWarnings = !!showWarnings || true;
+    canAddGadget: function(panelName, gadgetData, visibilityMap) {
       var currentPanelSpec = _getPanelSpecs(panelName);
       var gadgetType = gadgetData.gadget_type;
       var customizationArgs = gadgetData.customization_args;
@@ -176,7 +166,7 @@ oppia.factory('gadgetValidationService', [
       // Check if gadgetData is valid.
       // Warning will be displayed by isGadgetDataValid(...)
       if (!this.isGadgetDataValid(
-        gadgetType, customizationArgs, visibleInStates, showWarnings)) {
+        gadgetType, customizationArgs, visibleInStates)) {
         return false;
       }
 
@@ -191,9 +181,7 @@ oppia.factory('gadgetValidationService', [
             ' gadget panel can only have ' + currentPanelSpec.max_gadgets +
             ' gadget' + (currentPanelSpec.max_gadgets > 1 ? 's' : '') +
             ' visible at a time.';
-          if (showWarnings) {
-            warningsData.addWarning(warningText);
-          }
+          warningsData.addWarning(warningText);
           return false;
         }
 
@@ -202,7 +190,7 @@ oppia.factory('gadgetValidationService', [
           visibilityMap[stateName] = [];
         }
         visibilityMap[stateName].push(gadgetData);
-        if (!this.validatePanel(panelName, visibilityMap, showWarnings)) {
+        if (!this.validatePanel(panelName, visibilityMap)) {
           // Warning should be added by validatePanel.
           return false;
         }
