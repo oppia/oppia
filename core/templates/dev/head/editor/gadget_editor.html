@@ -30,7 +30,7 @@
               class="glyphicon glyphicon-remove oppia-gadget-delete-icon">
         </span>
         <span title="Rename <[gadgetName]>"
-              ng-click="configureGadgetNameEditorForm(gadgetName)"
+              ng-click="changeActiveGadgetNameEditor(gadgetName)"
               class="glyphicon glyphicon-pencil oppia-gadget-rename-icon">
         </span>
         <span ng-show="originalNameForRenamedGadget == gadgetName"
@@ -40,7 +40,7 @@
                   ng-click="renameGadget(newNameForRenamedGadget)">
           </button>
           <button class="btn btn-xs glyphicon glyphicon-remove"
-                  ng-click="configureGadgetNameEditorForm()">
+                  ng-click="changeActiveGadgetNameEditor()">
           </button>
         </span>
         <div class="oppia-gadget-preview-container" title="Edit <[gadgetName]>"
@@ -82,12 +82,12 @@
         </div>
       </div>
     </div>
-    <div ng-if="gadgetDict.gadget_type" class="gadget-customization-editor">
-      <div ng-show="!isEditingGadget" class="gadget-name-panel">
+    <div ng-if="gadgetDict.gadget_type" class="oppia-gadget-customization-editor">
+      <div ng-show="!isEditingGadget" class="oppia-gadget-name-panel">
         <label class="oppia-gadget-name-label">Gadget Name</label>
         <input ng-disabled="isEditingGadget" ng-model="gadgetDict.gadget_name">
       </div>
-      <div class="gadget-state-visibility-panel">
+      <div class="oppia-gadget-state-visibility-panel">
         <h3 class="oppia-gadget-state-visible-title">
           In which states should this gadget be visible?
         </h3>
@@ -98,7 +98,7 @@
           <[state]>
         </label>
       </div>
-      <form name="form.schemaForm">
+      <form name="form.gadgetSchemaForm">
         <div ng-if="customizationArgSpecs.length === 0">
           <em>
             There are no customization options available.
@@ -134,7 +134,7 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <!-- TODO(vjoisar): Make form.schemaForm.$invalid to work. -->
     <button ng-click="save()" class="btn btn-success"
-            ng-disabled="!gadgetDict.gadget_type || form.schemaForm.$invalid">
+            ng-disabled="!gadgetDict.gadget_type || form.gadgetSchemaForm.$invalid">
       <[isEditingGadget ? 'Update' : 'Add']> Gadget
     </button>
   </div>

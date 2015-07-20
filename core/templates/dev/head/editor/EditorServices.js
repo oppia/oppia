@@ -1110,7 +1110,8 @@ oppia.factory('explorationGadgetsService', [
         return;
       }
 
-      // Check if new gadget data is valid. Warning by gadgetValidationService.
+      // Check if new gadget data is valid.
+      // Warning will be displayed by isGadgetDataValid(...)
       if (!gadgetValidationService.isGadgetDataValid(
         gadgetName, newCustomizationArgs, newVisibleInStates)) {
         return;

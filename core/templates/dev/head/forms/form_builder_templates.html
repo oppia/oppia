@@ -186,7 +186,7 @@
     </textarea>
 
     <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
-      <input type="text" ng-disabled="isDisabled()"
+      <input type="text" ng-disabled="isDisabled()" apply-validation="validators()"
              ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
              ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
              ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"

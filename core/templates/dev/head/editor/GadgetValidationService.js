@@ -149,7 +149,7 @@ oppia.factory('gadgetValidationService', [
       gadgetType, customizationArgs, visibleInStates, showWarnings) {
       var showWarnings = !!showWarnings || true;
 
-      // It should atleast be visible in one state.
+      // It should be visible in at least one state.
       if (!visibleInStates.length) {
         warningsData.addWarning('This gadget is not visible in any states.');
         return false;
@@ -164,6 +164,7 @@ oppia.factory('gadgetValidationService', [
      * @param {object} visibilityMap The gadget dict list for gadgets
      *                 visible in this panel across all states.
      * @param {boolean=} showWarnings Whether to show warnings in the butterbar.
+     *                      If null/undefined defaults to true.
      * @returns {boolean} True if the gadget can be added, false otherwise.
      */
     canAddGadget: function(panelName, gadgetData, visibilityMap, showWarnings) {
@@ -175,7 +176,7 @@ oppia.factory('gadgetValidationService', [
       // Check if gadgetData is valid.
       // Warning will be displayed by isGadgetDataValid(...)
       if (!this.isGadgetDataValid(
-               gadgetType, customizationArgs, visibleInStates, showWarnings)) {
+        gadgetType, customizationArgs, visibleInStates, showWarnings)) {
         return false;
       }
 

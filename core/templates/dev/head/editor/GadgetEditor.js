@@ -80,16 +80,15 @@ oppia.controller('GadgetEditor', [
         $scope.originalNameForRenamedGadget, newGadgetName);
     }
     // hide the editor form;
-    $scope.configureGadgetNameEditorForm();
+    $scope.changeActiveGadgetNameEditor();
   };
 
   /**
    * This displays and hides the gadget name editor form.
-   * @param {string=} currentGadgetName The name of the gadget
-   *    that needs to be renamed to display the form.
-   *    Or empty if the form is to be hidden.
+   * @param {string} currentGadgetName The name of the gadget that needs to be
+   *   renamed to display the form. Or null if the form is to be hidden.
    */
-  $scope.configureGadgetNameEditorForm = function(currentGadgetName) {
+  $scope.changeActiveGadgetNameEditor = function(currentGadgetName) {
     // $scope.originalNameForRenamedGadget is null if no gadget is currently
     // being renamed, otherwise it is set to the original name of the gadget
     // currently being renamed. At most one gadget can be renamed at a time.

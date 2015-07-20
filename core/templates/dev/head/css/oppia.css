@@ -2017,11 +2017,11 @@ div#ng-curtain {
   text-align: center;
 }
 
-.gadget-customization-editor .label {
+.oppia-gadget-customization-editor .label {
   color: rgba(0, 0, 0, 0.73);;
 }
 
-.gadget-customization-editor label {
+.oppia-gadget-customization-editor label {
   font-weight: normal;
 }
 
@@ -2035,21 +2035,23 @@ div#ng-curtain {
 }
 
 .oppia-bottom-editor-gadget-panel {
-  bottom: 100px;
+  top: 95%;
   left: 37%;
   max-height: 135px;
+  max-width: 400px;
   min-width: 150px;
+  position: relative;
 }
 
 .oppia-right-editor-gadget-panel {
   left: 50%;
-  margin-left: 285px;
+  margin-left: 355px;
   top: 35px;
   width: 150px;
 }
 
 .oppia-left-editor-gadget-panel {
-  margin-right: 285px;
+  margin-right: 355px;
   right: 50%;
   top: 35px;
   width: 150px;
@@ -2082,6 +2084,7 @@ div#ng-curtain {
   right: 0;
   top: 80%;
 }
+
 .oppia-gadget-content {
   background: #fff;
 }
@@ -2139,14 +2142,13 @@ div#ng-curtain {
   cursor: pointer;
 }
 
-.gadget-name-panel,
-.gadget-layout-panel,
-.gadget-state-visibility-panel {
+.oppia-gadget-name-panel,
+.oppia-gadget-state-visibility-panel {
   border-top: 1px solid gray;
   padding: 10px 0;
 }
 
-.gadget-state-visibility-panel {
+.oppia-gadget-state-visibility-panel {
   border-bottom: 1px solid gray;
   margin-bottom: 10px;
   /* To clear the float */

@@ -59,6 +59,9 @@ class AdviceBar(base.BaseGadget):
                         'description': 'Tip title (visible on advice bar)',
                         'schema': {
                             'type': 'unicode',
+                            'validators': [{
+                                'id': 'is_nonempty',
+                            }]
                         },
                     }, {
                         'name': 'adviceHtml',
@@ -70,8 +73,8 @@ class AdviceBar(base.BaseGadget):
                 }
             },
             'default_value': [{
-                'adviceTitle': 'Tip Title',
-                'adviceHtml': 'Tip Content'
+                'adviceTitle': 'Tip title',
+                'adviceHtml': ''
             }]
         }
     ]
