@@ -630,3 +630,18 @@ class ClickOnImage(BaseObject):
             }
         }]
     }
+
+
+class ParameterName(BaseObject):
+    """Parameter name class.
+
+    Validation for this class is done only in the frontend.
+    """
+
+    description = 'A string representing a parameter name.'
+    edit_html_filename = 'parameter_name_editor'
+    edit_js_filename = 'ParameterNameEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+    }
