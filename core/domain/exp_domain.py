@@ -18,7 +18,8 @@
 
 Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
-should therefore be independent of the specific storage models used."""
+should therefore be independent of the specific storage models used.
+"""
 
 __author__ = 'Sean Lip'
 
@@ -1082,35 +1083,6 @@ class Exploration(object):
         self.created_on = created_on
         self.last_updated = last_updated
 
-    def is_equal_to(self, other):
-        simple_props = [
-            'id', 'title', 'category', 'objective', 'language_code',
-            'tags', 'blurb', 'author_notes', 'default_skin',
-            'states_schema_version', 'init_state_name', 'version']
-
-        for prop in simple_props:
-            if getattr(self, prop) != getattr(other, prop):
-                return False
-
-        for (state_name, state_obj) in self.states.iteritems():
-            if state_name not in other.states:
-                return False
-            if state_obj.to_dict() != other.states[state_name].to_dict():
-                return False
-
-        for (ps_name, ps_obj) in self.param_specs.iteritems():
-            if ps_name not in other.param_specs:
-                return False
-            if ps_obj.to_dict() != other.param_specs[ps_name].to_dict():
-                return False
-
-        for i in xrange(len(self.param_changes)):
-            if (self.param_changes[i].to_dict() !=
-                    other.param_changes[i].to_dict()):
-                return False
-
-        return True
-
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title, category, objective='',
@@ -1220,37 +1192,8 @@ class Exploration(object):
         return exploration
 
     @classmethod
-    def _require_valid_name(cls, name, name_type):
-        """Generic name validation.
-
-        Args:
-          name: the name to validate.
-          name_type: a human-readable string, like 'the exploration title' or
-            'a state name'. This will be shown in error messages.
-        """
-        # This check is needed because state names are used in URLs and as ids
-        # for statistics, so the name length should be bounded above.
-        if len(name) > 50 or len(name) < 1:
-            raise utils.ValidationError(
-                'The length of %s should be between 1 and 50 '
-                'characters; received %s' % (name_type, name))
-
-        if name[0] in string.whitespace or name[-1] in string.whitespace:
-            raise utils.ValidationError(
-                'Names should not start or end with whitespace.')
-
-        if re.search('\s\s+', name):
-            raise utils.ValidationError(
-                'Adjacent whitespace in %s should be collapsed.' % name_type)
-
-        for c in feconf.INVALID_NAME_CHARS:
-            if c in name:
-                raise utils.ValidationError(
-                    'Invalid character %s in %s: %s' % (c, name_type, name))
-
-    @classmethod
     def _require_valid_state_name(cls, name):
-        cls._require_valid_name(name, 'a state name')
+        utils.require_valid_name(name, 'a state name')
 
     def validate(self, strict=False):
         """Validates the exploration before it is committed to storage.
@@ -1260,13 +1203,13 @@ class Exploration(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        self._require_valid_name(self.title, 'the exploration title')
+        utils.require_valid_name(self.title, 'the exploration title')
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        self._require_valid_name(self.category, 'the exploration category')
+        utils.require_valid_name(self.category, 'the exploration category')
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(

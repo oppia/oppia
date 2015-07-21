@@ -46,7 +46,7 @@ import utils
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-#Name for the exploration search index
+# Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
 
@@ -263,7 +263,8 @@ def get_new_exploration_id():
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user may edit an exploration by checking
-    the given domain object."""
+    the given domain object.
+    """
     return user_id is not None and (
         user_id in exp_summary.editor_ids
         or user_id in exp_summary.owner_ids
@@ -299,7 +300,8 @@ def get_exploration_titles_and_categories(exp_ids):
 
 def _get_exploration_summary_dicts_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
-    corresponding exploration summary domain objects, keyed by id."""
+    corresponding exploration summary domain objects, keyed by id.
+    """
     exploration_summaries = [
         get_exploration_summary_from_model(exp_summary_model)
         for exp_summary_model in exp_summary_models]
@@ -368,21 +370,24 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
 
 def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id."""
+    keyed by their id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
 
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
-    keyed by their id."""
+    keyed by their id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_all())
 
 
 def get_private_at_least_viewable_exploration_summaries(user_id):
     """Returns a dict with all exploration summary domain objects that are
-    at least viewable by given user. The dict is keyed by exploration id."""
+    at least viewable by given user. The dict is keyed by exploration id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_private_at_least_viewable(
             user_id=user_id))
@@ -390,7 +395,8 @@ def get_private_at_least_viewable_exploration_summaries(user_id):
 
 def get_at_least_editable_exploration_summaries(user_id):
     """Returns a dict with all exploration summary domain objects that are
-    at least editable by given user. The dict is keyed by exploration id."""
+    at least editable by given user. The dict is keyed by exploration id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id))
@@ -514,9 +520,10 @@ def apply_change_list(exploration_id, change_list):
             elif (change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
-                # Eploration domain object automatically converts it to use the
-                # latest states schema version. As a result, simply resaving the
-                # exploration is sufficient to apply the states schema update.
+                # Exploration domain object automatically converts it to use
+                # the latest states schema version. As a result, simply
+                # resaving the exploration is sufficient to apply the states
+                # schema update.
                 continue
         return exploration
 
@@ -913,7 +920,7 @@ def update_exploration_summary(exploration_id):
 
 
 def get_summary_of_exploration(exploration):
-    """Create ExplorationSummary domain object for a given Exploration
+    """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
@@ -940,9 +947,9 @@ def get_summary_of_exploration(exploration):
 
 
 def save_exploration_summary(exp_summary):
-    """Save exploration summary domain object as ExpSummaryModel
-    entity in datastore."""
-
+    """Save an exploration summary domain object as an ExpSummaryModel entity
+    in the datastore.
+    """
     exp_summary_model = exp_models.ExpSummaryModel(
         id=exp_summary.id,
         title=exp_summary.title,
@@ -1096,7 +1103,7 @@ def load_demo(exploration_id):
     rights_manager.publish_exploration(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
     # Release ownership of all explorations.
-    rights_manager.release_ownership(
+    rights_manager.release_ownership_of_exploration(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])
@@ -1252,8 +1259,8 @@ def index_explorations_given_ids(exp_ids):
 
 def patch_exploration_search_document(exp_id, update):
     """Patches an exploration's current search document, with the values
-    from the 'update' dictionary."""
-
+    from the 'update' dictionary.
+    """
     doc = search_services.get_document_from_index(
         exp_id, SEARCH_INDEX_EXPLORATIONS)
     doc.update(update)

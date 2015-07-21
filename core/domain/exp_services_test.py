@@ -22,7 +22,6 @@ import os
 import StringIO
 import zipfile
 
-from core.domain import config_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs
@@ -31,14 +30,12 @@ from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
-from core.domain import rule_domain
 from core.domain import user_services
 from core.platform import models
-(base_models, exp_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration
+(exp_models,) = models.Registry.import_models([
+    models.NAMES.exploration
 ])
 search_services = models.Registry.import_search_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 from core.tests import test_utils
 import feconf
@@ -324,7 +321,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
 
 
-class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
+class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
@@ -1515,7 +1512,7 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(all_commits), 0)
 
 
-class SearchTests(ExplorationServicesUnitTests):
+class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
     def test_demo_explorations_are_added_to_search_index(self):
@@ -1698,11 +1695,13 @@ class SearchTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK + 30)
 
-        rating_services.assign_rating(self.OWNER_ID, self.EXP_ID, 5)
+        rating_services.assign_rating_to_exploration(
+            self.OWNER_ID, self.EXP_ID, 5)
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK + 40)
 
-        rating_services.assign_rating(self.user_id_admin, self.EXP_ID, 2)
+        rating_services.assign_rating_to_exploration(
+            self.user_id_admin, self.EXP_ID, 2)
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK + 38)
 
@@ -1717,12 +1716,14 @@ class SearchTests(ExplorationServicesUnitTests):
 
         # A user can (down-)rate an exploration at most once.
         for i in xrange(50):
-            rating_services.assign_rating('user_id_1', self.EXP_ID, 1)
+            rating_services.assign_rating_to_exploration(
+                'user_id_1', self.EXP_ID, 1)
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID), _BASE_SEARCH_RANK - 5)
 
         for i in xrange(50):
-            rating_services.assign_rating('user_id_%s' % i, self.EXP_ID, 1)
+            rating_services.assign_rating_to_exploration(
+                'user_id_%s' % i, self.EXP_ID, 1)
 
         # The rank will be at least 0.
         self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
@@ -1801,10 +1802,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             exp_summary, user_id=self.VIEWER_ID))
 
         # Owner makes viewer a viewer and editor an editor.
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
             rights_manager.ROLE_VIEWER)
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
 
@@ -1842,9 +1843,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (4) Albert edits the title of EXP_ID_1.
         - (5) Albert edits the title of EXP_ID_2.
         - (6) Bob reverts Albert's last edit to EXP_ID_1.
-        - (7) Albert deletes EXP_ID_1.
         - Bob tries to publish EXP_ID_2, and is denied access.
-        - (8) Albert publishes EXP_ID_2.
+        - (7) Albert publishes EXP_ID_2.
         """
         super(ExplorationServicesUnitTests, self).setUp()
 

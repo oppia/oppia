@@ -14,21 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""System for assigning and displaying ratings of explorations."""
+"""System for assigning and displaying ratings of explorations and collections.
+"""
 
 __author__ = 'Jacob Davis'
 
 import datetime
 
+from core.domain import collection_services
 from core.domain import exp_services
 from core.platform import models
 import feconf
-(exp_models, user_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user])
+(exp_models, collection_models, user_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.collection, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
-def assign_rating(user_id, exploration_id, new_rating):
+# Ratings functions for explorations.
+def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     """Records the rating awarded by the user to the exploration in both the
     user-specific data and exploration summary.
 
@@ -75,7 +78,7 @@ def assign_rating(user_id, exploration_id, new_rating):
     exp_services.save_exploration_summary(exploration_summary)
 
 
-def get_user_specific_rating(user_id, exploration_id):
+def get_user_specific_rating_for_exploration(user_id, exploration_id):
     """
     Returns:
         An integer 1-5, or None if there is no rating of this exploration by
@@ -86,7 +89,7 @@ def get_user_specific_rating(user_id, exploration_id):
     return exp_user_data_model.rating if exp_user_data_model else None
 
 
-def get_when_rated(user_id, exploration_id):
+def get_when_exploration_rated(user_id, exploration_id):
     """Returns the date-time the exploration was lasted rated by this user, or
     None if no such rating has been awarded.
 
@@ -98,6 +101,6 @@ def get_when_rated(user_id, exploration_id):
     return exp_user_data_model.rated_on if exp_user_data_model else None
 
 
-def get_overall_ratings(exploration_id):
+def get_overall_ratings_for_exploration(exploration_id):
     exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)
     return exp_summary.ratings

@@ -111,13 +111,13 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         ACTIVITY_ID = 'activity_id'
         subscription_services.subscribe_to_activity(USER_ID, ACTIVITY_ID)
         self.assertEqual(
-            subscription_services.get_activity_ids_subscribed_to(USER_ID), 
+            subscription_services.get_activity_ids_subscribed_to(USER_ID),
                 [ACTIVITY_ID])
 
         ACTIVITY_2_ID = 'activity_id_2'
         subscription_services.subscribe_to_activity(USER_ID, ACTIVITY_2_ID)
         self.assertEqual(
-            subscription_services.get_activity_ids_subscribed_to(USER_ID), 
+            subscription_services.get_activity_ids_subscribed_to(USER_ID),
             [ACTIVITY_ID, ACTIVITY_2_ID])
 
     def test_thread_and_activity_subscriptions_are_tracked_individually(self):
@@ -178,14 +178,14 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_activity_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, EXP_ID, self.owner_2_id, rights_manager.ROLE_OWNER)
         self.assertEqual(
             self._get_activity_ids_subscribed_to(self.owner_2_id), [EXP_ID])
 
         self.assertEqual(
             self._get_activity_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, EXP_ID, self.editor_id, rights_manager.ROLE_EDITOR)
         self.assertEqual(
             self._get_activity_ids_subscribed_to(self.editor_id), [EXP_ID])
@@ -198,7 +198,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_activity_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, EXP_ID, self.viewer_id, rights_manager.ROLE_VIEWER)
         self.assertEqual(
             self._get_activity_ids_subscribed_to(self.viewer_id), [])

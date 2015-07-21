@@ -119,7 +119,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
     def test_collaborators_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
         self.set_admins([self.OWNER_EMAIL])
@@ -150,7 +150,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
     def test_viewer_cannot_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         self.set_admins([self.OWNER_EMAIL])

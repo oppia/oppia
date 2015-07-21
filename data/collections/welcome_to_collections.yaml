@@ -1,0 +1,25 @@
+linked_explorations:
+  '0':
+    acquired_skills:
+    - Introduced to Oppia
+    prerequisite_skills: []
+  '2':
+    acquired_skills: []
+    prerequisite_skills:
+    - Introduced to Oppia
+  '4':
+    acquired_skills: []
+    prerequisite_skills:
+    - Introduced to Oppia
+  '14':
+    acquired_skills:
+    - Learned Oppia
+    prerequisite_skills:
+    - Introduced to Oppia
+  '15':
+    acquired_skills:
+    - Learned Gadgets
+    prerequisite_skills:
+    - Learned Oppia
+objective: To introduce collections using demo explorations.
+schema_version: 1

@@ -421,7 +421,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
-            rights_manager.assign_role(
+            rights_manager.assign_role_for_exploration(
                 user_a_id, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
             ModifiedRecentUpdatesAggregator.start_computation()
@@ -560,11 +560,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_activity', self._null_fn):
             # User A adds user B as an editor to the exploration.
-            rights_manager.assign_role(
+            rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
-            rights_manager.assign_role(
+            rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
@@ -610,12 +610,13 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_activity', self._null_fn):
             # User A adds user B as an editor to the exploration.
-            rights_manager.assign_role(
+            rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # The exploration becomes community-owned.
             rights_manager.publish_exploration(self.user_a_id, self.EXP_ID)
-            rights_manager.release_ownership(self.user_a_id, self.EXP_ID)
+            rights_manager.release_ownership_of_exploration(
+                self.user_a_id, self.EXP_ID)
             # User C edits the exploration.
             exp_services.update_exploration(
                 self.user_c_id, self.EXP_ID, [], 'Update exploration')

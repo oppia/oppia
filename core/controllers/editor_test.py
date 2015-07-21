@@ -440,7 +440,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             UNPUBLISHED_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
@@ -469,7 +469,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             PUBLISHED_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, PUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
