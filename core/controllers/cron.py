@@ -24,7 +24,7 @@ email_services = models.Registry.import_email_services()
 import feconf
 import utils
 
-from mapreduce.lib.pipeline import pipeline
+from pipeline import pipeline
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000

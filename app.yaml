@@ -3,6 +3,7 @@ version: 2-0-0-rc-2
 runtime: python27
 api_version: 1
 threadsafe: false
+instance_class: F4
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
@@ -87,7 +88,7 @@ handlers:
   http_headers:
     Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.0.0/mapreduce/lib/pipeline/ui/images
+  static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP

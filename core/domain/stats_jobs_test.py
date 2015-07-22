@@ -20,7 +20,6 @@ __author__ = 'Stephanie Federwisch'
 
 from core import jobs_registry
 from core.domain import event_services
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs
 from core.platform import models
