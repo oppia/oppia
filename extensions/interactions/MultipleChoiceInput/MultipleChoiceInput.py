@@ -61,9 +61,18 @@ class MultipleChoiceInput(base.BaseInteraction):
         'calculation_id': 'AnswerCounts',
     }, {
         # Table with answer counts.
+        # TODO(msl): add option 'title': 'All answers'
         'id': 'TwoColumnFrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count'],
+            'column_headers': ['Answer', 'Count']
         },
         'calculation_id': 'AnswerCounts',
+    }, {
+        # Table with answer counts for top N answers.
+        # TODO(msl): add option 'title': 'Top 5 answers'
+        'id': 'TwoColumnFrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count']
+        },
+        'calculation_id': 'Top5AnswerCounts',
     }]
