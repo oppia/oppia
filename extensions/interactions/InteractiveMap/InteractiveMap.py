@@ -62,3 +62,5 @@ class InteractiveMap(base.BaseInteraction):
         },
         'default_value': 0.0,
     }]
+
+    _answer_visualization_specs = []

@@ -34,3 +34,5 @@ class Continue(base.BaseInteraction):
         },
         'default_value': 'Continue',
     }]
+
+    _answer_visualization_specs = []

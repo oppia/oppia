@@ -20,11 +20,11 @@ import json
 
 from core import jobs
 from core.platform import models
+import feconf
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()
-import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -158,6 +158,8 @@ class StatisticsMRJobManager(
     """Job that calculates and creates stats models for exploration view.
        Includes: * number of visits to the exploration
                  * number of completions of the exploration
+       This deals with statistics of the whole exploration. See
+       stats_domain.StateAnswers for statistics of individual states.
     """
 
     _TYPE_STATE_COUNTER_STRING = 'counter'
@@ -444,3 +446,90 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     'all: %s sum:%s' % (
                         key, state_name, all_state_hit[state_name],
                         sum_state_hit[state_name]),)
+
+
+class InteractionAnswerSummariesMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+    """
+    Job to calculate interaction view statistics, e.g. most frequent
+    answers of multiple-choice interactions. Iterate over StateAnswer
+    objects and create StateAnswersCalcOutput objects.
+    """
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return InteractionAnswerSummariesAggregator
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import calculation_registry
+        from core.domain import interaction_registry
+
+        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
+                item):
+
+            # All visualizations desired for the interaction.
+            visualizations = interaction_registry.Registry.get_interaction_by_id(
+                item.interaction_id).answer_visualizations
+
+            # Get all desired calculations for the current state interaction id.
+            calc_ids = list(set(viz.calculation_id for viz in visualizations))
+            calculations = [
+                calculation_registry.Registry.get_calculation_by_id(calc_id)
+                for calc_id in calc_ids]
+
+            # Perform each calculation, and store the output.
+            for calc in calculations:
+                calc_output = calc.calculate_from_state_answers_entity(item)
+                calc_output.save()
+
+    @staticmethod
+    def reduce(id, state_answers_model):
+        pass
+
+
+class InteractionAnswerSummariesRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    num_starts = ndb.IntegerProperty(default=0)
+    num_completions = ndb.IntegerProperty(default=0)
+
+    
+class InteractionAnswerSummariesAggregator(
+        jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that listens to answers to states and
+    updates StateAnswer view calculations.
+    """
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return [
+            feconf.EVENT_TYPE_ANSWER_SUBMITTED]
+
+    @classmethod
+    def _get_realtime_datastore_class(cls):
+        return InteractionAnswerSummariesRealtimeModel
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return InteractionAnswerSummariesMRJobManager
+
+    # Public query methods.
+    @classmethod 
+    def get_calc_output(
+            cls, exploration_id, exploration_version, state_name, 
+            calculation_id):
+        """
+        Get state answers calculation output domain object obtained from 
+        StateAnswersCalcOutputModel instance stored in data store.
+        """
+        from core.domain import stats_domain
+        calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
+            exploration_id, exploration_version, state_name, calculation_id)
+        if calc_output_model:
+            return stats_domain.StateAnswersCalcOutput(
+                exploration_id, exploration_version, state_name, calculation_id,
+                calc_output_model.calculation_output)
+        else:
+            return None

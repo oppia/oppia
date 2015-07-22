@@ -52,3 +52,5 @@ class LogicProof(base.BaseInteraction):
             'default_proof_string': ''
         },
     }]
+
+    _answer_visualization_specs = []

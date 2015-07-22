@@ -28,3 +28,4 @@ class NumericInput(base.BaseInteraction):
     answer_type = 'Real'
 
     _customization_arg_specs = []
+    _answer_visualization_specs = []

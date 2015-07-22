@@ -130,13 +130,16 @@ oppia.controller('ExplorationStatistics', [
           },
           rulesStats: function() {
             return response.data.rules_stats;
+          },
+          visualizationsInfo: function() {
+            return response.data.visualizations_info;
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'stateName',
-          'stateStats', 'improvementType', 'rulesStats', function(
-             $scope, $modalInstance, stateName,
-             stateStats, improvementType, rulesStats) {
+          '$scope', '$modalInstance', '$filter', 'stateName', 'oppiaHtmlEscaper',
+          'stateStats', 'improvementType', 'rulesStats', 'visualizationsInfo', function(
+             $scope, $modalInstance, $filter, stateName, oppiaHtmlEscaper,
+             stateStats, improvementType, rulesStats, visualizationsInfo) {
           $scope.stateName = stateName;
           $scope.stateStats = stateStats;
           $scope.improvementType = improvementType;
@@ -168,6 +171,24 @@ oppia.controller('ExplorationStatistics', [
             }
             return false;
           };
+
+          var _getVisualizationsHtml = function() {
+            var htmlSnippets = [];
+
+            for (var i = 0; i < visualizationsInfo.length; i++) {
+              var el = $(
+                '<oppia-visualization-' +
+                $filter('camelCaseToHyphens')(visualizationsInfo[i].id) + '/>');
+              el.attr('data', oppiaHtmlEscaper.objToEscapedJson(
+                visualizationsInfo[i].data));
+              el.attr('options', oppiaHtmlEscaper.objToEscapedJson(
+                visualizationsInfo[i].options));
+              htmlSnippets.push(el.get(0).outerHTML);
+            }
+            return htmlSnippets.join('');
+          };
+
+          $scope.visualizationsHtml = _getVisualizationsHtml();
 
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
