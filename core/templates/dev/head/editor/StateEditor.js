@@ -34,6 +34,7 @@ oppia.controller('StateEditor', [
   $scope.isCurrentStateTerminal = false;
   $scope.isInteractionIdSet = false;
   $scope.isInteractionShown = false;
+  $scope.isInteractionTrainable = false;
 
   $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
@@ -44,6 +45,9 @@ oppia.controller('StateEditor', [
     $scope.isCurrentStateTerminal = (
       $scope.isInteractionIdSet && INTERACTION_SPECS[
         newInteractionId].is_terminal);
+    $scope.isInteractionTrainable = (
+      $scope.isInteractionIdSet && INTERACTION_SPECS[
+        newInteractionId].is_trainable);
   });
 
   $scope.initStateEditor = function() {
@@ -61,7 +65,10 @@ oppia.controller('StateEditor', [
       $scope.isCurrentStateTerminal = (
         $scope.isInteractionIdSet &&
         INTERACTION_SPECS[stateData.interaction.id].is_terminal);
-    }
+      $scope.isInteractionTrainable = (
+        $scope.isInteractionIdSet &&
+        INTERACTION_SPECS[stateData.interaction.id].is_trainable);
+      }
 
     if ($scope.content[0].value) {
       $scope.isInteractionShown = true;

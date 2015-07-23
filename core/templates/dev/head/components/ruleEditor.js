@@ -36,6 +36,9 @@ oppia.directive('ruleTypeSelector', [function() {
       var ruleTypesToDescriptions = INTERACTION_SPECS[
         stateInteractionIdService.savedMemento].rule_descriptions;
       for (var ruleType in ruleTypesToDescriptions) {
+        if (ruleType == 'FuzzyMatches') {
+          continue;
+        }
         numberOfRuleTypes++;
         choices.push({
           id: ruleType,
@@ -112,11 +115,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     controller: [
         '$scope', '$timeout', 'editorContextService', 'explorationStatesService',
         'routerService', 'validatorsService', 'responsesService',
-        'stateInteractionIdService', 'INTERACTION_SPECS',
+        'stateInteractionIdService', 'INTERACTION_SPECS', 'FUZZY_RULE_NAME',
         function(
-          $scope, $timeout, editorContextService, explorationStatesService, routerService,
-          validatorsService, responsesService, stateInteractionIdService,
-          INTERACTION_SPECS) {
+          $scope, $timeout, editorContextService, explorationStatesService,
+          routerService, validatorsService, responsesService,
+          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_NAME) {
       $scope.currentInteractionId = stateInteractionIdService.savedMemento;
       $scope.editRuleForm = {};
 
@@ -230,6 +233,15 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         }
       };
 
+      $scope.onDeleteTrainingDataEntry = function(index) {
+        if ($scope.rule.rule_type === FUZZY_RULE_NAME) {
+          var trainingData = $scope.rule.inputs.training_data;
+          if (index < trainingData.length) {
+            trainingData.splice(index, 1);
+          }
+        }
+      };
+
       $scope.cancelThisEdit = function() {
         $scope.onCancelRuleEdit();
       };
@@ -248,5 +260,34 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
       $scope.init();
     }]
+  };
+}]);
+
+oppia.directive('fuzzyRulePanel', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      ruleInputs: '=',
+      onTrainingDataDeletion: '&'
+    },
+    templateUrl: 'rules/fuzzyRulePanel',
+    controller: [
+      '$scope', 'oppiaExplorationService', 'stateInteractionIdService',
+      'stateCustomizationArgsService',
+      function($scope, oppiaExplorationService, stateInteractionIdService,
+          stateCustomizationArgsService) {
+        $scope.answerTemplates = [];
+        for (var i = 0; i < $scope.ruleInputs.training_data.length; i++) {
+          $scope.answerTemplates.push(oppiaExplorationService.getAnswerHtml(
+            $scope.ruleInputs.training_data[i],
+            stateInteractionIdService.savedMemento,
+            stateCustomizationArgsService.savedMemento));
+        }
+
+        $scope.deleteTrainingDataEntry = function(index) {
+          $scope.onTrainingDataDeletion({index: index});
+        };
+      }
+    ]
   };
 }]);

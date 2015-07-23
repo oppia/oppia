@@ -79,6 +79,8 @@ class BaseInteraction(object):
     # Whether this interaction should be considered terminal, i.e. it ends
     # the exploration. Defaults to False.
     is_terminal = False
+    # Whether this interaction supports training and fuzzy classification.
+    is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -163,6 +165,7 @@ class BaseInteraction(object):
             'description': self.description,
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
+            'is_trainable': self.is_trainable,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,

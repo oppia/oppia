@@ -196,6 +196,7 @@ oppia.factory('changeListService', [
     'widget_id': true,
     'answer_groups': true,
     'default_outcome': true,
+    'confirmed_unclassified_answers': true,
     'state_name': true,
     'content': true,
     'param_changes': true

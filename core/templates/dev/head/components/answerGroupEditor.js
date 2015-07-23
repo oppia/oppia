@@ -348,6 +348,10 @@ oppia.directive('outcomeFeedbackEditor', [function() {
             // If the first feedback is empty, copy no more feedback after.
             break;
           }
+          if (!feedback && i == 0) {
+            // If the first feedback is empty, copy no more feedback after.
+            break;
+          }
         }
         $scope.outcome.feedback = nonemptyFeedback;
       });

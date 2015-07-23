@@ -124,6 +124,20 @@ class Real(BaseObject):
     }
 
 
+class SetOfReal(BaseObject):
+    """Class for sets of Reals."""
+
+    description = 'A set (a list with unique elements) of real numbers.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Real.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }]
+    }
+
+
 class Int(BaseObject):
     """Integer class."""
 
@@ -199,6 +213,17 @@ class CodeEvaluation(BaseObject):
     }
 
 
+class ListOfCodeEvaluation(BaseObject):
+    """Class for lists of CodeEvaluations."""
+
+    description = 'A list of code and its evaluation results.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CodeEvaluation.SCHEMA
+    }
+
+
 class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
@@ -210,6 +235,17 @@ class CoordTwoDim(BaseObject):
         'type': 'list',
         'len': 2,
         'items': Real.SCHEMA,
+    }
+
+
+class ListOfCoordTwoDim(BaseObject):
+    """Class for lists of CoordTwoDims."""
+
+    description = 'A list of 2D coordinates.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CoordTwoDim.SCHEMA
     }
 
 
@@ -253,6 +289,21 @@ class NormalizedString(BaseObject):
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'normalize_spaces'
+        }]
+    }
+
+
+class SetOfNormalizedString(BaseObject):
+    """Class for sets of NormalizedStrings."""
+
+    description = (
+        'A set (a list with unique elements) of whitespace-collapsed strings.')
+
+    SCHEMA = {
+        'type': 'list',
+        'items': NormalizedString.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }
 
@@ -517,6 +568,17 @@ class Graph(BaseObject):
             raise TypeError('Cannot convert to graph %s' % raw)
 
         return raw
+
+
+class ListOfGraph(BaseObject):
+    """Class for lists of Graphs."""
+
+    description = 'A list of graphs.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Graph.SCHEMA
+    }
 
 
 class NormalizedRectangle2D(BaseObject):

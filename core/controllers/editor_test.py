@@ -67,7 +67,6 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
-        exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
         # Check that non-editors can access, but not edit, the editor page.
@@ -103,7 +102,6 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""
-        exp_services.delete_demo('0')
         exp_services.load_demo('0')
         CURRENT_VERSION = 1
 
@@ -175,7 +173,6 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
     def test_resolved_answers_handler(self):
-        exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
         # In the reader perspective, submit the first multiple-choice answer,
@@ -242,6 +239,78 @@ class EditorTest(BaseEditorControllerTest):
 
         self.logout()
 
+    def test_query_potential_training_data_handler(self):
+        # Load the fuzzy rules demo exploration.
+        exp_services.load_demo('16')
+
+        exploration_dict = self.get_json(
+            '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+        self.assertEqual(
+            exploration_dict['exploration']['title'],
+            'Demonstrating fuzzy rules')
+
+        # The initial interaction is numeric input and the goal is to input
+        # numbers which are similar to 15.
+        state_name = exploration_dict['exploration']['init_state_name']
+
+        # Input 15 since there is an explicit rule checking for that.
+        result_dict = self.submit_answer('16', state_name, '15')
+
+        # Input a number not at all similar to 15 (default outcome).
+        self.submit_answer('16', state_name, '98')
+
+        # Input 155: this is current training data and falls under the fuzzy
+        # rule.
+        self.submit_answer('16', state_name, '155')
+
+        # Input 157: this is not training data but will be classified under the
+        # fuzzy rule.
+        self.submit_answer('16', state_name, '157')
+
+        # Log in as an editor.
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/16')
+        csrf_token = self.get_csrf_token_from_response(response)
+        url = str('/createhandler/training_data/16/%s' % state_name)
+
+        exploration_dict = self.get_json(
+            '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+        state = exploration_dict['exploration']['states'][state_name]
+
+        # Only two of the four submitted answers should be unhandled.
+        response_dict = self.post_json(url, {'state': state}, csrf_token)
+        self.assertEqual(response_dict['unhandled_answers'], [98, 157])
+
+        # If the confirmed unclassified answers is trained for one of the
+        # values, it should no longer show up in unhandled answers.
+        state['interaction']['confirmed_unclassified_answers'] = ['98']
+        response_dict = self.post_json(url, {'state': state}, csrf_token)
+        self.assertEqual(response_dict['unhandled_answers'], [157])
+
+        # If one of the values is added to the training data of a fuzzy rule,
+        # then it should not be returned as an unhandled answer.
+        state['interaction']['confirmed_unclassified_answers'] = []
+        answer_group = state['interaction']['answer_groups'][1]
+        rule_spec = answer_group['rule_specs'][0]
+        self.assertEqual(rule_spec['rule_type'], 'FuzzyMatches')
+        rule_spec['inputs']['training_data'].append('157')
+        response_dict = self.post_json(url, {'state': state}, csrf_token)
+        self.assertEqual(response_dict['unhandled_answers'], [98])
+
+        # If both are classified, then nothing should be returned unhandled.
+        state['interaction']['confirmed_unclassified_answers'] = [98]
+        response_dict = self.post_json(url, {'state': state}, csrf_token)
+        self.assertEqual(response_dict['unhandled_answers'], [])
+
+        # If one of the existing training data elements in the fuzzy rule is
+        # removed (5 in this case), but it is not backed up by an answer, it
+        # will not be returned as potential training data.
+        del rule_spec['inputs']['training_data'][1]
+        response_dict = self.post_json(url, {'state': state}, csrf_token)
+        self.assertEqual(response_dict['unhandled_answers'], [])
+
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
@@ -252,6 +321,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -270,6 +340,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -288,6 +359,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -309,6 +381,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -508,7 +581,6 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
         self.EXP_ID = '0'
 
-        exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
@@ -623,7 +695,6 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
     def test_user_banning(self):
         """Test that banned users are banned."""
         EXP_ID = '0'
-        exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
 
         # Sign-up new editors Joe and Sandra.

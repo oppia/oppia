@@ -68,9 +68,11 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Graph objects."""
     
     def test_isisomorphic_rule(self):
-        self.assertTrue(graph.IsIsomorphicTo(_emptyGraph()).eval(_emptyGraph()))
-        self.assertTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_cycleGraph(5)))
-        self.assertTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval({
+        self.assertFuzzyTrue(
+            graph.IsIsomorphicTo(_emptyGraph()).eval(_emptyGraph()))
+        self.assertFuzzyTrue(
+            graph.IsIsomorphicTo(_cycleGraph(5)).eval(_cycleGraph(5)))
+        self.assertFuzzyTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval({
             'vertices': [{'label': '', 'x': 1.0, 'y': 1.0} for i in xrange(5)],
             'edges': [
                 {'src': i, 'dst': j, 'weight': 1} for i, j in 
@@ -80,7 +82,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertTrue(graph.IsIsomorphicTo({
+        self.assertFuzzyTrue(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0}, 
                 {'label': 'b', 'x': 2.0, 'y': 2.0}, 
@@ -105,7 +107,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': True
         }))
-        self.assertTrue(graph.IsIsomorphicTo({
+        self.assertFuzzyTrue(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0}, 
                 {'label': 'b', 'x': 2.0, 'y': 2.0}, 
@@ -132,7 +134,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': True,
             'isLabeled': True
         }))
-        self.assertTrue(graph.IsIsomorphicTo({
+        self.assertFuzzyTrue(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': '', 'x': 1.0, 'y': 1.0},
                 {'label': '', 'x': 2.0, 'y': 2.0}
@@ -156,12 +158,17 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertFalse(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_nullGraph(5)))
-        self.assertFalse(graph.IsIsomorphicTo(_nullGraph(5)).eval(_cycleGraph(5)))
-        self.assertFalse(graph.IsIsomorphicTo(_nullGraph(5)).eval(_nullGraph(6)))
-        self.assertFalse(graph.IsIsomorphicTo(_completeGraph(5)).eval(_cycleGraph(5)))
-        self.assertFalse(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_completeGraph(5)))
-        self.assertFalse(graph.IsIsomorphicTo({
+        self.assertFuzzyFalse(
+            graph.IsIsomorphicTo(_cycleGraph(5)).eval(_nullGraph(5)))
+        self.assertFuzzyFalse(
+            graph.IsIsomorphicTo(_nullGraph(5)).eval(_cycleGraph(5)))
+        self.assertFuzzyFalse(
+            graph.IsIsomorphicTo(_nullGraph(5)).eval(_nullGraph(6)))
+        self.assertFuzzyFalse(
+            graph.IsIsomorphicTo(_completeGraph(5)).eval(_cycleGraph(5)))
+        self.assertFuzzyFalse(
+            graph.IsIsomorphicTo(_cycleGraph(5)).eval(_completeGraph(5)))
+        self.assertFuzzyFalse(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0}, 
                 {'label': 'b', 'x': 2.0, 'y': 2.0}, 
@@ -188,7 +195,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': True,
             'isLabeled': True
         }))
-        self.assertFalse(graph.IsIsomorphicTo({
+        self.assertFuzzyFalse(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': '', 'x': 1.0, 'y': 1.0},
                 {'label': '', 'x': 2.0, 'y': 2.0}
@@ -211,7 +218,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': True,
             'isLabeled': False
         }))
-        self.assertFalse(graph.IsIsomorphicTo({
+        self.assertFuzzyFalse(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0},
                 {'label': 'b', 'x': 2.0, 'y': 2.0}

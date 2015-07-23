@@ -264,6 +264,9 @@ urls = [
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),
     get_redirect_route(
+        r'/explorehandler/batch_classify/<exploration_id>',
+        reader.BatchClassifyHandler, 'reader_batch_classify_handler'),
+    get_redirect_route(
         r'/explorehandler/rating/<exploration_id>',
         reader.RatingHandler, 'rating_handler'),
     get_redirect_route(
@@ -291,6 +294,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
+    get_redirect_route(
+        r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
+        editor.QueryPotentialTrainingDataHandler, 'training_data_handler'),
     get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),

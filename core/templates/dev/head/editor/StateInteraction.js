@@ -54,13 +54,13 @@ oppia.controller('StateInteraction', [
     'INTERACTION_SPECS', 'stateInteractionIdService',
     'stateCustomizationArgsService', 'editabilityService',
     'explorationStatesService', 'graphDataService',
-    'interactionDetailsCache',
+    'interactionDetailsCache', 'oppiaExplorationService',
     function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, changeListService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
-      interactionDetailsCache) {
+      interactionDetailsCache, oppiaExplorationService) {
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
   // interaction preview.
@@ -86,16 +86,8 @@ oppia.controller('StateInteraction', [
     if (!stateInteractionIdService.savedMemento) {
       return '';
     }
-
-    var el = $(
-      '<oppia-interactive-' +
-      $filter('camelCaseToHyphens')(stateInteractionIdService.savedMemento) + '/>');
-    for (var caName in interactionCustomizationArgs) {
-      el.attr(
-        $filter('camelCaseToHyphens')(caName) + '-with-value',
-        oppiaHtmlEscaper.objToEscapedJson(interactionCustomizationArgs[caName].value));
-    }
-    return el.get(0).outerHTML;
+    return oppiaExplorationService.getInteractionHtml(
+      stateInteractionIdService.savedMemento, interactionCustomizationArgs);
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -116,6 +108,8 @@ oppia.controller('StateInteraction', [
       'interactionId': stateData.interaction.id,
       'answerGroups': stateData.interaction.answer_groups,
       'defaultOutcome': stateData.interaction.default_outcome,
+      'confirmedUnclassifiedAnswers': (
+        stateData.interaction.confirmed_unclassified_answers)
     });
 
     _updateInteractionPreviewAndAnswerChoices();

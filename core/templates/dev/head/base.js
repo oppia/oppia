@@ -53,6 +53,11 @@ oppia.constant('CATEGORY_LIST', [
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 
+oppia.constant('DEFAULT_RULE_NAME', 'Default');
+
+oppia.constant('FUZZY_RULE_NAME', 'FuzzyMatches');
+
+oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
 // Global utility methods.
 oppia.controller('Base', [

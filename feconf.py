@@ -57,7 +57,7 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 5
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 6
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
@@ -75,6 +75,11 @@ FEEDBACK_TAB_PAGE_SIZE = 20
 DEFAULT_INIT_STATE_NAME = 'First Card'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# The threshold the truth value of an evaluated answer group must equal or
+# exceed in order to be considered a better classification than the default
+# group.
+DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
 # Default valid parameter for instantiating Explorations when explicit
 # skin customizations aren't provided.
@@ -256,6 +261,7 @@ DEMO_EXPLORATIONS = [
     # entire exploration as a dev demo.
     ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
      'Welcome'),
+    ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
 # TODO(sll): Add all other URLs here.

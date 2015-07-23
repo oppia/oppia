@@ -43,7 +43,7 @@ class RuleServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(rule_domain.get_rules_for_obj_type('NonnegativeInt')), 1)
         self.assertEqual(
-            len(rule_domain.get_rules_for_obj_type('Real')), 7)
+            len(rule_domain.get_rules_for_obj_type('Real')), 8)
         self.assertEqual(
             len(rule_domain.get_rules_for_obj_type('Null')), 0)
         self.assertEqual(
@@ -90,8 +90,11 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                 param_list = rule_domain.get_param_list(clazz.description)
 
                 for (param_name, param_obj_type) in param_list:
-                    # TODO(sll): Get rid of this special case.
-                    if param_obj_type.__name__ == 'NonnegativeInt':
+                    # TODO(sll): Get rid of these special cases.
+                    if param_obj_type.__name__ in [
+                            'NonnegativeInt', 'SetOfReal', 'ListOfGraph',
+                            'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
+                            'SetOfNormalizedString']:
                         continue
 
                     self.assertTrue(
@@ -114,6 +117,7 @@ class RuleFunctionUnitTests(test_utils.GenericTestBase):
                 'is equal to {{x|UnicodeString}}, taking case into account'),
             'Contains': 'contains {{x|UnicodeString}}',
             'Equals': 'is equal to {{x|UnicodeString}}',
+            'FuzzyMatches': 'is similar to {{training_data|SetOfUnicodeString}}',
             'MatchesBase64EncodedFile': (
                 'has same content as the file located at '
                 '{{filepath|UnicodeString}}'),

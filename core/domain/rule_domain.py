@@ -97,6 +97,10 @@ def get_param_list(description):
     return param_list
 
 
+CERTAIN_TRUE_VALUE = 1.0
+CERTAIN_FALSE_VALUE = 0.0
+
+
 class Rule(object):
     """Abstract base class for a value object that represents a rule.
 
@@ -138,8 +142,19 @@ class Rule(object):
         pass
 
     def _evaluate(self, subject):
-        """Returns a boolean indicating the truth value of the evaluation."""
+        """Returns a normalized value between 0 and 1 indicating the truth value
+        of the evaluation, where 1.0 is certainly true and 0.0 is certainly
+        false. This is to be implemented in overridden classes.
+        """
         raise NotImplementedError
+
+    def _fuzzify_truth_value(self, bool_value):
+        """Returns normalized truth value for a crisp true or false value."""
+        return CERTAIN_TRUE_VALUE if bool(bool_value) else CERTAIN_FALSE_VALUE
+
+    def _invert_fuzzy_truth_value(self, fuzzy_value):
+        """Performs a NOT operation on a fuzzy value."""
+        return CERTAIN_TRUE_VALUE - fuzzy_value
 
     def set_fs(self, fs):
         """Set an abstract file system to use with this rule."""

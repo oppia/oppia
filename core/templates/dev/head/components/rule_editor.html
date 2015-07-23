@@ -1,12 +1,10 @@
 <div style="position: relative;">
   <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
-    <div>
+    <div ng-if="rule.rule_type != 'FuzzyMatches'">
       <rule-type-selector class="protractor-test-answer-description" local-value="rule.rule_type" on-selection-change="onSelectNewRuleType">
       </rule-type-selector>
-    </div>
 
-    <div>
-      <span ng-repeat="item in ruleDescriptionFragments track by $index" class="protractor-test-answer-description-fragment" style="margin-right: 5px; width: 100%;">
+      <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-answer-description-fragment" style="margin-right: 5px; width: 100%;">
         <span ng-if="item.type == 'select'" style="color: black;">
           <span ng-if="ruleDescriptionChoices.length === 1">
             "<[ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
@@ -25,6 +23,10 @@
         </span>
       </span>
     </div>
+    <div ng-if="rule.rule_type == 'FuzzyMatches'">
+      <fuzzy-rule-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
+      </fuzzy-rule-panel>
+    </div>
   </form>
 
   <div class="oppia-rule-save-cancel-buttons" ng-if="isEditingRuleInline()">
@@ -36,3 +38,15 @@
     <div style="clear: both;"></div>
   </div>
 </div>
+
+<script type="text/ng-template" id="rules/fuzzyRulePanel">
+  is similar to
+
+  <ul>
+    <li ng-repeat="data in ruleInputs.training_data">
+      <div angular-html-bind="answerTemplates[$index]">
+      </div>
+      <span class="glyphicon glyphicon-trash oppia-editor-trash-icon" ng-click="deleteTrainingDataEntry($index)"></span>
+    </li>
+  </ul>
+</script>

@@ -103,7 +103,19 @@ oppia.factory('answerClassificationService', [
           answer: answer
         });
       }
-    }
+    },
+    getMatchingBatchClassificationResult: function(
+        explorationId, oldState, answers) {
+      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
+        // TODO(bhenning): Figure out a long-term solution for determining what
+        // params should be passed to the batch classifier.
+        var classifyUrl = '/explorehandler/batch_classify/' + explorationId;
+        return $http.post(classifyUrl, {
+          old_state: oldState,
+          answers: answers
+        });
+      }
+    },
   };
 }]);
 
@@ -120,19 +132,17 @@ oppia.factory('answerClassificationService', [
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
-    'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
-    'extensionTagAssemblerService', 'INTERACTION_SPECS', 'explorationContextService',
-    'PAGE_CONTEXT',
+    'answerClassificationService', 'stateTransitionService',
+    'extensionTagAssemblerService', 'INTERACTION_SPECS',
+    'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
+    'PAGE_CONTEXT', 'oppiaExplorationService',
     function(
       $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
-      extensionTagAssemblerService, INTERACTION_SPECS, explorationContextService,
-      PAGE_CONTEXT) {
-  var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
-  var _NULL_INTERACTION_HTML = (
-    '<span style="color: red;"><strong>Error</strong>: No interaction specified.</span>');
-
+      answerClassificationService, stateTransitionService,
+      extensionTagAssemblerService, INTERACTION_SPECS,
+      INTERACTION_DISPLAY_MODE_INLINE, explorationContextService,
+      PAGE_CONTEXT, oppiaExplorationService) {
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _introCardImageUrl = null;
@@ -157,26 +167,6 @@ oppia.factory('oppiaPlayerService', [
     stateHistory.push(_currentStateName);
   };
 
-  // TODO(sll): Move this (and the corresponding code in the exploration editor) to
-  // a common standalone service.
-  var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
-    if (!interactionId) {
-      return _NULL_INTERACTION_HTML;
-    }
-
-    var el = $(
-      '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
-
-    el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
-      el, interactionCustomizationArgSpecs);
-
-    if (labelForFocusTarget) {
-      el.attr('label-for-focus-target', labelForFocusTarget);
-    }
-
-    return ($('<div>').append(el)).html();
-  };
-
   var stopwatch = stopwatchProviderService.getInstance();
 
   var _onStateTransitionProcessed = function(
@@ -188,7 +178,7 @@ oppia.factory('oppiaPlayerService', [
     var refreshInteraction = (
       oldStateName !== newStateName ||
       INTERACTION_SPECS[oldStateInteractionId].display_mode ===
-        _INTERACTION_DISPLAY_MODE_INLINE);
+        INTERACTION_DISPLAY_MODE_INLINE);
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -358,7 +348,7 @@ oppia.factory('oppiaPlayerService', [
       return _currentStateName;
     },
     getInteractionHtml: function(stateName, labelForFocusTarget) {
-      return _getInteractionHtml(
+      return oppiaExplorationService.getInteractionHtml(
         _exploration.states[stateName].interaction.id,
         _exploration.states[stateName].interaction.customization_args,
         labelForFocusTarget);
@@ -371,7 +361,7 @@ oppia.factory('oppiaPlayerService', [
       return (
         interactionId &&
         INTERACTION_SPECS[interactionId].display_mode ===
-          _INTERACTION_DISPLAY_MODE_INLINE);
+          INTERACTION_DISPLAY_MODE_INLINE);
     },
     isStateTerminal: function(stateName) {
       return stateName && _exploration.states[stateName].interaction.id &&
@@ -398,22 +388,10 @@ oppia.factory('oppiaPlayerService', [
       return !!_editorPreviewMode;
     },
     getAnswerAsHtml: function(answer) {
-      var currentInteraction = _exploration.states[_currentStateName].interaction;
-      var currentInteractionId = currentInteraction.id;
-
-      // TODO(sll): Get rid of this special case for multiple choice.
-      var currentInteractionChoices = null;
-      if (currentInteraction.customization_args.choices) {
-        currentInteractionChoices = currentInteraction.customization_args.choices.value;
-      }
-
-      var el = $(
-        '<oppia-response-' + $filter('camelCaseToHyphens')(currentInteractionId) + '>');
-      el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
-      if (currentInteractionChoices) {
-        el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(currentInteractionChoices));
-      }
-      return ($('<div>').append(el)).html();
+      var currentInteraction = _exploration.states[
+        _currentStateName].interaction;
+      return oppiaExplorationService.getAnswerHtml(
+        answer, currentInteraction, currentInteraction.customization_args);
     },
     submitAnswer: function(answer, successCallback) {
       if (answerIsBeingProcessed) {

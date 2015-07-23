@@ -25,35 +25,35 @@ class Equals(base.RealRule):
     description = 'is equal to {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject == self.x
+        return self._fuzzify_truth_value(subject == self.x)
 
 
 class IsLessThan(base.RealRule):
     description = 'is less than {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject < self.x
+        return self._fuzzify_truth_value(subject < self.x)
 
 
 class IsGreaterThan(base.RealRule):
     description = 'is greater than {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject > self.x
+        return self._fuzzify_truth_value(subject > self.x)
 
 
 class IsLessThanOrEqualTo(base.RealRule):
     description = 'is less than or equal to {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject <= self.x
+        return self._fuzzify_truth_value(subject <= self.x)
 
 
 class IsGreaterThanOrEqualTo(base.RealRule):
     description = 'is greater than or equal to {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject >= self.x
+        return self._fuzzify_truth_value(subject >= self.x)
 
 
 class IsInclusivelyBetween(base.RealRule):
@@ -63,7 +63,7 @@ class IsInclusivelyBetween(base.RealRule):
         assert self.a <= self.b
 
     def _evaluate(self, subject):
-        return self.a <= subject <= self.b
+        return self._fuzzify_truth_value(self.a <= subject <= self.b)
 
 
 class IsWithinTolerance(base.RealRule):
@@ -73,3 +73,31 @@ class IsWithinTolerance(base.RealRule):
         return IsInclusivelyBetween(
             self.x - self.tol, self.x + self.tol
         )._evaluate(subject)
+
+
+class FuzzyMatches(base.RealRule):
+    description = 'is similar to {{training_data|SetOfReal}}'
+
+    def _evaluate(self, subject):
+        # For simple classification, this computes the inverse absolute
+        # distances between the input value and all values in the training set.
+        # The largest value is used as the "membership certainty" of the input
+        # value belonging to this cluster.
+
+        # If no training data exists, then this real value cannot belong to the
+        # cluster.
+        if len(self.training_data) == 0:
+            return self._fuzzify_truth_value(False)
+
+        def _compute_certainty(v1, v2):
+            abs_dist = abs(v1 - v2)
+            if abs_dist < 1:
+                return 1
+            return 1 / abs_dist
+
+        best_certainty = _compute_certainty(subject, self.training_data[0])
+        for value in self.training_data:
+            best_certainty = max(
+                best_certainty, _compute_certainty(subject, value))
+
+        return best_certainty

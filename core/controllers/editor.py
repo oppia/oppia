@@ -490,6 +490,49 @@ class ResolvedAnswersHandler(EditorHandler):
         self.render_json({})
 
 
+class QueryPotentialTrainingDataHandler(EditorHandler):
+    """Queries for answers which have been classified as a default or fuzzy
+    rule but are not part of the training data of any fuzzy rules in a given
+    state and have not been confirmed as being associated with the default
+    outcome.
+    """
+
+    def post(self, exploration_id, escaped_state_name):
+        """Handles POST requests."""
+        state_name = self.unescape_state_name(escaped_state_name)
+        state = exp_domain.State.from_dict(self.payload.get('state'))
+
+        answers = set(stats_services.get_state_rule_answers(
+            exploration_id, state_name, [
+                exp_domain.DEFAULT_RULESPEC_STR, 'FuzzyMatches']))
+
+        interaction_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                state.interaction.id))
+        normalized_answers = set([
+            interaction_instance.normalize_answer(answer)
+            for answer in answers
+        ])
+
+        training_data = set()
+        for answer_group in state.interaction.answer_groups:
+            for rule_spec in answer_group.rule_specs:
+                if rule_spec.rule_type == 'FuzzyMatches':
+                    training_data.update(set(
+                        interaction_instance.normalize_answer(trained)
+                        for trained in rule_spec.inputs['training_data']))
+
+        # Include all the answers which have been confirmed to be associated
+        # with the default outcome.
+        training_data.update(set(
+            interaction_instance.normalize_answer(confirmed)
+            for confirmed in state.interaction.confirmed_unclassified_answers))
+
+        self.render_json({
+            'unhandled_answers': list(normalized_answers - training_data)
+        })
+
+
 class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states."""

@@ -54,21 +54,21 @@ class CheckedProofRuleUnitTests(test_utils.GenericTestBase):
 
     def test_correct_rule(self):
         rule = checked_proof.Correct()
-        self.assertTrue(rule.eval(self.correct_example))
-        self.assertFalse(rule.eval(self.incorrect_example_parsing))
-        self.assertFalse(rule.eval(self.incorrect_example_typing))
+        self.assertFuzzyTrue(rule.eval(self.correct_example))
+        self.assertFuzzyFalse(rule.eval(self.incorrect_example_parsing))
+        self.assertFuzzyFalse(rule.eval(self.incorrect_example_typing))
 
     def test_not_correct_rule(self):
         rule = checked_proof.NotCorrect()
-        self.assertFalse(rule.eval(self.correct_example))
-        self.assertTrue(rule.eval(self.incorrect_example_parsing))
-        self.assertTrue(rule.eval(self.incorrect_example_typing))
+        self.assertFuzzyFalse(rule.eval(self.correct_example))
+        self.assertFuzzyTrue(rule.eval(self.incorrect_example_parsing))
+        self.assertFuzzyTrue(rule.eval(self.incorrect_example_typing))
 
     def test_not_correct_by_category_rule(self):
         rule = checked_proof.NotCorrectByCategory('typing')
-        self.assertFalse(rule.eval(self.correct_example))
-        self.assertFalse(rule.eval(self.incorrect_example_parsing))
-        self.assertTrue(rule.eval(self.incorrect_example_typing))
+        self.assertFuzzyFalse(rule.eval(self.correct_example))
+        self.assertFuzzyFalse(rule.eval(self.incorrect_example_parsing))
+        self.assertFuzzyTrue(rule.eval(self.incorrect_example_typing))
 
 
 

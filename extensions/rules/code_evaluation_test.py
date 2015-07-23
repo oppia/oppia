@@ -28,25 +28,25 @@ class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):
     def test_output_equals_rule(self):
         rule = code_evaluation.OutputEquals('1')
 
-        self.assertTrue(rule.eval({
+        self.assertFuzzyTrue(rule.eval({
             'code': 'hello',
             'output': '1',
             'evaluation': '',
             'error': ''
         }))
-        self.assertTrue(rule.eval({
+        self.assertFuzzyTrue(rule.eval({
             'code': 'hello',
             'output': '\n1\n     ',
             'evaluation': '',
             'error': ''
         }))
-        self.assertFalse(rule.eval({
+        self.assertFuzzyFalse(rule.eval({
             'code': 'hello',
             'output': '',
             'evaluation': '',
             'error': ''
         }))
-        self.assertFalse(rule.eval({
+        self.assertFuzzyFalse(rule.eval({
             'code': 'hello',
             'output': 'bad output',
             'evaluation': '',

@@ -111,6 +111,12 @@ def _migrate_states_schema(versioned_exploration_states):
             versioned_exploration_states)
         exploration_states_schema_version = 5
 
+    # Check for conversion to v6.
+    if exploration_states_schema_version == 5:
+        exp_domain.Exploration.update_states_v5_to_v6_from_model(
+            versioned_exploration_states)
+        exploration_states_schema_version = 6
+
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -488,6 +494,10 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     state.update_interaction_default_outcome(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
+                    state.update_interaction_confirmed_unclassified_answers(
+                        change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
