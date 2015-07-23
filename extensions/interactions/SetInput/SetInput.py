@@ -29,4 +29,29 @@ class SetInput(base.BaseInteraction):
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
     _customization_arg_specs = []
-    _answer_visualization_specs = []
+
+    _answer_visualization_specs = [{
+        # Table with answer counts.
+        # TODO(msl): add option 'title': 'All answers'
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count']
+        },
+        'calculation_id': 'AnswerCounts',
+    }, {
+        # Table with answer counts for top N answers.
+        # TODO(msl): add option 'title': 'Top 5 answers'
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count']
+        },
+        'calculation_id': 'Top5AnswerCounts',
+    }, {
+        # Table with most commonly submitted elements of set.
+        # TODO(msl): add option 'title': 'Commonly submitted elements'
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Element', 'Count']
+        },
+        'calculation_id': 'FrequencyCommonlySubmittedElements',
+    }]

@@ -81,6 +81,10 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         # TODO(msl): remove old answer recording models.
+
+	# In the old framework, answers are converted to unicode even when they
+	# are noot strings. This will be removed when migrating to the new
+	# framework.
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
             rule_spec_string, unicode(answer))

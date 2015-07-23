@@ -81,10 +81,14 @@ class AnswerCounts(BaseCalculation):
 
     def calculate_from_state_answers_entity(self, state_answers):
         """Computes the number of occurrences of each answer, and returns a
-        list of dicts; each dict has keys 'answer_value' and 'count'.
+        list of dicts; each dict has keys 'answer' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
+
+        # The words 'counts' and 'frequency' are used interchangeably and
+        # have the same meaning, referring to how often some answer was given.
+        # TODO(msl): Only use frequency everywhere to be more consistent?
 
         answer_values = [answer_dict['answer_value'] for answer_dict 
                           in state_answers.answers_list]
@@ -105,3 +109,81 @@ class AnswerCounts(BaseCalculation):
             state_answers.state_name,
             self.id,
             calculation_output)
+
+
+class Top5AnswerCounts(BaseCalculation):
+    """Class for calculating answer counts for top 5 answers.
+    """
+
+    def calculate_from_state_answers_entity(self, state_answers):
+        """Computes the number of occurrences of each answer, keeping only 
+        the top 5 answers, and returns a list of dicts; each dict has keys
+        'answer' and 'frequency'.
+
+        This method is run from within the context of a MapReduce job.
+        """
+
+        answer_values = [answer_dict['answer_value'] for answer_dict 
+                          in state_answers.answers_list]
+
+        top_5_answer_counts_as_list_of_pairs = (
+            sorted(collections.Counter(answer_values).items(),
+                   key=lambda x: x[1],
+                   reverse=True)[:5])
+        
+        calculation_output = []
+        for item in top_5_answer_counts_as_list_of_pairs:
+            calculation_output.append({
+                'answer': item[0],
+                'frequency': item[1],
+            })
+        
+        return stats_domain.StateAnswersCalcOutput(
+            state_answers.exploration_id,
+            state_answers.exploration_version,
+            state_answers.state_name,
+            self.id,
+            calculation_output)
+
+class FrequencyCommonlySubmittedElements(BaseCalculation):
+    """Class for calculating commonly submitted elements of answers that
+    are sets.
+    """
+
+    def calculate_from_state_answers_entity(self, state_answers):
+        """Computes the number of occurrences of each element across
+        all given answers, keeping only the top 10 elements. Returns a 
+        list of dicts; each dict has keys 'element' and 'frequency'.
+
+        This method is run from within the context of a MapReduce job.
+        """
+
+        # get a list of sets
+        answer_values = [answer_dict['answer_value'] for answer_dict 
+                          in state_answers.answers_list]
+
+        # convert to a list of all elements
+        list_of_all_elements = [item 
+                                 for myset in answer_values 
+                                 for item in myset]
+
+        # Get top 10 elements
+        top_10_elements_as_list_of_pairs = (
+            sorted(collections.Counter(list_of_all_elements).items(),
+                   key=lambda x: x[1],
+                   reverse=True)[:10])
+        
+        calculation_output = []
+        for item in top_10_elements_as_list_of_pairs:
+            calculation_output.append({
+                'element': item[0],
+                'frequency': item[1],
+            })
+        
+        return stats_domain.StateAnswersCalcOutput(
+            state_answers.exploration_id,
+            state_answers.exploration_version,
+            state_answers.state_name,
+            self.id,
+            calculation_output)
+
