@@ -95,18 +95,11 @@ oppia.directive('oppiaResponseImageClickInput', [
       scope: {},
       templateUrl: 'response/ImageClickInput',
       controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-        // TODO(czxcjx): Add image to response template when there's an easier
-        // way to access customization args from here
-        $scope.isHoveringOverResponse = false;
-        $scope.onMouseoverDiv = function(evt) {
-          $scope.isHoveringOverResponse = true;
-        };
-        $scope.onMouseoutDiv = function(evt) {
-          $scope.isHoveringOverResponse = false;
-        };
-        $scope.onMousemoveDiv = function(evt) {
-        };
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+
+        $scope.clickRegionLabel = '(Clicks on ' + (
+          _answer.clickedRegions.length > 0 ?
+          '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
       }]
     };
   }
