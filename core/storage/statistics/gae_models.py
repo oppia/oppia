@@ -34,9 +34,6 @@ MAX_ANSWER_HASH_LEN = 100
 # pointless and should be removed.
 _OLD_SUBMIT_HANDLER_NAME = 'submit'
 
-def hash_answer(answer):
-    return utils.convert_to_hash(answer, MAX_ANSWER_HASH_LEN)
-
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
@@ -64,10 +61,6 @@ class StateCounterModel(base_models.BaseModel):
         if not counter:
             counter = cls(id=instance_id)
         return counter
-
-    def get_exploration_id_and_state_name(self):
-        first_dot_loc = self.id.find('.')
-        return self.id[:first_dot_loc], self.id[first_dot_loc + 1:]
 
 
 class StateRuleAnswerLogModel(base_models.BaseModel):

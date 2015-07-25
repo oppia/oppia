@@ -238,7 +238,6 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.EXP_DATA['exp_id_3']['owner_id'] = self.USER_DATA['bob']['id']
         self.EXP_DATA['exp_id_4']['owner_id'] = self.USER_DATA['charlie']['id']
 
-        self.explorations = []
         for exp_id, exp in self.EXP_DATA.iteritems():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
