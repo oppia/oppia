@@ -143,11 +143,12 @@ class RatingServicesTests(test_utils.GenericTestBase):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, '2')
 
         with self.assertRaisesRegexp(
-                ValueError, 'Expected a rating 1-5, received: aaa'):
+                ValueError,
+                'Expected the rating to be an integer, received: aaa'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 'aaa')
 
     def test_invalid_exploration_ids_are_forbidden(self):
         with self.assertRaisesRegexp(
                 Exception, 'Invalid exploration id invalid_id'):
-            rating_services.assign_rating(self.USER_ID_1, 'invalid_id', '3')
+            rating_services.assign_rating(self.USER_ID_1, 'invalid_id', 3)
 

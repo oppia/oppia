@@ -39,7 +39,7 @@ def assign_rating(user_id, exploration_id, new_rating):
 
     if not isinstance(new_rating, int):
         raise ValueError(
-            'Expected the rating to be an integer, received %s' % new_rating)
+            'Expected the rating to be an integer, received: %s' % new_rating)
 
     ALLOWED_RATINGS = [1, 2, 3, 4, 5]
     if new_rating not in ALLOWED_RATINGS:

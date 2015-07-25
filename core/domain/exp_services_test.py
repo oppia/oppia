@@ -2099,6 +2099,11 @@ tags: []
         self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
 
+        # Create exploration that uses a states schema version of 0 and ensure
+        # it is properly converted.
+        old_exp_model = self.save_new_exp_with_states_schema_v0(
+            self.OLD_EXP_ID, self.ALBERT_ID, 'Old Title')
+
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
             self.NEW_EXP_ID, self.ALBERT_ID)
