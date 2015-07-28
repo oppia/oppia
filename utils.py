@@ -32,11 +32,6 @@ import yaml
 import zipfile
 
 
-# Sentinel value for schema verification, indicating that a value can take any
-# type.
-ANY_TYPE = 1
-
-
 class InvalidInputException(Exception):
     """Error class for invalid input."""
     pass

@@ -28,8 +28,6 @@ import utils
 
 from google.appengine.ext import ndb
 
-MAX_ANSWER_HASH_LEN = 100
-
 # TODO(bhenning): Everything is handler name submit; therefore, it is
 # pointless and should be removed.
 _OLD_SUBMIT_HANDLER_NAME = 'submit'

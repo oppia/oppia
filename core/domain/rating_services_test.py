@@ -130,25 +130,24 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
     def test_invalid_ratings_are_forbidden(self):
         with self.assertRaisesRegexp(
-                ValueError, 'Expected a rating 1-5, received: 0'):
+                ValueError, 'Expected a rating 1-5, received 0'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 0)
 
         with self.assertRaisesRegexp(
-                ValueError, 'Expected a rating 1-5, received: 7'):
+                ValueError, 'Expected a rating 1-5, received 7'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 7)
 
         with self.assertRaisesRegexp(
                 ValueError,
-                'Expected the rating to be an integer, received: 2'):
+                'Expected the rating to be an integer, received 2'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, '2')
 
         with self.assertRaisesRegexp(
                 ValueError,
-                'Expected the rating to be an integer, received: aaa'):
+                'Expected the rating to be an integer, received aaa'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 'aaa')
 
     def test_invalid_exploration_ids_are_forbidden(self):
         with self.assertRaisesRegexp(
                 Exception, 'Invalid exploration id invalid_id'):
             rating_services.assign_rating(self.USER_ID_1, 'invalid_id', 3)
-
