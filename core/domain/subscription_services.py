@@ -57,13 +57,14 @@ def subscribe_to_activity(user_id, activity_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if (activity_id not in subscriptions_model.activity_ids):
+    if activity_id not in subscriptions_model.activity_ids:
         subscriptions_model.activity_ids.append(activity_id)
         subscriptions_model.put()
 
 
 def get_activity_ids_subscribed_to(user_id):
-    """Returns a list with all subscriptions' ids of given user.
+    """Returns a list with all ids of all activities (i.e., explorations and
+    collections) that the given user subscribes to.
 
     Callers of this function should ensure that the user_id is valid.
     """
@@ -75,8 +76,7 @@ def get_activity_ids_subscribed_to(user_id):
 
 
 def subscribe_to_collection(user_id, collection_id):
-    """Subscribes a user to a collection (and, therefore, indirectly to all
-    feedback threads for that collection).
+    """Subscribes a user to a collection.
 
     Callers of this function should ensure that the user_id and collection_id
     are valid.
@@ -86,13 +86,13 @@ def subscribe_to_collection(user_id, collection_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if (collection_id not in subscriptions_model.collection_ids):
+    if collection_id not in subscriptions_model.collection_ids:
         subscriptions_model.collection_ids.append(collection_id)
         subscriptions_model.put()
 
 
 def get_collection_ids_subscribed_to(user_id):
-    """Returns a list with all subscriptions' ids of given user.
+    """Returns a list with all collections that the given user subscribes to.
 
     Callers of this function should ensure that the user_id is valid.
     """

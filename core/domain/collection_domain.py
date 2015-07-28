@@ -31,16 +31,18 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-LINKED_EXPLORATION_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
-LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
+COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
 # This takes an additional 'exploration_id' parameter.
-CMD_ADD_EXPLORATION = 'add_exploration'
+CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.
-CMD_DELETE_EXPLORATION = 'delete_exploration'
-# This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_LINKED_EXPLORATION_PROPERTY = 'edit_linked_exploration_property'
-# This takes additional 'property_name' and 'new_value' parameters.
+CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
+# This takes additional 'property_name' and 'new_value' parameters and,
+# optionally, 'old_value'.
+CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
+# This takes additional 'property_name' and 'new_value' parameters and,
+# optionally, 'old_value'.
 CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
@@ -55,9 +57,9 @@ class CollectionChange(object):
     cmd keys that already exist.
     """
 
-    LINKED_EXPLORATION_PROPERTIES = (
-        LINKED_EXPLORATION_PROPERTY_PREREQUISITE_SKILLS,
-        LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS)
+    COLLECTION_NODE_PROPERTIES = (
+        COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
+        COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS)
 
     COLLECTION_PROPERTIES = ('title', 'category', 'objective')
 
@@ -69,29 +71,29 @@ class CollectionChange(object):
 
         The possible values for 'cmd' are listed below, together with the other
         keys in the dict:
-        - 'add_exploration' (with exploration_id)
-        - 'delete_exploration' (with exploration_id)
-        - 'edit_linked_exploration_property' (with exploration_id,
+        - 'add_collection_node' (with exploration_id)
+        - 'delete_collection_node' (with exploration_id)
+        - 'edit_collection_node_property' (with exploration_id,
             property_name, new_value and, optionally, old_value)
         - 'edit_collection_property' (with property_name, new_value and,
             optionally, old_value)
         - 'migrate_schema' (with from_version and to_version)
 
-        For a linked exploration, property_name must be one of
-        LINKED_EXPLORATION_PROPERTIES. For a collection, property_name must be
+        For a collection node, property_name must be one of
+        COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
         one of COLLECTION_PROPERTIES.
         """
         if 'cmd' not in change_dict:
             raise Exception('Invalid change_dict: %s' % change_dict)
         self.cmd = change_dict['cmd']
 
-        if self.cmd == CMD_ADD_EXPLORATION:
+        if self.cmd == CMD_ADD_COLLECTION_NODE:
             self.exploration_id = change_dict['exploration_id']
-        elif self.cmd == CMD_DELETE_EXPLORATION:
+        elif self.cmd == CMD_DELETE_COLLECTION_NODE:
             self.exploration_id = change_dict['exploration_id']
-        elif self.cmd == CMD_EDIT_LINKED_EXPLORATION_PROPERTY:
+        elif self.cmd == CMD_EDIT_COLLECTION_NODE_PROPERTY:
             if (change_dict['property_name'] not in
-                    self.LINKED_EXPLORATION_PROPERTIES):
+                    self.COLLECTION_NODE_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.exploration_id = change_dict['exploration_id']
             self.property_name = change_dict['property_name']
@@ -147,9 +149,21 @@ class CollectionCommitLogEntry(object):
         }
 
 
-class LinkedExploration(object):
-    """Domain object for an exploration which is part of a collection."""
+class CollectionNode(object):
+    """Domain object describing a node in the exploration graph of a
+    collection. The node contains various information, including a reference to
+    an exploration (its ID), prerequisite skills in order to be qualified to
+    play the exploration, and acquired skills attained once the exploration is
+    completed.
+    """
 
+    """Constructs a new CollectionNode object.
+
+    Args:
+        exploration_id: A valid ID of an exploration referenced by this node.
+        prerequisite_skills: A list of skills (strings).
+        acquired_skills: A list of skills (strings).
+    """
     def __init__(self, exploration_id, prerequisite_skills, acquired_skills):
         self.exploration_id = exploration_id
         self.prerequisite_skills = prerequisite_skills
@@ -157,34 +171,27 @@ class LinkedExploration(object):
 
     def to_dict(self):
         return {
+            'exploration_id': self.exploration_id,
             'prerequisite_skills': self.prerequisite_skills,
             'acquired_skills': self.acquired_skills
         }
 
     @classmethod
-    def from_dict(cls, exploration_id, linked_exploration_dict):
+    def from_dict(cls, collection_node_dict):
         return cls(
-            exploration_id,
-            copy.deepcopy(linked_exploration_dict['prerequisite_skills']),
-            copy.deepcopy(linked_exploration_dict['acquired_skills']))
-
-    @property
-    def exploration(self):
-        from core.domain import exp_services
-        return exp_services.get_exploration_by_id(self.exploration_id)
+            copy.deepcopy(collection_node_dict['exploration_id']),
+            copy.deepcopy(collection_node_dict['prerequisite_skills']),
+            copy.deepcopy(collection_node_dict['acquired_skills']))
 
     @property
     def skills(self):
-        """The skills of a linked exploration is a unique set of both the
-        prerequisite and acquired skills of this exploration, within the
-        context of a collection.
+        """Returns a set of skills where each prerequisite and acquired skill
+        in this collection node is represented at most once.
         """
         return set(self.prerequisite_skills) | set(self.acquired_skills)
 
     def update_prerequisite_skills(self, prerequisite_skills):
-        prerequiste_and_acquired_skills = (
-          set(prerequisite_skills) & set(self.acquired_skills))
-        if prerequiste_and_acquired_skills:
+        if set(prerequisite_skills) & set(self.acquired_skills):
             raise utils.ValueError(
                 'No prerequisite skills may also be acquired skills: %s' %
                 prerequisite_skills)
@@ -192,27 +199,20 @@ class LinkedExploration(object):
         self.prerequisite_skills = copy.deepcopy(prerequisite_skills)
 
     def update_acquired_skills(self, acquired_skills):
-        prerequiste_and_acquired_skills = (
-          set(self.prerequisite_skills) & set(acquired_skills))
-        if prerequiste_and_acquired_skills:
+        if set(self.prerequisite_skills) & set(acquired_skills):
             raise utils.ValueError(
                 'No acquired skills may also be prerequisite skills: %s' %
                 acquired_skills)
 
         self.acquired_skills = copy.deepcopy(acquired_skills)
 
-    def validate(self, strict, validate_exploration):
-        """Validates the exploration linked by this domain object as well as
-        the skill lists.
-        """
-        if validate_exploration:
-            try:
-                self.exploration.validate(strict=strict)
-            except utils.ValidationError as validation_error:
-                raise validation_error
-            except Exception:
-                raise utils.ValidationError(
-                    'Error loading exploration: %s' % self.exploration_id)
+    def validate(self):
+        """Validates various properties of the collection node."""
+
+        if not isinstance(self.exploration_id, basestring):
+            raise utils.ValidationError(
+                'Expected exploration ID to be a string, received %s' %
+                self.exploration_id)
 
         if not isinstance(self.prerequisite_skills, list):
             raise utils.ValidationError(
@@ -224,6 +224,12 @@ class LinkedExploration(object):
                 'The prerequisite_skills list has duplicate entries: %s' %
                 self.prerequisite_skills)
 
+        for prerequisite_skill in self.prerequisite_skills:
+            if not isinstance(prerequisite_skill, basestring):
+                raise utils.ValidationError(
+                    'Expected all prerequisite skills to be strings, '
+                    'received %s' % prerequisite_skill)
+
         if not isinstance(self.acquired_skills, list):
             raise utils.ValidationError(
                 'Expected acquired_skills to be a list, received %s' %
@@ -234,31 +240,51 @@ class LinkedExploration(object):
                 'The acquired_skills list has duplicate entries: %s' %
                 self.acquired_skills)
 
-        prerequiste_and_acquired_skills = (
+        for acquired_skill in self.acquired_skills:
+            if not isinstance(acquired_skill, basestring):
+                raise utils.ValidationError(
+                    'Expected all acquired skills to be strings, received %s' %
+                    acquired_skill)
+
+        confusing_skills = (
           set(self.prerequisite_skills) & set(self.acquired_skills))
-        if prerequiste_and_acquired_skills:
+        if confusing_skills:
             raise utils.ValidationError(
-                'There are some skills which are both required for this '
-                'exploration and acquired after playing it: %s' %
-                prerequiste_and_acquired_skills)
+                'There are some skills which are both required for '
+                'exploration %s and acquired after playing it: %s' %
+                (self.exploration_id, confusing_skills))
 
     @classmethod
-    def create_default_linked_exploration(cls, exploration_id):
+    def create_default_collection_node(cls, exploration_id):
         return cls(exploration_id, [], [])
 
 
 class Collection(object):
     """Domain object for an Oppia collection."""
 
+    """Constructs a new collection given all the information necessary to
+    represent a collection.
+
+    Note: The schema_version represents the version of any underlying
+    dictionary or list structures stored within the collection. In particular,
+    the nodes structure schema is represented by this version. If any changes
+    happen to CollectionNode, then a migration function will need to be added
+    to this class to convert from the current schema version to the new one.
+    This function should be called in both from_yaml in this class and
+    collection_services._migrate_collection_to_latest_schema. The collection
+    schema version in feconf should be incremented and the new value should be
+    saved in the collection after the migration process, ensuring it represents
+    the latest schema version.
+    """
     def __init__(self, collection_id, title, category, objective,
-                 schema_version, linked_explorations, version,
-                 created_on=None, last_updated=None):
+                 schema_version, collection_nodes, version, created_on=None,
+                 last_updated=None):
         self.id = collection_id
         self.title = title
         self.category = category
         self.objective = objective
         self.schema_version = schema_version
-        self.linked_explorations = linked_explorations
+        self.nodes = collection_nodes
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -270,50 +296,45 @@ class Collection(object):
             'category': self.category,
             'objective': self.objective,
             'schema_version': self.schema_version,
-            'linked_explorations': {
-                exp_id: linked_exp.to_dict()
-                for (exp_id, linked_exp) in (
-                    self.linked_explorations.iteritems())
-            }
+            'nodes': [
+                collection_node.to_dict() for collection_node in self.nodes
+            ]
         }
 
     @classmethod
     def create_default_collection(
-            cls, collection_id, title, category, objective=''):
+            cls, collection_id, title, category, objective):
         return cls(
             collection_id, title, category, objective,
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, {}, 0)
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
 
     @classmethod
-    def create_collection_from_dict(
+    def from_dict(
             cls, collection_dict, collection_version=0,
             collection_created_on=None, collection_last_updated=None):
         collection = cls(
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
-            collection_dict['schema_version'], {}, collection_version,
+            collection_dict['schema_version'], [], collection_version,
             collection_created_on, collection_last_updated)
 
-        for (exp_id, linked_exp_dict) in (
-                collection_dict['linked_explorations'].iteritems()):
-            collection.linked_explorations[exp_id] = (
-                LinkedExploration.from_dict(exp_id, linked_exp_dict))
+        for collection_node_dict in collection_dict['nodes']:
+            collection.nodes.append(
+                CollectionNode.from_dict(collection_node_dict))
 
         return collection
 
     def to_yaml(self):
         collection_dict = self.to_dict()
 
-        # Properties which are not needed to be stored within the YAML
-        # representation.
+        # The ID is the only property which should not be stored within the
+        # YAML representation.
         del collection_dict['id']
-        del collection_dict['title']
-        del collection_dict['category']
 
         return utils.yaml_from_dict(collection_dict)
 
     @classmethod
-    def from_yaml(cls, collection_id, title, category, yaml_content):
+    def from_yaml(cls, collection_id, yaml_content):
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -323,69 +344,60 @@ class Collection(object):
                 % e)
 
         collection_dict['id'] = collection_id
-        collection_dict['title'] = title
-        collection_dict['category'] = category
-
-        return Collection.create_collection_from_dict(collection_dict)
+        return Collection.from_dict(collection_dict)
 
     @property
     def skills(self):
-        """The skills of a collection are made up of all prerequisites and
-        acquired skills of each exploration part of this collection.
+        """The skills of a collection are made up of all prerequisite and
+        acquired skills of each exploration that is part of this collection.
+        This returns a sorted list of all the skills of the collection.
         """
         unique_skills = set()
-        for exp_id in self.linked_explorations:
-            unique_skills.update(self.linked_explorations[exp_id].skills)
-        return list(unique_skills)
+        for collection_node in self.nodes:
+            unique_skills.update(collection_node.skills)
+        skills_list = list(unique_skills)
+        skills_list.sort()
+        return skills_list
+
+    @property
+    def exploration_ids(self):
+        """Returns a list of all the exploration IDs part of this collection.
+        """
+        return [
+            collection_node.exploration_id for collection_node in self.nodes]
 
     @property
     def init_exploration_ids(self):
-        """Returns a list of explorations IDs that could be initially started
-        for this collection (ie, they require no prior skills to complete).
+        """Returns a list of exploration IDs that are starting points for this
+        collection (ie, they require no prior skills to complete).
         """
         init_exp_ids = []
-        for (exp_id, linked_exp) in self.linked_explorations.iteritems():
-            if len(linked_exp.prerequisite_skills) == 0:
-                init_exp_ids.append(exp_id)
+        for collection_node in self.nodes:
+            if not collection_node.prerequisite_skills:
+                init_exp_ids.append(collection_node.exploration_id)
         return init_exp_ids
-
-    @property
-    def init_explorations(self):
-        """Returns a list of explorations that could be initially started for
-        this collection (ie, they require no prior skills to complete).
-        """
-        return [
-            self.linked_explorations[exp_id].exploration
-            for exp_id in self.init_exploration_ids]
 
     def get_next_exploration_ids(self, completed_exploration_ids):
         """Returns a list of exploration IDs for which the prerequisite skills
         are satisfied. These are the next explorations to complete for a user.
         If the list returned is empty and the collection is valid, then all
         skills have been acquired and the collection is completed. If the input
-        list is empty, then the initial explorations are returned.
+        list is empty, then only explorations with no prerequisite skills are
+        returned.
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
-            acquired_skills.update(set(
-                self.linked_explorations[completed_exp_id].acquired_skills))
+            acquired_skills.update(
+                self.get_collection_node(completed_exp_id).acquired_skills)
 
         next_exp_ids = []
-        for (exp_id, linked_exp) in self.linked_explorations.iteritems():
-            prereq_skills = set(linked_exp.prerequisite_skills)
-            remaining_skills = prereq_skills - acquired_skills
-            if len(remaining_skills) == 0:
-                next_exp_ids.append(exp_id)
-        return list(set(next_exp_ids) - set(completed_exploration_ids))
-
-    def get_next_explorations(self, completed_exploration_ids):
-        """Returns a list of explorations for which the prerequisite skills are
-        satisfied. See get_next_exploration_ids for more information.
-        """
-        return [
-            self.linked_explorations[exp_id].exploration
-            for exp_id in self.get_next_exploration_ids(
-                completed_exploration_ids)]
+        for collection_node in self.nodes:
+            if collection_node.exploration_id in completed_exploration_ids:
+                continue
+            prereq_skills = set(collection_node.prerequisite_skills)
+            if prereq_skills <= acquired_skills:
+                next_exp_ids.append(collection_node.exploration_id)
+        return next_exp_ids
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):
@@ -407,27 +419,40 @@ class Collection(object):
     def update_objective(self, objective):
         self.objective = objective
 
-    def add_exploration(self, exploration_id):
-        if exploration_id in self.linked_explorations:
+    def _find_collection_node(self, exploration_id):
+        for i in range(len(self.nodes)):
+            if self.nodes[i].exploration_id == exploration_id:
+                return i
+        return -1
+
+    def get_collection_node(self, exploration_id):
+        """Retrieves a collection node from the collection based on an
+        exploration ID.
+        """
+        for collection_node in self.nodes:
+            if collection_node.exploration_id == exploration_id:
+                return collection_node
+        return None
+
+    def add_collection_node(self, exploration_id):
+        if self.get_collection_node(exploration_id) is not None:
             raise ValueError(
                 'Exploration is already part of this collection: %s' %
                 exploration_id)
-        self.linked_explorations[exploration_id] = (
-            LinkedExploration.create_default_linked_exploration(
-                exploration_id))
+        self.nodes.append(
+            CollectionNode.create_default_collection_node(exploration_id))
 
-    def delete_exploration(self, exploration_id):
-        if exploration_id not in self.linked_explorations:
+    def delete_collection_node(self, exploration_id):
+        node_index = self._find_collection_node(exploration_id)
+        if node_index == -1:
             raise ValueError(
                 'Exploration is not part of this collection: %s' %
                 exploration_id)
+        del self.nodes[node_index]
 
-        del self.linked_explorations[exploration_id]
+    def validate(self, strict=True):
+        """Validates all properties of this collection and its constituents."""
 
-    def validate(self, strict=True, validate_explorations=True):
-        """Verifies all properties of this collection and its constituents are
-        in a valid and correct state.
-        """
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
@@ -444,34 +469,54 @@ class Collection(object):
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
+        if not self.objective:
+            raise utils.ValidationError(
+                'An objective must be specified (in the \'Settings\' tab).')
+
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s' %
                 self.schema_version)
 
-        if not isinstance(self.linked_explorations, dict):
+        if self.schema_version != feconf.CURRENT_COLLECTION_SCHEMA_VERSION:
             raise utils.ValidationError(
-                'Expected linked explorations to be a dict, received %s' %
-                self.linked_explorations)
+                'Expected schema version to be %s, received %s' % (
+                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
+                    self.schema_version))
+
+        if not isinstance(self.nodes, list):
+            raise utils.ValidationError(
+                'Expected nodes to be a list, received %s' % self.nodes)
+
+        all_exp_ids = self.exploration_ids
+        if len(set(all_exp_ids)) != len(all_exp_ids):
+            raise utils.ValidationError(
+                'There are explorations referenced in the collection more '
+                'than once.')
+
+        # Validate all collection nodes.
+        for collection_node in self.nodes:
+            collection_node.validate()
 
         # Ensure the skills graph has no cycles. This is done two-fold: first,
-        # the prerequisite and acquired skill lists cannot contain similar
-        # elements (validated in LinkedExploration). This ensure no
-        # explorations may recommend themselves/cycle back right away. Second,
-        # every exploration in the collection must be reachable when starting
-        # from the initial explorations and playing through all recommended
-        # explorations. Cycles can only exist in a disconnected graph.
+        # no skill can appear in both the prerequisite and acquired skills
+        # lists fpr any node. No exploration may grant a skill that it
+        # simultaneously lists as a prerequisite. Second, every exploration in
+        # the collection must be reachable when starting from the explorations
+        # with no prerequisite skills and playing through all subsequent
+        # explorations provided by get_next_exploration_ids. Cycles can only
+        # exist in a disconnected graph.
         if strict:
+            if not self.nodes:
+                raise utils.ValidationError(
+                    'Expected to have at least 1 exploration in the '
+                    'collection.')
+
             # Ensure the collection may be started.
-            if len(self.init_exploration_ids) == 0:
+            if not self.init_exploration_ids:
                 raise utils.ValidationError(
                     'Expected to have at least 1 exploration with no '
                     'prerequisite skills.')
-
-            if not self.objective:
-                raise utils.ValidationError(
-                    'An objective must be specified (in the '
-                        '\'Settings\' tab).')
 
             # Ensure the collection can be completed.
             completed_exp_ids = set(self.init_exploration_ids)
@@ -482,18 +527,11 @@ class Collection(object):
                 next_exp_ids = self.get_next_exploration_ids(
                     list(completed_exp_ids))
 
-            if len(completed_exp_ids) != len(self.linked_explorations):
-                all_exp_ids = set([
-                    exp_id for exp_id in self.linked_explorations])
-                unreachable_ids = all_exp_ids - completed_exp_ids
+            if len(completed_exp_ids) != len(self.nodes):
+                unreachable_ids = set(all_exp_ids) - completed_exp_ids
                 raise utils.ValidationError(
                     'Some explorations are unreachable from the initial '
                     'explorations: %s' % unreachable_ids)
-
-        # Validate all linked explorations.
-        for exp_id in self.linked_explorations:
-            self.linked_explorations[exp_id].validate(
-                strict, validate_explorations)
 
 
 class CollectionSummary(object):

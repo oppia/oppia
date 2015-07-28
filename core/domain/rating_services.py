@@ -14,23 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""System for assigning and displaying ratings of explorations and collections.
+"""System for assigning and displaying ratings of explorations.
 """
 
 __author__ = 'Jacob Davis'
 
 import datetime
 
-from core.domain import collection_services
 from core.domain import exp_services
 from core.platform import models
 import feconf
-(exp_models, collection_models, user_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.collection, models.NAMES.user])
+(exp_models, user_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
-# Ratings functions for explorations.
 def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     """Records the rating awarded by the user to the exploration in both the
     user-specific data and exploration summary.

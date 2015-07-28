@@ -94,7 +94,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
-            if exp_rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
                 exploration.validate()
             else:
                 exploration.validate(strict=True)

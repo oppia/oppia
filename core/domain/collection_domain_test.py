@@ -33,269 +33,281 @@ import utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = (
-"""linked_explorations:
-  an_exploration_id:
-    acquired_skills:
-    - Skill1
-    - Skill2
-    prerequisite_skills: []
+"""category: A category
+nodes:
+- acquired_skills:
+  - Skill0a
+  - Skill0b
+  exploration_id: an_exploration_id
+  prerequisite_skills: []
 objective: An objective
 schema_version: %d
+title: A title
 """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class CollectionDomainUnitTests(test_utils.GenericTestBase):
     """Test the collection domain object."""
 
-    def test_validation(self):
-        """Test validation of collections."""
+    COLLECTION_ID = 'collection_id'
+    EXPLORATION_ID = 'exp_id_0'
+
+    def setUp(self):
+        super(CollectionDomainUnitTests, self).setUp()
         self.save_new_valid_collection(
-            'collection_id', 'user@example.com', title='Title',
+            self.COLLECTION_ID, 'user@example.com', title='Title',
             category='Category', objective='Objective',
-            exploration_id='exp_id_0', end_state_name='End')
-        collection = collection_services.get_collection_by_id('collection_id')
+            exploration_id=self.EXPLORATION_ID)
+        self.collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
 
-        # Begin with valid strict validation.
-        collection.validate()
+    def test_initial_validation(self):
+        """Test validating a new, valid collection."""
+        self.collection.validate()
 
-        # Validate title.
-        collection.title = 0
+    def test_title_validation(self):
+        self.collection.title = 0
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected title to be a string'):
-            collection.validate()
-        collection.title = 'Title'
+            self.collection.validate()
 
-        # Validate category.
-        collection.category = 0
+    def test_category_validation(self):
+        self.collection.category = 0
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected category to be a string'):
-            collection.validate()
-        collection.category = 'Category'
+            self.collection.validate()
 
-        # Validate objective.
-        collection.objective = 0
+    def test_objective_validation(self):
+        self.collection.objective = ''
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'objective must be specified'):
+            self.collection.validate()
+
+        self.collection.objective = 0
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected objective to be a string'):
-            collection.validate()
-        collection.objective = 'Category'
+            self.collection.validate()
 
-        # Validate schema_verison.
-        collection.schema_version = 'some_schema_version'
+    def test_schema_version_validation(self):
+        self.collection.schema_version = 'some_schema_version'
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected schema version to be an int'):
-            collection.validate()
-        collection.schema_version = 1
+            self.collection.validate()
 
-        # Validate linked_explorations.
-        collection.linked_explorations = []
+        self.collection.schema_version = 100
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected schema version to be %s' %
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            self.collection.validate()
+
+    def test_nodes_validation(self):
+        self.collection.nodes = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected nodes to be a list'):
+            self.collection.validate()
+
+        self.collection.nodes = [
+            collection_domain.CollectionNode.from_dict({
+                'exploration_id': '0',
+                'prerequisite_skills': [],
+                'acquired_skills': ['skill0a']
+            }),
+            collection_domain.CollectionNode.from_dict({
+                'exploration_id': '0',
+                'prerequisite_skills': ['skill0a'],
+                'acquired_skills': ['skill0b']
+            })
+        ]
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                'Expected linked explorations to be a dict'):
-            collection.validate()
+                'There are explorations referenced in the collection more '
+                'than once.'):
+            self.collection.validate()
 
-        # Having no linked explorations is fine for non-strict validation.
-        collection.linked_explorations = {}
-        collection.validate(strict=False)
+    def test_initial_explorations_validation(self):
+        # Having no collection nodes is fine for non-strict validation.
+        self.collection.nodes = []
+        self.collection.validate(strict=False)
 
         # But it's not okay for strict validation.
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected to have at least 1 '
-                'exploration with no prerequisite skills.'):
-            collection.validate()
+                utils.ValidationError,
+                'Expected to have at least 1 exploration in the collection.'):
+            self.collection.validate()
 
-        # Having one exploration with prerequisite skills should also fail it.
-        collection.add_exploration('exp_id_1')
-        self.save_new_valid_exploration('exp_id_1', 'user@example.com',
-            end_state_name='End')
-        linked_exp1 = collection.linked_explorations['exp_id_1']
-        linked_exp1.update_prerequisite_skills(['first'])
+        # If the collection has exactly one exploration and that exploration
+        # has prerequisite skills, then the collection should fail validation.
+        self.collection.add_collection_node('exp_id_1')
+        self.save_new_valid_exploration(
+            'exp_id_1', 'user@example.com', end_state_name='End')
+        collection_node1 = self.collection.get_collection_node('exp_id_1')
+        collection_node1.update_prerequisite_skills(['skill1a'])
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected to have at least 1 '
                 'exploration with no prerequisite skills.'):
-            collection.validate()
+            self.collection.validate()
 
+    def test_collection_completability_validation(self):
         # Add another exploration, but make it impossible to reach exp_id_1.
-        collection.add_exploration('exp_id_0')
-        collection.add_exploration('exp_id_2')
-        self.save_new_valid_exploration('exp_id_2', 'user@example.com',
-            end_state_name='End')
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Some explorations are unreachable '
-                'from the initial explorations'):
-            collection.validate()
-
-        # Connecting the two explorations should lead to clean validation.
-        linked_exp2 = collection.linked_explorations['exp_id_2']
-        linked_exp2.update_acquired_skills(['first'])
-        collection.validate()
-
-        # Validate loading explorations in LinkedExplorations' validate.
-        collection.add_exploration('fake_exp_id')
+        self.collection.add_collection_node('exp_id_1')
+        collection_node1 = self.collection.get_collection_node('exp_id_1')
+        collection_node1.update_prerequisite_skills(['skill0a'])
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                'Error loading exploration: fake_exp_id'):
-            collection.validate()
-        collection.delete_exploration('fake_exp_id')
+                'Some explorations are unreachable from the initial '
+                'explorations'):
+            self.collection.validate()
 
-        # Verify explorations are validated with the collection.
-        orig_get_exp_by_id = exp_services.get_exploration_by_id
-        counters = {'exp_validate_counter': None}
-        def _mock_get_exp_by_id(exp_id, strict=True, version=None):
-            exp = orig_get_exp_by_id(exp_id, strict=strict, version=version)
-            exp_validate_counter = test_utils.CallCounter(exp.validate)
-            exp.validate = exp_validate_counter
-            counters['exp_validate_counter'] = exp_validate_counter
-            return exp
+        # Connecting the two explorations should lead to clean validation.
+        collection_node0 = self.collection.get_collection_node('exp_id_0')
+        collection_node0.update_acquired_skills(['skill0a'])
+        self.collection.validate()
 
-        with self.swap(
-                exp_services, 'get_exploration_by_id', _mock_get_exp_by_id):
-            collection.validate()
-            self.assertEqual(counters['exp_validate_counter'].times_called, 1)
+    def test_collection_node_exploration_id_validation(self):
+        # Validate CollectionNode's exploration_id.
+        collection_node0 = self.collection.get_collection_node('exp_id_0')
+        collection_node0.exploration_id = 2
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected exploration ID to be a string'):
+            self.collection.validate()
 
-        # Validate LinkedExploration's prerequisite_skills
-        linked_exp2.prerequisite_skills = {}
+    def test_collection_node_prerequisite_skills_validation(self):
+        collection_node0 = self.collection.get_collection_node('exp_id_0')
+
+        collection_node0.prerequisite_skills = {}
         with self.assertRaisesRegexp(
                 utils.ValidationError,
                 'Expected prerequisite_skills to be a list'):
-            collection.validate()
-        linked_exp2.prerequisite_skills = []
+            self.collection.validate()
 
-        linked_exp1.prerequisite_skills = ['first', 'first']
-        linked_exp2.update_acquired_skills(['first'])
+        collection_node0.prerequisite_skills = ['skill0a', 'skill0a']
         with self.assertRaisesRegexp(
                 utils.ValidationError,
                 'The prerequisite_skills list has duplicate entries'):
-            collection.validate()
-        linked_exp1.update_prerequisite_skills(['first'])
+            self.collection.validate()
 
-        # Validate LinkedExploration's acquired_skills
-        linked_exp1.acquired_skills = {}
+        collection_node0.prerequisite_skills = ['skill0a', 2]
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected all prerequisite skills to be strings'):
+            self.collection.validate()
+
+    def test_collection_node_acquired_skills_validation(self):
+        collection_node0 = self.collection.get_collection_node('exp_id_0')
+
+        collection_node0.acquired_skills = {}
         with self.assertRaisesRegexp(
                 utils.ValidationError,
                 'Expected acquired_skills to be a list'):
-            collection.validate()
+            self.collection.validate()
 
-        linked_exp1.acquired_skills = ['first', 'first']
+        collection_node0.acquired_skills = ['skill0a', 'skill0a']
         with self.assertRaisesRegexp(
                 utils.ValidationError,
                 'The acquired_skills list has duplicate entries'):
-            collection.validate()
+            self.collection.validate()
+
+        collection_node0.acquired_skills = ['skill0a', 2]
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'Expected all acquired skills to be strings'):
+            self.collection.validate()
+
+    def test_collection_node_skills_validation(self):
+        collection_node0 = self.collection.get_collection_node('exp_id_0')
 
         # Ensure prerequisite_skills and acquired_skills do not overlap.
-        linked_exp2.prerequisite_skills = ['first', 'second', 'third']
-        linked_exp2.acquired_skills = ['zeroeth', 'second', 'third', 'fourth']
-        linked_exp1.update_prerequisite_skills([])
-        linked_exp1.update_acquired_skills(linked_exp2.prerequisite_skills)
+        collection_node0.prerequisite_skills = [
+            'skill0a', 'skill0b', 'skill0c']
+        collection_node0.acquired_skills = [
+            'skill0z', 'skill0b', 'skill0c', 'skill0d']
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'There are some skills which are both '
-                'required for this exploration and acquired after playing it: '
-                '[second, third]'):
-            collection.validate()
-
-        # Restore a valid collection.
-        linked_exp2.prerequisite_skills = []
-        linked_exp2.acquired_skills = ['first']
-
-        collection.validate()
-
-    def test_objective_validation(self):
-        """Test that objectives are validated only in 'strict' mode."""
-        self.save_new_valid_collection(
-            'collection_id', 'user@example.com', title='Title',
-            category='Category', objective='Objective', end_state_name='End')
-        collection = collection_services.get_collection_by_id('collection_id')
-
-        collection.objective = ''
-        collection.validate(strict=False)
-
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'objective must be specified'):
-            collection.validate(strict=True)
-
-        collection.objective = 'An objective'
-        collection.validate(strict=True)
+                'required for exploration exp_id_0 and acquired after playing '
+                'it: [skill0b, skill0c]'):
+            self.collection.validate()
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category')
+            '0', 'title', 'category', 'objective')
         self.assertEqual(demo.is_demo, True)
 
         notdemo1 = collection_domain.Collection.create_default_collection(
-            'a', 'title', 'category')
+            'a', 'title', 'category', 'objective')
         self.assertEqual(notdemo1.is_demo, False)
 
         notdemo2 = collection_domain.Collection.create_default_collection(
-            'abcd', 'title', 'category')
+            'abcd', 'title', 'category', 'objective')
         self.assertEqual(notdemo2.is_demo, False)
 
     def test_collection_export_import(self):
         """Test that to_dict and from_dict preserve all data within an
         collection.
         """
-        self.save_new_valid_exploration('0', 'user@example.com',
-            end_state_name='End')
+        self.save_new_valid_exploration(
+            '0', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category')
+            '0', 'title', 'category', 'objective')
         collection_dict = collection.to_dict()
-        collection_from_dict = (
-            collection_domain.Collection.create_collection_from_dict(
-                collection_dict))
+        collection_from_dict = collection_domain.Collection.from_dict(
+            collection_dict)
         self.assertEqual(collection_from_dict.to_dict(), collection_dict)
 
-    def test_add_delete_exploration(self):
-        """Test that add_exploration and delete_exploration fail in the correct
-        situations.
+    def test_add_delete_collection_node(self):
+        """Test that add_collection_node and delete_collection_node fail in the
+        correct situations.
         """
         collection = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category')
-        self.assertEqual(len(collection.linked_explorations), 0)
+            '0', 'title', 'category', 'objective')
+        self.assertEqual(len(collection.nodes), 0)
 
-        collection.add_exploration('test_exp')
-        self.assertEqual(len(collection.linked_explorations), 1)
+        collection.add_collection_node('test_exp')
+        self.assertEqual(len(collection.nodes), 1)
 
         with self.assertRaisesRegexp(
                 ValueError,
                 'Exploration is already part of this collection: test_exp'):
-            collection.add_exploration('test_exp')
+            collection.add_collection_node('test_exp')
 
-        collection.add_exploration('another_exp')
-        self.assertEqual(len(collection.linked_explorations), 2)
+        collection.add_collection_node('another_exp')
+        self.assertEqual(len(collection.nodes), 2)
 
-        collection.delete_exploration('another_exp')
-        self.assertEqual(len(collection.linked_explorations), 1)
+        collection.delete_collection_node('another_exp')
+        self.assertEqual(len(collection.nodes), 1)
 
         with self.assertRaisesRegexp(
                 ValueError,
                 'Exploration is not part of this collection: another_exp'):
-            collection.delete_exploration('another_exp')
+            collection.delete_collection_node('another_exp')
 
-        collection.delete_exploration('test_exp')
-        self.assertEqual(len(collection.linked_explorations), 0)
+        collection.delete_collection_node('test_exp')
+        self.assertEqual(len(collection.nodes), 0)
 
     def test_skills_property(self):
         collection = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category')
+            '0', 'title', 'category', 'objective')
 
         self.assertEqual(collection.skills, [])
 
-        collection.add_exploration('exp_id_0')
-        collection.add_exploration('exp_id_1')
-        collection.linked_explorations['exp_id_0'].update_acquired_skills(
-            ['first'])
-        collection.linked_explorations['exp_id_1'].update_prerequisite_skills(
-            ['first'])
-        collection.linked_explorations['exp_id_1'].update_acquired_skills([
-            'second', 'third'])
+        collection.add_collection_node('exp_id_0')
+        collection.add_collection_node('exp_id_1')
+        collection.get_collection_node('exp_id_0').update_acquired_skills(
+            ['skill0a'])
+        collection.get_collection_node('exp_id_1').update_prerequisite_skills(
+            ['skill0a'])
+        collection.get_collection_node('exp_id_1').update_acquired_skills(
+            ['skill1b', 'skill1c'])
 
-        self.assertEqual(collection.skills, ['second', 'third', 'first'])
+        self.assertEqual(collection.skills, ['skill0a', 'skill1b', 'skill1c'])
 
-        # Skills should be unique, even if they are duplicate across multiple
+        # Skills should be unique, even if they are duplicated across multiple
         # acquired and prerequisite skill lists.
-        collection.add_exploration('exp_id_2')
-        collection.linked_explorations['exp_id_2'].update_acquired_skills(
-            ['first', 'third'])
-        self.assertEqual(collection.skills, ['second', 'third', 'first'])
+        collection.add_collection_node('exp_id_2')
+        collection.get_collection_node('exp_id_2').update_acquired_skills(
+            ['skill0a', 'skill1c'])
+        self.assertEqual(collection.skills, ['skill0a', 'skill1b', 'skill1c'])
 
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
@@ -310,72 +322,73 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
 
         # If there are no explorations in the collection, there can be no
         # initial explorations.
-        self.assertEqual(collection.linked_explorations, {})
-        self.assertEqual(collection.init_explorations, [])
+        self.assertEqual(collection.nodes, [])
+        self.assertEqual(collection.init_exploration_ids, [])
 
         # A freshly added exploration will be an initial one.
-        collection.add_exploration('exp_id_0')
+        collection.add_collection_node('exp_id_0')
         self.assertEqual(collection.init_exploration_ids, ['exp_id_0'])
 
         # Having prerequisites will make an exploration no longer initial.
-        collection.add_exploration('exp_id_1')
-        self.assertEqual(len(collection.linked_explorations), 2)
-        collection.linked_explorations['exp_id_1'].update_prerequisite_skills(
-            ['first'])
+        collection.add_collection_node('exp_id_1')
+        self.assertEqual(len(collection.nodes), 2)
+        collection.get_collection_node('exp_id_1').update_prerequisite_skills(
+            ['skill0a'])
         self.assertEqual(collection.init_exploration_ids, ['exp_id_0'])
 
         # There may be multiple initial explorations.
-        collection.add_exploration('exp_id_2')
+        collection.add_collection_node('exp_id_2')
         self.assertEqual(
-            collection.init_exploration_ids, ['exp_id_2', 'exp_id_0'])
+            collection.init_exploration_ids, ['exp_id_0', 'exp_id_2'])
 
     def test_next_explorations(self):
-        """Explorations should be recommended based on prerequisite and
-        acquired skills.
+        """Explorations should be suggested based on prerequisite and
+        acquired skills, as well as which explorations have already been played
+        in the collection.
         """
         collection = collection_domain.Collection.create_default_collection(
             'collection_id', 'A title', 'A category', 'An objective')
 
-        # There should be no recommendations for an empty collection.
+        # There should be no next explorations for an empty collection.
         self.assertEqual(collection.get_next_exploration_ids([]), [])
 
-        # If a new exploration is added, the recommended exploration IDs should
-        # be the same as the initial explorations.
-        collection.add_exploration('exp_id_1')
+        # If a new exploration is added, the next exploration IDs should be the
+        # same as the initial explorations.
+        collection.add_collection_node('exp_id_1')
         self.assertEqual(collection.get_next_exploration_ids([]), ['exp_id_1'])
         self.assertEqual(
             collection.init_exploration_ids,
             collection.get_next_exploration_ids([]))
 
         # Completing the only exploration of the collection should lead to no
-        # recommended explorations thereafter. This test is done without any
+        # available explorations thereafter. This test is done without any
         # prerequisite or acquired skill lists.
         self.assertEqual(collection.get_next_exploration_ids(['exp_id_1']), [])
 
-        # If the only exploration in the collection has a prerequired skill,
-        # there are no recommendations.
-        linked_exp1 = collection.linked_explorations['exp_id_1']
-        linked_exp1.update_prerequisite_skills(['first'])
+        # If the only exploration in the collection has a prerequisite skill,
+        # there are no explorations left to do.
+        collection_node1 = collection.get_collection_node('exp_id_1')
+        collection_node1.update_prerequisite_skills(['skill0a'])
         self.assertEqual(collection.get_next_exploration_ids([]), [])
 
         # If another exploration has been added with a prerequisite that is the
         # same as an acquired skill of another exploration and the exploration
         # giving that skill is completed, then the first exploration should be
-        # recommended.
-        collection.add_exploration('exp_id_2')
-        linked_exp2 = collection.linked_explorations['exp_id_2']
-        linked_exp1.update_acquired_skills(['second'])
-        linked_exp2.update_prerequisite_skills(['second'])
+        # the next one to complete.
+        collection.add_collection_node('exp_id_2')
+        collection_node2 = collection.get_collection_node('exp_id_2')
+        collection_node1.update_acquired_skills(['skill1b'])
+        collection_node2.update_prerequisite_skills(['skill1b'])
         self.assertEqual(collection.get_next_exploration_ids([]), [])
         self.assertEqual(collection.get_next_exploration_ids(
             ['exp_id_1']), ['exp_id_2'])
 
-        # If another exploration is added that has no prerequisites, the user
-        # will be able to get to exp_id_1. exp_id_2 should not be recommended
-        # unless exp_id_1 is thereafter completed.
-        collection.add_exploration('exp_id_0')
-        linked_exp0 = collection.linked_explorations['exp_id_0']
-        linked_exp0.update_acquired_skills(['first'])
+        # If another exploration is added that has no prerequisites, the
+        # learner will be able to get to exp_id_1. exp_id_2 should not be
+        # suggested to be completed unless exp_id_1 is thereafter completed.
+        collection.add_collection_node('exp_id_0')
+        collection_node0 = collection.get_collection_node('exp_id_0')
+        collection_node0.update_acquired_skills(['skill0a'])
         self.assertEqual(
             collection.get_next_exploration_ids([]), ['exp_id_0'])
         self.assertEqual(
@@ -384,20 +397,21 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
             collection.get_next_exploration_ids(['exp_id_0', 'exp_id_1']),
             ['exp_id_2'])
 
-        # There may be multiple branches of initial recommendations.
-        collection.add_exploration('exp_id_3')
+        # There may be multiple branches of initial suggested explorations.
+        collection.add_collection_node('exp_id_3')
         self.assertEqual(
-            collection.get_next_exploration_ids([]), ['exp_id_3', 'exp_id_0'])
+            collection.get_next_exploration_ids([]), ['exp_id_0', 'exp_id_3'])
 
-        # There may also be multiple branches farther into recommendations.
-        linked_exp3 = collection.linked_explorations['exp_id_3']
-        linked_exp3.update_prerequisite_skills(['third'])
-        linked_exp0.update_acquired_skills(['first', 'third'])
+        # There may also be multiple suggested explorations at other points,
+        # depending on which explorations the learner has completed.
+        collection_node3 = collection.get_collection_node('exp_id_3')
+        collection_node3.update_prerequisite_skills(['skill0c'])
+        collection_node0.update_acquired_skills(['skill0a', 'skill0c'])
         self.assertEqual(
             collection.get_next_exploration_ids([]), ['exp_id_0'])
         self.assertEqual(
             collection.get_next_exploration_ids(['exp_id_0']),
-            ['exp_id_3', 'exp_id_1'])
+            ['exp_id_1', 'exp_id_3'])
         self.assertEqual(
             collection.get_next_exploration_ids(['exp_id_0', 'exp_id_3']),
             ['exp_id_1'])
@@ -408,7 +422,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
             collection.get_next_exploration_ids(
                 ['exp_id_0', 'exp_id_1', 'exp_id_2']), ['exp_id_3'])
 
-        # If all explorations have been completed, none should be recommended.
+        # If all explorations have been completed, none should be suggested.
         self.assertEqual(
             collection.get_next_exploration_ids(
                 ['exp_id_0', 'exp_id_1', 'exp_id_2', 'exp_id_3']), [])
@@ -422,16 +436,16 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         COLLECTION_ID = 'a_collection_id'
         EXPLORATION_ID = 'an_exploration_id'
 
-        self.save_new_valid_exploration(EXPLORATION_ID, 'user@example.com',
-            end_state_name='End')
+        self.save_new_valid_exploration(
+            EXPLORATION_ID, 'user@example.com', end_state_name='End')
 
         collection = collection_domain.Collection.create_default_collection(
             COLLECTION_ID, 'A title', 'A category', 'An objective')
-        collection.add_exploration(EXPLORATION_ID)
-        self.assertEqual(len(collection.linked_explorations), 1)
+        collection.add_collection_node(EXPLORATION_ID)
+        self.assertEqual(len(collection.nodes), 1)
 
-        linked_exp = collection.linked_explorations[EXPLORATION_ID]
-        linked_exp.update_acquired_skills(['Skill1', 'Skill2'])
+        collection_node = collection.get_collection_node(EXPLORATION_ID)
+        collection_node.update_acquired_skills(['Skill0a', 'Skill0b'])
 
         collection.validate()
 
@@ -439,36 +453,38 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
         collection2 = collection_domain.Collection.from_yaml(
-            'collection2', 'Title', 'Category', yaml_content)
-        self.assertEqual(len(collection2.linked_explorations), 1)
+            'collection2', yaml_content)
+        self.assertEqual(len(collection2.nodes), 1)
         yaml_content_2 = collection2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
 
+        # Should not be able to create a collection from no YAML content.
         with self.assertRaises(Exception):
-            collection_domain.Collection.from_yaml(
-                'collection3', 'Title', 'Category')
+            collection_domain.Collection.from_yaml('collection3')
 
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
     YAML_CONTENT_V1 = (
-"""linked_explorations:
-  Exp1:
-    acquired_skills:
-    - Skill1
-    - Skill2
-    prerequisite_skills: []
+"""category: A category
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
+  exploration_id: Exp1
+  prerequisite_skills: []
 objective: ''
 schema_version: 1
+title: A title
 """)
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V1
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
-        self.save_new_valid_exploration('Exp1', 'user@example.com',
-            end_state_name='End')
+        self.save_new_valid_exploration(
+            'Exp1', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.from_yaml(
-            'cid', 'A title', 'A category', self.YAML_CONTENT_V1)
+            'cid', self.YAML_CONTENT_V1)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)

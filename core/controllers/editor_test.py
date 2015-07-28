@@ -65,10 +65,14 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 class EditorTest(BaseEditorControllerTest):
 
+    def setUp(self):
+        super(EditorTest, self).setUp()
+        exp_services.load_demo('0')
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, '0')
+
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
 
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
@@ -93,7 +97,7 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_new_state_template(self):
         """Test the validity of the NEW_STATE_TEMPLATE."""
-        exp_services.load_demo('0')
+
         exploration = exp_services.get_exploration_by_id('0')
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
@@ -103,8 +107,6 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
         CURRENT_VERSION = 1
 
         self.login(self.EDITOR_EMAIL)
@@ -175,9 +177,6 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
     def test_resolved_answers_handler(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
         # In the reader perspective, submit the first multiple-choice answer,
         # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
         # TODO(sll): Use the ExplorationPlayer in reader_test for this.
@@ -508,8 +507,9 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
         self.EXP_ID = '0'
 
-        exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
 
@@ -622,9 +622,11 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
     def test_user_banning(self):
         """Test that banned users are banned."""
+
         EXP_ID = '0'
-        exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID)
 
         # Sign-up new editors Joe and Sandra.
         self.signup('joe@example.com', 'joe')

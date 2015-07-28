@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import base64
 import datetime
-import feconf
 import hashlib
 import json
 import os
@@ -32,6 +31,8 @@ import urllib
 import urlparse
 import yaml
 import zipfile
+
+import feconf
 
 
 # Sentinel value for schema verification, indicating that a value can take any

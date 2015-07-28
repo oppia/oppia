@@ -99,21 +99,21 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PRIVATE)
+            rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLIC)
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
         self.logout()
 
     def test_collaborators_can_see_explorations(self):
@@ -129,21 +129,21 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PRIVATE)
+            rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLIC)
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
 
         self.logout()
 

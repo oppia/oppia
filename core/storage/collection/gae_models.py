@@ -27,9 +27,9 @@ import feconf
 from google.appengine.ext import ndb
 
 
-COLLECTION_STATUS_PRIVATE = 'private'
-COLLECTION_STATUS_PUBLIC = 'public'
-COLLECTION_STATUS_PUBLICIZED = 'publicized'
+ACTIVITY_STATUS_PRIVATE = 'private'
+ACTIVITY_STATUS_PUBLIC = 'public'
+ACTIVITY_STATUS_PUBLICIZED = 'publicized'
 
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -63,7 +63,7 @@ class CollectionModel(base_models.VersionedModel):
     schema_version = ndb.IntegerProperty(
         required=True, default=1, indexed=True)
     # A dict representing all explorations belonging to this collection.
-    linked_explorations = ndb.JsonProperty(default={}, indexed=False)
+    nodes = ndb.JsonProperty(default={}, indexed=False)
 
     @classmethod
     def get_collection_count(cls):
@@ -107,7 +107,7 @@ class CollectionModel(base_models.VersionedModel):
             post_commit_status=collection_rights.status,
             post_commit_community_owned=collection_rights.community_owned,
             post_commit_is_private=(
-                collection_rights.status == COLLECTION_STATUS_PRIVATE)
+                collection_rights.status == ACTIVITY_STATUS_PRIVATE)
         ).put_async()
 
 
@@ -148,11 +148,11 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=COLLECTION_STATUS_PRIVATE, indexed=True,
+        default=ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            COLLECTION_STATUS_PRIVATE,
-            COLLECTION_STATUS_PUBLIC,
-            COLLECTION_STATUS_PUBLICIZED
+            ACTIVITY_STATUS_PRIVATE,
+            ACTIVITY_STATUS_PUBLIC,
+            ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -192,7 +192,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == COLLECTION_STATUS_PRIVATE)
+                    self.status == ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
 
@@ -297,11 +297,11 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=COLLECTION_STATUS_PRIVATE, indexed=True,
+        default=ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            COLLECTION_STATUS_PRIVATE,
-            COLLECTION_STATUS_PUBLIC,
-            COLLECTION_STATUS_PUBLICIZED
+            ACTIVITY_STATUS_PRIVATE,
+            ACTIVITY_STATUS_PUBLIC,
+            ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -322,7 +322,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     def get_non_private(cls):
         """Returns an iterable with non-private collection summary models."""
         return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status != COLLECTION_STATUS_PRIVATE
+            CollectionSummaryModel.status != ACTIVITY_STATUS_PRIVATE
         ).filter(
             CollectionSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -333,7 +333,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status == COLLECTION_STATUS_PRIVATE
+            CollectionSummaryModel.status == ACTIVITY_STATUS_PRIVATE
         ).filter(
             ndb.OR(CollectionSummaryModel.owner_ids == user_id,
                    CollectionSummaryModel.editor_ids == user_id,

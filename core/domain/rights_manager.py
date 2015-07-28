@@ -21,16 +21,16 @@ __author__ = 'Sean Lip'
 
 import logging
 
-from core.domain import config_domain
 from core.domain import collection_domain
+from core.domain import config_domain
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
-(exp_models,collection_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.collection
+(collection_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration
 ])
 import utils
 
@@ -45,13 +45,12 @@ CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
 CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
 CMD_RELEASE_OWNERSHIP = 'release_ownership'
 
-EXPLORATION_STATUS_PRIVATE = 'private'
-EXPLORATION_STATUS_PUBLIC = 'public'
-EXPLORATION_STATUS_PUBLICIZED = 'publicized'
+ACTIVITY_STATUS_PRIVATE = 'private'
+ACTIVITY_STATUS_PUBLIC = 'public'
+ACTIVITY_STATUS_PUBLICIZED = 'publicized'
 
-COLLECTION_STATUS_PRIVATE = 'private'
-COLLECTION_STATUS_PUBLIC = 'public'
-COLLECTION_STATUS_PUBLICIZED = 'publicized'
+ACTIVITY_TYPE_EXPLORATION = 'exploration'
+ACTIVITY_TYPE_COLLECTION = 'collection'
 
 ROLE_OWNER = 'owner'
 ROLE_EDITOR = 'editor'
@@ -62,12 +61,13 @@ ROLE_ADMIN = 'admin'
 ROLE_MODERATOR = 'moderator'
 
 
-class ExplorationRights(object):
-    """Domain object for the rights/publication status of an exploration."""
-
+class ActivityRights(object):
+    """Domain object for the rights/publication status of an activity (an
+    exploration or a collection).
+    """
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
-                 status=EXPLORATION_STATUS_PRIVATE,
+                 status=ACTIVITY_STATUS_PRIVATE,
                  viewable_if_private=False):
         self.id = exploration_id
         self.owner_ids = owner_ids
@@ -79,7 +79,7 @@ class ExplorationRights(object):
         self.viewable_if_private = viewable_if_private
 
     def validate(self):
-        """Validates an ExplorationRights object.
+        """Validates an ActivityRights object.
 
         Raises:
           utils.ValidationError: if any of the owners, editors and viewers
@@ -92,11 +92,11 @@ class ExplorationRights(object):
                     'Community-owned explorations should have no owners, '
                     'editors or viewers specified.')
 
-        if self.community_owned and self.status == EXPLORATION_STATUS_PRIVATE:
+        if self.community_owned and self.status == ACTIVITY_STATUS_PRIVATE:
             raise utils.ValidationError(
                 'Community-owned explorations cannot be private.')
 
-        if self.status != EXPLORATION_STATUS_PRIVATE and self.viewer_ids:
+        if self.status != ACTIVITY_STATUS_PRIVATE and self.viewer_ids:
             raise utils.ValidationError(
                 'Public explorations should have no viewers specified.')
 
@@ -143,123 +143,58 @@ class ExplorationRights(object):
             }
 
 
-class CollectionRights(object):
-    """Domain object for the rights/publication status of an collection."""
-
-    def __init__(self, collection_id, owner_ids, editor_ids, viewer_ids,
-                 community_owned=False, status=COLLECTION_STATUS_PRIVATE,
-                 viewable_if_private=False):
-        self.id = collection_id
-        self.owner_ids = owner_ids
-        self.editor_ids = editor_ids
-        self.viewer_ids = viewer_ids
-        self.community_owned = community_owned
-        self.status = status
-        self.viewable_if_private = viewable_if_private
-
-    def validate(self):
-        """Validates an CollectionRights object.
-
-        Raises:
-          utils.ValidationError: if any of the owners, editors and viewers
-          lists overlap, or if a community-owned collection has owners,
-          editors or viewers specified.
-        """
-        if self.community_owned:
-            if self.owner_ids or self.editor_ids or self.viewer_ids:
-                raise utils.ValidationError(
-                    'Community-owned collections should have no owners, '
-                    'editors or viewers specified.')
-
-        if self.community_owned and self.status == COLLECTION_STATUS_PRIVATE:
-            raise utils.ValidationError(
-                'Community-owned collections cannot be private.')
-
-        if self.status != COLLECTION_STATUS_PRIVATE and self.viewer_ids:
-            raise utils.ValidationError(
-                'Public collections should have no viewers specified.')
-
-        owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
-        owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
-        editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
-        if owner_editor:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and an editor: %s' %
-                owner_editor)
-        if owner_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and a viewer: %s' %
-                owner_viewer)
-        if editor_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and an editor: %s' %
-                editor_viewer)
-
-    def to_dict(self):
-        """Returns a dict suitable for use by the frontend."""
-        if self.community_owned:
-            return {
-                'status': self.status,
-                'community_owned': True,
-                'owner_names': [],
-                'editor_names': [],
-                'viewer_names': [],
-                'viewable_if_private': self.viewable_if_private,
-            }
-        else:
-            return {
-                'status': self.status,
-                'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(
-                    self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(
-                    self.editor_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(
-                    self.viewer_ids),
-                'viewable_if_private': self.viewable_if_private,
-            }
-
-
-def _get_exploration_rights_from_model(exploration_rights_model):
-    return ExplorationRights(
-        exploration_rights_model.id,
-        exploration_rights_model.owner_ids,
-        exploration_rights_model.editor_ids,
-        exploration_rights_model.viewer_ids,
-        community_owned=exploration_rights_model.community_owned,
-        cloned_from=exploration_rights_model.cloned_from,
-        status=exploration_rights_model.status,
-        viewable_if_private=exploration_rights_model.viewable_if_private,
+def _get_rights_rights_from_model(activity_rights_model, activity_type):
+    return ActivityRights(
+        activity_rights_model.id,
+        activity_rights_model.owner_ids,
+        activity_rights_model.editor_ids,
+        activity_rights_model.viewer_ids,
+        community_owned=activity_rights_model.community_owned,
+        cloned_from=(
+            activity_rights_model.cloned_from
+            if activity_type == ACTIVITY_TYPE_EXPLORATION else None),
+        status=activity_rights_model.status,
+        viewable_if_private=activity_rights_model.viewable_if_private,
     )
 
 
-def _save_exploration_rights(
-        committer_id, exploration_rights, commit_message, commit_cmds):
-    """Saves an ExplorationRights domain object to the datastore."""
-    exploration_rights.validate()
+def _save_activity_rights(
+        model_cls, committer_id, activity_rights, commit_message,
+        commit_cmds, cloneable=True):
+    """Saves an ExplorationRights or CollectionRights domain object to the
+    datastore.
+    """
+    activity_rights.validate()
 
-    model = exp_models.ExplorationRightsModel.get(
-        exploration_rights.id, strict=False)
+    model = model_cls.get(activity_rights.id, strict=False)
 
-    model.owner_ids = exploration_rights.owner_ids
-    model.editor_ids = exploration_rights.editor_ids
-    model.viewer_ids = exploration_rights.viewer_ids
-    model.community_owned = exploration_rights.community_owned
-    model.cloned_from = exploration_rights.cloned_from
-    model.status = exploration_rights.status
-    model.viewable_if_private = exploration_rights.viewable_if_private
+    model.owner_ids = activity_rights.owner_ids
+    model.editor_ids = activity_rights.editor_ids
+    model.viewer_ids = activity_rights.viewer_ids
+    model.community_owned = activity_rights.community_owned
+    model.status = activity_rights.status
+    model.viewable_if_private = activity_rights.viewable_if_private
+    if cloneable:
+        model.cloned_from = activity_rights.cloned_from
 
     model.commit(committer_id, commit_message, commit_cmds)
 
-    # update summary of changed exploration (note that exploration rights id
-    # is the same as exploration id)
-    # TODO(msl): get rid of inline import by refactoring code
+
+# Update summary of changed activity (note that the activity rights id is the
+# same as the activity id).
+# TODO(msl): get rid of inline imports by refactoring code
+def _update_exploration_summary(activity_rights):
     from core.domain import exp_services
-    exp_services.update_exploration_summary(exploration_rights.id)
+    exp_services.update_exploration_summary(activity_rights.id)
+
+
+def _update_collection_summary(activity_rights):
+    from core.domain import collection_services
+    collection_services.update_collection_summary(activity_rights.id)
 
 
 def create_new_exploration_rights(exploration_id, committer_id):
-    exploration_rights = ExplorationRights(
+    exploration_rights = ActivityRights(
         exploration_id, [committer_id], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
@@ -281,17 +216,17 @@ def get_exploration_rights(exploration_id):
     model = exp_models.ExplorationRightsModel.get(exploration_id)
     if model is None:
         raise Exception('This exploration does not exist.')
-    return _get_exploration_rights_from_model(model)
+    return _get_rights_rights_from_model(model, ACTIVITY_TYPE_EXPLORATION)
 
 
 def is_exploration_private(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
-    return exploration_rights.status == EXPLORATION_STATUS_PRIVATE
+    return exploration_rights.status == ACTIVITY_STATUS_PRIVATE
 
 
 def is_exploration_public(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
-    return exploration_rights.status == EXPLORATION_STATUS_PUBLIC
+    return exploration_rights.status == ACTIVITY_STATUS_PUBLIC
 
 
 def is_exploration_cloned(exploration_id):
@@ -299,44 +234,8 @@ def is_exploration_cloned(exploration_id):
     return bool(exploration_rights.cloned_from)
 
 
-def _get_collection_rights_from_model(collection_rights_model):
-    return CollectionRights(
-        collection_rights_model.id,
-        collection_rights_model.owner_ids,
-        collection_rights_model.editor_ids,
-        collection_rights_model.viewer_ids,
-        community_owned=collection_rights_model.community_owned,
-        status=collection_rights_model.status,
-        viewable_if_private=collection_rights_model.viewable_if_private,
-    )
-
-
-def _save_collection_rights(
-        committer_id, collection_rights, commit_message, commit_cmds):
-    """Saves a CollectionRights domain object to the datastore."""
-    collection_rights.validate()
-
-    model = collection_models.CollectionRightsModel.get(
-        collection_rights.id, strict=False)
-
-    model.owner_ids = collection_rights.owner_ids
-    model.editor_ids = collection_rights.editor_ids
-    model.viewer_ids = collection_rights.viewer_ids
-    model.community_owned = collection_rights.community_owned
-    model.status = collection_rights.status
-    model.viewable_if_private = collection_rights.viewable_if_private
-
-    model.commit(committer_id, commit_message, commit_cmds)
-
-    # Update the summary of the changed collection (note that the collection
-    # rights id is the same as collection id).
-    # TODO(msl): get rid of inline import by refactoring code
-    from core.domain import collection_services
-    collection_services.update_collection_summary(collection_rights.id)
-
-
 def create_new_collection_rights(collection_id, committer_id):
-    collection_rights = CollectionRights(collection_id, [committer_id], [], [])
+    collection_rights = ActivityRights(collection_id, [committer_id], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     collection_models.CollectionRightsModel(
@@ -357,17 +256,17 @@ def get_collection_rights(collection_id):
     model = collection_models.CollectionRightsModel.get(collection_id)
     if model is None:
         raise Exception('This collection does not exist.')
-    return _get_collection_rights_from_model(model)
+    return _get_rights_rights_from_model(model, ACTIVITY_TYPE_COLLECTION)
 
 
 def is_collection_private(collection_id):
     collection_rights = get_collection_rights(collection_id)
-    return collection_rights.status == COLLECTION_STATUS_PRIVATE
+    return collection_rights.status == ACTIVITY_STATUS_PRIVATE
 
 
 def is_collection_public(collection_id):
     collection_rights = get_collection_rights(collection_id)
-    return collection_rights.status == COLLECTION_STATUS_PUBLIC
+    return collection_rights.status == ACTIVITY_STATUS_PUBLIC
 
 
 class Actor(object):
@@ -394,35 +293,36 @@ class Actor(object):
                 self.user_id in rights_object.editor_ids or
                 self.user_id in rights_object.owner_ids)
 
-    def _has_viewing_rights(self, rights_object, private_status):
-        return (rights_object.status != private_status or
+    def _has_viewing_rights(self, rights_object):
+        return (rights_object.status != ACTIVITY_STATUS_PRIVATE or
                 self.user_id in rights_object.viewer_ids or
                 self.user_id in rights_object.editor_ids or
                 self.user_id in rights_object.owner_ids)
 
-    def _can_play(self, rights_object, private_status):
-        if rights_object.status == private_status:
-            return (self._has_viewing_rights(rights_object, private_status)
+    def _can_play(self, rights_object):
+        if rights_object.status == ACTIVITY_STATUS_PRIVATE:
+            return (self._has_viewing_rights(rights_object)
                     or rights_object.viewable_if_private
                     or self.is_moderator())
         else:
             return True
 
-    def _can_edit(self, rights_object, private_status):
+    def _can_edit(self, rights_object):
         return (
             self._has_editing_rights(rights_object) or (
-                self.is_moderator() and rights_object.status != private_status
+                self.is_moderator() and (
+                    rights_object.status != ACTIVITY_STATUS_PRIVATE)
             )
         )
 
-    def _can_delete(self, rights_object, private_status, public_status):
+    def _can_delete(self, rights_object):
         is_deleting_own_private_object = (
-            rights_object.status == private_status and
+            rights_object.status == ACTIVITY_STATUS_PRIVATE and
             self._is_owner(rights_object)
         )
 
         is_moderator_deleting_public_object = (
-            rights_object.status == public_status and
+            rights_object.status == ACTIVITY_STATUS_PUBLIC and
             self.is_moderator()
         )
 
@@ -430,306 +330,192 @@ class Actor(object):
             is_deleting_own_private_object or
             is_moderator_deleting_public_object)
 
-    def is_owner_of_exploration(self, exploration_id):
+    def _get_activity_rights(self, activity_type, activity_id):
         try:
-            exp_rights = get_exploration_rights(exploration_id)
+            if activity_type == ACTIVITY_TYPE_EXPLORATION:
+                return get_exploration_rights(activity_id)
+            elif activity_type == ACTIVITY_TYPE_COLLECTION:
+                return get_collection_rights(activity_id)
         except Exception:
+            pass
+        return None
+
+    def is_owner(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
-        return self._is_owner(exp_rights)
+        return self._is_owner(activity_rights)
 
-    def has_exploration_editing_rights(self, exploration_id):
-        """Whether this user has editing rights for this exploration.
+    def has_editing_rights(self, activity_type, activity_id):
+        """Whether this user has editing rights for this activity.
 
-        This is true if the exploration is community-owned, or if the user is
-        in the owner/editor list for the exploration.
+        This is true if the activity is community-owned, or if the user is in
+        the owner/editor list for the activity.
         """
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
-        return self._has_editing_rights(exp_rights)
+        return self._has_editing_rights(activity_rights)
 
-    def has_exploration_viewing_rights(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+    def has_viewing_rights(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
-        return self._has_viewing_rights(exp_rights, EXPLORATION_STATUS_PRIVATE)
+        return self._has_viewing_rights(activity_rights)
 
-    def can_play_exploration(self, exploration_id):
-        """Whether the user can play the reader view of this exploration."""
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+    def can_play(self, activity_type, activity_id):
+        """Whether the user can play the reader view of this activity."""
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
-        return self._can_play(exp_rights, EXPLORATION_STATUS_PRIVATE)
+        return self._can_play(activity_rights)
 
-    def can_view_exploration(self, exploration_id):
-        """Whether the user can view the editor page for this exploration."""
-        return self.can_play_exploration(exploration_id)
+    def can_view(self, activity_type, activity_id):
+        """Whether the user can view the editor page for this activity."""
+        return self.can_play(activity_type, activity_id)
 
-    def can_edit_exploration(self, exploration_id):
+    def can_edit(self, activity_type, activity_id):
         # TODO(sll): Add a check here for whether a user is banned or not,
         # rather than having this check in the controller.
-        exp_rights = get_exploration_rights(exploration_id)
-        return self._can_edit(exp_rights, EXPLORATION_STATUS_PRIVATE)
-
-    def can_delete_exploration(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
-        return self._can_delete(
-            exp_rights, EXPLORATION_STATUS_PRIVATE, EXPLORATION_STATUS_PUBLIC)
+        return self._can_edit(activity_rights)
 
-    def can_change_private_exploration_viewability(self, exploration_id):
-        """Note that this requires the exploration in question
-        to be private.
-        """
-        return self.can_publish_exploration(exploration_id)
+    def can_delete(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
+            return False
+        return self._can_delete(activity_rights)
 
-    def can_publish_exploration(self, exploration_id):
-        if exp_domain.Exploration.is_demo_exploration_id(exploration_id):
-            # Demo explorations are public by default.
+    def can_change_private_viewability(
+            self, activity_type, activity_id):
+        """Note that this requires the activity in question to be private."""
+
+        return self.can_publish(activity_type, activity_id)
+
+    def can_publish(self, activity_type, activity_id):
+        # Demo activities are public by default.
+        if activity_type == ACTIVITY_TYPE_EXPLORATION and (
+                exp_domain.Exploration.is_demo_exploration_id(activity_id)):
+            return True
+        elif activity_type == ACTIVITY_TYPE_COLLECTION and (
+                collection_domain.Collection.is_demo_collection_id(
+                    activity_id)):
             return True
 
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
 
-        if exp_rights.status != EXPLORATION_STATUS_PRIVATE:
+        if activity_rights.status != ACTIVITY_STATUS_PRIVATE:
             return False
-        if exp_rights.cloned_from:
-            return False
-
-        return self.is_owner_of_exploration(exploration_id) or self.is_admin()
-
-    def can_unpublish_exploration(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+        if activity_rights.cloned_from:
             return False
 
-        if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
+        return self.is_owner(activity_type, activity_id) or self.is_admin()
+
+    def can_unpublish(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
-        if exp_rights.community_owned:
+
+        if activity_rights.status != ACTIVITY_STATUS_PUBLIC:
+            return False
+        if activity_rights.community_owned:
             return False
         return self.is_moderator()
 
-    def can_modify_exploration_roles(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+    def can_modify_roles(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
 
-        if exp_rights.community_owned or exp_rights.cloned_from:
+        if activity_rights.community_owned or activity_rights.cloned_from:
             return False
-        return self.is_admin() or self.is_owner_of_exploration(exploration_id)
+        return self.is_admin() or self.is_owner(activity_type, activity_id)
 
-    def can_release_ownership_of_exploration(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
-            return False
-
-        if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
-            return False
-        return self.can_modify_exploration_roles(exploration_id)
-
-    def can_publicize_exploration(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+    def can_release_ownership(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
 
-        if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
+        if activity_rights.status == ACTIVITY_STATUS_PRIVATE:
+            return False
+        return self.can_modify_roles(activity_type, activity_id)
+
+    def can_publicize(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
+            return False
+
+        if activity_rights.status != ACTIVITY_STATUS_PUBLIC:
             return False
         return self.is_moderator()
 
-    def can_unpublicize_exploration(self, exploration_id):
-        try:
-            exp_rights = get_exploration_rights(exploration_id)
-        except Exception:
+    def can_unpublicize(self, activity_type, activity_id):
+        activity_rights = self._get_activity_rights(activity_type, activity_id)
+        if activity_rights is None:
             return False
 
-        if exp_rights.status != EXPLORATION_STATUS_PUBLICIZED:
-            return False
-        return self.is_moderator()
-
-    def is_owner_of_collection(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-        return self._is_owner(collection_rights)
-
-    def has_collection_editing_rights(self, collection_id):
-        """Whether this user has editing rights for this collection.
-
-        This is true if the collection is community-owned, or if the user is
-        in the owner/editor list for the collection.
-        """
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-        return self._has_editing_rights(collection_rights)
-
-    def has_collection_viewing_rights(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-        return self._has_viewing_rights(
-            collection_rights, COLLECTION_STATUS_PRIVATE)
-
-    def can_play_collection(self, collection_id):
-        """Whether the user can play the reader view of this collection."""
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-        return self._can_play(collection_rights, COLLECTION_STATUS_PRIVATE)
-
-    def can_view_collection(self, collection_id):
-        """Whether the user can view the editor page for this collection."""
-        return self.can_play_collection(collection_id)
-
-    def can_edit_collection(self, collection_id):
-        # TODO(sll): Add a check here for whether a user is banned or not,
-        # rather than having this check in the controller.
-        collection_rights = get_collection_rights(collection_id)
-        return self._can_edit(collection_rights, COLLECTION_STATUS_PRIVATE)
-
-    def can_delete_collection(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-        return self._can_delete(
-            collection_rights, COLLECTION_STATUS_PRIVATE,
-            COLLECTION_STATUS_PUBLIC)
-
-    def can_change_private_collection_viewability(self, collection_id):
-        """Note that this requires the collection in question
-        to be private.
-        """
-        return self.can_publish_collection(collection_id)
-
-    def can_publish_collection(self, collection_id):
-        if collection_domain.Collection.is_demo_collection_id(collection_id):
-            # Demo collections are public by default.
-            return True
-
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-
-        if collection_rights.status != COLLECTION_STATUS_PRIVATE:
-            return False
-
-        return self.is_owner_of_collection(collection_id) or self.is_admin()
-
-    def can_unpublish_collection(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-
-        if collection_rights.status != COLLECTION_STATUS_PUBLIC:
-            return False
-        if collection_rights.community_owned:
-            return False
-        return self.is_moderator()
-
-    def can_modify_collection_roles(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-
-        if collection_rights.community_owned:
-            return False
-        return self.is_admin() or self.is_owner_of_collection(collection_id)
-
-    def can_release_ownership_of_collection(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-
-        if collection_rights.status == COLLECTION_STATUS_PRIVATE:
-            return False
-        return self.can_modify_collection_roles(collection_id)
-
-    def can_publicize_collection(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-
-        if collection_rights.status != COLLECTION_STATUS_PUBLIC:
-            return False
-        return self.is_moderator()
-
-    def can_unpublicize_collection(self, collection_id):
-        try:
-            collection_rights = get_collection_rights(collection_id)
-        except Exception:
-            return False
-
-        if collection_rights.status != COLLECTION_STATUS_PUBLICIZED:
+        if activity_rights.status != ACTIVITY_STATUS_PUBLICIZED:
             return False
         return self.is_moderator()
 
 
 def _assign_role(
-        committer_id, object_rights, assignee_id, new_role, object_name,
-        private_status):
+        committer_id, activity_rights, assignee_id, new_role, activity_type):
+    """Args:
+    - committer_id: str. The user_id of the user who is performing the action.
+    - activity_rights: The storage object for the rights of this activity (
+        one of: ExplorationRightsModel or CollectionRightsModel).
+    - assignee_id: str. The user_id of the user whose role is being changed.
+    - new_role: str. The name of the new role: either 'owner', 'editor' or
+        'viewer'.
+    - activity_type: str. One of ACTIVITY_TYPE_EXPLORATION or
+        ACTIVITY_TYPE_COLLECTION.
+    """
     assignee_username = user_services.get_username(assignee_id)
     old_role = ROLE_NONE
 
     if new_role == ROLE_OWNER:
-        if Actor(assignee_id)._is_owner(object_rights):
-            raise Exception('This user already owns this %s.' % object_name)
+        if Actor(assignee_id)._is_owner(activity_rights):
+            raise Exception('This user already owns this %s.' % activity_type)
 
-        object_rights.owner_ids.append(assignee_id)
+        activity_rights.owner_ids.append(assignee_id)
 
-        if assignee_id in object_rights.viewer_ids:
-            object_rights.viewer_ids.remove(assignee_id)
+        if assignee_id in activity_rights.viewer_ids:
+            activity_rights.viewer_ids.remove(assignee_id)
             old_role = ROLE_VIEWER
-        if assignee_id in object_rights.editor_ids:
-            object_rights.editor_ids.remove(assignee_id)
+        if assignee_id in activity_rights.editor_ids:
+            activity_rights.editor_ids.remove(assignee_id)
             old_role = ROLE_EDITOR
 
     elif new_role == ROLE_EDITOR:
-        if Actor(assignee_id)._has_editing_rights(object_rights):
+        if Actor(assignee_id)._has_editing_rights(activity_rights):
             raise Exception(
-                'This user already can edit this %s.'  % object_name)
+                'This user already can edit this %s.'  % activity_type)
 
-        if object_rights.community_owned:
+        if activity_rights.community_owned:
             raise Exception(
-                'Community-owned %ss can be edited by anyone.' % object_name)
+                'Community-owned %ss can be edited by anyone.' % activity_type)
 
-        object_rights.editor_ids.append(assignee_id)
+        activity_rights.editor_ids.append(assignee_id)
 
-        if assignee_id in object_rights.viewer_ids:
-            object_rights.viewer_ids.remove(assignee_id)
+        if assignee_id in activity_rights.viewer_ids:
+            activity_rights.viewer_ids.remove(assignee_id)
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
-        if Actor(assignee_id)._has_viewing_rights(
-                object_rights, private_status):
+        if Actor(assignee_id)._has_viewing_rights(activity_rights):
             raise Exception(
-                'This user already can view this %s.' % object_name)
+                'This user already can view this %s.' % activity_type)
 
-        if object_rights.status != private_status:
+        if activity_rights.status != ACTIVITY_STATUS_PRIVATE:
             raise Exception(
-                'Public %ss can be viewed by anyone.' % object_name)
+                'Public %ss can be viewed by anyone.' % activity_type)
 
-        object_rights.viewer_ids.append(assignee_id)
+        activity_rights.viewer_ids.append(assignee_id)
 
     else:
         raise Exception('Invalid role: %s' % new_role)
@@ -746,7 +532,7 @@ def _assign_role(
     }
 
 
-def _release_ownership(commiter_id, rights_object):
+def _release_ownership(rights_object):
     rights_object.community_owned = True
     rights_object.owner_ids = []
     rights_object.editor_ids = []
@@ -769,7 +555,8 @@ def assign_role_for_exploration(
     - new_role: str. The name of the new role: either 'owner', 'editor' or
         'viewer'.
     """
-    if not Actor(committer_id).can_modify_exploration_roles(exploration_id):
+    if not Actor(committer_id).can_modify_roles(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of exploration %s '
             'but was refused permission.' % (
@@ -779,13 +566,14 @@ def assign_role_for_exploration(
 
     exp_rights = get_exploration_rights(exploration_id)
     results = _assign_role(
-        committer_id, exp_rights, assignee_id, new_role, 'Exploration',
-        EXPLORATION_STATUS_PRIVATE)
+        committer_id, exp_rights, assignee_id, new_role, 'Exploration')
     commit_message = results['commit_message']
     commit_cmds = results['commit_cmds']
 
-    _save_exploration_rights(
-        committer_id, exp_rights, commit_message, commit_cmds)
+    _save_activity_rights(
+        exp_models.ExplorationRightsModel, committer_id, exp_rights,
+        commit_message, commit_cmds)
+    _update_exploration_summary(exp_rights)
 
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
         subscription_services.subscribe_to_activity(
@@ -797,8 +585,8 @@ def release_ownership_of_exploration(committer_id, exploration_id):
 
     Commits changes.
     """
-    if not Actor(committer_id).can_release_ownership_of_exploration(
-            exploration_id):
+    if not Actor(committer_id).can_release_ownership(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to release ownership of exploration %s but was '
             'refused permission.' % (committer_id, exploration_id))
@@ -806,14 +594,15 @@ def release_ownership_of_exploration(committer_id, exploration_id):
             'The ownership of this exploration cannot be released.')
 
     exploration_rights = get_exploration_rights(exploration_id)
-    _release_ownership(committer_id, exploration_rights)
+    _release_ownership(exploration_rights)
     commit_cmds = [{
         'cmd': CMD_RELEASE_OWNERSHIP,
     }]
 
-    _save_exploration_rights(
-        committer_id, exploration_rights,
+    _save_activity_rights(
+        exp_models.ExplorationRightsModel, committer_id, exploration_rights,
         'Exploration ownership released to the community.', commit_cmds)
+    _update_exploration_summary(exploration_rights)
 
 
 def _change_exploration_status(
@@ -836,21 +625,24 @@ def _change_exploration_status(
         'new_status': new_status
     }]
 
-    if new_status != EXPLORATION_STATUS_PRIVATE:
+    if new_status != ACTIVITY_STATUS_PRIVATE:
         exploration_rights.viewer_ids = []
 
-    _save_exploration_rights(
-        committer_id, exploration_rights, commit_message, commit_cmds)
+    _save_activity_rights(
+        exp_models.ExplorationRightsModel, committer_id, exploration_rights,
+        commit_message, commit_cmds)
+    _update_exploration_summary(exploration_rights)
     event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
 
 
-def set_private_viewability(committer_id, exploration_id, viewable_if_private):
+def set_private_viewability_of_exploration(
+        committer_id, exploration_id, viewable_if_private):
     """Sets the viewable_if_private attribute for an exploration's rights
     object. If viewable_if_private is True, this allows an private exploration
     to be viewed by anyone with the link.
     """
-    if not Actor(committer_id).can_change_private_exploration_viewability(
-            exploration_id):
+    if not Actor(committer_id).can_change_private_viewability(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to change private viewability of exploration %s '
             'but was refused permission.' % (committer_id, exploration_id))
@@ -875,8 +667,10 @@ def set_private_viewability(committer_id, exploration_id, viewable_if_private):
         if viewable_if_private else
         'Made exploration viewable only to invited playtesters.')
 
-    _save_exploration_rights(
-        committer_id, exploration_rights, commit_message, commit_cmds)
+    _save_activity_rights(
+        exp_models.ExplorationRightsModel, committer_id, exploration_rights,
+        commit_message, commit_cmds)
+    _update_exploration_summary(exploration_rights)
 
 
 def publish_exploration(committer_id, exploration_id):
@@ -885,27 +679,29 @@ def publish_exploration(committer_id, exploration_id):
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
     """
-    if not Actor(committer_id).can_publish_exploration(exploration_id):
+    if not Actor(committer_id).can_publish(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to publish exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
         raise Exception('This exploration cannot be published.')
 
     _change_exploration_status(
-        committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
+        committer_id, exploration_id, ACTIVITY_STATUS_PUBLIC,
         'Exploration published.')
 
 
 def unpublish_exploration(committer_id, exploration_id):
     """Unpublishes an exploration. Commits changes."""
-    if not Actor(committer_id).can_unpublish_exploration(exploration_id):
+    if not Actor(committer_id).can_unpublish(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to unpublish exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
         raise Exception('This exploration cannot be unpublished.')
 
     _change_exploration_status(
-        committer_id, exploration_id, EXPLORATION_STATUS_PRIVATE,
+        committer_id, exploration_id, ACTIVITY_STATUS_PRIVATE,
         'Exploration unpublished.')
 
 
@@ -915,27 +711,29 @@ def publicize_exploration(committer_id, exploration_id):
     It is the responsibility of the caller to check that the exploration is
     valid prior to publicizing it.
     """
-    if not Actor(committer_id).can_publicize_exploration(exploration_id):
+    if not Actor(committer_id).can_publicize(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to publicize exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
         raise Exception('This exploration cannot be marked as "featured".')
 
     _change_exploration_status(
-        committer_id, exploration_id, EXPLORATION_STATUS_PUBLICIZED,
+        committer_id, exploration_id, ACTIVITY_STATUS_PUBLICIZED,
         'Exploration publicized.')
 
 
 def unpublicize_exploration(committer_id, exploration_id):
     """Unpublicizes an exploration. Commits changes."""
-    if not Actor(committer_id).can_unpublicize_exploration(exploration_id):
+    if not Actor(committer_id).can_unpublicize(
+            ACTIVITY_TYPE_EXPLORATION, exploration_id):
         logging.error(
             'User %s tried to unpublicize exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
         raise Exception('This exploration cannot be unmarked as "featured".')
 
     _change_exploration_status(
-        committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
+        committer_id, exploration_id, ACTIVITY_STATUS_PUBLIC,
         'Exploration unpublicized.')
 
 
@@ -955,7 +753,8 @@ def assign_role_for_collection(
     - new_role: str. The name of the new role: either 'owner', 'editor' or
         'viewer'.
     """
-    if not Actor(committer_id).can_modify_collection_roles(collection_id):
+    if not Actor(committer_id).can_modify_roles(
+            ACTIVITY_TYPE_COLLECTION, collection_id):
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of collection %s '
             'but was refused permission.' % (
@@ -965,25 +764,27 @@ def assign_role_for_collection(
 
     collection_rights = get_collection_rights(collection_id)
     results = _assign_role(
-        committer_id, collection_rights, assignee_id, new_role, 'Collection',
-        COLLECTION_STATUS_PRIVATE)
+        committer_id, collection_rights, assignee_id, new_role, 'Collection')
     commit_message = results['commit_message']
     commit_cmds = results['commit_cmds']
 
-    _save_collection_rights(
-        committer_id, collection_rights, commit_message, commit_cmds)
+    _save_activity_rights(
+        collection_models.CollectionRightsModel, committer_id,
+        collection_rights, commit_message, commit_cmds, cloneable=False)
+    _update_collection_summary(collection_rights)
 
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
         subscription_services.subscribe_to_collection(
             assignee_id, collection_id)
+
 
 def release_ownership_of_collection(committer_id, collection_id):
     """Releases ownership of an collection to the community.
 
     Commits changes.
     """
-    if not Actor(committer_id).can_release_ownership_of_collection(
-            collection_id):
+    if not Actor(committer_id).can_release_ownership(
+            ACTIVITY_TYPE_COLLECTION, collection_id):
         logging.error(
             'User %s tried to release ownership of collection %s but was '
             'refused permission.' % (committer_id, collection_id))
@@ -991,14 +792,16 @@ def release_ownership_of_collection(committer_id, collection_id):
             'The ownership of this collection cannot be released.')
 
     collection_rights = get_collection_rights(collection_id)
-    _release_ownership(committer_id, collection_rights)
+    _release_ownership(collection_rights)
     commit_cmds = [{
         'cmd': CMD_RELEASE_OWNERSHIP,
     }]
 
-    _save_collection_rights(
-        committer_id, collection_rights,
-        'Collection ownership released to the community.', commit_cmds)
+    _save_activity_rights(
+        collection_models.CollectionRightsModel, committer_id,
+        collection_rights, 'Collection ownership released to the community.',
+        commit_cmds, cloneable=False)
+    _update_collection_summary(collection_rights)
 
 
 def _change_collection_status(
@@ -1021,11 +824,13 @@ def _change_collection_status(
         'new_status': new_status
     }]
 
-    if new_status != COLLECTION_STATUS_PRIVATE:
+    if new_status != ACTIVITY_STATUS_PRIVATE:
         collection_rights.viewer_ids = []
 
-    _save_collection_rights(
-        committer_id, collection_rights, commit_message, commit_cmds)
+    _save_activity_rights(
+        collection_models.CollectionRightsModel, committer_id,
+        collection_rights, commit_message, commit_cmds, cloneable=False)
+    _update_collection_summary(collection_rights)
     event_services.CollectionStatusChangeEventHandler.record(collection_id)
 
 
@@ -1035,27 +840,29 @@ def publish_collection(committer_id, collection_id):
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.
     """
-    if not Actor(committer_id).can_publish_collection(collection_id):
+    if not Actor(committer_id).can_publish(
+            ACTIVITY_TYPE_COLLECTION, collection_id):
         logging.error(
             'User %s tried to publish collection %s but was refused '
             'permission.' % (committer_id, collection_id))
         raise Exception('This collection cannot be published.')
 
     _change_collection_status(
-        committer_id, collection_id, COLLECTION_STATUS_PUBLIC,
+        committer_id, collection_id, ACTIVITY_STATUS_PUBLIC,
         'Collection published.')
 
 
 def unpublish_collection(committer_id, collection_id):
     """Unpublishes an collection. Commits changes."""
-    if not Actor(committer_id).can_unpublish_collection(collection_id):
+    if not Actor(committer_id).can_unpublish(
+            ACTIVITY_TYPE_COLLECTION, collection_id):
         logging.error(
             'User %s tried to unpublish collection %s but was refused '
             'permission.' % (committer_id, collection_id))
         raise Exception('This collection cannot be unpublished.')
 
     _change_collection_status(
-        committer_id, collection_id, COLLECTION_STATUS_PRIVATE,
+        committer_id, collection_id, ACTIVITY_STATUS_PRIVATE,
         'Collection unpublished.')
 
 
@@ -1065,25 +872,27 @@ def publicize_collection(committer_id, collection_id):
     It is the responsibility of the caller to check that the collection is
     valid prior to publicizing it.
     """
-    if not Actor(committer_id).can_publicize_collection(collection_id):
+    if not Actor(committer_id).can_publicize(
+            ACTIVITY_TYPE_COLLECTION, collection_id):
         logging.error(
             'User %s tried to publicize collection %s but was refused '
             'permission.' % (committer_id, collection_id))
         raise Exception('This collection cannot be marked as "featured".')
 
     _change_collection_status(
-        committer_id, collection_id, COLLECTION_STATUS_PUBLICIZED,
+        committer_id, collection_id, ACTIVITY_STATUS_PUBLICIZED,
         'Collection publicized.')
 
 
 def unpublicize_collection(committer_id, collection_id):
     """Unpublicizes an collection. Commits changes."""
-    if not Actor(committer_id).can_unpublicize_collection(collection_id):
+    if not Actor(committer_id).can_unpublicize(
+            ACTIVITY_TYPE_COLLECTION, collection_id):
         logging.error(
             'User %s tried to unpublicize collection %s but was refused '
             'permission.' % (committer_id, collection_id))
         raise Exception('This collection cannot be unmarked as "featured".')
 
     _change_collection_status(
-        committer_id, collection_id, COLLECTION_STATUS_PUBLIC,
+        committer_id, collection_id, ACTIVITY_STATUS_PUBLIC,
         'Collection unpublicized.')

@@ -260,10 +260,10 @@ def get_item_similarity(reference_exp_id, compared_exp_id):
     similarity_score = 0
 
     if (compared_exp_summary.status ==
-            rights_manager.EXPLORATION_STATUS_PRIVATE):
+            rights_manager.ACTIVITY_STATUS_PRIVATE):
         return 0
     elif (compared_exp_summary.status ==
-            rights_manager.EXPLORATION_STATUS_PUBLICIZED):
+            rights_manager.ACTIVITY_STATUS_PUBLICIZED):
         similarity_score += 1
 
     similarity_score += get_topic_similarity(

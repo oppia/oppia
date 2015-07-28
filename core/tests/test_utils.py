@@ -87,6 +87,7 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+    DEFAULT_END_STATE_NAME = 'End'
 
     VERSION_0_STATES_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: {
@@ -374,17 +375,18 @@ class TestBase(unittest.TestCase):
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, 'A category')
+            collection_id, title, 'A category', 'An objective')
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            exploration_id='an_exploration_id', end_state_name=None):
+            exploration_id='an_exploration_id',
+            end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective=objective)
-        collection.add_exploration(
+        collection.add_collection_node(
             self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
                 end_state_name=end_state_name).id)

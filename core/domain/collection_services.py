@@ -28,8 +28,8 @@ import copy
 import logging
 import os
 
-from core.domain import event_services
 from core.domain import collection_domain
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
@@ -47,9 +47,9 @@ CMD_CREATE_NEW = 'create_new'
 SEARCH_INDEX_COLLECTIONS = 'collections'
 
 
-def _migrate_collection_schemas(versioned_collection):
+def _migrate_collection_to_latest_schema(versioned_collection):
     """Holds the responsibility of performing a step-by-step, sequential update
-    of a the collection structure based on the schema version of the input
+    of the collection structure based on the schema version of the input
     collection dictionary. This is very similar to the exploration migration
     process seen in exp_services. If any of the current collection schemas
     change, a new conversion function must be added and some code appended to
@@ -58,20 +58,14 @@ def _migrate_collection_schemas(versioned_collection):
     Args:
         versioned_collection: A dict with two keys:
           - schema_version: the schema version for the collection.
-          - linked_explorations: the dict of linked explorations comprising the
-            collection. The keys in this dict are exploration IDs.
+          - nodes: the list of collection nodes comprising the collection.
     """
     collection_schema_version = versioned_collection['schema_version']
-    if (collection_schema_version is None
-            or collection_schema_version < 1):
-        collection_schema_version = 1
-
     if not (1 <= collection_schema_version
             <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         raise Exception(
-            'Sorry, we can only process v1-v%d and unversioned collection '
-            'schemas at present.' %
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+            'Sorry, we can only process v1-v%d collection schemas at '
+            'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
     # This is where conversion functions will be placed once updates to the
     # collection schemas happen.
@@ -102,25 +96,21 @@ def get_collection_from_model(collection_model, run_conversion=True):
     # Ensure the original collection model does not get altered.
     versioned_collection = {
         'schema_version': collection_model.schema_version,
-        'linked_explorations': copy.deepcopy(
-            collection_model.linked_explorations)
+        'nodes': copy.deepcopy(collection_model.nodes)
     }
 
-    # If the collection uses the latest states schema version, no conversion
-    # is necessary.
+    # Migrate the collection if it is not using the latest schema version.
     if (run_conversion and collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-        _migrate_collection_schemas(versioned_collection)
+        _migrate_collection_to_latest_schema(versioned_collection)
 
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
-        versioned_collection['schema_version'], {
-            exp_id: collection_domain.LinkedExploration.from_dict(
-                exp_id, linked_exp_dict)
-            for (exp_id, linked_exp_dict)
-            in versioned_collection['linked_explorations'].iteritems()
-        },
+        versioned_collection['schema_version'], [
+            collection_domain.CollectionNode.from_dict(collection_node_dict)
+            for collection_node_dict in versioned_collection['nodes']
+        ],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -252,10 +242,9 @@ def get_collection_titles_and_categories(collection_ids):
         for e in collection_models.CollectionModel.get_multi(collection_ids)]
 
     result = {}
-    for ind, collection in enumerate(collections):
+    for collection in collections:
         if collection is None:
-            logging.error(
-                'Could not find collection corresponding to id')
+            logging.error('Could not find collection corresponding to id')
         else:
             result[collection.id] = {
                 'title': collection.title,
@@ -304,7 +293,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     for i in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
 
-        collectionids, search_cursor = search_collections(
+        collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_collection_ids = []
@@ -336,45 +325,6 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     ], search_cursor)
 
 
-def get_non_private_collection_summaries():
-    """Returns a dict with all non-private collection summary domain objects,
-    keyed by their id.
-    """
-    return _get_collection_summary_dicts_from_models(
-        collection_models.CollectionSummaryModel.get_non_private())
-
-
-def get_all_collection_summaries():
-    """Returns a dict with all collection summary domain objects,
-    keyed by their id.
-    """
-    return _get_collection_summary_dicts_from_models(
-        collection_models.CollectionSummaryModel.get_all())
-
-
-def get_private_at_least_viewable_collection_summaries(user_id):
-    """Returns a dict with all collection summary domain objects that are
-    at least viewable by given user. The dict is keyed by collection id.
-    """
-    return _get_collection_summary_dicts_from_models(
-        collection_models.CollectionSummaryModel.get_private_at_least_viewable(
-            user_id=user_id))
-
-
-def get_at_least_editable_collection_summaries(user_id):
-    """Returns a dict with all collection summary domain objects that are
-    at least editable by given user. The dict is keyed by collection id.
-    """
-    return _get_collection_summary_dicts_from_models(
-        collection_models.CollectionSummaryModel.get_at_least_editable(
-            user_id=user_id))
-
-
-def count_collections():
-    """Returns the total number of collections."""
-    return collection_models.CollectionModel.get_collection_count()
-
-
 # Repository SAVE and DELETE methods.
 def apply_change_list(collection_id, change_list):
     """Applies a changelist to a pristine collection and returns the result.
@@ -391,21 +341,21 @@ def apply_change_list(collection_id, change_list):
                    for change_dict in change_list]
 
         for change in changes:
-            if change.cmd == collection_domain.CMD_ADD_EXPLORATION:
-                collection.add_exploration(change.exploration_id)
-            elif change.cmd == collection_domain.CMD_DELETE_EXPLORATION:
-                collection.delete_exploration(change.exploration_id)
+            if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
+                collection.add_collection_node(change.exploration_id)
+            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
+                collection.delete_collection_node(change.exploration_id)
             elif (change.cmd ==
-                    collection_domain.CMD_EDIT_LINKED_EXPLORATION_PROPERTY):
-                linked_exploration = collection.linked_explorations[
-                    change.exploration_id]
+                    collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
+                collection_node = collection.get_collection_node(
+                    change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.LINKED_EXPLORATION_PROPERTY_PREREQUISITE_SKILLS):
-                    linked_exploration.update_prerequisite_skills(
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
+                    collection_node.update_prerequisite_skills(
                         change.new_value)
                 elif (change.property_name ==
-                        collection_domain.LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS):
-                    linked_exploration.update_acquired_skills(change.new_value)
+                        collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
+                    collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if change.property_name == 'title':
                     collection.update_title(change.new_value)
@@ -417,9 +367,8 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
-                # latest states schema version. As a result, simply resaving
-                # the collection is sufficient to apply the states schema
-                # update.
+                # latest schema version. As a result, simply resaving the
+                # collection is sufficient to apply the schema migration.
                 continue
         return collection
 
@@ -431,136 +380,19 @@ def apply_change_list(collection_id, change_list):
         raise
 
 
-def get_summary_of_change_list(base_collection, change_list):
-    """Applies a changelist to a pristine collection and returns a summary.
-
-    Each entry in change_list is a dict that represents an CollectionChange
-    object.
-
-    Returns:
-      a dict with five keys:
-        collection_property_changes: a dict, where each key is a property_name
-          of the collection, and the corresponding values are dicts with keys
-          old_value and new_value.
-        linked_exploration_property_changes: a dict, where each key is an
-          exploration ID, and the corresponding values are dicts; the keys of
-          these dicts represent properties of the linked exploration, and the
-          corresponding values are dicts with keys old_value and new_value.
-        changed_explorations: a list of exploration IDs. This indicates that
-          the linked exploration has changed but we do not know what the
-          changes are. This can happen for complicated operations like removing
-          a linked exploration and later adding a new linked exploration with
-          the exploration ID as the removed linked exploration.
-        added_explorations: a list of added exploration IDs.
-        deleted_explorations: a list of deleted exploration IDs.
-    """
-    # TODO(sll): This really needs tests, especially the diff logic. Probably
-    # worth comparing with the actual changed collection.
-
-    # Ensure that the original collection does not get altered.
-    collection = copy.deepcopy(base_collection)
-
-    changes = [
-        collection_domain.CollectionChange(change_dict)
-        for change_dict in change_list]
-
-    collection_property_changes = {}
-    linked_exploration_property_changes = {}
-    changed_explorations = []
-    added_explorations = []
-    deleted_explorations = []
-
-    for change in changes:
-        if change.cmd == collection_domain.CMD_ADD_EXPLORATION:
-            if change.exploration_id in changed_explorations:
-                continue
-            elif change.exploration_id in deleted_explorations:
-                changed_explorations.append(change.exploration_id)
-                del linked_exploration_property_changes[change.exploration_id]
-                deleted_explorations.remove(change.exploration_id)
-            else:
-                added_explorations.append(change.state_name)
-        elif change.cmd == collection_domain.CMD_DELETE_EXPLORATION:
-            if change.exploration_id in changed_explorations:
-                continue
-            elif change.exploration_id in added_explorations:
-                added_explorations.remove(change.exploration_id)
-            else:
-                deleted_explorations.append(change.exploration_id)
-        elif (change.cmd ==
-                collection_domain.CMD_EDIT_LINKED_EXPLORATION_PROPERTY):
-            exp_id = change.exploration_id
-            if exp_id in changed_explorations:
-                continue
-
-            property_name = change.property_name
-
-            if exp_id not in linked_exploration_property_changes:
-                linked_exploration_property_changes[exp_id] = {}
-            if (property_name not in
-                    linked_exploration_property_changes[exp_id]):
-                linked_exploration_property_changes[exp_id][property_name] = {
-                    'old_value': change.old_value
-                }
-            linked_exploration_property_changes[exp_id][property_name][
-                'new_value'] = change.new_value
-        elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-            property_name = change.property_name
-
-            if property_name not in collection_property_changes:
-                collection_property_changes[property_name] = {
-                    'old_value': change.old_value
-                }
-            collection_property_changes[property_name]['new_value'] = (
-                change.new_value)
-        elif (change.cmd ==
-                collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
-            continue
-
-    unchanged_exploration_properties = []
-    for property_name in collection_property_changes:
-        if (collection_property_changes[property_name]['old_value'] ==
-                collection_property_changes[property_name]['new_value']):
-            unchanged_exploration_properties.append(property_name)
-    for property_name in unchanged_exploration_properties:
-        del collection_property_changes[property_name]
-
-    unchanged_exploration_ids = []
-    for exp_id in linked_exploration_property_changes:
-        unchanged_state_properties = []
-        changes = linked_exploration_property_changes[exp_id]
-        for property_name in changes:
-            if (changes[property_name]['old_value'] ==
-                    changes[property_name]['new_value']):
-                unchanged_state_properties.append(property_name)
-        for property_name in unchanged_state_properties:
-            del changes[property_name]
-
-        if len(changes) == 0:
-            unchanged_exploration_ids.append(exp_id)
-    for exp_id in unchanged_exploration_ids:
-        del linked_exploration_property_changes[exp_id]
-
-    return {
-        'collection_property_changes': collection_property_changes,
-        'linked_exploration_property_changes': (
-            linked_exploration_property_changes),
-        'changed_explorations': changed_explorations,
-        'added_explorations': added_explorations,
-        'deleted_explorations': deleted_explorations,
-    }
-
-
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates an collection and commits it to persistent storage.
 
     If successful, increments the version number of the incoming collection
     domain object by 1.
     """
-    if change_list is None:
-        change_list = []
+    if not change_list:
+        raise Exception(
+            'Unexpected error: received an invalid change list when trying to '
+            'save collection %s: %s' % (collection.id, change_list))
+
     collection_rights = rights_manager.get_collection_rights(collection.id)
-    if collection_rights.status != rights_manager.COLLECTION_STATUS_PRIVATE:
+    if collection_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
@@ -570,7 +402,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     if collection_model is None:
         collection_model = collection_models.CollectionModel(id=collection.id)
     else:
-        if collection_model.version > collection_model.version:
+        if collection.version > collection_model.version:
             raise Exception(
                 'Unexpected error: trying to update version %s of collection '
                 'from version %s. Please reload the page and try again.'
@@ -585,14 +417,14 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.title = collection.title
     collection_model.objective = collection.objective
     collection_model.schema_version = collection.schema_version
-    collection_model.linked_explorations = {
-        exp_id: linked_exp.to_dict()
-        for (exp_id, linked_exp) in collection.linked_explorations.iteritems()
-    }
+    collection_model.nodes = [
+        collection_node.to_dict() for collection_node in collection.nodes
+    ]
 
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
     event_services.CollectionContentChangeEventHandler.record(collection.id)
+    # TODO(bhenning): Verify rights that this should be indexed.
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -605,10 +437,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     present to tell it whether to do strict validation or not.
     """
     # This line is needed because otherwise a rights object will be created,
-    # but the creation of an collection object will fail. Do not validate
-    # explorations if it is a demo collection.
-    collection.validate(
-        strict=False, validate_explorations=not collection.is_demo)
+    # but the creation of an collection object will fail.
+    collection.validate(strict=False)
     rights_manager.create_new_collection_rights(collection.id, committer_id)
     model = collection_models.CollectionModel(
         id=collection.id,
@@ -616,11 +446,9 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         title=collection.title,
         objective=collection.objective,
         schema_version=collection.schema_version,
-        linked_explorations={
-            exp_id: linked_exp.to_dict()
-            for (exp_id, linked_exp)
-            in collection.linked_explorations.iteritems()
-        },
+        nodes=[
+            collection_node.to_dict() for collection_node in collection.nodes
+        ],
     )
     model.commit(committer_id, commit_message, commit_cmds)
     event_services.CollectionContentChangeEventHandler.record(collection.id)
@@ -671,50 +499,6 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
     delete_collection_summary(collection_id, force_deletion=force_deletion)
 
 
-# Operations on collection snapshots.
-def _get_simple_changelist_summary(collection_id, version_number, change_list):
-    """Returns an auto-generated changelist summary for the history logs."""
-    # TODO(sll): Get this from memcache where possible. It won't change, so we
-    # can keep it there indefinitely.
-
-    base_collection = get_collection_by_id(
-        collection_id, version=version_number)
-    if (len(change_list) == 1 and change_list[0]['cmd'] in
-            ['create_new', 'AUTO_revert_version_number']):
-        # An automatic summary is not needed here, because the original commit
-        # message is sufficiently descriptive.
-        return ''
-    else:
-        full_summary = get_summary_of_change_list(base_collection, change_list)
-
-        short_summary_fragments = []
-        if full_summary['added_explorations']:
-            short_summary_fragments.append(
-                'added \'%s\'' % '\', \''.join(
-                    full_summary['added_explorations']))
-        if full_summary['deleted_explorations']:
-            short_summary_fragments.append(
-                'deleted \'%s\'' % '\', \''.join(
-                    full_summary['deleted_explorations']))
-        if (full_summary['changed_explorations'] or
-                full_summary['linked_exploration_property_changes']):
-            affected_exploration_ids = (
-                full_summary['changed_explorations'] +
-                full_summary['linked_exploration_property_changes'].keys())
-            affected_exploration_titles = [
-                base_collection.linked_explorations[exp_id].exploration.title
-                for exp_id in affected_exploration_ids
-            ]
-            short_summary_fragments.append(
-                'edited \'%s\'' % '\', \''.join(affected_exploration_titles))
-        if full_summary['collection_property_changes']:
-            short_summary_fragments.append(
-                'edited collection properties %s' % ', '.join(
-                    full_summary['collection_property_changes'].keys()))
-
-        return '; '.join(short_summary_fragments)
-
-
 def get_collection_snapshots_metadata(collection_id):
     """Returns the snapshots for this collection, as dicts.
 
@@ -744,11 +528,12 @@ def update_collection(
     - committer_id: str. The id of the user who is performing the update
         action.
     - collection_id: str. The collection id.
-    - change_list: list of dicts, each representing a _Change object. These
-        changes are applied in sequence to produce the resulting collection.
+    - change_list: list of dicts, each representing a CollectionChange object.
+        These changes are applied in sequence to produce the resulting
+        collection.
     - commit_message: str or None. A description of changes made to the
         collection. For published collections, this must be present; for
-        unpublished collections, it should be equal to None.
+        unpublished collections, it may be equal to None.
     """
     is_public = rights_manager.is_collection_public(collection_id)
 
@@ -828,30 +613,9 @@ def delete_collection_summary(collection_id, force_deletion=False):
     collection_models.CollectionSummaryModel.get(collection_id).delete()
 
 
-# Demo creation and deletion methods.
-def get_demo_collection_components(demo_path):
-    """Gets the content of `demo_path` in the sample collections folder.
-
-    Args:
-      demo_path: the file path for the content of an collection in
-        SAMPLE_COLLECTIONS_DIR. E.g.: 'adventure.yaml' or 'tar/'.
-
-    Returns:
-      a yaml string
-    """
-    demo_filepath = os.path.join(feconf.SAMPLE_COLLECTIONS_DIR, demo_path)
-
-    if demo_filepath.endswith('yaml'):
-        file_contents = utils.get_file_contents(demo_filepath)
-        return file_contents
-    else:
-        raise Exception('Unrecognized file path: %s' % demo_path)
-
-
-def save_new_collection_from_yaml(
-        committer_id, yaml_content, title, category, collection_id):
+def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
     collection = collection_domain.Collection.from_yaml(
-        collection_id, title, category, yaml_content)
+        collection_id, yaml_content)
     commit_message = (
         'New collection created from YAML file with title \'%s\'.'
         % collection.title)
@@ -887,32 +651,32 @@ def load_demo(collection_id):
     """
     delete_demo(collection_id)
 
-    if not (0 <= int(collection_id) < len(feconf.DEMO_COLLECTIONS)):
+    if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)
 
-    collection_info = feconf.DEMO_COLLECTIONS[int(collection_id)]
+    demo_filepath = os.path.join(
+        feconf.SAMPLE_COLLECTIONS_DIR,
+        feconf.DEMO_COLLECTIONS[int(collection_id)])
 
-    if len(collection_info) == 3:
-        (collection_filename, title, category) = collection_info
+    if demo_filepath.endswith('yaml'):
+        yaml_content = utils.get_file_contents(demo_filepath)
     else:
-        raise Exception('Invalid demo collection: %s' % collection_info)
+        raise Exception('Unrecognized file path: %s' % demo_filepath)
 
-    yaml_content = get_demo_collection_components(collection_filename)
     collection = save_new_collection_from_yaml(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
-        collection_id)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
     rights_manager.publish_collection(
-        feconf.SYSTEM_COMMITTER_ID, collection_id)
-    # Release ownership of all demo collections.
-    rights_manager.release_ownership_of_collection(
         feconf.SYSTEM_COMMITTER_ID, collection_id)
 
     index_collections_given_ids([collection_id])
 
     # Now, load all of the demo explorations that are part of the collection.
-    for demo_exp_id in collection.linked_explorations:
-        exp_services.load_demo(demo_exp_id)
+    for collection_node in collection.nodes:
+        exp_id = collection_node.exploration_id
+        # Only load the demo exploration if it is not yet loaded.
+        if not exp_services.get_exploration_by_id(exp_id, strict=False):
+            exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
 
@@ -972,14 +736,14 @@ def get_next_page_of_all_non_private_commits(
 def _collection_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     doc = {}
-    if rights.status == rights_manager.COLLECTION_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
         doc['is'] = 'featured'
     return doc
 
 
 def _should_index(collection):
     rights = rights_manager.get_collection_rights(collection.id)
-    return rights.status != rights_manager.COLLECTION_STATUS_PRIVATE
+    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
 def _get_search_rank(collection_id):
@@ -999,7 +763,7 @@ def _get_search_rank(collection_id):
     summary = get_collection_summary_by_id(collection_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.COLLECTION_STATUS_PUBLICIZED
+        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
     # Iterate backwards through the collection history metadata until we find
@@ -1069,7 +833,7 @@ def patch_collection_search_document(collection_id, update):
 
 def update_collection_status_in_search(collection_id):
     rights = rights_manager.get_collection_rights(collection_id)
-    if rights.status == rights_manager.COLLECTION_STATUS_PRIVATE:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([collection_id])
     else:
         patch_collection_search_document(

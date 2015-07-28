@@ -44,6 +44,11 @@ import utils
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed
 
+def _count_at_least_editable_exploration_summaries(user_id):
+    return len(exp_services._get_exploration_summary_dicts_from_models(
+        exp_models.ExpSummaryModel.get_at_least_editable(
+            user_id=user_id)))
+
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
@@ -72,18 +77,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
-
-    def test_count_explorations(self):
-        """Test count_explorations()."""
-
-        self.assertEqual(exp_services.count_explorations(), 0)
-
-        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-        self.assertEqual(exp_services.count_explorations(), 1)
-
-        self.save_new_default_exploration(
-            'A_new_exploration_id', self.OWNER_ID)
-        self.assertEqual(exp_services.count_explorations(), 2)
 
     def test_get_exploration_titles_and_categories(self):
         self.assertEqual(
@@ -176,8 +169,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         # The exploration shows up in queries.
         self.assertEqual(
-            len(exp_services.get_at_least_editable_exploration_summaries(
-                self.OWNER_ID)), 1)
+            _count_at_least_editable_exploration_summaries(self.OWNER_ID), 1)
 
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
         with self.assertRaises(Exception):
@@ -185,9 +177,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.OWNER_ID),
-            {})
+            _count_at_least_editable_exploration_summaries(self.OWNER_ID), 0)
 
         # But the models still exist in the backend.
         self.assertIn(
@@ -208,8 +198,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         # The exploration shows up in queries.
         self.assertEqual(
-            len(exp_services.get_at_least_editable_exploration_summaries(
-                self.OWNER_ID)), 1)
+            _count_at_least_editable_exploration_summaries(self.OWNER_ID), 1)
 
         exp_services.delete_exploration(
             self.OWNER_ID, self.EXP_ID, force_deletion=True)
@@ -218,9 +207,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.OWNER_ID),
-            {})
+            _count_at_least_editable_exploration_summaries(self.OWNER_ID), 0)
 
         # The exploration model has been purged from the backend.
         self.assertNotIn(
@@ -241,8 +228,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration summary does not show up in any queries.
         self.assertEqual(
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.OWNER_ID), {})
+            _count_at_least_editable_exploration_summaries(self.OWNER_ID), 0)
 
         # The exploration summary model has been purged from the backend.
         self.assertNotIn(
@@ -325,7 +311,8 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
-        self.assertEqual(exp_services.count_explorations(), 0)
+        self.assertEqual(
+            exp_models.ExplorationModel.get_exploration_count(), 0)
 
         self.assertGreaterEqual(
             len(feconf.DEMO_EXPLORATIONS), 1,
@@ -354,12 +341,13 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
                 exploration.title.encode('utf-8'), processing_time))
 
         self.assertEqual(
-            exp_services.count_explorations(),
+            exp_models.ExplorationModel.get_exploration_count(),
             len(feconf.DEMO_EXPLORATIONS) - len(excluded_demo_explorations))
 
         for ind in range(len(feconf.DEMO_EXPLORATIONS)):
             exp_services.delete_demo(str(ind))
-        self.assertEqual(exp_services.count_explorations(), 0)
+        self.assertEqual(
+            exp_models.ExplorationModel.get_exploration_count(), 0)
 
 
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
@@ -1602,10 +1590,10 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.assertEqual(docs, [{'is': 'featured'}])
 
         def mock_get_rights(exp_id):
-            return rights_manager.ExplorationRights(
+            return rights_manager.ActivityRights(
                 self.EXP_ID,
                 [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PUBLICIZED
+                status=rights_manager.ACTIVITY_STATUS_PUBLICIZED
             )
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
@@ -1631,10 +1619,10 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
 
         def mock_get_rights(exp_id):
-            return rights_manager.ExplorationRights(
+            return rights_manager.ActivityRights(
                 self.EXP_ID,
                 [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PRIVATE
+                status=rights_manager.ACTIVITY_STATUS_PRIVATE
             )
 
         delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
@@ -1889,7 +1877,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
-                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
@@ -1917,7 +1905,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
-                rights_manager.EXPLORATION_STATUS_PRIVATE,
+                rights_manager.ACTIVITY_STATUS_PRIVATE,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
@@ -1926,7 +1914,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
-                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
@@ -1946,91 +1934,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             for prop in simple_props:
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))
-
-    def test_get_private_at_least_viewable_exploration_summaries(self):
-
-        actual_summaries = (
-            exp_services.get_private_at_least_viewable_exploration_summaries(
-                self.ALBERT_ID))
-
-        expected_summaries = {
-            self.EXP_ID_1: exp_domain.ExplorationSummary(
-                self.EXP_ID_1, 'Exploration 1 title',
-                'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
-                rights_manager.EXPLORATION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
-                actual_summaries[self.EXP_ID_1].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_1].exploration_model_last_updated
-                )}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries.keys(),
-                         expected_summaries.keys())
-        simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings', 'status',
-                        'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version',
-                        'exploration_model_created_on',
-                        'exploration_model_last_updated']
-        for exp_id in actual_summaries.keys():
-            for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
-
-        # do similar test for Bob
-        actual_summaries = (
-            exp_services.get_private_at_least_viewable_exploration_summaries(
-                self.BOB_ID))
-
-        expected_summaries = {}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries,
-                         expected_summaries)
-
-    def test_get_at_least_editable_exploration_summaries(self):
-        exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
-
-        actual_summaries = (
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.ALBERT_ID))
-
-        expected_summaries = {
-            self.EXP_ID_2: exp_domain.ExplorationSummary(
-                self.EXP_ID_2, 'Exploration 2 Albert title',
-                'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
-                rights_manager.EXPLORATION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
-                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
-        )}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries.keys(),
-                         expected_summaries.keys())
-        simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings','status',
-                        'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version',
-                        'exploration_model_created_on',
-                        'exploration_model_last_updated']
-        for exp_id in actual_summaries.keys():
-            for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
-
-        # do similar test for Bob
-        actual_summaries = (
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.BOB_ID))
-
-        expected_summaries = {}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries,
-                         expected_summaries)
 
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):

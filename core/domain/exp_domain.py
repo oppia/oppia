@@ -1101,7 +1101,7 @@ class Exploration(object):
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
-    def create_exploration_from_dict(
+    def from_dict(
             cls, exploration_dict,
             exploration_version=0, exploration_created_on=None,
             exploration_last_updated=None):
@@ -2065,7 +2065,7 @@ class Exploration(object):
         exploration_dict['title'] = title
         exploration_dict['category'] = category
 
-        return Exploration.create_exploration_from_dict(exploration_dict)
+        return Exploration.from_dict(exploration_dict)
 
     def to_yaml(self):
         exp_dict = self.to_dict()

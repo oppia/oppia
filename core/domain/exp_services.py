@@ -384,29 +384,6 @@ def get_all_exploration_summaries():
         exp_models.ExpSummaryModel.get_all())
 
 
-def get_private_at_least_viewable_exploration_summaries(user_id):
-    """Returns a dict with all exploration summary domain objects that are
-    at least viewable by given user. The dict is keyed by exploration id.
-    """
-    return _get_exploration_summary_dicts_from_models(
-        exp_models.ExpSummaryModel.get_private_at_least_viewable(
-            user_id=user_id))
-
-
-def get_at_least_editable_exploration_summaries(user_id):
-    """Returns a dict with all exploration summary domain objects that are
-    at least editable by given user. The dict is keyed by exploration id.
-    """
-    return _get_exploration_summary_dicts_from_models(
-        exp_models.ExpSummaryModel.get_at_least_editable(
-            user_id=user_id))
-
-
-def count_explorations():
-    """Returns the total number of explorations."""
-    return exp_models.ExplorationModel.get_exploration_count()
-
-
 # Methods for exporting states and explorations to other formats.
 def export_to_zip_file(exploration_id, version=None):
     """Returns a ZIP archive of the exploration."""
@@ -674,8 +651,7 @@ def get_summary_of_change_list(base_exploration, change_list):
     }
 
 
-def _save_exploration(
-        committer_id, exploration, commit_message, change_list):
+def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
     If successful, increments the version number of the incoming exploration
@@ -684,7 +660,7 @@ def _save_exploration(
     if change_list is None:
         change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -724,8 +700,7 @@ def _save_exploration(
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
 
-    exploration_model.commit(
-        committer_id, commit_message, change_list)
+    exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     index_explorations_given_ids([exploration.id])
@@ -813,47 +788,6 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
     # delete summary of exploration
     delete_exploration_summary(exploration_id, force_deletion=force_deletion)
-
-
-# Operations on exploration snapshots.
-def _get_simple_changelist_summary(
-        exploration_id, version_number, change_list):
-    """Returns an auto-generated changelist summary for the history logs."""
-    # TODO(sll): Get this from memcache where possible. It won't change, so we
-    # can keep it there indefinitely.
-
-    base_exploration = get_exploration_by_id(
-        exploration_id, version=version_number)
-    if (len(change_list) == 1 and change_list[0]['cmd'] in
-            ['create_new', 'AUTO_revert_version_number']):
-        # An automatic summary is not needed here, because the original commit
-        # message is sufficiently descriptive.
-        return ''
-    else:
-        full_summary = get_summary_of_change_list(
-            base_exploration, change_list)
-
-        short_summary_fragments = []
-        if full_summary['added_states']:
-            short_summary_fragments.append(
-                'added \'%s\'' % '\', \''.join(full_summary['added_states']))
-        if full_summary['deleted_states']:
-            short_summary_fragments.append(
-                'deleted \'%s\'' % '\', \''.join(
-                    full_summary['deleted_states']))
-        if (full_summary['changed_states'] or
-                full_summary['state_property_changes']):
-            affected_states = (
-                full_summary['changed_states'] +
-                full_summary['state_property_changes'].keys())
-            short_summary_fragments.append(
-                'edited \'%s\'' % '\', \''.join(affected_states))
-        if full_summary['exploration_property_changes']:
-            short_summary_fragments.append(
-                'edited exploration properties %s' % ', '.join(
-                    full_summary['exploration_property_changes'].keys()))
-
-        return '; '.join(short_summary_fragments)
 
 
 def get_exploration_snapshots_metadata(exploration_id):
@@ -1001,7 +935,7 @@ def revert_exploration(
     exploration = get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -1102,9 +1036,6 @@ def load_demo(exploration_id):
 
     rights_manager.publish_exploration(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
-    # Release ownership of all explorations.
-    rights_manager.release_ownership_of_exploration(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])
 
@@ -1162,14 +1093,14 @@ def get_next_page_of_all_non_private_commits(
 def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     doc = {}
-    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
         doc['is'] = 'featured'
     return doc
 
 
 def _should_index(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
-    return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
+    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
 def _get_search_rank(exp_id):
@@ -1190,7 +1121,7 @@ def _get_search_rank(exp_id):
     summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
+        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
     if summary.ratings:
@@ -1269,7 +1200,7 @@ def patch_exploration_search_document(exp_id, update):
 
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(

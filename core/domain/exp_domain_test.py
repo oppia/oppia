@@ -782,8 +782,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         demo = exp_domain.Exploration.create_default_exploration(
             '0', 'title', 'category')
         demo_dict = demo.to_dict()
-        exp_from_dict = exp_domain.Exploration.create_exploration_from_dict(
-            demo_dict)
+        exp_from_dict = exp_domain.Exploration.from_dict(demo_dict)
         self.assertEqual(exp_from_dict.to_dict(), demo_dict)
 
     def test_interaction_with_none_id_is_not_terminal(self):

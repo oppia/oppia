@@ -38,6 +38,11 @@ import utils
 # updated, reverted, deleted, created, rights changed. See TODO at the top of
 # exp_services_test for more original context.
 
+def _count_at_least_editable_collection_summaries(user_id):
+    return len(collection_services._get_collection_summary_dicts_from_models(
+        collection_models.CollectionSummaryModel.get_at_least_editable(
+            user_id=user_id)))
+
 
 class CollectionServicesUnitTests(test_utils.GenericTestBase):
     """Test the collection services module."""
@@ -66,17 +71,6 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     """Tests query methods."""
-
-    def test_count_collections(self):
-        """Test count_collections()."""
-
-        self.assertEqual(collection_services.count_collections(), 0)
-
-        self.save_new_default_collection(self.COLLECTION_ID, self.OWNER_ID)
-        self.assertEqual(collection_services.count_collections(), 1)
-
-        self.save_new_default_collection('A_new_collection_id', self.OWNER_ID)
-        self.assertEqual(collection_services.count_collections(), 2)
 
     def test_get_collection_titles_and_categories(self):
         self.assertEqual(
@@ -173,8 +167,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.save_new_default_collection(self.COLLECTION_ID, self.OWNER_ID)
         # The collection shows up in queries.
         self.assertEqual(
-            len(collection_services.get_at_least_editable_collection_summaries(
-                self.OWNER_ID)), 1)
+            _count_at_least_editable_collection_summaries(self.OWNER_ID), 1)
 
         collection_services.delete_collection(
             self.OWNER_ID, self.COLLECTION_ID)
@@ -183,8 +176,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # The deleted collection does not show up in any queries.
         self.assertEqual(
-            collection_services.get_at_least_editable_collection_summaries(
-                self.OWNER_ID), {})
+            _count_at_least_editable_collection_summaries(self.OWNER_ID), 0)
 
         # But the models still exist in the backend.
         self.assertIn(
@@ -207,8 +199,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.save_new_default_collection(self.COLLECTION_ID, self.OWNER_ID)
         # The collection shows up in queries.
         self.assertEqual(
-            len(collection_services.get_at_least_editable_collection_summaries(
-                self.OWNER_ID)), 1)
+            _count_at_least_editable_collection_summaries(self.OWNER_ID), 1)
 
         collection_services.delete_collection(
             self.OWNER_ID, self.COLLECTION_ID, force_deletion=True)
@@ -217,8 +208,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # The deleted collection does not show up in any queries.
         self.assertEqual(
-            collection_services.get_at_least_editable_collection_summaries(
-                self.OWNER_ID), {})
+            _count_at_least_editable_collection_summaries(self.OWNER_ID), 0)
 
         # The collection model has been purged from the backend.
         self.assertNotIn(
@@ -241,8 +231,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # The deleted collection summary does not show up in any queries.
         self.assertEqual(
-            collection_services.get_at_least_editable_collection_summaries(
-                self.OWNER_ID), {})
+            _count_at_least_editable_collection_summaries(self.OWNER_ID), 0)
 
         # The collection summary model has been purged from the backend.
         self.assertNotIn(
@@ -252,7 +241,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
                 include_deleted_entities=True)]
         )
 
-    def test_collection_are_removed_from_index_when_deleted(self):
+    def test_collections_are_removed_from_index_when_deleted(self):
         """Tests that deleted collections are removed from the search index."""
 
         self.save_new_default_collection(self.COLLECTION_ID, self.OWNER_ID)
@@ -271,30 +260,34 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
     def test_create_new_collection_error_cases(self):
         collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, '', '')
+            self.COLLECTION_ID, '', '', '')
         with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
             collection_services.save_new_collection(self.OWNER_ID, collection)
 
         collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'title', '')
+            self.COLLECTION_ID, 'title', '', '')
         with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
             collection_services.save_new_collection(self.OWNER_ID, collection)
 
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
-        collection_services._save_collection(self.OWNER_ID, collection, '', [])
+        collection_services._save_collection(
+            self.OWNER_ID, collection, '',
+            _get_collection_change_list('title', ''))
 
         retrieved_collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         self.assertEqual(retrieved_collection.title, 'A title')
         self.assertEqual(retrieved_collection.category, 'A category')
-        self.assertEqual(len(retrieved_collection.linked_explorations), 1)
+        self.assertEqual(len(retrieved_collection.nodes), 1)
 
     def test_save_and_retrieve_collection_summary(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
-        collection_services._save_collection(self.OWNER_ID, collection, '', [])
+        collection_services._save_collection(
+            self.OWNER_ID, collection, '',
+            _get_collection_change_list('title', ''))
 
         # Change the collection's title and category properties.
         collection_services.update_collection(
@@ -322,7 +315,8 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_collections(self):
         """Test loading, validation and deletion of the demo collections."""
-        self.assertEqual(collection_services.count_collections(), 0)
+        self.assertEqual(
+            collection_models.CollectionModel.get_collection_count(), 0)
 
         self.assertGreaterEqual(
             len(feconf.DEMO_COLLECTIONS), 1,
@@ -343,16 +337,17 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
                 collection.title.encode('utf-8'), processing_time))
 
         self.assertEqual(
-            collection_services.count_collections(),
+            collection_models.CollectionModel.get_collection_count(),
             len(feconf.DEMO_COLLECTIONS))
 
         for ind in range(len(feconf.DEMO_COLLECTIONS)):
             collection_services.delete_demo(str(ind))
-        self.assertEqual(collection_services.count_collections(), 0)
+        self.assertEqual(
+            collection_models.CollectionModel.get_collection_count(), 0)
 
 
-class UpdateLinkedExplorationTests(CollectionServicesUnitTests):
-    """Test updating a single linked exploration."""
+class UpdateCollectionNodeTests(CollectionServicesUnitTests):
+    """Test updating a single collection node."""
 
     EXPLORATION_ID = 'exp_id_0'
     COLLECTION_TITLE = 'title'
@@ -360,25 +355,24 @@ class UpdateLinkedExplorationTests(CollectionServicesUnitTests):
     COLLECTION_OBJECTIVE = 'objective'
 
     def setUp(self):
-        super(UpdateLinkedExplorationTests, self).setUp()
+        super(UpdateCollectionNodeTests, self).setUp()
         collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
-            exploration_id=self.EXPLORATION_ID, end_state_name='End')
+            exploration_id=self.EXPLORATION_ID)
 
-    def test_add_linked_exploration(self):
+    def test_add_collection_node(self):
         # Verify the initial collection only has 1 exploration in it.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        self.assertEqual(
-            collection.linked_explorations.keys(), [self.EXPLORATION_ID])
+        self.assertEqual(collection.exploration_ids, [self.EXPLORATION_ID])
 
         _NEW_EXP_ID = 'new_exploration_id'
         self.save_new_valid_exploration(_NEW_EXP_ID, self.OWNER_ID)
         collection_services.update_collection(
             self.OWNER_ID, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_EXPLORATION,
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': _NEW_EXP_ID
             }], 'Added new exploration')
 
@@ -386,26 +380,24 @@ class UpdateLinkedExplorationTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         self.assertEqual(
-            collection.linked_explorations.keys(),
-            [self.EXPLORATION_ID, _NEW_EXP_ID])
+            collection.exploration_ids, [self.EXPLORATION_ID, _NEW_EXP_ID])
 
-    def test_delete_linked_exploration(self):
+    def test_delete_collection_node(self):
         # Verify the initial collection only has 1 exploration in it.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        self.assertEqual(
-            collection.linked_explorations.keys(), [self.EXPLORATION_ID])
+        self.assertEqual(collection.exploration_ids, [self.EXPLORATION_ID])
 
         collection_services.update_collection(
             self.OWNER_ID, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_DELETE_EXPLORATION,
+                'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
                 'exploration_id': self.EXPLORATION_ID,
             }], 'Deleted exploration')
 
         # Verify the exploration was deleted (the collection is now empty).
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        self.assertEqual(collection.linked_explorations, {})
+        self.assertEqual(collection.nodes, [])
 
     def test_update_collection_title(self):
         # Verify initial title.
@@ -464,58 +456,84 @@ class UpdateLinkedExplorationTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         self.assertEqual(collection.objective, 'Some new objective')
 
-    def test_update_linked_exploration_prerequisite_skills(self):
+    def test_update_collection_node_prerequisite_skills(self):
         # Verify initial prerequisite skills are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        linked_exp = collection.linked_explorations[self.EXPLORATION_ID]
-        self.assertEqual(linked_exp.prerequisite_skills, [])
+        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        self.assertEqual(collection_node.prerequisite_skills, [])
 
         # Update the prerequisite skills.
         collection_services.update_collection(
             self.OWNER_ID, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_LINKED_EXPLORATION_PROPERTY,
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
                 'property_name': 'prerequisite_skills',
                 'new_value': ['first', 'second']
-            }], 'Changed the prerequisite skills of a linked exploration')
+            }], 'Changed the prerequisite skills of a collection node')
 
         # Verify the prerequisites are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        linked_exp = collection.linked_explorations[self.EXPLORATION_ID]
-        self.assertEqual(linked_exp.prerequisite_skills, ['first', 'second'])
+        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        self.assertEqual(
+            collection_node.prerequisite_skills, ['first', 'second'])
 
-    def test_update_linked_exploration_acquired_skills(self):
+    def test_update_collection_node_acquired_skills(self):
         # Verify initial acquired skills are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        linked_exp = collection.linked_explorations[self.EXPLORATION_ID]
-        self.assertEqual(linked_exp.acquired_skills, [])
+        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        self.assertEqual(collection_node.acquired_skills, [])
 
         # Update the acquired skills.
         collection_services.update_collection(
             self.OWNER_ID, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_LINKED_EXPLORATION_PROPERTY,
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
                 'property_name': 'acquired_skills',
                 'new_value': ['third', 'fourth']
-            }], 'Changed the acquired skills of a linked exploration')
+            }], 'Changed the acquired skills of a collection node')
 
         # Verify the acquired are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        linked_exp = collection.linked_explorations[self.EXPLORATION_ID]
-        self.assertEqual(linked_exp.acquired_skills, ['third', 'fourth'])
+        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        self.assertEqual(collection_node.acquired_skills, ['third', 'fourth'])
 
 
-def _get_change_list(exploration_id, property_name, new_value):
-    """Generates a change list for a single state change."""
+def _get_node_change_list(exploration_id, property_name, new_value):
+    """Generates a change list for a single collection node change."""
     return [{
-        'cmd': collection_domain.CMD_EDIT_LINKED_EXPLORATION_PROPERTY,
+        'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
         'exploration_id': exploration_id,
         'property_name': property_name,
         'new_value': new_value
+    }]
+
+
+def _get_collection_change_list(property_name, new_value):
+    """Generates a change list for a single collection property change."""
+    return [{
+        'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+        'property_name': property_name,
+        'new_value': new_value
+    }]
+
+
+def _get_added_exploration_change_list(exploration_id):
+    """Generates a change list for adding an exploration to a collection."""
+    return [{
+        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+        'exploration_id': exploration_id
+    }]
+
+
+def _get_deleted_exploration_change_list(exploration_id):
+    """Generates a change list for deleting an exploration from a collection."""
+    return [{
+        'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
+        'exploration_id': exploration_id
     }]
 
 
@@ -526,17 +544,16 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         super(CommitMessageHandlingTests, self).setUp()
         self.EXP_ID = 'an_exploration_id'
         collection = self.save_new_valid_collection(
-            self.COLLECTION_ID, self.OWNER_ID, exploration_id=self.EXP_ID,
-            end_state_name='End')
+            self.COLLECTION_ID, self.OWNER_ID, exploration_id=self.EXP_ID)
 
     def test_record_commit_message(self):
         """Check published collections record commit messages."""
         rights_manager.publish_collection(self.OWNER_ID, self.COLLECTION_ID)
 
         collection_services.update_collection(
-            self.OWNER_ID, self.COLLECTION_ID, _get_change_list(
+            self.OWNER_ID, self.COLLECTION_ID, _get_node_change_list(
                 self.EXP_ID,
-                collection_domain.LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS,
+                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
                 ['Skill']), 'A message')
 
         self.assertEqual(
@@ -552,30 +569,30 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
                 ValueError, 'Collection is public so expected a commit '
                             'message but received none.'):
             collection_services.update_collection(
-                self.OWNER_ID, self.COLLECTION_ID, _get_change_list(
+                self.OWNER_ID, self.COLLECTION_ID, _get_node_change_list(
                     self.EXP_ID,
-                    collection_domain.LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS,
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
                     ['Skill']), '')
 
     def test_unpublished_collections_can_accept_commit_message(self):
         """Test unpublished collections can accept optional commit messages."""
 
         collection_services.update_collection(
-            self.OWNER_ID, self.COLLECTION_ID, _get_change_list(
+            self.OWNER_ID, self.COLLECTION_ID, _get_node_change_list(
                 self.EXP_ID,
-                collection_domain.LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS,
+                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
                 ['Skill']), 'A message')
 
         collection_services.update_collection(
-            self.OWNER_ID, self.COLLECTION_ID, _get_change_list(
+            self.OWNER_ID, self.COLLECTION_ID, _get_node_change_list(
                 self.EXP_ID,
-                collection_domain.LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS,
+                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
                 ['Skill']), '')
 
         collection_services.update_collection(
-            self.OWNER_ID, self.COLLECTION_ID, _get_change_list(
+            self.OWNER_ID, self.COLLECTION_ID, _get_node_change_list(
                 self.EXP_ID,
-                collection_domain.LINKED_EXPLORATION_PROPERTY_ACQUIRED_SKILLS,
+                collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
                 ['Skill']), None)
 
 
@@ -584,7 +601,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
     def test_get_collection_snapshots_metadata(self):
         v1_collection = self.save_new_valid_collection(
-            self.COLLECTION_ID, self.OWNER_ID, end_state_name='End')
+            self.COLLECTION_ID, self.OWNER_ID)
 
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
@@ -666,7 +683,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         # Using the old version of the collection should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
             collection_services._save_collection(
-                'committer_id_2', v1_collection, '', [])
+                'committer_id_2', v1_collection, '',
+                _get_collection_change_list('title', ''))
 
         # Another person modifies the collection.
         new_change_list = [{
@@ -712,13 +730,14 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             snapshots_metadata[1]['created_on_ms'],
             snapshots_metadata[2]['created_on_ms'])
 
-    def test_versioning_with_add_and_delete_linked_explorations(self):
+    def test_versioning_with_add_and_delete_collection_nodes(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
 
         collection.title = 'First title'
         collection_services._save_collection(
-            self.OWNER_ID, collection, 'Changed title.', [])
+            self.OWNER_ID, collection, 'Changed title.',
+            _get_collection_change_list('title', 'First title'))
         commit_dict_2 = {
             'committer_id': self.OWNER_ID,
             'commit_message': 'Changed title.',
@@ -731,11 +750,12 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection.add_exploration(
+        collection.add_collection_node(
             self.save_new_valid_exploration(
                 'new_exploration_id', self.OWNER_ID).id)
         collection_services._save_collection(
-            'committer_id_2', collection, 'Added new exploration', [])
+            'committer_id_2', collection, 'Added new exploration',
+            _get_added_exploration_change_list('new_exploration_id'))
 
         commit_dict_3 = {
             'committer_id': 'committer_id_2',
@@ -758,12 +778,13 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         # This should not create a new version.
         with self.assertRaisesRegexp(
                 ValueError, 'is not part of this collection'):
-            collection.delete_exploration('invalid_exploration_id')
+            collection.delete_collection_node('invalid_exploration_id')
 
         # Now delete the newly added exploration.
-        collection.delete_exploration('new_exploration_id')
+        collection.delete_collection_node('new_exploration_id')
         collection_services._save_collection(
-            'committer_id_3', collection, 'Deleted exploration', [])
+            'committer_id_3', collection, 'Deleted exploration',
+            _get_deleted_exploration_change_list('new_exploration_id'))
 
         commit_dict_4 = {
             'committer_id': 'committer_id_3',
@@ -782,10 +803,10 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
 
-        # The final collection should have exactly one linked exploration.
+        # The final collection should have exactly one collection node.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        self.assertEqual(len(collection.linked_explorations), 1)
+        self.assertEqual(len(collection.nodes), 1)
 
 
 class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
@@ -905,7 +926,8 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
 
             collection_1.title = 'Exploration 1 title'
             collection_services._save_collection(
-                self.BOB_ID, collection_1, 'Changed title.', [])
+                self.BOB_ID, collection_1, 'Changed title.',
+                _get_collection_change_list('title', 'Exploration 1 title'))
 
             collection_2 = self.save_new_valid_collection(
                 self.COLLECTION_ID_2, self.ALBERT_ID)
@@ -913,11 +935,15 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
             collection_1.title = 'Exploration 1 Albert title'
             collection_services._save_collection(
                 self.ALBERT_ID, collection_1,
-                'Changed title to Albert1 title.', [])
+                'Changed title to Albert1 title.',
+                _get_collection_change_list(
+                    'title', 'Exploration 1 Albert title'))
 
             collection_2.title = 'Exploration 2 Albert title'
             collection_services._save_collection(
-                self.ALBERT_ID, collection_2, 'Changed title to Albert2.', [])
+                self.ALBERT_ID, collection_2, 'Changed title to Albert2.',
+                _get_collection_change_list(
+                    'title', 'Exploration 2 Albert title'))
 
             collection_services.delete_collection(
                 self.ALBERT_ID, self.COLLECTION_ID_1)
@@ -1103,10 +1129,10 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             self.assertEqual(docs, [{'is': 'featured'}])
 
         def mock_get_rights(collection_id):
-            return rights_manager.CollectionRights(
+            return rights_manager.ActivityRights(
                 self.COLLECTION_ID,
                 [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PUBLICIZED
+                status=rights_manager.ACTIVITY_STATUS_PUBLICIZED
             )
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
@@ -1134,10 +1160,10 @@ class CollectionSearchTests(CollectionServicesUnitTests):
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
 
         def mock_get_rights(collection_id):
-            return rights_manager.CollectionRights(
+            return rights_manager.ActivityRights(
                 self.COLLECTION_ID,
                 [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.COLLECTION_STATUS_PRIVATE
+                status=rights_manager.ACTIVITY_STATUS_PRIVATE
             )
 
         delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
@@ -1203,6 +1229,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             collection_services._get_search_rank(self.COLLECTION_ID),
             _BASE_SEARCH_RANK + 30)
 
+
 class CollectionChangedEventsTests(CollectionServicesUnitTests):
 
     def test_collection_contents_change_event_triggers(self):
@@ -1220,7 +1247,8 @@ class CollectionChangedEventsTests(CollectionServicesUnitTests):
         with record_event_swap:
             self.save_new_valid_collection(self.COLLECTION_ID, self.OWNER_ID)
             collection_services.update_collection(
-                self.OWNER_ID, self.COLLECTION_ID, [], '')
+                self.OWNER_ID, self.COLLECTION_ID,
+                _get_collection_change_list('title', 'Title'), '')
 
         self.assertEqual(
             recorded_ids, [self.COLLECTION_ID, self.COLLECTION_ID])
@@ -1335,7 +1363,8 @@ class CollectionSummaryGetTests(CollectionServicesUnitTests):
 
         collection_1.title = 'Collection 1 title'
         collection_services._save_collection(
-            self.BOB_ID, collection_1, 'Changed title.', [])
+            self.BOB_ID, collection_1, 'Changed title.',
+            _get_collection_change_list('title', 'Collection 1 title'))
 
         collection_2 = self.save_new_valid_collection(
             self.COLLECTION_ID_2, self.ALBERT_ID)
@@ -1351,7 +1380,8 @@ class CollectionSummaryGetTests(CollectionServicesUnitTests):
 
         collection_2.title = 'Collection 2 Albert title'
         collection_services._save_collection(
-            self.ALBERT_ID, collection_2, 'Changed title to Albert2.', [])
+            self.ALBERT_ID, collection_2, 'Changed title to Albert2.',
+            _get_collection_change_list('title', 'Collection 2 Albert title'))
 
         with self.assertRaisesRegexp(
                 Exception, 'This collection cannot be published'):
@@ -1359,142 +1389,3 @@ class CollectionSummaryGetTests(CollectionServicesUnitTests):
                 self.BOB_ID, self.COLLECTION_ID_2)
 
         rights_manager.publish_collection(self.ALBERT_ID, self.COLLECTION_ID_2)
-
-    def test_get_non_private_collection_summaries(self):
-        actual_summaries = (
-            collection_services.get_non_private_collection_summaries())
-
-        expected_summaries = {
-            self.COLLECTION_ID_2: collection_domain.CollectionSummary(
-                self.COLLECTION_ID_2, 'Collection 2 Albert title',
-                'A category', 'An objective',
-                rights_manager.COLLECTION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
-                actual_summaries[
-                    self.COLLECTION_ID_2].collection_model_created_on,
-                actual_summaries[
-                    self.COLLECTION_ID_2].collection_model_last_updated
-                )}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries.keys(), expected_summaries.keys())
-        simple_props = ['id', 'title', 'category', 'objective',
-            'status', 'community_owned', 'owner_ids', 'editor_ids',
-            'viewer_ids', 'version', 'collection_model_created_on',
-            'collection_model_last_updated']
-        for collection_id in actual_summaries.keys():
-            for prop in simple_props:
-                self.assertEqual(getattr(
-                        actual_summaries[collection_id], prop),
-                    getattr(expected_summaries[collection_id], prop))
-
-    def test_get_all_collection_summaries(self):
-        actual_summaries = collection_services.get_all_collection_summaries()
-
-        expected_summaries = {
-            self.COLLECTION_ID_1: collection_domain.CollectionSummary(
-                self.COLLECTION_ID_1, 'Collection 1 Albert title',
-                'A category', 'An objective',
-                rights_manager.COLLECTION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
-                actual_summaries[self.COLLECTION_ID_1].collection_model_created_on,
-                actual_summaries[self.COLLECTION_ID_1].collection_model_last_updated
-            ),
-            self.COLLECTION_ID_2: collection_domain.CollectionSummary(
-                self.COLLECTION_ID_2, 'Collection 2 Albert title',
-                'A category', 'An objective',
-                rights_manager.COLLECTION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
-                actual_summaries[self.COLLECTION_ID_2].collection_model_created_on,
-                actual_summaries[self.COLLECTION_ID_2].collection_model_last_updated
-            )
-        }
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries.keys(), expected_summaries.keys())
-        simple_props = ['id', 'title', 'category', 'objective',
-            'status', 'community_owned', 'owner_ids', 'editor_ids',
-            'viewer_ids', 'version', 'collection_model_created_on',
-            'collection_model_last_updated']
-        for collection_id in actual_summaries.keys():
-            for prop in simple_props:
-                self.assertEqual(getattr(
-                        actual_summaries[collection_id], prop),
-                    getattr(expected_summaries[collection_id], prop))
-
-    def test_get_private_at_least_viewable_collection_summaries(self):
-        actual_summaries = (
-            collection_services.get_private_at_least_viewable_collection_summaries(
-                self.ALBERT_ID))
-
-        expected_summaries = {
-            self.COLLECTION_ID_1: collection_domain.CollectionSummary(
-                self.COLLECTION_ID_1, 'Collection 1 Albert title',
-                'A category', 'An objective',
-                rights_manager.COLLECTION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
-                actual_summaries[self.COLLECTION_ID_1].collection_model_created_on,
-                actual_summaries[self.COLLECTION_ID_1].collection_model_last_updated
-                )}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries.keys(), expected_summaries.keys())
-        simple_props = ['id', 'title', 'category', 'objective',
-            'status', 'community_owned', 'owner_ids', 'editor_ids',
-            'viewer_ids', 'version', 'collection_model_created_on',
-            'collection_model_last_updated']
-        for collection_id in actual_summaries.keys():
-            for prop in simple_props:
-                self.assertEqual(getattr(
-                        actual_summaries[collection_id], prop),
-                    getattr(expected_summaries[collection_id], prop))
-
-        # do similar test for Bob
-        actual_summaries = (
-            collection_services.get_private_at_least_viewable_collection_summaries(
-                self.BOB_ID))
-
-        expected_summaries = {}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries, expected_summaries)
-
-    def test_get_at_least_editable_collection_summaries(self):
-        collection_services.delete_collection(
-            self.ALBERT_ID, self.COLLECTION_ID_1)
-
-        actual_summaries = (
-            collection_services.get_at_least_editable_collection_summaries(
-                self.ALBERT_ID))
-
-        expected_summaries = {
-            self.COLLECTION_ID_2: collection_domain.CollectionSummary(
-                self.COLLECTION_ID_2, 'Collection 2 Albert title',
-                'A category', 'An objective',
-                rights_manager.COLLECTION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
-                actual_summaries[self.COLLECTION_ID_2].collection_model_created_on,
-                actual_summaries[self.COLLECTION_ID_2].collection_model_last_updated
-        )}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries.keys(), expected_summaries.keys())
-        simple_props = ['id', 'title', 'category', 'objective',
-            'status', 'community_owned', 'owner_ids', 'editor_ids',
-            'viewer_ids', 'version', 'collection_model_created_on',
-            'collection_model_last_updated']
-        for collection_id in actual_summaries.keys():
-            for prop in simple_props:
-                self.assertEqual(getattr(
-                        actual_summaries[collection_id], prop),
-                    getattr(expected_summaries[collection_id], prop))
-
-        # do similar test for Bob
-        actual_summaries = (
-            collection_services.get_at_least_editable_collection_summaries(
-                self.BOB_ID))
-
-        expected_summaries = {}
-
-        # check actual summaries equal expected summaries
-        self.assertEqual(actual_summaries, expected_summaries)

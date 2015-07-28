@@ -60,9 +60,10 @@ DEFAULT_QUERY_LIMIT = 1000
 # executed.
 CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 5
 
-# The current version of the all collection blob schemas. If any backward-
-# incompatible changes are made to any of the blob schemas in the data store,
-# this version number must be changed.
+# The current version of the all collection blob schemas (such as the nodes
+# structure within the Collection domain object). If any backward-incompatible
+# changes are made to any of the blob schemas in the data store, this version
+# number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the gallery
@@ -265,8 +266,7 @@ DEMO_EXPLORATIONS = [
 ]
 
 DEMO_COLLECTIONS = [
-    ('welcome_to_collections.yaml', 'Welcome to Collections in Oppia!',
-     'Welcome')
+    'welcome_to_collections.yaml'
 ]
 
 # TODO(sll): Add all other URLs here.

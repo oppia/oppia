@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+import feconf
 import test_utils
 
 
@@ -47,50 +48,70 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_demo_exploration(self):
         exp_services.load_demo('1')
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, '1')
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_play_exploration('1'))
+            rights_manager.Actor(self.user_id_a).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_view_exploration('1'))
+            rights_manager.Actor(self.user_id_a).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_edit_exploration('1'))
+            rights_manager.Actor(self.user_id_a).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_a).can_delete_exploration('1'))
+            rights_manager.Actor(self.user_id_a).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_play_exploration('1'))
+            rights_manager.Actor(self.user_id_admin).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
             rights_manager.Actor(
-                self.user_id_admin).can_view_exploration('1'))
+                self.user_id_admin).can_view(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_edit_exploration('1'))
+            rights_manager.Actor(self.user_id_admin).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
             rights_manager.Actor(
-                self.user_id_admin).can_delete_exploration('1'))
+                self.user_id_admin).can_delete(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
         exp_services.load_demo('3')
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, '3')
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_play_exploration('3'))
+            rights_manager.Actor(self.user_id_a).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_view_exploration('3'))
+            rights_manager.Actor(self.user_id_a).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(rights_manager.Actor(
-            self.user_id_a).can_edit_exploration('3'))
+            self.user_id_a).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertFalse(rights_manager.Actor(
-            self.user_id_a).can_delete_exploration('3'))
+            self.user_id_a).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_play_exploration('3'))
+            rights_manager.Actor(self.user_id_admin).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_view_exploration('3'))
+            rights_manager.Actor(self.user_id_admin).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(rights_manager.Actor(
-            self.user_id_admin).can_edit_exploration('3'))
+            self.user_id_admin).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(
             rights_manager.Actor(
-                self.user_id_admin).can_delete_exploration('3'))
+                self.user_id_admin).can_delete(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
 
     def test_ownership(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -102,15 +123,15 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).is_owner_of_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).is_owner(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).is_owner_of_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).is_owner(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         self.assertFalse(
-            rights_manager.Actor(self.user_id_admin).is_owner_of_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_admin).is_owner(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_newly_created_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -118,43 +139,43 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_edit_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_admin).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_admin).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_admin).can_edit_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_admin).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_admin).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_admin).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_edit_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_inviting_collaborator(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -166,17 +187,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_edit_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_inviting_playtester(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -184,34 +205,34 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_edit_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         rights_manager.assign_role_for_exploration(
             self.user_id_a, self.EXP_ID, self.user_id_b,
             rights_manager.ROLE_VIEWER)
 
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_edit_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_setting_rights(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -257,29 +278,29 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         self.assertFalse(
-            rights_manager.Actor(self.user_id_a).can_unpublish_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_unpublish(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_play_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_cannot_delete_published_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -288,8 +309,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         self.assertFalse(
-            rights_manager.Actor(self.user_id_a).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_can_unpublish_and_delete_published_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -299,8 +320,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_delete_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_cannot_unpublish_exploration_after_edited(self):
         # User A creates an exploration, marks it private.
@@ -323,11 +344,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
 
         self.assertFalse(
-            rights_manager.Actor(self.user_id_a).can_publicize_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_publicize(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_publicize_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_admin).can_publicize(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_changing_viewability(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -335,56 +356,56 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         self.assertTrue(rights_manager.Actor(
-            self.user_id_a).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_a).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(rights_manager.Actor(
-            self.user_id_b).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_b).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(rights_manager.Actor(
-            self.user_id_admin).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_admin).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         with self.assertRaisesRegexp(Exception, 'already the current value'):
-            rights_manager.set_private_viewability(
+            rights_manager.set_private_viewability_of_exploration(
                 self.user_id_a, self.EXP_ID, False)
         with self.assertRaisesRegexp(Exception, 'cannot be changed'):
-            rights_manager.set_private_viewability(
+            rights_manager.set_private_viewability_of_exploration(
                 self.user_id_b, self.EXP_ID, True)
 
-        rights_manager.set_private_viewability(
+        rights_manager.set_private_viewability_of_exploration(
             self.user_id_a, self.EXP_ID, True)
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
-        rights_manager.set_private_viewability(
+        rights_manager.set_private_viewability_of_exploration(
             self.user_id_a, self.EXP_ID, False)
         self.assertTrue(
-            rights_manager.Actor(self.user_id_a).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_a).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_view_exploration(
-                self.EXP_ID))
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         self.assertFalse(rights_manager.Actor(
-            self.user_id_a).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_a).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
         rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         self.assertTrue(rights_manager.Actor(
-            self.user_id_a).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_a).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertFalse(rights_manager.Actor(
-            self.user_id_b).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_b).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertTrue(rights_manager.Actor(
-            self.user_id_admin).can_change_private_exploration_viewability(
-            self.EXP_ID))
+            self.user_id_admin).can_change_private_viewability(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
