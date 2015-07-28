@@ -1796,9 +1796,6 @@ class Exploration(object):
                 if outcome.dest == old_state_name:
                     outcome.dest = new_state_name
 
-        self._update_gadget_visibilities_for_renamed_state(
-            old_state_name, new_state_name)
-
     def delete_state(self, state_name):
         """Deletes the given state."""
         if state_name not in self.states:
@@ -1818,8 +1815,6 @@ class Exploration(object):
                     outcome.dest = other_state_name
 
         del self.states[state_name]
-
-        self._update_gadget_visibilities_for_deleted_state(state_name)
 
     # Methods relating to gadgets.
     def add_gadget(self, gadget_dict, panel_name):

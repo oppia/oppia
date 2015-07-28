@@ -35,6 +35,45 @@ oppia.controller('GadgetEditor', [
     $scope.activeStateName = currentStateName;
   });
 
+  /**
+   * Private function to update state visibilty information, when a state is
+   * deleted or renamed.
+   * If the gadget is only visible in the state being deleted the
+   *   explorationStatesService will show the alert and delete that gadget.
+   * param{string} oldStateName Name of the state that has been renamed or
+   *   deleted.
+   * param{string} NewStateName Null if the old state was deleted, or the new
+   *   updated name if it was renamed.
+   */
+  var _updateStateNameForGadgets = function(oldStateName, NewStateName) {
+    for (var gadgetName in $scope.gadgets) {
+      var gadgetStateVisibilityList = angular.copy(
+        $scope.gadgets[gadgetName].visible_in_states);
+      var stateNameIndex = gadgetStateVisibilityList.indexOf(oldStateName);
+      if (stateNameIndex > -1) {
+        if (NewStateName) {
+          // Update the old statename to new state name.
+          gadgetStateVisibilityList[stateNameIndex] = NewStateName;
+        } else {
+          // delete the old state name.
+          gadgetStateVisibilityList.splice(stateNameIndex, 1);
+        }
+        explorationGadgetsService.updateGadget(
+          gadgetName,
+          $scope.gadgets[gadgetName].customization_args,
+          gadgetStateVisibilityList);
+      }
+    }
+  };
+
+  $scope.$on('stateRenamed', function(evt, args) {
+    _updateStateNameForGadgets(args.oldStateName, args.newStateName);
+  });
+
+  $scope.$on('stateDeleted', function(evt, deletedStateName) {
+    _updateStateNameForGadgets(deletedStateName, null);
+  });
+
   $scope.refreshGadgetsInfo = function(){
     $scope.gadgets = explorationGadgetsService.getGadgets();
     $scope.panels = explorationGadgetsService.getPanels();
