@@ -275,10 +275,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
-    def get_commit(cls, exploration_id, version):
-        return cls.get_by_id('exploration-%s-%s' % (exploration_id, version))
-
-    @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)

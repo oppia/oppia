@@ -81,23 +81,3 @@ class ImageHandler(base.BaseHandler):
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
-
-
-class StaticFileHandler(base.BaseHandler):
-    """Handles static file serving on non-GAE platforms."""
-
-    def get(self):
-        """Handles GET requests."""
-        file_path = self.request.path
-        for path in feconf.PATH_MAP:
-            if file_path.startswith(path):
-                file_path = file_path.replace(path, feconf.PATH_MAP[path])
-        try:
-            with open(file_path, 'r') as f:
-                self.response.headers['Content-Type'] = mimetypes.guess_type(
-                    file_path)[0]
-                # TODO(sll): Add a ALLOW_CACHING flag and set the appropriate
-                # caching headers if that's turned on.
-                self.response.write(f.read())
-        except Exception:
-            self.response.set_status(404)

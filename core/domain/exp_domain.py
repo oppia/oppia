@@ -427,10 +427,6 @@ class Outcome(object):
         # triggered.
         self.param_changes = param_changes or []
 
-    def get_feedback_string(self):
-        """Returns a (possibly empty) string with feedback for this rule."""
-        return utils.get_random_choice(self.feedback) if self.feedback else ''
-
     def validate(self):
         if not self.dest:
             raise utils.ValidationError(
@@ -1081,35 +1077,6 @@ class Exploration(object):
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
-
-    def is_equal_to(self, other):
-        simple_props = [
-            'id', 'title', 'category', 'objective', 'language_code',
-            'tags', 'blurb', 'author_notes', 'default_skin',
-            'states_schema_version', 'init_state_name', 'version']
-
-        for prop in simple_props:
-            if getattr(self, prop) != getattr(other, prop):
-                return False
-
-        for (state_name, state_obj) in self.states.iteritems():
-            if state_name not in other.states:
-                return False
-            if state_obj.to_dict() != other.states[state_name].to_dict():
-                return False
-
-        for (ps_name, ps_obj) in self.param_specs.iteritems():
-            if ps_name not in other.param_specs:
-                return False
-            if ps_obj.to_dict() != other.param_specs[ps_name].to_dict():
-                return False
-
-        for i in xrange(len(self.param_changes)):
-            if (self.param_changes[i].to_dict() !=
-                    other.param_changes[i].to_dict()):
-                return False
-
-        return True
 
     @classmethod
     def create_default_exploration(
