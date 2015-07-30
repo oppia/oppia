@@ -135,14 +135,14 @@ oppia.factory('oppiaPlayerService', [
     'answerClassificationService', 'stateTransitionService',
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
-    'PAGE_CONTEXT', 'oppiaExplorationService',
+    'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
     function(
       $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       answerClassificationService, stateTransitionService,
       extensionTagAssemblerService, INTERACTION_SPECS,
       INTERACTION_DISPLAY_MODE_INLINE, explorationContextService,
-      PAGE_CONTEXT, oppiaExplorationService) {
+      PAGE_CONTEXT, oppiaExplorationHtmlFormatterService) {
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _introCardImageUrl = null;
@@ -348,7 +348,7 @@ oppia.factory('oppiaPlayerService', [
       return _currentStateName;
     },
     getInteractionHtml: function(stateName, labelForFocusTarget) {
-      return oppiaExplorationService.getInteractionHtml(
+      return oppiaExplorationHtmlFormatterService.getInteractionHtml(
         _exploration.states[stateName].interaction.id,
         _exploration.states[stateName].interaction.customization_args,
         labelForFocusTarget);
@@ -390,8 +390,8 @@ oppia.factory('oppiaPlayerService', [
     getAnswerAsHtml: function(answer) {
       var currentInteraction = _exploration.states[
         _currentStateName].interaction;
-      return oppiaExplorationService.getAnswerHtml(
-        answer, currentInteraction, currentInteraction.customization_args);
+      return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+        answer, currentInteraction.id, currentInteraction.customization_args);
     },
     submitAnswer: function(answer, successCallback) {
       if (answerIsBeingProcessed) {

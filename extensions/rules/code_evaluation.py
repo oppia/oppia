@@ -37,8 +37,7 @@ class ResultsInError(base.CodeEvaluationRule):
     description = 'results in an error when run'
 
     def _evaluate(self, subject):
-        error = subject['error'].strip()
-        return self._fuzzify_truth_value(error)
+        return self._fuzzify_truth_value(bool(subject['error'].strip()))
 
 
 class FuzzyMatches(base.CodeEvaluationRule):

@@ -26,15 +26,19 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       scope: {},
       templateUrl: 'interaction/CodeRepl',
       controller:  ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.language = oppiaHtmlEscaper.escapedJsonToObj($attrs.languageWithValue);
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
-        $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.preCodeWithValue);
-        $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.postCodeWithValue);
+        $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.languageWithValue);
+        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.placeholderWithValue);
+        $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.preCodeWithValue);
+        $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.postCodeWithValue);
 
         $scope.hasLoaded = false;
 
-        // Keep the code string given by the user and the stdout from the evaluation
-        // until sending them back to the server.
+        // Keep the code string given by the user and the stdout from the
+        // evaluation until sending them back to the server.
         $scope.code = ($scope.placeholder || '');
         $scope.output = '';
 
@@ -64,8 +68,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         // Set up the jsrepl instance with callbacks set.
         var jsrepl = new JSREPL({
           output: function(out) {
-            // For successful evaluation, this is called before 'result', so just keep
-            // the output string here.
+            // For successful evaluation, this is called before 'result', so
+            // just keep the output string here.
             $scope.output = out;
           },
           result: function(res) {
@@ -96,9 +100,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           $scope.code = codeInput;
           $scope.output = '';
 
-          // Running the code. This triggers one of the callbacks set to jsrepl which
-          // then calls sendResponse with the result.
-          var fullCode = $scope.preCode + '\n' + codeInput + '\n' + $scope.postCode;
+          // Running the code. This triggers one of the callbacks set to jsrepl
+          // which then calls sendResponse with the result.
+          var fullCode = (
+            $scope.preCode + '\n' + codeInput + '\n' + $scope.postCode);
           jsrepl.eval(fullCode);
         };
 
@@ -117,13 +122,25 @@ oppia.directive('oppiaInteractiveCodeRepl', [
   }
 ]);
 
-
 oppia.directive('oppiaResponseCodeRepl', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/CodeRepl',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseCodeRepl', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/CodeRepl',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
       }]

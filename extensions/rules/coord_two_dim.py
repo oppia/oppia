@@ -71,13 +71,10 @@ class FuzzyMatches(base.CoordTwoDimRule):
 
         def _compute_certainty(p1, p2):
             dist = _haversine_distance(p1, p2)
-            if dist < 1:
+            if dist < 1.0:
                 return 1
-            return 1 / dist
+            return 1.0 / dist
 
-        best_certainty = _compute_certainty(self.training_data[0], subject)
-        for value in self.training_data:
-            best_certainty = max(
-                best_certainty, _compute_certainty(value, subject))
-
-        return best_certainty
+        return max([
+            _compute_certainty(value, subject)
+            for value in self.training_data])

@@ -42,11 +42,28 @@
 <script type="text/ng-template" id="rules/fuzzyRulePanel">
   is similar to
 
-  <ul>
-    <li ng-repeat="data in ruleInputs.training_data">
-      <div angular-html-bind="answerTemplates[$index]">
-      </div>
-      <span class="glyphicon glyphicon-trash oppia-editor-trash-icon" ng-click="deleteTrainingDataEntry($index)"></span>
-    </li>
-  </ul>
+  <button type="button" ng-repeat="trainingDataHtml in trainingDataHtmlList" class="btn btn-default protractor-test-retrain-answer oppia-unresolved-answer-button" ng-click="openRetrainAnswerModal($index)">
+    <span angular-html-bind="trainingDataHtml"></span>
+  </button>
+</script>
+
+<script type="text/ng-template" id="modals/retrainAnswer">
+  <div class="modal-header">
+    <h3>Teach Oppia</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="teachOppiaForm" class="form-inline">
+      <div class="oppia-rule-details-header">
+        <div>
+          <training-panel answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTraining()">
+          </training-panel>
+        </div>
+      <div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" ng-click="finishTraining()">Exit</button>
+  </div>
 </script>

@@ -27,8 +27,10 @@ oppia.directive('ruleTypeSelector', [function() {
     },
     template: '<input type="hidden">',
     controller: [
-        '$scope', '$element', '$rootScope', '$filter', 'stateInteractionIdService', 'INTERACTION_SPECS',
-        function($scope, $element, $rootScope, $filter, stateInteractionIdService, INTERACTION_SPECS) {
+        '$scope', '$element', '$rootScope', '$filter',
+        'stateInteractionIdService', 'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
+        function($scope, $element, $rootScope, $filter,
+          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
 
       var choices = [];
       var numberOfRuleTypes = 0;
@@ -36,7 +38,7 @@ oppia.directive('ruleTypeSelector', [function() {
       var ruleTypesToDescriptions = INTERACTION_SPECS[
         stateInteractionIdService.savedMemento].rule_descriptions;
       for (var ruleType in ruleTypesToDescriptions) {
-        if (ruleType == 'FuzzyMatches') {
+        if (ruleType == FUZZY_RULE_TYPE) {
           continue;
         }
         numberOfRuleTypes++;
@@ -113,13 +115,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-        '$scope', '$timeout', 'editorContextService', 'explorationStatesService',
-        'routerService', 'validatorsService', 'responsesService',
-        'stateInteractionIdService', 'INTERACTION_SPECS', 'FUZZY_RULE_NAME',
-        function(
+        '$scope', '$timeout', 'editorContextService',
+        'explorationStatesService', 'routerService', 'validatorsService',
+        'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        'FUZZY_RULE_TYPE', function(
           $scope, $timeout, editorContextService, explorationStatesService,
           routerService, validatorsService, responsesService,
-          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_NAME) {
+          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
       $scope.currentInteractionId = stateInteractionIdService.savedMemento;
       $scope.editRuleForm = {};
 
@@ -234,7 +236,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       };
 
       $scope.onDeleteTrainingDataEntry = function(index) {
-        if ($scope.rule.rule_type === FUZZY_RULE_NAME) {
+        if ($scope.rule.rule_type === FUZZY_RULE_TYPE) {
           var trainingData = $scope.rule.inputs.training_data;
           if (index < trainingData.length) {
             trainingData.splice(index, 1);
@@ -272,20 +274,85 @@ oppia.directive('fuzzyRulePanel', [function() {
     },
     templateUrl: 'rules/fuzzyRulePanel',
     controller: [
-      '$scope', 'oppiaExplorationService', 'stateInteractionIdService',
-      'stateCustomizationArgsService',
-      function($scope, oppiaExplorationService, stateInteractionIdService,
-          stateCustomizationArgsService) {
-        $scope.answerTemplates = [];
-        for (var i = 0; i < $scope.ruleInputs.training_data.length; i++) {
-          $scope.answerTemplates.push(oppiaExplorationService.getAnswerHtml(
-            $scope.ruleInputs.training_data[i],
-            stateInteractionIdService.savedMemento,
-            stateCustomizationArgsService.savedMemento));
+      '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
+      'stateInteractionIdService', 'stateCustomizationArgsService',
+      'warningsData',
+      function($scope, $modal, oppiaExplorationHtmlFormatterService,
+          stateInteractionIdService, stateCustomizationArgsService,
+          warningsData) {
+        $scope.trainingDataHtmlList = [];
+        var _trainingData = $scope.ruleInputs.training_data;
+        for (var i = 0; i < _trainingData.length; i++) {
+          $scope.trainingDataHtmlList.push(
+            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+              _trainingData[i], stateInteractionIdService.savedMemento,
+              stateCustomizationArgsService.savedMemento));
         }
 
-        $scope.deleteTrainingDataEntry = function(index) {
-          $scope.onTrainingDataDeletion({index: index});
+        $scope.openRetrainAnswerModal = function(trainingDataIndex) {
+          warningsData.clear();
+
+          $modal.open({
+            templateUrl: 'modals/retrainAnswer',
+            backdrop: true,
+            controller: ['$scope', '$modalInstance', 'trainingDataService',
+              'explorationStatesService', 'editorContextService',
+              'answerClassificationService', 'explorationContextService',
+              function($scope, $modalInstance, trainingDataService,
+                  explorationStatesService, editorContextService,
+                  answerClassificationService, explorationContextService) {
+                $scope.trainingDataAnswer = '';
+                $scope.trainingDataFeedback = '';
+                $scope.trainingDataOutcomeDest = '';
+                $scope.classification = {feedbackIndex: 0, newOutcome: null};
+
+                $scope.finishTraining = function() {
+                  $modalInstance.close();
+                };
+
+                $scope.init = function() {
+                  var explorationId = (
+                    explorationContextService.getExplorationId());
+                  var currentStateName = (
+                    editorContextService.getActiveStateName());
+                  var state = (
+                    explorationStatesService.getState(currentStateName));
+
+                  // TODO(bhenning): Use a single classification request
+                  // specific to the editor view.
+                  var unhandledAnswers = [_trainingData[trainingDataIndex]];
+                  answerClassificationService.getMatchingBatchClassificationResult(
+                    explorationId, state, unhandledAnswers).success(
+                        function(response) {
+                      var classificationResult = response.results[0];
+                      var feedback = 'Nothing';
+                      var dest = classificationResult.outcome.dest;
+                      if (classificationResult.outcome.feedback.length > 0) {
+                        feedback = classificationResult.outcome.feedback[0];
+                      }
+                      if (dest == currentStateName) {
+                        dest = '<em>(try again)</em>';
+                      }
+
+                      // $scope.trainingDataAnswer, $scope.trainingDataFeedback
+                      // $scope.trainingDataOutcomeDest are intended to be local
+                      // to this modal and should not be used to populate any
+                      // information in the active exploration (including the
+                      // feedback). The feedback here refers to a representation
+                      // of the outcome of an answer group, rather than the
+                      // specific feedback of the outcome (for instance, it
+                      // includes the destination state within the feedback).
+                      $scope.trainingDataAnswer = unhandledAnswers[0];
+                      $scope.trainingDataFeedback = feedback;
+                      $scope.trainingDataOutcomeDest = dest;
+                      $scope.classification.feedbackIndex = (
+                        classificationResult.answer_group_index);
+                    });
+                };
+
+                $scope.init();
+              }]
+          });
         };
       }
     ]

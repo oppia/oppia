@@ -94,7 +94,7 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                     if param_obj_type.__name__ in [
                             'NonnegativeInt', 'SetOfReal', 'ListOfGraph',
                             'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
-                            'SetOfNormalizedString']:
+                            'SetOfNormalizedString', 'ListOfClickOnImage']:
                         continue
 
                     self.assertTrue(
@@ -117,7 +117,8 @@ class RuleFunctionUnitTests(test_utils.GenericTestBase):
                 'is equal to {{x|UnicodeString}}, taking case into account'),
             'Contains': 'contains {{x|UnicodeString}}',
             'Equals': 'is equal to {{x|UnicodeString}}',
-            'FuzzyMatches': 'is similar to {{training_data|SetOfUnicodeString}}',
+            rule_domain.FUZZY_RULE_TYPE: (
+                'is similar to {{training_data|SetOfUnicodeString}}'),
             'MatchesBase64EncodedFile': (
                 'has same content as the file located at '
                 '{{filepath|UnicodeString}}'),

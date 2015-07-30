@@ -131,8 +131,7 @@ def classify(exp_id, state, answer, params):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec = None
     best_matched_truth_value = 0.0
-    for i in range(len(state.interaction.answer_groups)):
-        answer_group = state.interaction.answer_groups[i]
+    for (i, answer_group) in enumerate(state.interaction.answer_groups):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exp_id))
         input_type = interaction_instance.answer_type
@@ -150,7 +149,7 @@ def classify(exp_id, state, answer, params):
             best_matched_answer_group = answer_group
             best_matched_answer_group_index = i
 
-    # The best matched group must match above a certain threshold. No group
+    # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
     # (if there is one present), resulting in the outcome of the answer being
     # the default outcome of the state.
@@ -168,7 +167,7 @@ def classify(exp_id, state, answer, params):
             'outcome': state.interaction.default_outcome.to_dict(),
             'rule_spec_string': exp_domain.DEFAULT_RULESPEC_STR,
             'answer_group_index': len(state.interaction.answer_groups),
-            'classification_certainty': 0
+            'classification_certainty': 0.0
         }
 
     raise Exception('Something has seriously gone wrong with the exploration. '
@@ -395,8 +394,8 @@ class ClassifyHandler(base.BaseHandler):
 
 class BatchClassifyHandler(base.BaseHandler):
     """Classification handler which classifies similarly to ClassifyHandler, but
-    across a list of answers rather than a single answer. The classificaiton
-    results for each answer is returned in a list in the same order as the
+    across a list of answers rather than a single answer. The classification
+    results for each answer are returned in a list in the same order as the
     original answers.
     """
 
@@ -412,7 +411,7 @@ class BatchClassifyHandler(base.BaseHandler):
         results = []
         for answer in answers:
             results.append(classify(exploration_id, old_state, answer, params))
-        self.render_json(results)
+        self.render_json({'results': results})
 
 
 class ReaderFeedbackHandler(base.BaseHandler):

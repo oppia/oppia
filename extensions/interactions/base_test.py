@@ -26,6 +26,7 @@ import struct
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
+from core.domain import rule_domain
 from core.tests import test_utils
 from extensions.interactions import base
 import feconf
@@ -274,3 +275,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction._customization_arg_specs)
 
             self._validate_dependencies(interaction.dependency_ids)
+
+    def test_trainable_interactions_have_fuzzy_rules(self):
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            if interaction.is_trainable:
+                obj_type = interaction.answer_type
+                all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
+                self.assertIn(
+                    rule_domain.FUZZY_RULE_TYPE,
+                    [rule_class.__name__ for rule_class in all_rule_classes])

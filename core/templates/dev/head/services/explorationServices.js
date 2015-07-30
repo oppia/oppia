@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory services for explorations which may be shared by both
+ * @fileoverview Utility services for explorations which may be shared by both
  * the learner and editor views.
  *
  * @author bhenning@google.com (Ben Henning)
@@ -21,7 +21,7 @@
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
-oppia.factory('oppiaExplorationService', [
+oppia.factory('oppiaExplorationHtmlFormatterService', [
     '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
     function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
 
@@ -67,6 +67,25 @@ oppia.factory('oppiaExplorationService', [
           interactionChoices));
       }
       return ($('<div>').append(el)).html();
+    },
+
+    getShortAnswerHtml: function(
+      answer, interactionId, interactionCustomizationArgs) {
+      // TODO(sll): Get rid of this special case for multiple choice.
+      var interactionChoices = null;
+      if (interactionCustomizationArgs.choices) {
+        interactionChoices = interactionCustomizationArgs.choices.value;
+      }
+
+      var el = $(
+        '<oppia-short-response-' + $filter('camelCaseToHyphens')(
+          interactionId) + '>');
+      el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+      if (interactionChoices) {
+        el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
+          interactionChoices));
+      }
+      return ($('<span>').append(el)).html();
     }
   };
 }]);

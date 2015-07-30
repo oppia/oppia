@@ -55,7 +55,14 @@ oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 
 oppia.constant('DEFAULT_RULE_NAME', 'Default');
 
-oppia.constant('FUZZY_RULE_NAME', 'FuzzyMatches');
+oppia.constant('FUZZY_RULE_TYPE', 'FuzzyMatches');
+
+oppia.constant('DEFAULT_FUZZY_RULE', {
+  'rule_type': 'FuzzyMatches',
+  'inputs': {
+    'training_data': []
+  }
+})
 
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 

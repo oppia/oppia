@@ -18,6 +18,7 @@
 
 __author__ = 'Zhan Xiong Chin'
 
+import math
 from extensions.rules import base
 
 
@@ -29,28 +30,28 @@ class IsInRegion(base.ClickOnImageRule):
 
 
 class FuzzyMatches(base.ClickOnImageRule):
-    description = 'is similar to {{training_data|SetOfReal}}'
+    description = 'is similar to {{training_data|ListOfClickOnImage}}'
 
     def _evaluate(self, subject):
-        # For simple classification, this computes the inverse absolute
+        # For simple classification, this computes the inverse Euclidean
         # distances between the input value and all values in the training set.
         # The largest value is used as the "membership certainty" of the input
         # value belonging to this cluster.
 
         # If no training data exists, then this real value cannot belong to the
         # cluster.
-        if len(self.training_data) == 0:
+        if not self.training_data:
             return self._fuzzify_truth_value(False)
 
         def _compute_certainty(v1, v2):
-            abs_dist = abs(v1 - v2)
-            if abs_dist < 1:
-                return 1
-            return 1 / abs_dist
+            dx = v1[0] - v2[0]
+            dy = v1[1] - v2[1]
+            dist = math.sqrt(dx * dx + dy * dy)
+            if dist < 1.0:
+                return 1.0
+            return 1.0 / dist
 
-        best_certainty = _compute_certainty(subject, self.training_data[0])
-        for value in self.training_data:
-            best_certainty = max(
-                best_certainty, _compute_certainty(subject, value))
-
-        return best_certainty
+        return max([
+            _compute_certainty(
+                subject['clickPosition'], value['clickPosition'])
+            for value in self.training_data])

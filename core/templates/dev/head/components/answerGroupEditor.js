@@ -33,10 +33,11 @@ oppia.directive('answerGroupEditor', [function() {
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
       'editorContextService', 'routerService', 'warningsData',
-      'INTERACTION_SPECS',
+      'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
       function(
         $scope, stateInteractionIdService, responsesService,
-        editorContextService, routerService, warningsData, INTERACTION_SPECS) {
+        editorContextService, routerService, warningsData, INTERACTION_SPECS,
+        FUZZY_RULE_TYPE) {
 
     $scope.rulesMemento = null;
     $scope.outcomeFeedbackMemento = null;
@@ -201,14 +202,23 @@ oppia.directive('answerGroupEditor', [function() {
     };
 
     $scope.addNewRule = function() {
-      // Save the state of the rules before adding a new one (in case the user
-      // cancels the addition).
-      $scope.rulesMemento = angular.copy($scope.rules);
-
       // Build an initial blank set of inputs for the initial rule.
       var interactionId = $scope.getCurrentInteractionId();
       var ruleDescriptions = INTERACTION_SPECS[interactionId].rule_descriptions;
-      var ruleType = Object.keys(ruleDescriptions)[0];
+      var ruleTypes = Object.keys(ruleDescriptions);
+      var ruleType = null;
+      for (var i = 0; i < ruleTypes.length; i++) {
+        if (ruleTypes[i] != FUZZY_RULE_TYPE) {
+          ruleType = ruleTypes[i];
+          break;
+        }
+      }
+      if (!ruleType) {
+        // TODO(bhenning): What happens if there is only a fuzzy rule for this
+        // interaction? This should raise an error to the user or the add rule
+        // button should be hidden.
+        return;
+      }
       var description = ruleDescriptions[ruleType];
 
       var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
@@ -223,6 +233,10 @@ oppia.directive('answerGroupEditor', [function() {
         inputs[varName] = getDefaultInputValue(varType);
         description = description.replace(PATTERN, ' ');
       }
+
+      // Save the state of the rules before adding a new one (in case the user
+      // cancels the addition).
+      $scope.rulesMemento = angular.copy($scope.rules);
 
       // TODO(bhenning): Should use functionality in ruleEditor.js, but move it
       // to responsesService in StateResponses.js to properly form a new rule.
@@ -345,10 +359,6 @@ oppia.directive('outcomeFeedbackEditor', [function() {
             nonemptyFeedback.push(feedbackStr);
           }
           if (!feedbackStr && i == 0) {
-            // If the first feedback is empty, copy no more feedback after.
-            break;
-          }
-          if (!feedback && i == 0) {
             // If the first feedback is empty, copy no more feedback after.
             break;
           }

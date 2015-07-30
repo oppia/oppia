@@ -27,17 +27,18 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/ImageClickInput',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue);
-        $scope.highlightRegionsOnHover = 
+      controller: ['$scope', '$element', '$attrs',
+          function($scope, $element, $attrs) {
+        var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.imageAndRegionsWithValue);
+        $scope.highlightRegionsOnHover =
           ($attrs.highlightRegionsOnHoverWithValue === 'true');
         $scope.filepath = imageAndRegions.imagePath;
         $scope.imageUrl = (
           $scope.filepath ?
           $sce.trustAsResourceUrl(
-            '/imagehandler/' + explorationContextService.getExplorationId() + '/' +
-            encodeURIComponent($scope.filepath)) :
-          null);
+            '/imagehandler/' + explorationContextService.getExplorationId() +
+            '/' + encodeURIComponent($scope.filepath)) : null);
         $scope.mouseX = 0;
         $scope.mouseY = 0;
         $scope.currentlyHoveredRegions = [];
@@ -68,9 +69,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
             var labeledRegion = imageAndRegions.labeledRegions[i];
             var regionArea = labeledRegion.region.area;
-            if (regionArea[0][0] <= $scope.mouseX && 
+            if (regionArea[0][0] <= $scope.mouseX &&
                 $scope.mouseX <= regionArea[1][0] &&
-                regionArea[0][1] <= $scope.mouseY && 
+                regionArea[0][1] <= $scope.mouseY &&
                 $scope.mouseY <= regionArea[1][1]) {
               $scope.currentlyHoveredRegions.push(labeledRegion.label);
             }
@@ -87,14 +88,13 @@ oppia.directive('oppiaInteractiveImageClickInput', [
   }
 ]);
 
-
 oppia.directive('oppiaResponseImageClickInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/ImageClickInput',
-      controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
         // TODO(czxcjx): Add image to response template when there's an easier
         // way to access customization args from here
@@ -107,6 +107,22 @@ oppia.directive('oppiaResponseImageClickInput', [
         };
         $scope.onMousemoveDiv = function(evt) {
         };
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseImageClickInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/ImageClickInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.clickRegionLabel = (
+          _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
+          'Clicked on image');
       }]
     };
   }

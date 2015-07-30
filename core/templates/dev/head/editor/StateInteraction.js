@@ -54,13 +54,13 @@ oppia.controller('StateInteraction', [
     'INTERACTION_SPECS', 'stateInteractionIdService',
     'stateCustomizationArgsService', 'editabilityService',
     'explorationStatesService', 'graphDataService',
-    'interactionDetailsCache', 'oppiaExplorationService',
+    'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
     function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, changeListService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
-      interactionDetailsCache, oppiaExplorationService) {
+      interactionDetailsCache, oppiaExplorationHtmlFormatterService) {
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
   // interaction preview.
@@ -77,16 +77,24 @@ oppia.controller('StateInteraction', [
       INTERACTION_SPECS[stateInteractionIdService.savedMemento].name : '');
   };
 
+  $scope.isInteractionTrainable = function() {
+    return (
+      stateInteractionIdService.savedMemento ? INTERACTION_SPECS[
+        stateInteractionIdService.savedMemento].is_trainable : false);
+  };
+
   $scope.doesCurrentInteractionHaveCustomizations = function() {
-    var interactionSpec = INTERACTION_SPECS[stateInteractionIdService.savedMemento];
-    return interactionSpec && interactionSpec.customization_arg_specs.length > 0;
+    var interactionSpec = INTERACTION_SPECS[
+      stateInteractionIdService.savedMemento];
+    return (
+      interactionSpec && interactionSpec.customization_arg_specs.length > 0);
   };
 
   var _getInteractionPreviewTag = function(interactionCustomizationArgs) {
     if (!stateInteractionIdService.savedMemento) {
       return '';
     }
-    return oppiaExplorationService.getInteractionHtml(
+    return oppiaExplorationHtmlFormatterService.getInteractionHtml(
       stateInteractionIdService.savedMemento, interactionCustomizationArgs);
   };
 
@@ -296,6 +304,96 @@ oppia.controller('StateInteraction', [
     });
   };
 
+  $scope.openTeachOppiaModal = function() {
+    warningsData.clear();
+    $rootScope.$broadcast('externalSave');
+
+    $modal.open({
+      templateUrl: 'modals/teachOppia',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance',
+        'oppiaExplorationHtmlFormatterService', 'stateInteractionIdService',
+        'stateCustomizationArgsService', 'explorationContextService',
+        'editorContextService', 'explorationStatesService',
+        'trainingDataService', 'answerClassificationService', 'focusService',
+        'DEFAULT_RULE_NAME', 'FUZZY_RULE_TYPE',
+        function($scope, $modalInstance, oppiaExplorationHtmlFormatterService,
+            stateInteractionIdService, stateCustomizationArgsService,
+            explorationContextService, editorContextService,
+            explorationStatesService, trainingDataService,
+            answerClassificationService, focusService, DEFAULT_RULE_NAME,
+            FUZZY_RULE_TYPE) {
+
+          var _explorationId = explorationContextService.getExplorationId();
+          var _stateName = editorContextService.getActiveStateName();
+          var _state = explorationStatesService.getState(_stateName);
+
+          $scope.stateContent = _state.content[0].value;
+          $scope.inputTemplate = (
+            oppiaExplorationHtmlFormatterService.getInteractionHtml(
+              stateInteractionIdService.savedMemento,
+              stateCustomizationArgsService.savedMemento,
+              'testInteractionInput'));
+          $scope.answerTemplate = '';
+
+          $scope.trainingData = [];
+          $scope.trainingDataAnswer = '';
+          $scope.trainingDataFeedback = '';
+          $scope.trainingDataOutcomeDest = '';
+          $scope.classification = {feedbackIndex: 0, newOutcome: null};
+
+          focusService.setFocus('testInteractionInput');
+
+          $scope.finishTeaching = function(reopen) {
+            $modalInstance.close({
+              'reopen': reopen
+            });
+          };
+
+          $scope.submitAnswer = function(answer) {
+            // TODO(bhenning): This should use the single classification
+            // handler, not the batch.
+            var unhandledAnswers = [answer];
+
+            $scope.answerTemplate = (
+              oppiaExplorationHtmlFormatterService.getAnswerHtml(
+                answer, stateInteractionIdService.savedMemento,
+                stateCustomizationArgsService.savedMemento));
+
+            answerClassificationService.getMatchingBatchClassificationResult(
+              _explorationId, _state, unhandledAnswers).success(
+                  function(response) {
+                var classificationResult = response.results[0];
+                var feedback = 'Nothing';
+                var dest = classificationResult.outcome.dest;
+                if (classificationResult.outcome.feedback.length > 0) {
+                  feedback = classificationResult.outcome.feedback[0];
+                }
+                if (dest == _stateName) {
+                  dest = '<em>(try again)</em>';
+                }
+                $scope.trainingDataAnswer = unhandledAnswers[0];
+                $scope.trainingDataFeedback = feedback;
+                $scope.trainingDataOutcomeDest = dest;
+
+                if (classificationResult.rule_spec_string !== DEFAULT_RULE_NAME &&
+                    classificationResult.rule_spec_string !== FUZZY_RULE_TYPE) {
+                  $scope.classification.feedbackIndex = -1;
+                } else {
+                  $scope.classification.feedbackIndex = (
+                    classificationResult.answer_group_index);
+                }
+              });
+          };
+        }]
+    }).result.then(function(result) {
+      // Check if the modal should be reopened right away.
+      if (result.reopen) {
+        $scope.openTeachOppiaModal();
+      }
+    });
+  };
+
   var _updateInteractionPreviewAndAnswerChoices = function() {
     $scope.interactionId = stateInteractionIdService.savedMemento;
 
@@ -336,5 +434,32 @@ oppia.controller('StateInteraction', [
     _stateDict.interaction.customization_args = angular.copy(
       stateCustomizationArgsService.savedMemento);
     explorationStatesService.setState(activeStateName, _stateDict);
+  };
+}]);
+
+oppia.directive('testInteractionPanel', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      stateContent: '&',
+      inputTemplate: '&',
+      onSubmitAnswer: '&'
+    },
+    templateUrl: 'teaching/testInteractionPanel',
+    controller: [
+      '$scope', 'editorContextService', 'explorationStatesService',
+      'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
+      function($scope, editorContextService, explorationStatesService,
+          INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
+        var _stateName = editorContextService.getActiveStateName();
+        var _state = explorationStatesService.getState(_stateName);
+        $scope.interactionIsInline = (
+          INTERACTION_SPECS[_state.interaction.id].display_mode ===
+          INTERACTION_DISPLAY_MODE_INLINE);
+        $scope.submitAnswer = function(answer) {
+          $scope.onSubmitAnswer({answer: answer});
+        };
+      }
+    ]
   };
 }]);

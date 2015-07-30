@@ -692,3 +692,13 @@ class ClickOnImage(BaseObject):
             }
         }]
     }
+
+class ListOfClickOnImage(BaseObject):
+    """Class for lists of ClickOnImage structures."""
+
+    description = 'A list of image clicks.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': ClickOnImage.SCHEMA
+    }

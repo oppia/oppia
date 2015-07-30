@@ -90,8 +90,9 @@ oppia.directive('customPopover', ['$sce', function($sce) {
       $(elt).popover({
         trigger: 'hover',
         html: true,
-        content: $sce.getTrustedHtml('<pre class="oppia-pre-wrapped-text">'
-	  + attrs.popoverText + '</pre>'),
+        content: $sce.getTrustedHtml(
+          '<pre class="oppia-pre-wrapped-text">' + attrs.popoverText +
+          '</pre>'),
         placement: attrs.popoverPlacement
       });
     },

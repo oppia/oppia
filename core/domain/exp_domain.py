@@ -324,7 +324,7 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == 'FuzzyMatches':
+        if self.rule_type == rule_domain.FUZZY_RULE_TYPE:
             return self.rule_type
         else:
             param_list = [utils.to_ascii(val) for

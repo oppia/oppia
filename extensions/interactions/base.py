@@ -117,8 +117,7 @@ class BaseInteraction(object):
                 self.answer_type).normalize(answer)
 
         raise Exception(
-            'No answer type initialized for interaction %s' %
-            (self.name))
+            'No answer type initialized for interaction %s' % self.name)
 
     @property
     def _stats_log_template(self):

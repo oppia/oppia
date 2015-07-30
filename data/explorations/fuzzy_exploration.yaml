@@ -1,12 +1,12 @@
 author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: number
+init_state_name: text
 language_code: en
 objective: To demonstrate fuzzy rules and trained responses in explorations.
 param_changes: []
 param_specs: {}
-schema_version: 8
+schema_version: 9
 skin_customizations:
   panels_contents: {}
 states:
@@ -103,6 +103,7 @@ states:
 
                 '
           rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
       customization_args:
         language:
           value: python
@@ -128,6 +129,7 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
@@ -245,6 +247,7 @@ states:
                 x: 147.5
                 y: 121.5625
           rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
           value: true
@@ -334,6 +337,7 @@ states:
             - - 33.99534487742393
               - -118.47650349140167
           rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
       customization_args:
         latitude:
           value: 37.326038
@@ -377,9 +381,10 @@ states:
             - 5.0
             - 1.0
           rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
-        dest: text
+        dest: code
         feedback:
         - <p>Hmm. Is {{answer}} really similar to 15? Let's try moving on.</p>
         param_changes: []
@@ -418,18 +423,19 @@ states:
             - thrilled
             - smile
           rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
         rows:
           value: 1
       default_outcome:
-        dest: code
+        dest: number
         feedback:
         - <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
         param_changes: []
       fallbacks: []
       id: TextInput
     param_changes: []
-states_schema_version: 5
+states_schema_version: 6
 tags: []

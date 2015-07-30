@@ -265,7 +265,6 @@ DEMO_EXPLORATIONS = [
 ]
 
 # TODO(sll): Add all other URLs here.
-CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
 EDITOR_URL_PREFIX = '/create'
@@ -323,6 +322,9 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
+
+# Unfinished feature.
+SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'

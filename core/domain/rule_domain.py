@@ -30,6 +30,8 @@ import jinja_utils
 # TODO(sll): In the frontend, use the rule descriptions as the single source
 # of truth for the params.
 
+FUZZY_RULE_TYPE = 'FuzzyMatches'
+
 
 def get_obj_type_for_param_name(rule_class, param_name):
     """Gets the obj type for a given param name."""
@@ -149,7 +151,10 @@ class Rule(object):
         raise NotImplementedError
 
     def _fuzzify_truth_value(self, bool_value):
-        """Returns normalized truth value for a crisp true or false value."""
+        """Returns a fuzzy truth value for a crisp true or false value. A crisp
+        value of true is reprsented by the fuzzy value of 1.0 and a crisp value
+        of false is represented by 0.0.
+        """
         return CERTAIN_TRUE_VALUE if bool(bool_value) else CERTAIN_FALSE_VALUE
 
     def _invert_fuzzy_truth_value(self, fuzzy_value):

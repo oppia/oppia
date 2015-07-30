@@ -94,18 +94,6 @@
       </button>
     </div>
   </md-card>
-
-  <div style="margin: 20px 0px; padding: 0px;">
-    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && isCurrentInteractionTrainable()" class="oppia-add-rule-button-container" style="text-align: center;">
-      <!-- TODO(bhenning): This abuses the MD cards and does not have a proper drop shadow like the other MD buttons. -->
-      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-teach-oppia-modal" style="width: 49%; float: left;" ng-click="openTeachOppiaModal()">
-        Teach Oppia
-      </button>
-      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-teach-oppia-modal" style="width: 49%; float: right;" ng-click="openTestOppiaModal()">
-        Test Oppia
-      </button>
-    </div>
-  </div>
 </div>
 
 <script type="text/ng-template" id="modals/addAnswerGroup">
@@ -116,7 +104,7 @@
   <div class="modal-body">
     <form name="addAnswerGroupForm.outcomeDetailsForm" class="form-inline protractor-test-add-response-details">
       <div class="oppia-rule-details-header">
-        <strong>If the learner's answer...</strong>
+        <strong>If the learners answer...</strong>
       </div>
 
       <rule-editor rule="tmpRule" is-editable="editabilityService.isEditable()" is-editing-rule-inline="false">
@@ -158,168 +146,5 @@
             ng-click="reallyDelete()">
       Delete Response
     </button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/teachOppia">
-  <div class="modal-header">
-    <h3>Teach Oppia</h3>
-  </div>
-
-  <div class="modal-body">
-    <form name="teachOppiaForm" class="form-inline">
-      <div class="oppia-rule-details-header">
-        <div>
-          <strong ng-if="trainingData.length == 0">
-            Oppia understands all the answers submitted for this question.
-          </strong>
-
-          <br>
-
-          <training-panel ng-if="trainingData.length > 0" answer="trainingData[0].answer" answer-feedback="trainingData[0].feedback" classification="classification" on-create-answer-group="createAnswerGroup()" on-finish-training="finishTraining(true)">
-          </training-panel>
-        </div>
-      <div>
-    </form>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-success" ng-click="finishTraining(false)">Exit</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/testOppia">
-  <div class="modal-header">
-    <h3>Test Oppia</h3>
-  </div>
-
-  <div class="modal-body">
-    <div class="oppia-rule-details-header">
-      <demo-interaction-panel state-content="stateContent" input-template="inputTemplate" on-submit-answer="submitAnswer(answer)">
-      </demo-interaction-panel>
-
-      <form name="testOppiaForm" class="form-inline">
-        <training-panel ng-if="trainingData.length > 0 && classification.feedbackIndex >= 0" answer="trainingData[0].answer" answer-feedback="trainingData[0].feedback" classification="classification" on-create-answer-group="createAnswerGroup()" on-finish-training="finishTesting(true)">
-        </training-panel>
-      </form>
-      <div ng-if="classification.feedbackIndex === -1">
-        <div>
-          <span><strong>If Oppia encounters the answer:</strong></span>
-        </div>
-
-        <div>
-          <div angular-html-bind="answerTemplate">
-          </div>
-        </div>
-
-        <br>
-
-        <div>
-          <span><strong>it will reply with:</strong></span>
-        </div>
-
-        <div>
-          <div angular-html-bind="trainingData[0].feedback">
-          </div>
-        </div>
-
-        <br>
-
-        <div>
-          <span><strong>This is due to a specific rule. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
-        </div>
-
-        <br>
-
-        <button class="btn btn-default" ng-click="finishTesting(true)">Test Oppia Again</button>
-      </div>
-    <div>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-success" ng-click="finishTesting(false)">Exit</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="teaching/trainingPanel">
-  <div class="form-inline" style="margin-bottom: 10px; border-top: 1px solid #e5e5e5;">
-    <div style="margin-top: 10px;">
-      <span><strong>If Oppia encounters the answer:</strong></span>
-    </div>
-
-    <div>
-      <div angular-html-bind="answerTemplate">
-      </div>
-    </div>
-
-    <br>
-
-    <div>
-      <span><strong>it will reply with:</strong></span>
-    </div>
-
-    <div>
-      <div angular-html-bind="answerFeedback">
-      </div>
-    </div>
-
-    <br>
-
-    <div>
-      <span><strong>Is this right?</strong></span>
-    </div>
-
-    <div>
-      <button class="btn btn-default" ng-disabled="changingFeedbackIndex" ng-click="beginChangingFeedbackIndex()">No</button>
-      <button class="btn btn-default" ng-disabled="changingFeedbackIndex" ng-click="confirmFeedbackIndex(classification.feedbackIndex)">Yes</button>
-    </div>
-
-    <br>
-
-    <div ng-if="changingFeedbackIndex">
-      <span><strong>Select correct feedback:</strong></span>
-      <div angular-html-bind="inputTemplate">
-      </div>
-      <button class="btn btn-default" ng-if="!addingNewResponse" ng-click="beginAddingNewResponse()">New Response</button>
-      <outcome-feedback-editor ng-if="addingNewResponse" outcome="classification.newOutcome">
-      </outcome-feedback-editor>
-      <button class="btn btn-default" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>
-    </div>
-  </div>
-</script>
-
-<script type="text/ng-template" id="teaching/demoInteractionPanel">
-  <div class="form-inline" style="margin-bottom: 20px;">
-    <table class="preview-conversation-skin-card-row-container">
-      <tr class="preview-conversation-skin-card-row">
-        <td class="preview-conversation-skin-row-avatar" valign="top">
-          <img class="preview-conversation-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
-        </td>
-        <td class="preview-conversation-skin-oppia-content">
-          <div angular-html-bind="stateContent"></div>
-        </td>
-      </tr>
-    </table>
-    <div ng-if="interactionIsInline">
-      <div class="preview-conversation-skin-inline-interaction">
-        <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
-          <tr class="preview-conversation-skin-card-row">
-            <td class="preview-conversation-skin-row-avatar" valign="top">
-              <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="/images/general/user_mint_48px.png">
-            </td>
-            <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate">
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
-      <div>
-        <md-card class="preview-conversation-skin-supplemental-card">
-          <div angular-html-bind="inputTemplate">
-          </div>
-        </md-card>
-      </div>
-    </div>
   </div>
 </script>

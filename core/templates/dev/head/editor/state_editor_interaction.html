@@ -25,6 +25,14 @@
       </div>
     </md-card>
   </div>
+
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="isInteractionTrainable()">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
+      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
+        Teach Oppia
+      </button>
+    </div>
+  </md-card>
 </div>
 
 <script type="text/ng-template" id="modals/customizeInteraction">
@@ -103,5 +111,100 @@
             ng-click="reallyDelete()">
       Delete Interaction
     </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/teachOppia">
+  <div class="modal-header">
+    <h3>Teach Oppia</h3>
+  </div>
+
+  <div class="modal-body">
+    <div class="oppia-rule-details-header">
+      <test-interaction-panel state-content="stateContent" input-template="inputTemplate" on-submit-answer="submitAnswer(answer)">
+      </test-interaction-panel>
+
+      <div ng-if="trainingDataAnswer" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
+        <form name="testOppiaForm" class="form-inline">
+          <training-panel ng-if="classification.feedbackIndex >= 0" answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTeaching(true)">
+          </training-panel>
+        </form>
+        <div ng-if="classification.feedbackIndex === -1">
+          <div>
+            <span><strong>If Oppia encounters the answer:</strong></span>
+          </div>
+
+          <div>
+            <div angular-html-bind="answerTemplate">
+            </div>
+          </div>
+
+          <br>
+
+          <div>
+            <span><strong>it will reply with:</strong></span>
+          </div>
+
+          <div>
+            <div angular-html-bind="trainingDataFeedback">
+            </div>
+          </div>
+
+          <br>
+
+          <div>
+            <span><strong>and then direct the learner to: </strong></span>
+            <span angular-html-bind="trainingDataOutcomeDest"></span>
+          </div>
+
+          <br>
+
+          <div>
+            <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
+          </div>
+        </div>
+      </div>
+    <div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="finishTeaching(false)">Exit</button>
+    <button class="btn btn-default btn-success" ng-click="finishTeaching(true)">Teach Oppia Something Else</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="teaching/testInteractionPanel">
+  <div class="form-inline" style="margin-bottom: 20px;">
+    <table class="preview-conversation-skin-card-row-container">
+      <tr class="preview-conversation-skin-card-row">
+        <td class="preview-conversation-skin-row-avatar" valign="top">
+          <img class="preview-conversation-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
+        </td>
+        <td class="preview-conversation-skin-oppia-content">
+          <div angular-html-bind="stateContent()"></div>
+        </td>
+      </tr>
+    </table>
+    <div ng-if="interactionIsInline">
+      <div class="preview-conversation-skin-inline-interaction">
+        <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
+          <tr class="preview-conversation-skin-card-row">
+            <td class="preview-conversation-skin-row-avatar" valign="top">
+              <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="/images/general/user_mint_48px.png">
+            </td>
+            <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate()">
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
+      <div>
+        <md-card class="preview-conversation-skin-supplemental-card">
+          <div angular-html-bind="inputTemplate()">
+          </div>
+        </md-card>
+      </div>
+    </div>
   </div>
 </script>

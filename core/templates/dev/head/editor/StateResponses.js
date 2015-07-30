@@ -46,13 +46,13 @@ oppia.factory('answerGroupsCache', [function() {
 
 
 oppia.factory('responsesService', [
-    'stateInteractionIdService', 'INTERACTION_SPECS', 'answerGroupsCache',
-    'editorContextService', 'changeListService', 'explorationStatesService',
-    'graphDataService', 'warningsData',
+    '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
+    'answerGroupsCache', 'editorContextService', 'changeListService',
+    'explorationStatesService', 'graphDataService', 'warningsData',
     function(
-      stateInteractionIdService, INTERACTION_SPECS, answerGroupsCache,
-      editorContextService, changeListService, explorationStatesService,
-      graphDataService, warningsData) {
+      $rootScope, stateInteractionIdService, INTERACTION_SPECS,
+      answerGroupsCache, editorContextService, changeListService,
+      explorationStatesService, graphDataService, warningsData) {
 
   var _answerGroupsMemento = null;
   var _defaultOutcomeMemento = null;
@@ -72,6 +72,7 @@ oppia.factory('responsesService', [
     if (newAnswerGroups && oldAnswerGroups &&
         !angular.equals(newAnswerGroups, oldAnswerGroups)) {
       _answerGroups = newAnswerGroups;
+      $rootScope.$broadcast('answerGroupChanged');
 
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'answer_groups',
@@ -174,6 +175,7 @@ oppia.factory('responsesService', [
         // Recreate the default outcome if switching away from a terminal
         // interaction.
         _answerGroups = [];
+        _confirmedUnclassifiedAnswers = [];
         if (newInteractionId) {
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
@@ -236,9 +238,8 @@ oppia.factory('responsesService', [
     deleteAnswerGroup: function(index) {
       _answerGroupsMemento = angular.copy(_answerGroups);
       _answerGroups.splice(index, 1);
-      _saveAnswerGroups(_answerGroups);
       _activeAnswerGroupIndex = -1;
-      return true;
+      _saveAnswerGroups(_answerGroups);
     },
     updateActiveAnswerGroup: function(updates) {
       _updateAnswerGroup(_activeAnswerGroupIndex, updates);
@@ -290,12 +291,20 @@ oppia.factory('responsesService', [
 oppia.controller('StateResponses', [
     '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
     'editorContextService', 'warningsData', 'responsesService', 'routerService',
+    'explorationContextService', 'trainingDataService',
     'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
     function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, warningsData, responsesService, routerService,
-      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
+      explorationContextService, trainingDataService, PLACEHOLDER_OUTCOME_DEST,
+      INTERACTION_SPECS) {
   $scope.editorContextService = editorContextService;
+
+  var _initializeTrainingData = function() {
+    var explorationId = explorationContextService.getExplorationId();
+    var currentStateName = editorContextService.getActiveStateName();
+    trainingDataService.initializeTrainingData(explorationId, currentStateName);
+  };
 
   $scope.changeActiveAnswerGroupIndex = function(newIndex) {
     $rootScope.$broadcast('externalSave');
@@ -309,7 +318,8 @@ oppia.controller('StateResponses', [
   };
 
   $scope.isCurrentInteractionTrainable = function() {
-    return INTERACTION_SPECS[$scope.getCurrentInteractionId()].is_trainable;
+    var interactionId = $scope.getCurrentInteractionId();
+    return interactionId && INTERACTION_SPECS[interactionId].is_trainable;
   };
 
   $scope.isCreatingNewState = function(outcome) {
@@ -328,6 +338,9 @@ oppia.controller('StateResponses', [
       responsesService.changeActiveAnswerGroupIndex(0);
     }
 
+    // Initialize training data for these answer groups.
+    _initializeTrainingData();
+
     $scope.activeAnswerGroupIndex = (
       responsesService.getActiveAnswerGroupIndex());
     $rootScope.$broadcast('externalSave');
@@ -338,6 +351,9 @@ oppia.controller('StateResponses', [
     responsesService.onInteractionIdChanged(newInteractionId, function() {
       $scope.answerGroups = responsesService.getAnswerGroups();
       $scope.defaultOutcome = responsesService.getDefaultOutcome();
+
+      // Reinitialize training data if the interaction ID is changed.
+      _initializeTrainingData();
 
       $scope.activeAnswerGroupIndex = (
         responsesService.getActiveAnswerGroupIndex());
@@ -352,7 +368,7 @@ oppia.controller('StateResponses', [
     }
   });
 
-  $scope.$on('answerGroupDeleted', function(evt) {
+  $scope.$on('answerGroupChanged', function(evt) {
     $scope.answerGroups = responsesService.getAnswerGroups();
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
     $scope.activeAnswerGroupIndex = (
@@ -362,16 +378,6 @@ oppia.controller('StateResponses', [
   $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
     responsesService.updateAnswerChoices(newAnswerChoices);
   });
-
-  var _createAnswerGroup = function(rules, outcome) {
-    _answerGroupsMemento = angular.copy($scope.answerGroups);
-    $scope.answerGroups.push({
-      'rule_specs': angular.copy(rules),
-      'outcome': angular.copy(outcome)
-    });
-    responsesService.save($scope.answerGroups, $scope.defaultOutcome);
-    $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
-  };
 
   $scope.openAddAnswerGroupModal = function() {
     warningsData.clear();
@@ -428,7 +434,13 @@ oppia.controller('StateResponses', [
         };
       }]
     }).result.then(function(result) {
-      _createAnswerGroup([result.tmpRule], result.tmpOutcome);
+      // Create a new answer group.
+      $scope.answerGroups.push({
+        'rule_specs': [result.tmpRule],
+        'outcome': angular.copy(result.tmpOutcome)
+      });
+      responsesService.save($scope.answerGroups, $scope.defaultOutcome);
+      $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
       // After saving it, check if the modal should be reopened right away.
       if (result.reopen) {
@@ -438,172 +450,6 @@ oppia.controller('StateResponses', [
   };
 
   $scope.isDraggingActiveAnswerGroup = null;
-
-  $scope.openTeachOppiaModal = function() {
-    warningsData.clear();
-    $rootScope.$broadcast('externalSave');
-
-    $modal.open({
-      templateUrl: 'modals/teachOppia',
-      backdrop: true,
-      controller: ['$scope', '$modalInstance', 'trainingDataService',
-        'explorationStatesService', 'editorContextService',
-        'answerClassificationService', 'explorationContextService',
-        function($scope, $modalInstance, trainingDataService,
-            explorationStatesService, editorContextService,
-            answerClassificationService, explorationContextService) {
-          $scope.trainingData = [];
-          $scope.classification = {feedbackIndex: 0, newOutcome: null};
-          $scope.inputTemplate = '';
-
-          $scope.createAnswerGroup = function() {
-            if ($scope.classification.newOutcome) {
-              // Create a new answer group with the given feedback.
-              _createAnswerGroup([], $scope.classification.newOutcome);
-            }
-          };
-
-          $scope.finishTraining = function(reopen) {
-            $modalInstance.close({
-              'reopen': reopen
-            });
-          };
-
-          var setFeedbackIndexForTrainingData = function(trainingDataIndex) {
-            if ($scope.trainingData.length == 0) {
-              return;
-            }
-            $scope.classification.feedbackIndex = (
-              $scope.trainingData[trainingDataIndex].index);
-          };
-
-          var explorationId = explorationContextService.getExplorationId();
-          var currentStateName = editorContextService.getActiveStateName();
-          var state = explorationStatesService.getState(currentStateName);
-
-          var trainingDataResult = trainingDataService.getTrainingDataResult(
-            explorationId, currentStateName, state);
-
-          trainingDataResult.success(function(result) {
-            var unhandledAnswers = result['unhandled_answers'];
-
-            answerClassificationService.getMatchingBatchClassificationResult(
-              explorationId, state, unhandledAnswers).success(
-                  function(classificationResults) {
-                for (var i = 0; i < classificationResults.length; i++) {
-                  var classificationResult = classificationResults[i];
-                  var feedback = 'Nothing';
-                  if (classificationResult.outcome.feedback.length > 0) {
-                    feedback = classificationResult.outcome.feedback[0];
-                  }
-                  $scope.trainingData.push({
-                    answer: unhandledAnswers[i],
-                    feedback: feedback,
-                    index: classificationResult.answer_group_index
-                  });
-                }
-
-                setFeedbackIndexForTrainingData(0);
-              });
-          });
-        }]
-    }).result.then(function(result) {
-      // Check if the modal should be reopened right away.
-      if (result.reopen) {
-        $scope.openTeachOppiaModal();
-      }
-    });
-  };
-
-  $scope.openTestOppiaModal = function() {
-    warningsData.clear();
-    $rootScope.$broadcast('externalSave');
-
-    $modal.open({
-      templateUrl: 'modals/testOppia',
-      backdrop: true,
-      controller: ['$scope', '$modalInstance', 'oppiaExplorationService',
-        'stateInteractionIdService', 'stateCustomizationArgsService',
-        'explorationContextService', 'editorContextService',
-        'explorationStatesService', 'trainingDataService',
-        'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-        'FUZZY_RULE_NAME',
-        function($scope, $modalInstance, oppiaExplorationService,
-            stateInteractionIdService, stateCustomizationArgsService,
-            explorationContextService, editorContextService,
-            explorationStatesService, trainingDataService,
-            answerClassificationService, focusService, DEFAULT_RULE_NAME,
-            FUZZY_RULE_NAME) {
-
-          var _explorationId = explorationContextService.getExplorationId();
-          var _state = explorationStatesService.getState(
-            editorContextService.getActiveStateName());
-
-          $scope.stateContent = _state.content[0].value;
-          $scope.inputTemplate = oppiaExplorationService.getInteractionHtml(
-            stateInteractionIdService.savedMemento,
-            stateCustomizationArgsService.savedMemento, 'testInteractionInput');
-          $scope.answerTemplate = '';
-
-          $scope.trainingData = [];
-          $scope.classification = {feedbackIndex: 0, newOutcome: null};
-
-          focusService.setFocus('testInteractionInput');
-
-          $scope.createAnswerGroup = function() {
-            if ($scope.classification.newOutcome) {
-              _createAnswerGroup([], $scope.classification.newOutcome);
-            }
-          };
-
-          $scope.finishTesting = function(reopen) {
-            $modalInstance.close({
-              'reopen': reopen
-            });
-          };
-
-          $scope.submitAnswer = function(answer) {
-            // TODO(bhenning): This should use the single classification
-            // handler, not the batch.
-            // TODO(bhenning): Some of the functionality here is duplicated with
-            // the training modal.
-            var unhandledAnswers = [answer];
-
-            $scope.answerTemplate = oppiaExplorationService.getAnswerHtml(
-              answer, stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento);
-
-            answerClassificationService.getMatchingBatchClassificationResult(
-              _explorationId, _state, unhandledAnswers).success(
-                  function(classificationResults) {
-                // TODO(ben): This should be exactly 1.
-                var classificationResult = classificationResults[0];
-                var feedback = 'Nothing';
-                if (classificationResult.outcome.feedback.length > 0) {
-                  feedback = classificationResult.outcome.feedback[0];
-                }
-                $scope.trainingData = [{
-                  answer: unhandledAnswers[0],
-                  feedback: feedback
-                }];
-
-                if (classificationResult.rule_spec_string !== DEFAULT_RULE_NAME &&
-                    classificationResult.rule_spec_string !== FUZZY_RULE_NAME) {
-                  $scope.classification.feedbackIndex = -1;
-                } else {
-                  $scope.classification.feedbackIndex = (
-                    classificationResult.answer_group_index);
-                }
-              });
-          };
-        }]
-    }).result.then(function(result) {
-      // Check if the modal should be reopened right away.
-      if (result.reopen) {
-        $scope.openTestOppiaModal();
-      }
-    });
-  };
 
   $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
@@ -656,10 +502,7 @@ oppia.controller('StateResponses', [
         };
       }]
     }).result.then(function() {
-      var successfullyDeleted = responsesService.deleteAnswerGroup(index);
-      if (successfullyDeleted) {
-        $rootScope.$broadcast('answerGroupDeleted');
-      }
+      responsesService.deleteAnswerGroup(index);
     });
   };
 
@@ -698,262 +541,5 @@ oppia.controller('StateResponses', [
 
   $scope.navigateToState = function(stateName) {
     routerService.navigateToMainTab(stateName);
-  };
-}]);
-
-// A service that, given an exploration ID and state name, determines all of the
-// answers which do not have certain classification and are not currently used
-// as part of an fuzzy rule training models.
-oppia.factory('trainingDataService', ['$http', 'responsesService',
-    'FUZZY_RULE_NAME', function($http, responsesService, FUZZY_RULE_NAME) {
-
-  // This goes through all answer group training data and the confirmed
-  // unclassified answers to verify that the answer is unique; it will remove
-  // any other occurrences from any training data inputs or the confirmed
-  // unclassified answer list.
-  var _ensureUniqueness = function(answer) {
-    var answerGroups = responsesService.getAnswerGroups();
-    var confirmedUnclassifiedAnswers = (
-      responsesService.getConfirmedUnclassifiedAnswers());
-    var updatedAnswerGroups = false;
-    var updatedConfirmedUnclassifiedAnswers = false;
-
-    var ensureUniquenessInData = function(answer, trainingData) {
-      var index = trainingData.indexOf(answer);
-      if (index != -1) {
-        trainingData.splice(index, 1);
-        return true;
-      }
-      return false;
-    };
-
-    // Guarantee uniqueness in all answer groups.
-    for (var i = 0; i < answerGroups.length; i++) {
-      var answerGroup = answerGroups[i];
-      var ruleSpecs = answerGroup.rule_specs;
-      var trainingData = null;
-      for (var j = 0; j < ruleSpecs.length; j++) {
-        var ruleSpec = ruleSpecs[j];
-        if (ruleSpec.rule_type == FUZZY_RULE_NAME) {
-          trainingData = ruleSpec.inputs.training_data;
-          break;
-        }
-      }
-      if (trainingData && ensureUniquenessInData(answer, trainingData)) {
-        updatedAnswerGroups = true;
-      }
-    }
-
-    // Guarantee uniqueness in the confirmed unclassified answers.
-    updatedConfirmedUnclassifiedAnswers = ensureUniquenessInData(
-      answer, confirmedUnclassifiedAnswers);
-
-    if (updatedAnswerGroups) {
-      responsesService.save(answerGroups, responsesService.getDefaultOutcome());
-    }
-
-    if (updatedConfirmedUnclassifiedAnswers) {
-      responsesService.updateConfirmedUnclassifiedAnswers(
-        confirmedUnclassifiedAnswers);
-    }
-  };
-
-  return {
-    // Returns a promise with the corresponding training data.
-    getTrainingDataResult: function(explorationId, stateName, state) {
-      var trainingDataUrl = '/createhandler/training_data/' + explorationId +
-        '/' + encodeURIComponent(stateName);
-      return $http.post(trainingDataUrl, {state: state});
-    },
-
-    getAllPotentialFeedback: function(state) {
-      var feedback = [];
-      var interaction = state.interaction;
-
-      for (var i = 0; i < interaction.answer_groups.length; i++) {
-        var outcome = interaction.answer_groups[i].outcome;
-        feedback.push((outcome.feedback.length > 0) ? outcome.feedback[0] : '');
-      }
-
-      if (interaction.default_outcome) {
-        var outcome = interaction.default_outcome;
-        feedback.push((outcome.feedback.length > 0) ? outcome.feedback[0] : '');
-      } else {
-        feedback.push('');
-      }
-
-      return feedback;
-    },
-
-    trainAnswerGroup: function(answerGroupIndex, answer) {
-      _ensureUniqueness(answer);
-
-      var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
-      var rules = answerGroup.rule_specs;
-
-      // Ensure the answer group has a fuzzy rule.
-      var fuzzyRule = null;
-      for (var i = 0; i < rules.length; i++) {
-        var rule = rules[i];
-        if (rule.rule_type == FUZZY_RULE_NAME) {
-          fuzzyRule = rule;
-          break;
-        }
-      }
-      if (!fuzzyRule) {
-        // Create new fuzzy rule for classification. All fuzzy rules should
-        // match this schema.
-        fuzzyRule = {
-          'rule_type': FUZZY_RULE_NAME,
-          'inputs': {
-            'training_data': []
-          }
-        };
-        rules.push(fuzzyRule);
-      }
-
-      // Train the rule to include this answer, but only if it's not already in
-      // the training data.
-      if (fuzzyRule.inputs.training_data.indexOf(answer) == -1) {
-        fuzzyRule.inputs.training_data.push(answer);
-      }
-
-      responsesService.updateAnswerGroup(answerGroupIndex, {'rules': rules});
-    },
-
-    trainDefaultResponse: function(answer) {
-      _ensureUniqueness(answer);
-
-      var confirmedUnclassifiedAnswers = (
-        responsesService.getConfirmedUnclassifiedAnswers());
-
-      if (confirmedUnclassifiedAnswers.indexOf(answer) == -1) {
-        confirmedUnclassifiedAnswers.push(answer);
-      }
-
-      responsesService.updateConfirmedUnclassifiedAnswers(
-        confirmedUnclassifiedAnswers);
-    }
-  };
-}]);
-
-oppia.directive('trainingPanel', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      answer: '=',
-      answerFeedback: '=',
-      classification: '=',
-      onCreateAnswerGroup: '&',
-      onFinishTraining: '&'
-    },
-    templateUrl: 'teaching/trainingPanel',
-    controller: [
-      '$scope', 'oppiaExplorationService', 'editorContextService',
-      'explorationStatesService', 'trainingDataService', 'responsesService',
-      'stateInteractionIdService', 'stateCustomizationArgsService',
-      function($scope, oppiaExplorationService, editorContextService,
-          explorationStatesService, trainingDataService, responsesService,
-          stateInteractionIdService, stateCustomizationArgsService) {
-        $scope.changingFeedbackIndex = false;
-        $scope.addingNewResponse = false;
-
-        var _state = explorationStatesService.getState(
-          editorContextService.getActiveStateName());
-        $scope.allFeedback = trainingDataService.getAllPotentialFeedback(
-          _state);
-
-        // Use the multiple choice interaction to select the feedback that
-        // should be used for a particular answer.
-        var _customizationArgs = {
-          'choices': {
-            'value': $scope.allFeedback
-          }
-        };
-        $scope.inputTemplate = oppiaExplorationService.getInteractionHtml(
-          'MultipleChoiceInput', _customizationArgs, 'trainOppiaInput');
-
-        var _updateAnswerTemplate = function() {
-          $scope.answerTemplate = oppiaExplorationService.getAnswerHtml(
-            $scope.answer, stateInteractionIdService.savedMemento,
-            stateCustomizationArgsService.savedMemento);
-        }
-        _updateAnswerTemplate();
-        $scope.$watch(
-          function() {
-            return $scope.answer;
-          }, _updateAnswerTemplate);
-
-        $scope.beginChangingFeedbackIndex = function() {
-          $scope.changingFeedbackIndex = true;
-        };
-
-        $scope.beginAddingNewResponse = function() {
-          $scope.classification.newOutcome = {
-            'dest': editorContextService.getActiveStateName(),
-            'feedback': [''],
-            'param_changes': []
-          };
-          $scope.addingNewResponse = true;
-        };
-
-        $scope.confirmFeedbackIndex = function(index) {
-          $scope.classification.feedbackIndex = index;
-
-          if (index == responsesService.getAnswerGroupCount()) {
-            trainingDataService.trainDefaultResponse($scope.answer);
-          } else {
-            trainingDataService.trainAnswerGroup(index, $scope.answer);
-          }
-
-          $scope.onFinishTraining();
-        };
-        $scope.confirmNewFeedback = function() {
-          $scope.onCreateAnswerGroup();
-
-          if ($scope.classification.newOutcome) {
-            // Train the group with the answer.
-            var index = responsesService.getAnswerGroupCount() - 1;
-            trainingDataService.trainAnswerGroup(index, $scope.answer);
-          }
-
-          $scope.onFinishTraining();
-        };
-
-        // Use confirmFeedbackIndex to submit the MultipleChoice interaction.
-        // Note that this is based on MultipleChoice submitting the selected
-        // index, rather than the text of an answer.
-        // TODO(bhenning): This needs to be changed when MultipleChoice no
-        // longer refers to choices by their index.
-        $scope.submitAnswer = $scope.confirmFeedbackIndex;
-      }
-    ]
-  };
-}]);
-
-oppia.directive('demoInteractionPanel', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      stateContent: '=',
-      inputTemplate: '=',
-      onSubmitAnswer: '&'
-    },
-    templateUrl: 'teaching/demoInteractionPanel',
-    controller: [
-      '$scope', 'editorContextService', 'explorationStatesService',
-      'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-      function($scope, editorContextService, explorationStatesService,
-          INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
-        var _stateName = editorContextService.getActiveStateName();
-        var _state = explorationStatesService.getState(_stateName);
-        $scope.interactionIsInline = (
-          INTERACTION_SPECS[_state.interaction.id].display_mode ===
-          INTERACTION_DISPLAY_MODE_INLINE);
-        $scope.submitAnswer = function(answer) {
-          $scope.onSubmitAnswer({answer: answer});
-        };
-      }
-    ]
   };
 }]);

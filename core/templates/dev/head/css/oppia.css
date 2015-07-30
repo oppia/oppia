@@ -599,6 +599,21 @@ textarea {
   }
 }
 
+.btn.oppia-unresolved-answer-button {
+  text-align: left;
+  background-color: white;
+  color: black;
+  width: auto;
+  border-radius: 12px;
+  padding: 8px 18px;
+  margin: 4px;
+  font-size: 14px;
+}
+
+.btn.oppia-unresolved-answer-button:hover {
+  background-color: #eee;
+}
+
 .oppia-gallery-tiles-area {
   background-color: #eee;
   position: relative;

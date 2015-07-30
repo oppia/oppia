@@ -86,18 +86,15 @@ class FuzzyMatches(base.RealRule):
 
         # If no training data exists, then this real value cannot belong to the
         # cluster.
-        if len(self.training_data) == 0:
+        if not self.training_data:
             return self._fuzzify_truth_value(False)
 
         def _compute_certainty(v1, v2):
             abs_dist = abs(v1 - v2)
             if abs_dist < 1:
-                return 1
-            return 1 / abs_dist
+                return 1.0
+            return 1.0 / abs_dist
 
-        best_certainty = _compute_certainty(subject, self.training_data[0])
-        for value in self.training_data:
-            best_certainty = max(
-                best_certainty, _compute_certainty(subject, value))
-
-        return best_certainty
+        return max([
+            _compute_certainty(subject, value)
+            for value in self.training_data])
