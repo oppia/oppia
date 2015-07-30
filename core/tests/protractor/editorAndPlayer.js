@@ -587,15 +587,16 @@ describe('Exploration history', function() {
       11: {text: '    - inputs:', highlighted: true},
       12: {text: '        x: 6.0', highlighted: true},
       13: {text: '      rule_type: Equals', highlighted: true},
-      14: {text: '  customization_args: {}', highlighted: false},
-      15: {text: '  default_outcome:', highlighted: false},
-      16: {text: '    dest: first', highlighted: true},
-      17: {text: '    feedback: []', highlighted: false},
-      18: {text: '    param_changes: []', highlighted: false},
-      19: {text: '  fallbacks: []', highlighted: false},
-      20: {text: '  id: NumericInput', highlighted: true},
-      21: {text: 'param_changes: []', highlighted: false},
-      22: {text: ' ', highlighted: false}
+      14: {text: '  confirmed_unclassified_answers: []', highlighted: false},
+      15: {text: '  customization_args: {}', highlighted: false},
+      16: {text: '  default_outcome:', highlighted: false},
+      17: {text: '    dest: first', highlighted: true},
+      18: {text: '    feedback: []', highlighted: false},
+      19: {text: '    param_changes: []', highlighted: false},
+      20: {text: '  fallbacks: []', highlighted: false},
+      21: {text: '  id: NumericInput', highlighted: true},
+      22: {text: 'param_changes: []', highlighted: false},
+      23: {text: ' ', highlighted: false}
     };
     var VERSION_2_STATE_1_CONTENTS = {
       1: {text: 'content:', highlighted: false},
@@ -603,20 +604,21 @@ describe('Exploration history', function() {
       3: {text: '  value: \'\'', highlighted: true},
       4: {text: 'interaction:', highlighted: false},
       5: {text: '  answer_groups: []', highlighted: true},
-      6: {text: '  customization_args: {}', highlighted: false},
-      7: {text: '  default_outcome:', highlighted: false},
+      6: {text: '  confirmed_unclassified_answers: []', highlighted: false},
+      7: {text: '  customization_args: {}', highlighted: false},
+      8: {text: '  default_outcome:', highlighted: false},
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      8: {
+      9: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true
       },
-      9: {text: '    feedback: []', highlighted: false},
-      10: {text: '    param_changes: []', highlighted: false},
-      11: {text: '  fallbacks: []', highlighted: false},
-      12: {text: '  id: null', highlighted: true},
-      13: {text: 'param_changes: []', highlighted: false},
-      14: {text: ' ', highlighted: false}
+      10: {text: '    feedback: []', highlighted: false},
+      11: {text: '    param_changes: []', highlighted: false},
+      12: {text: '  fallbacks: []', highlighted: false},
+      13: {text: '  id: null', highlighted: true},
+      14: {text: 'param_changes: []', highlighted: false},
+      15: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
@@ -624,6 +626,7 @@ describe('Exploration history', function() {
       '  value: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
+      '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value: Continue\n' +

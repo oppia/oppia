@@ -505,6 +505,12 @@ class UntrainedAnswersHandler(EditorHandler):
             raise self.PageNotFoundException
 
         state_name = self.unescape_state_name(escaped_state_name)
+        if state_name not in exploration.states:
+            # If trying to access a non-existing state, there is no training
+            # data associated with it.
+            self.render_json({'unhandled_answers': []})
+            return
+
         state = exploration.states[state_name]
 
         # TODO(bhenning): Answers should be bound to a particular exploration

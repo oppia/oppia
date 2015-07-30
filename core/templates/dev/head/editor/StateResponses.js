@@ -221,7 +221,7 @@ oppia.factory('responsesService', [
         _activeAnswerGroupIndex = newIndex;
       }
 
-      _activeRuleIndex = 0;
+      _activeRuleIndex = -1;
     },
     getActiveRuleIndex: function() {
       return _activeRuleIndex;

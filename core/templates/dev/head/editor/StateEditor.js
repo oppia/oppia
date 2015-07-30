@@ -63,7 +63,7 @@ oppia.controller('StateEditor', [
         INTERACTION_SPECS[stateData.interaction.id].is_terminal);
       }
 
-    if ($scope.content[0].value) {
+    if ($scope.content[0].value || stateData.interaction.id) {
       $scope.isInteractionShown = true;
     }
 
