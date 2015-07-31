@@ -293,6 +293,7 @@ NAV_MODE_GALLERY = 'gallery'
 NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
+NAV_MODE_SIGNUP = 'signup'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
