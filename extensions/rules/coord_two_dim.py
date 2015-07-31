@@ -72,7 +72,7 @@ class FuzzyMatches(base.CoordTwoDimRule):
         def _compute_certainty(p1, p2):
             dist = _haversine_distance(p1, p2)
             if dist < 1.0:
-                return 1
+                return 1.0
             return 1.0 / dist
 
         return max([

@@ -163,3 +163,21 @@ class CoordTwoDimRuleUnitTests(test_utils.GenericTestBase):
         self.assertFuzzyTrue(coord_two_dim.NotWithin(
             6220, [27, -123]
         ).eval([83, -127]))
+
+    def test_fuzzy_matches_rule(self):
+        rule = coord_two_dim.FuzzyMatches([[90, 0], [0, -120]])
+
+        # The exact training coordinates should be perfect matches.
+        self.assertFuzzyTrue(rule.eval([90, 0]))
+        self.assertFuzzyTrue(rule.eval([0, -120]))
+
+        # A coordinate far from all training data should nearly false (per an
+        # epsilon value).
+        self.assertLess(rule.eval([0, 0]), 0.0001)
+
+        # Coordinates near the training data should be somewhat true.
+        self.assertGreater(rule.eval([90.002, -0.9998]), 0.4)
+        self.assertGreater(rule.eval([0.0001, -119.9999]), 0.4)
+
+        # Testing anything with no training data should result in false.
+        self.assertFuzzyFalse(coord_two_dim.FuzzyMatches([]).eval([90, 0]))

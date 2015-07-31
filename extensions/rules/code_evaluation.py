@@ -46,6 +46,9 @@ class FuzzyMatches(base.CodeEvaluationRule):
     def _evaluate(self, subject):
         # TODO(bhenning): This is where a third party library could be used to
         # intelligently normalize and compare different submissions of code.
+        # Also, this should return a value between 0 and 1 depending on how
+        # closely it matches the training data, rather than doing a crisp
+        # comparison on stripped code.
 
         # A very naive approach to 'normalizing' the code is to strip out all
         # comments and whitespace. This normalization currently assumes Python.

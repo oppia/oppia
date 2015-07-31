@@ -66,7 +66,7 @@ def _completeGraph(n):
 
 class GraphRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Graph objects."""
-    
+
     def test_isisomorphic_rule(self):
         self.assertFuzzyTrue(
             graph.IsIsomorphicTo(_emptyGraph()).eval(_emptyGraph()))
@@ -75,7 +75,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         self.assertFuzzyTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval({
             'vertices': [{'label': '', 'x': 1.0, 'y': 1.0} for i in xrange(5)],
             'edges': [
-                {'src': i, 'dst': j, 'weight': 1} for i, j in 
+                {'src': i, 'dst': j, 'weight': 1} for i, j in
                 [(0, 2), (2, 4), (4, 1), (1, 3), (3, 0)]
             ],
             'isDirected': False,
@@ -84,24 +84,24 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         }))
         self.assertFuzzyTrue(graph.IsIsomorphicTo({
             'vertices': [
-                {'label': 'a', 'x': 1.0, 'y': 1.0}, 
-                {'label': 'b', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
                 {'label': 'c', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
-                {'src': 0, 'dst': 1, 'weight': 1}, 
+                {'src': 0, 'dst': 1, 'weight': 1},
             ],
             'isDirected': False,
             'isWeighted': False,
             'isLabeled': True
         }).eval({
             'vertices': [
-                {'label': 'c', 'x': 1.0, 'y': 1.0}, 
-                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'c', 'x': 1.0, 'y': 1.0},
+                {'label': 'a', 'x': 2.0, 'y': 2.0},
                 {'label': 'b', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
-                {'src': 2, 'dst': 1, 'weight': 1}, 
+                {'src': 2, 'dst': 1, 'weight': 1},
             ],
             'isDirected': False,
             'isWeighted': False,
@@ -109,12 +109,12 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         }))
         self.assertFuzzyTrue(graph.IsIsomorphicTo({
             'vertices': [
-                {'label': 'a', 'x': 1.0, 'y': 1.0}, 
-                {'label': 'b', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
                 {'label': 'c', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
-                {'src': 0, 'dst': 1, 'weight': 2}, 
+                {'src': 0, 'dst': 1, 'weight': 2},
                 {'src': 1, 'dst': 2, 'weight': 1}
             ],
             'isDirected': False,
@@ -122,12 +122,12 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isLabeled': True
         }).eval({
             'vertices': [
-                {'label': 'b', 'x': 1.0, 'y': 1.0}, 
-                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'b', 'x': 1.0, 'y': 1.0},
+                {'label': 'a', 'x': 2.0, 'y': 2.0},
                 {'label': 'c', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
-                {'src': 2, 'dst': 0, 'weight': 1}, 
+                {'src': 2, 'dst': 0, 'weight': 1},
                 {'src': 1, 'dst': 0, 'weight': 2}
             ],
             'isDirected': False,
@@ -170,12 +170,12 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             graph.IsIsomorphicTo(_cycleGraph(5)).eval(_completeGraph(5)))
         self.assertFuzzyFalse(graph.IsIsomorphicTo({
             'vertices': [
-                {'label': 'a', 'x': 1.0, 'y': 1.0}, 
-                {'label': 'b', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
                 {'label': 'c', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
-                {'src': 0, 'dst': 1, 'weight': 1}, 
+                {'src': 0, 'dst': 1, 'weight': 1},
                 {'src': 1, 'dst': 2, 'weight': 2}
             ],
             'isDirected': False,
@@ -183,12 +183,12 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isLabeled': True
         }).eval({
             'vertices': [
-                {'label': 'b', 'x': 1.0, 'y': 1.0}, 
-                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'b', 'x': 1.0, 'y': 1.0},
+                {'label': 'a', 'x': 2.0, 'y': 2.0},
                 {'label': 'c', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
-                {'src': 0, 'dst': 1, 'weight': 1}, 
+                {'src': 0, 'dst': 1, 'weight': 1},
                 {'src': 1, 'dst': 2, 'weight': 2}
             ],
             'isDirected': False,
@@ -240,4 +240,106 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': True
+        }))
+
+    def test_fuzzy_matches_rule(self):
+        rule = graph.FuzzyMatches([{
+                'vertices': [
+                    {'label': '', 'x': 1.0, 'y': 1.0},
+                    {'label': '', 'x': 2.0, 'y': 2.0},
+                    {'label': '', 'x': 3.0, 'y': 3.0}
+                ],
+                'edges': [
+                    {'src': 0, 'dst': 1, 'weight': 1},
+                    {'src': 1, 'dst': 2, 'weight': 1},
+                    {'src': 2, 'dst': 0, 'weight': 1},
+                ],
+                'isDirected': False,
+                'isWeighted': False,
+                'isLabeled': False
+            }, {
+                'vertices': [
+                    {'label': '', 'x': 1.0, 'y': 1.0},
+                    {'label': '', 'x': 2.0, 'y': 2.0},
+                    {'label': '', 'x': 3.0, 'y': 3.0},
+                    {'label': '', 'x': 4.0, 'y': 4.0}
+                ],
+                'edges': [
+                    {'src': 0, 'dst': 1, 'weight': 1},
+                    {'src': 1, 'dst': 2, 'weight': 1},
+                    {'src': 2, 'dst': 3, 'weight': 1},
+                    {'src': 3, 'dst': 0, 'weight': 1},
+                ],
+                'isDirected': False,
+                'isWeighted': False,
+                'isLabeled': False
+            }
+        ])
+
+        # An isomorphic graph should match.
+        self.assertFuzzyTrue(rule.eval({
+            'vertices': [
+                {'label': '', 'x': 4.0, 'y': 4.0},
+                {'label': '', 'x': 5.0, 'y': 5.0},
+                {'label': '', 'x': 6.0, 'y': 6.0}
+            ],
+            'edges': [
+                {'src': 2, 'dst': 0, 'weight': 1},
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 2, 'dst': 1, 'weight': 1},
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+
+        # An isomorphic graph should match.
+        self.assertFuzzyTrue(rule.eval({
+            'vertices': [
+                {'label': '', 'x': 4.0, 'y': 4.0},
+                {'label': '', 'x': 5.0, 'y': 5.0},
+                {'label': '', 'x': 6.0, 'y': 6.0}
+            ],
+            'edges': [
+                {'src': 2, 'dst': 0, 'weight': 1},
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 2, 'dst': 1, 'weight': 1},
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+
+        # If this isomorphic to another graph in the training data, it should
+        # match.
+        self.assertFuzzyTrue(rule.eval({
+            'vertices': [
+                {'label': '', 'x': 4.0, 'y': 4.0},
+                {'label': '', 'x': 5.0, 'y': 5.0},
+                {'label': '', 'x': 6.0, 'y': 6.0},
+                {'label': '', 'x': 7.0, 'y': 7.0}
+            ],
+            'edges': [
+                {'src': 3, 'dst': 0, 'weight': 1},
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 2, 'dst': 1, 'weight': 1},
+                {'src': 3, 'dst': 2, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+
+        # A completely different graph should not match.
+        self.assertFuzzyFalse(rule.eval({
+            'vertices': [
+                {'label': '', 'x': 4.0, 'y': 4.0},
+                {'label': '', 'x': 5.0, 'y': 5.0},
+            ],
+            'edges': [
+                {'src': 1, 'dst': 0, 'weight': 1},
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
         }))
