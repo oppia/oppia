@@ -354,17 +354,15 @@ oppia.controller('StateInteraction', [
           };
 
           $scope.submitAnswer = function(answer) {
-            var unhandledAnswers = [answer];
 
             $scope.answerTemplate = (
               oppiaExplorationHtmlFormatterService.getAnswerHtml(
                 answer, stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento));
 
-            answerClassificationService.getMatchingBatchClassificationResult(
-              _explorationId, _state, unhandledAnswers).success(
-                  function(response) {
-                var classificationResult = response.results[0];
+            answerClassificationService.getMatchingEditorClassificationResult(
+              _explorationId, _state, answer).success(
+                  function(classificationResult) {
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
                 if (classificationResult.outcome.feedback.length > 0) {
@@ -373,7 +371,7 @@ oppia.controller('StateInteraction', [
                 if (dest == _stateName) {
                   dest = '<em>(try again)</em>';
                 }
-                $scope.trainingDataAnswer = unhandledAnswers[0];
+                $scope.trainingDataAnswer = answer;
                 $scope.trainingDataFeedback = feedback;
                 $scope.trainingDataOutcomeDest = dest;
 

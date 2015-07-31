@@ -22,5 +22,5 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/InteractiveMap">
-  <span><[Math.abs(answer[0]).toFixed(3)]>&deg; <span ng-if="answer[0] >= 0">N</span><span ng-if="answer[0] < 0">S</span>, <[Math.abs(answer[1]).toFixed(3)]>&deg; <span ng-if="answer[1] >= 0">W</span><span ng-if="answer[1] < 0">E</span></span>
+  <span><[formattedCoords]></span>
 </script>

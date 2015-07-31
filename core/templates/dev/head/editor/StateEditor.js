@@ -147,11 +147,9 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
               var currentStateName = editorContextService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
 
-              var unhandledAnswers = [unhandledAnswer];
-              answerClassificationService.getMatchingBatchClassificationResult(
-                explorationId, state, unhandledAnswers).success(
-                    function(response) {
-                  var classificationResult = response.results[0];
+              answerClassificationService.getMatchingEditorClassificationResult(
+                explorationId, state, unhandledAnswer).success(
+                    function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
                   if (classificationResult.outcome.feedback.length > 0) {
@@ -169,7 +167,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
                   // the outcome of an answer group, rather than the specific
                   // feedback of the outcome (for instance, it includes the
                   // destination state within the feedback).
-                  $scope.trainingDataAnswer = unhandledAnswers[0];
+                  $scope.trainingDataAnswer = unhandledAnswer;
                   $scope.trainingDataFeedback = feedback;
                   $scope.trainingDataOutcomeDest = dest;
                   $scope.classification.answerGroupIndex = (
@@ -195,7 +193,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
   var _trainingDataAnswers = [];
   var _trainingDataCounts = [];
 
-  var _indexOfTrainingData = function(answer, trainingData) {
+  var _getIndexOfTrainingData = function(answer, trainingData) {
     var index = -1;
     for (var i = 0; i < trainingData.length; i++) {
       if (angular.equals(trainingData[i], answer)) {
@@ -210,7 +208,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
   // function returns the index of the answer that was removed if it was
   // successfully removed from the training data, or -1 otherwise.
   var _removeAnswerFromTrainingData = function(answer, trainingData) {
-    var index = _indexOfTrainingData(answer, trainingData);
+    var index = _getIndexOfTrainingData(answer, trainingData);
     if (index != -1) {
       trainingData.splice(index, 1);
     }
@@ -255,8 +253,8 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
     }
 
     // Remove the answer from the confirmed unclassified answers.
-    updatedConfirmedUnclassifiedAnswers = _removeAnswerFromTrainingData(
-      answer, confirmedUnclassifiedAnswers);
+    updatedConfirmedUnclassifiedAnswers = (_removeAnswerFromTrainingData(
+      answer, confirmedUnclassifiedAnswers) != -1);
 
     if (updatedAnswerGroups) {
       responsesService.save(answerGroups, responsesService.getDefaultOutcome());
@@ -301,19 +299,19 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
     },
 
     getAllPotentialOutcomes: function(state) {
-      var feedback = [];
+      var potentialOutcomes = [];
       var interaction = state.interaction;
 
       for (var i = 0; i < interaction.answer_groups.length; i++) {
-        feedback.push(interaction.answer_groups[i].outcome);
+        potentialOutcomes.push(interaction.answer_groups[i].outcome);
       }
 
       if (interaction.default_outcome) {
         var outcome = interaction.default_outcome;
-        feedback.push(interaction.default_outcome);
+        potentialOutcomes.push(interaction.default_outcome);
       }
 
-      return feedback;
+      return potentialOutcomes;
     },
 
     trainAnswerGroup: function(answerGroupIndex, answer) {
@@ -340,7 +338,8 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
 
       // Train the rule to include this answer, but only if it's not already in
       // the training data.
-      if (_indexOfTrainingData(answer, fuzzyRule.inputs.training_data) == -1) {
+      if (_getIndexOfTrainingData(
+          answer, fuzzyRule.inputs.training_data) == -1) {
         fuzzyRule.inputs.training_data.push(answer);
       }
 
@@ -353,7 +352,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
       var confirmedUnclassifiedAnswers = (
         responsesService.getConfirmedUnclassifiedAnswers());
 
-      if (_indexOfTrainingData(answer, confirmedUnclassifiedAnswers) == -1) {
+      if (_getIndexOfTrainingData(answer, confirmedUnclassifiedAnswers) == -1) {
         confirmedUnclassifiedAnswers.push(answer);
       }
 

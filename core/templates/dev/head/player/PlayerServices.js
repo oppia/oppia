@@ -104,15 +104,16 @@ oppia.factory('answerClassificationService', [
         });
       }
     },
-    getMatchingBatchClassificationResult: function(
-        explorationId, oldState, answers) {
+    getMatchingEditorClassificationResult: function(
+        explorationId, oldState, answer) {
       if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
         // TODO(bhenning): Figure out a long-term solution for determining what
         // params should be passed to the batch classifier.
-        var classifyUrl = '/explorehandler/batch_classify/' + explorationId;
+        var classifyUrl = '/explorehandler/classify/' + explorationId;
         return $http.post(classifyUrl, {
           old_state: oldState,
-          answers: answers
+          params: {},
+          answer: answer
         });
       }
     },

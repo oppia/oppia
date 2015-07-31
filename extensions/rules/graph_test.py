@@ -310,8 +310,8 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isLabeled': False
         }))
 
-        # If this isomorphic to another graph in the training data, it should
-        # match.
+        # If this is isomorphic to another graph in the training data, it
+        # should match.
         self.assertFuzzyTrue(rule.eval({
             'vertices': [
                 {'label': '', 'x': 4.0, 'y': 4.0},

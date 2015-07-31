@@ -392,34 +392,6 @@ class ClassifyHandler(base.BaseHandler):
         self.render_json(classify(exploration_id, old_state, answer, params))
 
 
-# TODO(bhenning): Use the current classification handler only for training
-# answers in the exploration editor. Create a new classification handler which
-# looks up the state rather than having it passed into it. Finally, remove the
-# batch classification handler and change all references to it in the frontend
-# to use the single classification handler that takes a state as input.
-# Consider moving the editor-specific classification handler to editor.py.
-class BatchClassifyHandler(base.BaseHandler):
-    """Classification handler which classifies similarly to ClassifyHandler, but
-    across a list of answers rather than a single answer. The classification
-    results for each answer are returned in a list in the same order as the
-    original answers.
-    """
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
-        answers = self.payload.get('answers')
-        # TODO(bhening): Determine whether we need params for these evaluations.
-        params = []
-
-        results = []
-        for answer in answers:
-            results.append(classify(exploration_id, old_state, answer, params))
-        self.render_json({'results': results})
-
-
 class ReaderFeedbackHandler(base.BaseHandler):
     """Submits feedback from the reader."""
 

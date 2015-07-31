@@ -264,9 +264,6 @@ urls = [
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),
     get_redirect_route(
-        r'/explorehandler/batch_classify/<exploration_id>',
-        reader.BatchClassifyHandler, 'reader_batch_classify_handler'),
-    get_redirect_route(
         r'/explorehandler/rating/<exploration_id>',
         reader.RatingHandler, 'rating_handler'),
     get_redirect_route(

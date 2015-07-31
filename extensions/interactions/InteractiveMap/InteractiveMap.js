@@ -89,10 +89,12 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
       scope: {},
       templateUrl: 'shortResponse/InteractiveMap',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-        // This is necessary as described here:
-        //   http://stackoverflow.com/questions/12740329
-        $scope.Math = window.Math;
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
+        $scope.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+        $scope.formattedCoords += ', ';
+        $scope.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
+        $scope.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
       }]
     };
   }
