@@ -43,7 +43,7 @@ class RuleServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(rule_domain.get_rules_for_obj_type('NonnegativeInt')), 1)
         self.assertEqual(
-            len(rule_domain.get_rules_for_obj_type('Real')), 8)
+            len(rule_domain.get_rules_for_obj_type('Real')), 7)
         self.assertEqual(
             len(rule_domain.get_rules_for_obj_type('Null')), 0)
         self.assertEqual(
@@ -92,9 +92,9 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                 for (param_name, param_obj_type) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_type.__name__ in [
-                            'NonnegativeInt', 'SetOfReal', 'ListOfGraph',
+                            'NonnegativeInt', 'ListOfGraph',
                             'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
-                            'SetOfNormalizedString', 'ListOfClickOnImage']:
+                            'SetOfNormalizedString']:
                         continue
 
                     self.assertTrue(
@@ -117,8 +117,6 @@ class RuleFunctionUnitTests(test_utils.GenericTestBase):
                 'is equal to {{x|UnicodeString}}, taking case into account'),
             'Contains': 'contains {{x|UnicodeString}}',
             'Equals': 'is equal to {{x|UnicodeString}}',
-            rule_domain.FUZZY_RULE_TYPE: (
-                'is similar to {{training_data|SetOfUnicodeString}}'),
             'MatchesBase64EncodedFile': (
                 'has same content as the file located at '
                 '{{filepath|UnicodeString}}'),

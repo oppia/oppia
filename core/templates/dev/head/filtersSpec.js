@@ -167,9 +167,10 @@ describe('Testing filters', function() {
     expect(filter(' A   single line with spaces at either end. ')).toEqual(
       ' A   single line with spaces at either end. ');
     expect(filter('Single line\nMultiple lines\nStuff')).toEqual('Single line');
-    expect(filter('No newline at end\n')).toEqual('No newline at end');
-    expect(filter('\nNo newline at beginning.')).toEqual(
-      'No newline at beginning.');
+    expect(filter('Removes newline at end\n')).toEqual(
+      'Removes newline at end');
+    expect(filter('\nRemoves newline at beginning.')).toEqual(
+      'Removes newline at beginning.');
 
     expect(filter('\n')).toEqual('');
     expect(filter('\n\n\n')).toEqual('');

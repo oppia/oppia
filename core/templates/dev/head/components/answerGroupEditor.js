@@ -214,9 +214,9 @@ oppia.directive('answerGroupEditor', [function() {
         }
       }
       if (!ruleType) {
-        // TODO(bhenning): What happens if there is only a fuzzy rule for this
-        // interaction? This should raise an error to the user or the add rule
-        // button should be hidden.
+        // This should never happened. An interaction must have more than just
+        // a fuzzy rule, as verified in a backend test suite:
+        //   extensions.interactions.base_test.InteractionUnitTests.
         return;
       }
       var description = ruleDescriptions[ruleType];

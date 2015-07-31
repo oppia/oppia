@@ -124,20 +124,6 @@ class Real(BaseObject):
     }
 
 
-class SetOfReal(BaseObject):
-    """Class for sets of Reals."""
-
-    description = 'A set (a list with unique elements) of real numbers.'
-
-    SCHEMA = {
-        'type': 'list',
-        'items': Real.SCHEMA,
-        'validators': [{
-            'id': 'is_uniquified'
-        }]
-    }
-
-
 class Int(BaseObject):
     """Integer class."""
 
@@ -691,14 +677,4 @@ class ClickOnImage(BaseObject):
                 'items': UnicodeString.SCHEMA
             }
         }]
-    }
-
-class ListOfClickOnImage(BaseObject):
-    """Class for lists of ClickOnImage structures."""
-
-    description = 'A list of image clicks.'
-
-    SCHEMA = {
-        'type': 'list',
-        'items': ClickOnImage.SCHEMA
     }

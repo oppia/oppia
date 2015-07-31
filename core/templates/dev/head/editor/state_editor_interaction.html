@@ -126,10 +126,10 @@
 
       <div ng-if="trainingDataAnswer" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
         <form name="testOppiaForm" class="form-inline">
-          <training-panel ng-if="classification.feedbackIndex >= 0" answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTeaching(true)">
+          <training-panel ng-if="classification.answerGroupIndex >= 0" answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTeaching(true)">
           </training-panel>
         </form>
-        <div ng-if="classification.feedbackIndex === -1">
+        <div ng-if="classification.answerGroupIndex === -1">
           <div>
             <span><strong>If Oppia encounters the answer:</strong></span>
           </div>

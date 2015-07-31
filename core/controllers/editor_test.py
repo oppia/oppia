@@ -244,7 +244,7 @@ class EditorTest(BaseEditorControllerTest):
         with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
             def _create_answer(value, count=1):
                 return {'value': value, 'count': count}
-            def _create_td(*arg):
+            def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
             # Load the fuzzy rules demo exploration.
@@ -256,32 +256,28 @@ class EditorTest(BaseEditorControllerTest):
                 exploration_dict['exploration']['title'],
                 'Demonstrating fuzzy rules')
 
-            # TODO(bhenning): Since numeric input's fuzzy rule is not
-            # public-facing, it might make more sense to change this test to
-            # use the text input state, instead.
-
             # This test uses the interaction which supports numeric input.
-            state_name = 'number'
+            state_name = 'text'
 
             self.assertIn(
                 state_name, exploration_dict['exploration']['states'])
             self.assertEqual(
                 exploration_dict['exploration']['states'][state_name][
-                    'interaction']['id'], 'NumericInput')
+                    'interaction']['id'], 'TextInput')
 
-            # Input 15 since there is an explicit rule checking for that.
-            result_dict = self.submit_answer('16', state_name, '15')
+            # Input happy since there is an explicit rule checking for that.
+            result_dict = self.submit_answer('16', state_name, 'happy')
 
-            # Input a number not at all similar to 15 (default outcome).
-            self.submit_answer('16', state_name, '98')
+            # Input text not at all similar to happy (default outcome).
+            self.submit_answer('16', state_name, 'sad')
 
-            # Input 155: this is current training data and falls under the
+            # Input cheerful: this is current training data and falls under the
             # fuzzy rule.
-            self.submit_answer('16', state_name, '155')
+            self.submit_answer('16', state_name, 'cheerful')
 
-            # Input 157: this is not training data but will be classified under
-            # the fuzzy rule.
-            self.submit_answer('16', state_name, '157')
+            # Input joyful: this is not training data but will be classified
+            # under the fuzzy rule.
+            self.submit_answer('16', state_name, 'joyful')
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
@@ -295,7 +291,8 @@ class EditorTest(BaseEditorControllerTest):
             # Only two of the four submitted answers should be unhandled.
             response_dict = self.get_json(url)
             self.assertEqual(
-                response_dict['unhandled_answers'], _create_td(98.0, 157.0))
+                response_dict['unhandled_answers'],
+                _create_training_data('joyful', 'sad'))
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
@@ -305,14 +302,15 @@ class EditorTest(BaseEditorControllerTest):
                         'state_name': state_name,
                         'property_name': (
                             exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
-                        'new_value': ['98']
+                        'new_value': ['sad']
                     }],
                     'commit_message': 'Update confirmed unclassified answers',
                     'version': exploration_dict['version'],
                 }, csrf_token)
             response_dict = self.get_json(url)
             self.assertEqual(
-                response_dict['unhandled_answers'], _create_td(157.0))
+                response_dict['unhandled_answers'],
+                _create_training_data('joyful'))
 
             exploration_dict = self.get_json(
                 '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
@@ -324,7 +322,7 @@ class EditorTest(BaseEditorControllerTest):
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
                 rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
-            rule_spec['inputs']['training_data'].append('157')
+            rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/16', {
                     'change_list': [{
@@ -345,7 +343,8 @@ class EditorTest(BaseEditorControllerTest):
                 }, csrf_token)
             response_dict = self.get_json(url)
             self.assertEqual(
-                response_dict['unhandled_answers'], _create_td(98.0))
+                response_dict['unhandled_answers'],
+                _create_training_data('sad'))
 
             exploration_dict = self.get_json(
                 '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
@@ -358,7 +357,7 @@ class EditorTest(BaseEditorControllerTest):
                         'state_name': state_name,
                         'property_name': (
                             exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
-                        'new_value': ['98']
+                        'new_value': ['sad']
                     }],
                     'commit_message': 'Update confirmed unclassified answers',
                     'version': exploration_dict['version'],

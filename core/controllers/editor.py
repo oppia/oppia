@@ -516,28 +516,32 @@ class UntrainedAnswersHandler(EditorHandler):
         # TODO(bhenning): Answers should be bound to a particular exploration
         # version or interaction ID.
 
-        # TODO(bhenning): If the top 100 answers are classified, this handler
-        # will always return an empty list.
+        # TODO(bhenning): If the top 100 answers have already been classified,
+        # then this handler will always return an empty list.
 
         # TODO(bhenning): This entire function will not work as expected until
-        # the answers storage backend stores answers in non-lossy way.
+        # the answers storage backend stores answers in a non-lossy way.
         # Currently, answers are stored as HTML strings and they are not able
         # to be converted back to the original objects they started as, so the
         # normalization calls in this function will not work correctly on those
         # strings. Once this happens, this handler should also be tested.
 
-        # The total number of possible answers is 100.
+        NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
+
+        # The total number of possible answers is 100 because it requests the
+        # top 50 answers matched to the default rule and the top 50 answers
+        # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
-            50)
+            NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
         unhandled_answers = []
         if feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS and interaction.id:
             interaction_instance = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        interaction.id))
+                interaction_registry.Registry.get_interaction_by_id(
+                    interaction.id))
 
             try:
                 # Normalize the answers.

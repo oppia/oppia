@@ -288,4 +288,41 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
                 self.assertIn(
                     rule_domain.FUZZY_RULE_TYPE,
-                    [rule_class.__name__ for rule_class in all_rule_classes])
+                    [rule_class.__name__ for rule_class in all_rule_classes],
+                    'Expected to find a fuzzy rule in trainable '
+                    'interaction: %s' % interaction_id)
+
+    def test_untrainable_interactions_do_not_have_fuzzy_rules(self):
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            if not interaction.is_trainable:
+                obj_type = interaction.answer_type
+                all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
+                self.assertNotIn(
+                    rule_domain.FUZZY_RULE_TYPE,
+                    [rule_class.__name__ for rule_class in all_rule_classes],
+                    'Did not expect to find a fuzzy rule in untrainable '
+                    'interaction: %s' % interaction_id)
+
+    def test_trainable_interactions_have_more_than_just_a_fuzzy_rule(self):
+        """This ensures that trainable interactions cannot only have a fuzzy
+        rule, as that would break frontend functionality (users would not be
+        able to create manual answer groups).
+        """
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            if interaction.is_trainable:
+                obj_type = interaction.answer_type
+                all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
+                self.assertNotEqual(
+                    len(all_rule_classes), 1,
+                    'Expected trainable interaction to have more than just a '
+                    'fuzzy rule: %s' % interaction_id)

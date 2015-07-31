@@ -159,8 +159,10 @@ oppia.directive('oppiaShortResponseGraphInput', [
       scope: {},
       templateUrl: 'shortResponse/GraphInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        // TODO(bhenning): Improve this short response by using a small version
+        // of the graph image instead of an arbitrary label of vertices and
+        // edges.
         $scope.graph = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-
       }]
     };
   }

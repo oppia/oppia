@@ -600,14 +600,14 @@ textarea {
 }
 
 .btn.oppia-unresolved-answer-button {
-  text-align: left;
   background-color: white;
-  color: black;
-  width: auto;
   border-radius: 12px;
-  padding: 8px 18px;
-  margin: 4px;
+  color: black;
   font-size: 14px;
+  margin: 4px;
+  padding: 8px 18px;
+  text-align: left;
+  width: auto;
 }
 
 .btn.oppia-unresolved-answer-button:hover {
@@ -2076,4 +2076,33 @@ md-card.preview-conversation-skin-supplemental-card {
 .preview-conversation-skin-supplemental-interaction {
   margin: 0 auto;
   max-width: 560px;
+}
+
+.trained-feedback-selection-form-container {
+  margin-top: -5px;
+}
+
+.trained-feedback-selection-container {
+  border-bottom: thin solid #EEEEEE;
+  margin-bottom: 5px;
+}
+
+.trained-feedback-selection-container md-input-group.md-default-theme label {
+  border-bottom: 0px;
+}
+
+.trained-feedback-selection {
+  background: none;
+  border: none;
+  color: rgba(0,0,0,0.5);
+  margin: 0;
+  padding-left: 0;
+  padding-top: 9px;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+
+.trained-feedback-selection:hover {
+  color: #00897B;
 }

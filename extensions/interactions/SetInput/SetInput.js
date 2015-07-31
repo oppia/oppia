@@ -84,8 +84,8 @@ oppia.directive('oppiaShortResponseSetInput', [
       templateUrl: 'shortResponse/SetInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-        $scope.displayedAnswer = (_answer.length > 0 ? _answer.join(', ') :
-          'No answer given.');
+        $scope.displayedAnswer = (
+          _answer.length > 0 ? _answer.join(', ') : 'No answer given.');
       }]
     };
   }

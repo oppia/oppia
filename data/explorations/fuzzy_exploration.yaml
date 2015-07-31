@@ -353,44 +353,6 @@ states:
       fallbacks: []
       id: InteractiveMap
     param_changes: []
-  number:
-    content:
-    - type: text
-      value: <p>What numbers are similar to 15?</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: number
-          feedback:
-          - <p>That is exactly 15! What numbers are similar to 15?</p>
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: 15.0
-          rule_type: Equals
-      - outcome:
-          dest: number
-          feedback:
-          - <p>Hm. That does seem similar to 15. What other numbers can you think
-            of?</p>
-          param_changes: []
-        rule_specs:
-        - inputs:
-            training_data:
-            - 155.0
-            - 5.0
-            - 1.0
-          rule_type: FuzzyMatches
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: code
-        feedback:
-        - <p>Hmm. Is {{answer}} really similar to 15? Let's try moving on.</p>
-        param_changes: []
-      fallbacks: []
-      id: NumericInput
-    param_changes: []
   text:
     content:
     - type: text
@@ -430,7 +392,7 @@ states:
         rows:
           value: 1
       default_outcome:
-        dest: number
+        dest: code
         feedback:
         - <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
         param_changes: []

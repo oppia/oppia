@@ -340,7 +340,10 @@ oppia.controller('StateInteraction', [
           $scope.trainingDataAnswer = '';
           $scope.trainingDataFeedback = '';
           $scope.trainingDataOutcomeDest = '';
-          $scope.classification = {feedbackIndex: 0, newOutcome: null};
+
+          // See the training panel directive in StateEditor for an explanation
+          // on the structure of this object.
+          $scope.classification = {answerGroupIndex: 0, newOutcome: null};
 
           focusService.setFocus('testInteractionInput');
 
@@ -351,8 +354,6 @@ oppia.controller('StateInteraction', [
           };
 
           $scope.submitAnswer = function(answer) {
-            // TODO(bhenning): This should use the single classification
-            // handler, not the batch.
             var unhandledAnswers = [answer];
 
             $scope.answerTemplate = (
@@ -378,9 +379,9 @@ oppia.controller('StateInteraction', [
 
                 if (classificationResult.rule_spec_string !== DEFAULT_RULE_NAME &&
                     classificationResult.rule_spec_string !== FUZZY_RULE_TYPE) {
-                  $scope.classification.feedbackIndex = -1;
+                  $scope.classification.answerGroupIndex = -1;
                 } else {
-                  $scope.classification.feedbackIndex = (
+                  $scope.classification.answerGroupIndex = (
                     classificationResult.answer_group_index);
                 }
               });

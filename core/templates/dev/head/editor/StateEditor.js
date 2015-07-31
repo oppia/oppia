@@ -110,6 +110,79 @@ oppia.controller('StateEditor', [
   };
 }]);
 
+// A service which handles opening and closing the training modal used for both
+// unresolved answers and answers within the training data of a fuzzy rule.
+oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
+    function($rootScope, $modal, warningsData) {
+  return {
+    openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
+      warningsData.clear();
+      if (externalSave) {
+        $rootScope.$broadcast('externalSave');
+      }
+
+      $modal.open({
+        templateUrl: 'modals/trainUnresolvedAnswer',
+        backdrop: true,
+        controller: ['$scope', '$modalInstance', 'explorationStatesService',
+          'editorContextService', 'answerClassificationService',
+          'explorationContextService',
+          function($scope, $modalInstance, explorationStatesService,
+              editorContextService, answerClassificationService,
+              explorationContextService) {
+            $scope.trainingDataAnswer = '';
+            $scope.trainingDataFeedback = '';
+            $scope.trainingDataOutcomeDest = '';
+
+            // See the training panel directive in StateEditor for an
+            // explanation on the structure of this object.
+            $scope.classification = {answerGroupIndex: 0, newOutcome: null};
+
+            $scope.finishTraining = function() {
+              $modalInstance.close();
+            };
+
+            $scope.init = function() {
+              var explorationId = explorationContextService.getExplorationId();
+              var currentStateName = editorContextService.getActiveStateName();
+              var state = explorationStatesService.getState(currentStateName);
+
+              var unhandledAnswers = [unhandledAnswer];
+              answerClassificationService.getMatchingBatchClassificationResult(
+                explorationId, state, unhandledAnswers).success(
+                    function(response) {
+                  var classificationResult = response.results[0];
+                  var feedback = 'Nothing';
+                  var dest = classificationResult.outcome.dest;
+                  if (classificationResult.outcome.feedback.length > 0) {
+                    feedback = classificationResult.outcome.feedback[0];
+                  }
+                  if (dest == currentStateName) {
+                    dest = '<em>(try again)</em>';
+                  }
+
+                  // $scope.trainingDataAnswer, $scope.trainingDataFeedback
+                  // $scope.trainingDataOutcomeDest are intended to be local to
+                  // this modal and should not be used to populate any
+                  // information in the active exploration (including the
+                  // feedback). The feedback here refers to a representation of
+                  // the outcome of an answer group, rather than the specific
+                  // feedback of the outcome (for instance, it includes the
+                  // destination state within the feedback).
+                  $scope.trainingDataAnswer = unhandledAnswers[0];
+                  $scope.trainingDataFeedback = feedback;
+                  $scope.trainingDataOutcomeDest = dest;
+                  $scope.classification.answerGroupIndex = (
+                    classificationResult.answer_group_index);
+                });
+            };
+
+            $scope.init();
+          }]
+      });
+    }
+  };
+}]);
 
 // A service that, given an exploration ID and state name, determines all of the
 // answers which do not have certain classification and are not currently used
@@ -119,14 +192,25 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
     function($rootScope, $http, responsesService, FUZZY_RULE_TYPE,
       DEFAULT_FUZZY_RULE) {
 
-  var _servicedTrainingDataAnswers = [];
-  var _servicedTrainingDataCounts = [];
+  var _trainingDataAnswers = [];
+  var _trainingDataCounts = [];
+
+  var _indexOfTrainingData = function(answer, trainingData) {
+    var index = -1;
+    for (var i = 0; i < trainingData.length; i++) {
+      if (angular.equals(trainingData[i], answer)) {
+        index = i;
+        break;
+      }
+    }
+    return index;
+  };
 
   // Attempts to remove a given answer from a list of trained answers. This
   // function returns the index of the answer that was removed if it was
-  // successfully removed from the training data, or -1 if otherwise.
+  // successfully removed from the training data, or -1 otherwise.
   var _removeAnswerFromTrainingData = function(answer, trainingData) {
-    var index = trainingData.indexOf(answer);
+    var index = _indexOfTrainingData(answer, trainingData);
     if (index != -1) {
       trainingData.splice(index, 1);
     }
@@ -144,7 +228,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
     var updatedAnswerGroups = false;
     var updatedConfirmedUnclassifiedAnswers = false;
 
-    // Guarantee uniqueness in all answer groups.
+    // Remove the answer from all answer groups.
     for (var i = 0; i < answerGroups.length; i++) {
       var answerGroup = answerGroups[i];
       var ruleSpecs = answerGroup.rule_specs;
@@ -170,7 +254,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
       }
     }
 
-    // Guarantee uniqueness in the confirmed unclassified answers.
+    // Remove the answer from the confirmed unclassified answers.
     updatedConfirmedUnclassifiedAnswers = _removeAnswerFromTrainingData(
       answer, confirmedUnclassifiedAnswers);
 
@@ -183,29 +267,11 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
         confirmedUnclassifiedAnswers);
     }
 
-    var index = _removeAnswerFromTrainingData(
-      answer, _servicedTrainingDataAnswers);
+    var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
     if (index != -1) {
-      _servicedTrainingDataCounts.splice(index, 1);
+      _trainingDataCounts.splice(index, 1);
       $rootScope.$broadcast('updatedTrainingData');
     }
-  };
-
-  var _getOutcomeSummary = function(stateName, outcome) {
-    var summary = '';
-    if (outcome.feedback.length > 0) {
-      summary += outcome.feedback[0];
-    } else {
-      summary += '<em>(No feedback)</em><br>';
-    }
-    summary += '<br><span style="float: right;">→ ';
-    if (outcome.dest != stateName) {
-      summary += outcome.dest;
-    } else {
-      summary += '<em>(try again)</em>';
-    }
-    summary += '</span>';
-    return summary;
   };
 
   return {
@@ -214,39 +280,37 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
         '/' + encodeURIComponent(stateName);
       $http.get(trainingDataUrl).success(function(result) {
         var unhandledAnswers = result['unhandled_answers'];
-        _servicedTrainingDataAnswers = [];
-        _servicedTrainingDataCounts = [];
+        _trainingDataAnswers = [];
+        _trainingDataCounts = [];
         for (var i = 0; i < unhandledAnswers.length; i++) {
           var unhandledAnswer = unhandledAnswers[i];
-          _servicedTrainingDataAnswers.push(unhandledAnswer.value);
-          _servicedTrainingDataCounts.push(unhandledAnswer.count);
+          _trainingDataAnswers.push(unhandledAnswer.value);
+          _trainingDataCounts.push(unhandledAnswer.count);
         }
         $rootScope.$broadcast('updatedTrainingData');
-        console.debug('Received training data: ', _servicedTrainingDataAnswers);
+        console.debug('Received training data: ', _trainingDataAnswers);
       });
     },
 
     getTrainingDataAnswers: function() {
-      return _servicedTrainingDataAnswers;
+      return _trainingDataAnswers;
     },
 
     getTrainingDataCounts: function() {
-      return _servicedTrainingDataCounts;
+      return _trainingDataCounts;
     },
 
-    getAllPotentialFeedback: function(state, stateName) {
+    getAllPotentialOutcomes: function(state) {
       var feedback = [];
       var interaction = state.interaction;
 
       for (var i = 0; i < interaction.answer_groups.length; i++) {
-        feedback.push(_getOutcomeSummary(
-          stateName, interaction.answer_groups[i].outcome));
+        feedback.push(interaction.answer_groups[i].outcome);
       }
 
       if (interaction.default_outcome) {
         var outcome = interaction.default_outcome;
-        feedback.push(_getOutcomeSummary(
-          stateName, interaction.default_outcome));
+        feedback.push(interaction.default_outcome);
       }
 
       return feedback;
@@ -276,7 +340,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
 
       // Train the rule to include this answer, but only if it's not already in
       // the training data.
-      if (fuzzyRule.inputs.training_data.indexOf(answer) == -1) {
+      if (_indexOfTrainingData(answer, fuzzyRule.inputs.training_data) == -1) {
         fuzzyRule.inputs.training_data.push(answer);
       }
 
@@ -289,7 +353,7 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
       var confirmedUnclassifiedAnswers = (
         responsesService.getConfirmedUnclassifiedAnswers());
 
-      if (confirmedUnclassifiedAnswers.indexOf(answer) == -1) {
+      if (_indexOfTrainingData(answer, confirmedUnclassifiedAnswers) == -1) {
         confirmedUnclassifiedAnswers.push(answer);
       }
 
@@ -306,6 +370,17 @@ oppia.directive('trainingPanel', [function() {
       answer: '=',
       answerFeedback: '=',
       answerOutcomeDest: '=',
+      // The classification input is an object with two keys:
+      //   -answerGroupIndex: This refers to which answer group the answer being
+      //      trained has been classified to (for displaying feedback to the
+      //      creator). If answerGroupIndex is equal to the number of answer
+      //      groups, then it represents the default outcome feedback. This
+      //      index is changed by the panel when the creator specifies which
+      //      feedback should be associated with the answer.
+      //   -newOutcome: This refers to an outcome structure (containing a list
+      //      of feedback and a destination state name) which is non-null if,
+      //      and only if, the creator has specified that a new response should
+      //      be created for the trained answer.
       classification: '=',
       onFinishTraining: '&'
     },
@@ -318,24 +393,13 @@ oppia.directive('trainingPanel', [function() {
           editorContextService, explorationStatesService, trainingDataService,
           responsesService, stateInteractionIdService,
           stateCustomizationArgsService) {
-        $scope.changingFeedbackIndex = false;
+        $scope.changingAnswerGroupIndex = false;
         $scope.addingNewResponse = false;
 
         var _stateName = editorContextService.getActiveStateName();
         var _state = explorationStatesService.getState(_stateName);
-        $scope.allFeedback = trainingDataService.getAllPotentialFeedback(
-          _state, _stateName);
-
-        // Use the multiple choice interaction to select the feedback that
-        // should be used for a particular answer.
-        var _customizationArgs = {
-          'choices': {
-            'value': $scope.allFeedback
-          }
-        };
-        $scope.inputTemplate = (
-          oppiaExplorationHtmlFormatterService.getInteractionHtml(
-            'MultipleChoiceInput', _customizationArgs, 'trainOppiaInput'));
+        $scope.allOutcomes = trainingDataService.getAllPotentialOutcomes(
+          _state);
 
         var _updateAnswerTemplate = function() {
           $scope.answerTemplate = (
@@ -343,11 +407,16 @@ oppia.directive('trainingPanel', [function() {
               $scope.answer, stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento));
         };
-        _updateAnswerTemplate();
-        $scope.$watch('answer', _updateAnswerTemplate);
 
-        $scope.beginChangingFeedbackIndex = function() {
-          $scope.changingFeedbackIndex = true;
+        $scope.$watch('answer', _updateAnswerTemplate);
+        _updateAnswerTemplate();
+
+        $scope.getCurrentStateName = function() {
+          return editorContextService.getActiveStateName();
+        };
+
+        $scope.beginChangingAnswerGroupIndex = function() {
+          $scope.changingAnswerGroupIndex = true;
         };
 
         $scope.beginAddingNewResponse = function() {
@@ -359,8 +428,8 @@ oppia.directive('trainingPanel', [function() {
           $scope.addingNewResponse = true;
         };
 
-        $scope.confirmFeedbackIndex = function(index) {
-          $scope.classification.feedbackIndex = index;
+        $scope.confirmAnswerGroupIndex = function(index) {
+          $scope.classification.answerGroupIndex = index;
 
           if (index == responsesService.getAnswerGroupCount()) {
             trainingDataService.trainDefaultResponse($scope.answer);
@@ -388,13 +457,6 @@ oppia.directive('trainingPanel', [function() {
 
           $scope.onFinishTraining();
         };
-
-        // Use confirmFeedbackIndex to submit the MultipleChoice interaction.
-        // Note that this is based on MultipleChoice submitting the selected
-        // index, rather than the text of an answer.
-        // TODO(bhenning): This needs to be changed when MultipleChoice no
-        // longer refers to choices by their index.
-        $scope.submitAnswer = $scope.confirmFeedbackIndex;
       }
     ]
   };

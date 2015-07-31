@@ -81,7 +81,7 @@ def get_state_rules_stats(exploration_id, state_name):
 
 
 def get_top_state_rule_answers(
-    exploration_id, state_name, rule_str_list, top_answer_count_per_rule):
+        exploration_id, state_name, rule_str_list, top_answer_count_per_rule):
     """Returns a list of top answers (by submission frequency) submitted to the
     given state in the given exploration which were mapped to any of the rules
     listed in 'rule_str_list'. The number of answers returned is the number of

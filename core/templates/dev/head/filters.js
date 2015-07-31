@@ -73,7 +73,7 @@ oppia.filter('truncateAtFirstLine', [function() {
     }
 
     var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
-    // Normalize line endings then split using the normalized delimeter.
+    // Normalize line endings then split using the normalized delimiter.
     var lines = input.replace(pattern, '\n').split('\n');
     var nonemptyLineIndex = -1;
     for (var i = 0; i < lines.length; i++) {

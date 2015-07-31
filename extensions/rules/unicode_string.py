@@ -61,14 +61,3 @@ class MatchesBase64EncodedFile(base.UnicodeStringRule):
     def _evaluate(self, subject):
         return self._fuzzify_truth_value(
             base64.b64decode(subject) == self.fs.get(self.filepath))
-
-
-class FuzzyMatches(base.UnicodeStringRule):
-    description = 'is similar to {{training_data|SetOfUnicodeString}}'
-
-    def _evaluate(self, subject):
-        lowercase_subject = subject.lower()
-        for possibility in self.training_data:
-            if possibility.lower() == lowercase_subject:
-                return self._fuzzify_truth_value(True)
-        return self._fuzzify_truth_value(False)

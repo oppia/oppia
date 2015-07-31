@@ -126,8 +126,7 @@ oppia.directive('oppiaResponseEndExploration', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/EndExploration',
-      controller: [function(){}]
+      templateUrl: 'response/EndExploration'
     };
   }
 ]);
@@ -137,8 +136,7 @@ oppia.directive('oppiaShortResponseEndExploration', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/EndExploration',
-      controller: [function(){}]
+      templateUrl: 'shortResponse/EndExploration'
     };
   }
 ]);

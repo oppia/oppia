@@ -61,12 +61,12 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/MultipleChoiceInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        // TODO(bhenning): This response might not be short if there are RTE
-        // elements in the answer choices.
+      controller: ['$scope', '$attrs', '$filter',
+          function($scope, $attrs, $filter) {
         var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
         var _choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choices);
-        $scope.response = _choices[_answer];
+        var response = $filter('convertToPlainText')(_choices[_answer]);
+        $scope.response = $filter('truncateAtFirstLine')(response);
       }]
     };
   }

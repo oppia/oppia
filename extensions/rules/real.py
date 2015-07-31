@@ -73,28 +73,3 @@ class IsWithinTolerance(base.RealRule):
         return IsInclusivelyBetween(
             self.x - self.tol, self.x + self.tol
         )._evaluate(subject)
-
-
-class FuzzyMatches(base.RealRule):
-    description = 'is similar to {{training_data|SetOfReal}}'
-
-    def _evaluate(self, subject):
-        # For simple classification, this computes the inverse absolute
-        # distances between the input value and all values in the training set.
-        # The largest value is used as the "membership certainty" of the input
-        # value belonging to this cluster.
-
-        # If no training data exists, then this real value cannot belong to the
-        # cluster.
-        if not self.training_data:
-            return self._fuzzify_truth_value(False)
-
-        def _compute_certainty(v1, v2):
-            abs_dist = abs(v1 - v2)
-            if abs_dist < 1:
-                return 1.0
-            return 1.0 / abs_dist
-
-        return max([
-            _compute_certainty(subject, value)
-            for value in self.training_data])

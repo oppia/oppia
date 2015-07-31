@@ -276,10 +276,10 @@ oppia.directive('fuzzyRulePanel', [function() {
     controller: [
       '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
       'stateInteractionIdService', 'stateCustomizationArgsService',
-      'warningsData',
+      'trainingModalService',
       function($scope, $modal, oppiaExplorationHtmlFormatterService,
           stateInteractionIdService, stateCustomizationArgsService,
-          warningsData) {
+          trainingModalService) {
         $scope.trainingDataHtmlList = [];
         var _trainingData = $scope.ruleInputs.training_data;
         for (var i = 0; i < _trainingData.length; i++) {
@@ -290,69 +290,8 @@ oppia.directive('fuzzyRulePanel', [function() {
         }
 
         $scope.openRetrainAnswerModal = function(trainingDataIndex) {
-          warningsData.clear();
-
-          $modal.open({
-            templateUrl: 'modals/retrainAnswer',
-            backdrop: true,
-            controller: ['$scope', '$modalInstance', 'trainingDataService',
-              'explorationStatesService', 'editorContextService',
-              'answerClassificationService', 'explorationContextService',
-              function($scope, $modalInstance, trainingDataService,
-                  explorationStatesService, editorContextService,
-                  answerClassificationService, explorationContextService) {
-                $scope.trainingDataAnswer = '';
-                $scope.trainingDataFeedback = '';
-                $scope.trainingDataOutcomeDest = '';
-                $scope.classification = {feedbackIndex: 0, newOutcome: null};
-
-                $scope.finishTraining = function() {
-                  $modalInstance.close();
-                };
-
-                $scope.init = function() {
-                  var explorationId = (
-                    explorationContextService.getExplorationId());
-                  var currentStateName = (
-                    editorContextService.getActiveStateName());
-                  var state = (
-                    explorationStatesService.getState(currentStateName));
-
-                  // TODO(bhenning): Use a single classification request
-                  // specific to the editor view.
-                  var unhandledAnswers = [_trainingData[trainingDataIndex]];
-                  answerClassificationService.getMatchingBatchClassificationResult(
-                    explorationId, state, unhandledAnswers).success(
-                        function(response) {
-                      var classificationResult = response.results[0];
-                      var feedback = 'Nothing';
-                      var dest = classificationResult.outcome.dest;
-                      if (classificationResult.outcome.feedback.length > 0) {
-                        feedback = classificationResult.outcome.feedback[0];
-                      }
-                      if (dest == currentStateName) {
-                        dest = '<em>(try again)</em>';
-                      }
-
-                      // $scope.trainingDataAnswer, $scope.trainingDataFeedback
-                      // $scope.trainingDataOutcomeDest are intended to be local
-                      // to this modal and should not be used to populate any
-                      // information in the active exploration (including the
-                      // feedback). The feedback here refers to a representation
-                      // of the outcome of an answer group, rather than the
-                      // specific feedback of the outcome (for instance, it
-                      // includes the destination state within the feedback).
-                      $scope.trainingDataAnswer = unhandledAnswers[0];
-                      $scope.trainingDataFeedback = feedback;
-                      $scope.trainingDataOutcomeDest = dest;
-                      $scope.classification.feedbackIndex = (
-                        classificationResult.answer_group_index);
-                    });
-                };
-
-                $scope.init();
-              }]
-          });
+          trainingModalService.openTrainUnresolvedAnswerModal(
+            _trainingData[trainingDataIndex], false);
         };
       }
     ]

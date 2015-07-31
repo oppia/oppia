@@ -90,6 +90,9 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
       templateUrl: 'shortResponse/InteractiveMap',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        // This is necessary as described here:
+        //   http://stackoverflow.com/questions/12740329
+        $scope.Math = window.Math;
       }]
     };
   }

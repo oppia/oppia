@@ -151,8 +151,8 @@ def classify(exp_id, state, answer, params):
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
-    # (if there is one present), resulting in the outcome of the answer being
-    # the default outcome of the state.
+    # resulting in the outcome of the answer being the default outcome of the
+    # state.
     if (best_matched_truth_value >=
             feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
         return {
@@ -392,6 +392,12 @@ class ClassifyHandler(base.BaseHandler):
         self.render_json(classify(exploration_id, old_state, answer, params))
 
 
+# TODO(bhenning): Use the current classification handler only for training
+# answers in the exploration editor. Create a new classification handler which
+# looks up the state rather than having it passed into it. Finally, remove the
+# batch classification handler and change all references to it in the frontend
+# to use the single classification handler that takes a state as input.
+# Consider moving the editor-specific classification handler to editor.py.
 class BatchClassifyHandler(base.BaseHandler):
     """Classification handler which classifies similarly to ClassifyHandler, but
     across a list of answers rather than a single answer. The classification
