@@ -1002,10 +1002,6 @@ pre.oppia-pre-wrapped-text {
   text-decoration: underline;
 }
 
-.oppia-answer-header {
-  padding-top: 16px;
-}
-
 .oppia-add-interaction-button,
 .oppia-add-response-button {
   background-color: rgba(5,140,166,0.9);
@@ -1119,7 +1115,7 @@ pre.oppia-pre-wrapped-text {
   background: rgba(0,0,0,0.05);
   border-radius: 0;
   border-bottom: 1px solid #f0f0f0;
-  color: #aaa;
+  color: #444;
   padding: 7px 15px;
   width: 100%;
 }
@@ -1136,7 +1132,6 @@ pre.oppia-pre-wrapped-text {
   background: rgba(5,140,166,0.1);
   border-right: 0;
   color: #333;
-  cursor: default;
 }
 
 .oppia-default-rule-tab {
@@ -1751,7 +1746,7 @@ div#ng-curtain {
   position: absolute;
   right: 15px;
   top: 28px;
-  width: 350px;
+  width: 300px;
 }
 .oppia-editor-sidebar accordion .panel {
   border-radius: 0;

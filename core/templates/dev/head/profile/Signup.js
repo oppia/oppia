@@ -24,6 +24,8 @@ oppia.controller('Signup', [
   var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
+  $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
+  $scope.submissionInProcess = false;
 
   $http.get(_SIGNUP_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
@@ -34,6 +36,7 @@ oppia.controller('Signup', [
   });
 
   $scope.blurredAtLeastOnce = false;
+  $scope.canReceiveEmailUpdates = null;
 
   $scope.isFormValid = function() {
     return (
@@ -78,7 +81,7 @@ oppia.controller('Signup', [
     var oppia = /oppia/i;
 
     if (!username) {
-      $scope.warningText = 'Please enter a username.';
+      $scope.warningText = 'Please choose a username.';
     } else if (username.indexOf(' ') !== -1) {
       $scope.warningText = 'Please ensure that your username has no spaces.';
     } else if (username.length > 50) {
@@ -94,11 +97,15 @@ oppia.controller('Signup', [
     }
   };
 
-  $scope.submitPrerequisitesForm = function(agreedToTerms, username) {
+  $scope.onSelectEmailPreference = function() {
+    $scope.emailPreferencesWarningText = '';
+  };
+
+  $scope.submitPrerequisitesForm = function(agreedToTerms, username, canReceiveEmailUpdates) {
     if (!agreedToTerms) {
       warningsData.addWarning(
-          'In order to edit explorations on this site, you will need to ' +
-          'agree to the site terms.');
+        'In order to edit explorations on this site, you will need to ' +
+        'agree to the site terms.');
       return;
     }
 
@@ -107,14 +114,34 @@ oppia.controller('Signup', [
     }
 
     var requestParams = {
-      agreed_to_terms: agreedToTerms
+      agreed_to_terms: agreedToTerms,
+      can_receive_email_updates: null
     };
     if (!$scope.hasUsername) {
       requestParams.username = username;
     }
 
+    if (GLOBALS.CAN_SEND_EMAILS_TO_USERS) {
+      if (canReceiveEmailUpdates === null) {
+        $scope.emailPreferencesWarningText = 'This field is required.';
+        return;
+      }
+
+      if (canReceiveEmailUpdates === 'yes') {
+        requestParams.can_receive_email_updates = true;
+      } else if (canReceiveEmailUpdates === 'no') {
+        requestParams.can_receive_email_updates = false;
+      } else {
+        throw Error(
+          'Invalid value for email preferences: ' + canReceiveEmailUpdates);
+      }
+    }
+
+    $scope.submissionInProcess = true;
     $http.post(_SIGNUP_DATA_URL, requestParams).success(function(data) {
       window.location = window.decodeURIComponent(urlService.getUrlParams().return_url);
+    }).error(function(data) {
+      $scope.submissionInProcess = false;
     });
   };
 }]);

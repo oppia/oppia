@@ -8,7 +8,7 @@ time. If in doubt, consult the latest OpenEdX documentation.
 
 Download the contents of the
 
-    /integrations/openedx_xblock_20150614_v0.0.0/
+    /integrations/openedx_xblock_20150715_v0.0.0/
 
 directory to a folder on your local machine, and deploy it following the
 instructions in the tutorial here:

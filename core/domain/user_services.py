@@ -338,3 +338,33 @@ def record_user_started_state_editor_tutorial(user_id):
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
     _save_user_settings(user_settings)
+
+
+def update_email_preferences(user_id, can_receive_email_updates):
+    """Updates whether the user has chosen to receive email updates.
+
+    If no UserEmailPreferencesModel exists for this user, a new one will
+    be created.
+    """
+    email_preferences_model = user_models.UserEmailPreferencesModel.get(
+        user_id, strict=False)
+    if email_preferences_model is None:
+        email_preferences_model = user_models.UserEmailPreferencesModel(
+            id=user_id)
+
+    email_preferences_model.site_updates = can_receive_email_updates
+    email_preferences_model.put()
+
+
+def get_email_preferences(user_id):
+    """Returns a boolean representing whether the user has chosen to receive
+    email updates.
+    """
+    email_preferences_model = user_models.UserEmailPreferencesModel.get(
+        user_id, strict=False)
+    return {
+        'can_receive_email_updates': (
+            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.site_updates)
+    }

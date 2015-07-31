@@ -402,9 +402,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
             results_list = []
             for item_reader in iterator:
                 for item in item_reader:
-                    # For some reason, the last value is an empty string.
-                    if item:
-                        results_list.append(json.loads(item))
+                    results_list.append(json.loads(item))
             job_class.register_completion(job_id, results_list)
         except Exception as e:
             logging.error(traceback.format_exc())
@@ -421,7 +419,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
 
     def write(self, data):
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            json.dumps(data))
+            '%s\n' % json.dumps(data))
 
 
 class BaseMapReduceJobManager(BaseJobManager):

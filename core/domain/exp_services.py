@@ -809,52 +809,11 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations on exploration snapshots.
-def _get_simple_changelist_summary(
-        exploration_id, version_number, change_list):
-    """Returns an auto-generated changelist summary for the history logs."""
-    # TODO(sll): Get this from memcache where possible. It won't change, so we
-    # can keep it there indefinitely.
-
-    base_exploration = get_exploration_by_id(
-        exploration_id, version=version_number)
-    if (len(change_list) == 1 and change_list[0]['cmd'] in
-            ['create_new', 'AUTO_revert_version_number']):
-        # An automatic summary is not needed here, because the original commit
-        # message is sufficiently descriptive.
-        return ''
-    else:
-        full_summary = get_summary_of_change_list(
-            base_exploration, change_list)
-
-        short_summary_fragments = []
-        if full_summary['added_states']:
-            short_summary_fragments.append(
-                'added \'%s\'' % '\', \''.join(full_summary['added_states']))
-        if full_summary['deleted_states']:
-            short_summary_fragments.append(
-                'deleted \'%s\'' % '\', \''.join(
-                    full_summary['deleted_states']))
-        if (full_summary['changed_states'] or
-                full_summary['state_property_changes']):
-            affected_states = (
-                full_summary['changed_states'] +
-                full_summary['state_property_changes'].keys())
-            short_summary_fragments.append(
-                'edited \'%s\'' % '\', \''.join(affected_states))
-        if full_summary['exploration_property_changes']:
-            short_summary_fragments.append(
-                'edited exploration properties %s' % ', '.join(
-                    full_summary['exploration_property_changes'].keys()))
-
-        return '; '.join(short_summary_fragments)
-
-
 def get_exploration_snapshots_metadata(exploration_id):
     """Returns the snapshots for this exploration, as dicts.
 
     Args:
         exploration_id: str. The id of the exploration in question.
-        limit: int. The maximum number of snapshots to return.
 
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
@@ -1194,8 +1153,19 @@ def _get_search_rank(exp_id):
                 summary.ratings[rating_value] *
                 RATING_WEIGHTINGS[rating_value])
 
-    _TIME_NOW = datetime.datetime.utcnow()
-    time_delta_days = int((_TIME_NOW - exploration.last_updated).days)
+    # Iterate backwards through the exploration history metadata until we find
+    # the most recent snapshot that was committed by a human.
+    last_human_update_ms = 0
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    for snapshot_metadata in reversed(snapshots_metadata):
+        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
+            last_human_update_ms = snapshot_metadata['created_on_ms']
+            break
+
+    _TIME_NOW_MS = utils.get_current_time_in_millisecs()
+    _MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
+    time_delta_days = int(
+        (_TIME_NOW_MS - last_human_update_ms) / _MS_IN_ONE_DAY)
     if time_delta_days == 0:
         rank += 80
     elif time_delta_days == 1:

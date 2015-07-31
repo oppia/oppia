@@ -108,11 +108,6 @@ class GalleryHandler(base.BaseHandler):
         # TODO(sll): Figure out what to do about explorations in categories
         # other than those explicitly listed.
 
-        language_codes_to_short_descs = {
-            lc['code']: utils.get_short_language_description(lc['description'])
-            for lc in feconf.ALL_LANGUAGE_CODES
-        }
-
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
         exp_summaries_list, search_cursor = (

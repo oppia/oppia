@@ -71,14 +71,7 @@ oppia.directive('ruleTypeSelector', [function() {
         allowClear: false,
         width: '350px',
         formatSelection: function(object, container) {
-          if (object.id === 'Default') {
-            return (
-              stateInteractionIdService.savedMemento === 'Continue' ?
-              'is clicked...' :
-              'is anything else...');
-          } else {
-            return $filter('truncateAtFirstEllipsis')(object.text);
-          }
+          return $filter('truncateAtFirstEllipsis')(object.text);
         }
       });
 
@@ -117,11 +110,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-        '$scope', 'editorContextService', 'explorationStatesService',
+        '$scope', '$timeout', 'editorContextService', 'explorationStatesService',
         'routerService', 'validatorsService', 'responsesService',
         'stateInteractionIdService', 'INTERACTION_SPECS',
         function(
-          $scope, editorContextService, explorationStatesService, routerService,
+          $scope, $timeout, editorContextService, explorationStatesService, routerService,
           validatorsService, responsesService, stateInteractionIdService,
           INTERACTION_SPECS) {
       $scope.currentInteractionId = stateInteractionIdService.savedMemento;
@@ -181,7 +174,17 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             });
           }
         }
-        $scope.ruleDescriptionFragments = result;
+
+        // The following is necessary in order to ensure that the object-editor
+        // HTML tags load correctly when the rule type is changed. This is an
+        // issue for, e.g., the MusicNotesInput interaction, where the rule
+        // inputs can sometimes be integers and sometimes be lists of music
+        // notes.
+        $scope.ruleDescriptionFragments = [];
+        $timeout(function() {
+          $scope.ruleDescriptionFragments = result;
+        }, 10);
+
         return ruleDescription;
       };
 

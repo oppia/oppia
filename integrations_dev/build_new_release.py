@@ -34,6 +34,7 @@ import datetime
 import os
 import re
 import shutil
+import tarfile
 
 INTEGRATION_NAME_GCB_OPPIA_TAG = 'gcb_oppia_tag'
 INTEGRATION_NAME_GOOGLE_SITES = 'google_sites'
@@ -45,6 +46,11 @@ ALLOWED_INTEGRATION_NAMES = [
     INTEGRATION_NAME_OPENEDX_XBLOCK,
     INTEGRATION_NAME_OPPIA_PLAYER
 ]
+INTEGRATIONS_NEEDING_TAR_FILE = {
+    INTEGRATION_NAME_OPENEDX_XBLOCK: {
+        'relative_src_path': 'xblock-oppia',
+    }
+}
 
 SCRIPT_FILEPATH = os.path.join(
     os.getcwd(), 'static', 'scripts', 'oppia-player-0.0.1.min.js')
@@ -87,6 +93,12 @@ SOURCE_DIR = os.path.join(INTEGRATIONS_DEV_ROOT, INTEGRATION_NAME)
 TARGET_DIR = os.path.join(
     INTEGRATIONS_ROOT,
     '%s_%s_v%s' % (INTEGRATION_NAME, DATE_STR, VERSION_NUMBER))
+
+
+def _make_tarfile(output_filename, source_dir):
+    with tarfile.open(output_filename, 'w:gz') as tar:
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
+
 
 print ''
 print 'Starting deployment process for %s' % SOURCE_DIR
@@ -134,6 +146,15 @@ try:
         shutil.copy(
             SCRIPT_FILEPATH,
             os.path.join(TARGET_DIR, SCRIPT_LOCATIONS[INTEGRATION_NAME]))
+
+    if INTEGRATION_NAME in INTEGRATIONS_NEEDING_TAR_FILE:
+        relative_src_path = INTEGRATIONS_NEEDING_TAR_FILE[
+            INTEGRATION_NAME]['relative_src_path']
+        _make_tarfile(
+            os.path.join(
+                TARGET_DIR, '%s_%s_v%s.tar.gz' % (
+                    INTEGRATION_NAME, DATE_STR, VERSION_NUMBER)),
+            os.path.join(SOURCE_DIR, relative_src_path))
 
     print ''
     print 'Done! Please check %s for the release candidate.' % TARGET_DIR

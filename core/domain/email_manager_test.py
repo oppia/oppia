@@ -100,8 +100,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
         self.NEW_EMAIL_CONTENT = {
             'subject': 'Welcome!',
             'html_body': (
-                'Here is some HTML text.<br>\n'
-                'With a <b>bold</b> bit and an <i>italic</i> bit.<br>\n')
+                'Here is some HTML text.<br>'
+                'With a <b>bold</b> bit and an <i>italic</i> bit.<br>')
         }
 
         self.EXPECTED_PLAINTEXT_EMAIL_CONTENT = (
@@ -113,12 +113,12 @@ class SignupEmailTests(test_utils.GenericTestBase):
             '\n'
             'Unsubscribe from emails at your Preferences page.')
         self.EXPECTED_HTML_EMAIL_CONTENT = (
-            'Hi editor,<br>\n'
-            '<br>\n'
-            'Here is some HTML text.<br>\n'
-            'With a <b>bold</b> bit and an <i>italic</i> bit.<br>\n'
-            '<br>\n'
-            '<br>\n'
+            'Hi editor,<br>'
+            '<br>'
+            'Here is some HTML text.<br>'
+            'With a <b>bold</b> bit and an <i>italic</i> bit.<br>'
+            '<br>'
+            '<br>'
             'Unsubscribe from emails at your '
             '<a href="https://www.site.com/prefs">Preferences page</a>.')
 
@@ -182,6 +182,93 @@ class SignupEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
+    def test_email_not_sent_if_content_config_is_partially_modified(self):
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+
+        config_services.set_property(
+            self.ADMIN_ID, email_manager.SIGNUP_EMAIL_CONTENT.name, {
+                'subject': (
+                    email_manager.SIGNUP_EMAIL_CONTENT.default_value[
+                        'subject']),
+                'html_body': 'New HTML body.',
+            })
+
+        logged_errors = []
+
+        def _log_error_for_tests(error_message):
+            logged_errors.append(error_message)
+
+        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
+        log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', log_new_error_counter)
+
+        with can_send_emails_ctx, log_new_error_ctx:
+            self.assertEqual(log_new_error_counter.times_called, 0)
+
+            self.login(self.EDITOR_EMAIL)
+            response = self.testapp.get(feconf.SIGNUP_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            # No user-facing error should surface.
+            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+                'agreed_to_terms': True,
+                'username': self.EDITOR_USERNAME
+            }, csrf_token=csrf_token)
+
+            # However, an error should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logged_errors[0],
+                'Please ensure that the value for the admin config property '
+                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
+                'emails to be sent.')
+
+            # Check that no email was sent.
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(0, len(messages))
+
+    def test_email_with_bad_content_is_not_sent(self):
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+
+        config_services.set_property(
+            self.ADMIN_ID, email_manager.SIGNUP_EMAIL_CONTENT.name, {
+                'subject': 'New email subject',
+                'html_body': 'New HTML body.<script>alert(3);</script>',
+            })
+
+        logged_errors = []
+
+        def _log_error_for_tests(error_message):
+            logged_errors.append(error_message)
+
+        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
+        log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', log_new_error_counter)
+
+        with can_send_emails_ctx, log_new_error_ctx:
+            self.assertEqual(log_new_error_counter.times_called, 0)
+
+            self.login(self.EDITOR_EMAIL)
+            response = self.testapp.get(feconf.SIGNUP_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            # No user-facing error should surface.
+            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+                'agreed_to_terms': True,
+                'username': self.EDITOR_USERNAME
+            }, csrf_token=csrf_token)
+
+            # However, an error should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 1)
+            self.assertTrue(logged_errors[0].startswith(
+                'Original email HTML body does not match cleaned HTML body'))
+
+            # Check that no email was sent.
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(0, len(messages))
+
     def test_contents_of_signup_email_are_correct(self):
         with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
             config_services.set_property(
@@ -190,6 +277,9 @@ class SignupEmailTests(test_utils.GenericTestBase):
             config_services.set_property(
                 self.ADMIN_ID, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.NEW_EMAIL_CONTENT)
+            config_services.set_property(
+                self.ADMIN_ID, email_manager.EMAIL_SENDER_NAME.name,
+                'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
             response = self.testapp.get(feconf.SIGNUP_URL)
@@ -204,7 +294,9 @@ class SignupEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
-            self.assertEqual(messages[0].sender, feconf.SYSTEM_EMAIL_ADDRESS)
+            self.assertEqual(
+                messages[0].sender,
+                'Email Sender <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
             self.assertEqual(messages[0].subject, 'Welcome!')
             self.assertEqual(
@@ -286,6 +378,9 @@ class SignupEmailTests(test_utils.GenericTestBase):
             config_services.set_property(
                 self.ADMIN_ID, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.NEW_EMAIL_CONTENT)
+            config_services.set_property(
+                self.ADMIN_ID, email_manager.EMAIL_SENDER_NAME.name,
+                'Email Sender')
 
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
@@ -319,7 +414,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
-                sent_email_model.sender_email, feconf.SYSTEM_EMAIL_ADDRESS)
+                sent_email_model.sender_email,
+                'Email Sender <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, email_models.INTENT_SIGNUP)
             self.assertEqual(

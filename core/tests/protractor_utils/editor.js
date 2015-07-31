@@ -146,9 +146,11 @@ var setInteraction = function(interactionId) {
     if (isVisible) {
       element(by.css('.protractor-test-delete-interaction')).click();
       // Click through the "are you sure?" warning.
-      browser.driver.switchTo().alert().accept();
+      element(by.css('.protractor-test-confirm-delete-interaction')).click();
     }
   });
+
+  general.waitForSystem();
 
   element(by.css('.protractor-test-open-add-interaction-modal')).click();
 
@@ -195,6 +197,15 @@ var setInteraction = function(interactionId) {
   element(by.css('.protractor-test-save-interaction')).click();
   // Wait for the customization modal to close.
   general.waitForSystem();
+
+  // If the "Add Response" modal opens, close it.
+  var headerElem = element(by.css('.protractor-test-add-response-modal-header'));
+  headerElem.isPresent().then(function(isVisible) {
+    if (isVisible) {
+      element(by.css('.protractor-test-close-add-response-modal')).click();
+      general.waitForSystem();
+    }
+  });
 };
 
 // Likewise this can receive additional arguments.
@@ -311,7 +322,7 @@ var _setOutcomeDest = function(destEditorElem, destName, createDest) {
   });
 };
 
-// This clicks the "add new rule" button and then selects the rule type and
+// This clicks the "add new response" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
 //
@@ -323,9 +334,15 @@ var _setOutcomeDest = function(destEditorElem, destName, createDest) {
 //   dialog as part of adding this rule.
 var addResponse = function(interactionId, feedbackInstructions, destStateName,
     createState, ruleName) {
-  // Select the default response.
-  element(by.css('.protractor-test-open-add-response-modal')).click();
-  general.waitForSystem();
+
+  // Open the "Add Response" modal if it is not already open.
+  var headerElem = element(by.css('.protractor-test-add-response-modal-header'));
+  headerElem.isPresent().then(function(isVisible) {
+    if (!isVisible) {
+      element(by.css('.protractor-test-open-add-response-modal')).click();
+      general.waitForSystem();
+    }
+  });
 
   // Set the rule description.
   var ruleElement = element(by.css('.protractor-test-add-response-details'));
@@ -377,18 +394,18 @@ var ResponseEditor = function(responseNum) {
   var headerElem;
   if (responseNum === 'default') {
     headerElem = element(by.css('.protractor-test-default-response-tab'));
-    headerElem.isPresent().then(function(isVisible) {
-      // If there is only one rule, no tabs are shown, so we don't have to click
-      // anything.
-      if (isVisible) {
-        headerElem.click();
-      }
-    });
   } else {
     headerElem = element.all(by.css('.protractor-test-response-tab')).get(
       responseNum);
-    headerElem.click();
   }
+
+  var responseBodyElem = element(
+    by.css('.protractor-test-response-body-' + responseNum));
+  responseBodyElem.isPresent().then(function(isVisible) {
+    if (!isVisible) {
+      headerElem.click();
+    }
+  });
 
   return {
     setFeedback: function(richTextInstructions) {
@@ -461,7 +478,7 @@ var ResponseEditor = function(responseNum) {
     },
     delete: function() {
       headerElem.element(by.css('.protractor-test-delete-response')).click();
-      browser.driver.switchTo().alert().accept();
+      element(by.css('.protractor-test-confirm-delete-response')).click();
     },
     expectCannotSetFeedback: function() {
       var feedbackEditorElem = element(by.css(

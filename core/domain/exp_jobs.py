@@ -18,7 +18,7 @@
 
 __author__ = 'Frederik Creemers'
 
-import copy
+import logging
 
 from core import jobs
 from core.platform import models
@@ -91,10 +91,10 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-        exp_summary = rights_manager.get_exploration_rights(item.id)
+        exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
-            if exp_summary.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+            if exp_rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
                 exploration.validate()
             else:
                 exploration.validate(strict=True)
@@ -176,9 +176,22 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
         from core.domain import exp_domain
         from core.domain import exp_services
 
+        if item.deleted:
+            return
+
+        # Do not upgrade explorations that fail non-strict validation.
+        old_exploration = exp_services.get_exploration_by_id(item.id)
+        try:
+            old_exploration.validate()
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            return
+
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
-        if (not item.deleted and item.states_schema_version !=
+        if (item.states_schema_version !=
                 feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
@@ -198,4 +211,3 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-

@@ -13,6 +13,14 @@
   </ul>
 {% endblock navbar_breadcrumb %}
 
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.CAN_SEND_EMAILS_TO_USERS = JSON.parse(
+      '{{CAN_SEND_EMAILS_TO_USERS|js_string}}');
+  </script>
+{% endblock header_js %}
+
 {% block content %}
   <!-- NOTE: This page should not contain any direct anchors to internal links. If the user visits an internal
   link before completing the signup process, they will be logged out.
@@ -28,15 +36,8 @@
     <md-card class="oppia-page-card">
       <h2 class="oppia-signup-page-title">Complete Your Registration</h2>
 
-      <form ng-submit="submitPrerequisitesForm(agreedToTerms, username)">
+      <form ng-submit="submitPrerequisitesForm(agreedToTerms, username, canReceiveEmailUpdates)">
         <div ng-show="!hasUsername" role="form" class="form-horizontal">
-          <div class="form-group">
-            <label class="col-lg-3 col-md-3 col-sm-3">Email</label>
-            <div class="col-lg-9 col-md-9 col-sm-9">
-              {{user_email}}
-            </div>
-          </div>
-
           <div class="form-group">
             <label for="username" class="col-lg-3 col-md-3 col-sm-3">Username</label>
             <div class="col-lg-9 col-md-9 col-sm-9">
@@ -47,6 +48,30 @@
               <div style="height: 18px; width: 550px;">
                 <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
                   <[warningText]>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div ng-show="showEmailPreferencesForm" class="form-group">
+            <label for="canReceiveEmailUpdates" class="col-lg-3 col-md-3 col-sm-3">Email Preferences</label>
+            <div class="col-lg-9 col-md-9 col-sm-9">
+              <div class="radio">
+                <label>
+                  <input type="radio" ng-model="canReceiveEmailUpdates" value="yes" name="canReceiveEmailUpdates" ng-change="onSelectEmailPreference()">
+                  Send me news and updates about the site
+                </label>
+                <label>
+                  <input type="radio" ng-model="canReceiveEmailUpdates" value="no" name="canReceiveEmailUpdates" ng-change="onSelectEmailPreference()">
+                  Do not send these emails
+                </label>
+                <span class="help-block" style="font-size: smaller">
+                  You can change this setting at any time from your Preferences page.
+                </span>
+              </div>            
+              <div style="height: 18px; width: 550px;">
+                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
+                  <[emailPreferencesWarningText]>
                 </span>
               </div>
             </div>
@@ -73,7 +98,7 @@
 
         <br>
 
-        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms">Submit and start contributing</button>
+        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms || submissionInProcess">Submit and start contributing</button>
       </form>
     </md-card>
   </div>

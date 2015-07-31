@@ -504,7 +504,8 @@ class Graph(BaseObject):
                     assert (edge['weight'] == 1.0)
 
             if raw['isDirected']:
-                edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
+                edge_pairs = [
+                    (edge['src'], edge['dst']) for edge in raw['edges']]
             else:
                 edge_pairs = (
                     [(edge['src'], edge['dst']) for edge in raw['edges']] +
@@ -521,7 +522,9 @@ class Graph(BaseObject):
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
 
-    description = 'A rectangle normalized so that the coordinates are within the range [0,1].'
+    description = (
+        'A rectangle normalized so that the coordinates are within the range '
+        '[0,1].')
 
     SCHEMA = {
         'type': 'list',
@@ -535,7 +538,8 @@ class NormalizedRectangle2D(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        # Moves cur_value to the nearest available value in the range [min_value, max_value]
+        # Moves cur_value to the nearest available value in the range
+        # [min_value, max_value].
         def clamp(min_value, current_value, max_value):
             return min(max_value, max(min_value, current_value))
         try:
@@ -557,9 +561,10 @@ class ImageRegion(BaseObject):
 
     description = 'A region of an image.'
 
-    # Note: at the moment, only supports rectangular image regions
-    # Coordinates are [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]]
-    # origin is top-left, increasing x is to the right, increasing y is down
+    # Note: at the moment, only supports rectangular image regions.
+    # Coordinates are:
+    #   [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]].
+    # Origin is top-left, increasing x is to the right, increasing y is down.
     SCHEMA = {
         'type': 'dict',
         'properties': [{
