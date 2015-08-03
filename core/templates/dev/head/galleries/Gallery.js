@@ -255,13 +255,13 @@ oppia.controller('SearchBar', [
   $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
     return {
       id: categoryName,
-      text: categoryName
+      text: 'I18N_GALLERY_CATEGORIES_' + categoryName.toUpperCase().replace(' ', '_')
     }
   });
   $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
     return {
       id: languageItem.code,
-      text: languageItem.name
+      text: 'I18N_GALLERY_LANGUAGES_' + languageItem.code.toUpperCase()
     };
   });
 
@@ -284,6 +284,7 @@ oppia.controller('SearchBar', [
       summary: ''
     }
   };
+  $scope.translationData = {}
 
   // Update the description, numSelections and summary fields of the relevant
   // entry of $scope.selectionDetails.
@@ -302,9 +303,11 @@ oppia.controller('SearchBar', [
     $scope.selectionDetails[itemsType].numSelections = totalCount;
 
     $scope.selectionDetails[itemsType].summary = (
-      totalCount === 0 ? 'All ' + itemsName.charAt(0).toUpperCase() + itemsName.substr(1) :
+      totalCount === 0 ? 'I18N_GALLERY_ALL_' + itemsName.toUpperCase() :
       totalCount === 1 ? selectedItems[0] :
-      totalCount + ' ' + itemsName);
+      'I18N_GALLERY_N_' + itemsName.toUpperCase());
+
+    $scope.translationData[itemsName] = { totalCount: totalCount }
 
     $scope.selectionDetails[itemsType].description = (
       selectedItems.length > 0 ? selectedItems.join(', ') :

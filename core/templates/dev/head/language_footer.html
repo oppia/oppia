@@ -1,6 +1,6 @@
-<div class="oppia-footer" ng-controller="i18n">
+<div class="oppia-footer" ng-controller="I18nFooter">
   <span ng-repeat="(langCode, langName) in SUPPORTED_LANGUAGES">
-    <a ng-click="changeLanguage(langCode)"><[ langName ]></a>
+    <a ng-click="changeLanguage(langCode)"><[langName]></a>
     <span ng-if="!$last">·</span>
   </span>
 </div>

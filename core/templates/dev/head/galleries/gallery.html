@@ -2,11 +2,11 @@
 
 <!-- Gallery page is a special case: we switch the main and sub titles -->
 {% block maintitle %}
-  Gallery
+  <['I18N_GALLERY_PAGE_TITLE' | translate]>
 {% endblock maintitle %}
 
 {% block subtitle %}
-  Oppia
+  <['I18N_GALLERY_PAGE_SUBTITLE' | translate]>
 {% endblock subtitle %}
 
 {% block navbar_breadcrumb %}
@@ -21,19 +21,19 @@
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            href="{{gallery_login_redirect_url}}">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span translate>GALLERY-CREATE-EXPLORATION</span>
+          <span translate>I18N_GALLERY_CREATE_EXPLORATION</span>
         </a>
       {% else %}
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            ng-click="showCreateExplorationModal()">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span translate>GALLERY-CREATE-EXPLORATION</span>
+          <span translate>I18N_GALLERY_CREATE_EXPLORATION</span>
         </a>
         {% if allow_yaml_file_upload %}
           <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
              ng-click="showUploadExplorationModal()">
             <span class="oppia-navbar-add-exploration-button-plus">+</span>
-            <span translate>GALLERY-UPLOAD-EXPLORATION</span>
+            <span translate>I18N_GALLERY_UPLOAD_EXPLORATION</span>
           </a>
         {% endif %}
       {% endif %}
@@ -48,7 +48,7 @@
                              'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
             </span>
           </div>
-          <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+          <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="<[ 'I18N_GALLERY_SEARCH_PLACEHOLDER' | translate ]>" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
         </div>
       </div>
     </form>
@@ -56,7 +56,7 @@
     <div dropdown class="dropdown navbar-left oppia-navbar-button-container oppia-gallery-category-selector protractor-test-gallery-category-selector">
       <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak"
               title="<[selectionDetails.categories.description]>" style="max-width: 130px;">
-        <span><[selectionDetails.categories.summary | truncate:14 ]></span>
+        <span><[selectionDetails.categories.summary | translate:translationData.categories | truncate:14 ]></span>
         <span class="caret"></span>
       </button>
       <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
@@ -65,7 +65,7 @@
             class="protractor-test-selected"
             ng-if="selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
-            <[item.text]>
+            <span translate><[item.text]></span>
             <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -73,7 +73,7 @@
         <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
             ng-if="!selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
-            <[item.text]>
+            <span translate><[item.text]></span>
             <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -84,7 +84,7 @@
       <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak"
               style="border-bottom-right-radius: 4px; border-top-right-radius: 4px; max-width: 130px;"
               title="<[selectionDetails.languageCodes.description]>">
-        <[selectionDetails.languageCodes.summary | truncate:14 ]>
+        <[selectionDetails.languageCodes.summary | translate:translationData.languages | truncate:14 ]>
         <span class="caret"></span>
       </button>
       <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
@@ -93,7 +93,7 @@
             class="protractor-test-selected"
             ng-if="selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <[item.text]>
+            <span translate><[item.text]></span>
             <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -101,7 +101,7 @@
         <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
             ng-if="!selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <[item.text]>
+            <span translate><[item.text]></span>
             <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -129,15 +129,15 @@
   <div ng-controller="Gallery" class="oppia-gallery-container">
     <div ng-if="inSplashMode" class="oppia-gallery-banner-container">
       <div class="oppia-gallery-banner-content">
-        <span translate>GALLERY-TITLE</span>
+        <span translate>I18N_GALLERY_TITLE</span>
       </div>
       <carousel interval="CAROUSEL_INTERVAL">
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
             <div class="oppia-gallery-banner-tagline">
-              <span translate>GALLERY-SUBTITLE</span>
+              <span translate>I18N_GALLERY_SUBTITLE</span>
               <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link" translate>
-                GALLERY-SUBTITLE-COLOR-<[slide.topic]>
+                I18N_GALLERY_SUBTITLE_COLOR_<[slide.topic]>
               </a>
             </div>
           </div>
@@ -151,9 +151,9 @@
           <img src="/images/gallery/oppia_video.png" class="oppia-gallery-interstitial-video" ng-click="showSplashVideoModal()">
         {% else %}
           <span>
-            Oppia is a personalized learning platform created by and for people like you.
+            <span translate>I18N_GALLERY_OPPIA_DESCRIPTION</span>
             <div style="display: inline-block;">
-              <a href="/about">Find out more!</a>
+              <a href="/about" translate>I18N_GALLERY_OPPIA_FIND_OUT_MORE</a>
             </div>
           </span>
         {% endif %}
@@ -162,22 +162,22 @@
       <div class="oppia-gallery-tiles-area">
         <div class="oppia-gallery-tiles-container">
           <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
-            <em>
-              We don't have any explorations matching this query yet.
+            <em translate>
+              I18N_GALLERY_NO_EXPLORATION_FOR_QUERY
             </em>
             <br><br>
             <div style="display: inline-block;">
             <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
               {% if not user_email %}
-                <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
+                <a href="{{gallery_login_redirect_url}}" translate>I18N_GALLERY_CREATE_EXPLORATION_QUESTION</a>
               {% else %}
-                <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
+                <a ng-click="showCreateExplorationModal()" translate>I18N_GALLERY_CREATE_EXPLORATION_QUESTION</a>
               {% endif %}
             </div>
           </div>
 
           <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
-            Dive into an exploration created by the community:
+            <span translate>I18N_GALLERY_COMMUNITY_EXPLORATIONS</span>
           </div>
 
           <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
@@ -187,16 +187,16 @@
                 <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
                    ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
                   <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                        title="Edit this exploration"></span>
-                  Edit
+                        title="<['I18N_GALLERY_EDIT_THIS_EXPLORATION' | translate]>"></span>
+                  <span translate>I18N_GALLERY_EDIT_EXPLORATION</span>
                 </a>
                 {% if is_moderator %}
                   <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
                      ng-if="!exploration.is_editable && currentUserIsModerator"
                      ng-href="/create/<[exploration.id]>">
                     <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                          title="Edit (as moderator)"></span>
-                    Edit (as moderator)
+                          title="<[I18N_GALLERY_EDIT_EXPLORATION_AS_MODERATOR | translate]>"></span>
+                    <span translate>I18N_GALLERY_EDIT_EXPLORATION_AS_MODERATOR</span>
                   </a>
                 {% endif %}
 
@@ -222,13 +222,14 @@
 
                       <div class="oppia-gallery-tile-second-row">
                         <span style="color: #888">
-                          <strong><[exploration.category]></strong>
+                          <strong translate>I18N_GALLERY_CATEGORIES_<[exploration.category.replace(' ', '_') | uppercase]></strong>
                           <span style="font-weight: bold;">&middot;</span>
-                          Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                          <span translate>I18N_GALLERY_LAST_UPDATED</span>
+                          <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                         </span>
                         <span ng-if="exploration.status === 'publicized'">
                           <span style="font-weight: bold;">&middot;</span>
-                          <span style="color: #888">Featured</span>
+                          <span style="color: #888" translate>I18N_GALLERY_EXPLORATION_FEATURED</span>
                         </span>
                         <span ng-if="areRatingsShown(exploration.ratings)">
                           <span style="font-weight: bold;">&middot;</span>

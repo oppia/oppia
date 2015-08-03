@@ -196,6 +196,7 @@ textarea {
   padding: 5px;
   position: fixed;
   right: 0;
+  z-index: 10;
 }
 
 /*
@@ -2007,10 +2008,8 @@ div#ng-curtain {
 
 .oppia-footer {
   background-color: white;
-  padding: 20px;
-  padding-left: 25px;
-  padding-right: 25px;
-  z-index: 1;
-  position: relative;
   font-size: 0.9em;
+  padding: 20px 25px;
+  position: relative;
+  z-index: 1;
 }

@@ -23,23 +23,24 @@ oppia.constant('SUPPORTED_LANGUAGES', {
   'es': 'Español'
 });
 
-oppia.controller('i18n', [
-  '$scope', '$translate', 'SUPPORTED_LANGUAGES', function($scope, $translate,
-    SUPPORTED_LANGUAGES) {
-    $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
-    // Changes the language of the translations.
-    $scope.changeLanguage = function (langCode) {
-      $translate.use(langCode);
-    };
+oppia.controller('I18nFooter', [
+    '$scope', '$translate', 'SUPPORTED_LANGUAGES',
+    function($scope, $translate, SUPPORTED_LANGUAGES) {
+  $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+  // Changes the language of the translations.
+  $scope.changeLanguage = function (langCode) {
+    $translate.use(langCode);
+  };
 }]);
 
-oppia.config(['$translateProvider', '$translatePartialLoaderProvider',
-  function ($translateProvider, $translatePartialLoaderProvider) {
-    $translateProvider.useLoader('$translatePartialLoader', {
-      urlTemplate: '/i18n/{part}/{lang}.json'
-    });
-    $translatePartialLoaderProvider.addPart('sidenav');
-    $translatePartialLoaderProvider.addPart('topnav');
-    $translateProvider.preferredLanguage('en');
-    $translateProvider.fallbackLanguage('en');
+oppia.config([
+    '$translateProvider', '$translatePartialLoaderProvider',
+    function($translateProvider, $translatePartialLoaderProvider) {
+  $translateProvider.useLoader('$translatePartialLoader', {
+    urlTemplate: '/i18n/{part}/{lang}.json'
+  });
+  $translatePartialLoaderProvider.addPart('sidenav');
+  $translatePartialLoaderProvider.addPart('topnav');
+  $translateProvider.preferredLanguage('en');
+  $translateProvider.fallbackLanguage('en');
 }]);
