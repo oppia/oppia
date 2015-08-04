@@ -677,10 +677,10 @@ oppia.factory('explorationParamChangesService', [
 oppia.factory('explorationStatesService', [
     '$log', '$modal', '$filter', '$location', '$rootScope', 'explorationInitStateNameService',
     'warningsData', 'changeListService', 'editorContextService', 'validatorsService',
-    'newStateTemplateService',
+    'newStateTemplateService', 'explorationGadgetsService',
     function($log, $modal, $filter, $location, $rootScope, explorationInitStateNameService,
              warningsData, changeListService, editorContextService, validatorsService,
-             newStateTemplateService) {
+             newStateTemplateService, explorationGadgetsService) {
   var _states = null;
   return {
     init: function(value) {
@@ -748,28 +748,31 @@ oppia.factory('explorationStatesService', [
         controller: [
           '$scope', '$modalInstance', 'explorationGadgetsService', 'deleteStateName',
           function($scope, $modalInstance, explorationGadgetsService, deleteStateName) {
-            $scope.deleteStateName = deleteStateName;
-            $scope.alertText = 'Are you really sure you want to delete the card "' +
-            deleteStateName + '"?';
-            // Get all the gadget that are only visible in this state.
-            // If a gadget is visibile in multiple state, gadgetEditor will
-            // update when 'stateDeleted' event is broadcasted.
-            var uniqueGadgets = (
-              explorationGadgetsService.getGadgetsUniqueToState(deleteStateName)
-            );
-            if (uniqueGadgets.length) {
-              // Update message to show that the gadgets will be deleted too.
-              $scope.alertText = 'Deleting this will also delete gadget' +
-                (uniqueGadgets.length > 1 ? 's' : '') + ' "' +
-                uniqueGadgets.join(", ") + '". ' + $scope.alertText;
+            $scope.deleteStateWarningText = (
+              'Are you sure you want to delete the card "' +
+              deleteStateName + '"?');
+
+            // Get all the gadgets that are only visible in this state.
+            var gadgetNamesUniqueToThisState = (
+              explorationGadgetsService.getGadgetNamesUniqueToState(
+                deleteStateName));
+            if (gadgetNamesUniqueToThisState.length) {
+              // Update message to show that the gadgets unique to this state
+              // will be deleted too.
+              $scope.deleteStateWarningText = $scope.deleteStateWarningText +
+                ' This will also delete the following gadget' +
+                (gadgetNamesUniqueToThisState.length > 1 ? 's: ' : ': ') +
+                gadgetNamesUniqueToThisState.join(", ") + '.';
             }
 
             $scope.reallyDelete = function() {
               $modalInstance.close(deleteStateName);
               // Delete the gadgets without additional dialog when confirmed.
-              for (var i = 0, len = uniqueGadgets.length; i < len; i++) {
-                // Will add cmd to changelist service.
-                explorationGadgetsService.deleteGadget(uniqueGadgets[i], true);
+              for (var i = 0; i < gadgetNamesUniqueToThisState.length; i++) {
+                // explorationGadgetsService will update the data and add
+                // additional 'delete gadget' cmds to changelist service.
+                explorationGadgetsService.deleteGadget(
+                  gadgetNamesUniqueToThisState[i], false);
               }
             };
 
@@ -807,9 +810,8 @@ oppia.factory('explorationStatesService', [
         // This ensures that if the deletion changes rules in the current
         // state, they get updated in the view.
         $rootScope.$broadcast('refreshStateEditor');
-        // This notifies gadgetEditor to remove this state name from gadget's
-        // visibilty settings.
-        $rootScope.$broadcast('stateDeleted', deleteStateName);
+        // This state name is removed from gadget's visibilty settings.
+        explorationGadgetsService.handleStateDeletion(deleteStateName);
       });
     },
     renameState: function(oldStateName, newStateName) {
@@ -854,12 +856,8 @@ oppia.factory('explorationStatesService', [
         explorationInitStateNameService.saveDisplayedValue(newStateName);
       }
       $rootScope.$broadcast('refreshGraph');
-        // This notifies gadgetEditor to update this state name in gadget's
-        // visibilty settings to the new name.
-      $rootScope.$broadcast('stateRenamed', {
-        'oldStateName': oldStateName,
-        'newStateName': newStateName
-      });
+      // The state name is updated in gadget's visibilty settings to the new name.
+      explorationGadgetsService.handleStateRenaming(oldStateName, newStateName);
     }
   };
 }]);
@@ -1120,18 +1118,61 @@ oppia.factory('explorationGadgetsService', [
     },
     /**
      * Function that returns list of gadget names only visible in the state name
-     * provided. Gadget visible in multiple states would not be included.
+     * provided. Gadgets visible in multiple states would not be included.
      */
-    getGadgetsUniqueToState: function(stateName) {
+    getGadgetNamesUniqueToState: function(stateName) {
       var gadgetNameList = [];
       for (var gadgetName in _gadgets) {
         var gadgetStateVisibilityList = _gadgets[gadgetName].visible_in_states;
-        var stateNameIndex = gadgetStateVisibilityList.indexOf(stateName);
-        if (gadgetStateVisibilityList.length == 1 && stateNameIndex == 0) {
+        if (gadgetStateVisibilityList.length == 1 &&
+            gadgetStateVisibilityList[0] === stateName) {
           gadgetNameList.push(gadgetName);
         }
       }
       return gadgetNameList;
+    },
+    /**
+     * Function that updates the old state name to the new state name in
+     * gadget's visibility settings.
+     */
+    handleStateRenaming: function(oldStateName, newStateName) {
+      for (var gadgetName in _gadgets) {
+        var gadgetStateVisibilityList = angular.copy(
+          _gadgets[gadgetName].visible_in_states);
+        var stateNameIndex = gadgetStateVisibilityList.indexOf(oldStateName);
+        if (stateNameIndex > -1) {
+          gadgetStateVisibilityList[stateNameIndex] = newStateName;
+          changeListService.editGadgetProperty(
+            gadgetName,
+            'gadget_visibility',
+            gadgetStateVisibilityList,
+            _gadgets[gadgetName].visible_in_states
+          );
+          _gadgets[gadgetName].visible_in_states = gadgetStateVisibilityList;
+          $rootScope.$broadcast('gadgetsChangedOrInitialized');
+        }
+      }
+    },
+    /**
+     * Function that deletes the state name in gadget's visibility settings.
+     */
+    handleStateDeletion: function(stateName) {
+      for (var gadgetName in _gadgets) {
+        var gadgetStateVisibilityList = angular.copy(
+          _gadgets[gadgetName].visible_in_states);
+        var stateNameIndex = gadgetStateVisibilityList.indexOf(stateName);
+        if (stateNameIndex > -1) {
+          gadgetStateVisibilityList.splice(stateNameIndex, 1);
+          changeListService.editGadgetProperty(
+            gadgetName,
+            'gadget_visibility',
+            gadgetStateVisibilityList,
+            _gadgets[gadgetName].visible_in_states
+          );
+          _gadgets[gadgetName].visible_in_states = gadgetStateVisibilityList;
+          $rootScope.$broadcast('gadgetsChangedOrInitialized');
+        }
+      }
     },
     /**
      * Updates a gadget's visibility and/or customization args using
@@ -1198,7 +1239,7 @@ oppia.factory('explorationGadgetsService', [
       }
 
       if(_gadgets.hasOwnProperty(gadgetData.gadget_name)){
-        warningsData.addWarning('Gadget with this name already exists.');
+        warningsData.addWarning('A gadget with this name already exists.');
         return;
       }
       _gadgets[gadgetData.gadget_name] = gadgetData;
@@ -1209,13 +1250,15 @@ oppia.factory('explorationGadgetsService', [
     /**
      * Function that opens a modal to confirm gadget delete.
      * @param{string} deleteGadgetName The name of the gadget to be deleted.
-     * @param{bool} noDialog To disable the confirmation dialog, pass true.
-     *   Defaults to false.
+     * @param{bool} showConfirmationDialog To disable the confirmation dialog,
+     *  pass false, true otherwise. Defaults to true.
      */
-    deleteGadget: function(deleteGadgetName, noDialog) {
+    deleteGadget: function(deleteGadgetName, showConfirmationDialog) {
       warningsData.clear();
 
-      var _deleteGadget = function (deleteGadgetName) {
+      var showConfirmationDialog = showConfirmationDialog || true;
+
+      var _actuallyDeleteGadget = function(deleteGadgetName) {
         // Update _gadgets
         delete _gadgets[deleteGadgetName];
         // Update _panels
@@ -1228,7 +1271,6 @@ oppia.factory('explorationGadgetsService', [
         changeListService.deleteGadget(deleteGadgetName);
       };
 
-      var noDialog = noDialog || false;
       if (!_gadgets.hasOwnProperty(deleteGadgetName)) {
         // This warning can't be triggered in current UI.
         // Keeping as defense-in-depth for future UI changes.
@@ -1237,10 +1279,12 @@ oppia.factory('explorationGadgetsService', [
         );
         changeListService.deleteGadget(deleteGadgetName);
       }
-      if (noDialog) {
-        _deleteGadget(deleteGadgetName);
+
+      if (!showConfirmationDialog) {
+        _actuallyDeleteGadget(deleteGadgetName);
         return;
       }
+
       $modal.open({
         templateUrl: 'modals/deleteGadget',
         backdrop: true,
@@ -1252,6 +1296,7 @@ oppia.factory('explorationGadgetsService', [
         controller: [
           '$scope', '$modalInstance', 'deleteGadgetName',
           function($scope, $modalInstance, deleteGadgetName) {
+
             $scope.deleteGadgetName = deleteGadgetName;
 
             $scope.reallyDelete = function() {
@@ -1265,7 +1310,7 @@ oppia.factory('explorationGadgetsService', [
           }
         ]
       }).result.then(function(deleteGadgetName) {
-        _deleteGadget(deleteGadgetName);
+        _actuallyDeleteGadget(deleteGadgetName);
       });
     },
     renameGadget: function(oldGadgetName, newGadgetName) {
