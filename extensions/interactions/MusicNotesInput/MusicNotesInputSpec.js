@@ -26,6 +26,8 @@ describe('MusicNotesInput interaction', function() {
 
     beforeEach(module('oppia'));
     beforeEach(module('directiveTemplates'));
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
+
     beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
@@ -180,7 +182,7 @@ describe('Music phrase player service', function() {
 
   describe('music phrase player service', function() {
     var mpps = null;
-
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
     beforeEach(inject(function($injector, $window) {
       mpps = $injector.get('musicPhrasePlayerService');
       // This is here so that, if the test environment is modified

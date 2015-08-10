@@ -19,8 +19,16 @@
  */
 
 oppia.controller('Signup', [
-    '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService', 'focusService',
-    function($scope, $http, $rootScope, $modal, warningsData, urlService, focusService) {
+    '$scope', '$http', '$rootScope', '$modal', '$translate',
+    '$translatePartialLoader', 'warningsData', 'urlService',
+    'focusService',
+    function($scope, $http, $rootScope, $modal, $translate,
+             $translatePartialLoader, warningsData, urlService,
+             focusService) {
+
+  $translatePartialLoader.addPart('sign_up');
+  $translate.refresh();
+
   var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
@@ -67,7 +75,7 @@ oppia.controller('Signup', [
         username: $scope.username
       }).success(function(data) {
         if (data.username_is_taken) {
-          $scope.warningText = 'Sorry, this username is already taken.'
+          $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN'
         }
       });
     }
@@ -81,17 +89,17 @@ oppia.controller('Signup', [
     var oppia = /oppia/i;
 
     if (!username) {
-      $scope.warningText = 'Please choose a username.';
+      $scope.warningText = 'I18N_SIGNUP_ERROR_NO_USERNAME';
     } else if (username.indexOf(' ') !== -1) {
-      $scope.warningText = 'Please ensure that your username has no spaces.';
+      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
     } else if (username.length > 50) {
-      $scope.warningText = 'A username can have at most 50 characters.';
+      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
     } else if (!alphanumeric.test(username)) {
-      $scope.warningText = 'Usernames can only have alphanumeric characters.';
+      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
     } else if (admin.test(username)) {
-      $scope.warningText = 'User names with \'admin\' are reserved.';
+      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
     } else if (oppia.test(username)) {
-      $scope.warningText = 'This user name is not available.';
+      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
     } else {
       $scope.warningText = '';
     }
@@ -103,9 +111,7 @@ oppia.controller('Signup', [
 
   $scope.submitPrerequisitesForm = function(agreedToTerms, username, canReceiveEmailUpdates) {
     if (!agreedToTerms) {
-      warningsData.addWarning(
-        'In order to edit explorations on this site, you will need to ' +
-        'agree to the site terms.');
+      warningsData.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
       return;
     }
 

@@ -191,6 +191,7 @@ describe('Compare versions service', function() {
         $provide.value('explorationData', mockExplorationData);
       });
     });
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
     beforeEach(inject(function($injector) {
       cvs = $injector.get('compareVersionsService');

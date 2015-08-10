@@ -40,6 +40,8 @@ describe('MyExplorations controller', function() {
       num_total_threads: 3
     }];
 
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
+
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/myexplorationshandler/data').respond({

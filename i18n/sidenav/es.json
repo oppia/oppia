@@ -1,3 +1,8 @@
 {
-  "I18N_SIDEBAR_HOME_LINK": "Página principal"
+  "I18N_SIDEBAR_HOME_LINK": "Página principal",
+  "I18N_SIDEBAR_HOME_ABOUT": "Acerca de",
+  "I18N_SIDEBAR_PARTICIPATION_PLAYBOOK": "Guía de Participación",
+  "I18N_SIDEBAR_FORUM": "Foro",
+  "I18N_SIDEBAR_FOLLOW_US": "Síguenos",
+  "I18N_SIDEBAR_ADDITIONAL_LINK_SITE_FEEDBACK": "Comentarios del Sitio"
 }

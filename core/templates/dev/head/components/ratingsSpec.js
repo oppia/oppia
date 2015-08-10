@@ -24,6 +24,7 @@ describe('Ratings from value directive', function() {
 
   beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
+  beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_, _$templateCache_) {
     $httpBackend = _$httpBackend_;
 
@@ -67,6 +68,7 @@ describe('Ratings from frequencies directive', function() {
 
   beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
+  beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_, _$templateCache_) {
     $httpBackend = _$httpBackend_;
 

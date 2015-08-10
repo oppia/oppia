@@ -26,6 +26,7 @@ describe('Signup controller', function() {
     beforeEach(function() {
       module('oppia');
     });
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
@@ -57,8 +58,7 @@ describe('Signup controller', function() {
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'In order to edit explorations on this site, you will need to agree ' +
-        'to the site terms.');
+        'I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
     });
 
     it('should get data correctly from the server', function() {
@@ -76,35 +76,34 @@ describe('Signup controller', function() {
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'In order to edit explorations on this site, you will need to ' +
-        'agree to the site terms.');
+        'I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
     });
 
     it('should show warning if no username provided', function($http) {
       scope.updateWarningText('');
-      expect(scope.warningText).toEqual('Please choose a username.');
+      expect(scope.warningText).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
 
       scope.submitPrerequisitesForm(false);
-      expect(scope.warningText).toEqual('Please choose a username.');
+      expect(scope.warningText).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
     });
 
     it('should show warning if username is too long', function($http) {
       scope.updateWarningText(
         'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
       expect(scope.warningText).toEqual(
-        'A username can have at most 50 characters.');
+        'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS');
     });
 
     it('should show warning if username has non-alphanumeric characters', function($http) {
       scope.updateWarningText('a-a');
       expect(scope.warningText).toEqual(
-        'Usernames can only have alphanumeric characters.');
+        'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
     });
 
     it('should show warning if username has \'admin\' in it', function($http) {
       scope.updateWarningText('administrator');
       expect(scope.warningText).toEqual(
-        'User names with \'admin\' are reserved.');
+        'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
     });
   });
 });

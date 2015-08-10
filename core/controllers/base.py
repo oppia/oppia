@@ -86,7 +86,7 @@ SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
     },
     'Additional links to show in the sidebar menu.',
     default_value=[{
-        'name': 'Site Feedback',
+        'name': 'I18N_SIDEBAR_ADDITIONAL_LINK_SITE_FEEDBACK',  # Site Feedback
         'link': 'http://site/feedback/url',
         'icon_filename': 'comment.png',
     }])
