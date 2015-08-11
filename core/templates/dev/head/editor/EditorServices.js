@@ -1283,6 +1283,7 @@ oppia.factory('explorationGadgetsService', [
         warningsData.addWarning(
           'No gadget with name ' + deleteGadgetName + ' exists.'
         );
+        return;
       }
 
       if (!showConfirmationDialog) {
