@@ -480,28 +480,266 @@ describe('Exploration rights service', function() {
 describe('New exploration gadgets service', function() {
   beforeEach(module('oppia'));
 
-  describe('New exploration gadgets service', function() {
+  describe('exploration gadgets service', function() {
     var egs = null;
     var mockWarningsData;
+    var GADGET_SPECS = {
+      "ScoreBar": {
+        "type": "ScoreBar",
+        "width_px": 250,
+        "customization_arg_specs": [{
+          "name": "title",
+          "description": "Optional title for the score bar (e.g. \"Score\")",
+          "schema": {
+            "type": "unicode"
+          },
+          "default_value": "Score"
+        }, {
+          "name": "maxValue",
+          "description": "Maximum value (bar fills as a % of this value)",
+          "schema": {
+            "type": "int"
+          },
+          "default_value": 100
+        }, {
+          "name": "paramName",
+          "description": "The parameter name this score bar follows.",
+          "schema": {
+            "type": "unicode"
+          },
+          "default_value": ""
+        }],
+        "height_px": 100,
+        "description": "A visual score bar that can represent progress or success.",
+        "name": "ScoreBar"
+      },
+      "AdviceBar": {
+        "type": "AdviceBar",
+        "width_px": 100,
+        "customization_arg_specs": [{
+          "name": "title",
+          "description": "Optional title for the advice bar (e.g. \"Tips\")",
+          "schema": {
+            "type": "unicode"
+          },
+          "default_value": "",
+        }, {
+          "name": "adviceObjects",
+          "description": "Title and content for each tip.",
+          "schema": {
+            "type": "list",
+            "validators": [ {
+                    "id": "has_length_at_least",
+                    "min_value": 1
+                }, {
+                    "id": "has_length_at_most",
+                    "max_value": 3
+                }
+            ],
+            "items": {
+              "properties": [{
+                "name": "adviceTitle",
+                "description": "Tip title (visible on advice bar)",
+                "schema": {
+                  "type": "unicode",
+                  "validators": [{
+                    "id": "is_nonempty"
+                  }]
+                },
+              }, {
+                "name": "adviceHtml",
+                "description": "Advice content (visible upon click)",
+                "schema": {
+                  "type": "html"
+                },
+              }],
+              "type": "dict"
+            }
+          },
+          "default_value": [{
+            "adviceTitle": "Tip title",
+            "adviceHtml": ""
+          }],
+        }],
+        "height_px": 300,
+        "description": "Allows learners to receive advice from predefined tips.",
+        "name": "AdviceBar"
+      }
+    };
+    var skinCustomizationsData = {
+      "panels_contents": {
+        "left": [{
+          "gadget_name": "AdviceBar1",
+          "visible_in_states": [
+            "Example1",
+            "Example2"
+          ],
+          "customization_args": {
+            "title": {
+              "value": "TIP1"
+            },
+            "adviceObjects": {
+              "value": [{
+                "adviceTitle": "title1",
+                "adviceHtml": "content1"
+              }]
+            }
+          },
+          "gadget_type": "AdviceBar"
+        }],
+        "bottom": [],
+        "right": [{
+          "gadget_name": "AdviceBar2",
+          "visible_in_states": [
+            "Example2"
+          ],
+          "customization_args": {
+            "title": {
+              "value": "TIP2"
+            },
+            "adviceObjects": {
+              "value": [{
+                "adviceTitle": "title2",
+                "adviceHtml": "content2"
+              }]
+            }
+          },
+          "gadget_type": "AdviceBar"
+        }]
+      }
+    };
+    var gadgetData = {
+      gadget_type: 'AdviceBar',
+      gadget_name: 'NewAdviceBar',
+      customization_args: {
+        "title": {
+          "value": "TIP3"
+        },
+        "adviceObjects": {
+          "value": [{
+            "adviceTitle": "title3",
+            "adviceHtml": "content3"
+          }]
+        }
+      },
+      visible_in_states: ['state1']
+    };
 
     beforeEach(function() {
       mockWarningsData = {
         addWarning: function(warning) {}
       };
       module(function($provide) {
-        $provide.value('warningsData', mockWarningsData)
+        $provide.value('warningsData', mockWarningsData);
+        $provide.constant('GADGET_SPECS', GADGET_SPECS);
       });
       spyOn(mockWarningsData, 'addWarning');
     });
 
     beforeEach(inject(function($injector) {
       egs = $injector.get('explorationGadgetsService');
+      esid = $injector.get('explorationSkinIdService');
+      esid.savedMemento = 'conversation_v1';
+      GLOBALS.SKIN_SPECS = {
+        "conversation_v1": {
+          "bottom": {
+            "stackable_axis": "horizontal",
+            "pixels_between_gadgets": 80,
+            "max_gadgets": 1,
+            "width": 350,
+            "height": 100
+          },
+          "left": {
+            "stackable_axis": "vertical",
+            "pixels_between_gadgets": 50,
+            "max_gadgets": 1,
+            "width": 100,
+            "height": 350
+          },
+          "right": {
+            "stackable_axis": "vertical",
+            "pixels_between_gadgets": 50,
+            "max_gadgets": 1,
+            "width": 160,
+            "height": 350
+          }
+        }
+      };
     }));
+
+    it('Update gadgets data when state is renamed', function() {
+      egs.init(skinCustomizationsData);
+      egs.handleStateDeletion('Example1');
+
+      expect(egs.getGadgets()['AdviceBar1'].visible_in_states).toEqual(
+        ['Example2']
+      );
+    });
+
+    it('Update gadgets data when state is deleted', function() {
+      egs.init(skinCustomizationsData);
+      egs.handleStateRenaming('Example2', 'newStateName');
+
+      expect(egs.getGadgets()['AdviceBar2'].visible_in_states).toEqual(
+        ['newStateName']
+      );
+    });
+
     it('should detect invalid data passed for initialization', function() {
       egs.init({'wrongObjectKey': 'value'});
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Gadget Initialization failed. Panel contents were not provided');
     });
+
+    it('init on valid data', function() {
+      egs.init(skinCustomizationsData);
+      expect(egs.getPanels()).toEqual({
+        "left": ["AdviceBar1"],
+        "bottom": [],
+        "right": ["AdviceBar2"]
+      });
+    });
+
+    it('add a new gadget with valid data', function() {
+      egs.init(skinCustomizationsData);
+      egs.addGadget(gadgetData, 'right');
+      expect(egs.getPanels()).toEqual({
+        "left": ["AdviceBar1"],
+        "bottom": [],
+        "right": ["AdviceBar2", "NewAdviceBar"]
+      });
+    });
+
+    it('should detect non existent panel when adding gadget', function() {
+      egs.init(skinCustomizationsData);
+      egs.addGadget(gadgetData, 'unknown_panel');
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Attempted to add to a non-existent panel: unknown_panel');
+    });
+
+    it('should detect same gadget name before adding gadget', function() {
+      egs.init(skinCustomizationsData);
+      gadgetData.gadget_name = 'AdviceBar1';
+      egs.addGadget(gadgetData, 'right');
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'A gadget with this name already exists.');
+    });
+
+    it('should detect unknown gadget name before updating gadget', function() {
+      egs.init(skinCustomizationsData);
+      egs.updateGadget('unknownGadgetName', {}, []);
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Attempted to update a non-existent gadget: unknownGadgetName');
+    });
+
+    it('should detect if gadget is not visible in any state.', function() {
+      egs.init(skinCustomizationsData);
+      egs.updateGadget('AdviceBar1', gadgetData['AdviceBar1'], []);
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'This gadget is not visible in any states.');
+    });
+
+
   });
 });
 

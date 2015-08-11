@@ -836,7 +836,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration_with_gadgets.skin_instance.panel_contents_dict[
             'right'].append(another_gadget)
         self.assertEqual(
-            exploration_with_gadgets.get_gadget_types(), 
+            exploration_with_gadgets.get_gadget_types(),
             ['AnotherGadget', 'TestGadget']
         )
 
@@ -1992,48 +1992,3 @@ class GadgetVisibilityInStatesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(affected_gadget_instances), 1)
         self.assertEqual(affected_gadget_instances[0].name, 'ATestGadget')
-
-    def test_gadget_visibility_on_state_rename(self):
-        """Test that gadget visibility is in sync when states are renamed."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-
-        gadget_instance = (
-            exploration._get_gadget_instances_visible_in_state(
-                'Second state')[0])
-
-        self.assertEqual(
-            gadget_instance.visible_in_states,
-            ['New state', 'Second state'])
-
-        exploration.rename_state('Second state', 'new second state')
-
-        self.assertEqual(
-            gadget_instance.visible_in_states,
-            ['New state', 'new second state'])
-
-    def test_gadget_visibility_on_state_deletion(self):
-        """Test that gadget visibility is in sync when states are deleted."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-
-        gadget_instance = (
-            exploration._get_gadget_instances_visible_in_state(
-                'Second state')[0])
-
-        self.assertEqual(
-            gadget_instance.visible_in_states,
-            ['New state', 'Second state'])
-
-        exploration.delete_state('New state')
-
-        self.assertEqual(
-            gadget_instance.visible_in_states,
-            ['Second state'])
-
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                "Deleting 'Second state' state leaves 'ATestGadget' gadget "
-                'with no visible states. This is not currently supported and '
-                'should be handled with editor guidance on the front-end.'):
-            exploration.delete_state('Second state')

@@ -762,7 +762,7 @@ oppia.factory('explorationStatesService', [
               $scope.deleteStateWarningText = $scope.deleteStateWarningText +
                 ' This will also delete the following gadget' +
                 (gadgetNamesUniqueToThisState.length > 1 ? 's: ' : ': ') +
-                gadgetNamesUniqueToThisState.join(", ") + '.';
+                gadgetNamesUniqueToThisState.join(', ') + '.';
             }
 
             $scope.reallyDelete = function() {
@@ -770,7 +770,7 @@ oppia.factory('explorationStatesService', [
               // Delete the gadgets without additional dialog when confirmed.
               for (var i = 0; i < gadgetNamesUniqueToThisState.length; i++) {
                 // explorationGadgetsService will update the data and add
-                // additional 'delete gadget' cmds to changelist service.
+                // additional 'delete gadget' cmds to changeListService.
                 explorationGadgetsService.deleteGadget(
                   gadgetNamesUniqueToThisState[i], false);
               }
@@ -1251,12 +1251,18 @@ oppia.factory('explorationGadgetsService', [
      * Function that opens a modal to confirm gadget delete.
      * @param{string} deleteGadgetName The name of the gadget to be deleted.
      * @param{bool} showConfirmationDialog To disable the confirmation dialog,
-     *  pass false, true otherwise. Defaults to true.
+     *  pass false, true otherwise.
      */
     deleteGadget: function(deleteGadgetName, showConfirmationDialog) {
       warningsData.clear();
 
-      var showConfirmationDialog = showConfirmationDialog || true;
+      if (showConfirmationDialog === null ||
+          showConfirmationDialog === undefined) {
+        warningsData.addWarning(
+          'Missing param: No information was passed to show or hide the dialog.'
+        );
+        return;
+      }
 
       var _actuallyDeleteGadget = function(deleteGadgetName) {
         // Update _gadgets
@@ -1277,7 +1283,6 @@ oppia.factory('explorationGadgetsService', [
         warningsData.addWarning(
           'No gadget with name ' + deleteGadgetName + ' exists.'
         );
-        changeListService.deleteGadget(deleteGadgetName);
       }
 
       if (!showConfirmationDialog) {
