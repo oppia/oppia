@@ -1264,6 +1264,15 @@ oppia.factory('explorationGadgetsService', [
         return;
       }
 
+      if (!_gadgets.hasOwnProperty(deleteGadgetName)) {
+        // This warning can't be triggered in current UI.
+        // Keeping as defense-in-depth for future UI changes.
+        warningsData.addWarning(
+          'No gadget with name ' + deleteGadgetName + ' exists.'
+        );
+        return;
+      }
+
       var _actuallyDeleteGadget = function(deleteGadgetName) {
         // Update _gadgets
         delete _gadgets[deleteGadgetName];
@@ -1276,15 +1285,6 @@ oppia.factory('explorationGadgetsService', [
         // Update changeListService
         changeListService.deleteGadget(deleteGadgetName);
       };
-
-      if (!_gadgets.hasOwnProperty(deleteGadgetName)) {
-        // This warning can't be triggered in current UI.
-        // Keeping as defense-in-depth for future UI changes.
-        warningsData.addWarning(
-          'No gadget with name ' + deleteGadgetName + ' exists.'
-        );
-        return;
-      }
 
       if (!showConfirmationDialog) {
         _actuallyDeleteGadget(deleteGadgetName);
