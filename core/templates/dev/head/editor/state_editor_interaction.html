@@ -75,8 +75,6 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed">Change Interaction</button>
-
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-save-interaction" ng-click="save()"
             ng-disabled="!stateInteractionIdService.displayed || form.schemaForm.$invalid">
