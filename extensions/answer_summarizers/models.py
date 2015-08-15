@@ -145,6 +145,7 @@ class Top5AnswerCounts(BaseCalculation):
             self.id,
             calculation_output)
 
+
 class FrequencyCommonlySubmittedElements(BaseCalculation):
     """Class for calculating commonly submitted elements of answers that
     are sets.
@@ -158,14 +159,20 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         This method is run from within the context of a MapReduce job.
         """
 
-        # get a list of sets
+        # Get a list of stringified sets
+        # e.g. [u"[u'abc', u'www']", u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [answer_dict['answer_value'] for answer_dict 
                           in state_answers.answers_list]
 
-        # convert to a list of all elements
-        list_of_all_elements = [item 
-                                 for myset in answer_values 
-                                 for item in myset]
+        # For each stringified set, replace '[' and ']' by empty string,
+        # and split at commas ', ' to convert string to set.
+        # TODO(msl): This will yield wrong results if answers contain ',',
+        # '[', or ']'. Consider saving sets instead of stringified sets.
+        list_of_all_elements = []
+        for setstring in answer_values:
+            elts_this_set = (
+                setstring.replace('[','').replace(']','').split(', '))
+            list_of_all_elements += elts_this_set
 
         elements_as_list_of_pairs = sorted(
             collections.Counter(list_of_all_elements).items(),
@@ -177,8 +184,10 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         calculation_output = []
         for item in elements_as_list_of_pairs:
+            # Save element with key 'answer' so it gets displayed correctly
+            # by FrequencyTable visualization.
             calculation_output.append({
-                'element': item[0],
+                'answer': item[0],
                 'frequency': item[1],
             })
         
