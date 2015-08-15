@@ -31,27 +31,27 @@ class SetInput(base.BaseInteraction):
     _customization_arg_specs = []
 
     _answer_visualization_specs = [{
-        # Table with answer counts.
-        # TODO(msl): add option 'title': 'All answers'
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count']
-        },
-        'calculation_id': 'AnswerCounts',
-    }, {
         # Table with answer counts for top N answers.
-        # TODO(msl): add option 'title': 'Top 5 answers'
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count']
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 5 answers'
         },
         'calculation_id': 'Top5AnswerCounts',
     }, {
         # Table with most commonly submitted elements of set.
-        # TODO(msl): add option 'title': 'Commonly submitted elements'
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Element', 'Count']
+            'column_headers': ['Element', 'Count'],
+            'title': 'Commonly submitted elements'
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
+    }, {
+        # Table with answer counts.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'All answers'
+        },
+        'calculation_id': 'AnswerCounts',
     }]

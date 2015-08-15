@@ -167,14 +167,16 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                                  for myset in answer_values 
                                  for item in myset]
 
-        # Get top 10 elements
-        top_10_elements_as_list_of_pairs = (
-            sorted(collections.Counter(list_of_all_elements).items(),
-                   key=lambda x: x[1],
-                   reverse=True)[:10])
-        
+        elements_as_list_of_pairs = sorted(
+            collections.Counter(list_of_all_elements).items(),
+            key=lambda x: x[1],
+            reverse=True)
+        # Keep only top 10 elements
+        if len(elements_as_list_of_pairs) > 10:
+            elements_as_list_of_pairs = elements_as_list_of_pairs[:10]
+
         calculation_output = []
-        for item in top_10_elements_as_list_of_pairs:
+        for item in elements_as_list_of_pairs:
             calculation_output.append({
                 'element': item[0],
                 'frequency': item[1],
