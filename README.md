@@ -1,5 +1,5 @@
 # Oppia
-Oppia is an online learning tool that enables anyone to easily create and share interactive activities. These activities, called 'explorations', simulate a one-on-one conversation with an intelligent tutor. You can try a hosted version at [Oppia.org](https://www.oppia.org), or read more at our [GitHub page](http://oppia.github.io/).
+Oppia is an online learning tool that enables anyone to easily create and share interactive activities. These activities, called 'explorations', simulate a one-on-one conversation with an intelligent tutor. You can try a hosted version at [Oppia.org](https://www.oppia.org), and read more at our [GitHub page](http://oppia.github.io/).
 
 ## Installation
 Please refer to https://code.google.com/p/oppia/wiki/GettingStarted for extensive installation instructions. Here is just a short summary for developers who would like to contribute:
@@ -56,26 +56,31 @@ Here are full instructions for how to make a code change:
 1. **Choose a descriptive name for your branch.** Branch names should be lowercase and hyphen-separated. They should also be nouns describing the change. So, 'fuzzy-rules' is fine, but not 'implement-fuzzy-rules'. In addition:
   * Branch names should not start with 'hotfix' or 'release'.
   * Branch names should only begin with 'experiment-' if they represent an experimental change that may not be merged into develop. For consistency, please use 'experiment-' and not 'experimental-'.
-2. **Starting from 'develop', create a new branch with this name.**
-  * Run:
-    ```
-        git fetch upstream
-        git checkout develop
-        git merge upstream/develop
-        git checkout -b your-branch-name
-    ```
+2. **Starting from 'develop', create a new branch with the name you picked.** To do this, run:
+
+  ```
+    git fetch upstream
+    git checkout develop
+    git merge upstream/develop
+    git checkout -b your-branch-name
+  ```
+
 3. **Make a commit to your feature branch.** Each commit should be self-contained, and should have a descriptive commit message that helps other developers understand why the changes were made.
   * Before making a commit, ensure that all tests still pass, by running:
+
     ```
-        bash scripts/test.sh
-        bash scripts/run_js_tests.sh
-        bash scripts/run_integration_tests.sh (if necessary)
+      bash scripts/test.sh
+      bash scripts/run_js_tests.sh
+      bash scripts/run_integration_tests.sh (if necessary)
     ```
+
   * To actually make the commit and push it to your fork on GitHub, run:
+
     ```
-        git commit -a -m "{{YOUR COMMIT MESSAGE HERE}}"
-        git push origin {{YOUR BRANCH NAME}}
+      git commit -a -m "{{YOUR COMMIT MESSAGE HERE}}"
+      git push origin {{YOUR BRANCH NAME}}
     ```
+
 4. **When your feature is ready to merge, create a pull request.** A pull request is like a regular GitHub issue, that has a series of commits attached to it.
   * Go to the GitHub page for your fork, and select your branch from the dropdown menu.
   * Click "pull request". Ensure that the 'base' repository is the main oppia repo and that the 'base' branch is 'develop'. Also ensure that the 'combine' fork and branch correspond to your fork and the branch you've been working on.
@@ -87,6 +92,7 @@ Here are full instructions for how to make a code change:
      * Make a new commit addressing the comments, and push it to the same branch.
      * In addition, reply to each of the reviewer's comments. If a change is requested, you can just reply "Done" once you've fixed it -- otherwise, explain why you think it should not be fixed. All comments should be resolved before an LGTM can be given.
   * If any merge conflicts arise, you'll need to resolve them. To resolve merge issues between 'new-branch-name' (in your fork) and 'develop' (in the main oppia repository), run:
+
   ```
     git checkout new-branch-name
     git fetch upstream
@@ -96,10 +102,13 @@ Here are full instructions for how to make a code change:
     git commit -a
     git push origin new-branch-name
   ```
+
   * At the end, the reviewer should merge the pull request.
 6. **Tidy up!** Delete the feature branch from your local clone and from the GitHub repository:
+
   ```
     git branch -D new-branch-name
     git push origin --delete new-branch-name
   ```
+
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
