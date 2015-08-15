@@ -18,6 +18,7 @@
 
 __author__ = 'Xinyu Wu'
 
+from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import user_services
@@ -255,23 +256,50 @@ class ExplorationRecommendationsUnitTests(RecommendationsServicesUnitTests):
     """Test recommendations services relating to exploration comparison."""
 
     def test_get_item_similarity(self):
-        with self.assertRaisesRegexp(
-                Exception, 'Invalid reference_exp_id fake_exp_id'):
-            recommendations_services.get_item_similarity(
-                'fake_exp_id', 'fake_exp_id_2')
+        exp_summaries = exp_services.get_all_exploration_summaries()
 
         self.assertEqual(recommendations_services.get_item_similarity(
-            'exp_id_1', 'exp_id_2'), 4.5)
+            exp_summaries['exp_id_1'].category,
+            exp_summaries['exp_id_1'].language_code,
+            exp_summaries['exp_id_1'].owner_ids,
+            exp_summaries['exp_id_2'].category,
+            exp_summaries['exp_id_2'].language_code,
+            exp_summaries['exp_id_2'].exploration_model_last_updated,
+            exp_summaries['exp_id_2'].owner_ids,
+            exp_summaries['exp_id_2'].status), 4.5)
         self.assertEqual(recommendations_services.get_item_similarity(
-            'exp_id_4', 'exp_id_4'), 9.0)
+            exp_summaries['exp_id_4'].category,
+            exp_summaries['exp_id_4'].language_code,
+            exp_summaries['exp_id_4'].owner_ids,
+            exp_summaries['exp_id_4'].category,
+            exp_summaries['exp_id_4'].language_code,
+            exp_summaries['exp_id_4'].exploration_model_last_updated,
+            exp_summaries['exp_id_4'].owner_ids,
+            exp_summaries['exp_id_4'].status), 9.0)
 
         rights_manager.publicize_exploration(self.ADMIN_ID, 'exp_id_4')
+        exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(recommendations_services.get_item_similarity(
-            'exp_id_4', 'exp_id_4'), 10.0)
+            exp_summaries['exp_id_4'].category,
+            exp_summaries['exp_id_4'].language_code,
+            exp_summaries['exp_id_4'].owner_ids,
+            exp_summaries['exp_id_4'].category,
+            exp_summaries['exp_id_4'].language_code,
+            exp_summaries['exp_id_4'].exploration_model_last_updated,
+            exp_summaries['exp_id_4'].owner_ids,
+            exp_summaries['exp_id_4'].status), 10.0)
 
         rights_manager.unpublish_exploration(self.ADMIN_ID, 'exp_id_2')
+        exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(recommendations_services.get_item_similarity(
-            'exp_id_1', 'exp_id_2'), 0.0)
+            exp_summaries['exp_id_1'].category,
+            exp_summaries['exp_id_1'].language_code,
+            exp_summaries['exp_id_1'].owner_ids,
+            exp_summaries['exp_id_2'].category,
+            exp_summaries['exp_id_2'].language_code,
+            exp_summaries['exp_id_2'].exploration_model_last_updated,
+            exp_summaries['exp_id_2'].owner_ids,
+            exp_summaries['exp_id_2'].status), 0.0)
 
     def test_get_and_set_exploration_recommendations(self):
         recommended_exp_ids = ['exp_id_2', 'exp_id_3']
