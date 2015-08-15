@@ -423,3 +423,10 @@ Small Device Styles
   }
 
 }
+
+pre.prettyprint {
+  padding: 0.5em;
+  overflow: auto;
+  font-family: Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+  font-size: 93%;
+}
