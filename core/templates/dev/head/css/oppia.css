@@ -431,6 +431,7 @@ textarea {
 .navbar-default .navbar-nav .open > a:hover,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+
   color: #05a69a;
 }
 
@@ -441,6 +442,9 @@ textarea {
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
   background: #fff;
   color: #05a69a;
+}
+.navbar-default .navbar-nav .open .dropdown-menu > li > a{
+  white-space: normal;
 }
 
 .navbar-default .navbar-nav > li.dropdown.open,
