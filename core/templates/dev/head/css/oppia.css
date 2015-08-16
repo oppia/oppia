@@ -499,10 +499,6 @@ textarea {
   color: #05a69a;
 }
 
-.navbar-default .navbar-nav .open .dropdown-menu > li > a {
-  white-space: normal;
-}
-
 .navbar-default .navbar-nav > li.dropdown.open,
 .navbar-default .navbar-nav > li.dropdown.open > a {
   background: #fff;
@@ -623,6 +619,15 @@ textarea {
 .oppia-navbar-button-container {
   border-radius: 0;
   margin-top: 10px;
+}
+
+
+/* In Bootstrap, .dropdown-menu > li > a whitespace is no-wrap.
+   we use this default one instead.
+*/
+
+.oppia-navbar-button-container >.dropdown-menu > li > a {
+  white-space: normal;
 }
 
 .btn.oppia-navbar-add-exploration-button {
