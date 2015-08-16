@@ -557,7 +557,12 @@ textarea {
   border-radius: 0;
   margin-top: 10px;
 }
-
+/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to allign ticks and 
+   dropdown options 
+*/
+.oppia-navbar-button-container > .dropdown-menu > li > a {
+  white-space: normal;
+}
 .btn.oppia-navbar-add-exploration-button {
   background-color: rgba(5, 190, 178, 0.9);
   color: rgba(255,255,255,0.9);
