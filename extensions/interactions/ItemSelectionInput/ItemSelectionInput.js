@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * Directive for the ItemSelectionInput interaction.
  *
@@ -20,6 +19,7 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
 oppia.directive('oppiaInteractiveItemSelectionInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
@@ -27,30 +27,56 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       scope: {},
       templateUrl: 'interaction/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.items = oppiaHtmlEscaper.escapedJsonToObj($attrs.itemsWithValue);
-        var allowableSelections = $attrs.selectionCountWithValue;
+        $scope.choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choicesWithValue);
+        var maxAllowableSelectionCount = $attrs.maxAllowableSelectionCountWithValue;
+        var minAllowableSelectionCount = $attrs.minAllowableSelectionCountWithValue;
         $scope.studentSelections = {};
 
-        for (var i = 0; i < $scope.items.length; i++) {
-          $scope.studentSelections[$scope.items[i]] = false;
+        if (maxAllowableSelectionCount == 1) {
+          $scope.isCheckbox = false;
+        } else {
+          $scope.isCheckbox = true;
         }
 
-        $scope.submitAnswer = function(answer) {
-          var answer = [];
-          var answerCount = 0;
-          for (item in $scope.studentSelections) {
-            if ($scope.studentSelections[item]) {
-              answer.push(item);
-              answerCount++;
 
-              if (answerCount > allowableSelections) {
-                alert("You have selected more items than allowed! \
-                      Please edit your selections");
-                return;
-              }
-            }
+        for (var i = 0; i < $scope.choices.length; i++) {
+          $scope.studentSelections[$scope.choices[i]] = false;
+        }
+
+        $scope.answers = [];
+        $scope.maxed = false; // Indicates if the count is over max.
+        $scope.min = false;  // Indicates if count is under min.
+
+        $scope.checkCount = function(selection) {
+          index = $scope.answers.indexOf(selection);
+          if (index !== -1) {
+            $scope.answers.splice(index, 1);
+          } else if (!$scope.maxed) {
+            $scope.answers.push(selection);
           }
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
+          var size = $scope.answers.length;
+          if (size >= maxAllowableSelectionCount) {
+            $scope.maxed = true;
+          } else {
+            $scope.maxed = false;
+          }
+          if (size >= minAllowableSelectionCount) {
+            $scope.min = true;
+          } else {
+            $scope.min = false;
+          }
+        };
+
+        $scope.submitAnswer = function(answer) {
+          var answers = [];
+
+          if (answer != null) {
+            answers.push(answer);
+          } else {
+            answers = $scope.answers;
+          }
+
+          $scope.$parent.$parent.submitAnswer(answers, 'submit');
         };
       }]
     };

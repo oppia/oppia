@@ -30,16 +30,22 @@ class Equals(base.SetOfHtmlStringRule):
 
 
 class Contains(base.SetOfHtmlStringRule):
-    description = 'contains {{x|Html}}'
+    description = 'contains at least one of {{x|SetOfHtmlString}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        return self.x in subject
+        for e in subject:
+            if e in self.x:
+                return True
+        return False
 
 
 class DoesNotContain(base.SetOfHtmlStringRule):
-    description = 'does not contain {{x|Html}}'
+    description = 'does not contain at least one of {{x|SetOfHtmlString}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        return self.x not in subject
+        for e in subject:
+            if e not in self.x:
+                return True
+        return False

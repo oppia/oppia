@@ -17,6 +17,15 @@
           </span>
         </span>
 
+        <span ng-if="item.type == 'checkbox'" style="color: black;">
+          <div ng-repeat="choice in ruleDescriptionChoices">
+            <label>
+              <input type="checkbox" class="form-control" ng-click="toggleSelection(choice.id)" ng-checked="rule.inputs[item.varName].indexOf(choice.id) !== -1" style="max-width: 300px;">
+              <span angular-html-bind="choice.id"></span>
+            </label>
+          </div>
+        </span>
+
         <span ng-if="item.type != 'select' && item.type != 'noneditable'">
           <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="rule.inputs[item.varName]" style="color: black;"></object-editor>
         </span>

@@ -153,6 +153,8 @@ oppia.directive('answerGroupEditor', [function() {
           return [getDefaultInputValue('Real'), getDefaultInputValue('Real')];
         case 'ListOfUnicodeString':
         case 'SetOfUnicodeString':
+        case 'SetOfHtmlString':
+          return false;
         case 'MusicPhrase':
           return [];
         case 'CheckedProof':

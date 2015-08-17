@@ -28,14 +28,23 @@ class ItemSelectionInput(base.BaseInteraction):
     answer_type = 'SetOfHtmlString'
 
     _customization_arg_specs = [{
-        'name': 'selection_count',
-        'description': 'Number of selections the student can make',
+        'name': 'max_allowable_selection_count',
+        'description': 'Maximum number of selections the student may make, '
+                       'please note that this is not the correct number of answers.',
         'schema': {
             'type': 'int'
         },
         'default_value': 1,
     }, {
-        'name': 'items',
+        'name': 'min_allowable_selection_count',
+        'description': 'Minimum number of selections the student may make, '
+                       'please note that this is not the correct number of answers.',
+        'schema': {
+            'type': 'int'
+        },
+        'default_value': 1,
+    }, {
+        'name': 'choices',
         'description': 'Items for selection',
         'schema': {
             'type': 'list',
@@ -49,5 +58,5 @@ class ItemSelectionInput(base.BaseInteraction):
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': ['Sample item selection answer'],
+        'default_value': ['Sample item answer'],
     }]

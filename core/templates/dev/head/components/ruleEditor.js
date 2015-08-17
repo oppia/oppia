@@ -153,15 +153,25 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             // This rule is for a multiple-choice or image-click interaction.
             // TODO(sll): Remove the need for this special case.
             if (_answerChoices.length > 0) {
-              $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
-                return {
-                  val: choice.label,
-                  id: choice.val
-                };
-              });
-              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
-              if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
-                $scope.rule.inputs[finalInputArray[i + 1]] = $scope.ruleDescriptionChoices[0].id;
+              if (finalInputArray[2] === 'SetOfHtmlString') {
+                $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+                  return {
+                    val: false,
+                    id: choice.label
+                  };
+                });
+                result.push({'type': 'checkbox', 'varName': finalInputArray[i+1]});
+              } else {
+                $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+                  return {
+                    val: choice.label,
+                    id: choice.val
+                  };
+                });
+                result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+                if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
+                  $scope.rule.inputs[finalInputArray[i + 1]] = $scope.ruleDescriptionChoices[0].id;
+                }
               }
             } else {
               $scope.ruleDescriptionChoices = [];
@@ -222,11 +232,27 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isWeighted': false,
               'isLabeled': false
             };
+          } else if (varType == 'SetOfHtmlString') {
+            $scope.rule.inputs[varName] = [];
           } else {
             $scope.rule.inputs[varName] = '';
           }
 
           tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+        }
+      };
+
+      // The following function is necessary to insert elements into the answer
+      // groups for the Item Selection Widget.
+      $scope.toggleSelection = function(choice) {
+        var tmpRuleDescription = _computeRuleDescriptionFragments();
+        var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+        var varName = tmpRuleDescription.match(PATTERN)[1];
+        var index = $scope.rule.inputs[varName].indexOf(choice);
+        if (index > -1) {
+          $scope.rule.inputs[varName].splice(index, 1);
+        } else {
+          $scope.rule.inputs[varName].push(choice);
         }
       };
 

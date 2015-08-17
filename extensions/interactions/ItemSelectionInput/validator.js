@@ -20,68 +20,92 @@
 oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
     '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
     function($filter, WARNING_TYPES, baseInteractionValidationService) {
-  // Returns a list of warnings.
-  return function(stateName, customizationArgs, ruleSpecs) {
+      // Returns a list of warnings.
+      return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
     var warningsList = [];
 
-    var numItems = customizationArgs.items.value.length;
+    baseInteractionValidationService.requireCustomizationArguments(
+      customizationArgs, ['choices']);
 
-    var areAnyItemsEmpty = false;
-    var areAnyItemsDuplicated = false;
-    var seenItems = [];
-    for (var i = 0; i < customizationArgs.items.value.length; i++) {
-      var item = customizationArgs.items.value[i];
-      if (item.trim().length === 0) {
-        areAnyItemsEmpty = true;
+    var areAnyChoicesEmpty = false;
+    var areAnyChoicesDuplicated = false;
+    var seenChoices = [];
+    var numChoices = customizationArgs.choices.value.length;
+    for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+      var choice = customizationArgs.choices.value[i];
+      if (choice.trim().length === 0) {
+        areAnyChoicesEmpty = true;
       }
-      if (seenItems.indexOf(item) !== -1) {
-        areAnyItemsDuplicated = true;
+      if (seenChoices.indexOf(choice) !== -1) {
+        areAnyChoicesDuplicated = true;
       }
-      seenItems.push(item);
+      seenChoices.push(choice);
     }
 
-    if (areAnyItemsEmpty) {
+    if (areAnyChoicesEmpty) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the items are nonempty.'
-      });
-    }
-    if (areAnyItemsDuplicated) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the items are unique.'
+        message: 'please ensure the choices are nonempty.'
       });
     }
 
-    var numRuleSpecs = ruleSpecs.length;
-    var uniqueRuleItems = [];
-    for (var i = 0; i < numRuleSpecs - 1; i++) {
-      if (ruleSpecs[i].definition.name === 'Equals' &&
-          uniqueRuleItems.indexOf(ruleSpecs[i].definition.inputs.x) === -1) {
-        uniqueRuleItems.push(ruleSpecs[i].definition.inputs.x);
-      }
+    if (areAnyChoicesDuplicated) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure the choices are unique.'
+      });
+    }
 
-      // TODO: Complete after implemention of Rules
-      // if (ruleSpecs[i].definition.inputs.x >= numItems) {
-      //   warningsList.push({
-      //     type: WARNING_TYPES.CRITICAL,
-      //     message: 'please ensure that each rule corresponds to a valid item.'
-      //   });
-      // }
+    var selectedEqualsChoices = [];
+    for (var i = 0; i < answerGroups.length; i++) {
+      var ruleSpecs = answerGroups[i].rule_specs;
+      for (var j = 0; j < ruleSpecs.length; j++) {
+        if (ruleSpecs[j].inputs.x >= numChoices) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+              String(i + 1) + ' refers to a valid choice.'
+          });
+        }
+      }
+    }
+
+    var minAllowedCount = customizationArgs.min_allowable_selection_count.value;
+    var maxAllowedCount = customizationArgs.max_allowable_selection_count.value;
+
+    if (minAllowedCount > maxAllowedCount) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure that the max allowed count is greater than the min count.'
+      });
+    }
+
+    if (numChoices < maxAllowedCount) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure that you have the enough choices to reach the max count.'
+      });
+    }
+
+    if (numChoices < minAllowedCount) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure that you have the enough choices to reach the min count.'
+      });
     }
 
     warningsList = warningsList.concat(
-      baseInteractionValidationService.getNonDefaultRuleSpecsWarnings(
-        ruleSpecs, stateName));
+      baseInteractionValidationService.getAnswerGroupWarnings(
+        answerGroups, stateName));
 
-    // Only require a default rule if some items have not been taken care of by rules.
-    if (uniqueRuleItems.length < numItems) {
-      var lastRuleSpec = ruleSpecs[ruleSpecs.length - 1];
-      if ($filter('isRuleSpecConfusing')(lastRuleSpec, stateName)) {
+    // Only require a default rule if some choices have not been taken care of by rules.
+    if (selectedEqualsChoices.length < numChoices) {
+      if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please add a rule to cover what should happen in the general case.')
+            'please clarify the default outcome so it is less confusing to ' +
+            'the user.')
         });
       }
     }

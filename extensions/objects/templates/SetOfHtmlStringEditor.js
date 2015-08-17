@@ -21,7 +21,7 @@ oppia.directive('setOfHtmlStringEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'SetOfHtmlString';
       };
       $compile(element.contents())(scope);
     },
@@ -30,11 +30,14 @@ oppia.directive('setOfHtmlStringEditor', function($compile, warningsData) {
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function ($scope, $attrs) {
       $scope.SCHEMA = {
-        'type': 'bool',
+        type: 'list',
+        items: {
+          type: 'unicode'
+        }
       };
 
       if (!$scope.$parent.value) {
-        $scope.$parent.value = false;
+        $scope.$parent.value = [];
       }
     }
   };
