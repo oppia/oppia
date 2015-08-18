@@ -2,9 +2,10 @@
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities. These activities, called 'explorations', simulate a one-on-one conversation with an intelligent tutor. You can try a hosted version at [Oppia.org](https://www.oppia.org), and read more at our [GitHub page](http://oppia.github.io/).
 
 ## Installation
-Please refer to https://code.google.com/p/oppia/wiki/GettingStarted for extensive installation instructions. Here is just a short summary for developers who would like to contribute:
 
-1. First, we suggest making a new, empty folder called `opensource/` within your home folder (`mkdir opensource`). The Oppia installation process will add other folders to `opensource`; this is done in order to separate files and folders that should be pushed to production from the others.
+Please refer to the [wiki](https://github.com/oppia/oppia/wiki) for extensive installation instructions. This is a short summary for developers who would like to contribute:
+
+1. First, create a new, empty folder called `opensource/` within your home folder. (Note that the Oppia installation process will, later, add other folders to `opensource`.)
 
 2. Navigate to this folder (`cd opensource`), then fork and clone the Oppia repo to it by following the instructions on Github's [Fork a Repo page](https://help.github.com/articles/fork-a-repo/). This will create a new folder named `opensource/oppia`.
 
