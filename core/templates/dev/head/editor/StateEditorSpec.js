@@ -293,10 +293,6 @@ describe('State Editor controller', function() {
 
     });
 
-    // Test training answer group, training default. Test that trained answer
-    // group will move data to default and vice versa. Test add fuzzy rule.
-    // Test deleting fuzzy rule. Test that deleting a fuzzy rule does not
-    // happen if it is the last rule.
     it('should be able to train answer groups and the default response',
         function() {
       // Training the first answer of a group should add a new fuzzy rule.
