@@ -9,14 +9,14 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for ex
 
 2. Navigate to this folder (`cd opensource`), then fork and clone the Oppia repo to it by following the instructions on Github's [Fork a Repo page](https://help.github.com/articles/fork-a-repo/). This will create a new folder named `opensource/oppia`.
 
-3. Navigate to `opensource/oppia/`, then install the development version of Oppia by running
+3. To install the development version of Oppia, navigate to `opensource/oppia/` and run:
 
   ```
     git checkout develop
     bash scripts/start.sh
   ```
 
-4. To test the installation, stay in `oppia/`, and run
+4. To test the installation, run:
 
   ```
     bash scripts/test.sh
