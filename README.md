@@ -3,7 +3,7 @@ Oppia is an online learning tool that enables anyone to easily create and share 
 
 ## Installation
 
-Please refer to the [wiki](https://github.com/oppia/oppia/wiki) for extensive installation instructions. This is a short summary for developers who would like to contribute:
+Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for extensive installation instructions. This is a short summary for developers who would like to contribute:
 
 1. First, create a new, empty folder called `opensource/` within your home folder. (Note that the Oppia installation process will, later, add other folders to `opensource`.)
 
