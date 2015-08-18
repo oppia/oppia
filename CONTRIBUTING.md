@@ -120,13 +120,7 @@ This section outlines some basic git commands for developers new to Git.
      $ git pull
   ```
 
-3. When you are ready to commit a change to your local Git repository, run:
-
-  ```
-     $ git commit -a -m [COMMIT_MSG]
-  ```
- 
-  where [COMMIT\_MSG](COMMIT_MSG.md) is replaced by a commit message in quotes, e.g.:
+3. To commit a change to your local Git repository, with the commit message "Add a new graphical editor", run:
 
   ```
      $ git commit -a -m "Add a new graphical editor."
@@ -135,22 +129,22 @@ This section outlines some basic git commands for developers new to Git.
 4. To download a branch someone else created:
 
   ```
-     $ git checkout -b [repo-name-then-branch-name] [branch-name]
-     $ git pull https://github.com/[repo-name]/[branch-name].git [branch-name]
+     $ git checkout -b {{repo-name-then-branch-name}} {{branch-name}}
+     $ git pull https://github.com/{{repo-name}}/{{branch-name}}.git {{branch-name}}
   ```
 
 5. To patch a specific commit onto a different branch:
 
   ```
-     $ git checkout <branch-to-patch-from>
+     $ git checkout {{branch-to-patch-from}}
      $ git format-patch -1   # goes back one commit
   ```
   
   This should create a file with the extension .patch. The name should include part of the commit message from the change it is patching. You may need to move this file to somewhere where it won't disappear when you switch branches.
 
   ```
-     $ git checkout <branch-to-patch-to>
-     $ git apply <patch-file-name>
+     $ git checkout {{branch-to-patch-to}}
+     $ git apply {{patch-file-name}}
   ```
 
 6. If you have a bunch of small unreviewed commits, you might want to squash them into a single large commit before they are reviewed. To squash the last three commits, do
