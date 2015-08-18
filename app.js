@@ -17,7 +17,7 @@
 	      project_tag: 'Embedding Your Exploration'
 	    })
 	    // route for the customized page
-	  .when('/customized', {
+	    .when('/customized', {
 	      templateUrl: 'pages/customized.html',
 	      controller: 'customizedController',
 	      project_tag: 'Customizing States'
@@ -36,6 +36,7 @@
 	oppia.run(['$location', '$rootScope', function($location, $rootScope) {
 	  $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
 	    $rootScope.project_tag = current.$$route.project_tag;
+	    $rootScope.title = 'Oppia-' + current.$$route.project_tag;
 	  });
 	}]);
 
