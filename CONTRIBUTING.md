@@ -9,7 +9,7 @@ Next, update your GitHub notification settings:
 1. Go to your settings page (click the Settings option under the profile menu in the top right), then go to 'Notification center' and ensure that everything's as you want it.
 2. Go to the repository page, and click 'Watch' at the top right. Ensure that your notification status is not set to "Ignoring", so that you at least get notified when someone replies to a conversation you're part of. Note that you won't get emails for comments that you make on issues.
 
-Next, please sign the CLA so that we can accept your contributions. If you're an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company would own the copyright to your contributions, a representative from the company should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
+Next, please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company would own the copyright to your contributions, a representative from the company should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
 
 You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time.
 
