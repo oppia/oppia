@@ -101,52 +101,65 @@ Please arrange with the maintainers to create a new branch (that's not "develop"
 This section outlines some basic git commands for developers new to Git.
 
 1. After making a local clone of Oppia, you can make code changes in your local directory, under oppia/ . These changes will be tracked by Git. At any time, you can check what git thinks has been changed using:
+  
+  ```
+     $ git status
+  ```
 
-```
-   $ git status
-```
+  Note that new files will need to be explicitly 'git add'ed.
 
-Note that new files will need to be explicitly 'git add'ed.
+  You can also view diffs of your changes by typing:
 
-You can also view diffs of your changes by typing:
-
-```
-   $ git diff
-```
+  ```
+     $ git diff
+  ```
 
 2. To sync your local code with the latest updates from the GitHub repo, run:
-```
-   $ git pull
-```
+
+  ```
+     $ git pull
+  ```
 
 3. When you are ready to commit a change to your local Git repository, run:
 
-```
-   $ git commit -a -m [COMMIT_MSG]
-```
+  ```
+     $ git commit -a -m [COMMIT_MSG]
+  ```
+ 
+  where [COMMIT\_MSG](COMMIT_MSG.md) is replaced by a commit message in quotes, e.g.:
 
-where [COMMIT\_MSG](COMMIT_MSG.md) is replaced by a commit message in quotes, e.g.:
-
-```
-   $ git commit -a -m "Add a new graphical editor."
-```
+  ```
+     $ git commit -a -m "Add a new graphical editor."
+  ```
 
 4. To download a branch someone else created:
-```
-   $ git pull
-   $ git checkout <branch-name>
-   $ git pull origin <branch-name>
-```
+
+  ```
+     $ git checkout -b [repo-name-then-branch-name] [branch-name]
+     $ git pull https://github.com/[repo-name]/[branch-name].git [branch-name]
+  ```
 
 5. To patch a specific commit onto a different branch:
 
-```
-   $ git checkout <branch-to-patch-from>
-   $ git format-patch -1   # goes back one commit
-```
-This should create a file with the extension .patch. The name should include part of the commit message from the change it is patching. You may need to move this file to somewhere where it won't disappear when you switch branches.
+  ```
+     $ git checkout <branch-to-patch-from>
+     $ git format-patch -1   # goes back one commit
+  ```
+  
+  This should create a file with the extension .patch. The name should include part of the commit message from the change it is patching. You may need to move this file to somewhere where it won't disappear when you switch branches.
 
-```
-   $ git checkout <branch-to-patch-to>
-   $ git apply <patch-file-name>
-```
+  ```
+     $ git checkout <branch-to-patch-to>
+     $ git apply <patch-file-name>
+  ```
+
+6. If you have a bunch of small unreviewed commits, you might want to squash them into a single large commit before they are reviewed. To squash the last three commits, do
+
+  ```
+    git reset --soft HEAD~3 &&
+    git commit -m "{{YOUR_COMMIT_MESSAGE_HERE}}"
+  ```
+
+  Be careful to only squash "local" commits -- never squash anything that has been uploaded to the codesite before (no matter what branch). In particular, don't squash commits that already have code review comments on them. Also, don't squash any commit that merged two branches.
+
+  If you want to squash commits that you previously pushed to GitHub, make a new local branch that includes the small commits, squash the commits locally, and push the new branch instead.
