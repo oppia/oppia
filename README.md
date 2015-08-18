@@ -4,21 +4,18 @@ Oppia is an online learning tool that enables anyone to easily create and share 
 ## Installation
 Please refer to https://code.google.com/p/oppia/wiki/GettingStarted for extensive installation instructions. Here is just a short summary for developers who would like to contribute:
 
-1. First, fork and clone the Oppia repo. We suggest you make a directory called opensource/ within your home folder (mkdir opensource). Then do
+1. First, we suggest making a new, empty folder called `opensource/` within your home folder (`mkdir opensource`). The Oppia installation process will add other folders to `opensource`; this is done in order to separate files and folders that should be pushed to production from the others.
+
+2. Navigate to this folder (`cd opensource`), then fork and clone the Oppia repo to it by following the instructions on Github's [Fork a Repo page](https://help.github.com/articles/fork-a-repo/). This will create a new folder named `opensource/oppia`.
+
+3. Navigate to `opensource/oppia/`, then install the development version of Oppia by running
 
   ```
-    cd opensource/
-  ```
-
-  and follow the instructions on Github's [Fork a Repo page](https://help.github.com/articles/fork-a-repo/) to clone the repo to that directory. This should create a new folder named `oppia`.
-
-2. Navigate to `oppia/` and install Oppia by running
-
-  ```
+    git checkout develop
     bash scripts/start.sh
   ```
 
-3. To test the installation, navigate to `oppia/` and run
+4. To test the installation, stay in `oppia/`, and run
 
   ```
     bash scripts/test.sh

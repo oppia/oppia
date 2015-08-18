@@ -64,8 +64,8 @@ Here are full instructions for how to make a one-off code change. (If you're wor
   * An admin should notice the new pull request, and will assign a reviewer to your commit.
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
   * When your reviewer has reviewed the code, you'll get an email from them. You'll need to respond in two ways:
-     * Make a new commit addressing the comments, and push it to the same branch. Ideally, the commit message would explain what the commit does (e.g. "Fix lint error"), but if there are a lot of disparate review comments, it's fine to refer to the original commit message and add something like "(address review comments)".
-     * In addition, please reply to each of the reviewer's comments. If they requested a change, you can just reply "Done" once you've fixed it -- otherwise, explain why you think it should not be fixed. All comments should be resolved before an LGTM can be given.
+     * Make a new commit addressing the comments you agree with, and push it to the same branch. Ideally, the commit message would explain what the commit does (e.g. "Fix lint error"), but if there are a lot of disparate review comments, it's fine to refer to the original commit message and add something like "(address review comments)".
+     * In addition, please reply to each of the reviewer's comments. Each comment should be either "Done" or a response explaining why the corresponding suggestion wasn't implemented. All comments must be resolved before an LGTM can be given.
   * If any merge conflicts arise, you'll need to resolve them. To resolve merge issues between 'new-branch-name' (in your fork) and 'develop' (in the main oppia repository), run:
 
   ```
@@ -88,8 +88,65 @@ Here are full instructions for how to make a one-off code change. (If you're wor
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
 
+
 ## Instructions for contributors working on a large feature that involves more than one person
 
 Please arrange with the maintainers to create a new branch (that's not "develop") for this feature. The rest of the review process is as above, except that you'll be pushing commits to the new branch instead of "develop". Once that branch is clean and ready to ship, it can be merged into "develop".
 
-(This is experimental -- the main concern here is that the process hinges on the maintainers responding quickly to pull requests. If that ends up being an issue, we should look into other solutions, such as: (i) adding additional teams with write access, (ii) writing a special pre-commit hook, or (iii) having one of the collaborators on that feature 'own' the repo with the feature branch.)
+(This is experimental. The main concern here is that the process hinges on the maintainers responding quickly to pull requests. If that ends up being an issue, we should look into other solutions, such as: (i) adding additional teams with write access, (ii) writing a special pre-commit hook, or (iii) having one of the collaborators on that feature 'own' the repo with the feature branch.)
+
+
+## Git command reference
+
+This section outlines some basic git commands for developers new to Git.
+
+1. After making a local clone of Oppia, you can make code changes in your local directory, under oppia/ . These changes will be tracked by Git. At any time, you can check what git thinks has been changed using:
+
+```
+   $ git status
+```
+
+Note that new files will need to be explicitly 'git add'ed.
+
+You can also view diffs of your changes by typing:
+
+```
+   $ git diff
+```
+
+2. To sync your local code with the latest updates from the GitHub repo, run:
+```
+   $ git pull
+```
+
+3. When you are ready to commit a change to your local Git repository, run:
+
+```
+   $ git commit -a -m [COMMIT_MSG]
+```
+
+where [COMMIT\_MSG](COMMIT_MSG.md) is replaced by a commit message in quotes, e.g.:
+
+```
+   $ git commit -a -m "Add a new graphical editor."
+```
+
+4. To download a branch someone else created:
+```
+   $ git pull
+   $ git checkout <branch-name>
+   $ git pull origin <branch-name>
+```
+
+5. To patch a specific commit onto a different branch:
+
+```
+   $ git checkout <branch-to-patch-from>
+   $ git format-patch -1   # goes back one commit
+```
+This should create a file with the extension .patch. The name should include part of the commit message from the change it is patching. You may need to move this file to somewhere where it won't disappear when you switch branches.
+
+```
+   $ git checkout <branch-to-patch-to>
+   $ git apply <patch-file-name>
+```
