@@ -64,16 +64,6 @@ class WarmupHandler(base.BaseHandler):
 r = '[A-Za-z0-9=_-]+'
 
 
-def generate_static_url_tuples():
-    static_urls = []
-    url_tuples = []
-    for url in feconf.PATH_MAP:
-        static_urls.append(url + '.+')
-    for url in static_urls:
-        url_tuples.append((url, resources.StaticFileHandler))
-    return url_tuples
-
-
 def get_redirect_route(regex_route, handler, name, defaults=None):
     """Returns a route that redirects /foo/ to /foo.
 

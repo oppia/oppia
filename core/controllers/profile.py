@@ -152,7 +152,7 @@ class SignupPage(base.BaseHandler):
             return
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_PROFILE,
+            'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
             'SITE_NAME': pages.SITE_NAME.value,
         })

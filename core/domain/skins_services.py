@@ -61,13 +61,6 @@ class Registry(object):
         return cls._skins_dict.keys()
 
     @classmethod
-    def get_all_skin_classes(cls):
-        """Get a dict mapping skin ids to skin classes."""
-        if not cls._skins_dict:
-            cls._refresh_registry()
-        return copy.deepcopy(cls._skins_dict)
-
-    @classmethod
     def get_skin_templates(cls, skin_ids):
         """Returns the concatanated HTML for the given skins.
 

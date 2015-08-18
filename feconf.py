@@ -42,7 +42,6 @@ RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-OBJECTS_DIR = os.path.join('extensions', 'objects')
 SKINS_TEMPLATES_DIR = os.path.join('extensions', 'skins')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
 FRONTEND_TEMPLATES_DIR = os.path.join(
@@ -266,7 +265,6 @@ DEMO_EXPLORATIONS = [
 
 # TODO(sll): Add all other URLs here.
 CONTRIBUTE_GALLERY_URL = '/contribute'
-CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
@@ -279,10 +277,8 @@ GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
 LEARN_GALLERY_URL = '/learn'
-LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
-PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_URL = '/signup'
@@ -291,13 +287,13 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
-NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
 NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
+NAV_MODE_SIGNUP = 'signup'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'

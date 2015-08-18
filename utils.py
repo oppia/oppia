@@ -32,18 +32,8 @@ import yaml
 import zipfile
 
 
-# Sentinel value for schema verification, indicating that a value can take any
-# type.
-ANY_TYPE = 1
-
-
 class InvalidInputException(Exception):
     """Error class for invalid input."""
-    pass
-
-
-class EntityIdNotFoundError(Exception):
-    """Error class for when an entity ID is not in the datastore."""
     pass
 
 
@@ -233,36 +223,6 @@ def get_random_choice(alist):
 
     index = get_random_int(len(alist))
     return alist[index]
-
-
-def verify_dict_keys_and_types(adict, dict_schema):
-    """Checks the keys in adict, and that their values have the right types.
-
-    Args:
-      adict: the dictionary to test.
-      dict_schema: list of 2-element tuples. The first element of each
-        tuple is the key name and the second element is the value type.
-    """
-    for item in dict_schema:
-        if len(item) != 2:
-            raise Exception('Schema %s is invalid.' % dict_schema)
-        if not isinstance(item[0], str):
-            raise Exception('Schema key %s is not a string.' % item[0])
-        if item[1] != ANY_TYPE and not isinstance(item[1], type):
-            raise Exception('Schema value %s is not a valid type.' % item[1])
-
-    TOP_LEVEL_KEYS = [item[0] for item in dict_schema]
-    if sorted(TOP_LEVEL_KEYS) != sorted(adict.keys()):
-        raise ValidationError(
-            'Dict %s should conform to schema %s.' % (adict, dict_schema))
-
-    for item in dict_schema:
-        if item[1] == ANY_TYPE:
-            continue
-        if not isinstance(adict[item[0]], item[1]):
-            raise ValidationError(
-                'Value \'%s\' for key \'%s\' is not of type %s in:\n\n %s'
-                % (adict[item[0]], item[0], item[1], adict))
 
 
 def convert_png_to_data_url(filepath):

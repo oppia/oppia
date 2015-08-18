@@ -72,7 +72,6 @@ class IsEqualToExceptFor(base.MusicPhraseRule):
     def _evaluate(self, subject):
         midi_target_sequence = _convert_sequence_to_midi(self.x)
         midi_user_sequence = _convert_sequence_to_midi(subject)
-        num_correct_notes_needed = len(midi_target_sequence) - self.k
         if len(midi_user_sequence) != len(midi_target_sequence):
             return rule_domain.CERTAIN_FALSE_VALUE
         num_correct_notes = (
