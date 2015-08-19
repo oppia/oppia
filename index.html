@@ -24,10 +24,13 @@
       <h2 id="project_tagline" ng-bind="$root.projectTag"></h2>
     </header>
   </div>
-  <div ng-controller="mainController">
-    <!-- angular templating -->
-    <!-- this is where content will be injected -->
-    <div ng-view>
+  <div id="main_content_wrap" class="outer">
+    <div ng-include="'pages/sidebar.html'"></div>
+    <div ng-controller="mainController">
+      <!-- angular templating -->
+      <!-- this is where content will be injected -->
+      <div ng-view>
+      </div>
     </div>
   </div>
   <!-- FOOTER  -->
