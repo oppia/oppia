@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 var oppiaGithubPages = angular.module('oppiaGithubPages', ['ngRoute']);
 // configure our routes
 oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
@@ -34,7 +35,10 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
     templateUrl: 'pages/improve.html',
     controller: 'improveController',
     projectTag: 'Improve The Exploration'
-  });
+  })
+    .otherwise({
+        redirectTo: '/'
+      });
 }]);
 
 oppiaGithubPages.run(['$location', '$rootScope', function($location, $rootScope) {
