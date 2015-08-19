@@ -21,17 +21,17 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       controller: 'mainController',
       projectTag: 'A tool for creating interactive tutors'
     })
-    .when('/embedded', {
+    .when('/wiki/embedded', {
       templateUrl: 'pages/embedded.html',
       controller: 'embeddedController',
       projectTag: 'Embedding Your Exploration'
     })
-    .when('/customized', {
+    .when('/wiki/customized', {
       templateUrl: 'pages/customized.html',
       controller: 'customizedController',
       projectTag: 'Customizing States'
     })
-    .when('/improve', {
+    .when('/wiki/improve', {
     templateUrl: 'pages/improve.html',
     controller: 'improveController',
     projectTag: 'Improve The Exploration'
