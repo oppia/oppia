@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- define angular app -->
-<html ng-app="oppiaApp">
+<html ng-app="oppiaGithubPages">
 
 <head>
   <meta charset='utf-8'>
@@ -8,7 +8,7 @@
   <meta name="description" content="Oppia : A tool for creating interactive tutors">
   <link rel="stylesheet" type="text/css" media="screen" href="static/css/stylesheet.css">
   <!-- javascript -->
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
   <script src="app.js"></script>
   <title ng-bind="$root.title"></title>
@@ -21,7 +21,7 @@
     <header class="inner">
       <a id="forkme_banner" href="https://github.com/oppia">View on GitHub</a>
       <h1 id="project_title"><a href="#" class="anchor" >Oppia</a></h1>
-      <h2 id="project_tagline" ng-bind="$root.project_tag"></h2>
+      <h2 id="project_tagline" ng-bind="$root.projectTag"></h2>
     </header>
   </div>
   <div ng-controller="mainController">
@@ -37,6 +37,16 @@
     </footer>
   </div>
   <script src="static/javascripts/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=css" defer="defer"></script>
+  <script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+  try {
+    var pageTracker = _gat._getTracker("UA-66335041-1");
+    pageTracker._trackPageview();
+  } catch (err) {}
+  </script>
 </body>
 
 </html>

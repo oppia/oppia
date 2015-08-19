@@ -394,12 +394,13 @@ Full-Width Styles
   font-weight: 700;
   text-shadow: #111 0px 0px 10px;
 }
-#project_title > a:hover, 
+
+#project_title > a:hover,
 #project_title > a:visited,
-#project_title > a:link, 
-#project_title > a:active{
+#project_title > a:link,
+#project_title > a:active {
   color: inherit;
-   text-decoration: none;
+  text-decoration: none;
 }
 
 #project_tagline {
