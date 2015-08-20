@@ -20,9 +20,7 @@
 }
 
 #sidebar>.primary .selected a:link,
-#sidebar>.primary .selected a:visited,
-#sidebar>.primary .sub-nav .selected a:link,
-#sidebar>.primary .sub-nav .selected a:visited {
+#sidebar>.primary .selected a:visited {
   font-weight: 600;
   color: #222222;
 }
@@ -35,26 +33,3 @@
   height: 16px
 }
 
-#sidebar>.primary .sub-nav {
-  list-style: none;
-  margin-left: 28px;
-  margin-bottom: -2px
-}
-
-#sidebar>.primary .sub-nav li {
-  line-height: 22px;
-  margin-top: 8px
-}
-
-#sidebar>.primary .sub-nav li a:link,
-#sidebar>.primary .sub-nav li a:visited {
-  font-weight: normal;
-  font-size: 13px;
-  display: block
-}
-
-#sidebar>.primary .sub-nav .selected a:link,
-#sidebar>.primary .sub-nav .selected a:visited {
-  margin-left: -10px;
-  padding-left: 10px
-}

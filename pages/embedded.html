@@ -1,11 +1,12 @@
 <!-- MAIN CONTENT -->
 <section id="main_content" class="inner">
   <h2>
-      <a id="embeded" class="anchor" href="#embeded" aria-hidden="true"><span class="octicon octicon-link"></span></a>Embed the exploration</h2>
+    <a id="embedded" class="anchor" href="#embedded" aria-hidden="true"><span class="octicon octicon-link"></span></a>Embed the exploration</h2>
   <p>Oppia explorations that have been published can be easily embedded in other web pages. Just copy the Oppia embedding script below into the source code for your webpage, then add individual
     <tt>&lt;oppia&gt;</tt> HTML tags for each exploration you want to embed. You only need to include the embedding script code once; it will do all the work of embedding the explorations for you. (The instructions below are generic, but you can find URLs tailored to the particular exploration you want to embed by going to the corresponding exploration editor page and clicking the embed button on the top-right.) </p>
   <p><strong>Important:</strong> Please note that, since private explorations are not world-viewable, they cannot be embedded in other pages. </p>
-  <h3><a id="Step_1:_Include_the_embedding_script" class="anchor" href="#Step_1:_Include_the_embedding_script" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 1: Include the embedding script</h3>
+  <h3>
+    <a id="Step_1:_Include_the_embedding_script" class="anchor" href="#Step_1:_Include_the_embedding_script" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 1: Include the embedding script</h3>
   <p>Option 1: Use one of the hosted scripts, by including one of the following codes on your page: </p>
   <ul>
     <li>jsDelivr: </li>
@@ -33,7 +34,8 @@
       <tt>exploration-version</tt>: this is optional. If it is not specified, the latest version of the exploration will be embedded. If it is specified, it represents the version number of the exploration that you want to embed; you can determine this by looking at the History tab on the exploration editor page. Specifying an
       <tt>exploration-version</tt> attribute means that the embedded exploration will never change (even if subsequent changes are made to the original exploration), but it also means that you would have to update the version number on a regular basis if you wanted to incorporate these subsequent changes. </li>
   </ul>
-  <h3><a id="Step_3:_Check_that_everything_works" class="anchor" href="#Step_3:_Check_that_everything_works" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 3: Check that everything works</h3>
+  <h3>
+    <a id="Step_3:_Check_that_everything_works" class="anchor" href="#Step_3:_Check_that_everything_works" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 3: Check that everything works</h3>
   <p>
     That's it, you're done! Navigate to the page containing the exploration and check that everything works. If the exploration does not load, open the <a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers" rel="nofollow">development console</a> in your browser, and check to see if there are any errors.
   </p>
@@ -42,7 +44,8 @@
   <h3><a id="Integration_with_particular_platforms" class="anchor" href="#Integration_with_particular_platforms" aria-hidden="true"><span class="octicon octicon-link"></span></a>Integration with particular platforms</h3>
   <p>We also have support for integration with platforms such as <a href="https://code.google.com/p/course-builder/" rel="nofollow">Course Builder</a>. More information can be found in the
     <tt>integrations</tt> subdirectory of the <a href="https://github.com/oppia/oppia/tree/develop/integrations_dev" rel="nofollow">Oppia source code</a>. </p>
-  <h3><a id="Event_hooks_(optional)" href="#Event_hooks_(optional)" aria-hidden="true"><span class="octicon octicon-link"></a>Event hooks (optional)</h3>
+  <h3>
+    <a id="Event_hooks_(optional)" href="#Event_hooks_(optional)" aria-hidden="true"><span class="octicon octicon-link"></a>Event hooks (optional)</h3>
   <p>When a learner interaction happens within an Oppia exploration, an event is emitted to the embedding page. If you wish, you can listen to these events and add custom behavior to them. This is done by overwriting, in the embedding page, the corresponding event hooks -- so, for example, if you wanted to print a message to the console when an exploration is loaded, you could write: </p>
   <pre class="prettyprint"><span class="pln">&nbsp; window</span><span class="pun">.</span><span class="pln">OPPIA_PLAYER</span><span class="pun">.</span><span class="pln">onExplorationLoadedPostHook </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">(</span><span class="pln">iframeNode</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"><br>&nbsp; &nbsp; console</span><span class="pun">.</span><span class="pln">log</span><span class="pun">(</span><span class="str">'Exploration loaded.'</span><span class="pun">);</span><span class="pln"><br>&nbsp; </span><span class="pun">};</span></pre>
   <p>Other events are also emitted on card transitions or exploration completion. For more details, please see the bottom of the <a href="https://github.com/oppia/oppia/blob/develop/static/scripts/oppia-player-0.0.1.js" rel="nofollow">embedding script file</a>. </p>
