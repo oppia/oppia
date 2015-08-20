@@ -9,7 +9,7 @@ For full user documentation, see our [GitHub page](http://oppia.github.io/). You
 
 Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for extensive installation instructions. This is a short summary for developers who would like to contribute:
 
-1. First, create a new, empty folder called `opensource/` within your home folder. (Note that the Oppia installation process will add other folders to `opensource`.)
+1. Create a new, empty folder called `opensource/` within your home folder. (Note that the Oppia installation process will add other folders to `opensource`.)
 
 2. Navigate to this folder (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo. This will create a new folder named `opensource/oppia`.
 
@@ -31,9 +31,11 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for ex
 
 ## Contributing
 
-The Oppia project is built by the community for the community. We love contributions, and new contributors are always welcome.
+The Oppia project is built by the community for the community, and is currently in active development. 
 
-Please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to contribute code to Oppia.
+We love contributions. There are many ways to help with Oppia's development, including art, coding, design and documentation. New contributors are always welcome!
+
+If you'd like to help with code-related stuff, please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions. We'll add instructions for helping with other types of things soon -- but, if you're interested in any of these, please send an email to `admin@oppia.org`, and we'll get back to you promptly!
 
 
 ## Support
