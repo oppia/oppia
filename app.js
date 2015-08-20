@@ -21,24 +21,39 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       controller: 'mainController',
       projectTag: 'A tool for creating interactive tutors'
     })
-    .when('/wiki/embedded', {
-      templateUrl: 'pages/embedded.html',
+    .when('/wiki/Embedded', {
+      templateUrl: 'pages/wiki/embedded.html',
       controller: 'embeddedController',
       projectTag: 'Embedding Your Exploration'
     })
-    .when('/wiki/customized', {
-      templateUrl: 'pages/customized.html',
+    .when('/wiki/Customized', {
+      templateUrl: 'pages/wiki/customized.html',
       controller: 'customizedController',
       projectTag: 'Customizing States'
     })
-    .when('/wiki/improve', {
-    templateUrl: 'pages/improve.html',
-    controller: 'improveController',
-    projectTag: 'Improve The Exploration'
-  })
+    .when('/wiki/Improve', {
+      templateUrl: 'pages/wiki/improve.html',
+      controller: 'improveController',
+      projectTag: 'Improve The Exploration'
+    })
+    .when('/wiki/WhatIsOppia', {
+      templateUrl: 'pages/wiki/whatIsOppia.html',
+      controller: 'whatIsOppiaController',
+      projectTag: 'What is Oppia?'
+    })
+    .when('/wiki/KeyConceptsInOppia', {
+      templateUrl: 'pages/wiki/keyConcepts.html',
+      controller: 'keyConceptsInOppiaController',
+      projectTag: 'Key concepts in Oppia'
+    })
+    .when('/wiki/TheExplorationGallery', {
+      templateUrl: 'pages/wiki/theExplorationGallery.html',
+      controller: 'theExplorationGalleryController',
+      projectTag: 'The Exploration Gallery'
+    })
     .otherwise({
-        redirectTo: '/'
-      });
+      redirectTo: '/'
+    });
 }]);
 
 oppiaGithubPages.run(['$location', '$rootScope', function($location, $rootScope) {
@@ -62,5 +77,17 @@ oppiaGithubPages.controller('embeddedController', function($scope) {
 });
 
 oppiaGithubPages.controller('improveController', function($scope) {
+
+});
+
+oppiaGithubPages.controller('whatIsOppiaController', function($scope) {
+
+});
+
+oppiaGithubPages.controller('keyConceptsInOppiaController', function($scope) {
+
+});
+
+oppiaGithubPages.controller('theExplorationGalleryController', function($scope) {
 
 });
