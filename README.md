@@ -31,11 +31,11 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for ex
 
 ## Contributing
 
-The Oppia project is built by the community for the community, and is currently in active development. 
+The Oppia project is built by the community for the community. It is currently in active development. 
 
-We love contributions. There are many ways to help with Oppia's development, including art, coding, design and documentation. New contributors are always welcome!
+There are many ways to help with Oppia's development, including art, coding, design and documentation. We welcome contributions from everyone, and new contributors are always welcome!
 
-If you'd like to help with code-related stuff, please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions. We'll add instructions for helping with other types of things soon -- but, if you're interested in any of these, please send an email to `admin@oppia.org`, and we'll get back to you promptly!
+If you'd like to help with code-related stuff, please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions. We'll add instructions for helping with other types of things soon -- but, if you're interested in any of these, please send an email to `admin@oppia.org`, and we'll get back to you promptly.
 
 
 ## Support
