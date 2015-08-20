@@ -25,11 +25,13 @@
     </header>
   </div>
   <div id="main_content_wrap" class="outer">
-    <div ng-include="'pages/sidebar.html'"></div>
     <div ng-controller="mainController">
-      <!-- angular templating -->
-      <!-- this is where content will be injected -->
-      <div ng-view>
+    <!--A container to make a grid with a fixed column-->
+      <div class="container row">
+        <div ng-include="'pages/sidebar.html'"></div>
+        <!-- angular templating -->
+        <!-- this is where content will be injected -->
+        <div class="view-content" ng-view></div>
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@
   float: left;
   padding-top: 40px;
   padding-left: 5%;
+  min-width: 240px;
   margin: 0 auto;
 }
 
@@ -32,4 +33,3 @@
 #sidebar>.primary>li>a {
   height: 16px
 }
-

@@ -351,11 +351,15 @@ Full-Width Styles
 
 .outer {
   width: 100%;
+  /*for small screen div should go beyond screen size 
+    to enable horizontal scrolling min-width=(container width+padding)*/
+  min-width: 1092px;
 }
 
 .inner {
   position: relative;
-  max-width: 640px;
+  /*max-width should match image max-width*/
+  max-width: 730px;
   padding: 20px 10px;
   margin: 0 auto;
 }
@@ -457,8 +461,26 @@ Full-Width Styles
   border-bottom: 1px solid #111;
 }
 
+.container {
+  width: 990px;
+  margin: 0 auto;
+  boxing-size: border-box;
+}
+
+.row:before,
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 #main_content {
   padding-top: 40px;
+}
+
+.view-content {
+  max-width: 640px;
+  float: right;
 }
 
 #footer_wrap {
@@ -476,10 +498,6 @@ Small Device Styles
   }
   #downloads {
     display: none;
-  }
-  .inner {
-    min-width: 320px;
-    max-width: 480px;
   }
   #project_title {
     font-size: 32px;
@@ -507,5 +525,14 @@ Small Device Styles
     min-width: 320px;
     max-width: 480px;
     font-size: 11px;
+  }
+}
+
+
+/*reduce the size of the image for small screen devices*/
+
+@media (max-width: 640px) {
+  img {
+    width: 640px;
   }
 }
