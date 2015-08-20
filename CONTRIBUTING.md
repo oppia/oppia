@@ -1,6 +1,6 @@
 # Contributing code to Oppia
 
-*Note: These instructions are for developers who would like to contribute code to Oppia. If you'd prefer to help out with art, design or other things, please see our [general contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).*
+*These instructions are for developers who would like to contribute code to Oppia. If you'd prefer to help out with art, design or other things, please see our [general contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).*
 
 ## Setting things up
 
@@ -81,4 +81,4 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 Please arrange with the maintainers to create a new branch (not `develop`) for this feature. The rest of the review process is as above, except that you'll be pushing commits to the new branch instead of `develop`. Once that branch is clean and ready to ship, it can be merged into `develop`.
 
-(This is experimental. The main concern here is that the process hinges on the maintainers responding quickly to pull requests. If that ends up being a bottleneck, we should look into other solutions, such as: (i) adding additional teams with write access, (ii) writing a special pre-commit hook, or (iii) having one of the collaborators on that feature 'own' the repo with the feature branch.)
+*Note: This is experimental. The main concern here is that the process hinges on the maintainers responding quickly to pull requests. If that ends up being a bottleneck, we should look into other solutions, such as: (i) adding additional teams with write access, (ii) writing a special pre-commit hook, or (iii) having one of the collaborators on that feature 'own' the repo with the feature branch.*
