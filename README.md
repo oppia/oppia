@@ -31,9 +31,9 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for ex
 
 ## Contributing
 
-The Oppia project is built by the community for the community. It is currently in active development. 
+The Oppia project is built by the community for the community. We welcome contributions from everyone, and new contributors are always welcome.
 
-There are many ways to help with Oppia's development, including art, coding, design and documentation. We welcome contributions from everyone, and new contributors are always welcome!
+There are many ways to help with Oppia's development, including art, coding, design and documentation:
 
   * **Developers**: please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).
