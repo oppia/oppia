@@ -2,25 +2,29 @@
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing and get feedback.
 
-For full user documentation, see our [GitHub page](http://oppia.github.io/). You can also create explorations on the community site at [Oppia.org](https://www.oppia.org).
+  * Community site: [Oppia.org](https://www.oppia.org)
+  * Full user documentation: https://oppia.github.io/
 
+<p align="center">
+  <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank">
+    <img src="http://img.youtube.com/vi/Ntcw0H0hwPU/0.jpg">
+  </a>
+</p>
 
 ## Installation
 
-Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for extensive installation instructions. This is a short summary for developers who would like to contribute:
+Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for full installation instructions. This is just a short summary for developers who would like to contribute:
 
-1. Create a new, empty folder called `opensource/` within your home folder. (Note that the Oppia installation process will add other folders to `opensource`.)
+1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo. This will create a new folder named `opensource/oppia`.
 
-2. Navigate to this folder (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo. This will create a new folder named `opensource/oppia`.
-
-3. Navigate to `opensource/oppia/` and run:
+2. Navigate to `opensource/oppia/` and run:
 
   ```
     git checkout develop
     bash scripts/start.sh
   ```
 
-4. To test the installation, run:
+3. To run tests:
 
   ```
     bash scripts/test.sh
@@ -31,10 +35,9 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for ex
 
 ## Contributing
 
-The Oppia project is built by the community for the community. We welcome contributions from everyone, and new contributors are always welcome.
+The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
-There are many ways to help with Oppia's development, including art, coding, design and documentation:
-
+You can help with Oppia's development in many ways, including art, coding, design and documentation.
   * **Developers**: please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).
 
