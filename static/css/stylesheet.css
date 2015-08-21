@@ -465,6 +465,9 @@ Full-Width Styles
   width: 990px;
   margin: 0 auto;
   boxing-size: border-box;
+  /*for page with few content sidebar touches footer
+  Use padding instead to fix*/
+  padding-bottom: 20px;
 }
 
 .row:before,
