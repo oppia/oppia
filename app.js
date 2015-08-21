@@ -57,6 +57,14 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'pages/designTips.html',
       projectTag: 'Exploration design tips'
     })
+    .when('/NoninteractiveWidget', {
+      templateUrl: 'pages/noninteractiveWidget.html',
+      projectTag: 'Non-interactive content in Oppia'
+    })
+    .when('/InteractiveWidget', {
+      templateUrl: 'pages/interactiveWidget.html',
+      projectTag: 'Overview of interactions'
+    })
     .otherwise({
       redirectTo: '/'
     });
