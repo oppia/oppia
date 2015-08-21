@@ -69,4 +69,3 @@ oppiaGithubPages.run(['$location', '$rootScope', function($location, $rootScope)
 oppiaGithubPages.controller('mainController', function($scope) {
 
 });
-
