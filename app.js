@@ -23,42 +23,34 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
     })
     .when('/Embedded', {
       templateUrl: 'pages/embedded.html',
-      controller: 'embeddedController',
       projectTag: 'Embedding Your Exploration'
     })
     .when('/Customized', {
       templateUrl: 'pages/customized.html',
-      controller: 'customizedController',
       projectTag: 'Customizing States'
     })
     .when('/Improve', {
       templateUrl: 'pages/improve.html',
-      controller: 'improveController',
       projectTag: 'Improve The Exploration'
     })
     .when('/WhatIsOppia', {
       templateUrl: 'pages/whatIsOppia.html',
-      controller: 'whatIsOppiaController',
       projectTag: 'What is Oppia?'
     })
     .when('/KeyConceptsInOppia', {
       templateUrl: 'pages/keyConcepts.html',
-      controller: 'keyConceptsInOppiaController',
       projectTag: 'Key concepts in Oppia'
     })
     .when('/TheExplorationGallery', {
       templateUrl: 'pages/theExplorationGallery.html',
-      controller: 'theExplorationGalleryController',
       projectTag: 'The Exploration Gallery'
     })
     .when('/LearnerView', {
       templateUrl: 'pages/learnerView.html',
-      controller: 'learnerViewController',
       projectTag: 'The Exploration Gallery'
     })
     .when('/PlanningYourExploration', {
       templateUrl: 'pages/planningYourExploration.html',
-      controller: 'planningYourExplorationController',
       projectTag: 'Planning Your Exploration'
     })
     .otherwise({
@@ -78,33 +70,3 @@ oppiaGithubPages.controller('mainController', function($scope) {
 
 });
 
-oppiaGithubPages.controller('customizedController', function($scope) {
-
-});
-
-oppiaGithubPages.controller('embeddedController', function($scope) {
-
-});
-
-oppiaGithubPages.controller('improveController', function($scope) {
-
-});
-
-oppiaGithubPages.controller('whatIsOppiaController', function($scope) {
-
-});
-
-oppiaGithubPages.controller('keyConceptsInOppiaController', function($scope) {
-
-});
-
-oppiaGithubPages.controller('theExplorationGalleryController', function($scope) {
-
-});
-
-oppiaGithubPages.controller('learnerViewController', function($scope) {
-
-});
-oppiaGithubPages.controller('planningYourExplorationController', function($scope) {
-
-});
