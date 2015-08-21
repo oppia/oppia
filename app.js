@@ -73,6 +73,14 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'pages/parameters.html',
       projectTag: 'Customizing Explorations with Parameters'
     })
+    .when('/AuditAndPublishYourExploration', {
+      templateUrl: 'pages/auditAndPublishYourExploration.html',
+      projectTag: 'Publishing your exploration'
+    })
+    .when('/ExportingYourExploration', {
+      templateUrl: 'pages/exportingYourExploration.html',
+      projectTag: 'Exporting your exploration to a zip file'
+    })
     .otherwise({
       redirectTo: '/'
     });
