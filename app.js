@@ -56,6 +56,11 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       controller: 'learnerViewController',
       projectTag: 'The Exploration Gallery'
     })
+    .when('/PlanningYourExploration', {
+      templateUrl: 'pages/planningYourExploration.html',
+      controller: 'planningYourExplorationController',
+      projectTag: 'Planning Your Exploration'
+    })
     .otherwise({
       redirectTo: '/'
     });
@@ -98,5 +103,8 @@ oppiaGithubPages.controller('theExplorationGalleryController', function($scope) 
 });
 
 oppiaGithubPages.controller('learnerViewController', function($scope) {
+
+});
+oppiaGithubPages.controller('planningYourExplorationController', function($scope) {
 
 });
