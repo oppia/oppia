@@ -57,12 +57,12 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'pages/designTips.html',
       projectTag: 'Exploration design tips'
     })
-    .when('/NoninteractiveWidget', {
-      templateUrl: 'pages/noninteractiveWidget.html',
+    .when('/NoninteractiveContent', {
+      templateUrl: 'pages/noninteractiveContent.html',
       projectTag: 'Non-interactive content in Oppia'
     })
-    .when('/InteractiveWidget', {
-      templateUrl: 'pages/interactiveWidget.html',
+    .when('/InteractiveWidgets', {
+      templateUrl: 'pages/interactiveWidgets.html',
       projectTag: 'Overview of interactions'
     })
     .otherwise({
