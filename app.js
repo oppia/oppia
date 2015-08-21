@@ -65,6 +65,10 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'pages/interactiveWidgets.html',
       projectTag: 'Overview of interactions'
     })
+    .when('/Rules', {
+      templateUrl: 'pages/rules.html',
+      projectTag: 'Rules'
+    })
     .otherwise({
       redirectTo: '/'
     });
