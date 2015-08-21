@@ -23,7 +23,7 @@ Otherwise, you could try searching the issue tracker for something that looks in
 
   * [TODO: code](https://github.com/oppia/oppia/labels/TODO%3A%20code) means that the overall solution is known, and the only thing left to do is code it.
   * [TODO: design doc](https://github.com/oppia/oppia/labels/TODO%3A%20design%20doc) means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then circulate it to the [dev team](https://groups.google.com/forum/#!forum/oppia-dev) for feedback before starting implementation.
-  * [TODO: investigation](https://github.com/oppia/oppia/labels/TODO%3A%20investigation) means that the problem is known, but no one has a clue why it's happening. This is generally a detective puzzle: any information you can add to the thread that helps identify the root of the problem would be very helpful!
+  * [TODO: investigation](https://github.com/oppia/oppia/labels/TODO%3A%20investigation) means that the problem is known, but no one has a clue why it's happening. This is generally a detective puzzle: any information you can add to the thread that helps us get closer to the root of the problem would be very helpful!
 
 If this is your first contribution, we additionally suggest picking a [starter project](https://github.com/oppia/oppia/labels/starter%20project). These projects are local to a small part of the codebase, and they tend to be easier, so they give you a chance to get your feet wet without having to understand the entire codebase.
 
