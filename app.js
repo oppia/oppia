@@ -53,6 +53,10 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'pages/planningYourExploration.html',
       projectTag: 'Planning Your Exploration'
     })
+    .when('/DesignTips', {
+      templateUrl: 'pages/designTips.html',
+      projectTag: 'Exploration design tips'
+    })
     .otherwise({
       redirectTo: '/'
     });
