@@ -1,0 +1,24 @@
+<section id="main_content" class="inner">
+  <h2>
+    <a id="Card_Editor:_Rules" class="anchor" href="#Card_Editor:_Rules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Card Editor: Rules</h2>
+  <p>Each card in an exploration includes a set of classification rules. When readers enter some input, Oppia classifies it according to these rules, and displays the appropriate feedback. It also makes any necessary card changes. Each interaction also has a default rule, which Oppia uses if none of the other rules match. </p>
+  <p>The types of rules for each interaction differ depending on what sort of input the interaction accepts. For example, a text input field may test whether the input contains a certain sequence of characters, whereas an interactive map may test whether the input click is within a given radius of a particular location. </p>
+  <h2>
+    <a id="Viewing_the_rules_for_a_card" class="anchor" href="#Viewing_the_rules_for_a_card" aria-hidden="true"><span class="octicon octicon-link"></span></a>Viewing the rules for a card</a></h2>
+  <p>You can find the rule editor below the interaction editor. The rules are listed as individual tiles, in the order in which they are applied to the reader's answer. The first rule that matches the answer will be used. If no rule matches, the default rule (which is always the last one) is used. </p>
+  <p>In the screenshot below, there are three rules: two equality checks, and one default rule. </p>
+  <p><img src="http://wiki.oppia.googlecode.com/git/images/rules.png" width="300"> </p>
+  <p>The dark blue header of each tile describes the test that is being made on the answer. This is followed by a list of possible responses from Oppia (one of which is chosen at random) and a destination card. Note that the refresh symbol (⟳) in the destination column means that, if the corresponding rule is used, Oppia will return the reader to the same card. </p>
+  <h2>
+    <a id="Editing_the_rules_for_a_card" class="anchor" href="#Editing_the_rules_for_a_card" aria-hidden="true"><span class="octicon octicon-link"></span></a>Editing the rules for a card</h2>
+  <p>To edit a rule, click on the 'Edit' button in the right-hand column. To add a new rule, click the 'Add new rule' button, and choose the type of rule you want to add. In the example below, we check whether the input text contains a given string. </p>
+  <p><img src="http://wiki.oppia.googlecode.com/git/images/rules1.png" width="300"> </p>
+  <p>Clicking 'Select' brings us to a new page where we can specify the details of the rule. In this case, we want to check whether the reader's answer contains the word 'factorial'. </p>
+  <p><img src="http://wiki.oppia.googlecode.com/git/images/rules2.png" width="300"> </p>
+  <p>In this dialog box, you can also specify the destination card, as well as the feedback given to the reader. You can enter as many feedback responses as you like; one will be chosen at random and displayed to the reader if this rule is triggered. This helps to make the conversation less stilted. If you do not specify any feedback, none will be shown to the reader. </p>
+  <p><strong>Important</strong>: If the destination card is the same as the current card, and no feedback is given, the reader will be presented with the same input field with no indication that any interaction has occurred. In general, this is not a good user experience, and we recommend that you always either send the reader to a different card, or provide some useful feedback that would help him/her when trying again. To help you spot cases like this, we show a small warning sign next to rules that have no feedback and loop to the same card, and we display the header of the rule tile using a different colour. </p>
+  <p>When you have finished editing your rule, click "Save". You can add further rules, and rearrange the existing ones. Note that <i>order is important</i>: an incoming answer is compared against each of the rules in sequence, so if multiple rules match a given answer, only the first one is triggered. </p>
+  <h2>
+    <a id="Extending_Oppia's_rules" class="anchor" href="#Extending_Oppia's_rules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extending Oppia's rules</h2>
+  <p>If the given rules are not sufficient, you can create new ones, though you will need to edit Python code to do so. However, depending on what you want to do, the edits may end up being quite minimal. See <a href="">Creating New Rules(TODO:Add link)</a> for more details on how to do this. </p>
+</section>
