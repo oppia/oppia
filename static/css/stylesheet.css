@@ -462,7 +462,7 @@ Full-Width Styles
 }
 
 .container {
-  width: 990px;
+  width: 1024px;
   margin: 0 auto;
   boxing-size: border-box;
   /*for page with few content sidebar touches footer
@@ -537,5 +537,8 @@ Small Device Styles
 @media screen and (max-width: 640px) {
   img {
     width: 640px;
+  }
+  .container{
+    width:990px;
   }
 }

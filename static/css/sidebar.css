@@ -1,8 +1,7 @@
 #sidebar {
   float: left;
   padding-top: 40px;
-  padding-left: 5%;
-  min-width: 240px;
+  min-width: 180px;
   margin: 0 auto;
 }
 
