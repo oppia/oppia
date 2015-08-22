@@ -534,7 +534,7 @@ Small Device Styles
 
 /*reduce the size of the image for small screen devices*/
 
-@media (max-width: 640px) {
+@media screen and (max-width: 640px) {
   img {
     width: 640px;
   }
