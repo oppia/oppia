@@ -33,16 +33,17 @@
           {% endif %}
         </h1>
         <br>
-	<img src="288x128_Oops_mint.png" alt="Oops!" style="width:288px;height:128px;">
+	{% load staticfiles %}
+	<img src="{% static 'oppia/static/images/general/288x128_Oops_mint.png' %}" alt="Oops!" width="288" height="128"/>
         <p>
           {% if code == 400 %}
-            Sometimes machines can't understand humans. This is one of those times.
+            <h3>Sometimes machines can't understand humans. This is one of those times.</h3>
           {% elif code == 401 %}
-            Sorry, we can't let you in there. Quick, go back before the security guards arrive!
+            <h3>You can't get in there. Quick, go back before the teacher comes!</h3>
           {% elif code == 404 %}
-            Sorry, we looked and looked but we just couldn't find that page. 
+            <h3>Sorry, we looked and looked but we just couldn't find that page.</h3>
           {% elif code == 500 %}
-            Something went horribly wrong. But it wasn't your fault. An internal error occurred.
+            <h3>Something went horribly wrong. But it wasn't your fault. An internal error occurred.</h3>
           {% endif %}
         </p>
         <p>
