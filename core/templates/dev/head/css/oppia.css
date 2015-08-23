@@ -557,8 +557,8 @@ textarea {
   border-radius: 0;
   margin-top: 10px;
 }
-/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to allign ticks and 
-   dropdown options 
+/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to allign ticks and
+   dropdown options
 */
 .oppia-navbar-button-container > .dropdown-menu > li > a {
   white-space: normal;
@@ -982,7 +982,7 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-graph-viz-container {
+.oppia-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
   height: 300px;
