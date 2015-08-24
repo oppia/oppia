@@ -18,10 +18,10 @@
 
   <body>
     <div id="header_wrap" class="outer">
-      <header class="inner">
-        <a id="forkme_banner" href="https://github.com/oppia">View on GitHub</a>
+      <header class="inner" style="max-width: 900px;">
+        <a id="forkme_banner" href="https://github.com/oppia/oppia">View on GitHub</a>
         <h1 id="project_title">
-          <a href="#" class="anchor">Oppia</a>
+          <a href="https://www.oppia.org" class="anchor">Oppia</a>
         </h1>
         <h2 id="project_tagline" ng-bind="$root.projectTag"></h2>
       </header>
@@ -30,7 +30,7 @@
     <div id="main_content_wrap" class="outer">
       <div>
       <!--A container to make a grid with a fixed column-->
-        <div class="container row">
+        <div class="container row" style="width: 900px;">
           <div ng-include="'pages/sidebar.html'"></div>
           <!-- Content will be injected here. -->
           <div class="view-content" ng-view></div>
@@ -39,8 +39,10 @@
     </div>
 
     <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      <footer class="inner" style="max-width: 900px; width: 900px;">
+        <p style="font-size: smaller;">
+          Published with <a href="https://pages.github.com">GitHub Pages</a>
+        </p>
       </footer>
     </div>
 
