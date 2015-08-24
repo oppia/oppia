@@ -157,8 +157,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version, exploration_model.created_on,
-        exploration_model.last_updated)
+        exploration_model.version, created_on=exploration_model.created_on,
+        last_updated=exploration_model.last_updated)
 
 
 def get_exploration_summary_from_model(exp_summary_model):

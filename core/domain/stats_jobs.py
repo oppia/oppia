@@ -32,7 +32,7 @@ from google.appengine.ext import ndb
 
 _NO_SPECIFIED_VERSION_STRING = 'none'
 _ALL_VERSIONS_STRING = 'all'
-# This date represents the date we stopped using StateCounterModel
+# This date represents the date we stopped using StateCounterModel.
 # This is here because StateCounterModel did not explicitly record
 # a start event. It only used the hit count for the start state.
 # This means that we need to figure out what the start state was
@@ -226,25 +226,26 @@ class StatisticsMRJobManager(
     @staticmethod
     def reduce(key, stringified_values):
         from core.domain import exp_services
+
         exploration = None
-        (exp_id, version) = key.split(':')
+        exp_id, version = key.split(':')
         try:
-            if version not in [
-                    _NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
+            if version == _NO_SPECIFIED_VERSION_STRING:
+                exploration = exp_services.get_exploration_by_id(exp_id)
+
+                # Rewind to the last commit before the transition from
+                # StateCounterModel.
+                current_version = exploration.version
+                while (exploration.last_updated > _STATE_COUNTER_CUTOFF_DATE
+                       and current_version > 1):
+                    current_version -= 1
+                    exploration = exp_models.ExplorationModel.get_version(
+                        exp_id, current_version)
+            elif version == _ALL_VERSIONS_STRING:
+                exploration = exp_services.get_exploration_by_id(exp_id)
+            else:
                 exploration = exp_services.get_exploration_by_id(
                     exp_id, version=version)
-            else:
-                exploration = exp_services.get_exploration_by_id(exp_id)
-		if version == _NO_SPECIFIED_VERSION_STRING:
-                    current_version = exploration.version
-                    snapshot_id = exp_models.ExplorationModel._get_snapshot_id(exp_id, current_version)
-                    exp_snapshot = exp_models.ExplorationSnapshotContentModel.get(snapshot_id)
-                    while (exp_snapshot.last_updated > _STATE_COUNTER_CUTOFF_DATE
-                        and current_version > 1):
-                        current_version -= 1
-                        snapshot_id = exp_models.ExplorationModel._get_snapshot_id(exp_id, current_version)
-                        exp_snapshot = exp_models.ExplorationSnapshotContentModel.get(snapshot_id)
-                    exploration = exp_models.ExplorationModel(id=exp_id)._reconstitute_from_snapshot_id(snapshot_id)
 
         except base_models.BaseModel.EntityNotFoundError:
             return
