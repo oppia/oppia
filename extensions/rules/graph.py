@@ -153,3 +153,45 @@ class HasGraphProperty(base.GraphRule):
             return is_regular(subject)
         else:
             return False
+
+
+class IsIsomorphicTo(base.GraphRule):
+    description = 'is isomorphic to {{g|Graph}}, including matching labels'
+    is_generic = False
+    ISOMORPHISM_VERTEX_LIMIT = 15
+
+    def _evaluate(self, subject):
+        if len(subject['vertices']) != len(self.g['vertices']):
+            return False
+        if (
+            len(subject['vertices']) > self.ISOMORPHISM_VERTEX_LIMIT or 
+            len(self.g['vertices']) > self.ISOMORPHISM_VERTEX_LIMIT
+        ):
+            return False
+
+        adjacency_matrix_1 = construct_adjacency_matrix(subject)
+        adjacency_matrix_2 = construct_adjacency_matrix(self.g)
+
+        # Check against every permutation of vertices. 
+        # The new index of vertex i in self.g is perm[i].
+        num_vertices = len(self.g['vertices'])
+        for perm in itertools.permutations(range(num_vertices)):
+            # Test matching labels
+            if subject['isLabeled'] and any([
+                    self.g['vertices'][i]['label'] !=
+                    subject['vertices'][perm[i]]['label']
+                    for i in xrange(num_vertices)]):
+                continue
+
+            # Test isomorphism
+            found_isomorphism = True
+            for i in xrange(num_vertices):
+                for j in xrange(num_vertices):
+                    if adjacency_matrix_1[perm[i]][perm[j]] != adjacency_matrix_2[i][j]:
+                        found_isomorphism = False
+                        break
+                if not found_isomorphism:
+                    break
+            if found_isomorphism:
+                return True
+        return False
