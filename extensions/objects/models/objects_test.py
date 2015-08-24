@@ -377,6 +377,18 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Graph, mappings, invalid_values)
 
+    def test_graph_property_validation(self):
+        """Tests objects of type GraphProperty"""
+
+        mappings = [
+            ('acyclic', 'acyclic'), ('regular', 'regular'),
+            ('strongly_connected', 'strongly_connected'),
+            ('weakly_connected', 'weakly_connected')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.GraphProperty, mappings, invalid_values)
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 

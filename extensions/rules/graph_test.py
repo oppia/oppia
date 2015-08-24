@@ -67,11 +67,11 @@ def _completeGraph(n):
 class GraphRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Graph objects."""
    
-    def test_is_connected_rule(self):
-        self.assertTrue(graph.IsConnected().eval(_emptyGraph()))
-        self.assertTrue(graph.IsConnected().eval(_cycleGraph(5)))
-        self.assertTrue(graph.IsConnected().eval(_completeGraph(10)))
-        self.assertTrue(graph.IsConnected().eval({
+    def test_is_weakly_connected_rule(self):
+        self.assertTrue(graph.HasGraphProperty('weakly_connected').eval(_emptyGraph()))
+        self.assertTrue(graph.HasGraphProperty('weakly_connected').eval(_cycleGraph(5)))
+        self.assertTrue(graph.HasGraphProperty('weakly_connected').eval(_completeGraph(10)))
+        self.assertTrue(graph.HasGraphProperty('weakly_connected').eval({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0},
                 {'label': 'b', 'x': 2.0, 'y': 2.0},
@@ -85,8 +85,56 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': True,
             'isLabeled': True
         }))
-        self.assertFalse(graph.IsConnected().eval(_nullGraph(2)))
-        self.assertFalse(graph.IsConnected().eval({
+        self.assertFalse(graph.HasGraphProperty('weakly_connected').eval(_nullGraph(2)))
+        self.assertFalse(graph.HasGraphProperty('weakly_connected').eval({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
+                {'label': 'c', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
+    
+    def test_is_strongly_connected_rule(self):
+        self.assertTrue(graph.HasGraphProperty('strongly_connected').eval(_emptyGraph()))
+        self.assertTrue(graph.HasGraphProperty('strongly_connected').eval(_cycleGraph(5)))
+        self.assertTrue(graph.HasGraphProperty('strongly_connected').eval(_completeGraph(10)))
+        self.assertTrue(graph.HasGraphProperty('strongly_connected').eval({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
+                {'label': 'c', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2},
+                {'src': 1, 'dst': 2, 'weight': 1},
+                {'src': 2, 'dst': 0, 'weight': 3},
+            ],
+            'isDirected': True,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
+        self.assertFalse(graph.HasGraphProperty('strongly_connected').eval({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
+                {'label': 'c', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2},
+                {'src': 2, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': True,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
+        self.assertFalse(graph.HasGraphProperty('strongly_connected').eval(_nullGraph(2)))
+        self.assertFalse(graph.HasGraphProperty('strongly_connected').eval({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0},
                 {'label': 'b', 'x': 2.0, 'y': 2.0},
@@ -101,9 +149,9 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         }))
 
     def test_is_acyclic_rule(self):
-        self.assertTrue(graph.IsAcyclic().eval(_emptyGraph()))
-        self.assertTrue(graph.IsAcyclic().eval(_completeGraph(2)))
-        self.assertTrue(graph.IsAcyclic().eval({
+        self.assertTrue(graph.HasGraphProperty('acyclic').eval(_emptyGraph()))
+        self.assertTrue(graph.HasGraphProperty('acyclic').eval(_completeGraph(2)))
+        self.assertTrue(graph.HasGraphProperty('acyclic').eval({
             'vertices': [
                 {'label': 'a', 'x': 0.0, 'y': 0.0},
                 {'label': 'b', 'x': 0.0, 'y': 0.0},
@@ -119,7 +167,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': True,
             'isLabeled': True
         }))
-        self.assertTrue(graph.IsAcyclic().eval({
+        self.assertTrue(graph.HasGraphProperty('acyclic').eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
                 {'label': '', 'x': 0.0, 'y': 0.0},
@@ -134,9 +182,9 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertFalse(graph.IsAcyclic().eval(_cycleGraph(5)))
-        self.assertFalse(graph.IsAcyclic().eval(_completeGraph(4)))
-        self.assertFalse(graph.IsAcyclic().eval({
+        self.assertFalse(graph.HasGraphProperty('acyclic').eval(_cycleGraph(5)))
+        self.assertFalse(graph.HasGraphProperty('acyclic').eval(_completeGraph(4)))
+        self.assertFalse(graph.HasGraphProperty('acyclic').eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
                 {'label': '', 'x': 0.0, 'y': 0.0},
@@ -153,12 +201,12 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         }))
 
     def test_is_regular_rule(self):
-        self.assertTrue(graph.IsRegular().eval(_emptyGraph()))
-        self.assertTrue(graph.IsRegular().eval(_nullGraph(9)))
-        self.assertTrue(graph.IsRegular().eval(_completeGraph(8)))
-        self.assertTrue(graph.IsRegular().eval(_cycleGraph(3)))
-        self.assertTrue(graph.IsRegular().eval(_cycleGraph(4)))
-        self.assertTrue(graph.IsRegular().eval({
+        self.assertTrue(graph.HasGraphProperty('regular').eval(_emptyGraph()))
+        self.assertTrue(graph.HasGraphProperty('regular').eval(_nullGraph(9)))
+        self.assertTrue(graph.HasGraphProperty('regular').eval(_completeGraph(8)))
+        self.assertTrue(graph.HasGraphProperty('regular').eval(_cycleGraph(3)))
+        self.assertTrue(graph.HasGraphProperty('regular').eval(_cycleGraph(4)))
+        self.assertTrue(graph.HasGraphProperty('regular').eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
                 {'label': '', 'x': 0.0, 'y': 0.0},
@@ -173,7 +221,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertFalse(graph.IsRegular().eval({
+        self.assertFalse(graph.HasGraphProperty('regular').eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
                 {'label': '', 'x': 0.0, 'y': 0.0},
@@ -188,7 +236,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertFalse(graph.IsRegular().eval({
+        self.assertFalse(graph.HasGraphProperty('regular').eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
                 {'label': '', 'x': 0.0, 'y': 0.0},
@@ -201,7 +249,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertFalse(graph.IsRegular().eval({
+        self.assertFalse(graph.HasGraphProperty('regular').eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
                 {'label': '', 'x': 0.0, 'y': 0.0},

@@ -518,6 +518,21 @@ class Graph(BaseObject):
         return raw
 
 
+class GraphProperty(BaseObject):
+    """A string from a list of possible graph properties"""
+
+    description = 'One of the possible properties possessed by a graph.'
+    edit_html_filename = 'graph_property_editor'
+    edit_js_filename = 'GraphPropertyEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': [
+            'strongly_connected', 'weakly_connected', 'acyclic', 'regular'
+        ]
+    }
+
+
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
     
