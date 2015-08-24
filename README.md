@@ -2,6 +2,8 @@
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing and get feedback.
 
+Oppia is written using Python and AngularJS, and is built on top of Google App Engine.
+
   * Community site: [Oppia.org](https://www.oppia.org)
   * Full user documentation: [oppia.github.io](https://oppia.github.io/)
 
