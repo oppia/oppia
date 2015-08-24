@@ -267,9 +267,7 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
         throw 'Expected exactly one rule option to match: ' + ruleDescriptionInDropdown;
       }
 
-      for (var i = 0; i < optionElements.length; i++) {
-        optionElements[i].click();
-      }
+      optionElements[0].click();
     });
   });
 
@@ -729,7 +727,7 @@ var expectGraphComparisonOf = function(v1, v2) {
         } else if (linkColor == COLOR_DELETED) {
           return 'deleted';
         } else {
-          return 'total';
+          return 'other';
         }
       });
     }).then(function(linkTypes) {
