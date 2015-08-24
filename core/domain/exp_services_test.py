@@ -356,6 +356,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     SAMPLE_YAML_CONTENT = (
 """author_notes: ''
 blurb: ''
+category: A category
 default_skin: conversation_v1
 init_state_name: %s
 language_code: en
@@ -404,6 +405,7 @@ states:
     param_changes: []
 states_schema_version: %d
 tags: []
+title: A title
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
@@ -414,6 +416,7 @@ tags: []
     UPDATED_YAML_CONTENT = (
 """author_notes: ''
 blurb: ''
+category: A category
 default_skin: conversation_v1
 init_state_name: %s
 language_code: en
@@ -462,6 +465,7 @@ states:
     param_changes: []
 states_schema_version: %d
 tags: []
+title: A title
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
@@ -1361,7 +1365,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         'commit_type': 'edit',
         'post_commit_community_owned': False,
         'post_commit_is_private': False,
-        'commit_message': 'Exploration published.',
+        'commit_message': 'exploration published.',
         'post_commit_status': 'public'
     }
 
@@ -1948,6 +1952,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     UPGRADED_EXP_YAML = (
 """author_notes: ''
 blurb: ''
+category: category
 default_skin: conversation_v1
 init_state_name: %s
 language_code: en
@@ -1989,6 +1994,7 @@ states:
     param_changes: []
 states_schema_version: %d
 tags: []
+title: Old Title
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,

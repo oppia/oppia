@@ -362,7 +362,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXPLORATION_ID)
 
-    def test_add_collection_node(self):
+    def test_add_node(self):
         # Verify the initial collection only has 1 exploration in it.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
@@ -382,7 +382,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection.exploration_ids, [self.EXPLORATION_ID, _NEW_EXP_ID])
 
-    def test_delete_collection_node(self):
+    def test_delete_node(self):
         # Verify the initial collection only has 1 exploration in it.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
@@ -460,7 +460,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         # Verify initial prerequisite skills are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.prerequisite_skills, [])
 
         # Update the prerequisite skills.
@@ -475,7 +475,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         # Verify the prerequisites are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(
             collection_node.prerequisite_skills, ['first', 'second'])
 
@@ -483,7 +483,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         # Verify initial acquired skills are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.acquired_skills, [])
 
         # Update the acquired skills.
@@ -498,7 +498,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         # Verify the acquired are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection_node = collection.get_collection_node(self.EXPLORATION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.acquired_skills, ['third', 'fourth'])
 
 
@@ -730,7 +730,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             snapshots_metadata[1]['created_on_ms'],
             snapshots_metadata[2]['created_on_ms'])
 
-    def test_versioning_with_add_and_delete_collection_nodes(self):
+    def test_versioning_with_add_and_delete_nodes(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
 
@@ -750,7 +750,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection.add_collection_node(
+        collection.add_node(
             self.save_new_valid_exploration(
                 'new_exploration_id', self.OWNER_ID).id)
         collection_services._save_collection(
@@ -778,10 +778,10 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         # This should not create a new version.
         with self.assertRaisesRegexp(
                 ValueError, 'is not part of this collection'):
-            collection.delete_collection_node('invalid_exploration_id')
+            collection.delete_node('invalid_exploration_id')
 
         # Now delete the newly added exploration.
-        collection.delete_collection_node('new_exploration_id')
+        collection.delete_node('new_exploration_id')
         collection_services._save_collection(
             'committer_id_3', collection, 'Deleted exploration',
             _get_deleted_exploration_change_list('new_exploration_id'))
@@ -893,7 +893,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         'commit_type': 'edit',
         'post_commit_community_owned': False,
         'post_commit_is_private': False,
-        'commit_message': 'Collection published.',
+        'commit_message': 'collection published.',
         'post_commit_status': 'public'
     }
 
@@ -1277,6 +1277,9 @@ class CollectionChangedEventsTests(CollectionServicesUnitTests):
             rights_manager.unpublish_collection(
                 self.user_id_admin, self.COLLECTION_ID)
 
+        # There are only 4 CollectionStatusChangeEvents fired because
+        # create_new_collection_rights does not fire a
+        # CollectionStatusChangeEvent.
         self.assertEqual(recorded_ids, [
             self.COLLECTION_ID, self.COLLECTION_ID,
             self.COLLECTION_ID, self.COLLECTION_ID])

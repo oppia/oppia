@@ -27,11 +27,6 @@ import feconf
 from google.appengine.ext import ndb
 
 
-ACTIVITY_STATUS_PRIVATE = 'private'
-ACTIVITY_STATUS_PUBLIC = 'public'
-ACTIVITY_STATUS_PUBLICIZED = 'publicized'
-
-
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
     pass
@@ -107,7 +102,7 @@ class CollectionModel(base_models.VersionedModel):
             post_commit_status=collection_rights.status,
             post_commit_community_owned=collection_rights.community_owned,
             post_commit_is_private=(
-                collection_rights.status == ACTIVITY_STATUS_PRIVATE)
+                collection_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
         ).put_async()
 
 
@@ -148,11 +143,11 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            ACTIVITY_STATUS_PRIVATE,
-            ACTIVITY_STATUS_PUBLIC,
-            ACTIVITY_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.ACTIVITY_STATUS_PUBLIC,
+            feconf.ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -192,7 +187,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == ACTIVITY_STATUS_PRIVATE)
+                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
 
@@ -297,11 +292,11 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            ACTIVITY_STATUS_PRIVATE,
-            ACTIVITY_STATUS_PUBLIC,
-            ACTIVITY_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.ACTIVITY_STATUS_PUBLIC,
+            feconf.ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -322,7 +317,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     def get_non_private(cls):
         """Returns an iterable with non-private collection summary models."""
         return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status != ACTIVITY_STATUS_PRIVATE
+            CollectionSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
             CollectionSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -333,7 +328,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status == ACTIVITY_STATUS_PRIVATE
+            CollectionSummaryModel.status == feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ndb.OR(CollectionSummaryModel.owner_ids == user_id,
                    CollectionSummaryModel.editor_ids == user_id,

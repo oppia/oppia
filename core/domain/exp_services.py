@@ -978,7 +978,7 @@ def save_new_exploration_from_yaml_and_assets(
     if assets_list is None:
         assets_list = []
 
-    exploration = exp_domain.Exploration.from_yaml(
+    exploration = exp_domain.Exploration.from_untitled_yaml(
         exploration_id, title, category, yaml_content)
     commit_message = (
         'New exploration created from YAML file with title \'%s\'.'

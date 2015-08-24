@@ -1899,7 +1899,8 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 8
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 9
+    LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION = 8
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -2008,8 +2009,16 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def from_yaml(cls, exploration_id, title, category, yaml_content):
-        """Creates and returns exploration from a YAML text string."""
+    def _convert_v8_dict_to_v9_dict(cls, exploration_dict, title, category):
+        """Converts a v8 exploration dict into a v9 exploration dict."""
+        exploration_dict['schema_version'] = 9
+        exploration_dict['title'] = title
+        exploration_dict['category'] = category
+        return exploration_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(cls, yaml_content, title=None,
+            category=None):
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -2019,6 +2028,7 @@ class Exploration(object):
                 % e)
 
         exploration_schema_version = exploration_dict.get('schema_version')
+        initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
         if not (1 <= exploration_schema_version
@@ -2061,21 +2071,59 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 8
 
-        exploration_dict['id'] = exploration_id
-        exploration_dict['title'] = title
-        exploration_dict['category'] = category
+        if exploration_schema_version == 8:
+            exploration_dict = cls._convert_v8_dict_to_v9_dict(
+                exploration_dict, title, category)
+            exploration_schema_version = 9
 
+        return (exploration_dict, initial_schema_version)
+
+    @classmethod
+    def from_yaml(cls, exploration_id, yaml_content):
+        """Creates and returns exploration from a YAML text string for YAML
+        schema versions 9 and later.
+        """
+        migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
+        exploration_dict = migration_result[0]
+        initital_schema_version = migration_result[1]
+
+        if (initital_schema_version <=
+                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+            raise Exception(
+                'Expecting a title and category to be provided for an '
+                'exploration encoded in the YAML version: %d' % (
+                    exploration_dict['schema_version']))
+
+        exploration_dict['id'] = exploration_id
+        return Exploration.from_dict(exploration_dict)
+
+    @classmethod
+    def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
+        """Creates and returns exploration from a YAML text string. This is
+        for importing explorations using YAML schema version 8 or earlier.
+        """
+        migration_result = cls._migrate_to_latest_yaml_version(
+            yaml_content, title, category)
+        exploration_dict = migration_result[0]
+        initital_schema_version = migration_result[1]
+
+        if (initital_schema_version >
+                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+            raise Exception(
+                'No title or category need to be provided for an exploration '
+                'encoded in the YAML version: %d' % (
+                    exploration_dict['schema_version']))
+
+        exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 
     def to_yaml(self):
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXPLORATION_SCHEMA_VERSION
 
-        # Remove elements from the exploration dictionary that should not be
-        # saved within the YAML representation.
+        # The ID is the only property which should not be stored within the
+        # YAML representation.
         del exp_dict['id']
-        del exp_dict['title']
-        del exp_dict['category']
 
         return utils.yaml_from_dict(exp_dict)
 

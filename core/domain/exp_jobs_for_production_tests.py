@@ -85,7 +85,7 @@ class ExpCopiesMRJobManager(
         from core.domain import exp_services
         from core.domain import rights_manager
         for stringified_exp in list_of_exps:
-            exploration = exp_domain.Exploration.from_yaml(
+            exploration = exp_domain.Exploration.from_untitled_yaml(
                 exp_id, 'Copy', 'Copies', stringified_exp)
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)

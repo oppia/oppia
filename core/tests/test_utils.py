@@ -386,7 +386,7 @@ class TestBase(unittest.TestCase):
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective=objective)
-        collection.add_collection_node(
+        collection.add_node(
             self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
                 end_state_name=end_state_name).id)

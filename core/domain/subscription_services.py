@@ -63,7 +63,7 @@ def subscribe_to_activity(user_id, activity_id):
 
 
 def get_activity_ids_subscribed_to(user_id):
-    """Returns a list with all ids of all activities (i.e., explorations and
+    """Returns a list with ids of all activities (i.e., explorations and
     collections) that the given user subscribes to.
 
     Callers of this function should ensure that the user_id is valid.
@@ -92,7 +92,8 @@ def subscribe_to_collection(user_id, collection_id):
 
 
 def get_collection_ids_subscribed_to(user_id):
-    """Returns a list with all collections that the given user subscribes to.
+    """Returns a list with ids of all collections that the given user
+    subscribes to.
 
     Callers of this function should ensure that the user_id is valid.
     """

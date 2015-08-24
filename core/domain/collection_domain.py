@@ -177,11 +177,11 @@ class CollectionNode(object):
         }
 
     @classmethod
-    def from_dict(cls, collection_node_dict):
+    def from_dict(cls, node_dict):
         return cls(
-            copy.deepcopy(collection_node_dict['exploration_id']),
-            copy.deepcopy(collection_node_dict['prerequisite_skills']),
-            copy.deepcopy(collection_node_dict['acquired_skills']))
+            copy.deepcopy(node_dict['exploration_id']),
+            copy.deepcopy(node_dict['prerequisite_skills']),
+            copy.deepcopy(node_dict['acquired_skills']))
 
     @property
     def skills(self):
@@ -191,19 +191,9 @@ class CollectionNode(object):
         return set(self.prerequisite_skills) | set(self.acquired_skills)
 
     def update_prerequisite_skills(self, prerequisite_skills):
-        if set(prerequisite_skills) & set(self.acquired_skills):
-            raise utils.ValueError(
-                'No prerequisite skills may also be acquired skills: %s' %
-                prerequisite_skills)
-
         self.prerequisite_skills = copy.deepcopy(prerequisite_skills)
 
     def update_acquired_skills(self, acquired_skills):
-        if set(self.prerequisite_skills) & set(acquired_skills):
-            raise utils.ValueError(
-                'No acquired skills may also be prerequisite skills: %s' %
-                acquired_skills)
-
         self.acquired_skills = copy.deepcopy(acquired_skills)
 
     def validate(self):
@@ -246,16 +236,16 @@ class CollectionNode(object):
                     'Expected all acquired skills to be strings, received %s' %
                     acquired_skill)
 
-        confusing_skills = (
-          set(self.prerequisite_skills) & set(self.acquired_skills))
-        if confusing_skills:
+        redundant_skills = (
+            set(self.prerequisite_skills) & set(self.acquired_skills))
+        if redundant_skills:
             raise utils.ValidationError(
                 'There are some skills which are both required for '
                 'exploration %s and acquired after playing it: %s' %
-                (self.exploration_id, confusing_skills))
+                (self.exploration_id, redundant_skills))
 
     @classmethod
-    def create_default_collection_node(cls, exploration_id):
+    def create_default_node(cls, exploration_id):
         return cls(exploration_id, [], [])
 
 
@@ -267,24 +257,24 @@ class Collection(object):
 
     Note: The schema_version represents the version of any underlying
     dictionary or list structures stored within the collection. In particular,
-    the nodes structure schema is represented by this version. If any changes
-    happen to CollectionNode, then a migration function will need to be added
-    to this class to convert from the current schema version to the new one.
-    This function should be called in both from_yaml in this class and
-    collection_services._migrate_collection_to_latest_schema. The collection
-    schema version in feconf should be incremented and the new value should be
-    saved in the collection after the migration process, ensuring it represents
-    the latest schema version.
+    the schema for CollectionNodes is represented by this version. If the
+    schema for CollectionNode changes, then a migration function will need to
+    be added to this class to convert from the current schema version to the
+    new one. This function should be called in both from_yaml in this class and
+    collection_services._migrate_collection_to_latest_schema.
+    feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the new
+    value should be saved in the collection after the migration process,
+    ensuring it represents the latest schema version.
     """
     def __init__(self, collection_id, title, category, objective,
-                 schema_version, collection_nodes, version, created_on=None,
+                 schema_version, nodes, version, created_on=None,
                  last_updated=None):
         self.id = collection_id
         self.title = title
         self.category = category
         self.objective = objective
         self.schema_version = schema_version
-        self.nodes = collection_nodes
+        self.nodes = nodes
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -297,7 +287,7 @@ class Collection(object):
             'objective': self.objective,
             'schema_version': self.schema_version,
             'nodes': [
-                collection_node.to_dict() for collection_node in self.nodes
+                node.to_dict() for node in self.nodes
             ]
         }
 
@@ -318,9 +308,9 @@ class Collection(object):
             collection_dict['schema_version'], [], collection_version,
             collection_created_on, collection_last_updated)
 
-        for collection_node_dict in collection_dict['nodes']:
+        for node_dict in collection_dict['nodes']:
             collection.nodes.append(
-                CollectionNode.from_dict(collection_node_dict))
+                CollectionNode.from_dict(node_dict))
 
         return collection
 
@@ -353,28 +343,29 @@ class Collection(object):
         This returns a sorted list of all the skills of the collection.
         """
         unique_skills = set()
-        for collection_node in self.nodes:
-            unique_skills.update(collection_node.skills)
-        skills_list = list(unique_skills)
-        skills_list.sort()
-        return skills_list
+        for node in self.nodes:
+            unique_skills.update(node.skills)
+        return sorted(unique_skills)
 
     @property
     def exploration_ids(self):
-        """Returns a list of all the exploration IDs part of this collection.
+        """Returns a list of all the exploration IDs that are part of this
+        collection.
         """
         return [
-            collection_node.exploration_id for collection_node in self.nodes]
+            node.exploration_id for node in self.nodes]
 
     @property
     def init_exploration_ids(self):
         """Returns a list of exploration IDs that are starting points for this
-        collection (ie, they require no prior skills to complete).
+        collection (ie, they require no prior skills to complete). The order
+        of these IDs is given by the order each respective exploration was
+        added to the collection.
         """
         init_exp_ids = []
-        for collection_node in self.nodes:
-            if not collection_node.prerequisite_skills:
-                init_exp_ids.append(collection_node.exploration_id)
+        for node in self.nodes:
+            if not node.prerequisite_skills:
+                init_exp_ids.append(node.exploration_id)
         return init_exp_ids
 
     def get_next_exploration_ids(self, completed_exploration_ids):
@@ -383,20 +374,21 @@ class Collection(object):
         If the list returned is empty and the collection is valid, then all
         skills have been acquired and the collection is completed. If the input
         list is empty, then only explorations with no prerequisite skills are
-        returned.
+        returned. The order of the exploration IDs is given by the order in
+        which each exploration was added to the collection.
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
             acquired_skills.update(
-                self.get_collection_node(completed_exp_id).acquired_skills)
+                self.get_node(completed_exp_id).acquired_skills)
 
         next_exp_ids = []
-        for collection_node in self.nodes:
-            if collection_node.exploration_id in completed_exploration_ids:
+        for node in self.nodes:
+            if node.exploration_id in completed_exploration_ids:
                 continue
-            prereq_skills = set(collection_node.prerequisite_skills)
+            prereq_skills = set(node.prerequisite_skills)
             if prereq_skills <= acquired_skills:
-                next_exp_ids.append(collection_node.exploration_id)
+                next_exp_ids.append(node.exploration_id)
         return next_exp_ids
 
     @classmethod
@@ -419,32 +411,31 @@ class Collection(object):
     def update_objective(self, objective):
         self.objective = objective
 
-    def _find_collection_node(self, exploration_id):
+    def _find_node(self, exploration_id):
         for i in range(len(self.nodes)):
             if self.nodes[i].exploration_id == exploration_id:
                 return i
-        return -1
+        return None
 
-    def get_collection_node(self, exploration_id):
+    def get_node(self, exploration_id):
         """Retrieves a collection node from the collection based on an
         exploration ID.
         """
-        for collection_node in self.nodes:
-            if collection_node.exploration_id == exploration_id:
-                return collection_node
+        for node in self.nodes:
+            if node.exploration_id == exploration_id:
+                return node
         return None
 
-    def add_collection_node(self, exploration_id):
-        if self.get_collection_node(exploration_id) is not None:
+    def add_node(self, exploration_id):
+        if self.get_node(exploration_id) is not None:
             raise ValueError(
                 'Exploration is already part of this collection: %s' %
                 exploration_id)
-        self.nodes.append(
-            CollectionNode.create_default_collection_node(exploration_id))
+        self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
-    def delete_collection_node(self, exploration_id):
-        node_index = self._find_collection_node(exploration_id)
-        if node_index == -1:
+    def delete_node(self, exploration_id):
+        node_index = self._find_node(exploration_id)
+        if node_index == None:
             raise ValueError(
                 'Exploration is not part of this collection: %s' %
                 exploration_id)
@@ -495,17 +486,9 @@ class Collection(object):
                 'than once.')
 
         # Validate all collection nodes.
-        for collection_node in self.nodes:
-            collection_node.validate()
+        for node in self.nodes:
+            node.validate()
 
-        # Ensure the skills graph has no cycles. This is done two-fold: first,
-        # no skill can appear in both the prerequisite and acquired skills
-        # lists fpr any node. No exploration may grant a skill that it
-        # simultaneously lists as a prerequisite. Second, every exploration in
-        # the collection must be reachable when starting from the explorations
-        # with no prerequisite skills and playing through all subsequent
-        # explorations provided by get_next_exploration_ids. Cycles can only
-        # exist in a disconnected graph.
         if strict:
             if not self.nodes:
                 raise utils.ValidationError(
@@ -518,7 +501,12 @@ class Collection(object):
                     'Expected to have at least 1 exploration with no '
                     'prerequisite skills.')
 
-            # Ensure the collection can be completed.
+            # Ensure the collection can be completed. This is done in two
+            # steps: first, no exploration may grant a skill that it
+            # simultaneously lists as a prerequisite. Second, every exploration
+            # in the collection must be reachable when starting from the
+            # explorations with no prerequisite skills and playing through all
+            # subsequent explorations provided by get_next_exploration_ids.
             completed_exp_ids = set(self.init_exploration_ids)
             next_exp_ids = self.get_next_exploration_ids(
                 list(completed_exp_ids))

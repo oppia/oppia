@@ -342,13 +342,12 @@ def apply_change_list(collection_id, change_list):
 
         for change in changes:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
-                collection.add_collection_node(change.exploration_id)
+                collection.add_node(change.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
-                collection.delete_collection_node(change.exploration_id)
+                collection.delete_node(change.exploration_id)
             elif (change.cmd ==
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
-                collection_node = collection.get_collection_node(
-                    change.exploration_id)
+                collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
                         collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
                     collection_node.update_prerequisite_skills(
@@ -424,7 +423,6 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
     event_services.CollectionContentChangeEventHandler.record(collection.id)
-    # TODO(bhenning): Verify rights that this should be indexed.
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -675,7 +673,7 @@ def load_demo(collection_id):
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
         # Only load the demo exploration if it is not yet loaded.
-        if not exp_services.get_exploration_by_id(exp_id, strict=False):
+        if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
@@ -752,7 +750,10 @@ def _get_search_rank(collection_id):
     Featured collections get a ranking bump, and so do collections that
     have been more recently updated.
     """
-    # TODO(sll): Improve this calculation.
+    # TODO(bhenning): Improve this calculation. Some possible suggestions for
+    # a better ranking include using an average of the search ranks of each
+    # exploration referenced in the collection and/or demoting collections
+    # for any validation errors from explorations referenced in the collection.
     _STATUS_PUBLICIZED_BONUS = 30
     # This is done to prevent the rank hitting 0 too easily. Note that
     # negative ranks are disallowed in the Search API.
