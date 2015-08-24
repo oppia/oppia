@@ -139,7 +139,7 @@ def is_regular(graph):
 
 
 class HasGraphProperty(base.GraphRule):
-    description = 'is a graph with the property {{p|GraphProperty}}'
+    description = 'is {{p|GraphProperty}}'
     is_generic = False
 
     def _evaluate(self, subject):

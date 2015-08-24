@@ -32,16 +32,16 @@ oppia.directive('graphPropertyEditor', function($compile, warningsData) {
       $scope.alwaysEditable = true;
       $scope.properties = [{
         name: 'regular',
-        humanReadable: 'Regular'
+        humanReadable: 'regular'
       }, {
         name: 'acyclic',
         humanReadable: 'acyclic'
       }, {
         name: 'strongly_connected',
-        humanReadable: 'Strongly connected'
+        humanReadable: 'strongly connected'
       }, {
         name: 'weakly_connected',
-        humanReadable: 'Weakly connected'
+        humanReadable: 'weakly connected'
       }];
 
       $scope.localValue = {
