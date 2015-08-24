@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html ng-app="oppiaGithubPages">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-state=1">
+    <meta name="description" content="Oppia : A tool for creating interactive tutors">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="static/css/stylesheet.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
+    <script src="app.js"></script>
+
+    <title ng-bind="$root.title"></title>
+  </head>
+
+  <body>
+    <div id="header_wrap" class="outer">
+      <header class="inner" style="max-width: 900px;">
+        <a id="forkme_banner" href="https://github.com/oppia/oppia">View on GitHub</a>
+        <h1 id="project_title">
+          <a href="https://www.oppia.org" class="anchor">Oppia</a>
+        </h1>
+        <h2 id="project_tagline" ng-bind="$root.projectTag"></h2>
+      </header>
+    </div>
+
+    <div id="main_content_wrap" class="outer">
+      <div>
+      <!--A container to make a grid with a fixed column-->
+        <div class="container row" style="width: 900px;">
+          <div ng-include="'pages/sidebar.html'"></div>
+          <!-- Content will be injected here. -->
+          <div class="view-content" ng-view></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer_wrap" class="outer">
+      <footer class="inner" style="max-width: 900px; width: 900px;">
+        <p style="font-size: smaller;">
+          Published with <a href="https://pages.github.com">GitHub Pages</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="static/javascripts/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=css" defer="defer"></script>
+
+    <script src="https://ssl.google-analytics.com/ga.js" type="text/javascript">
+    </script>
+
+    <script type="text/javascript">
+      try {
+        var pageTracker = _gat._getTracker("UA-66335041-1");
+        pageTracker._trackPageview();
+      } catch (err) {}
+    </script>
+  </body>
+
+</html>
