@@ -13,13 +13,17 @@
 // limitations under the License.
 
 var oppiaGithubPages = angular.module('oppiaGithubPages', ['ngRoute']);
-// configure our routes
+
 oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {
       templateUrl: 'pages/home.html',
       controller: 'mainController',
-      projectTag: 'A tool for creating interactive tutors'
+      projectTag: 'User Documentation'
+    })
+    .when('/CreatingAnExploration', {
+      templateUrl: 'pages/creatingAnExploration.html',
+      projectTag: 'Creating an Exploration'
     })
     .when('/Embedded', {
       templateUrl: 'pages/embedded.html',
@@ -89,11 +93,6 @@ oppiaGithubPages.config(['$routeProvider', function($routeProvider) {
 oppiaGithubPages.run(['$location', '$rootScope', function($location, $rootScope) {
   $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
     $rootScope.projectTag = current.$$route.projectTag;
-    $rootScope.title = 'OppiaGithub-' + current.$$route.projectTag;
+    $rootScope.title = 'Oppia: ' + current.$$route.projectTag;
   });
 }]);
-
-// TODO:(create separate files for controllers)
-oppiaGithubPages.controller('mainController', function($scope) {
-
-});
