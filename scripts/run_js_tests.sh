@@ -40,7 +40,9 @@ source $(dirname $0)/setup_gae.sh || exit 1
 
 # Install third party dependencies
 # TODO(sll): Make this work with fewer third-party dependencies.
-bash scripts/install_third_party.sh
+# Travis aborts test run if nothing is printed back to STDOUT for some time.
+# -x is used to avoid that.
+bash -x scripts/install_third_party.sh
 
 echo Checking whether karma is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
