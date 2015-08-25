@@ -897,7 +897,8 @@ oppia.filter('isFloat', [function() {
   return function(input) {
     // TODO(sll): Accept expressions (like '2.') with nothing after the decimal
     // point.
-    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+    var FLOAT_REGEXP = /^((\-?\d+(\.|\,)?)|(\-?(\.|\,)?))\d+\%?$/; 
+    // Reg chaned to allow entries of .2 and ,2 and now allows % also
 
     var viewValue = '';
     try {
@@ -906,10 +907,15 @@ oppia.filter('isFloat', [function() {
       return undefined;
     }
 
-    if (viewValue !== '' && viewValue !== '-' && FLOAT_REGEXP.test(viewValue)) {
+    if (viewValue !== '' && FLOAT_REGEXP.test(viewValue) && viewValue.slice(-1) !== "%") {
       return parseFloat(viewValue.replace(',', '.'));
     }
+    else if (viewValue !== '' && FLOAT_REGEXP.test(viewValue) && viewValue.slice(-1) === "%") {
+      return parseFloat(viewValue.replace(',', '.')) / 100; // User entry needs to be / 100 for %
+    }
+    else {
     return undefined;
+    }
   };
 }]);
 
