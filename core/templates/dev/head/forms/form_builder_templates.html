@@ -185,12 +185,20 @@
               ng-focus="onInputFocus()">
     </textarea>
 
-    <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
-      <input type="text" ng-disabled="isDisabled()"
+    <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()" style="margin-top: 0;">
+      <input type="text" ng-disabled="isDisabled()" ng-class="{'oppia-unicode-editor-with-speech-recognition': allowSpeechRecognition}"
              ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
              ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
              ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"
-             style="padding-top: 20px; margin-top: -30px;">
+             style="padding-top: 20px; margin-top: -20px;">
+      <span ng-if="allowSpeechRecognition" ng-click="toggleSpeechRecognition()">
+        <img ng-if="!isCurrentlyRecording"
+             src="/third_party/static/material-design-icons-1.0.1/ic_mic_none_black_48dp.png"
+             class="oppia-unicode-form-mic-button">
+        <img ng-if="isCurrentlyRecording"
+             src="/third_party/static/material-design-icons-1.0.1/ic_mic_black_48dp.png"
+             class="oppia-unicode-form-mic-button" style="background-color: red; border-radius: 50%;">
+      </span>
     </md-input-group>
 
     <!-- Note that we do not yet support ng-blur for the code editor. -->

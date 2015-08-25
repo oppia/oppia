@@ -1274,10 +1274,60 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
-    controller: ['$scope', '$filter', '$sce', 'parameterSpecsService',
-        function($scope, $filter, $sce, parameterSpecsService) {
+    controller: ['$scope', '$filter', '$sce', '$window', 'parameterSpecsService',
+        function($scope, $filter, $sce, $window, parameterSpecsService) {
       $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType('unicode');
       $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
+
+      $scope.allowSpeechRecognition = (
+        $scope.uiConfig() &&
+        $scope.uiConfig().speechRecognitionLanguage &&
+        !!$window.webkitSpeechRecognition);
+      $scope.isCurrentlyRecording = false;
+
+      var recognition = new webkitSpeechRecognition();
+
+      $scope.toggleSpeechRecognition = function() {
+        if ($scope.isCurrentlyRecording) {
+          recognition.stop();
+          recognition.abort();
+          $scope.isCurrentlyRecording = false;
+          $scope.$apply();
+          return;
+        }
+
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = $scope.uiConfig().speechRecognitionLanguage;
+
+        $scope.isCurrentlyRecording = true;
+        recognition.start();
+
+        recognition.onerror = function(evt) {
+          recognition.stop();
+          recognition.abort();
+          $scope.isCurrentlyRecording = false;
+          $scope.$apply();
+        };
+
+        recognition.onresult = function(evt) {
+          for (var i = 0; i < evt.results.length; i++) {
+            if (evt.results[i].isFinal) {
+              if ($scope.localValue && evt.results[i][0].transcript &&
+                  $scope.localValue[$scope.localValue.length - 1] !== ' ') {
+                $scope.localValue += ' ';
+              }
+              $scope.localValue += evt.results[i][0].transcript;
+              recognition.stop();
+              recognition.abort();
+              $scope.isCurrentlyRecording = false;
+              $scope.$apply();
+              break;
+            }
+          }
+        };
+      };
 
       if ($scope.uiConfig() && $scope.uiConfig().rows && $scope.doUnicodeParamsExist) {
         $scope.doUnicodeParamsExist = false;
