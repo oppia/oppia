@@ -4,7 +4,7 @@ Oppia is an online learning tool that enables anyone to easily create and share 
 
 Oppia is written using Python and AngularJS, and is built on top of Google App Engine.
 
-  * Community site: [Oppia.org](https://www.oppia.org)
+  * [Oppia.org community site](https://www.oppia.org)
   * [Documentation](https://oppia.github.io/)
   * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
   * [Developer mailing list](http://groups.google.com/group/oppia-dev)
