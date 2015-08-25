@@ -501,6 +501,9 @@ class ExplorationDownloadHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+            raise self.PageNotFoundException
+
         version = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
         width = int(self.request.get('width', default_value=80))
@@ -531,6 +534,9 @@ class StateDownloadHandler(EditorHandler):
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
+            raise self.PageNotFoundException
+
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
