@@ -387,6 +387,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -405,6 +406,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -445,6 +447,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -463,6 +466,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -573,6 +577,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -594,6 +599,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -616,6 +622,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -2061,6 +2068,7 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
@@ -2074,6 +2082,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue

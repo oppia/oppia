@@ -1,114 +1,71 @@
 # Oppia
-Oppia is an online learning tool that enables anyone to easily create and share interactive activities. These activities, called 'explorations', simulate a one-on-one conversation with an intelligent tutor. You can try a hosted version at [Oppia.org](https://www.oppia.org), and read more at our [GitHub page](http://oppia.github.io/).
+
+Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing and get feedback.
+
+Oppia is written using Python and AngularJS, and is built on top of Google App Engine.
+
+  * [Oppia.org community site](https://www.oppia.org)
+  * [Documentation](https://oppia.github.io/)
+  * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
+  * [Developer mailing list](http://groups.google.com/group/oppia-dev)
+  * [File an issue](https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!)
+
+<p align="center">
+  <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank">
+    <img src="http://img.youtube.com/vi/Ntcw0H0hwPU/0.jpg">
+  </a>
+</p>
 
 ## Installation
-Please refer to https://code.google.com/p/oppia/wiki/GettingStarted for extensive installation instructions. Here is just a short summary for developers who would like to contribute:
 
-1. First, fork and clone the Oppia repo. We suggest you make a directory called opensource/ within your home folder (mkdir opensource). Then do
+Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for full installation instructions. This is just a short summary for developers who would like to contribute:
 
-  ```
-    cd opensource/
-  ```
+1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo. This will create a new folder named `opensource/oppia`.
 
-  and follow the instructions on Github's [Fork a Repo page](https://help.github.com/articles/fork-a-repo/) to clone the repo to that directory. This should create a new folder named `oppia`.
-
-2. Navigate to `oppia/` and install Oppia by running
+2. Navigate to `opensource/oppia/` and run:
 
   ```
+    git checkout develop
     bash scripts/start.sh
   ```
 
-3. To test the installation, navigate to `oppia/` and run
+3. To run tests:
 
   ```
     bash scripts/test.sh
     bash scripts/run_js_tests.sh
+    bash scripts/run_integration_tests.sh
   ```
 
-# Contributing
 
-## Setting things up
+## Contributing
 
-First, make a local clone of the repository on your computer by following the installation instructions above.
+The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
-Next, update your GitHub notification settings:
+You can help with Oppia's development in many ways, including art, coding, design and documentation.
+  * **Developers**: please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to set things up and commit changes.
+  * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).
 
-1. Go to your settings page (click the Settings option under the profile menu in the top right), then go to 'Notification center' and ensure that everything's as you want it.
-2. Go to the repository page, and click 'Watch' at the top right. Ensure that your notification status is not set to "Ignoring", so that you at least get notified when someone replies to a conversation you're part of. Note that you won't get emails for comments that you make on issues.
+In addition, if you're making contributions to the codebase, please sign the CLA so that we can accept your contributions.
+  * If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0).
+  * If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
 
-Next, please sign the CLA so that we can accept your contributions. If you're an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company would own the copyright to your contributions, a representative from the company should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
 
-You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time.
+## Support
 
-## Instructions for code contributors
+If you have any feature requests or bug reports, please log them on our [issue tracker](https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!).
 
-Oppia development is mainly done via the [Gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow), which defines a few special types of branches:
+Please report security issues directly to admin@oppia.org.
 
-* develop: this is the central branch for development, which should be clean and ready for release at any time
-* master: this is the branch that the production server at [Oppia.org](https://www.oppia.org) is synced to
-* "hotfix"-prefixed branches: these are used for hotfixes to master that can't wait until the next release
-* "release"-prefixed branches: these are used for testing and QA of new releases
 
-Please don't commit directly to these branches! We want to ensure that the main develop branch is always clean, since it's used as the base branch by all contributors. Instead, you should create a new feature branch off of **develop**, and make changes there.
+## License
 
-Here are full instructions for how to make a code change:
+The Oppia code is released under the [Apache v2 license](https://github.com/oppia/oppia/blob/master/LICENSE).
 
-1. **Choose a descriptive name for your branch.** Branch names should be lowercase and hyphen-separated. They should also be nouns describing the change. So, 'fuzzy-rules' is fine, but not 'implement-fuzzy-rules'. In addition:
-  * Branch names should not start with 'hotfix' or 'release'.
-  * Branch names should only begin with 'experiment-' if they represent an experimental change that may not be merged into develop. For consistency, please use 'experiment-' and not 'experimental-'.
-2. **Starting from 'develop', create a new branch with the name you picked.** To do this, run:
 
-  ```
-    git fetch upstream
-    git checkout develop
-    git merge upstream/develop
-    git checkout -b your-branch-name
-  ```
+## Keeping in touch
 
-3. **Make a commit to your feature branch.** Each commit should be self-contained, and should have a descriptive commit message that helps other developers understand why the changes were made.
-  * Before making a commit, ensure that all tests still pass, by running:
-
-    ```
-      bash scripts/test.sh
-      bash scripts/run_js_tests.sh
-      bash scripts/run_integration_tests.sh (if necessary)
-    ```
-
-  * To actually make the commit and push it to your fork on GitHub, run:
-
-    ```
-      git commit -a -m "{{YOUR COMMIT MESSAGE HERE}}"
-      git push origin {{YOUR BRANCH NAME}}
-    ```
-
-4. **When your feature is ready to merge, create a pull request.** A pull request is like a regular GitHub issue, that has a series of commits attached to it.
-  * Go to the GitHub page for your fork, and select your branch from the dropdown menu.
-  * Click "pull request". Ensure that the 'base' repository is the main oppia repo and that the 'base' branch is 'develop'. Also ensure that the 'combine' fork and branch correspond to your fork and the branch you've been working on.
-  * Add a descriptive comment explaining the purpose of the branch (e.g. "Add a warning when the user leaves a page in the middle of an exploration."). This will be the first message in the review conversation, and it will tell the reviewer what the purpose of the branch is.
-  * Click "Create pull request". (This will notify anyone who's watching the repository.)
-  * An admin should notice the new pull request, and will assign a reviewer to your commit.
-5. **Address review comments until all reviewers give LGTM ('looks good to me').**
-  * When your reviewer has reviewed the code, you'll get an email from them. You'll need to respond in two ways:
-     * Make a new commit addressing the comments, and push it to the same branch.
-     * In addition, reply to each of the reviewer's comments. If a change is requested, you can just reply "Done" once you've fixed it -- otherwise, explain why you think it should not be fixed. All comments should be resolved before an LGTM can be given.
-  * If any merge conflicts arise, you'll need to resolve them. To resolve merge issues between 'new-branch-name' (in your fork) and 'develop' (in the main oppia repository), run:
-
-  ```
-    git checkout new-branch-name
-    git fetch upstream
-    git merge upstream/develop
-    ...[fix the conflicts]...
-    ...[make sure the tests pass before committing]...
-    git commit -a
-    git push origin new-branch-name
-  ```
-
-  * At the end, the reviewer should merge the pull request.
-6. **Tidy up!** Delete the feature branch from your local clone and from the GitHub repository:
-
-  ```
-    git branch -D new-branch-name
-    git push origin --delete new-branch-name
-  ```
-
-7. **Celebrate.** Congratulations, you have contributed to Oppia!
+  * [Blog](https://oppiablog.blogspot.com/)
+  * [Discussion forum](http://groups.google.com/group/oppia)
+  * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
+  * Social media: [G+](https://plus.google.com/109898456505810251700/about), [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)

@@ -24,6 +24,7 @@ class NumericInput(base.BaseInteraction):
     description = (
         'Allows learners to enter integers and floating point numbers.')
     display_mode = base.DISPLAY_MODE_INLINE
+    is_trainable = False
     _dependency_ids = []
     answer_type = 'Real'
 

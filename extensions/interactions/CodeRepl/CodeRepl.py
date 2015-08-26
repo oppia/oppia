@@ -23,6 +23,7 @@ class CodeRepl(base.BaseInteraction):
     name = 'Code Editor'
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable = True
     _dependency_ids = ['jsrepl', 'codemirror']
     answer_type = 'CodeEvaluation'
 
