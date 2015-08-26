@@ -27,5 +27,6 @@ class NumericInput(base.BaseInteraction):
     is_trainable = False
     _dependency_ids = []
     answer_type = 'Real'
+    instructions = None
 
     _customization_arg_specs = []

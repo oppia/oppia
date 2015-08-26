@@ -27,6 +27,7 @@ class MusicNotesInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
     answer_type = 'MusicPhrase'
+    instructions = 'Drag notes to the staff to form a sequence'
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',

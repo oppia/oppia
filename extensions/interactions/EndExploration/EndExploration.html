@@ -20,9 +20,11 @@
     </div>
   </div>
 
-  <div ng-if="!isIframed" class="oppia-end-exploration-gallery-button">
-    <a class="btn btn-default" href="/" style="font-size: 1.1em;">
-      Return to gallery
+  <div ng-if="!isIframed">
+    <a href="/">
+      <md-button class="md-button-success">
+        Return to gallery
+      </md-button>
     </a>
   </div>
 </script>

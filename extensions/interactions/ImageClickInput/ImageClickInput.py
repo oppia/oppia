@@ -27,6 +27,7 @@ class ImageClickInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
     answer_type = 'ClickOnImage'
+    instructions = 'Click on the image'
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',

@@ -19,7 +19,23 @@
   mode.
 */
 html, body {
+  background: url('/images/general/background.png') no-repeat center center fixed;
   background-color: #eee;
+  color: rgba(0,0,0,0.87);
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 1.0em;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  -background-size: cover;
+}
+
+body {
+  background: url('/images/general/background.png') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 /*
@@ -27,162 +43,225 @@ html, body {
   All classes below should start with .conversation-skin
  */
 
+.conversation-skin-initial-oppia-avatar,
+.conversation-skin-oppia-avatar,
+.conversation-skin-user-avatar {
+  position: absolute;
+}
+.conversation-skin-initial-oppia-avatar {
+  height: 36px;
+  left: -18px;
+  top: 30px;
+  width: 36px;
+}
+.conversation-skin-oppia-avatar {
+  height: 36px;
+  left: -18px;
+  top: -9px;
+  width: 36px;
+}
+.conversation-skin-user-avatar {
+  height: 36px;
+  left: -18px;
+  top: 12px;
+  width: 36px;
+}
+
+.conversation-skin-responses-dropdown-container {
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  line-height: 0.1em;
+  margin: 0 auto 30px auto;
+  text-align: center;
+  width: 90%;
+}
+.conversation-skin-responses-dropdown-text {
+  background-color: #fff;
+  color: #888;
+  font-size: 0.8em;
+  padding: 0 10px;
+}
+
+.conversation-skin-main-gadget-panel {
+
+}
+
 .conversation-skin-cards-container {
-  margin-bottom: 50px;
-}
-
-.conversation-skin-exploration-intro-card {
-  background-color: rgb(255,255,255);
-  font-family: 'Roboto';
-  margin: 20px auto;
-  max-height: 567px;
-  max-width: 560px;
-  padding: 0px;
-  text-align: center;
-}
-
-
-.conversation-skin-left-gadget-panel {
-  margin-right: 285px;
-  max-width: 200px;
-  position: fixed;
-  right: 50%;
-  top: 76px;
-}
-
-.conversation-skin-right-gadget-panel {
-  margin-left: 285px;
-  max-width: 200px;
-  position: fixed;
-  left: 50%;
-  top: 76px;
-}
-
-.conversation-skin-card-row-container {
-  margin-bottom: 17px;
-  table-layout: fixed;
-  width: 100%;
-}
-
-.conversation-skin-card-row {
-  margin-bottom: 20px;
-  margin-top: 20px;
-  width: 100%;
-}
-
-.conversation-skin-row-avatar {
-  padding-right: 10px;
-  width: 30px;
-}
-
-.conversation-skin-row-avatar-img {
-  height: 24px;
-  max-width: 24px;
-}
-
-.conversation-skin-exploration-header {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
-  font-size: 1.25em;
-  text-align: center;
-  height: 30%;
-  margin-top: -13.9%;
-  padding-bottom: 1%;
-  padding-top: 1%;
-  position: relative;
-}
-
-.conversation-skin-iframe-container {
-  -webkit-overflow-scrolling: touch;
+  margin: 0 auto;
+  /* This is the width of the main card, plus the width of the supplemental
+     card, plus a 12px margin between them.
+  */
+  max-width: 1084px;
 }
 
 /* 'md-card' is needed to ensure that this takes precedence over the default
    Material Design stylesheet. */
-md-card.conversation-skin-card {
+md-card.conversation-skin-tutor-card {
   background: rgb(255,255,255);
-  margin: 20px auto;
-  margin-top: -5px;
-  max-width: 560px;
-  padding: 40px 60px 27px 22px;
+  margin: 0 auto;
+  max-width: 472px;
+  padding: 0;
   position: relative;
   text-align: left;
 }
 
-.conversation-skin-card-feedback-toggle-container {
+.conversation-skin-tutor-card-top-section {
+  padding: 36px 36px 24px 36px;
+}
+.conversation-skin-tutor-card-bottom-section,
+.conversation-skin-tutor-card-middle-section {
+  padding: 0px 36px 2px 36px
+}
+
+.conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
+.conversation-skin-tutor-card-bottom-section .conversation-skin-oppia-avatar,
+.conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+  left: -56px;
+  top: -7px;
+}
+
+.conversation-skin-interaction-clickable-instructions {
+  cursor: pointer;
+}
+
+.conversation-skin-learner-answer-container,
+.conversation-skin-oppia-feedback-container {
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.conversation-skin-tutor-card-feedback-toggle-container {
   position: absolute;
   right: 10px;
   top: 11px;
   width: 20px;
 }
-.conversation-skin-card-feedback-toggle {
+.conversation-skin-tutor-card-feedback-toggle {
   cursor: pointer;
   height: 20px;
   opacity: 0.4;
 }
-.conversation-skin-card-feedback-toggle:hover {
+.conversation-skin-tutor-card-feedback-toggle:hover {
   opacity: 0.8;
 }
 
-.conversation-skin-learner-input {
-  padding-left: 15px;
+.conversation-skin-inline-interaction {
+  background: rgba(0,0,0,0.06);
+  padding: 16px 36px 24px 36px;
+  position: relative;
 }
 
 .conversation-skin-learner-answer {
-  color: #579287;
-  padding-left: 15px;
-  width: 100%;
-  word-wrap: break-word;
+  color: #0D4781;
 }
-
-.conversation-skin-oppia-content {
-  padding-left: 15px;
-  padding-top: 2px;
-}
-
+.conversation-skin-learner-answer,
 .conversation-skin-oppia-feedback {
-  padding-left: 15px;
-  text-align: left;
-  width: 100%;
   word-wrap: break-word;
 }
 
-.conversation-skin-loading-dots {
-  text-align: center;
-}
-.conversation-skin-loading-dots > .oppia-loading-dot-one,
-.conversation-skin-loading-dots > .oppia-loading-dot-two,
-.conversation-skin-loading-dots > .oppia-loading-dot-three {
-  background-color: black;
+.conversation-skin-feedback-dot-one,
+.conversation-skin-feedback-dot-two,
+.conversation-skin-feedback-dot-three {
+  background-color: #666;
   display: inline-block;
-  height: 10px;
-  margin: 10px;
-  width: 10px;
+  height: 2px;
+  width: 2px;
+}
+.conversation-skin-feedback-dot-one {
+  opacity: 0;
+  animation: dot 1.5s infinite;
+  animation-delay: 0.0s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.0s;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.0s;
+}
+.conversation-skin-feedback-dot-two {
+  opacity: 0;
+  animation: dot 1.5s infinite;
+  animation-delay: 0.3s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.3s;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.3s;
+}
+.conversation-skin-feedback-dot-three {
+  opacity: 0;
+  animation: dot 1.5s infinite;
+  animation-delay: 0.6s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.6s;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.6s;
 }
 
-/* 'md-card' is needed to ensure that this takes precedence over the default
-   Material Design stylesheet. */
-md-card.conversation-skin-inline-interaction {
-  background-color: #f6f6f6;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  margin: -20px auto;
-  max-width: 560px;
+.conversation-skin-supplemental-card-container {
+  display: inline-block;
+  margin: 0;
+  position: relative;
+  width: 100%;
 }
-
-.conversation-skin-supplemental-interaction {
-  margin: 0 auto;
-  max-width: 560px;
+.conversation-skin-right-card-container {
+  margin-left: 12px;
+  width: 600px;
 }
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
-  margin: -5px 0;
-  max-width: 560px;
+  margin: 0 auto;
+  width: 600px;
+}
+
+.conversation-skin-supplemental-card-overlay {
+  background: #eee;
+  height: 100%;
+  opacity: 0.5;
+  position: absolute;
+  width: 100%;
+  z-index: 3;
 }
 
 .conversation-skin-final-ratings {
   padding-top: 20px;
   text-align: center;
+}
+
+.conversation-skin-left-card {
+  margin-left: 0;
+  float: left;
+}
+
+.conversation-skin-card-switcher {
+  background: rgb(207, 219, 247);
+  bottom: 0;
+  height: 50px;
+  position: fixed;
+  width: 100%;
+}
+.conversation-skin-card-switcher-thumbnails-container {
+  height: 100%;
+  margin: auto;
+  text-align: center;
+  width: 100%;
+}
+.conversation-skin-card-switcher-thumbnail {
+  border: 1px solid black;
+  cursor: pointer;
+  height: 40px;
+  margin-top: 5px;
+  width: 40px;
+}
+.conversation-skin-card-switcher-thumbnail-active {
+  border: 3px solid green;
+  cursor: default;
+  height: 46px;
+  margin-top: 2px;
+  width: 46px;
+}
+
+.conversation-skin-far-offscreen {
+  left: -30000px;
+  position: absolute;
+  top: -30000px;
 }

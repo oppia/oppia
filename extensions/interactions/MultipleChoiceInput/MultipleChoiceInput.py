@@ -26,6 +26,7 @@ class MultipleChoiceInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'NonnegativeInt'
+    instructions = None
 
     _customization_arg_specs = [{
         'name': 'choices',

@@ -28,6 +28,7 @@ class GraphInput(base.BaseInteraction):
     is_trainable = True
     _dependency_ids = []
     answer_type = 'Graph'
+    instructions = 'Create a graph'
 
     _customization_arg_specs = [{
         'name': 'graph',

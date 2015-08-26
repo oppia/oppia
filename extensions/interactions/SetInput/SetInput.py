@@ -25,6 +25,7 @@ class SetInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
     answer_type = 'SetOfUnicodeString'
+    instructions = 'Make a list of items'
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.

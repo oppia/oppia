@@ -2,107 +2,228 @@
   <link rel="stylesheet" type="text/css"
         href="/extensions/skins/conversation_v1/static/conversation.css">
 
-  <div role="main" style="margin: 0 auto; max-width: 95%; position: relative;">
-    <div class="conversation-skin-cards-container">
-      <md-card class="conversation-skin-exploration-intro-card">
-        <img ng-src="<[introCardImageUrl]>">
-        <div class="conversation-skin-exploration-header">
-          <h3 itemprop="description" role="heading" class="protractor-test-exploration-header"><[explorationTitle]></h3>
+  <!-- Off-screen preview of future card in order to pre-determine the target height for the animation. -->
+  <md-card class="conversation-skin-tutor-card" style="position: absolute; left: -30000px; top: -30000px;">
+    <div id="futurePreview">
+      <div class="conversation-skin-tutor-card-top-section">
+        <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
+        <div class="protractor-test-conversation-content" angular-html-bind="upcomingContentHtml">
+        </div>
+      </div>
+
+      <div ng-if="activeCard.interactionIsInline && upcomingInlineInteractionHtml">
+        <div class="conversation-skin-inline-interaction">
+          <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
+          <div class="protractor-test-conversation-input" angular-html-bind="upcomingInlineInteractionHtml">
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+
+  <!-- TODO(sll): do we need to preserve the itemprop attr? -->
+  <div role="main" style="margin: 0 auto; position: relative;">
+    <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex">
+    </progress-dots>
+
+    <div class="conversation-skin-cards-container conversation-skin-animate-cards" ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
+      <md-card class="conversation-skin-tutor-card" ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+        <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
+          <span class="glyphicon glyphicon-comment conversation-skin-tutor-card-feedback-toggle"
+                popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>"
+                popover-template="popover/feedback" popover-trigger="click"
+                tooltip="Feedback" tooltip-placement="bottom"
+                state-name="<[activeCard.stateName]>">
+          </span>
+        </div>
+
+        <div class="conversation-skin-animate-card-contents" ng-class="{'animate-card-change': startCardChangeAnimation}">
+          <div class="conversation-skin-tutor-card-top-section">
+            <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
+            <div class="protractor-test-conversation-content" angular-html-bind="activeCard.content">
+            </div>
+          </div>
+
+          <div ng-if="activeCard.answerFeedbackPairs.length > 1">
+            <h4 class="conversation-skin-responses-dropdown-container" ng-click="toggleShowPreviousResponses()">
+              <span class="conversation-skin-responses-dropdown-text">
+                <span ng-if="!arePreviousResponsesShown">
+                  <[activeCard.answerFeedbackPairs.length - 1]> prior response<span ng-if="activeCard.answerFeedbackPairs.length > 2">s</span>
+                  <span class="glyphicon glyphicon-play" style="font-size:10px; margin-bottom: -4px;"></span>
+                </span>
+                <span ng-if="arePreviousResponsesShown">
+                  <[activeCard.answerFeedbackPairs.length]> response<span ng-if="activeCard.answerFeedbackPairs.length > 1">s</span>
+                  <span class="glyphicon glyphicon-triangle-bottom" style="font-size:10px; margin-bottom: -4px;"></span>
+                </span>
+              </span>
+            </h4>
+          </div>
+
+          <div class="conversation-skin-tutor-card-middle-section" ng-if="arePreviousResponsesShown">
+            <div ng-repeat="responsePair in activeCard.answerFeedbackPairs track by $index">
+              <div ng-if="!$last">
+                <answer-feedback-pair profile-picture="profilePicture"
+                                      answer="responsePair.learnerAnswer"
+                                      feedback="responsePair.oppiaFeedback">
+                </answer-feedback-pair>
+              </div>
+            </div>
+          </div>
+
+          <!-- Always show the most recent response pair, if there is one. -->
+          <div class="conversation-skin-tutor-card-bottom-section" ng-if="activeCard.answerFeedbackPairs.length > 0">
+            <answer-feedback-pair profile-picture="profilePicture"
+                                  answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].learnerAnswer"
+                                  feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback">
+            </answer-feedback-pair>
+          </div>
+
+          <div ng-if="!waitingForOppiaFeedback && (activeCard.interaction || waitingForContinueButtonClick) && currentProgressDotIndex === transcript.length - 1">
+            <div class="conversation-skin-inline-interaction">
+              <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
+              <div ng-if="waitingForContinueButtonClick">
+                <md-button class="md-button-success" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                           ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
+                  Continue
+                </md-button>
+              </div>
+              <div ng-if="activeCard.interaction && !activeCard.interactionIsDisabled">
+                <div ng-if="activeCard.interactionIsInline">
+                  <div class="protractor-test-conversation-input"
+                       angular-html-bind="activeCard.interaction">
+                  </div>
+                </div>
+                <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_INTERACTION)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
+                  (<[activeCard.interactionInstructions]>)
+                  <span class="glyphicon glyphicon-hand-right pull-right"></span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </md-card>
 
-      <div class="conversation-skin-iframe-container">
-        <oppia-gadget-panel panel-contents="gadgetPanelsContents.left" class="conversation-skin-left-gadget-panel"></oppia-gadget-panel>
-        <oppia-gadget-panel panel-contents="gadgetPanelsContents.right" class="conversation-skin-right-gadget-panel"></oppia-gadget-panel>
-        <div ng-repeat="state in allResponseStates track by $index"
-             ng-class="{'conversation-skin-last-log-entry': $last}">
-          <md-card class="conversation-skin-card">
-            <div class="conversation-skin-card-feedback-toggle-container" ng-if="state.stateName && !isInPreviewMode">
-              <span class="glyphicon glyphicon-comment conversation-skin-card-feedback-toggle" popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>" popover-template="popover/feedback" popover-trigger="click" tooltip="Feedback" tooltip-placement="bottom" state-name="<[state.stateName]>">
-              </span>
-            </div>
-
-            <table class="conversation-skin-card-row-container">
-              <tr class="conversation-skin-card-row">
-                <td class="conversation-skin-row-avatar" valign="top">
-                  <img class="conversation-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
-                </td>
-                <td class="conversation-skin-oppia-output conversation-skin-oppia-content">
-                  <div class="protractor-test-conversation-content" angular-html-bind="state.content"></div>
-                </td>
-              </tr>
-            </table>
-
-            <div ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
-              <table class="conversation-skin-card-row-container">
-                <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row">
-                  <td class="conversation-skin-row-avatar" valign="top">
-                    <img class="conversation-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
-                  </td>
-                  <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"></td>
-                </tr>
-              </table>
-              <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
-                <tr class="conversation-skin-card-row">
-                  <td class="conversation-skin-row-avatar" valign="top">
-                    <img class="conversation-skin-row-avatar-img" src="/images/general/oppia_black_48px.png">
-                  </td>
-                  <td class="conversation-skin-oppia-output conversation-skin-oppia-feedback protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
-                </tr>
-              </table>
-            </div>
-
-            <div ng-if="$last" ng-show="waitingForOppiaFeedback">
-              <div class="conversation-skin-loading-dots">
-                <div class="oppia-loading-dot-one"></div>
-                <div class="oppia-loading-dot-two"></div>
-                <div class="oppia-loading-dot-three"></div>
-              </div>
-            </div>
-
-            <div ng-if="stateName && !waitingForNewCard && !waitingForOppiaFeedback && interactionIsInline && $last">
-              <div class="conversation-skin-inline-interaction">
-                <table class="conversation-skin-card-row-container" style="margin-bottom: 0;">
-                  <tr class="conversation-skin-card-row">
-                    <td class="conversation-skin-row-avatar" valign="top">
-                      <img class="conversation-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
-                    </td>
-                    <td class="conversation-skin-learner-input protractor-test-conversation-input"
-                        angular-html-bind="inputTemplate">
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-          </md-card>
+      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}">
+        <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
         </div>
-      </div>
-
-      <div ng-if="waitingForNewCard">
-        <div class="conversation-skin-loading-dots">
-          <div class="oppia-loading-dot-one"></div>
-          <div class="oppia-loading-dot-two"></div>
-          <div class="oppia-loading-dot-three"></div>
-        </div>
-      </div>
-
-      <div class="conversation-skin-supplemental-interaction">
-        <div ng-if="!waitingForNewCard && !interactionIsInline && inputTemplate && (!finished || !isIframed)">
-          <md-card class="conversation-skin-supplemental-card">
-            <div class="protractor-test-conversation-input" angular-html-bind="inputTemplate">
+        <!--
+          This needs to use ng-show and a loop over the transcript, so that the
+          state of previous supplemental interactions is preserved.
+        -->
+        <md-card ng-show="!activeCard.interactionIsInline && activeCard.interaction"
+                 class="conversation-skin-supplemental-card"
+                 ng-class="{'conversation-skin-far-offscreen': !isPanelVisible(PANEL_INTERACTION)}">
+          <div ng-repeat="transcriptCard in transcript">
+            <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interaction" ng-show="$index === currentProgressDotIndex">
             </div>
-          </md-card>
-        </div>
+          </div>
+        </md-card>
       </div>
+    </div>
+  </div>
 
-      <div ng-if="!waitingForNewCard && finished && isLoggedIn && !isInPreviewMode && !isIframed" class="conversation-skin-final-ratings">
-        <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"></oppia-gadget-panel>
-        <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
-        <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
-          <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">
-          </rating-from-value>
-        </div>
+  <div ng-if="finished && isLoggedIn && !isInPreviewMode && !isIframed" class="conversation-skin-final-ratings">
+    <oppia-gadget-panel panel-contents="gadgetPanelsContents.main" class="conversation-skin-main-gadget-panel"></oppia-gadget-panel>
+
+    <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
+    <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+      <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">
+      </rating-from-value>
+    </div>
+  </div>
+
+  <div class="conversation-skin-card-switcher" ng-if="panels.length >= 2">
+    <div class="conversation-skin-card-switcher-thumbnails-container">
+      <span ng-repeat="panelName in panels">
+        <img class="conversation-skin-card-switcher-thumbnail img-circle" ng-src="<[getThumbnailSrc(panelName)]>" ng-click="setVisiblePanel(panelName)" ng-class="{'conversation-skin-card-switcher-thumbnail-active': isPanelVisible(panelName)}">
+      </span>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="components/answerFeedbackPair">
+  <div class="conversation-skin-learner-answer-container">
+    <img class="conversation-skin-user-avatar" ng-src="<[profilePicture()]>">
+    <div class="conversation-skin-learner-answer" angular-html-bind="answer()">
+    </div>
+  </div>
+
+  <div class="conversation-skin-oppia-feedback-container" ng-if="feedback() !== ''">
+    <img class="conversation-skin-oppia-avatar img-circle" src="/images/general/o_black_72px.png">
+
+    <div class="conversation-skin-oppia-feedback protractor-test-conversation-feedback">
+      <div ng-if="feedback() === null">
+        <div class="conversation-skin-feedback-dot-one"></div>
+        <div class="conversation-skin-feedback-dot-two"></div>
+        <div class="conversation-skin-feedback-dot-three"></div>
       </div>
+      <div ng-if="feedback() !== null" angular-html-bind="feedback()"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="components/progressDots">
+  <style>
+    @keyframes oppia-animate-enter-progress-dot {
+      0% {
+        margin-left: -10px;
+      }
+
+      100% {
+        margin-left: 0;
+      }
+    }
+
+    .oppia-progress-dot {
+      border-radius: 50%;
+      box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+      float: left;
+      margin-left: 10px;
+    }
+    .oppia-progress-dot-active {
+      background-color: #fff;
+      height: 10px;
+      width: 10px;
+    }
+    .oppia-progress-dot-inactive {
+      background-color: #ccc;
+      cursor: pointer;
+      height: 10px;
+      width: 10px;
+    }
+
+    .oppia-progress-dot-list {
+      list-style-type: none;
+      margin: 10px auto;
+      padding-left: 0;
+      position: relative;
+      text-align: center;
+    }
+
+    .oppia-animate-progress-dot {
+      display: inline-block;
+    }
+    .oppia-animate-progress-dot.ng-enter {
+      -webkit-animation: 400ms oppia-animate-enter-progress-dot;
+      animation: 400ms oppia-animate-enter-progress-dot;
+      -webkit-animation-timing-function: linear;
+      animation-timing-function: linear;
+    }
+  </style>
+
+  <div style="margin: 12px auto;">
+    <div style="width: 300px; margin: 10px auto;">
+      <ul class="oppia-progress-dot-list">
+        <li ng-repeat="dot in dots track by $index" class="oppia-animate-progress-dot">
+          <span class="oppia-progress-dot oppia-progress-dot-active"
+                ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
+          </span>
+          <span class="oppia-progress-dot oppia-progress-dot-inactive"
+                ng-if="$index !== currentDotIndex"
+                ng-click="changeActiveDot($index)">
+          </span>
+        </li>
+      </ul>
     </div>
   </div>
 </script>

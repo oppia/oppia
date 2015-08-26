@@ -146,7 +146,7 @@ oppia.factory('oppiaPlayerService', [
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService) {
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-  var _introCardImageUrl = null;
+  var _infoCardImageUrl = null;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
@@ -163,16 +163,28 @@ oppia.factory('oppiaPlayerService', [
 
   var _updateStatus = function(newParams, newStateName) {
     // TODO(sll): Do this more incrementally.
-    learnerParamsService.init(newParams);
-    _currentStateName = newStateName;
-    stateHistory.push(_currentStateName);
+    if (newParams !== null) {
+      learnerParamsService.init(newParams);
+    }
+
+    if (newStateName !== null) {
+      _currentStateName = newStateName;
+      stateHistory.push(_currentStateName);
+    }
   };
 
   var stopwatch = stopwatchProviderService.getInstance();
 
+  var cachedParamUpdates = {
+    newParams: null,
+    newStateName: null
+  };
+
+  // If delayParamUpdates is true, the parameters will need to be updated
+  // manually by calling applyCachedParamUpdates().
   var _onStateTransitionProcessed = function(
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
-      successCallback) {
+      successCallback, delayParamUpdates) {
     var oldStateName = _currentStateName;
     var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
 
@@ -185,21 +197,21 @@ oppia.factory('oppiaPlayerService', [
       // Record the state hit to the event handler.
       var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
 
-      if (newStateName) {
-        $http.post(stateHitEventHandlerUrl, {
-          new_state_name: newStateName,
-          exploration_version: version,
-          session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-          old_params: learnerParamsService.getAllParams()
-        });
-      }
+      $http.post(stateHitEventHandlerUrl, {
+        new_state_name: newStateName,
+        exploration_version: version,
+        session_id: sessionId,
+        client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+        old_params: learnerParamsService.getAllParams()
+      });
 
       // If the new state contains a terminal interaction, record a completion
-      // event.
-      if (!newStateName ||
-          INTERACTION_SPECS[
+      // event, and inform the parent page that a completion has happened.
+      if (INTERACTION_SPECS[
             _exploration.states[newStateName].interaction.id].is_terminal) {
+        messengerService.sendMessage(
+          messengerService.EXPLORATION_COMPLETED, null);
+
         var completeExplorationUrl = (
           '/explorehandler/exploration_complete_event/' + _explorationId);
         $http.post(completeExplorationUrl, {
@@ -219,17 +231,19 @@ oppia.factory('oppiaPlayerService', [
       });
     }
 
-    _updateStatus(newParams, newStateName);
+    if (!delayParamUpdates) {
+      _updateStatus(newParams, newStateName);
+    } else {
+      cachedParamUpdates.newParams = angular.copy(newParams);
+      cachedParamUpdates.newStateName = angular.copy(newStateName);
+    }
+
     stopwatch.resetStopwatch();
 
     var newStateData = _exploration.states[newStateName];
-    var newInteractionId = newStateData.interaction.id;
-
     $rootScope.$broadcast('playerStateChange');
-
     successCallback(
-      newStateName, refreshInteraction, newFeedbackHtml,
-      newQuestionHtml, newInteractionId);
+      newStateName, refreshInteraction, newFeedbackHtml, newQuestionHtml);
   };
 
   var _registerMaybeLeaveEvent = function(stateName) {
@@ -248,7 +262,7 @@ oppia.factory('oppiaPlayerService', [
     stopwatch.resetStopwatch();
     _updateStatus(newParams, initStateName);
     $rootScope.$broadcast('playerStateChange');
-    callback(initStateName, initHtml, _viewerHasEditingRights, _introCardImageUrl);
+    callback(initStateName, initHtml);
   };
 
   // This should only be called when _exploration is non-null.
@@ -302,7 +316,7 @@ oppia.factory('oppiaPlayerService', [
      * Initializes an exploration, passing the data for the first state to
      * successCallback.
      *
-     * In editor preview mode, populateExploration() should be called before
+     * In editor preview mode, populateExploration() must be called before
      * calling init().
      *
      * @param {function} successCallback The function to execute after the initial
@@ -317,7 +331,7 @@ oppia.factory('oppiaPlayerService', [
 
       if (_editorPreviewMode) {
         if (_exploration) {
-          _introCardImageUrl = (
+          _infoCardImageUrl = (
             '/images/gallery/exploration_background_' +
             (GLOBALS.CATEGORIES_TO_COLORS[_exploration.category] || 'teal') +
             '_large.png');
@@ -326,18 +340,25 @@ oppia.factory('oppiaPlayerService', [
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
-          _introCardImageUrl = data.intro_card_image_url;
+          _infoCardImageUrl = data.info_card_image_url;
           version = data.version,
           _isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
           $rootScope.$broadcast('playerServiceInitialized');
+          messengerService.sendMessage(
+            messengerService.EXPLORATION_LOADED, null);
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
         });
       }
+    },
+    applyCachedParamUpdates: function() {
+      _updateStatus(cachedParamUpdates.newParams, cachedParamUpdates.newStateName);
+      cachedParamUpdates.newParams = null;
+      cachedParamUpdates.newStateName = null;
     },
     getExplorationId: function() {
       return _explorationId;
@@ -356,6 +377,26 @@ oppia.factory('oppiaPlayerService', [
     },
     getGadgetPanelsContents: function() {
       return angular.copy(_exploration.skin_customizations.panels_contents);
+    },
+    getInteractionThumbnailSrc: function(stateName) {
+      // TODO(sll): unify this with the 'choose interaction' modal in
+      // state_editor_interaction.html.
+      var interactionId = _exploration.states[stateName].interaction.id;
+      if (!interactionId) {
+        return '';
+      } else {
+        return (
+          '/extensions/interactions/' + interactionId + '/static/' +
+          interactionId + '.png');
+      }
+    },
+    getInteractionInstructions: function(stateName) {
+      var interactionId = _exploration.states[stateName].interaction.id;
+      if (!interactionId) {
+        return '';
+      } else {
+        return INTERACTION_SPECS[interactionId].instructions;
+      }
     },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
@@ -394,7 +435,7 @@ oppia.factory('oppiaPlayerService', [
       return oppiaExplorationHtmlFormatterService.getAnswerHtml(
         answer, currentInteraction.id, currentInteraction.customization_args);
     },
-    submitAnswer: function(answer, successCallback) {
+    submitAnswer: function(answer, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -424,9 +465,7 @@ oppia.factory('oppiaPlayerService', [
         // Compute the data for the next state. This may be null if there are
         // malformed expressions.
         var nextStateData = stateTransitionService.getNextStateData(
-          outcome,
-          _exploration.states[newStateName],
-          answer);
+          outcome, _exploration.states[newStateName], answer);
 
         if (nextStateData) {
           nextStateData['state_name'] = newStateName;
@@ -434,7 +473,7 @@ oppia.factory('oppiaPlayerService', [
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
             nextStateData.question_html, nextStateData.feedback_html,
-            answer, successCallback);
+            answer, successCallback, delayParamUpdates);
         } else {
           answerIsBeingProcessed = false;
           warningsData.addWarning('Expression parsing error.');
@@ -451,7 +490,7 @@ oppia.factory('oppiaPlayerService', [
     // user is not logged in or has not uploaded a profile picture, or the
     // player is in preview mode.
     getUserProfileImage: function() {
-      var DEFAULT_PROFILE_IMAGE_PATH = '/images/general/user_mint_48px.png';
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/general/user_blue_72px.png';
       var deferred = $q.defer();
       if (_isLoggedIn && !_editorPreviewMode) {
         $http.get('/preferenceshandler/profile_picture').success(function(data) {
