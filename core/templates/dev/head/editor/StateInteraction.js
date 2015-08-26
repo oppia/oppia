@@ -77,12 +77,6 @@ oppia.controller('StateInteraction', [
       INTERACTION_SPECS[stateInteractionIdService.savedMemento].name : '');
   };
 
-  $scope.isInteractionTrainable = function() {
-    return (
-      stateInteractionIdService.savedMemento ? INTERACTION_SPECS[
-        stateInteractionIdService.savedMemento].is_trainable : false);
-  };
-
   $scope.doesCurrentInteractionHaveCustomizations = function() {
     var interactionSpec = INTERACTION_SPECS[
       stateInteractionIdService.savedMemento];
@@ -301,95 +295,6 @@ oppia.controller('StateInteraction', [
       _updateStatesDict();
       graphDataService.recompute();
       _updateInteractionPreviewAndAnswerChoices();
-    });
-  };
-
-  $scope.openTeachOppiaModal = function() {
-    warningsData.clear();
-    $rootScope.$broadcast('externalSave');
-
-    $modal.open({
-      templateUrl: 'modals/teachOppia',
-      backdrop: true,
-      controller: ['$scope', '$modalInstance',
-        'oppiaExplorationHtmlFormatterService', 'stateInteractionIdService',
-        'stateCustomizationArgsService', 'explorationContextService',
-        'editorContextService', 'explorationStatesService',
-        'trainingDataService', 'answerClassificationService', 'focusService',
-        'DEFAULT_RULE_NAME', 'FUZZY_RULE_TYPE',
-        function($scope, $modalInstance, oppiaExplorationHtmlFormatterService,
-            stateInteractionIdService, stateCustomizationArgsService,
-            explorationContextService, editorContextService,
-            explorationStatesService, trainingDataService,
-            answerClassificationService, focusService, DEFAULT_RULE_NAME,
-            FUZZY_RULE_TYPE) {
-
-          var _explorationId = explorationContextService.getExplorationId();
-          var _stateName = editorContextService.getActiveStateName();
-          var _state = explorationStatesService.getState(_stateName);
-
-          $scope.stateContent = _state.content[0].value;
-          $scope.inputTemplate = (
-            oppiaExplorationHtmlFormatterService.getInteractionHtml(
-              stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento,
-              'testInteractionInput'));
-          $scope.answerTemplate = '';
-
-          $scope.trainingData = [];
-          $scope.trainingDataAnswer = '';
-          $scope.trainingDataFeedback = '';
-          $scope.trainingDataOutcomeDest = '';
-
-          // See the training panel directive in StateEditor for an explanation
-          // on the structure of this object.
-          $scope.classification = {answerGroupIndex: 0, newOutcome: null};
-
-          focusService.setFocus('testInteractionInput');
-
-          $scope.finishTeaching = function(reopen) {
-            $modalInstance.close({
-              'reopen': reopen
-            });
-          };
-
-          $scope.submitAnswer = function(answer) {
-
-            $scope.answerTemplate = (
-              oppiaExplorationHtmlFormatterService.getAnswerHtml(
-                answer, stateInteractionIdService.savedMemento,
-                stateCustomizationArgsService.savedMemento));
-
-            answerClassificationService.getMatchingEditorClassificationResult(
-              _explorationId, _state, answer).success(
-                  function(classificationResult) {
-                var feedback = 'Nothing';
-                var dest = classificationResult.outcome.dest;
-                if (classificationResult.outcome.feedback.length > 0) {
-                  feedback = classificationResult.outcome.feedback[0];
-                }
-                if (dest == _stateName) {
-                  dest = '<em>(try again)</em>';
-                }
-                $scope.trainingDataAnswer = answer;
-                $scope.trainingDataFeedback = feedback;
-                $scope.trainingDataOutcomeDest = dest;
-
-                if (classificationResult.rule_spec_string !== DEFAULT_RULE_NAME &&
-                    classificationResult.rule_spec_string !== FUZZY_RULE_TYPE) {
-                  $scope.classification.answerGroupIndex = -1;
-                } else {
-                  $scope.classification.answerGroupIndex = (
-                    classificationResult.answer_group_index);
-                }
-              });
-          };
-        }]
-    }).result.then(function(result) {
-      // Check if the modal should be reopened right away.
-      if (result.reopen) {
-        $scope.openTeachOppiaModal();
-      }
     });
   };
 
