@@ -20,6 +20,7 @@
  */
 
 var forms = require('../../../core/tests/protractor_utils/forms.js');
+var general = require('../../../core/tests/protractor_utils/general.js');
 
 var customizeComponent = function(modal, heading, contentInstructions) {
   forms.UnicodeEditor(
@@ -36,7 +37,9 @@ var expectComponentDetailsToMatch = function(elem, heading, contentInstructions)
     elem.element(by.css('.protractor-test-collapsible-heading')).getText()
   ).toMatch(heading);
   // Open the collapsible block so we can examine it.
-  element(by.css('.glyphicon-plus-sign')).click();
+  elem.element(by.css('.glyphicon-plus-sign')).click();
+  general.waitForSystem();
+
   forms.expectRichText(
     elem.element(by.css('.panel-body')).element(by.xpath('./div'))
   ).toMatch(contentInstructions);

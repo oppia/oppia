@@ -74,6 +74,7 @@ var submitAnswer = function(interactionId, answerData) {
 };
 
 var expectExplorationToBeOver = function() {
+  general.waitForSystem();
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
   ).toEqual('Congratulations, you have finished!');
