@@ -75,7 +75,7 @@
     <br>
 
     <div ng-if="changingAnswerGroupIndex">
-      <span><strong>Select correct feedback:</strong></span>
+      <span><strong>Select correct feedback or type a new response:</strong></span>
 
       <div class="trained-feedback-selection-form-container">
         <form>
@@ -103,7 +103,7 @@
       <button class="btn btn-default" ng-if="!addingNewResponse" ng-click="beginAddingNewResponse()">New Response</button>
       <outcome-feedback-editor ng-if="addingNewResponse" outcome="classification.newOutcome">
       </outcome-feedback-editor>
-      <button class="btn btn-default" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>
+      <button class="btn btn-default btn-success" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>
     </div>
   </div>
 </script>

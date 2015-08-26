@@ -87,6 +87,7 @@
     </div>
   </md-card>
 
+{% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
   <md-card style="margin: 20px 0px; padding: 0px;" ng-if="isCurrentInteractionTrainable()">
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
@@ -95,6 +96,9 @@
     </div>
   </md-card>
   <md-card style="margin: 20px 0px; padding: 0px;" ng-if="!isCurrentInteractionTrainable()">
+{% else %}
+  <md-card style="margin: 20px 0px; padding: 0px;">
+{% endif %}
     <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Oppia Response
@@ -103,7 +107,7 @@
   </md-card>
 </div>
 
-
+{% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
 <script type="text/ng-template" id="modals/teachOppia">
   <div class="modal-header">
     <h3>Enter a Sample Answer</h3>
@@ -161,6 +165,7 @@
     <button class="btn btn-default" ng-click="finishTeaching(false)">Exit</button>
   </div>
 </script>
+{% endif %}
 
 <script type="text/ng-template" id="modals/addAnswerGroup">
   <div class="modal-header protractor-test-add-response-modal-header">

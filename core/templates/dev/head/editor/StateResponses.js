@@ -366,7 +366,8 @@ oppia.controller('StateResponses', [
         !INTERACTION_SPECS[newInteractionId].is_terminal) {
       // Open the training interface if the interaction is trainable, otherwise
       // open the answer group modal.
-      if ($scope.isCurrentInteractionTrainable()) {
+      if (GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS &&
+          $scope.isCurrentInteractionTrainable()) {
         $scope.openTeachOppiaModal();
       } else {
         $scope.openAddAnswerGroupModal();
