@@ -18,6 +18,7 @@
 
 __author__ = 'Zhan Xiong Chin'
 
+import math
 from extensions.rules import base
 
 
@@ -25,4 +26,4 @@ class IsInRegion(base.ClickOnImageRule):
     description = 'is in the region {{x|UnicodeString}}'
 
     def _evaluate(self, subject):
-        return self.x in subject['clickedRegions']
+        return self._fuzzify_truth_value(self.x in subject['clickedRegions'])

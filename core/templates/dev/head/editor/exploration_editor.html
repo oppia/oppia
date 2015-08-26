@@ -20,6 +20,7 @@
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse('{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -393,6 +394,7 @@
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ value_generators_js }}
     {{ include_js_file('services/explorationContextService.js') }}
+    {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('editor/RouterServices.js') }}
     {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}

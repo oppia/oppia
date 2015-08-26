@@ -25,46 +25,47 @@ class Equals(base.SetOfUnicodeStringRule):
     description = 'is equal to {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return set(subject) == set(self.x)
+        return self._fuzzify_truth_value(set(subject) == set(self.x))
 
 
 class IsSubsetOf(base.SetOfUnicodeStringRule):
     description = 'is a proper subset of {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return set(subject) < set(self.x)
+        return self._fuzzify_truth_value(set(subject) < set(self.x))
 
 
 class IsSupersetOf(base.SetOfUnicodeStringRule):
     description = 'is a proper superset of {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return set(subject) > set(self.x)
+        return self._fuzzify_truth_value(set(subject) > set(self.x))
 
 
 class HasElementsIn(base.SetOfUnicodeStringRule):
     description = 'has elements in common with {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return bool(set(subject).intersection(set(self.x)))
+        return self._fuzzify_truth_value(set(subject).intersection(set(self.x)))
 
 
 class HasElementsNotIn(base.SetOfUnicodeStringRule):
     description = 'has elements not in {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return bool(set(subject) - set(self.x))
+        return self._fuzzify_truth_value(set(subject) - set(self.x))
 
 
 class OmitsElementsIn(base.SetOfUnicodeStringRule):
     description = 'omits some elements of {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return bool(set(self.x) - set(subject))
+        return self._fuzzify_truth_value(set(self.x) - set(subject))
 
 
 class IsDisjointFrom(base.SetOfUnicodeStringRule):
     description = 'has no elements in common with {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
-        return not bool(set(subject).intersection(set(self.x)))
+        return self._fuzzify_truth_value(
+            not bool(set(subject).intersection(set(self.x))))

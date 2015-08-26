@@ -569,7 +569,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
               'answer_groups': 'Responses',
-              'default_outcome': 'Default outcome'
+              'default_outcome': 'Default outcome',
+              'confirmed_unclassified_answers': 'Confirmed unclassified answers'
             }
 
             // An ordered list of state properties that determines the order in which

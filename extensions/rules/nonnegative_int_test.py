@@ -26,5 +26,5 @@ class NonnegativeIntUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on NonnegativeInt objects."""
 
     def test_equals_rule(self):
-        self.assertTrue(nonnegative_int.Equals(3).eval(3))
-        self.assertFalse(nonnegative_int.Equals(4).eval(3))
+        self.assertFuzzyTrue(nonnegative_int.Equals(3).eval(3))
+        self.assertFuzzyFalse(nonnegative_int.Equals(4).eval(3))

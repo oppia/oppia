@@ -604,6 +604,21 @@ textarea {
   }
 }
 
+.btn.oppia-unresolved-answer-button {
+  background-color: white;
+  border-radius: 12px;
+  color: black;
+  font-size: 14px;
+  margin: 4px;
+  padding: 8px 18px;
+  text-align: left;
+  width: auto;
+}
+
+.btn.oppia-unresolved-answer-button:hover {
+  background-color: #eee;
+}
+
 .oppia-gallery-tiles-area {
   background-color: #eee;
   position: relative;
@@ -978,6 +993,17 @@ pre.oppia-pre-wrapped-text {
   position: absolute;
   width: 100%;
   z-index: 50;
+}
+
+.oppia-editor-trash-icon {
+  opacity: 0.2;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
+}
+
+.oppia-editor-trash-icon:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 
 /* Styles for the state graph vizualization. */
@@ -2000,4 +2026,88 @@ div#ng-curtain {
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
+}
+
+/* Styles for the editor training interfaces. */
+
+.preview-conversation-skin-card-row-container {
+  margin-bottom: 17px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.preview-conversation-skin-card-row {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.preview-conversation-skin-row-avatar {
+  padding-right: 10px;
+  width: 30px;
+}
+
+.preview-conversation-skin-row-avatar-img {
+  height: 24px;
+  max-width: 24px;
+}
+
+.preview-conversation-skin-oppia-content {
+  padding-left: 15px;
+  padding-top: 2px;
+}
+
+.preview-conversation-skin-learner-input {
+  padding-left: 15px;
+}
+
+md-card.preview-conversation-skin-inline-interaction {
+  background-color: #f6f6f6;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  margin: -20px auto;
+  max-width: 560px;
+}
+
+md-card.preview-conversation-skin-supplemental-card {
+  background-color: #f6f6f6;
+  margin: -5px 0;
+  max-width: 560px;
+}
+
+.preview-conversation-skin-supplemental-interaction {
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.trained-feedback-selection-form-container {
+  margin-top: -5px;
+}
+
+.trained-feedback-selection-container {
+  border-bottom: thin solid #EEEEEE;
+  margin-bottom: 5px;
+}
+
+.trained-feedback-selection-container md-input-group.md-default-theme label {
+  border-bottom: 0px;
+}
+
+.trained-feedback-selection {
+  background: none;
+  border: none;
+  color: rgba(0,0,0,0.5);
+  margin: 0;
+  padding-left: 0;
+  padding-top: 9px;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+
+.trained-feedback-selection:hover {
+  color: #00897B;
 }
