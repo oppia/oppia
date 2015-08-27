@@ -254,6 +254,9 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.setVisiblePanel = function(panelName) {
         $scope.currentVisiblePanelName = panelName;
+        if (panelName === $scope.PANEL_INTERACTION) {
+          $scope.$broadcast('showInteraction');
+        }
       };
 
       $scope.resetVisiblePanel = function() {
@@ -358,7 +361,9 @@ oppia.directive('conversationSkin', [function() {
           return;
         }
 
-        _recomputeAndResetPanels();
+        $timeout(function() {
+          _recomputeAndResetPanels();
+        }, 250);
 
         _answerIsBeingProcessed = true;
         hasInteractedAtLeastOnce = true;

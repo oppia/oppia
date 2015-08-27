@@ -26,19 +26,25 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/InteractiveMap',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
         $scope.coords = [
           oppiaHtmlEscaper.escapedJsonToObj($attrs.latitudeWithValue),
           oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
         $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
 
-        // This is required in order to avoid the following bug:
-        //   http://stackoverflow.com/questions/18769287
-        window.setTimeout(function() {
-          google.maps.event.trigger($scope.map, 'resize');
-        }, 100);
+        $scope.$on('showInteraction', function() {
+          refreshMap();
+        });
 
         $scope.mapMarkers = [];
+
+        // This is required in order to avoid the following bug:
+        //   http://stackoverflow.com/questions/18769287
+        var refreshMap = function() {
+          $timeout(function() {
+            google.maps.event.trigger($scope.map, 'resize');
+          }, 100);
+        };
 
         var coords = $scope.coords || [0, 0];
         var zoom_level = parseInt($scope.zoom, 10) || 0;
@@ -57,6 +63,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 
           $scope.$parent.$parent.submitAnswer([ll.lat(), ll.lng()]);
         };
+
+        refreshMap();
       }]
     };
   }

@@ -217,21 +217,18 @@ md-card.conversation-skin-tutor-card {
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
+  left: 0;
   margin: 44px auto;
   position: absolute;
+  right: 0;
   width: 600px;
 }
 
 .conversation-skin-right-card-container md-card.conversation-skin-supplemental-card-fixed {
   margin-top: 8px;
   position: fixed;
-}
-
-@media(max-width: 600px) {
-  .conversation-skin-right-card-container,
-  md-card.conversation-skin-supplemental-card {
-    width: 100%;
-  }
+  left: inherit;
+  right: inherit;
 }
 
 .conversation-skin-supplemental-card-overlay {
@@ -292,6 +289,7 @@ md-card.conversation-skin-supplemental-card {
 .conversation-skin-tutor-card.ng-hide-remove.ng-hide-remove-active,
 .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
 .conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
+  -webkit-transition: all ease-out 0.4s;
   transition: all ease-out 0.4s;
 }
 
@@ -300,7 +298,21 @@ md-card.conversation-skin-supplemental-card {
   transform: translateX(-1000px);
 }
 
-.conversation-skin-supplemental-card.ng-hide{
+.conversation-skin-supplemental-card.ng-hide {
   opacity: 0;
   transform: translateX(1000px);
+}
+
+@media(max-width: 1119px) {
+  md-card.conversation-skin-tutor-card {
+    position: absolute;
+  }
+}
+
+@media(max-width: 600px) {
+  .conversation-skin-right-card-container,
+  md-card.conversation-skin-supplemental-card,
+  md-card.conversation-skin-tutor-card {
+    width: 100%;
+  }
 }
