@@ -99,7 +99,14 @@ describe('Normalizer tests', function() {
     expect(filter('-1')).toEqual(-1);
     expect(filter('-1.0')).toEqual(-1);
     expect(filter('1,5')).toEqual(1.5);
+    expect(filter('1%')).toEqual(0.01);
+    expect(filter('1.5%')).toEqual(0.015);
+    expect(filter('-5%')).toEqual(-0.05);
+    expect(filter('.35')).toEqual(0.35);
+    expect(filter(',3')).toEqual(0.3);
 
+    expect(filter('3.2% ')).toBeUndefined();
+    expect(filter('5%,')).toBeUndefined();
     expect(filter('')).toBeUndefined();
     expect(filter('1.23a')).toBeUndefined();
     expect(filter('abc')).toBeUndefined();

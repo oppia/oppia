@@ -895,10 +895,16 @@ oppia.filter('isNonempty', [function() {
 
 oppia.filter('isFloat', [function() {
   return function(input) {
-    // TODO(sll): Accept expressions (like '2.') with nothing after the decimal
-    // point.
-    var FLOAT_REGEXP = /^((\-?\d+(\.|\,)?)|(\-?(\.|\,)?))\d+\%?$/; 
-    // Reg chaned to allow entries of .2 and ,2 and now allows % also
+
+    var FLOAT_REGEXP = /^((\-?\d+(\.|\,)?)|(\-?(\.|\,)?))\d+\%?$/;
+
+    // This regex accepts floats in the following formats:
+    // 0.55..
+    // -0.55.. 
+    // .5 55.. 
+    // -.555..
+    // All examples above with '.' replaced with ',' are also valid
+    // Expresions containing % are also valid(5.1% etc)
 
     var viewValue = '';
     try {
@@ -907,15 +913,16 @@ oppia.filter('isFloat', [function() {
       return undefined;
     }
 
-    if (viewValue !== '' && FLOAT_REGEXP.test(viewValue) && viewValue.slice(-1) !== "%") {
-      return parseFloat(viewValue.replace(',', '.'));
-    }
-    else if (viewValue !== '' && FLOAT_REGEXP.test(viewValue) && viewValue.slice(-1) === "%") {
-      return parseFloat(viewValue.replace(',', '.')) / 100; // User entry needs to be / 100 for %
-    }
-    else {
-    return undefined;
-    }
+    if (viewValue !== '' && FLOAT_REGEXP.test(viewValue)) {
+      if (viewValue.slice(-1) === '%'){
+
+        // This is a percentage, so the input needs to be divided by 100.
+        return parseFloat(viewValue.replace(',', '.')) / 100;
+      } else{
+        return parseFloat(viewValue.replace(',', '.'));
+      }
+    } else {
+    } return undefined; 
   };
 }]);
 
