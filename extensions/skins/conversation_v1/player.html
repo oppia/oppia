@@ -23,7 +23,7 @@
 
   <!-- TODO(sll): do we need to preserve the itemprop attr? -->
   <div role="main" style="margin: 0 auto; position: relative;">
-    <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex">
+    <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex" class="conversation-skin-progress-dots">
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards" ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
@@ -47,12 +47,11 @@
           <div ng-if="activeCard.answerFeedbackPairs.length > 1">
             <h4 class="conversation-skin-responses-dropdown-container" ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
+                Previous responses
                 <span ng-if="!arePreviousResponsesShown">
-                  <[activeCard.answerFeedbackPairs.length - 1]> prior response<span ng-if="activeCard.answerFeedbackPairs.length > 2">s</span>
                   <span class="glyphicon glyphicon-play" style="font-size:10px; margin-bottom: -4px;"></span>
                 </span>
                 <span ng-if="arePreviousResponsesShown">
-                  <[activeCard.answerFeedbackPairs.length]> response<span ng-if="activeCard.answerFeedbackPairs.length > 1">s</span>
                   <span class="glyphicon glyphicon-triangle-bottom" style="font-size:10px; margin-bottom: -4px;"></span>
                 </span>
               </span>
@@ -103,16 +102,16 @@
         </div>
       </md-card>
 
-      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}">
+      <div class="conversation-skin-supplemental-card-container"
+           ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}"
+           ng-show="!activeCard.interactionIsInline && activeCard.interaction">
         <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
         </div>
         <!--
           This needs to use ng-show and a loop over the transcript, so that the
           state of previous supplemental interactions is preserved.
         -->
-        <md-card ng-show="!activeCard.interactionIsInline && activeCard.interaction"
-                 class="conversation-skin-supplemental-card"
-                 ng-class="{'conversation-skin-far-offscreen': !isPanelVisible(PANEL_INTERACTION)}">
+        <md-card class="conversation-skin-supplemental-card" ng-show="isPanelVisible(PANEL_INTERACTION)">
           <div ng-repeat="transcriptCard in transcript">
             <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interaction" ng-show="$index === currentProgressDotIndex">
             </div>
@@ -174,22 +173,32 @@
       }
     }
 
+    .oppia-progress-arrow {
+      color: #ccc;
+      display: inline-block;
+      margin-left: 10px;
+      vertical-align: middle;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .oppia-progress-arrow-active {
+      color: #fff;
+      cursor: pointer;
+    }
+
     .oppia-progress-dot {
       border-radius: 50%;
-      box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
       float: left;
+      height: 12px;
       margin-left: 10px;
+      width: 12px;
     }
     .oppia-progress-dot-active {
       background-color: #fff;
-      height: 10px;
-      width: 10px;
     }
     .oppia-progress-dot-inactive {
       background-color: #ccc;
       cursor: pointer;
-      height: 10px;
-      width: 10px;
     }
 
     .oppia-progress-dot-list {
@@ -202,6 +211,7 @@
 
     .oppia-animate-progress-dot {
       display: inline-block;
+      vertical-align: middle;
     }
     .oppia-animate-progress-dot.ng-enter {
       -webkit-animation: 400ms oppia-animate-enter-progress-dot;
@@ -211,19 +221,27 @@
     }
   </style>
 
-  <div style="margin: 12px auto;">
-    <div style="width: 300px; margin: 10px auto;">
-      <ul class="oppia-progress-dot-list">
-        <li ng-repeat="dot in dots track by $index" class="oppia-animate-progress-dot">
-          <span class="oppia-progress-dot oppia-progress-dot-active"
-                ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
-          </span>
-          <span class="oppia-progress-dot oppia-progress-dot-inactive"
-                ng-if="$index !== currentDotIndex"
-                ng-click="changeActiveDot($index)">
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <ul class="oppia-progress-dot-list">
+    <li class="oppia-progress-arrow" ng-show="dots.length > 1"
+        ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
+        ng-click="decrementCurrentDotIndex()">
+      <span class=" glyphicon glyphicon-arrow-left">
+      </span>
+    </li>
+    <li ng-repeat="dot in dots track by $index" class="oppia-animate-progress-dot">
+      <span class="oppia-progress-dot oppia-progress-dot-active"
+            ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
+      </span>
+      <span class="oppia-progress-dot oppia-progress-dot-inactive"
+            ng-if="$index !== currentDotIndex"
+            ng-click="changeActiveDot($index)">
+      </span>
+    </li>
+    <li class="oppia-progress-arrow" ng-show="dots.length > 1"
+        ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
+        ng-click="incrementCurrentDotIndex()">
+      <span class=" glyphicon glyphicon-arrow-right">
+      </span>
+    </li>
+  </ul>
 </script>

@@ -22,19 +22,8 @@ html, body {
   background: url('/images/general/background.png') no-repeat center center fixed;
   background-color: #eee;
   color: rgba(0,0,0,0.87);
-  font-family: 'Open Sans', Arial, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 1.0em;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  -background-size: cover;
-}
-
-body {
-  background: url('/images/general/background.png') no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
   background-size: cover;
 }
 
@@ -42,6 +31,20 @@ body {
   Additional CSS for the conversation_v1 skin.
   All classes below should start with .conversation-skin
  */
+
+/* Overwrite the default color for the 'Loading...' message. */
+.oppia-loading-fullpage {
+  color: #fff;
+}
+
+.conversation-skin-progress-dots {
+  left: 0;
+  margin: 0 auto;
+  position: fixed;
+  right: 0;
+  top: 56px;
+  z-index: 100;
+}
 
 .conversation-skin-initial-oppia-avatar,
 .conversation-skin-oppia-avatar,
@@ -98,10 +101,12 @@ body {
    Material Design stylesheet. */
 md-card.conversation-skin-tutor-card {
   background: rgb(255,255,255);
-  margin: 0 auto;
+  left: 0;
+  margin: 44px auto 24px auto;
   max-width: 472px;
   padding: 0;
   position: relative;
+  right: 0;
   text-align: left;
 }
 
@@ -110,7 +115,8 @@ md-card.conversation-skin-tutor-card {
 }
 .conversation-skin-tutor-card-bottom-section,
 .conversation-skin-tutor-card-middle-section {
-  padding: 0px 36px 2px 36px
+  margin-top: -16px;
+  padding: 0px 36px 2px 36px;
 }
 
 .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
@@ -147,7 +153,7 @@ md-card.conversation-skin-tutor-card {
 }
 
 .conversation-skin-inline-interaction {
-  background: rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.04);
   padding: 16px 36px 24px 36px;
   position: relative;
 }
@@ -198,8 +204,8 @@ md-card.conversation-skin-tutor-card {
 
 .conversation-skin-supplemental-card-container {
   display: inline-block;
-  margin: 0;
-  position: relative;
+  margin: 27px auto;
+  position: fixed;
   width: 100%;
 }
 .conversation-skin-right-card-container {
@@ -209,7 +215,7 @@ md-card.conversation-skin-tutor-card {
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
-  margin: 0 auto;
+  margin: 16px auto;
   width: 600px;
 }
 
@@ -228,12 +234,12 @@ md-card.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-left-card {
-  margin-left: 0;
   float: left;
+  margin-left: 0;
 }
 
 .conversation-skin-card-switcher {
-  background: rgb(207, 219, 247);
+  background: #05a69a;
   bottom: 0;
   height: 50px;
   position: fixed;
@@ -249,11 +255,11 @@ md-card.conversation-skin-supplemental-card {
   border: 1px solid black;
   cursor: pointer;
   height: 40px;
-  margin-top: 5px;
+  margin-top: 2px;
   width: 40px;
 }
 .conversation-skin-card-switcher-thumbnail-active {
-  border: 3px solid green;
+  border: 3px solid #0d47a1;
   cursor: default;
   height: 46px;
   margin-top: 2px;
@@ -264,4 +270,21 @@ md-card.conversation-skin-supplemental-card {
   left: -30000px;
   position: absolute;
   top: -30000px;
+}
+
+.conversation-skin-tutor-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-tutor-card.ng-hide-remove.ng-hide-remove-active,
+.conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
+  transition: all ease-out 0.4s;
+}
+
+.conversation-skin-tutor-card.ng-hide {
+  opacity: 0;
+  transform: translateX(-1000px);
+}
+
+.conversation-skin-supplemental-card.ng-hide{
+  opacity: 0;
+  transform: translateX(1000px);
 }

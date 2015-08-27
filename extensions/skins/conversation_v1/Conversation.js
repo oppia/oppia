@@ -395,6 +395,9 @@ oppia.directive('conversationSkin', [function() {
                 oppiaPlayerService.getRandomSuffix());
             }
 
+            $('html, body').animate({
+              scrollTop: $(document).height()
+            }, 1200);
             focusService.setFocus(_nextFocusLabel);
           } else {
             // There is a new card. Disable the current interaction -- then, if
@@ -420,6 +423,9 @@ oppia.directive('conversationSkin', [function() {
             if (feedbackHtml) {
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
               $scope.waitingForContinueButtonClick = true;
+              $('html, body').animate({
+                scrollTop: $(document).height()
+              }, 1200);
               focusService.setFocus($scope.CONTINUE_BUTTON_FOCUS_LABEL);
             } else {
               // Note that feedbackHtml is an empty string if no feedback has
@@ -444,6 +450,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.showPendingCard = function(newStateName, newContentHtml, successCallback) {
         $scope.waitingForContinueButtonClick = false;
         $scope.startCardChangeAnimation = true;
+        $('html, body').scrollTop(0);
 
         $timeout(function() {
           _addNewCard(
@@ -504,6 +511,14 @@ oppia.directive('conversationSkin', [function() {
         $scope.windowWidth = windowDimensionsService.getWidth();
         _recomputeAndResetPanels();
       };
+
+      $window.addEventListener('scroll', function() {
+        var progressDots = $('.conversation-skin-progress-dots');
+        var progressDotsTop = progressDots.height();
+        var newOpacity = Math.max(
+          (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
+        progressDots.css({opacity: newOpacity});
+      });
 
       $scope.canWindowFitTwoCards = function() {
         return $scope.windowWidth >= $scope.TWO_CARD_THRESHOLD_PX;
@@ -568,6 +583,18 @@ oppia.directive('progressDots', [function() {
 
       $scope.changeActiveDot = function(index) {
         $scope.currentDotIndex = index;
+      };
+
+      $scope.decrementCurrentDotIndex = function() {
+        if ($scope.currentDotIndex > 0) {
+          $scope.changeActiveDot($scope.currentDotIndex - 1);
+        }
+      };
+
+      $scope.incrementCurrentDotIndex = function() {
+        if ($scope.currentDotIndex < $scope.dots.length - 1) {
+          $scope.changeActiveDot($scope.currentDotIndex + 1);
+        }
       };
     }]
   };

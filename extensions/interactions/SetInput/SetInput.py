@@ -22,10 +22,10 @@ class SetInput(base.BaseInteraction):
 
     name = 'Set Input'
     description = 'Allows learners to enter an unordered set of strings.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'SetOfUnicodeString'
-    instructions = 'Make a list of items'
+    instructions = None
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
