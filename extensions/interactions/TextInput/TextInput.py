@@ -27,6 +27,7 @@ class TextInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'NormalizedString'
     instructions = None
+    needs_summary = False
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in

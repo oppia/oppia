@@ -435,6 +435,20 @@ oppia.factory('oppiaPlayerService', [
       return oppiaExplorationHtmlFormatterService.getAnswerHtml(
         answer, currentInteraction.id, currentInteraction.customization_args);
     },
+    getShortAnswerAsHtml: function(answer) {
+      // Returns a HTML string representing a short summary of the answer, or
+      // null if the answer does not have to be summarized.
+      var currentInteraction = _exploration.states[
+        _currentStateName].interaction;
+
+      if (!currentInteraction.id ||
+          !INTERACTION_SPECS[currentInteraction.id].needs_summary) {
+        return null;
+      } else {
+        return oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+          answer, currentInteraction.id, currentInteraction.customization_args);
+      }
+    },
     submitAnswer: function(answer, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;

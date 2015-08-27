@@ -172,7 +172,6 @@ oppia.directive('conversationSkin', [function() {
       var _nextFocusLabel = null;
 
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
-      $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
       // This will be replaced with the dataURI representation of the
@@ -335,6 +334,7 @@ oppia.directive('conversationSkin', [function() {
         hasInteractedAtLeastOnce = false;
 
         oppiaPlayerService.init(function(stateName, initHtml) {
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
           _nextFocusLabel = focusService.generateFocusLabel();
           $scope.gadgetPanelsContents = (
             oppiaPlayerService.getGadgetPanelsContents());
@@ -368,6 +368,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.transcript[$scope.transcript.length - 1].stateName);
         $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs.push({
           learnerAnswer: oppiaPlayerService.getAnswerAsHtml(answer),
+          shortLearnerAnswer: oppiaPlayerService.getShortAnswerAsHtml(answer),
           oppiaFeedback: null
         });
 
@@ -544,7 +545,8 @@ oppia.directive('answerFeedbackPair', [function() {
     scope: {
       answer: '&',
       feedback: '&',
-      profilePicture: '&'
+      profilePicture: '&',
+      shortAnswer: '&'
     },
     templateUrl: 'components/answerFeedbackPair'
   };

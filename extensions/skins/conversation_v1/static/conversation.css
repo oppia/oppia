@@ -116,7 +116,6 @@ md-card.conversation-skin-tutor-card {
 }
 .conversation-skin-tutor-card-bottom-section,
 .conversation-skin-tutor-card-middle-section {
-  margin-top: -16px;
   padding: 0px 36px 2px 36px;
 }
 
@@ -230,6 +229,7 @@ md-card.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-final-ratings {
+  color: #eee;
   padding-top: 20px;
   text-align: center;
 }
