@@ -52,7 +52,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should walk through the tutorial when user repeteadly clicks Next', function() {
+  it('should walk through the tutorial when user repeatedly clicks Next', function() {
     var NUM_TUTORIAL_STAGES = 5;
     users.createUser('user@example.com', 'user');
     users.login('user@example.com');
@@ -128,6 +128,7 @@ describe('State editor', function() {
     player.expectLatestFeedbackToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('correct');
     });
+    player.continueToNextCard();
     player.expectExplorationToBeOver();
 
     users.logout();

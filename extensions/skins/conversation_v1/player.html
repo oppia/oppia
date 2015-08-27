@@ -7,14 +7,14 @@
     <div id="futurePreview">
       <div class="conversation-skin-tutor-card-top-section">
         <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
-        <div class="protractor-test-conversation-content" angular-html-bind="upcomingContentHtml">
+        <div angular-html-bind="upcomingContentHtml">
         </div>
       </div>
 
       <div ng-if="activeCard.interactionIsInline && upcomingInlineInteractionHtml">
         <div class="conversation-skin-inline-interaction">
           <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
-          <div class="protractor-test-conversation-input" angular-html-bind="upcomingInlineInteractionHtml">
+          <div angular-html-bind="upcomingInlineInteractionHtml">
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
             <div class="conversation-skin-inline-interaction">
               <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
               <div ng-if="waitingForContinueButtonClick">
-                <md-button class="md-button-success" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                <md-button class="md-button-success protractor-test-continue-to-next-card-button" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
                   Continue
                 </md-button>
@@ -160,13 +160,14 @@
   <div class="conversation-skin-oppia-feedback-container" ng-if="feedback() !== ''">
     <img class="conversation-skin-oppia-avatar img-circle" src="/images/general/o_black_72px.png">
 
-    <div class="conversation-skin-oppia-feedback protractor-test-conversation-feedback">
+    <div class="conversation-skin-oppia-feedback">
       <div ng-if="feedback() === null">
         <div class="conversation-skin-feedback-dot-one"></div>
         <div class="conversation-skin-feedback-dot-two"></div>
         <div class="conversation-skin-feedback-dot-three"></div>
       </div>
-      <div ng-if="feedback() !== null" angular-html-bind="feedback()"></div>
+      <div ng-if="feedback() !== null" angular-html-bind="feedback()"
+           class="protractor-test-conversation-feedback"></div>
     </div>
   </div>
 </script>
