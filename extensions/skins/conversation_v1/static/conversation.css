@@ -115,7 +115,7 @@ md-card.conversation-skin-tutor-card {
 }
 .conversation-skin-tutor-card-bottom-section,
 .conversation-skin-tutor-card-middle-section {
-  margin-top: -16px;
+  margin-top: 8px;
   padding: 0px 36px 2px 36px;
 }
 
@@ -204,10 +204,11 @@ md-card.conversation-skin-tutor-card {
 
 .conversation-skin-supplemental-card-container {
   display: inline-block;
-  margin: 27px auto;
-  position: fixed;
+  margin: 0 auto;
+  position: absolute;
   width: 100%;
 }
+
 .conversation-skin-right-card-container {
   margin-left: 12px;
   width: 600px;
@@ -215,8 +216,21 @@ md-card.conversation-skin-tutor-card {
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
-  margin: 16px auto;
+  margin: 44px auto;
+  position: absolute;
   width: 600px;
+}
+
+.conversation-skin-right-card-container md-card.conversation-skin-supplemental-card-fixed {
+  margin-top: 8px;
+  position: fixed;
+}
+
+@media(max-width: 600px) {
+  .conversation-skin-right-card-container,
+  md-card.conversation-skin-supplemental-card {
+    width: 100%;
+  }
 }
 
 .conversation-skin-supplemental-card-overlay {

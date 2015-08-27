@@ -27,7 +27,7 @@
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards" ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-      <md-card class="conversation-skin-tutor-card" ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+      <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active" ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
           <span class="glyphicon glyphicon-comment conversation-skin-tutor-card-feedback-toggle"
                 popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>"
@@ -102,16 +102,16 @@
         </div>
       </md-card>
 
-      <div class="conversation-skin-supplemental-card-container"
-           ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}"
-           ng-show="!activeCard.interactionIsInline && activeCard.interaction">
+      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}">
         <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
         </div>
         <!--
           This needs to use ng-show and a loop over the transcript, so that the
           state of previous supplemental interactions is preserved.
         -->
-        <md-card class="conversation-skin-supplemental-card" ng-show="isPanelVisible(PANEL_INTERACTION)">
+        <md-card ng-show="!activeCard.interactionIsInline && activeCard.interaction"
+                 class="conversation-skin-supplemental-card"
+                 ng-class="{'conversation-skin-far-offscreen': !isPanelVisible(PANEL_INTERACTION)}">
           <div ng-repeat="transcriptCard in transcript">
             <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interaction" ng-show="$index === currentProgressDotIndex">
             </div>

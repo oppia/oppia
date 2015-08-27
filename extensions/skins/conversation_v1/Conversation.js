@@ -394,11 +394,8 @@ oppia.directive('conversationSkin', [function() {
                 oppiaPlayerService.getInteractionHtml(newStateName, _nextFocusLabel) +
                 oppiaPlayerService.getRandomSuffix());
             }
-
-            $('html, body').animate({
-              scrollTop: $(document).height()
-            }, 1200);
             focusService.setFocus(_nextFocusLabel);
+            scrollToBottom();
           } else {
             // There is a new card. Disable the current interaction -- then, if
             // there is no feedback, move on immediately. Otherwise, give the
@@ -423,15 +420,15 @@ oppia.directive('conversationSkin', [function() {
             if (feedbackHtml) {
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
               $scope.waitingForContinueButtonClick = true;
-              $('html, body').animate({
-                scrollTop: $(document).height()
-              }, 1200);
               focusService.setFocus($scope.CONTINUE_BUTTON_FOCUS_LABEL);
+              scrollToBottom();
             } else {
               // Note that feedbackHtml is an empty string if no feedback has
               // been specified. This causes the answer-feedback pair to change
               // abruptly, so we make the change only after the animation has
               // completed.
+              
+              // scrollToTop();
               $scope.showPendingCard(
                 newStateName,
                 contentHtml + oppiaPlayerService.getRandomSuffix(),
@@ -450,7 +447,6 @@ oppia.directive('conversationSkin', [function() {
       $scope.showPendingCard = function(newStateName, newContentHtml, successCallback) {
         $scope.waitingForContinueButtonClick = false;
         $scope.startCardChangeAnimation = true;
-        $('html, body').scrollTop(0);
 
         $timeout(function() {
           _addNewCard(
@@ -475,6 +471,34 @@ oppia.directive('conversationSkin', [function() {
           }
         }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC + 10);
       };
+
+      var scrollToBottom = function() {
+        $timeout(function() {
+          console.log('scroll down');
+          var tutorCard = $(".conversation-skin-tutor-card-active");
+          var tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight(); 
+          if ($(window).height() < tutorCardBottom) {
+            $('html, body').animate({
+              scrollTop: tutorCardBottom - $(window).height() + 12
+            }, {
+              duration: 600, 
+              easing: "easeOutQuad"
+            });
+          } 
+        }, 100);
+      }
+
+      // var scrollToTop = function() {
+      //   $timeout(function() {
+      //     console.log('scroll up');
+      //     $('html, body').animate({
+      //       scrollTop: 0
+      //     }, {
+      //       duration: 200, 
+      //       easing: "easeOutQuad"
+      //     });
+      //   }, 100);
+      // }
 
       $scope.submitUserRating = function(ratingValue) {
         ratingService.submitUserRating(ratingValue);
@@ -513,12 +537,27 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $window.addEventListener('scroll', function() {
+        fadeDotsOnScroll();
+        fixSupplementOnScroll();
+      });
+
+      var fadeDotsOnScroll = function() {
         var progressDots = $('.conversation-skin-progress-dots');
         var progressDotsTop = progressDots.height();
         var newOpacity = Math.max(
           (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
         progressDots.css({opacity: newOpacity});
-      });
+      }
+
+      var fixSupplementOnScroll = function() {
+        var supplementCard = $("md-card.conversation-skin-supplemental-card");
+        var topMargin = $(".navbar-container").height() - 20;
+        if ($(window).scrollTop() > topMargin) {
+          supplementCard.addClass("conversation-skin-supplemental-card-fixed");
+        } else {
+          supplementCard.removeClass("conversation-skin-supplemental-card-fixed");
+        }
+      }
 
       $scope.canWindowFitTwoCards = function() {
         return $scope.windowWidth >= $scope.TWO_CARD_THRESHOLD_PX;
