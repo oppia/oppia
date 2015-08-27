@@ -279,12 +279,6 @@ md-card.conversation-skin-supplemental-card {
   width: 46px;
 }
 
-.conversation-skin-far-offscreen {
-  left: -30000px;
-  position: absolute;
-  top: -30000px;
-}
-
 .conversation-skin-tutor-card.ng-hide-add.ng-hide-add-active,
 .conversation-skin-tutor-card.ng-hide-remove.ng-hide-remove-active,
 .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,

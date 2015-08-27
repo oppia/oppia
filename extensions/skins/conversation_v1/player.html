@@ -112,8 +112,7 @@
           state of previous supplemental interactions is preserved.
         -->
         <md-card ng-show="isPanelVisible(PANEL_INTERACTION)"
-                 class="conversation-skin-supplemental-card"
-                 ng-class="{'conversation-skin-far-offscreen': !isPanelVisible(PANEL_INTERACTION)}">
+                 class="conversation-skin-supplemental-card">
           <div ng-repeat="transcriptCard in transcript">
             <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interaction" ng-show="$index === currentProgressDotIndex">
             </div>
