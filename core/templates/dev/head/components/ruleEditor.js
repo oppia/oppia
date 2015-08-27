@@ -201,6 +201,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.rule.rule_type = newRuleType;
         $scope.rule.inputs = {};
         var tmpRuleDescription = _computeRuleDescriptionFragments();
+        //this is for image-click interaction.
+        var _answerChoices = responsesService.getAnswerChoices();
 
         // Finds the parameters and sets them in $scope.rule.inputs.
         var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
@@ -227,6 +229,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isWeighted': false,
               'isLabeled': false
             };
+          } else if(_answerChoices){
+            //defaultValue
+            $scope.rule.inputs[varName] =_answerChoices; 
           } else {
             $scope.rule.inputs[varName] = '';
           }
