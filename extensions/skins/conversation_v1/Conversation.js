@@ -358,6 +358,8 @@ oppia.directive('conversationSkin', [function() {
           return;
         }
 
+        _recomputeAndResetPanels();
+
         _answerIsBeingProcessed = true;
         hasInteractedAtLeastOnce = true;
         $scope.waitingForOppiaFeedback = true;

@@ -401,7 +401,7 @@ oppia.factory('oppiaPlayerService', [
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
       return (
-        interactionId &&
+        !interactionId ||
         INTERACTION_SPECS[interactionId].display_mode ===
           INTERACTION_DISPLAY_MODE_INLINE);
     },
