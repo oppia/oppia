@@ -33,6 +33,7 @@ class EndExploration(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'Null'
     instructions = None
+    needs_summary = False
 
     _customization_arg_specs = [{
         'name': 'recommendedExplorationIds',

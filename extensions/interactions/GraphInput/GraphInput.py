@@ -29,6 +29,7 @@ class GraphInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'Graph'
     instructions = 'Create a graph'
+    needs_summary = True
 
     _customization_arg_specs = [{
         'name': 'graph',

@@ -7,14 +7,14 @@
     <div id="futurePreview">
       <div class="conversation-skin-tutor-card-top-section">
         <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
-        <div class="protractor-test-conversation-content" angular-html-bind="upcomingContentHtml">
+        <div angular-html-bind="upcomingContentHtml">
         </div>
       </div>
 
       <div ng-if="activeCard.interactionIsInline && upcomingInlineInteractionHtml">
         <div class="conversation-skin-inline-interaction">
           <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
-          <div class="protractor-test-conversation-input" angular-html-bind="upcomingInlineInteractionHtml">
+          <div angular-html-bind="upcomingInlineInteractionHtml">
           </div>
         </div>
       </div>
@@ -63,6 +63,7 @@
               <div ng-if="!$last">
                 <answer-feedback-pair profile-picture="profilePicture"
                                       answer="responsePair.learnerAnswer"
+                                      short-answer="responsePair.shortLearnerAnswer"
                                       feedback="responsePair.oppiaFeedback">
                 </answer-feedback-pair>
               </div>
@@ -73,6 +74,7 @@
           <div class="conversation-skin-tutor-card-bottom-section" ng-if="activeCard.answerFeedbackPairs.length > 0">
             <answer-feedback-pair profile-picture="profilePicture"
                                   answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].learnerAnswer"
+                                  short-answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].shortLearnerAnswer"
                                   feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback">
             </answer-feedback-pair>
           </div>
@@ -81,7 +83,7 @@
             <div class="conversation-skin-inline-interaction">
               <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
               <div ng-if="waitingForContinueButtonClick">
-                <md-button class="md-button-success" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                <md-button class="md-button-success protractor-test-continue-to-next-card-button" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
                   Continue
                 </md-button>
@@ -94,7 +96,7 @@
                 </div>
                 <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_INTERACTION)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
                   (<[activeCard.interactionInstructions]>)
-                  <span class="glyphicon glyphicon-hand-right pull-right"></span>
+                  <i class="zmdi zmdi-arrow-right"></i>
                 </div>
               </div>
             </div>
@@ -143,20 +145,29 @@
 <script type="text/ng-template" id="components/answerFeedbackPair">
   <div class="conversation-skin-learner-answer-container">
     <img class="conversation-skin-user-avatar" ng-src="<[profilePicture()]>">
-    <div class="conversation-skin-learner-answer" angular-html-bind="answer()">
+    <div ng-if="shortAnswer()">
+      <div popover-placement="bottom" popover-template="popover/answer" popover-trigger="click" style="cursor: pointer;">
+        <div class="conversation-skin-learner-answer" angular-html-bind="shortAnswer()">
+        </div>
+      </div>
+    </div>
+    <div ng-if="!shortAnswer()">
+      <div class="conversation-skin-learner-answer" angular-html-bind="answer()">
+      </div>
     </div>
   </div>
 
   <div class="conversation-skin-oppia-feedback-container" ng-if="feedback() !== ''">
     <img class="conversation-skin-oppia-avatar img-circle" src="/images/general/o_black_72px.png">
 
-    <div class="conversation-skin-oppia-feedback protractor-test-conversation-feedback">
+    <div class="conversation-skin-oppia-feedback">
       <div ng-if="feedback() === null">
         <div class="conversation-skin-feedback-dot-one"></div>
         <div class="conversation-skin-feedback-dot-two"></div>
         <div class="conversation-skin-feedback-dot-three"></div>
       </div>
-      <div ng-if="feedback() !== null" angular-html-bind="feedback()"></div>
+      <div ng-if="feedback() !== null" angular-html-bind="feedback()"
+           class="protractor-test-conversation-feedback"></div>
     </div>
   </div>
 </script>
@@ -244,4 +255,8 @@
       </span>
     </li>
   </ul>
+</script>
+
+<script type="text/ng-template" id="popover/answer">
+  <div angular-html-bind="answer()"></div>
 </script>

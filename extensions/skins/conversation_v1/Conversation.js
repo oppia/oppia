@@ -172,7 +172,6 @@ oppia.directive('conversationSkin', [function() {
       var _nextFocusLabel = null;
 
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
-      $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
       // This will be replaced with the dataURI representation of the
@@ -335,6 +334,7 @@ oppia.directive('conversationSkin', [function() {
         hasInteractedAtLeastOnce = false;
 
         oppiaPlayerService.init(function(stateName, initHtml) {
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
           _nextFocusLabel = focusService.generateFocusLabel();
           $scope.gadgetPanelsContents = (
             oppiaPlayerService.getGadgetPanelsContents());
@@ -358,6 +358,8 @@ oppia.directive('conversationSkin', [function() {
           return;
         }
 
+        _recomputeAndResetPanels();
+
         _answerIsBeingProcessed = true;
         hasInteractedAtLeastOnce = true;
         $scope.waitingForOppiaFeedback = true;
@@ -366,6 +368,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.transcript[$scope.transcript.length - 1].stateName);
         $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs.push({
           learnerAnswer: oppiaPlayerService.getAnswerAsHtml(answer),
+          shortLearnerAnswer: oppiaPlayerService.getShortAnswerAsHtml(answer),
           oppiaFeedback: null
         });
 
@@ -427,8 +430,6 @@ oppia.directive('conversationSkin', [function() {
               // been specified. This causes the answer-feedback pair to change
               // abruptly, so we make the change only after the animation has
               // completed.
-              
-              // scrollToTop();
               $scope.showPendingCard(
                 newStateName,
                 contentHtml + oppiaPlayerService.getRandomSuffix(),
@@ -462,6 +463,7 @@ oppia.directive('conversationSkin', [function() {
 
         $timeout(function() {
           focusService.setFocus(_nextFocusLabel);
+          scrollToTop();
         }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC);
 
         $timeout(function() {
@@ -474,10 +476,9 @@ oppia.directive('conversationSkin', [function() {
 
       var scrollToBottom = function() {
         $timeout(function() {
-          console.log('scroll down');
           var tutorCard = $(".conversation-skin-tutor-card-active");
           var tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight(); 
-          if ($(window).height() < tutorCardBottom) {
+          if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
             $('html, body').animate({
               scrollTop: tutorCardBottom - $(window).height() + 12
             }, {
@@ -486,19 +487,13 @@ oppia.directive('conversationSkin', [function() {
             });
           } 
         }, 100);
-      }
+      };
 
-      // var scrollToTop = function() {
-      //   $timeout(function() {
-      //     console.log('scroll up');
-      //     $('html, body').animate({
-      //       scrollTop: 0
-      //     }, {
-      //       duration: 200, 
-      //       easing: "easeOutQuad"
-      //     });
-      //   }, 100);
-      // }
+      var scrollToTop = function() {
+        $timeout(function() {
+          $(window).scrollTop(0);  
+        });
+      };
 
       $scope.submitUserRating = function(ratingValue) {
         ratingService.submitUserRating(ratingValue);
@@ -547,7 +542,7 @@ oppia.directive('conversationSkin', [function() {
         var newOpacity = Math.max(
           (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
         progressDots.css({opacity: newOpacity});
-      }
+      };
 
       var fixSupplementOnScroll = function() {
         var supplementCard = $("md-card.conversation-skin-supplemental-card");
@@ -557,7 +552,7 @@ oppia.directive('conversationSkin', [function() {
         } else {
           supplementCard.removeClass("conversation-skin-supplemental-card-fixed");
         }
-      }
+      };
 
       $scope.canWindowFitTwoCards = function() {
         return $scope.windowWidth >= $scope.TWO_CARD_THRESHOLD_PX;
@@ -581,7 +576,8 @@ oppia.directive('answerFeedbackPair', [function() {
     scope: {
       answer: '&',
       feedback: '&',
-      profilePicture: '&'
+      profilePicture: '&',
+      shortAnswer: '&'
     },
     templateUrl: 'components/answerFeedbackPair'
   };
