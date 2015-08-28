@@ -481,22 +481,22 @@ oppia.directive('conversationSkin', [function() {
 
       var scrollToBottom = function() {
         $timeout(function() {
-          var tutorCard = $(".conversation-skin-tutor-card-active");
-          var tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight(); 
+          var tutorCard = $('.conversation-skin-tutor-card-active');
+          var tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight();
           if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
             $('html, body').animate({
               scrollTop: tutorCardBottom - $(window).height() + 12
             }, {
-              duration: 600, 
-              easing: "easeOutQuad"
+              duration: 600,
+              easing: 'easeOutQuad'
             });
-          } 
+          }
         }, 100);
       };
 
       var scrollToTop = function() {
         $timeout(function() {
-          $(window).scrollTop(0);  
+          $(window).scrollTop(0);
         });
       };
 
@@ -550,12 +550,12 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var fixSupplementOnScroll = function() {
-        var supplementCard = $("md-card.conversation-skin-supplemental-card");
-        var topMargin = $(".navbar-container").height() - 20;
+        var supplementCard = $('md-card.conversation-skin-supplemental-card');
+        var topMargin = $('.navbar-container').height() - 20;
         if ($(window).scrollTop() > topMargin) {
-          supplementCard.addClass("conversation-skin-supplemental-card-fixed");
+          supplementCard.addClass('conversation-skin-supplemental-card-fixed');
         } else {
-          supplementCard.removeClass("conversation-skin-supplemental-card-fixed");
+          supplementCard.removeClass('conversation-skin-supplemental-card-fixed');
         }
       };
 

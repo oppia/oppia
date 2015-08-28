@@ -176,31 +176,31 @@ md-card.conversation-skin-tutor-card {
   width: 2px;
 }
 .conversation-skin-feedback-dot-one {
-  opacity: 0;
   animation: dot 1.5s infinite;
   animation-delay: 0.0s;
   -moz-animation: dot 1.5s infinite;
   -moz-animation-delay: 0.0s;
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.0s;
+  opacity: 0;
 }
 .conversation-skin-feedback-dot-two {
-  opacity: 0;
   animation: dot 1.5s infinite;
   animation-delay: 0.3s;
   -moz-animation: dot 1.5s infinite;
   -moz-animation-delay: 0.3s;
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.3s;
+  opacity: 0;
 }
 .conversation-skin-feedback-dot-three {
-  opacity: 0;
   animation: dot 1.5s infinite;
   animation-delay: 0.6s;
   -moz-animation: dot 1.5s infinite;
   -moz-animation-delay: 0.6s;
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.6s;
+  opacity: 0;
 }
 
 .conversation-skin-supplemental-card-container {
@@ -225,9 +225,9 @@ md-card.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-right-card-container md-card.conversation-skin-supplemental-card-fixed {
+  left: inherit;
   margin-top: 8px;
   position: fixed;
-  left: inherit;
   right: inherit;
 }
 
