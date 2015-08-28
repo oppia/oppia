@@ -75,7 +75,7 @@ var submitAnswer = function(interactionId, answerData) {
   general.waitForSystem();
 };
 
-var continueToNextCard = function(interactionId, answerData) {
+var clickThroughToNextCard = function(interactionId, answerData) {
   element(by.css('.protractor-test-continue-to-next-card-button')).click();
 };
 
@@ -99,7 +99,7 @@ exports.expectLatestFeedbackToMatch = expectLatestFeedbackToMatch;
 
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
-exports.continueToNextCard = continueToNextCard;
+exports.clickThroughToNextCard = clickThroughToNextCard;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;

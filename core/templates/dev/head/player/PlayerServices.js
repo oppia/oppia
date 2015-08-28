@@ -205,6 +205,13 @@ oppia.factory('oppiaPlayerService', [
         old_params: learnerParamsService.getAllParams()
       });
 
+      // Broadcast the state transition to the parent page.
+      messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+        oldStateName: _currentStateName,
+        jsonAnswer: JSON.stringify(answer),
+        newStateName: newStateName ? newStateName : 'END'
+      });
+
       // If the new state contains a terminal interaction, record a completion
       // event, and inform the parent page that a completion has happened.
       if (INTERACTION_SPECS[
@@ -222,13 +229,6 @@ oppia.factory('oppiaPlayerService', [
           version: version
         });
       }
-
-      // Broadcast the state hit to the parent page.
-      messengerService.sendMessage(messengerService.STATE_TRANSITION, {
-        oldStateName: _currentStateName,
-        jsonAnswer: JSON.stringify(answer),
-        newStateName: newStateName ? newStateName : 'END'
-      });
     }
 
     if (!delayParamUpdates) {

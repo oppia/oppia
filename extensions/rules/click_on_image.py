@@ -18,7 +18,6 @@
 
 __author__ = 'Zhan Xiong Chin'
 
-import math
 from extensions.rules import base
 
 
