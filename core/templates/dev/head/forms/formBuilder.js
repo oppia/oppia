@@ -895,34 +895,34 @@ oppia.filter('isNonempty', [function() {
 
 oppia.filter('isFloat', [function() {
   return function(input) {
-
-    var FLOAT_REGEXP = /^((\-?\d+(\.|\,)?)|(\-?(\.|\,)?))\d+\%?$/;
-
+    var FLOAT_REGEXP = /(?=.*\d)^\-?\d*(\.|\,)?\d*\%?$/;
     // This regex accepts floats in the following formats:
+    // 0.
     // 0.55..
     // -0.55.. 
     // .5 55.. 
     // -.555..
-    // All examples above with '.' replaced with ',' are also valid
-    // Expresions containing % are also valid(5.1% etc)
+    // All examples above with '.' replaced with ',' are also valid.
+    // Expresions containing % are also valid (5.1% etc).
 
     var viewValue = '';
     try {
-      var viewValue = input.toString();
+      var viewValue = input.toString().trim();
     } catch(e) {
       return undefined;
     }
 
     if (viewValue !== '' && FLOAT_REGEXP.test(viewValue)) {
-      if (viewValue.slice(-1) === '%'){
+      if (viewValue.slice(-1) === '%') {
 
         // This is a percentage, so the input needs to be divided by 100.
-        return parseFloat(viewValue.replace(',', '.')) / 100;
-      } else{
+        return viewValue.substring(0, viewValue.length - 1).replace(',', '.') / 100;
+      } else {
         return parseFloat(viewValue.replace(',', '.'));
       }
     } else {
-    } return undefined; 
+      return undefined;
+    }  
   };
 }]);
 
