@@ -201,7 +201,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.rule.rule_type = newRuleType;
         $scope.rule.inputs = {};
         var tmpRuleDescription = _computeRuleDescriptionFragments();
-        //this is for image-click interaction.
+        //this is to get input for image-click interaction.
         var _answerChoices = responsesService.getAnswerChoices();
 
         // Finds the parameters and sets them in $scope.rule.inputs.
@@ -230,8 +230,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isLabeled': false
             };
           } else if(_answerChoices){
-            //defaultValue
-            $scope.rule.inputs[varName] =_answerChoices; 
+            //It should return array of answers of region labels 
+             $scope.rule.inputs[varName] = [];
           } else {
             $scope.rule.inputs[varName] = '';
           }
