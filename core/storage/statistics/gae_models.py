@@ -381,6 +381,10 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     - session_id: ID of current student's session
     - params: current parameter values, in the form of a map of parameter name
               to its value
+    This event does not have a client_time_spent_in_secs.
+    It is implied to be 0.0. Every other event is timed starting
+    from when the user entered the state, meaning that every other
+    time is based off of the timing of this event.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
