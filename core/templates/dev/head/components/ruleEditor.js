@@ -201,6 +201,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.rule.rule_type = newRuleType;
         $scope.rule.inputs = {};
         var tmpRuleDescription = _computeRuleDescriptionFragments();
+        // This provides the list of choices for the multiple-choice and image-click interactions.
+        var _answerChoices = responsesService.getAnswerChoices();
 
         // Finds the parameters and sets them in $scope.rule.inputs.
         var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
@@ -214,11 +216,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
           }
 
-          if (varType == 'Set') {
-            $scope.rule.inputs[varName] = [];
-          } else if (varType == 'NonnegativeInt') {
-            // Set a default value.
-            $scope.rule.inputs[varName] = 0;
+          if (_answerChoices) {
+            $scope.rule.inputs[varName] = angular.copy(_answerChoices[0].val);
           } else if (varType == "Graph") {
             $scope.rule.inputs[varName] = {
               'vertices': [],
@@ -227,6 +226,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isWeighted': false,
               'isLabeled': false
             };
+          } else if (varType == 'Set') {
+            $scope.rule.inputs[varName] = [];
           } else {
             $scope.rule.inputs[varName] = '';
           }
