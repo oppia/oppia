@@ -105,14 +105,10 @@
       </md-card>
 
       <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}" ng-if="!activeCard.interactionIsInline && activeCard.interaction">
-        <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
-        </div>
-        <!--
-          This needs to use ng-show and a loop over the transcript, so that the
-          state of previous supplemental interactions is preserved.
-        -->
         <md-card ng-show="isPanelVisible(PANEL_INTERACTION)"
                  class="conversation-skin-supplemental-card">
+          <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
+          </div>
           <div ng-repeat="transcriptCard in transcript">
             <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interaction" ng-show="$index === currentProgressDotIndex">
             </div>
