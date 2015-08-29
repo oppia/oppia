@@ -28,53 +28,41 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       templateUrl: 'interaction/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choicesWithValue);
-        var maxAllowableSelectionCount = $attrs.maxAllowableSelectionCountWithValue;
-        var minAllowableSelectionCount = $attrs.minAllowableSelectionCountWithValue;
-        $scope.studentSelections = {};
+        $scope.maxAllowableSelectionCount = $attrs.maxAllowableSelectionCountWithValue;
+        $scope.minAllowableSelectionCount = $attrs.minAllowableSelectionCountWithValue;
 
-        if (maxAllowableSelectionCount == 1) {
-          $scope.isCheckbox = false;
-        } else {
-          $scope.isCheckbox = true;
-        }
-
+        // The following is formated so that the key is an html choice and the value
+        // either true or false.
+        $scope.userSelections = {};
 
         for (var i = 0; i < $scope.choices.length; i++) {
-          $scope.studentSelections[$scope.choices[i]] = false;
+          $scope.userSelections[$scope.choices[i]] = false;
         }
 
-        $scope.answers = [];
-        $scope.maxed = false; // Indicates if the count is over max.
-        $scope.min = false;  // Indicates if count is under min.
+        $scope.displayCheckboxes = ($scope.maxAllowableSelectionCount > 1);
 
-        $scope.checkCount = function(selection) {
-          index = $scope.answers.indexOf(selection);
-          if (index !== -1) {
-            $scope.answers.splice(index, 1);
-          } else if (!$scope.maxed) {
-            $scope.answers.push(selection);
-          }
-          var size = $scope.answers.length;
-          if (size >= maxAllowableSelectionCount) {
-            $scope.maxed = true;
-          } else {
-            $scope.maxed = false;
-          }
-          if (size >= minAllowableSelectionCount) {
-            $scope.min = true;
-          } else {
-            $scope.min = false;
-          }
+        // The following indicates that the number of answers is more than maxAllowableSelectionCount.
+        $scope.preventAdditionalSelections = false;
+
+        // The following indicates that the number of answers is less than minAllowableSelectionCount.
+        $scope.notEnoughSelections = true;
+
+        $scope.size = function() {
+          return Object.keys($scope.userSelections).reduce(function(previous, current) {
+            return previous + $scope.userSelections[current];
+          }, 0);
+        };
+
+        $scope.onToggleCheckbox = function() {
+          $scope.newQuestion = false;
+          $scope.preventAdditionalSelections = ($scope.size() >= $scope.maxAllowableSelectionCount);
+          $scope.notEnoughSelections = ($scope.size() < $scope.minAllowableSelectionCount);
         };
 
         $scope.submitAnswer = function(answer) {
-          var answers = [];
-
-          if (answer != null) {
-            answers.push(answer);
-          } else {
-            answers = $scope.answers;
-          }
+          var answers = Object.keys($scope.userSelections).filter(function(obj) {
+            return $scope.userSelections[obj];
+          });
 
           $scope.$parent.$parent.submitAnswer(answers, 'submit');
         };

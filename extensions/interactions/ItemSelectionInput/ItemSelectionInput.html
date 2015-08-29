@@ -1,8 +1,17 @@
 <style>
-  .item-selection-form-container {
+  /* The following is needed so that the radio button does not show */
+  input[type="radio"] {
+    display: none;
+  }
+
+  md-checkbox {
+    margin: 5px;
+  }
+
+  .item-selection-input-form-container {
     margin-top: -5px;
   }
-  .item {
+  .item-selection-input-item {
     background: none;
     border: none;
     color: rgba(0,0,0,0.5);
@@ -13,41 +22,48 @@
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
-  .item-container {
+  .item-selection-input-container {
     border-bottom: thin solid #EEEEEE;
     margin-bottom: 5px;
   }
 
-  .item-container md-input-group.md-default-theme label {
+  .item-selection-input-container md-input-group.md-default-theme label {
     border-bottom: 0px;
   }
 
-  .item:hover {
+  .item-selection-input-item:hover {
     color: #00897B;
   }
+
 </style>
 
 <script type="text/ng-template" id="interaction/ItemSelectionInput">
-  <div class="item-selection-form-container">
+  <div class="item-selection-input-form-container">
     <form ng-submit="submitAnswer()">
-      <div class="item-container" ng-repeat="choice in choices">
-        <label ng-switch="isCheckbox">
+      <div class="item-selection-input-container" ng-repeat="choice in choices">
+        <label class="item-selection-input-item" ng-switch="displayCheckboxes">
           <div ng-switch-when="true">
-            <md-checkbox class="item" ng-checked="answers.indexOf(choice) !== -1" ng-click="checkCount(choice)"
-              ng-disabled="maxed && answers.indexOf(choice) === -1" aria-label="choice">
+            <md-checkbox ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
+              ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" aria-label="choice">
               <span angular-html-bind="choice"></span>
             </md-checkbox>
           </div>
 
           <div ng-switch-when="false">
-            <button class="item" ng-click="submitAnswer(choice)" aria-label="choice">
-             <span angular-html-bind="choice"></span>
-            </button>
+            <!--  Using radio input so that the ng-model will change in the backend when clicked -->
+            <input type="radio" value="true" ng-model="userSelections[choice]" ng-change="submitAnswer(userSelections)" aria-label="choice">
+            <span angular-html-bind="choice"></span>
           </div>
         </label>
       </div>
-      <md-button ng-if="isCheckbox" class="md-button-success"
-        ng-click="submitAnswer()" aria-label="Submit" ng-disabled="!min || !maxed">Submit</md-button>
+      <div ng-if="displayCheckboxes && notEnoughSelections">
+        <small>You have not selected enough choices!</small>
+      </div>
+      <div ng-if="displayCheckboxes && preventAdditionalSelections">
+        <small>You have selected the maximum number of allowable choices</small>
+      </div>
+      <md-button ng-if="displayCheckboxes" class="md-button-success"
+        ng-click="submitAnswer(userSelections)" aria-label="Submit" ng-disabled="notEnoughSelections">Submit</md-button>
     </form>
   </div>
 </script>

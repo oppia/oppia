@@ -14,9 +14,6 @@
         <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
-            <span ng-if="getCurrentInteractionId() === 'ItemSelectionInput'">
-              <span class="oppia-item-selection-rule" angular-html-bind="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices"><span>...
-            </span>
             <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== activeRuleIndex">
               <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
             </span>

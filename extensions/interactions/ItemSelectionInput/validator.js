@@ -56,22 +56,8 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
       });
     }
 
-    var selectedEqualsChoices = [];
-    for (var i = 0; i < answerGroups.length; i++) {
-      var ruleSpecs = answerGroups[i].rule_specs;
-      for (var j = 0; j < ruleSpecs.length; j++) {
-        if (ruleSpecs[j].inputs.x >= numChoices) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'please ensure rule ' + String(j + 1) + ' in group ' +
-              String(i + 1) + ' refers to a valid choice.'
-          });
-        }
-      }
-    }
-
-    var minAllowedCount = customizationArgs.min_allowable_selection_count.value;
-    var maxAllowedCount = customizationArgs.max_allowable_selection_count.value;
+    var minAllowedCount = customizationArgs.minAllowableSelectionCount.value;
+    var maxAllowedCount = customizationArgs.maxAllowableSelectionCount.value;
 
     if (minAllowedCount > maxAllowedCount) {
       warningsList.push({
@@ -98,16 +84,14 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
       baseInteractionValidationService.getAnswerGroupWarnings(
         answerGroups, stateName));
 
-    // Only require a default rule if some choices have not been taken care of by rules.
-    if (selectedEqualsChoices.length < numChoices) {
-      if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'please clarify the default outcome so it is less confusing to ' +
-            'the user.')
-        });
-      }
+
+    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+      warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'please clarify the default outcome so it is less confusing to ' +
+          'the user.')
+      });
     }
 
     return warningsList;

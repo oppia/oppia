@@ -675,7 +675,6 @@ oppia.factory('explorationStatesService', [
         for (var otherStateName in _states) {
           var interaction = _states[otherStateName].interaction;
           var groups = interaction.answer_groups;
-          console.log(groups);
           for (var i = 0; i < groups.length; i++) {
             if (groups[i].outcome.dest === deleteStateName) {
               groups[i].outcome.dest = otherStateName;

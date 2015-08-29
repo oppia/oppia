@@ -154,7 +154,7 @@ oppia.directive('answerGroupEditor', [function() {
         case 'ListOfUnicodeString':
         case 'SetOfUnicodeString':
         case 'SetOfHtmlString':
-          return false;
+          return [];
         case 'MusicPhrase':
           return [];
         case 'CheckedProof':

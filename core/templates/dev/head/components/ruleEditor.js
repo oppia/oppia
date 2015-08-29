@@ -150,17 +150,17 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           var _answerChoices = responsesService.getAnswerChoices();
 
           if (_answerChoices) {
-            // This rule is for a multiple-choice or image-click interaction.
+            // This rule is for a multiple-choice, image-click, or item selection interaction.
             // TODO(sll): Remove the need for this special case.
             if (_answerChoices.length > 0) {
               if (finalInputArray[2] === 'SetOfHtmlString') {
                 $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
                   return {
-                    val: false,
+                    val: choice.label,
                     id: choice.label
                   };
                 });
-                result.push({'type': 'checkbox', 'varName': finalInputArray[i+1]});
+                result.push({'type': 'checkboxes', 'varName': finalInputArray[i+1]});
               } else {
                 $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
                   return {
@@ -239,20 +239,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
 
           tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
-        }
-      };
-
-      // The following function is necessary to insert elements into the answer
-      // groups for the Item Selection Widget.
-      $scope.toggleSelection = function(choice) {
-        var tmpRuleDescription = _computeRuleDescriptionFragments();
-        var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-        var varName = tmpRuleDescription.match(PATTERN)[1];
-        var index = $scope.rule.inputs[varName].indexOf(choice);
-        if (index > -1) {
-          $scope.rule.inputs[varName].splice(index, 1);
-        } else {
-          $scope.rule.inputs[varName].push(choice);
         }
       };
 

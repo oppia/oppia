@@ -333,7 +333,7 @@ oppia.controller('StateInteraction', [
       $rootScope.$broadcast(
         'updateAnswerChoices', currentCustomizationArgs['choices'].value.map(function(val, ind) {
           return {
-            val: false,
+            val: val,
             label: val
           };
         })

@@ -29,23 +29,17 @@ class Equals(base.SetOfHtmlStringRule):
         return set(subject) == set(self.x)
 
 
-class Contains(base.SetOfHtmlStringRule):
+class ContainsAtLeastOneOf(base.SetOfHtmlStringRule):
     description = 'contains at least one of {{x|SetOfHtmlString}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        for e in subject:
-            if e in self.x:
-                return True
-        return False
+        return any([e in self.x for e in subject])
 
 
-class DoesNotContain(base.SetOfHtmlStringRule):
+class DoesNotContainAtLeastOneOf(base.SetOfHtmlStringRule):
     description = 'does not contain at least one of {{x|SetOfHtmlString}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        for e in subject:
-            if e not in self.x:
-                return True
-        return False
+        return any([e not in self.x for e in subject])

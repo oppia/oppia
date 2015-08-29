@@ -36,7 +36,7 @@ class SetOfHtmlStringUnitTests(test_utils.GenericTestBase):
         self.assertFalse(rule.eval(['a']))
 
     def test_contains_rule(self):
-        rule = set_of_html_string.Contains(['a'])
+        rule = set_of_html_string.ContainsAtLeastOneOf(['a'])
 
         self.assertTrue(rule.eval(['a', 'b']))
         self.assertTrue(rule.eval([' ', 'a']))
@@ -45,7 +45,7 @@ class SetOfHtmlStringUnitTests(test_utils.GenericTestBase):
         self.assertFalse(rule.eval(['b']))
 
     def test_does_not_contain_rule(self):
-        rule = set_of_html_string.DoesNotContain(['los', 'la'])
+        rule = set_of_html_string.DoesNotContainAtLeastOneOf(['los', 'la'])
 
         self.assertTrue(rule.eval(['ld']))
         self.assertTrue(rule.eval(['l']))
