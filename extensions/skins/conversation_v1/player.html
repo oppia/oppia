@@ -27,7 +27,7 @@
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards" ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-      <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active" ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+      <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active" ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': !activeCard.interactionIsInline && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
           <span class="glyphicon glyphicon-comment conversation-skin-tutor-card-feedback-toggle"
                 popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>"
@@ -121,7 +121,9 @@
   <div ng-if="finished && isLoggedIn && !isInPreviewMode && !isIframed" class="conversation-skin-final-ratings">
     <oppia-gadget-panel panel-contents="gadgetPanelsContents.main" class="conversation-skin-main-gadget-panel"></oppia-gadget-panel>
 
-    <div style="margin-bottom: 20px;">Learned something new? How would you rate this exploration?</div>
+    <div style="color: #eee; margin-bottom: 20px;">
+      Learned something new? How would you rate this exploration?
+    </div>
     <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
       <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px;">
       </rating-from-value>

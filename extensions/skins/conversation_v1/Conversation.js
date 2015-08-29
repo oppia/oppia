@@ -351,6 +351,8 @@ oppia.directive('conversationSkin', [function() {
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
           focusService.setFocus(_nextFocusLabel);
+
+          $scope.finished = oppiaPlayerService.isStateTerminal(stateName);
         });
       };
 

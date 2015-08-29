@@ -243,7 +243,6 @@ md-card.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-final-ratings {
-  color: #eee;
   padding-top: 20px;
   text-align: center;
 }
@@ -300,7 +299,13 @@ md-card.conversation-skin-supplemental-card {
 }
 
 @media(max-width: 1119px) {
-  md-card.conversation-skin-tutor-card {
+  /*
+    This is needed so that the left/right animation works smoothly with a
+    supplemental interaction on small screens. However, it needs the extra
+    'has-subsidiary-cards' class in order to avoid the final ratings section
+    displaying at the top of the page.
+  */
+  md-card.conversation-skin-tutor-card.conversation-skin-has-subsidiary-cards {
     position: absolute;
   }
 }
