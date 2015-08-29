@@ -217,12 +217,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
 
           if (_answerChoices) {
-            if (varType == 'NonnegativeInt') {
-            // Set a default value.
-            $scope.rule.inputs[varName] = 0;
-          }
-          $scope.rule.inputs[varName] = angular.copy(_answerChoices[0].val);
-        } else if (varType == "Graph") {
+            $scope.rule.inputs[varName] = angular.copy(_answerChoices[0].val);
+          } else if (varType == "Graph") {
             $scope.rule.inputs[varName] = {
               'vertices': [],
               'edges': [],
