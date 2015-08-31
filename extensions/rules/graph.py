@@ -25,32 +25,29 @@ GRAPH_ADJACENCY_MODE_DIRECTED = 'directed'
 GRAPH_ADJACENCY_MODE_INVERTED = 'inverted'
 GRAPH_ADJACENCY_MODE_UNDIRECTED = 'undirected'
 
-# Constructs adjacency lists from a Graph object and a string indicating the chosen mode.
-# Depending on the mode chosen, it either:
-# - Adds all edges to the lists (directed)
-# - Inverts all edges and adds them to the lists (inverted)
-# - Adds both edges from above two modes to the lists, as though 
-# the graph were undirected (undirected)
 def construct_adjacency_lists(graph, mode = GRAPH_ADJACENCY_MODE_DIRECTED):
+    """Constructs adjacency lists from a Graph object and a string indicating the chosen mode.
+
+    Depending on the mode chosen, it either:
+    - Adds all edges to the lists (directed)
+    - Inverts all edges and adds them to the lists (inverted)
+    - Adds both edges from above two modes to the lists, as though 
+    the graph were undirected (undirected)"""
     adjacency_lists = [[] for v in graph['vertices']]
     if not graph['isDirected']:
         # if a graph is undirected, all modes work the same way anyway
         mode = GRAPH_ADJACENCY_MODE_UNDIRECTED
     for edge in graph['edges']:
-        if (
-            mode == GRAPH_ADJACENCY_MODE_DIRECTED or 
-            mode == GRAPH_ADJACENCY_MODE_UNDIRECTED
-        ):
+        if (mode == GRAPH_ADJACENCY_MODE_DIRECTED or 
+            mode == GRAPH_ADJACENCY_MODE_UNDIRECTED):
             adjacency_lists[edge['src']].append(edge['dst'])
-        if (
-            mode == GRAPH_ADJACENCY_MODE_INVERTED or
-            mode == GRAPH_ADJACENCY_MODE_UNDIRECTED
-        ):
+        if (mode == GRAPH_ADJACENCY_MODE_INVERTED or
+            mode == GRAPH_ADJACENCY_MODE_UNDIRECTED):
             adjacency_lists[edge['dst']].append(edge['src'])
     return adjacency_lists
 
-# Constructs adjacency matrices from a Graph object
 def construct_adjacency_matrix(graph):
+    """Constructs adjacency matrices from a Graph object."""
     adjacency_matrix = [[None for v in graph['vertices']] for v in graph['vertices']]
     for edge in graph['edges']:
         weight = edge['weight'] if graph['isWeighted'] else 1
@@ -59,30 +56,30 @@ def construct_adjacency_matrix(graph):
             adjacency_matrix[edge['dst']][edge['src']] = weight
     return adjacency_matrix
 
-# Takes the index of the starting vertex, a list of adjacency lists, and a visited list
-# and marks the index of all vertices reachable from the starting vertex in the visited list
 def mark_visited(start_vertex, adjacency_lists, is_visited):
+    """Takes the index of the starting vertex, a list of adjacency lists, and a visited list
+and marks the index of all vertices reachable from the starting vertex in the visited list."""
     is_visited[start_vertex] = True
     for next_vertex in adjacency_lists[start_vertex]:
         if not is_visited[next_vertex]:
             mark_visited(next_vertex, adjacency_lists, is_visited)
 
-# Takes a Graph object and returns whether it is strongly connected
 def is_strongly_connected(graph):
+    """Takes a Graph object and returns whether it is strongly connected."""
     # Uses depth first search on each vertex to try and visit every other vertex from 0
     # in both the normal and inverted adjacency lists
     if len(graph['vertices']) == 0:
         return True
     adjacency_lists = construct_adjacency_lists(graph)
-    inverted_adjacency_lists =  construct_adjacency_lists(graph, GRAPH_ADJACENCY_MODE_INVERTED)
+    inverted_adjacency_lists = construct_adjacency_lists(graph, GRAPH_ADJACENCY_MODE_INVERTED)
     is_visited = [False for v in graph['vertices']]
     mark_visited(0, adjacency_lists, is_visited)
     is_visited_in_inverse = [False for v in graph['vertices']]
     mark_visited(0, inverted_adjacency_lists, is_visited_in_inverse)
     return not ((False in is_visited) or (False in is_visited_in_inverse))
 
-# Takes a Graph object and returns whether it is weakly connected
 def is_weakly_connected(graph):
+    """Takes a Graph object and returns whether it is weakly connected."""
     # Generates adjacency lists assuming graph is undirected, then uses depth first search 
     # on 0 to try and reach every other vertex
     if len(graph['vertices']) == 0:
@@ -163,10 +160,8 @@ class IsIsomorphicTo(base.GraphRule):
     def _evaluate(self, subject):
         if len(subject['vertices']) != len(self.g['vertices']):
             return False
-        if (
-            len(subject['vertices']) > self.ISOMORPHISM_VERTEX_LIMIT or 
-            len(self.g['vertices']) > self.ISOMORPHISM_VERTEX_LIMIT
-        ):
+        if (len(subject['vertices']) > self.ISOMORPHISM_VERTEX_LIMIT or 
+            len(self.g['vertices']) > self.ISOMORPHISM_VERTEX_LIMIT):
             return False
 
         adjacency_matrix_1 = construct_adjacency_matrix(subject)
@@ -177,21 +172,15 @@ class IsIsomorphicTo(base.GraphRule):
         num_vertices = len(self.g['vertices'])
         for perm in itertools.permutations(range(num_vertices)):
             # Test matching labels
-            if subject['isLabeled'] and any([
+            if (subject['isLabeled'] or self.g['isLabeled']) and any(
                     self.g['vertices'][i]['label'] !=
                     subject['vertices'][perm[i]]['label']
-                    for i in xrange(num_vertices)]):
+                    for i in xrange(num_vertices)):
                 continue
 
             # Test isomorphism
-            found_isomorphism = True
-            for i in xrange(num_vertices):
-                for j in xrange(num_vertices):
-                    if adjacency_matrix_1[perm[i]][perm[j]] != adjacency_matrix_2[i][j]:
-                        found_isomorphism = False
-                        break
-                if not found_isomorphism:
-                    break
-            if found_isomorphism:
+            if all(adjacency_matrix_1[perm[i]][perm[j]] == adjacency_matrix_2[i][j] 
+                    for i in xrange(num_vertices) 
+                    for j in xrange(num_vertices)):
                 return True
         return False

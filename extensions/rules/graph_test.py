@@ -134,6 +134,33 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         }))
         self.assertTrue(graph.IsIsomorphicTo({
             'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0}, 
+                {'label': '', 'x': 2.0, 'y': 2.0}, 
+                {'label': '', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}, 
+                {'src': 1, 'dst': 2, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }).eval({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0}, 
+                {'label': '', 'x': 2.0, 'y': 2.0}, 
+                {'label': '', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 2, 'dst': 0, 'weight': 1}, 
+                {'src': 1, 'dst': 0, 'weight': 2}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': False
+        }))
+        self.assertTrue(graph.IsIsomorphicTo({
+            'vertices': [
                 {'label': '', 'x': 1.0, 'y': 1.0},
                 {'label': '', 'x': 2.0, 'y': 2.0}
             ],
@@ -187,6 +214,33 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': True
+        }))
+        self.assertFalse(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': '', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}, 
+                {'src': 1, 'dst': 2, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }).eval({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0}, 
+                {'label': '', 'x': 2.0, 'y': 2.0}, 
+                {'label': '', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 2, 'dst': 0, 'weight': 1}, 
+                {'src': 1, 'dst': 0, 'weight': 2}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': False
         }))
         self.assertFalse(graph.IsIsomorphicTo({
             'vertices': [
