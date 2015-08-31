@@ -1,0 +1,112 @@
+<section id="main_content" class="inner">
+  <h2>
+    <a id="Card_Editor:_Interactions" class="anchor" href="#Card_Editor:_Interactions"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Card Editor: Interactions
+  </h2>
+
+  <p>
+    Every card in Oppia contains an interaction that allows a learner to
+    communicate with Oppia. Examples of such interactions are text input fields,
+    multiple-choice inputs, an embeddable and clickable Google Map, and so on.
+  </p>
+  <p>
+    The simplest interaction is the 'Continue' button. The only thing that the
+    learner can do with this interaction is to click on it. This will show
+    the learner another card, as specified by the exploration creator.
+  </p>
+
+  <p>
+    However, most interactions permit the learner to be more expressive. The
+    general pattern is as follows:
+  </p>
+
+  <ul>
+    <li>
+      A learner sends a response to Oppia by submitting an answer to the
+      interaction. This communication may be triggered by clicking a button,
+      typing a character, hitting a key, and so on. The trigger is defined by
+      the developer of the interaction.
+    </li>
+  </ul>
+  <ul>
+    <li>
+      Oppia matches the learner's response against a set of
+      <a href="#Rules">rules</a>. It takes the feedback attached to the first
+      rule that applies to the learner's input, and displays it to the learner.
+      It also changes the learner's card based on the instructions attached to
+      that rule. If no rule applies to the learner's input, the default rule is
+      used.
+    </li>
+  </ul>
+
+  <h2>
+    <a id="Specifying_an_interaction" class="anchor" href="#Specifying_an_interaction"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Specifying an interaction
+  </h2>
+
+  <p>
+    To specify an interaction, click "Change type" in the right column under the
+    'Interaction' heading.
+  </p>
+
+  <p><img src="static/images/interaction.png" width="100%"></p>
+
+  <p>
+    This will open up a dialog box from which you can select a new interaction
+    from the ones that are available.
+  </p>
+
+  <p>
+    <strong>Warning:</strong> At the moment, changing the interaction type will
+    delete all existing rules and feedback (except the default rule).
+  </p>
+
+  <h2>
+    <a id="Customizing_an_interaction" class="anchor" href="#Customizing_an_interaction"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Customizing an interaction
+  </h2>
+  <p>
+    Some interactions are customizable. For example, the Text interaction allows
+    customization of the default placeholder text.
+  </p>
+  <p>
+    Note that these customization options are distinct from
+    <a href="#Parameters">exploration parameters</a>, which are attached to the
+    learner's session and remain with the learner throughout the exploration.
+    The values of these options are only used in the display of the interaction,
+    and are not persisted between cards.
+  </p>
+
+  <h2>
+    <a id="Writing_custom_interactions" class="anchor" href="#Writing_custom_interactions"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Writing custom interactions
+  </h2>
+  <p>
+    If you would like to use an interaction that does not already exist, you can
+    <a href="https://github.com/oppia/oppia/wiki/Creating-Interactions">write your own</a>,
+    but in order to do this you will need to know how to write HTML and
+    JavaScript code. If you believe that the interaction you write is likely to
+    be useful more generally, please consider <a href="https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md">contributing</a> it to Oppia so that others can make use of it.
+  </p>
+
+  <p>
+    Alternatively, you could
+    <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!" rel="nofollow">file an issue</a> describing what type of interaction you would
+    like, and what you would like it to do. This allows us to keep track of the
+    request, and someone might be able to help you -- but there are no
+    guarantees. Having said that, if your interaction is likely to be generally
+    useful to other creators, the chances of it getting built are higher.
+  </p>
+</section>

@@ -1,0 +1,110 @@
+<section id="main_content" class="inner">
+  <h2>
+    <a id="Planning_Your_Exploration" class="anchor" href="#Planning_Your_Exploration"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Planning Your Exploration
+  </h2>
+  <p>
+    Oppia models a teacher-student interaction (or, more generally, the
+    interaction between an exploration creator and a learner) by breaking it
+    down into <i>cards</i>. The learner's answer represents a transition between
+    cards, and the card itself contains Oppia's feedback.
+  </p>
+
+  <p>
+    For example, the initial card of an exploration could consist of the question:
+  </p>
+  <blockquote>
+    <i>"Can you figure out the value of 2 + 2?"</i>
+  </blockquote>
+
+  <ul>
+    <li>
+      If the learner answers "4", we might transition to the completed card,
+      which says "Correct!".
+    </li>
+  </ul>
+  <ul>
+    <li>
+      If the learner answers "-4", we might transition to the NegativeAnswer
+      card, which says "You're adding two positive numbers together. Surely the
+      answer should be positive?"
+    </li>
+  </ul>
+  <ul>
+    <li>
+      If the learner answers "Yes", we might transition to the SmartyPants card,
+      which says "OK, what is 2 + 2?" (Or, better still, we would
+      <a href="#Improve">rewrite the question to be clearer</a>, but that's
+      another story.)
+    </li>
+  </ul>
+
+  <p>
+    Note that these subsequent cards also say something, and expect an answer
+    from the learner. This is similar to a teacher asking a question of a
+    student, and waiting for the answer.
+  </p>
+
+  <h2>
+    <a id="Planning_Your_Exploration" class="anchor" href="#Planning_Your_Exploration"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Planning Your Exploration
+  </h2>
+  <p>
+    Writing an Oppia exploration is a bit more involved than writing a webpage
+    or recording a video. This is not unexpected: the former media are somewhat
+    static, whereas one of Oppia's highlights is that it is able to respond
+    dynamically to learner input -- and thus it needs to handle different
+    answers for each 'card'.
+  </p>
+  <p>
+    The problem with writing one card that links to five cards, each of which
+    links to five more cards, etc. is that it results in quite a bit of
+    complexity. We recommend that you do not start by doing this. Instead,
+    start by creating something that is, for the most part, linear. You can
+    always add branching and loops later on. This will help you get to a
+    'complete' exploration as soon as possible.
+  </p>
+  <p>
+    Another suggestion is to spend some time planning your exploration on paper
+    before converting it into a playable Oppia exploration, since it's easier
+    to edit a rough pencil-and-paper draft in a way that still makes it easy to
+    see the big picture.
+  </p>
+  <p>
+    We'd also encourage you to have a look at the
+    <a href="#DesignTips">Design Tips</a> page, which contains a large list of
+    common patterns that you can make use of when writing an exploration.
+  </p>
+
+  <h2>
+    <a id="Crafting_Individual_Responses" class="anchor" href="#Crafting_Individual_Responses"
+       aria-hidden="true">
+      <span class="octicon octicon-link"></span>
+    </a>
+    Crafting Individual Responses
+  </h2>
+  <p>
+    Writing an exploration is not as complicated as it may seem. Basically, you
+    would be answering the following question many times:
+  </p>
+  <blockquote>
+    <i>
+      If the person I'm talking to says X in response to my question Y, what
+      should I say?
+    </i>
+  </blockquote>
+  <p>for different possibilities of X and Y.</p>
+
+  <p>
+    In other words, consider yourself to be in the position of someone who is
+    having a 1-on-1 conversation with the learner. If the learner gives you a
+    particular answer, how would you respond in a way that is most helpful for
+    them? That is exactly what you should write for the feedback in that card.
+  </p>
+</section>
