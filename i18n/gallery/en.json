@@ -37,7 +37,7 @@
   "I18N_GALLERY_CATEGORIES_SPORT": "Sport",
   "I18N_GALLERY_CATEGORIES_STATISTICS": "Statistics",
   "I18N_GALLERY_CATEGORIES_WELCOME": "Welcome",
-  "I18N_GALLERY_N_CATEGORIES": "<[ totalCount ]> Categories",
+  "I18N_GALLERY_N_CATEGORIES": "<[totalCount]> Categories",
   "I18N_GALLERY_ALL_LANGUAGES": "All Languages",
   "I18N_GALLERY_LANGUAGES_EN": "English",
   "I18N_GALLERY_LANGUAGES_AR": "العربية",
@@ -77,7 +77,7 @@
   "I18N_GALLERY_LANGUAGES_TR": "Türkçe",
   "I18N_GALLERY_LANGUAGES_UK": "українська",
   "I18N_GALLERY_LANGUAGES_VI": "Tiếng Việt",
-  "I18N_GALLERY_N_LANGUAGES": "<[ totalCount ]> Languages",
+  "I18N_GALLERY_N_LANGUAGES": "<[totalCount]> Languages",
   "I18N_GALLERY_OPPIA_DESCRIPTION": "Oppia is a personalized learning platform created by and for people like you.",
   "I18N_GALLERY_OPPIA_FIND_OUT_MORE": "Find out more!",
   "I18N_GALLERY_NO_EXPLORATION_FOR_QUERY": "We don't have any explorations matching this query yet.",
@@ -87,5 +87,6 @@
   "I18N_GALLERY_EDIT_THIS_EXPLORATION": "Edit this exploration",
   "I18N_GALLERY_EDIT_EXPLORATION_AS_MODERATOR": "Edit (as moderator)",
   "I18N_GALLERY_LAST_UPDATED": "Last updated",
-  "I18N_GALLERY_EXPLORATION_FEATURED": "Featured"
+  "I18N_GALLERY_EXPLORATION_FEATURED": "Featured",
+  "I18N_GALLERY_LOADING": "Loading"
 }

@@ -12,7 +12,7 @@
 
     <div ng-show="loadingMessage" class="oppia-loading-fullpage">
       <div class="oppia-align-center">
-        <[loadingMessage]>
+        <span translate><[loadingMessage]></span>
         <span class="oppia-loading-dot-one">.</span>
         <span class="oppia-loading-dot-two">.</span>
         <span class="oppia-loading-dot-three">.</span>
@@ -190,7 +190,7 @@
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
                             <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
-                              <span translate>I18N_TOPNAV_SING_IN</span>
+                              <span translate>I18N_TOPNAV_SIGN_IN</span>
                               <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">

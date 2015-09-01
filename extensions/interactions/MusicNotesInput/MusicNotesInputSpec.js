@@ -24,7 +24,6 @@ describe('MusicNotesInput interaction', function() {
     var $httpBackend, $templateCache;
     var elt, scope, ctrlScope;
 
-    beforeEach(module('oppia'));
     beforeEach(module('directiveTemplates'));
     beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
@@ -178,7 +177,6 @@ describe('MusicNotesInput interaction', function() {
 
 
 describe('Music phrase player service', function() {
-  beforeEach(module('oppia'));
 
   describe('music phrase player service', function() {
     var mpps = null;

@@ -22,7 +22,6 @@
 describe('Ratings from value directive', function() {
   var elt, scope, $httpBackend, compiledElem, ctrlScope;
 
-  beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
   beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_, _$templateCache_) {
@@ -66,7 +65,6 @@ describe('Ratings from value directive', function() {
 describe('Ratings from frequencies directive', function() {
   var elt, scope, $httpBackend, ctrlScope;
 
-  beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
   beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_, _$templateCache_) {

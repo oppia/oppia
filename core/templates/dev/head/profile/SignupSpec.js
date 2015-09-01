@@ -23,9 +23,6 @@ describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
 
-    beforeEach(function() {
-      module('oppia');
-    });
     beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {

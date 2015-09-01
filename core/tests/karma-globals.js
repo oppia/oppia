@@ -18,8 +18,15 @@
 
 var GLOBALS = {};
 
-GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER =  function($provide, $translateProvider) {
-  $provide.factory('customLoader', function ($q) {
+/* This function overwrites the translationProvider for a dummy function
+ * (customLoader). This is necessary to prevent the js test warnings about an
+ * "unexpected GET request" when the translationProvider tries to load the
+ * translation files.
+ * More info in the angular-translate documentation
+ * http://angular-translate.github.io/docs/#/guide/22_unit-testing-with-angular-translate
+ */
+GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER = function($provide, $translateProvider) {
+  $provide.factory('customLoader', function($q) {
     return function () {
       var deferred = $q.defer();
       deferred.resolve({});

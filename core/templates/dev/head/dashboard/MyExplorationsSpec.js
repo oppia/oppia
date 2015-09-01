@@ -20,7 +20,6 @@
  */
 
 describe('MyExplorations controller', function() {
-  beforeEach(module('oppia'));
 
   describe('MyExplorations', function() {
     var scope, ctrl, $httpBackend;

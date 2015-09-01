@@ -26,11 +26,11 @@ oppia.controller('Signup', [
              $translatePartialLoader, warningsData, urlService,
              focusService) {
 
-  $translatePartialLoader.addPart('sign_up');
+  $translatePartialLoader.addPart('signup');
   $translate.refresh();
 
   var _SIGNUP_DATA_URL = '/signuphandler/data';
-  $rootScope.loadingMessage = 'Loading';
+  $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
   $scope.warningText = '';
   $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
   $scope.submissionInProcess = false;
@@ -129,7 +129,7 @@ oppia.controller('Signup', [
 
     if (GLOBALS.CAN_SEND_EMAILS_TO_USERS) {
       if (canReceiveEmailUpdates === null) {
-        $scope.emailPreferencesWarningText = 'This field is required.';
+        $scope.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
         return;
       }
 

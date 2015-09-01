@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -224,7 +226,6 @@ BANNED_USERNAMES = ConfigProperty(
     [])
 
 
-# TODO(milit): Check the language codes are valid
 LANGUAGES_SUPPORTED = ConfigProperty(
     'languages_supported',
     {

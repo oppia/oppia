@@ -165,7 +165,7 @@ oppia.controller('Gallery', [
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 
-  $rootScope.loadingMessage = 'Loading';
+  $rootScope.loadingMessage = 'I18N_GALLERY_LOADING';
 
   $scope.showCreateExplorationModal = function() {
     createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
@@ -284,7 +284,8 @@ oppia.controller('SearchBar', [
       summary: ''
     }
   };
-  $scope.translationData = {}
+  // Non translatable parts of the html strings, like numbers or user names.
+  $scope.nonTranslatableStrings = {}
 
   // Update the description, numSelections and summary fields of the relevant
   // entry of $scope.selectionDetails.
@@ -307,7 +308,7 @@ oppia.controller('SearchBar', [
       totalCount === 1 ? selectedItems[0] :
       'I18N_GALLERY_N_' + itemsName.toUpperCase());
 
-    $scope.translationData[itemsName] = { totalCount: totalCount }
+    $scope.nonTranslatableStrings[itemsName] = {totalCount: totalCount}
 
     $scope.selectionDetails[itemsType].description = (
       selectedItems.length > 0 ? selectedItems.join(', ') :

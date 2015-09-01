@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @translation dictionaries for Oppia.
+ * @fileoverview Translation functions for Oppia.
  *
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
