@@ -454,7 +454,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   };
 
   $scope.saveChanges = function() {
-    routerService.savePendingChanges();
+    $timeout(function() {
+      $scope.isSaveInProgress=true;
+      routerService.savePendingChanges();
+    },0);
 
     $scope.changeListSummaryUrl = (
       '/createhandler/change_list_summary/' + explorationData.explorationId);
