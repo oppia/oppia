@@ -384,6 +384,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $scope.$apply();
         $scope.lastSaveOrDiscardAction = 'discard';
         $scope.isDiscardInProgress = false;
+        // This is when save is in progress and changes are discarded before they are saved.
+        $scope.isSaveInProgress = false;
       });
     }
   };
@@ -455,7 +457,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
   $scope.saveChanges = function() {
     $timeout(function() {
-      $scope.isSaveInProgress=true;
+      $scope.isSaveInProgress = true;
       routerService.savePendingChanges();
     },0);
 
@@ -638,6 +640,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $timeout(function() {
           focusService.setFocus('saveChangesModalOpened');
         });
+        // When modal is rendered and cancel button is clicked
+        // Then it should set isSaveInProgress false
+        $scope.isSaveInProgress = false;
       });
 
       modalInstance.result.then(function(commitMessage) {
