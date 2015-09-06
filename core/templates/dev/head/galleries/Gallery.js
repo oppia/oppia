@@ -34,8 +34,8 @@ angular.module("template/carousel/carousel.html", []).run(["$templateCache", fun
 oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
 
 oppia.factory('searchService', [
-    '$http', '$rootScope', 'GALLERY_DATA_URL',
-    function($http, $rootScope, GALLERY_DATA_URL) {
+    '$http', '$rootScope', '$translate', 'GALLERY_DATA_URL',
+    function($http, $rootScope, $translate, GALLERY_DATA_URL) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -91,6 +91,7 @@ oppia.factory('searchService', [
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
         $rootScope.$broadcast('refreshGalleryData', data, hasPageFinishedLoading());
+        $translate.refresh();
       });
 
       if (successCallback) {
