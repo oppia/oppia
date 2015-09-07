@@ -227,6 +227,63 @@ var expectCannotDeleteInteraction = function() {
     '.protractor-test-delete-interaction')).isPresent()).toBeFalsy();
 };
 
+// GADGETS
+// TODO(anuzis): add the below .protractor-test hooks to the editor html.
+// TODO(anuzis): modify to work with different gadget panels
+
+// Additional arguments may be sent to this function, and they will be
+// passed on to the relevant gadget editor.
+var setGadget = function(gadgetId) {
+  element(by.css('.protractor-test-delete-gadget')).isPresent().then(function(isVisible) {
+    // If there is already a gadget present, delete it.
+    if (isVisible) {
+      element(by.css('.protractor-test-delete-gadget')).click();
+      // Click through the "are you sure?" warning.
+      element(by.css('.protractor-test-confirm-delete-gadget')).click();
+    }
+  });
+
+  general.waitForSystem();
+
+  element(by.css('.protractor-test-insert-gadget-button')).click();
+
+  general.waitForSystem();
+
+  var gadgetElem = element(by.css(
+    '.protractor-test-gadget-tile-' + gadgetId));
+
+  // TODO(anuzis): click() the right gadget within selector modal.
+  // Warn if not found.
+
+  var elem = element(by.css('.protractor-test-gadget-editor'));
+  var customizationArgs = [elem];
+
+  if (arguments.length > 1) {
+    for (var i = 1; i < arguments.length; i++) {
+      customizationArgs.push(arguments[i]);
+    }
+    gadgets.getGadget(gadgetId).customizeGadget.apply(
+      null, customizationArgs);
+  }
+
+  element(by.css('.protractor-test-save-gadget')).click();
+  // Wait for the customization modal to close.
+  general.waitForSystem();
+
+};
+
+// Likewise this can receive additional arguments.
+var expectGadgetToMatch = function(gadgetId) {
+  // Convert additional arguments to an array to send on.
+  var args = [element(by.css('.protractor-test-gadget'))];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  gadgets.getGadget(gadgetId).
+    expectGadgetDetailsToMatch.apply(null, args);
+};
+
+
 // RULES
 
 // This function selects a rule for the current interaction and enters the

@@ -382,6 +382,42 @@ describe('Full exploration editor', function() {
   });
 });
 
+describe('Gadget editor', function() {
+  it('should have an insert gadget button from the editor view', function() {
+    // TODO(anuzis): Implement.
+  });
+
+  it('should present a gadget selector modal', function() {
+    // TODO(anuzis): Implement.
+  });
+
+  it('should allow configuration of visibility settings', function() {
+    // TODO(anuzis): Implement.
+  });
+
+  it('should not allow a gadget to save without all required info', function() {
+    // TODO(anuzis): Implement.
+  });
+
+  it('should allow a gadget to save with all required info', function() {
+    // TODO(anuzis): Implement. Consider consolidating last 4 similar to Full
+    // exploration editor example that handles several related dynamics.
+  });
+
+  it('should allow editing an existing gadget', function() {
+    // TODO(anuzis): Implement.
+  });
+
+  it('should allow renaming an existing gadget', function() {
+    // TODO(anuzis): Implement.
+  });
+
+  it('should allow deleting an existing gadget', function() {
+    // TODO(anuzis): Implement.
+  });
+
+});
+
 describe('rich-text components', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');
@@ -525,6 +561,35 @@ describe('Interactions', function() {
           player.submitAnswer(interactionId, test.correctAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('yes'));
         }
+        editor.navigateToMainTab();
+      }
+    }
+
+    editor.discardChanges();
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Gadgets', function() {
+  it('should pass their own test suites', function() {
+    users.createUser('gadgets@example.com', 'gadgets');
+    users.login('gadgets@example.com');
+    workflow.createExploration('gadgets', 'gadgets');
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('some content'));
+
+    var defaultOutcomeSet = false;
+
+    for (var gadgetId in gadgets.GADGETS) {
+      var gadget = gadgets.GADGETS[gadgetId];
+
+        editor.navigateToPreviewTab();
+        player.expectGadgetToMatch.apply(
+          null, [gadgetId].concat(test.expectedGadgetDetails));
         editor.navigateToMainTab();
       }
     }

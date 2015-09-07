@@ -13,15 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the TestGadget gadget.
+ * @fileoverview End-to-end testing utilities for the AdviceBar gadget.
  */
 
-var customizeGadget = function(elem, testCustomization) {
-	return; // TODO(anuzis): TestGadget should perform a customization.
+var objects = require('../../objects/protractor.js');
+
+var customizeGadget = function(elem, title) {
+  objects.UnicodeStringEditor(
+    elem.element(by.tagName('TO-BE-CREATED'))
+  ).setValue(placeholderText);
 };
 
-var expectGadgetDetailsToMatch = function(elem, testCustomization) {
-	return true; // TODO(anuzis): TestGadget should perform a customization.
+var expectGadgetDetailsToMatch = function(elem, title) {
+  expect(
+    elem.element(by.tagName('TO-BE-CREATED')).isPresent()
+  ).toBe(true);
 };
 
 exports.customizeGadget = customizeGadget;

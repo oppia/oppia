@@ -1,7 +1,7 @@
 <div ng-controller="GadgetEditor">
   <div ng-repeat="(panelName, panelContents) in panels"
        class="oppia-<[panelName]>-editor-gadget-panel">
-    <div class="oppia-insert-gadget-button"
+    <div class="oppia-insert-gadget-button protractor-test-insert-gadget-button"
          ng-click="addNewGadget(panelName)">
       + Insert Gadget
     </div>

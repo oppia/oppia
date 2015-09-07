@@ -13,15 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the TestGadget gadget.
+ * @fileoverview End-to-end testing utilities for the ScoreBar gadget.
  */
 
-var customizeGadget = function(elem, testCustomization) {
-	return; // TODO(anuzis): TestGadget should perform a customization.
+var objects = require('../../objects/protractor.js');
+
+var customizeGadget = function(elem, title, maxVal, targetParam) {
+  objects.UnicodeStringEditor(
+    elem.element(by.css('.protractor-test-scorebar-title'))
+  ).setValue(title);
+  objects.IntEditor(
+    elem.element(by.tagName('schema-based-int-editor'))
+  ).setValue(maxVal);
 };
 
-var expectGadgetDetailsToMatch = function(elem, testCustomization) {
-	return true; // TODO(anuzis): TestGadget should perform a customization.
+var expectGadgetDetailsToMatch = function(elem, title, maxVal, targetParam) {
+  expect(
+    elem.element(by.tagName('.protractor-test-scorebar-title')).isPresent()
+  ).toBe(title);
 };
 
 exports.customizeGadget = customizeGadget;
