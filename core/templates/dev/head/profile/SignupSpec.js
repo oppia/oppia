@@ -65,7 +65,7 @@ describe('Signup controller', function() {
     });
 
     it('should show a loading message until the data is retrieved', function() {
-      expect(rootScope.loadingMessage).toBe('Loading');
+      expect(rootScope.loadingMessage).toBe('I18N_SIGNUP_LOADING');
       $httpBackend.flush();
       expect(rootScope.loadingMessage).toBeFalsy();
     });
