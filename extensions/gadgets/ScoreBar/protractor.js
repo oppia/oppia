@@ -19,9 +19,12 @@
 var objects = require('../../objects/protractor.js');
 
 var customizeGadget = function(elem, title, maxVal, targetParam) {
-  objects.UnicodeStringEditor(
-    elem.element(by.css('.protractor-test-scorebar-title'))
-  ).setValue(title);
+  elem.element(by.name('form.gadgetSchemaForm')
+    ).all(by.tagName('schema-based-unicode-editor')).then(function(items) {
+      objects.UnicodeStringEditor(items[0]).setValue(title);
+      objects.UnicodeStringEditor(items[1]).setValue(targetParam);
+    });
+
   objects.IntEditor(
     elem.element(by.tagName('schema-based-int-editor'))
   ).setValue(maxVal);

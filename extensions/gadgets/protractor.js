@@ -13,16 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the TestGadget gadget.
+ * @fileoverview Clearing-house for protractor test utilities for gadgets.
+ *
+ * @author Michael Anuzis(anuzis@gmail.com)
  */
 
-var customizeGadget = function(elem, testCustomization) {
-	return; // TODO(anuzis): TestGadget should perform a customization.
+/* Each gadgets's protractor file must implement the following:
+ * customizeGadget: a function that receives an element containing the
+ *   gadget editor followed by some number of arguments used to customize the
+ *   gadget in question (e.g options for the ScoreBar).
+ * expectGadgetDetailsToMatch: a function that receives arguments
+ *   describing the way the gadget is expected to look, and is run in the
+ *   player to verify the gadget actually looks this way.
+ */
+
+var GADGETS = {
+  AdviceBar: require('./AdviceBar/protractor.js'),
+  ScoreBar: require('./ScoreBar/protractor.js'),
+  TestGadget: require('./TestGadget/protractor.js'),
 };
 
-var expectGadgetDetailsToMatch = function(elem, testCustomization) {
-	return true; // TODO(anuzis): TestGadget should perform a customization.
+var getGadget = function(gadgetType) {
+  if (GADGETS.hasOwnProperty(gadgetType)) {
+    return GADGETS[gadgetType];
+  } else {
+    throw Error('Unknown gadget: ' + gadgetType);
+  }
 };
 
-exports.customizeGadget = customizeGadget;
-exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;
+exports.GADGETS = GADGETS;
+exports.getGadget = getGadget;
