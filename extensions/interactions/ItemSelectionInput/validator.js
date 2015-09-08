@@ -62,7 +62,7 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
     if (minAllowedCount > maxAllowedCount) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure that the max allowed count is greater than the min count.'
+        message: 'please ensure that the max allowed count is not less than the min count.'
       });
     }
 

@@ -57,10 +57,13 @@
         </label>
       </div>
       <div ng-if="displayCheckboxes && notEnoughSelections">
-        <small>You have not selected enough choices!</small>
+        <!-- The following will display the least number choices needed to submit, if the least required number of choice
+        is one, it will print: You will need to select at least a choice. -->
+        <small>You need to select at least <span ng-if="minAllowableSelectionCount > 1" ng-bind="minAllowableSelectionCount"></span><span ng-if="minAllowableSelectionCount == 1">a choice</span>.
+        </small>
       </div>
       <div ng-if="displayCheckboxes && preventAdditionalSelections">
-        <small>You have selected the maximum number of allowable choices</small>
+        <small>You you can only select at most <span ng-bind="maxAllowableSelectionCount"></span> choices.</small>
       </div>
       <md-button ng-if="displayCheckboxes" class="md-button-success"
         ng-click="submitAnswer(userSelections)" aria-label="Submit" ng-disabled="notEnoughSelections">Submit</md-button>

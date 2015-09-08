@@ -626,7 +626,8 @@ describe('Interaction validator', function() {
       }).toThrow('Expected customization arguments to have property: choices');
     });
 
-    it('should expect maxAllowableSelectionCount to be greater than or equal to minAllowableSelectionCount', function() {
+    it('should expect maxAllowableSelectionCount to be greater than or equal to ' +
+       'minAllowableSelectionCount', function() {
       customizationArguments.minAllowableSelectionCount.value = 3;
 
       var warnings = validator(
@@ -634,17 +635,18 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure that the max allowed count is greater than the min count.'
+        'message': 'please ensure that the max allowed count is not less than the min count.'
       }]);
     });
 
-    it('should expect maxAllowableSelectionCount to the smaller than the total number of selections', function() {
+    it('should expect maxAllowableSelectionCount to the less than the total number of ' +
+       'selections', function() {
       // Reset the minAllowableSelectionCount to the default
       customizationArguments.minAllowableSelectionCount.value = 1;
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
       // Remove the last choice
-      customizationArguments.choices.value.splice(2, 2);
+      customizationArguments.choices.value.splice(2, 1);
 
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
@@ -654,6 +656,55 @@ describe('Interaction validator', function() {
         'message': 'please ensure that you have the enough choices to reach the max count.'
       }]);
     });
+
+    it('should expect minAllowableSelectionCount to the less than the total number of ' +
+       'selections', function() {
+      // Remove the last choice
+      customizationArguments.choices.value.splice(2, 1);
+
+      // Set the min count to be greater than the total count
+      customizationArguments.minAllowableSelectionCount.value = 3;
+      customizationArguments.maxAllowableSelectionCount.value = 2;
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure that the max allowed count is not less than the min count.'
+      }, {
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure that you have the enough choices to reach the min count.'
+      }]);
+    });
+
+
+    it('should expect all choices to not be empty', function() {
+      // Set the first choice to empty
+      customizationArguments.choices.value[0] = '';
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure the choices are nonempty.'
+      }]);
+    });
+
+    it('should expect all to be unique', function() {
+      // Repeat the last choice.
+      customizationArguments.choices.value.push('Selection 3');
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure the choices are unique.'
+      }]);
+    });
+
   });
 
   describe('oppiaInteractiveLogicProofValidator', function() {

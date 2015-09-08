@@ -160,7 +160,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
                     id: choice.label
                   };
                 });
-                result.push({'type': 'checkboxes', 'varName': finalInputArray[i+1]});
+                result.push({'type': 'checkboxes', 'varName': finalInputArray[i + 1]});
               } else {
                 $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
                   return {

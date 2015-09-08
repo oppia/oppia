@@ -31,8 +31,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
         $scope.maxAllowableSelectionCount = $attrs.maxAllowableSelectionCountWithValue;
         $scope.minAllowableSelectionCount = $attrs.minAllowableSelectionCountWithValue;
 
-        // The following is formated so that the key is an html choice and the value
-        // either true or false.
+        // The following is an associative array where the key is a choice (html)
+        // and the value is a boolean value indicating whether the choice was selected
+        // by the user (default is false).
         $scope.userSelections = {};
 
         for (var i = 0; i < $scope.choices.length; i++) {
@@ -41,22 +42,22 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
 
         $scope.displayCheckboxes = ($scope.maxAllowableSelectionCount > 1);
 
-        // The following indicates that the number of answers is more than maxAllowableSelectionCount.
+        // The following indicates that the number of answers is more than
+        // maxAllowableSelectionCount.
         $scope.preventAdditionalSelections = false;
 
-        // The following indicates that the number of answers is less than minAllowableSelectionCount.
+        // The following indicates that the number of answers is less than
+        // minAllowableSelectionCount.
         $scope.notEnoughSelections = true;
 
-        $scope.size = function() {
-          return Object.keys($scope.userSelections).reduce(function(previous, current) {
-            return previous + $scope.userSelections[current];
-          }, 0);
-        };
 
         $scope.onToggleCheckbox = function() {
           $scope.newQuestion = false;
-          $scope.preventAdditionalSelections = ($scope.size() >= $scope.maxAllowableSelectionCount);
-          $scope.notEnoughSelections = ($scope.size() < $scope.minAllowableSelectionCount);
+          $scope.selectionCount = Object.keys($scope.userSelections).filter(function(obj) {
+            return $scope.userSelections[obj];
+          }).length;
+          $scope.preventAdditionalSelections = ($scope.selectionCount >= $scope.maxAllowableSelectionCount);
+          $scope.notEnoughSelections = ($scope.selectionCount < $scope.minAllowableSelectionCount);
         };
 
         $scope.submitAnswer = function(answer) {
