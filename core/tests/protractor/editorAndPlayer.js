@@ -383,43 +383,90 @@ describe('Full exploration editor', function() {
 });
 
 describe('Gadget editor', function() {
-  it('should allow adding a gadget that is visible in the editor preview', function() {
+  iit('should allow adding a gadget that is visible in the editor preview ' +
+       'and player view.', function() {
     users.createUser('gadgetuser1@example.com', 'gadgetuser1');
     users.login('gadgetuser1@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.setContent(function(richTextEditor) {
-      richTextEditor.appendPlainText('Some plain text for a gadget integration test.');
-    });
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'final card', true);
+
+    // Setup a terminating state
+    editor.moveToState('final card');
+    editor.setContent(forms.toRichText('the final card'));
+    editor.setInteraction('EndExploration');
+    editor.moveToState('first');
+
+    // Add a parameter for the ScoreBar to follow.
+    // not yet working, see method in editor.js
+    //editor.addParameterChange('powerlevel', 3000);
+
     editor.addGadget(
       'bottom',
       'ScoreBar',
-      'Power Levels!!!', // title
-      '9999', // maxValue
-      'powerlevel' // parameter to follow, TODO(anuzis): this needs to exist!
+      'Power Level!!!', // title
+      '9000', // maxValue
+      'powerlevel' // parameter to follow
     );
-    editor.setDefaultOutcome(null, 'final card', true);
+
+    // TODO: EXPECT gadget visible in preview here.
 
     editor.saveChanges();
+
+    general.moveToPlayer();
+
+    // TODO: EXPECT gadget visible on player view here, and invisible on final state
+
 
     users.logout();
   });
 
-  it('should present a gadget selector modal', function() {
-    // TODO(anuzis): Implement.
-  });
+  it('should allow configuration of visibility settings, forbid saving ' +
+      'unless the gadget is visible in at least one state, and properly ' +
+      'render as visible or invisible as expected per state.' , function() {
+    users.createUser('gadgetuser2@example.com', 'gadgetuser2');
+    users.login('gadgetuser2@example.com');
 
-  it('should allow configuration of visibility settings', function() {
-    // TODO(anuzis): Implement.
-  });
+    workflow.createExploration('sums', 'maths');
 
-  it('should not allow a gadget to save without all required info', function() {
-    // TODO(anuzis): Implement.
-  });
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'final card', true);
 
-  it('should allow a gadget to save with all required info', function() {
-    // TODO(anuzis): Implement. Consider consolidating last 4 similar to Full
-    // exploration editor example that handles several related dynamics.
+    // Setup a terminating state
+    editor.moveToState('final card');
+    editor.setContent(forms.toRichText('the final card'));
+    editor.setInteraction('EndExploration');
+    editor.moveToState('first');
+
+    // Add a parameter for the ScoreBar to follow.
+    // not yet working, see method in editor.js
+    //editor.addParameterChange('powerlevel', 3000);
+
+    editor.addGadget(
+      'bottom',
+      'ScoreBar',
+      'Power Level!!!', // title
+      '9000', // maxValue
+      'powerlevel' // parameter to follow
+    );
+
+    // TODO(anuzis): update addGadget to accept gadgetName param,
+    // enabling a gadgetEditor hook to adjust visibility.
+    editor.openGadgetEditor()
+
+    // EXPECT gadget allowed to save by default on current state.
+    // EXPECT gadget not allowed to save after unchecking all.
+    // EXPECT gadget allowed to save again after checking.
+    // EXPECT gadget visible on first and final state in player view.
+
   });
 
   it('should allow editing an existing gadget', function() {

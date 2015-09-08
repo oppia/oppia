@@ -262,6 +262,37 @@ var addGadget = function(panelName, gadgetType) {
 
 };
 
+// Enables gadget visibility in all states.
+// This method can only be called with the gadget editor modal open.
+var checkGadgetVisibilityAllStates = function() {
+  element(by.css('.oppia-gadget-state-visibility-panel')
+    ).all(by.tagName('input')).then(function(items) {
+      for (var i = 0; i < items.length; i++) {
+        items[i].isSelected().then(function(selected) {
+          if (!selected) {
+            items[i].click();
+          }
+        })
+      }
+    })
+};
+
+// Unchecks gadget visibility checkboxes for all states. This is an invalid
+// configuration and won't allow saving.
+// This method can only be called with the gadget editor modal open.
+var uncheckGadgetVisibilityAllStates = function() {
+  element(by.css('.oppia-gadget-state-visibility-panel')
+    ).all(by.tagName('input')).then(function(items) {
+      for (var i = 0; i < items.length; i++) {
+        items[i].isSelected().then(function(selected) {
+          if (selected) {
+            items[i].click();
+          }
+        })
+      }
+    })
+};
+
 // Likewise this can receive additional arguments.
 var expectGadgetToMatch = function(gadgetType) {
   // Convert additional arguments to an array to send on.
@@ -272,6 +303,28 @@ var expectGadgetToMatch = function(gadgetType) {
   gadgets.getGadget(gadgetType).
     expectGadgetDetailsToMatch.apply(null, args);
 };
+
+// PARAMETERS
+
+// TODO(anuzis): Get addParameterChange working. select2 is very finicky...
+// This function adds a parameter change, creating the parameter if necessary.
+var addParameterChange = function(paramName, paramValue) {
+  // Open the add param pane.
+  element(by.css('.protractor-test-add-param-button')).click();
+
+  // Expand the selection dropdown and enter the paramName.
+  //element(by.tagName('select2-dropdown')).click(); // This doesn't always help.
+  element(by.css('.protractor-test-param-changes-editor')).all(
+    by.tagName('input')).then(function(items) {
+      items[0].sendKeys(paramName, protractor.Key.ENTER); // This doesn't work.
+      items[1].sendKeys(paramValue);
+    });
+
+  element(by.css('.protractor-test-param-changes-editor')).all(
+    by.css('.btn-success')).then(function(items) {
+      items[0].click();
+    });
+}
 
 
 // RULES
@@ -926,7 +979,11 @@ exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
 
 exports.addGadget = addGadget;
+exports.checkGadgetVisibilityAllStates = checkGadgetVisibilityAllStates;
+exports.uncheckGadgetVisibilityAllStates = uncheckGadgetVisibilityAllStates;
 exports.expectGadgetToMatch = expectGadgetToMatch;
+
+exports.addParameterChange = addParameterChange;
 
 exports.addResponse = addResponse;
 exports.setDefaultOutcome = setDefaultOutcome;
