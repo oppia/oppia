@@ -242,8 +242,10 @@ var addGadget = function(panelName, gadgetType, gadgetName) {
   // Select the desired gadgetType from the modal.
   element(by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal')).click();
 
-  // Set name.
-  element(by.model('gadgetDict.gadget_name')).sendKeys(gadgetName);
+  var gadgetNameInput = element(by.model('gadgetDict.gadget_name'));
+  gadgetNameInput.clear().then(function() {
+    gadgetNameInput.sendKeys(gadgetName);
+  });
 
   // Locate the customization section and apply any customizations.
   var elem = element(by.css('.protractor-test-gadget-customization-editor'));
@@ -268,8 +270,11 @@ var addGadget = function(panelName, gadgetType, gadgetName) {
 var renameGadget = function(currentName, newName) {
   element(by.css('.protractor-test-rename-' + gadgetName + '-gadget-icon')
     ).click();
-  element(by.model('newNameForRenamedGadget')).sendKeys(newName);
-  element(by.css('.protractor-test-gadget-rename-confirmation-button').click();
+  var gadgetNameInput = element(by.model('newNameForRenamedGadget'));
+  gadgetNameInput.clear().then(function() {
+    gadgetNameInput.sendKeys(newName);
+  });
+  element(by.css('.protractor-test-gadget-rename-confirmation-button')).click();
 };
 
 // gadgetName must exist.
@@ -351,7 +356,8 @@ var uncheckGadgetVisibilityAllStates = function() {
 // fully operational.
 var expectGadgetPreviewToMatch = function(gadgetType, gadgetName) {
   // Convert additional arguments to an array to send on.
-  var args = [element(by.css('.protractor-test-gadget'))];
+  var args = [element(
+    by.css('.protractor-test-<[panelName]>-visible-gadgets-container'))];
   for (var i = 2; i < arguments.length; i++) {
     args.push(arguments[i]);
   }

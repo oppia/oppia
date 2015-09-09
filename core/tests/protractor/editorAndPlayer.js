@@ -418,6 +418,13 @@ describe('Gadget editor', function() {
     general.waitForSystem();
 
     // TODO: EXPECT gadget visible in preview here.
+    editor.expectGadgetPreviewToMatch(
+      'ScoreBar',
+      'PowerScoreBar',
+      'Power Level!!!',
+      '9000',
+      'powerlevel'
+    );
 
     // editor.saveChanges();
 
