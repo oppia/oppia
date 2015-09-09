@@ -17,12 +17,17 @@
  */
 
 var customizeGadget = function(elem, testCustomization) {
-	return; // TODO(anuzis): TestGadget should perform a customization.
+  return; // TODO(anuzis): TestGadget should perform a customization.
 };
 
-var expectGadgetDetailsToMatch = function(elem, testCustomization) {
-	return true; // TODO(anuzis): TestGadget should perform a customization.
+var expectGadgetPreviewDetailsToMatch = function(elem, testCustomization) {
+  return; // TODO(anuzis): TestGadget should perform a customization.
+};
+
+var expectGadgetPlayerDetailsToMatch = function(elem, testCustomization) {
+  return; // TODO(anuzis): TestGadget should perform a customization.
 };
 
 exports.customizeGadget = customizeGadget;
-exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;
+exports.expectGadgetPreviewDetailsToMatch = expectGadgetPreviewDetailsToMatch;
+exports.expectGadgetPlayerDetailsToMatch = expectGadgetPlayerDetailsToMatch;

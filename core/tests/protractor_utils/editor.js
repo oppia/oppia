@@ -232,7 +232,7 @@ var expectCannotDeleteInteraction = function() {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant gadget editor.
-var addGadget = function(panelName, gadgetType) {
+var addGadget = function(panelName, gadgetType, gadgetName) {
 
   // Bring up the gadget insertion modal for the specified panel.
   element(by.css('.protractor-test-' + panelName + '-panel-insert-gadget-button')).click();
@@ -242,24 +242,77 @@ var addGadget = function(panelName, gadgetType) {
   // Select the desired gadgetType from the modal.
   element(by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal')).click();
 
-  // Locate the customization section modal and apply any customizations.
+  // Set name.
+  element(by.model('gadgetDict.gadget_name')).sendKeys(gadgetName);
+
+  // Locate the customization section and apply any customizations.
   var elem = element(by.css('.protractor-test-gadget-customization-editor'));
   var customizationArgs = [elem];
 
-  if (arguments.length > 2) {
-    for (var i = 2; i < arguments.length; i++) {
+  if (arguments.length > 3) {
+    for (var i = 3; i < arguments.length; i++) {
       customizationArgs.push(arguments[i]);
     }
     gadgets.getGadget(gadgetType).customizeGadget.apply(
       null, customizationArgs);
   }
 
-  general.waitForSystem();
-
   element(by.css('.protractor-test-save-gadget-button')).click();
+
   // Wait for the customization modal to close.
   general.waitForSystem();
 
+};
+
+// currentName must exist.
+var renameGadget = function(currentName, newName) {
+  element(by.css('.protractor-test-rename-' + gadgetName + '-gadget-icon')
+    ).click();
+  element(by.model('newNameForRenamedGadget')).sendKeys(newName);
+  element(by.css('.protractor-test-gadget-rename-confirmation-button').click();
+};
+
+// gadgetName must exist.
+var deleteGadget = function(gadgetName) {
+  element(by.css('.protractor-test-delete-gadgetName-gadget-icon')).click();
+  general.waitForSystem(); // wait for modal popup.
+  element(by.cssContainingText('.btn-danger', 'Delete Gadget')).click();
+};
+
+// Opens the editor modal for the specified gadget.
+// This method is a precursor to other methods like adjusting visibility.
+var openGadgetEditorModal = function(gadgetName) {
+  element(by.css('.protractor-test-edit-<[gadgetName]>-gadget-icon')).click();
+};
+
+var saveAndCloseGadgetEditorModal = function() {
+  element(by.css('.protractor-test-save-gadget-button')).click();
+};
+
+// Check (activate) visibility for a given state.
+// openGadgetEditorModal must be called before this method.
+var checkGadgetVisibilityForState = function(stateName) {
+  var visibilityCheckbox = element(by.cssContainingText(
+    'protractor-test-state-visibility-checkbox', stateName));
+  visibilityCheckbox.isSelected().then(
+    function(selected) {
+      if (!selected) {
+        visibilityCheckbox.click();
+      }
+    })
+};
+
+// Uncheck (disable) visibility for a given state.
+// openGadgetEditorModal must be called before this method.
+var uncheckGadgetVisibilityForState = function(stateName) {
+  var visibilityCheckbox = element(by.cssContainingText(
+    'protractor-test-state-visibility-checkbox', stateName));
+  visibilityCheckbox.isSelected().then(
+    function(selected) {
+      if (selected) {
+        visibilityCheckbox.click();
+      }
+    })
 };
 
 // Enables gadget visibility in all states.
@@ -293,15 +346,17 @@ var uncheckGadgetVisibilityAllStates = function() {
     })
 };
 
-// Likewise this can receive additional arguments.
-var expectGadgetToMatch = function(gadgetType) {
+// This can receive additional arguments for the gadget's customizationArgs.
+// Keep in mind this method applies to a gadget preview which may not be
+// fully operational.
+var expectGadgetPreviewToMatch = function(gadgetType, gadgetName) {
   // Convert additional arguments to an array to send on.
   var args = [element(by.css('.protractor-test-gadget'))];
-  for (var i = 1; i < arguments.length; i++) {
+  for (var i = 2; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   gadgets.getGadget(gadgetType).
-    expectGadgetDetailsToMatch.apply(null, args);
+    expectGadgetPreviewDetailsToMatch.apply(null, args);
 };
 
 // PARAMETERS
@@ -979,9 +1034,18 @@ exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
 
 exports.addGadget = addGadget;
+exports.renameGadget = renameGadget;
+exports.deleteGadget = deleteGadget;
+
+exports.expectGadgetPreviewToMatch = expectGadgetPreviewToMatch;
+
+exports.openGadgetEditorModal = openGadgetEditorModal;
+exports.saveAndCloseGadgetEditorModal = saveAndCloseGadgetEditorModal;
+
+exports.checkGadgetVisibilityForState = checkGadgetVisibilityForState;
+exports.uncheckGadgetVisibilityForState = uncheckGadgetVisibilityForState;
 exports.checkGadgetVisibilityAllStates = checkGadgetVisibilityAllStates;
 exports.uncheckGadgetVisibilityAllStates = uncheckGadgetVisibilityAllStates;
-exports.expectGadgetToMatch = expectGadgetToMatch;
 
 exports.addParameterChange = addParameterChange;
 

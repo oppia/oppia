@@ -24,11 +24,18 @@ var customizeGadget = function(elem, title) {
   ).setValue(placeholderText);
 };
 
-var expectGadgetDetailsToMatch = function(elem, title) {
+var expectGadgetPreviewDetailsToMatch = function(elem, title) {
+  expect(
+    elem.element(by.tagName('TO-BE-CREATED')).isPresent()
+  ).toBe(true);
+};
+
+var expectGadgetPlayerDetailsToMatch = function(elem, title) {
   expect(
     elem.element(by.tagName('TO-BE-CREATED')).isPresent()
   ).toBe(true);
 };
 
 exports.customizeGadget = customizeGadget;
-exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;
+exports.expectGadgetPreviewDetailsToMatch = expectGadgetPreviewDetailsToMatch;
+exports.expectGadgetPlayerDetailsToMatch = expectGadgetPlayerDetailsToMatch;

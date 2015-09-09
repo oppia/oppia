@@ -36,7 +36,7 @@
         <span ng-show="originalNameForRenamedGadget == gadgetName"
               class="oppia-rename-gadget-form">
           <input type="text" ng-model="newNameForRenamedGadget">
-          <button class="btn btn-xs glyphicon glyphicon-ok"
+          <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
                   ng-click="renameGadget(newNameForRenamedGadget)">
           </button>
           <button class="btn btn-xs glyphicon glyphicon-remove"
@@ -94,6 +94,7 @@
         <label class="oppia-gadget-state-visible-input-label"
                ng-repeat="state in allExplorationStateNames">
           <input type="checkbox" ng-click="toggleVisibilityInState(state)"
+                 css="protractor-test-state-visibility-checkbox"
                  ng-checked="gadgetDict.visible_in_states.indexOf(state) > -1">
           <[state]>
         </label>

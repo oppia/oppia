@@ -391,34 +391,37 @@ describe('Gadget editor', function() {
     workflow.createExploration('sums', 'maths');
 
     // Setup the first state.
-    editor.setStateName('first');
+    //editor.setStateName('first');
     editor.setContent(forms.toRichText('gadget integration test.'));
-    editor.setInteraction('Continue');
-    editor.setDefaultOutcome(null, 'final card', true);
+    //editor.setInteraction('Continue');
+    //editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setContent(forms.toRichText('the final card'));
-    editor.setInteraction('EndExploration');
-    editor.moveToState('first');
+    //editor.moveToState('final card');
+    //editor.setContent(forms.toRichText('the final card'));
+    //editor.setInteraction('EndExploration');
+    //editor.moveToState('first');
 
     // Add a parameter for the ScoreBar to follow.
     // not yet working, see method in editor.js
     //editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
-      'bottom',
-      'ScoreBar',
+      'bottom', // panel
+      'ScoreBar', // type
+      'PowerScoreBar', // name
       'Power Level!!!', // title
       '9000', // maxValue
       'powerlevel' // parameter to follow
     );
 
+    general.waitForSystem();
+
     // TODO: EXPECT gadget visible in preview here.
 
-    editor.saveChanges();
+    // editor.saveChanges();
 
-    general.moveToPlayer();
+    //general.moveToPlayer();
 
     // TODO: EXPECT gadget visible on player view here, and invisible on final state
 
@@ -426,8 +429,7 @@ describe('Gadget editor', function() {
     users.logout();
   });
 
-  it('should allow configuration of visibility settings, forbid saving ' +
-      'unless the gadget is visible in at least one state, and properly ' +
+  it('should allow configuration of visibility settings, and properly ' +
       'render as visible or invisible as expected per state.' , function() {
     users.createUser('gadgetuser2@example.com', 'gadgetuser2');
     users.login('gadgetuser2@example.com');
@@ -436,7 +438,13 @@ describe('Gadget editor', function() {
 
     // Setup the first state.
     editor.setStateName('first');
-    editor.setContent(forms.toRichText('gadget integration test.'));
+    editor.setContent(forms.toRichText('gadget integration test card 1.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'second', true);
+
+    // Setup the second state
+    editor.moveToState('second');
+    editor.setContent(forms.toRichText('gadget integration test card 2.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'final card', true);
 
@@ -451,34 +459,62 @@ describe('Gadget editor', function() {
     //editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
-      'bottom',
-      'ScoreBar',
+      'bottom', // panel
+      'ScoreBar', // type
+      'PowerScoreBar', // name
       'Power Level!!!', // title
       '9000', // maxValue
       'powerlevel' // parameter to follow
     );
 
-    // TODO(anuzis): update addGadget to accept gadgetName param,
-    // enabling a gadgetEditor hook to adjust visibility.
-    editor.openGadgetEditor()
+    // Edit visibility
+    editor.openGadgetEditor('PowerScoreBar');
+    editor.checkGadgetVisibilityForState('final card');
+    editor.saveAndCloseGadgetEditorModal();
 
-    // EXPECT gadget allowed to save by default on current state.
-    // EXPECT gadget not allowed to save after unchecking all.
-    // EXPECT gadget allowed to save again after checking.
-    // EXPECT gadget visible on first and final state in player view.
+    // TODO(anuzis): Move to player
+    // EXPECT gadget visible on first state
+    // EXPECT gadget invisible on second state
+    // EXPECT gadget visible in final state
 
   });
 
-  it('should allow editing an existing gadget', function() {
-    // TODO(anuzis): Implement.
-  });
+  // This test only inspects within the editor view since gadget names only
+  // exist to help authors differentiate between gadgets, and are not visible
+  // in the player view.
+  it('should allow renaming and deleting existing gadgets', function() {
+    users.createUser('gadgetuser3@example.com', 'gadgetuser3');
+    users.login('gadgetuser3@example.com');
 
-  it('should allow renaming an existing gadget', function() {
-    // TODO(anuzis): Implement.
-  });
+    workflow.createExploration('sums', 'maths');
 
-  it('should allow deleting an existing gadget', function() {
-    // TODO(anuzis): Implement.
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test card 1.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'second', true);
+
+    // Add a parameter for the ScoreBar to follow.
+    // not yet working, see method in editor.js
+    //editor.addParameterChange('powerlevel', 3000);
+
+    editor.addGadget(
+      'bottom', // panel
+      'ScoreBar', // type
+      'PowerScoreBar', // name
+      'Power Level!!!', // title
+      '9000', // maxValue
+      'powerlevel' // parameter to follow
+    );
+
+    // TODO(anuzis): EXPECT gadget preview to display correct original name.
+
+    editor.renameGadget('PowerScoreBar', 'SuperPowerScoreBar');
+    // TODO(anuzis): EXPECT gadget preview to display correct new name.
+
+    editor.deleteGadget('SuperPowerScoreBar');
+    // TODO(anuzis): EXPECT gadget no longer exists.
+
   });
 
 });
