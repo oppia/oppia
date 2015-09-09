@@ -56,10 +56,12 @@
           </div>
         </label>
       </div>
+      <!-- The following ng-if divs will only show if maxAllowableSelectionCount is at least 2. If maxAllowableSelectionCount
+      is 1, the choices will be buttons rather than checkboxes -->
       <div ng-if="displayCheckboxes && notEnoughSelections">
         <!-- The following will display the least number choices needed to submit, if the least required number of choice
-        is one, it will print: You will need to select at least a choice. -->
-        <small>You need to select at least <span ng-if="minAllowableSelectionCount > 1" ng-bind="minAllowableSelectionCount"></span><span ng-if="minAllowableSelectionCount == 1">a choice</span>.
+        is one, it will print: You will need to select at least one choice. -->
+        <small>You need to select at least <span ng-if="minAllowableSelectionCount > 1" ng-bind="minAllowableSelectionCount"></span><span ng-if="minAllowableSelectionCount == 1">one choice</span>.
         </small>
       </div>
       <div ng-if="displayCheckboxes && preventAdditionalSelections">
