@@ -383,7 +383,7 @@ describe('Full exploration editor', function() {
 });
 
 describe('Gadget editor', function() {
-  iit('should allow adding a gadget that is visible in the editor preview ' +
+  it('should allow adding a gadget that is visible in the editor preview ' +
        'and player view.', function() {
     users.createUser('gadgetuser1@example.com', 'gadgetuser1');
     users.login('gadgetuser1@example.com');
@@ -391,20 +391,12 @@ describe('Gadget editor', function() {
     workflow.createExploration('sums', 'maths');
 
     // Setup the first state.
-    //editor.setStateName('first');
+    editor.setStateName('first');
     editor.setContent(forms.toRichText('gadget integration test.'));
-    //editor.setInteraction('Continue');
-    //editor.setDefaultOutcome(null, 'final card', true);
+    editor.setInteraction('EndExploration');
 
-    // Setup a terminating state
-    //editor.moveToState('final card');
-    //editor.setContent(forms.toRichText('the final card'));
-    //editor.setInteraction('EndExploration');
-    //editor.moveToState('first');
-
-    // Add a parameter for the ScoreBar to follow.
-    // not yet working, see method in editor.js
-    //editor.addParameterChange('powerlevel', 3000);
+    // Setup a parameter for the ScoreBar to follow.
+    editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
       'bottom', // panel
@@ -415,9 +407,6 @@ describe('Gadget editor', function() {
       'powerlevel' // parameter to follow
     );
 
-    general.waitForSystem();
-
-    // TODO: EXPECT gadget visible in preview here.
     editor.expectGadgetPreviewToMatch(
       'ScoreBar',
       'PowerScoreBar',
@@ -426,12 +415,16 @@ describe('Gadget editor', function() {
       'powerlevel'
     );
 
-    // editor.saveChanges();
+    editor.saveChanges();
+    general.moveToPlayer();
 
-    //general.moveToPlayer();
-
-    // TODO: EXPECT gadget visible on player view here, and invisible on final state
-
+    player.expectGadgetToMatch(
+      'ScoreBar',
+      'PowerScoreBar',
+      'Power Level!!!',
+      '9000',
+      'powerlevel'
+    );
 
     users.logout();
   });
@@ -445,25 +438,24 @@ describe('Gadget editor', function() {
 
     // Setup the first state.
     editor.setStateName('first');
-    editor.setContent(forms.toRichText('gadget integration test card 1.'));
+    editor.setContent(forms.toRichText('gadget visibility integration test card 1.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'second', true);
 
     // Setup the second state
     editor.moveToState('second');
-    editor.setContent(forms.toRichText('gadget integration test card 2.'));
+    editor.setContent(forms.toRichText('gadget visibility integration test card 2.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
     editor.moveToState('final card');
-    editor.setContent(forms.toRichText('the final card'));
+    editor.setContent(forms.toRichText('gadget visibility final card'));
     editor.setInteraction('EndExploration');
     editor.moveToState('first');
 
     // Add a parameter for the ScoreBar to follow.
-    // not yet working, see method in editor.js
-    //editor.addParameterChange('powerlevel', 3000);
+    editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
       'bottom', // panel
@@ -475,21 +467,30 @@ describe('Gadget editor', function() {
     );
 
     // Edit visibility
-    editor.openGadgetEditor('PowerScoreBar');
+    editor.openGadgetEditorModal('PowerScoreBar');
     editor.checkGadgetVisibilityForState('final card');
     editor.saveAndCloseGadgetEditorModal();
 
-    // TODO(anuzis): Move to player
-    // EXPECT gadget visible on first state
-    // EXPECT gadget invisible on second state
-    // EXPECT gadget visible in final state
+    editor.saveChanges();
+    general.moveToPlayer();
+
+    player.expectVisibleGadget('ScoreBar');
+    player.submitAnswer('Continue', null);
+    general.waitForSystem(2000);
+
+    player.expectInvisibleGadget('ScoreBar');
+    player.submitAnswer('Continue', null);
+    general.waitForSystem(2000);
+
+    player.expectVisibleGadget('ScoreBar');
+    users.logout();
 
   });
 
-  // This test only inspects within the editor view since gadget names only
-  // exist to help authors differentiate between gadgets, and are not visible
-  // in the player view.
-  it('should allow renaming and deleting existing gadgets', function() {
+  // This test inspects within the editor view since gadget names only exist
+  // to help authors differentiate between gadgets, and are not visible in the
+  // player view.
+  it('should allow renaming and deleting gadgets', function() {
     users.createUser('gadgetuser3@example.com', 'gadgetuser3');
     users.login('gadgetuser3@example.com');
 
@@ -502,8 +503,7 @@ describe('Gadget editor', function() {
     editor.setDefaultOutcome(null, 'second', true);
 
     // Add a parameter for the ScoreBar to follow.
-    // not yet working, see method in editor.js
-    //editor.addParameterChange('powerlevel', 3000);
+    editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
       'bottom', // panel
@@ -514,13 +514,18 @@ describe('Gadget editor', function() {
       'powerlevel' // parameter to follow
     );
 
-    // TODO(anuzis): EXPECT gadget preview to display correct original name.
-
     editor.renameGadget('PowerScoreBar', 'SuperPowerScoreBar');
-    // TODO(anuzis): EXPECT gadget preview to display correct new name.
+
+    editor.expectGadgetPreviewToMatch(
+      'ScoreBar',
+      'SuperPowerScoreBar',
+      'Power Level!!!',
+      '9000',
+      'powerlevel'
+    );
 
     editor.deleteGadget('SuperPowerScoreBar');
-    // TODO(anuzis): EXPECT gadget no longer exists.
+    editor.expectGadgetWithNameDoesNotExist('SuperPowerScoreBar');
 
   });
 
@@ -682,11 +687,13 @@ describe('Interactions', function() {
   });
 });
 
+/*
+// TODO(anuzis): Implement!
 describe('Gadgets', function() {
   it('should pass their own test suites', function() {
-    // TODO(anuzis): Implement!
   });
 });
+*/
 
 describe('Exploration history', function() {
   it('should display the history', function() {

@@ -235,12 +235,16 @@ var expectCannotDeleteInteraction = function() {
 var addGadget = function(panelName, gadgetType, gadgetName) {
 
   // Bring up the gadget insertion modal for the specified panel.
-  element(by.css('.protractor-test-' + panelName + '-panel-insert-gadget-button')).click();
+  element(
+    by.css('.protractor-test-' + panelName + '-panel-insert-gadget-button'))
+    .click();
 
   general.waitForSystem();
 
   // Select the desired gadgetType from the modal.
-  element(by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal')).click();
+  element(
+    by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal'))
+    .click();
 
   var gadgetNameInput = element(by.model('gadgetDict.gadget_name'));
   gadgetNameInput.clear().then(function() {
@@ -268,18 +272,20 @@ var addGadget = function(panelName, gadgetType, gadgetName) {
 
 // currentName must exist.
 var renameGadget = function(currentName, newName) {
-  element(by.css('.protractor-test-rename-' + gadgetName + '-gadget-icon')
-    ).click();
+  element(by.css('.protractor-test-rename-' + currentName + '-gadget-icon'))
+    .click();
   var gadgetNameInput = element(by.model('newNameForRenamedGadget'));
   gadgetNameInput.clear().then(function() {
     gadgetNameInput.sendKeys(newName);
   });
-  element(by.css('.protractor-test-gadget-rename-confirmation-button')).click();
+  element(
+    by.css('.protractor-test-gadget-rename-confirmation-button')).click();
 };
 
 // gadgetName must exist.
 var deleteGadget = function(gadgetName) {
-  element(by.css('.protractor-test-delete-gadgetName-gadget-icon')).click();
+  element(by.css('.protractor-test-delete-' + gadgetName + '-gadget-icon'))
+    .click();
   general.waitForSystem(); // wait for modal popup.
   element(by.cssContainingText('.btn-danger', 'Delete Gadget')).click();
 };
@@ -287,7 +293,7 @@ var deleteGadget = function(gadgetName) {
 // Opens the editor modal for the specified gadget.
 // This method is a precursor to other methods like adjusting visibility.
 var openGadgetEditorModal = function(gadgetName) {
-  element(by.css('.protractor-test-edit-<[gadgetName]>-gadget-icon')).click();
+  element(by.css('.protractor-test-edit-' + gadgetName + '-gadget')).click();
 };
 
 var saveAndCloseGadgetEditorModal = function() {
@@ -297,57 +303,28 @@ var saveAndCloseGadgetEditorModal = function() {
 // Check (activate) visibility for a given state.
 // openGadgetEditorModal must be called before this method.
 var checkGadgetVisibilityForState = function(stateName) {
-  var visibilityCheckbox = element(by.cssContainingText(
-    'protractor-test-state-visibility-checkbox', stateName));
-  visibilityCheckbox.isSelected().then(
-    function(selected) {
-      if (!selected) {
-        visibilityCheckbox.click();
-      }
+  element(by.cssContainingText(
+    '.protractor-test-state-visibility-checkbox-label',
+    stateName)).all(by.tagName('input')).then(function(items) {
+      items[0].isSelected().then(function(selected) {
+        if (!selected) {
+          items[0].click();
+        }
+      })
     })
 };
 
 // Uncheck (disable) visibility for a given state.
 // openGadgetEditorModal must be called before this method.
 var uncheckGadgetVisibilityForState = function(stateName) {
-  var visibilityCheckbox = element(by.cssContainingText(
-    'protractor-test-state-visibility-checkbox', stateName));
-  visibilityCheckbox.isSelected().then(
-    function(selected) {
-      if (selected) {
-        visibilityCheckbox.click();
-      }
-    })
-};
-
-// Enables gadget visibility in all states.
-// This method can only be called with the gadget editor modal open.
-var checkGadgetVisibilityAllStates = function() {
-  element(by.css('.oppia-gadget-state-visibility-panel')
-    ).all(by.tagName('input')).then(function(items) {
-      for (var i = 0; i < items.length; i++) {
-        items[i].isSelected().then(function(selected) {
-          if (!selected) {
-            items[i].click();
-          }
-        })
-      }
-    })
-};
-
-// Unchecks gadget visibility checkboxes for all states. This is an invalid
-// configuration and won't allow saving.
-// This method can only be called with the gadget editor modal open.
-var uncheckGadgetVisibilityAllStates = function() {
-  element(by.css('.oppia-gadget-state-visibility-panel')
-    ).all(by.tagName('input')).then(function(items) {
-      for (var i = 0; i < items.length; i++) {
-        items[i].isSelected().then(function(selected) {
-          if (selected) {
-            items[i].click();
-          }
-        })
-      }
+  element(by.cssContainingText(
+    '.protractor-test-state-visibility-checkbox-label',
+    stateName)).all(by.tagName('input')).then(function(items) {
+      items[0].isSelected().then(function(selected) {
+        if (selected) {
+          items[0].click();
+        }
+      })
     })
 };
 
@@ -357,7 +334,7 @@ var uncheckGadgetVisibilityAllStates = function() {
 var expectGadgetPreviewToMatch = function(gadgetType, gadgetName) {
   // Convert additional arguments to an array to send on.
   var args = [element(
-    by.css('.protractor-test-<[panelName]>-visible-gadgets-container'))];
+    by.css('.protractor-test-' + gadgetName + '-gadget'))];
   for (var i = 2; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
@@ -365,26 +342,35 @@ var expectGadgetPreviewToMatch = function(gadgetType, gadgetName) {
     expectGadgetPreviewDetailsToMatch.apply(null, args);
 };
 
+var expectGadgetWithNameDoesNotExist = function(gadgetName) {
+  element.all(by.css('.protractor-test-' + gadgetName + '-gadget'))
+    .then(function(items) {
+      expect(items.length).toBe(0);
+    })
+};
+
 // PARAMETERS
 
-// TODO(anuzis): Get addParameterChange working. select2 is very finicky...
 // This function adds a parameter change, creating the parameter if necessary.
 var addParameterChange = function(paramName, paramValue) {
-  // Open the add param pane.
   element(by.css('.protractor-test-add-param-button')).click();
 
-  // Expand the selection dropdown and enter the paramName.
-  //element(by.tagName('select2-dropdown')).click(); // This doesn't always help.
   element(by.css('.protractor-test-param-changes-editor')).all(
     by.tagName('input')).then(function(items) {
-      items[0].sendKeys(paramName, protractor.Key.ENTER); // This doesn't work.
-      items[1].sendKeys(paramValue);
+      items[0].sendKeys(paramName, protractor.Key.ENTER);
+    });
+
+  element(by.css('.protractor-test-param-changes-editor')).all(
+    by.model('localValue.label')).then(function(items) {
+      items[0].sendKeys(paramValue);
     });
 
   element(by.css('.protractor-test-param-changes-editor')).all(
     by.css('.btn-success')).then(function(items) {
       items[0].click();
     });
+
+  general.waitForSystem(500);
 }
 
 
@@ -1044,14 +1030,13 @@ exports.renameGadget = renameGadget;
 exports.deleteGadget = deleteGadget;
 
 exports.expectGadgetPreviewToMatch = expectGadgetPreviewToMatch;
+exports.expectGadgetWithNameDoesNotExist = expectGadgetWithNameDoesNotExist;
 
 exports.openGadgetEditorModal = openGadgetEditorModal;
 exports.saveAndCloseGadgetEditorModal = saveAndCloseGadgetEditorModal;
 
 exports.checkGadgetVisibilityForState = checkGadgetVisibilityForState;
 exports.uncheckGadgetVisibilityForState = uncheckGadgetVisibilityForState;
-exports.checkGadgetVisibilityAllStates = checkGadgetVisibilityAllStates;
-exports.uncheckGadgetVisibilityAllStates = uncheckGadgetVisibilityAllStates;
 
 exports.addParameterChange = addParameterChange;
 

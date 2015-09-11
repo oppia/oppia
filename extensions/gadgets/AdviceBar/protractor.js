@@ -30,7 +30,7 @@ var expectGadgetPreviewDetailsToMatch = function(elem, title) {
   ).toBe(true);
 };
 
-var expectGadgetPlayerDetailsToMatch = function(elem, title) {
+var expectGadgetDetailsToMatch = function(elem, title) {
   expect(
     elem.element(by.tagName('TO-BE-CREATED')).isPresent()
   ).toBe(true);
@@ -38,4 +38,4 @@ var expectGadgetPlayerDetailsToMatch = function(elem, title) {
 
 exports.customizeGadget = customizeGadget;
 exports.expectGadgetPreviewDetailsToMatch = expectGadgetPreviewDetailsToMatch;
-exports.expectGadgetPlayerDetailsToMatch = expectGadgetPlayerDetailsToMatch;
+exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;

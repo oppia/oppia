@@ -55,8 +55,7 @@ exports.config = {
   //
   // Spec patterns are relative to the location of this config.
   specs: [
-    'protractor/editorAndPlayer.js' // TODO(anuzis): revert to full tests before pull request.
-    //'protractor/*.js'
+    'protractor/*.js'
   ],
 
   // Patterns to exclude.

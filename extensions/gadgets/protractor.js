@@ -25,7 +25,7 @@
  * expectGadgetPreviewDetailsToMatch: a function that receives arguments
  *   describing the way the gadget is expected to look in the editor preview,
  *   which is run in the editor to verify the gadget actually looks this way.
- * expectGadgetPlayerDetailsToMatch: a function that receives arguments
+ * expectGadgetDetailsToMatch: a function that receives arguments
  *   describing the way the gadget is expected to look, and is run in the
  *   player to verify the gadget actually looks this way.
  */

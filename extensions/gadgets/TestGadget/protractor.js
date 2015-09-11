@@ -24,10 +24,10 @@ var expectGadgetPreviewDetailsToMatch = function(elem, testCustomization) {
   return; // TODO(anuzis): TestGadget should perform a customization.
 };
 
-var expectGadgetPlayerDetailsToMatch = function(elem, testCustomization) {
+var expectGadgetDetailsToMatch = function(elem, testCustomization) {
   return; // TODO(anuzis): TestGadget should perform a customization.
 };
 
 exports.customizeGadget = customizeGadget;
 exports.expectGadgetPreviewDetailsToMatch = expectGadgetPreviewDetailsToMatch;
-exports.expectGadgetPlayerDetailsToMatch = expectGadgetPlayerDetailsToMatch;
+exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;

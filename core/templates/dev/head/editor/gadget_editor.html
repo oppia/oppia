@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="oppia-visible-gadgets-container protractor-test-<[panelName]>-visible-gadgets-container">
+    <div class="oppia-visible-gadgets-container">
       <div ng-repeat="gadgetName in panelContents"
            ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) > -1">
         <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
@@ -43,16 +43,17 @@
                   ng-click="changeActiveGadgetNameEditor()">
           </button>
         </span>
-        <div class="oppia-gadget-preview-container" title="Edit <[gadgetName]>"
+        <div class="oppia-gadget-preview-container protractor-test-edit-<[gadgetName]>-gadget" title="Edit <[gadgetName]>"
              ng-click="editGadget(gadgetName)">
           <oppia-gadget-preview
             gadget-type="gadgets[gadgetName].gadget_type"
             gadget-name="gadgetName" style="pointer-events: none;"
             gadget-customization-args="gadgets[gadgetName].customization_args"
+            class="protractor-test-<[gadgetName]>-gadget"
             visible-in-states="gadgets[gadgetName].visible_in_states">
           </oppia-gadget-preview>
           <span title="Edit Gadget Content"
-                class="glyphicon glyphicon-edit oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget-icon">
+                class="glyphicon glyphicon-edit oppia-gadget-edit-icon">
           </span>
         </div>
       </div>
@@ -91,10 +92,9 @@
         <h3 class="oppia-gadget-state-visible-title">
           In which states should this gadget be visible?
         </h3>
-        <label class="oppia-gadget-state-visible-input-label"
+        <label class="oppia-gadget-state-visible-input-label protractor-test-state-visibility-checkbox-label"
                ng-repeat="state in allExplorationStateNames">
           <input type="checkbox" ng-click="toggleVisibilityInState(state)"
-                 css="protractor-test-state-visibility-checkbox"
                  ng-checked="gadgetDict.visible_in_states.indexOf(state) > -1">
           <[state]>
         </label>

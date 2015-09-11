@@ -30,18 +30,14 @@ var customizeGadget = function(elem, title, maxVal, targetParam) {
   ).setValue(maxVal);
 };
 
-var expectGadgetPreviewDetailsToMatch = function(elem, title, maxVal, targetParam) {
-  expect(
-    elem.element(by.tagName('.protractor-test-scorebar-title')).isPresent()
-  ).toBe(title);
+var expectGadgetPreviewDetailsToMatch = function(elem, title) {
+  expect(elem.element(by.css('.protractor-test-scorebar-title')).getText()).toBe(title);
 };
 
-var expectGadgetPlayerDetailsToMatch = function(elem, title, maxVal, targetParam) {
-  expect(
-    elem.element(by.tagName('.protractor-test-scorebar-title')).isPresent()
-  ).toBe(title);
+var expectGadgetDetailsToMatch = function(elem, title) {
+  expect(elem.element(by.css('.protractor-test-scorebar-title')).getText()).toBe(title);
 };
 
 exports.customizeGadget = customizeGadget;
 exports.expectGadgetPreviewDetailsToMatch = expectGadgetPreviewDetailsToMatch;
-exports.expectGadgetPlayerDetailsToMatch = expectGadgetPlayerDetailsToMatch;
+exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;
