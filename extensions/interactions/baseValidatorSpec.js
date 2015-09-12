@@ -641,11 +641,9 @@ describe('Interaction validator', function() {
 
     it('should expect maxAllowableSelectionCount to be less than the total number of selections',
         function() {
-      // Reset the minAllowableSelectionCount to the default
-      customizationArguments.minAllowableSelectionCount.value = 1;
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
-      // Remove the last choice
+      // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
       var warnings = validator(
@@ -653,16 +651,16 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure that you have the enough choices to reach the max count.'
+        'message': 'please ensure that you have enough choices to reach the max count.'
       }]);
     });
 
     it('should expect minAllowableSelectionCount to be less than the total number of selections',
         function() {
-      // Remove the last choice
+      // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
-      // Set the min count to be greater than the total count
+      // Set the min count to be greater than the total count.
       customizationArguments.minAllowableSelectionCount.value = 3;
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
@@ -671,12 +669,12 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure that you have the enough choices to reach the min count.'
+        'message': 'please ensure that you have enough choices to reach the min count.'
       }]);
     });
 
     it('should expect all choices to be nonempty', function() {
-      // Set the first choice to empty
+      // Set the first choice to empty.
       customizationArguments.choices.value[0] = '';
 
       var warnings = validator(

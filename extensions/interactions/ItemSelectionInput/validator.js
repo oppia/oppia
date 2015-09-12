@@ -66,18 +66,15 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
       });
     }
 
-    // The following error will be suppressed if minAllowedCount is less than numChoices
-    if (numChoices < maxAllowedCount && !(numChoices < minAllowedCount)) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure that you have the enough choices to reach the max count.'
-      });
-    }
-
     if (numChoices < minAllowedCount) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure that you have the enough choices to reach the min count.'
+        message: 'please ensure that you have enough choices to reach the min count.'
+      });
+    } else if (numChoices < maxAllowedCount) {
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'please ensure that you have enough choices to reach the max count.'
       });
     }
 
