@@ -79,7 +79,14 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
     EXPLORATION_RESET: 'explorationReset',
     EXPLORATION_COMPLETED: 'explorationCompleted',
     sendMessage: function(messageTitle, messageData) {
-      // Only send a message if the oppia window is iframed.
+      // Run each post-completion hook on exploration completion.
+      if (messageTitle === 'explorationCompleted') {
+        for (var i = 0; i < GLOBALS.POST_COMPLETION_HOOKS.length; i++) {
+          GLOBALS.POST_COMPLETION_HOOKS[i](messageData);
+        }
+      }
+
+      // Only send a message to the parent if the oppia window is iframed.
       if ($window.parent !== $window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
         var rawHash = $window.location.hash.substring(1);
