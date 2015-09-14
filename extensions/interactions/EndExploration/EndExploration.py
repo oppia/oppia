@@ -27,7 +27,8 @@ class EndExploration(base.BaseInteraction):
 
     name = 'End Conversation'
     description = (
-        'Suggests recommendations for explorations to try next.')
+        'Ends the exploration, and suggests recommendations for explorations '
+        'to try next.')
     display_mode = base.DISPLAY_MODE_INLINE
     is_terminal = True
     _dependency_ids = []

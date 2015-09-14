@@ -2,7 +2,7 @@
   <link rel="stylesheet" type="text/css"
         href="/extensions/skins/conversation_v1/static/conversation.css">
 
-  <!-- Off-screen preview of future card in order to pre-determine the target height for the animation. -->
+  <!-- Off-screen preview of the next card in order to pre-determine the target height for the card content transition animation. -->
   <md-card class="conversation-skin-tutor-card" style="position: absolute; left: -30000px; top: -30000px;">
     <div id="futurePreview">
       <div class="conversation-skin-tutor-card-top-section">
@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <div ng-if="activeCard.interactionIsInline && upcomingInlineInteractionHtml">
+      <div ng-if="upcomingInlineInteractionHtml">
         <div class="conversation-skin-inline-interaction">
           <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
           <div angular-html-bind="upcomingInlineInteractionHtml">
@@ -21,16 +21,17 @@
     </div>
   </md-card>
 
-  <!-- TODO(sll): do we need to preserve the itemprop attr? -->
   <div role="main" style="margin: 0 auto; position: relative;">
     <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex" class="conversation-skin-progress-dots">
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards" ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-      <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active" ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': !activeCard.interactionIsInline && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+      <!-- If the interaction is not inline, two cases arise: (a) the screen is narrow, in which case only one card shows on the screen at a time, and a selection bar appears at the bottom of the screen to switch between cards, (b) the screen is wide, in which case both cards appear side-by-side. -->
+      <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
+               ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': !activeCard.interactionIsInline && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
           <span class="glyphicon glyphicon-comment conversation-skin-tutor-card-feedback-toggle"
-                popover-placement="<[isWindowNarrow() ? 'left' : 'bottom']>"
+                popover-placement="<[getFeedbackPopoverPlacement()]>"
                 popover-template="popover/feedback" popover-trigger="click"
                 tooltip="Feedback" tooltip-placement="bottom"
                 state-name="<[activeCard.stateName]>">
@@ -40,7 +41,7 @@
         <div class="conversation-skin-animate-card-contents" ng-class="{'animate-card-change': startCardChangeAnimation}">
           <div class="conversation-skin-tutor-card-top-section">
             <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
-            <div class="protractor-test-conversation-content" angular-html-bind="activeCard.content">
+            <div class="protractor-test-conversation-content" angular-html-bind="activeCard.contentHtml">
             </div>
           </div>
 
@@ -49,10 +50,10 @@
               <span class="conversation-skin-responses-dropdown-text">
                 Previous responses
                 <span ng-if="!arePreviousResponsesShown">
-                  <span class="glyphicon glyphicon-play" style="font-size:10px; margin-bottom: -4px;"></span>
+                  <span class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"></span>
                 </span>
                 <span ng-if="arePreviousResponsesShown">
-                  <span class="glyphicon glyphicon-triangle-bottom" style="font-size:10px; margin-bottom: -4px;"></span>
+                  <span class="glyphicon glyphicon-triangle-bottom conversation-skin-responses-dropdown-icon"></span>
                 </span>
               </span>
             </h4>
@@ -79,7 +80,9 @@
             </answer-feedback-pair>
           </div>
 
-          <div ng-if="!waitingForOppiaFeedback && (activeCard.interaction || waitingForContinueButtonClick) && currentProgressDotIndex === transcript.length - 1">
+          <!-- Show the interaction (if it is inline), the interaction instructions (if the interaction is supplemental), or a continuation button (if Oppia has given feedback and the learner is being asked to move on to the next card).
+          -->
+          <div ng-if="!waitingForOppiaFeedback && (activeCard.interactionHtml || waitingForContinueButtonClick) && currentProgressDotIndex === transcript.length - 1">
             <div class="conversation-skin-inline-interaction">
               <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
               <div ng-if="waitingForContinueButtonClick">
@@ -88,10 +91,10 @@
                   Continue
                 </md-button>
               </div>
-              <div ng-if="activeCard.interaction && !activeCard.interactionIsDisabled">
+              <div ng-if="activeCard.interactionHtml && !activeCard.interactionIsDisabled">
                 <div ng-if="activeCard.interactionIsInline">
                   <div class="protractor-test-conversation-input"
-                       angular-html-bind="activeCard.interaction">
+                       angular-html-bind="activeCard.interactionHtml">
                   </div>
                 </div>
                 <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_INTERACTION)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
@@ -104,13 +107,13 @@
         </div>
       </md-card>
 
-      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}" ng-if="!activeCard.interactionIsInline && activeCard.interaction">
+      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}" ng-if="!activeCard.interactionIsInline && activeCard.interactionHtml">
         <md-card ng-show="isPanelVisible(PANEL_INTERACTION)"
                  class="conversation-skin-supplemental-card">
           <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
           </div>
           <div ng-repeat="transcriptCard in transcript">
-            <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interaction" ng-show="$index === currentProgressDotIndex">
+            <div class="protractor-test-conversation-input" angular-html-bind="transcriptCard.interactionHtml" ng-show="$index === currentProgressDotIndex">
             </div>
           </div>
         </md-card>
@@ -118,7 +121,7 @@
     </div>
   </div>
 
-  <div ng-if="finished && isLoggedIn && !isInPreviewMode && !isIframed" class="conversation-skin-final-ratings">
+  <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1" class="conversation-skin-final-ratings">
     <oppia-gadget-panel panel-contents="gadgetPanelsContents.main" class="conversation-skin-main-gadget-panel"></oppia-gadget-panel>
 
     <div style="color: #eee; margin-bottom: 20px;">

@@ -162,23 +162,17 @@ oppia.factory('oppiaPlayerService', [
   var _viewerHasEditingRights = false;
 
   var _updateStatus = function(newParams, newStateName) {
-    // TODO(sll): Do this more incrementally.
-    if (newParams !== null) {
-      learnerParamsService.init(newParams);
-    }
+    learnerParamsService.init(newParams);
 
-    if (newStateName !== null) {
-      _currentStateName = newStateName;
-      stateHistory.push(_currentStateName);
-    }
+    _currentStateName = newStateName;
+    stateHistory.push(_currentStateName);
   };
 
-  var stopwatch = stopwatchProviderService.getInstance();
+  var _stopwatch = stopwatchProviderService.getInstance();
 
-  var cachedParamUpdates = {
-    newParams: null,
-    newStateName: null
-  };
+  // When this is not null, it is an object with keys 'newParams' and
+  // 'newStateName'.
+  var _cachedUpdates = null;
 
   // If delayParamUpdates is true, the parameters will need to be updated
   // manually by calling applyCachedParamUpdates().
@@ -201,7 +195,7 @@ oppia.factory('oppiaPlayerService', [
         new_state_name: newStateName,
         exploration_version: version,
         session_id: sessionId,
-        client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+        client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
         old_params: learnerParamsService.getAllParams()
       });
 
@@ -209,7 +203,7 @@ oppia.factory('oppiaPlayerService', [
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
         oldStateName: _currentStateName,
         jsonAnswer: JSON.stringify(answer),
-        newStateName: newStateName ? newStateName : 'END'
+        newStateName: newStateName
       });
 
       // If the new state contains a terminal interaction, record a completion
@@ -222,7 +216,7 @@ oppia.factory('oppiaPlayerService', [
         var completeExplorationUrl = (
           '/explorehandler/exploration_complete_event/' + _explorationId);
         $http.post(completeExplorationUrl, {
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
           params: learnerParamsService.getAllParams(),
           session_id: sessionId,
           state_name: newStateName,
@@ -234,11 +228,13 @@ oppia.factory('oppiaPlayerService', [
     if (!delayParamUpdates) {
       _updateStatus(newParams, newStateName);
     } else {
-      cachedParamUpdates.newParams = angular.copy(newParams);
-      cachedParamUpdates.newStateName = angular.copy(newStateName);
+      _cachedUpdates = {
+        newParams: angular.copy(newParams),
+        newStateName: angular.copy(newStateName)
+      };
     }
 
-    stopwatch.resetStopwatch();
+    _stopwatch.resetStopwatch();
 
     var newStateData = _exploration.states[newStateName];
     $rootScope.$broadcast('playerStateChange');
@@ -250,7 +246,7 @@ oppia.factory('oppiaPlayerService', [
     var maybeLeaveExplorationUrl = (
       '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
     $http.post(maybeLeaveExplorationUrl, {
-      client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+      client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
       params: learnerParamsService.getAllParams(),
       session_id: sessionId,
       state_name: stateName,
@@ -259,7 +255,7 @@ oppia.factory('oppiaPlayerService', [
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
-    stopwatch.resetStopwatch();
+    _stopwatch.resetStopwatch();
     _updateStatus(newParams, initStateName);
     $rootScope.$broadcast('playerStateChange');
     callback(initStateName, initHtml);
@@ -356,9 +352,10 @@ oppia.factory('oppiaPlayerService', [
       }
     },
     applyCachedParamUpdates: function() {
-      _updateStatus(cachedParamUpdates.newParams, cachedParamUpdates.newStateName);
-      cachedParamUpdates.newParams = null;
-      cachedParamUpdates.newStateName = null;
+      if (_cachedUpdates !== null) {
+        _updateStatus(_cachedUpdates.newParams, _cachedUpdates.newStateName);
+        _cachedUpdates = null;
+      }
     },
     getExplorationId: function() {
       return _explorationId;
