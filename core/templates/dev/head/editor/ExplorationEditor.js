@@ -453,6 +453,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     }
   };
 
+  // Before the saveChanges is called check the state if modal is open
+  // Initialize to false 
+  var modalIsOpen = false; 
+
   $scope.saveChanges = function() {
     routerService.savePendingChanges();
 
@@ -496,6 +500,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       warningsData.clear();
+
+      // If modal is open do not open another modal
+      if(modalIsOpen) return;
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
@@ -620,14 +627,18 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
             $scope.save = function(commitMessage) {
               $modalInstance.close(commitMessage);
+              modalIsOpen = false;
             };
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
               warningsData.clear();
+              modalIsOpen = false;
             };
           }
         ]
       });
+      // Modal is opened
+      modalIsOpen = true;
 
       modalInstance.opened.then(function(data) {
         // The $timeout seems to be needed in order to give the modal time to
