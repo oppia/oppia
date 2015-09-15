@@ -397,6 +397,9 @@ oppia.factory('oppiaPlayerService', [
     },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
+      // Note that we treat a null interaction as an inline one, so that the
+      // error message associated with it is displayed in the most compact way
+      // possible in the learner view.
       return (
         !interactionId ||
         INTERACTION_SPECS[interactionId].display_mode ===

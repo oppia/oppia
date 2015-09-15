@@ -176,8 +176,8 @@ oppia.directive('conversationSkin', [function() {
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
-      // This will be replaced with the dataURI representation of the
-      // user-uploaded profile image, if it exists.
+      // The user's profile picture will be replaced with the dataURI
+      // representation of the user-uploaded profile image, if it exists.
       $scope.profilePicture = '/images/general/user_blue_72px.png';
       $scope.explorationCompleted = false;
 
