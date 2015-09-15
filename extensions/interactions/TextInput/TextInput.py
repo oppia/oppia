@@ -26,6 +26,8 @@ class TextInput(base.BaseInteraction):
     is_trainable = True
     _dependency_ids = []
     answer_type = 'NormalizedString'
+    instructions = None
+    needs_summary = False
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in

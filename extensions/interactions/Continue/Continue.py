@@ -25,6 +25,8 @@ class Continue(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'Null'
+    instructions = None
+    needs_summary = False
 
     _customization_arg_specs = [{
         'name': 'buttonText',
