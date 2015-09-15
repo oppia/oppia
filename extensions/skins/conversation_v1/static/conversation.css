@@ -89,6 +89,8 @@ html, body {
   padding: 0 10px;
 }
 
+/* TODO(sll): Add the relevant CSS rules here once gadgets are brought into the
+   learner view. */
 .conversation-skin-main-gadget-panel {
 
 }
