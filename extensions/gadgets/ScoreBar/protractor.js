@@ -35,7 +35,8 @@ var expectGadgetPreviewDetailsToMatch = function(elem, title) {
 };
 
 var expectGadgetDetailsToMatch = function(elem, title) {
-  expect(elem.element(by.css('.protractor-test-scorebar-title')).getText()).toBe(title);
+  expect(elem.element(by.css('.protractor-test-scorebar-title'))
+    .getText()).toBe(title);
 };
 
 exports.customizeGadget = customizeGadget;

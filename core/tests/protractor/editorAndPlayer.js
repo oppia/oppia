@@ -468,7 +468,7 @@ describe('Gadget editor', function() {
 
     // Edit visibility
     editor.openGadgetEditorModal('PowerScoreBar');
-    editor.checkGadgetVisibilityForState('final card');
+    editor.enableGadgetVisibilityForState('final card');
     editor.saveAndCloseGadgetEditorModal();
 
     editor.saveChanges();
@@ -686,14 +686,6 @@ describe('Interactions', function() {
     general.checkForConsoleErrors([]);
   });
 });
-
-/*
-// TODO(anuzis): Implement!
-describe('Gadgets', function() {
-  it('should pass their own test suites', function() {
-  });
-});
-*/
 
 describe('Exploration history', function() {
   it('should display the history', function() {
