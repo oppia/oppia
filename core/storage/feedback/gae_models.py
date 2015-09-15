@@ -41,6 +41,7 @@ STATUS_CHOICES = [
 
 class FeedbackThreadModel(base_models.BaseModel):
     """Threads for each exploration.
+
     The id/key of instances of this class has the form
         [EXPLORATION_ID].[THREAD_ID]
     """
@@ -64,11 +65,12 @@ class FeedbackThreadModel(base_models.BaseModel):
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
     # Specifies whether this thread has a related learner suggestion.
-    has_suggestion = ndb.BooleanProperty(indexed=False)  
+    has_suggestion = ndb.BooleanProperty(indexed=False, default=False)
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
         """Generates a new thread id, unique within the exploration.
+
         Exploration ID + the generated thread ID is globally unique.
         """
         MAX_RETRIES = 10
@@ -89,6 +91,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     @classmethod
     def create(cls, exploration_id, thread_id):
         """Creates a new FeedbackThreadModel entry.
+
         Throws an exception if a thread with the given exploration ID and
         thread ID combination exists already.
         """
@@ -100,6 +103,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     @classmethod
     def get_by_exp_and_thread_id(cls, exploration_id, thread_id):
         """Gets the FeedbackThreadModel entry for the given ID.
+
         Returns None if the thread is not found or is already deleted.
         """
         return cls.get_by_id(cls._generate_id(exploration_id, thread_id))
@@ -107,20 +111,17 @@ class FeedbackThreadModel(base_models.BaseModel):
     @classmethod
     def get_threads(cls, exploration_id):
         """Returns an array of threads associated to the exploration.
+
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).fetch(
                 feconf.DEFAULT_QUERY_LIMIT)
 
-    @classmethod
-    def thread_has_suggestion(cls, exploration_id, thread_id):
-        return cls.get_by_id(cls._generate_id(
-            exploration_id, thread_id)).has_suggestion
-
 
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
+
     The id/key of instances of this class has the form
         [EXPLORATION_ID].[THREAD_ID].[MESSAGE_ID]
     """
@@ -156,6 +157,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def create(cls, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
+
         Throws an exception if a message with the given thread ID and message
         ID combination exists already.
         """
@@ -167,6 +169,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get(cls, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID.
+
         If the message id is valid and it is not marked as deleted, returns the
         message instance. Otherwise:
         - if strict is True, raises EntityNotFoundError
@@ -178,6 +181,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_messages(cls, thread_id):
         """Returns an array of messages in the thread.
+
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
@@ -191,6 +195,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_message_count(cls, thread_id):
         """Returns the number of messages in the thread.
+
         Includes the deleted entries.
         """
         return cls.get_all(include_deleted_entities=True).filter(
@@ -204,6 +209,7 @@ class FeedbackMessageModel(base_models.BaseModel):
 
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     """Model for storing feedback thread analytics for an exploration.
+
     The key of each instance is the exploration id.
     """
     # The number of open feedback threads filed against this exploration.
@@ -219,3 +225,66 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             num_open_threads=num_open_threads,
             num_total_threads=num_total_threads
         ).put()
+
+
+STATUS_NEW = 'new'
+STATUS_ACCEPTED = 'accepted'
+STATUS_REJECTED = 'rejected'
+
+
+class SuggestionModel(base_models.BaseModel):
+    """Suggestions made by learners.
+    
+    The id of each instance is the id of the corresponding thread. 
+    """ 
+
+    # ID of the user who submitted the suggestion.
+    author_id = ndb.StringProperty(required=True, indexed=True)
+    # ID of the corresponding exploration.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration version for which the suggestion was made.
+    exploration_version = ndb.IntegerProperty(required=True, indexed=True)
+    # Name of the corresponding state.
+    state_name = ndb.StringProperty(required=True, indexed=True)
+    # Current status of the suggestion.
+    status = ndb.StringProperty(indexed=True,
+                                choices=[STATUS_NEW,
+                                         STATUS_ACCEPTED,
+                                         STATUS_REJECTED],
+                                required=True)
+    state_content = ndb.JsonProperty(required=True, indexed=False)
+
+    @classmethod
+    def create(cls, exploration_id, thread_id, author_id, exploration_version,
+               state_name, state_content, status=STATUS_NEW):
+        """Creates a new SuggestionModel entry.
+
+        Throws an exception if a suggestion with the given thread id already
+        exists.
+        """
+        instance_id = '.'.join([exploration_id, thread_id])
+        if cls.get_by_id(instance_id):
+            raise Exception('There is already a feedback thread with the given'
+                            'thread id: %s' % instance_id)
+        return cls(id=instance_id, author_id=author_id,
+                   exploration_id=exploration_id,
+                   exploration_version=exploration_version,
+                   state_name=state_name, status=status,
+                   state_content=state_content).put()
+
+    @classmethod
+    def get_by_exp_id_and_status(cls, exploration_id, status=None):
+        """Gets a list of SuggestionModel objects matching the given
+        exploration ID and an optional status.
+
+        If no status is specified all suggestions matching the given
+        epxloration are returned.
+        """
+        all_suggestions_for_exploration = cls.get_all().filter(
+            cls.exploration_id == exploration_id)
+        if status is None:
+            return all_suggestions_for_exploration.fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
+        else:
+            return all_suggestions_for_exploration.filter(
+               cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
