@@ -52,7 +52,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should walk through the tutorial when user repeteadly clicks Next', function() {
+  it('should walk through the tutorial when user repeatedly clicks Next', function() {
     var NUM_TUTORIAL_STAGES = 5;
     users.createUser('user@example.com', 'user');
     users.login('user@example.com');
@@ -128,6 +128,7 @@ describe('State editor', function() {
     player.expectLatestFeedbackToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('correct');
     });
+    player.clickThroughToNextCard();
     player.expectExplorationToBeOver();
 
     users.logout();
@@ -268,6 +269,7 @@ describe('Full exploration editor', function() {
       player.submitAnswer('NumericInput', 6);
       // This checks the previously-deleted group no longer applies.
       player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
+      player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
 
       editor.discardChanges();
@@ -371,6 +373,7 @@ describe('Full exploration editor', function() {
 
       player.expectLatestFeedbackToMatch(
         forms.toRichText('Okay, now this is just becoming annoying.'));
+      player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
 
       users.logout();

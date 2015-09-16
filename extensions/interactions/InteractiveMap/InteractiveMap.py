@@ -26,6 +26,8 @@ class InteractiveMap(base.BaseInteraction):
     is_trainable = True
     _dependency_ids = ['google_maps']
     answer_type = 'CoordTwoDim'
+    instructions = 'Click on the map'
+    needs_summary = True
 
     _customization_arg_specs = [{
         'name': 'latitude',

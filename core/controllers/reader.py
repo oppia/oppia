@@ -289,7 +289,7 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        intro_card_color = (
+        info_card_color = (
             feconf.CATEGORIES_TO_COLORS[exploration.category] if
             exploration.category in feconf.CATEGORIES_TO_COLORS else
             feconf.DEFAULT_COLOR)
@@ -299,9 +299,9 @@ class ExplorationHandler(base.BaseHandler):
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'intro_card_image_url': (
+            'info_card_image_url': (
                 '/images/gallery/exploration_background_%s_large.png' %
-                intro_card_color),
+                info_card_color),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_random_string(24),
             'version': exploration.version,
