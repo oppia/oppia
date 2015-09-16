@@ -390,6 +390,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -408,6 +409,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -451,6 +453,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -469,6 +472,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -579,6 +583,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -600,6 +605,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -622,6 +628,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -2460,6 +2467,7 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
@@ -2473,6 +2481,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -2502,7 +2511,7 @@ tags: []
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.
-        old_exp_model = self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v0(
             self.OLD_EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Create standard exploration that should not be converted.
@@ -2546,7 +2555,7 @@ tags: []
         _EXP_ID = 'exp_id2'
 
         # Create a exploration with states schema version 0.
-        old_exp_model = self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v0(
             _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Load the exploration without using the conversion pipeline. All of
@@ -2680,7 +2689,7 @@ tags: []
 
         # Create a exploration with states schema version 0 and an old states
         # blob.
-        old_exp_model = self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v0(
             _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Ensure the exploration was converted.

@@ -32,6 +32,7 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
+from core.domain import rule_domain
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
@@ -250,6 +251,8 @@ class ExplorationPage(EditorHandler):
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
+            'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
+                feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
@@ -489,15 +492,104 @@ class ResolvedAnswersHandler(EditorHandler):
         self.render_json({})
 
 
+class UntrainedAnswersHandler(EditorHandler):
+    """Returns answers that learners have submitted, but that Oppia hasn't been
+    explicitly trained to respond to be an exploration author.
+    """
+    def get(self, exploration_id, escaped_state_name):
+        """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        state_name = self.unescape_state_name(escaped_state_name)
+        if state_name not in exploration.states:
+            # If trying to access a non-existing state, there is no training
+            # data associated with it.
+            self.render_json({'unhandled_answers': []})
+            return
+
+        state = exploration.states[state_name]
+
+        # TODO(bhenning): Answers should be bound to a particular exploration
+        # version or interaction ID.
+
+        # TODO(bhenning): If the top 100 answers have already been classified,
+        # then this handler will always return an empty list.
+
+        # TODO(bhenning): This entire function will not work as expected until
+        # the answers storage backend stores answers in a non-lossy way.
+        # Currently, answers are stored as HTML strings and they are not able
+        # to be converted back to the original objects they started as, so the
+        # normalization calls in this function will not work correctly on those
+        # strings. Once this happens, this handler should also be tested.
+
+        NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
+
+        # The total number of possible answers is 100 because it requests the
+        # top 50 answers matched to the default rule and the top 50 answers
+        # matched to a fuzzy rule individually.
+        answers = stats_services.get_top_state_rule_answers(
+            exploration_id, state_name, [
+                exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
+            NUMBER_OF_TOP_ANSWERS_PER_RULE)
+
+        interaction = state.interaction
+        unhandled_answers = []
+        if feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS and interaction.id:
+            interaction_instance = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    interaction.id))
+
+            try:
+                # Normalize the answers.
+                for answer in answers:
+                    answer['value'] = interaction_instance.normalize_answer(
+                        answer['value'])
+
+                trained_answers = set()
+                for answer_group in interaction.answer_groups:
+                    for rule_spec in answer_group.rule_specs:
+                        if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                            trained_answers.update(
+                                interaction_instance.normalize_answer(trained)
+                                for trained
+                                in rule_spec.inputs['training_data'])
+
+                # Include all the answers which have been confirmed to be
+                # associated with the default outcome.
+                trained_answers.update(set(
+                    interaction_instance.normalize_answer(confirmed)
+                    for confirmed
+                    in interaction.confirmed_unclassified_answers))
+
+                unhandled_answers = [
+                    answer for answer in answers
+                    if answer['value'] not in trained_answers
+                ]
+            except Exception as e:
+                logging.warning(
+                    'Error loading untrained answers for interaction %s: %s.' %
+                    (interaction.id, e))
+
+        self.render_json({
+            'unhandled_answers': unhandled_answers
+        })
+
+
 class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
-    representing states."""
-
+    representing states.
+    """
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
+            raise self.PageNotFoundException
+
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
@@ -530,6 +622,9 @@ class StateDownloadHandler(EditorHandler):
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
+            raise self.PageNotFoundException
+
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)

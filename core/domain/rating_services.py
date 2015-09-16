@@ -43,7 +43,7 @@ def assign_rating(user_id, exploration_id, new_rating):
 
     ALLOWED_RATINGS = [1, 2, 3, 4, 5]
     if new_rating not in ALLOWED_RATINGS:
-        raise ValueError('Expected a rating 1-5, received: %s.' % new_rating)
+        raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
 
     try:
         exp_services.get_exploration_by_id(exploration_id)

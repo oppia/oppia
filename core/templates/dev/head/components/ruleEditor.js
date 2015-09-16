@@ -27,8 +27,10 @@ oppia.directive('ruleTypeSelector', [function() {
     },
     template: '<input type="hidden">',
     controller: [
-        '$scope', '$element', '$rootScope', '$filter', 'stateInteractionIdService', 'INTERACTION_SPECS',
-        function($scope, $element, $rootScope, $filter, stateInteractionIdService, INTERACTION_SPECS) {
+        '$scope', '$element', '$rootScope', '$filter',
+        'stateInteractionIdService', 'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
+        function($scope, $element, $rootScope, $filter,
+          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
 
       var choices = [];
       var numberOfRuleTypes = 0;
@@ -36,6 +38,9 @@ oppia.directive('ruleTypeSelector', [function() {
       var ruleTypesToDescriptions = INTERACTION_SPECS[
         stateInteractionIdService.savedMemento].rule_descriptions;
       for (var ruleType in ruleTypesToDescriptions) {
+        if (ruleType == FUZZY_RULE_TYPE) {
+          continue;
+        }
         numberOfRuleTypes++;
         choices.push({
           id: ruleType,
@@ -110,13 +115,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-        '$scope', '$timeout', 'editorContextService', 'explorationStatesService',
-        'routerService', 'validatorsService', 'responsesService',
-        'stateInteractionIdService', 'INTERACTION_SPECS',
-        function(
-          $scope, $timeout, editorContextService, explorationStatesService, routerService,
-          validatorsService, responsesService, stateInteractionIdService,
-          INTERACTION_SPECS) {
+        '$scope', '$timeout', 'editorContextService',
+        'explorationStatesService', 'routerService', 'validatorsService',
+        'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        'FUZZY_RULE_TYPE', function(
+          $scope, $timeout, editorContextService, explorationStatesService,
+          routerService, validatorsService, responsesService,
+          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
       $scope.currentInteractionId = stateInteractionIdService.savedMemento;
       $scope.editRuleForm = {};
 
@@ -196,6 +201,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.rule.rule_type = newRuleType;
         $scope.rule.inputs = {};
         var tmpRuleDescription = _computeRuleDescriptionFragments();
+        // This provides the list of choices for the multiple-choice and image-click interactions.
+        var _answerChoices = responsesService.getAnswerChoices();
 
         // Finds the parameters and sets them in $scope.rule.inputs.
         var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
@@ -209,11 +216,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
           }
 
-          if (varType == 'Set') {
-            $scope.rule.inputs[varName] = [];
-          } else if (varType == 'NonnegativeInt') {
-            // Set a default value.
-            $scope.rule.inputs[varName] = 0;
+          if (_answerChoices) {
+            $scope.rule.inputs[varName] = angular.copy(_answerChoices[0].val);
           } else if (varType == "Graph") {
             $scope.rule.inputs[varName] = {
               'vertices': [],
@@ -222,11 +226,22 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isWeighted': false,
               'isLabeled': false
             };
+          } else if (varType == 'Set') {
+            $scope.rule.inputs[varName] = [];
           } else {
             $scope.rule.inputs[varName] = '';
           }
 
           tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+        }
+      };
+
+      $scope.onDeleteTrainingDataEntry = function(index) {
+        if ($scope.rule.rule_type === FUZZY_RULE_TYPE) {
+          var trainingData = $scope.rule.inputs.training_data;
+          if (index < trainingData.length) {
+            trainingData.splice(index, 1);
+          }
         }
       };
 
@@ -248,5 +263,38 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
       $scope.init();
     }]
+  };
+}]);
+
+oppia.directive('fuzzyRulePanel', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      ruleInputs: '=',
+      onTrainingDataDeletion: '&'
+    },
+    templateUrl: 'rules/fuzzyRulePanel',
+    controller: [
+      '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
+      'stateInteractionIdService', 'stateCustomizationArgsService',
+      'trainingModalService',
+      function($scope, $modal, oppiaExplorationHtmlFormatterService,
+          stateInteractionIdService, stateCustomizationArgsService,
+          trainingModalService) {
+        $scope.trainingDataHtmlList = [];
+        var _trainingData = $scope.ruleInputs.training_data;
+        for (var i = 0; i < _trainingData.length; i++) {
+          $scope.trainingDataHtmlList.push(
+            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+              _trainingData[i], stateInteractionIdService.savedMemento,
+              stateCustomizationArgsService.savedMemento));
+        }
+
+        $scope.openRetrainAnswerModal = function(trainingDataIndex) {
+          trainingModalService.openTrainUnresolvedAnswerModal(
+            _trainingData[trainingDataIndex], false);
+        };
+      }
+    ]
   };
 }]);

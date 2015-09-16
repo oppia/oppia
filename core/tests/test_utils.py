@@ -28,6 +28,7 @@ from core.controllers import reader
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -114,6 +115,14 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
+
+    def assertFuzzyTrue(self, value):
+        self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
+        self.assertTrue(isinstance(value, float))
+
+    def assertFuzzyFalse(self, value):
+        self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
+        self.assertTrue(isinstance(value, float))
 
     def signup_superadmin_user(self):
         """Signs up a superadmin user. Should be called at the end of setUp().

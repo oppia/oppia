@@ -265,7 +265,7 @@ textarea {
 
 .oppia-sidebar-menu-icon {
   height: 22px;
-  margin: 0px 16px 3px 6px;
+  margin: 0 16px 3px 6px;
   width: 22px;
 }
 
@@ -331,7 +331,7 @@ textarea {
 
 .oppia-sidebar-footer a {
   display: inline;
-  padding: 0px 10px 0px 0px;
+  padding: 0 10px 0 0;
   margin-top: 5px;
 }
 
@@ -367,7 +367,7 @@ textarea {
 }
 
 .navbar {
-  border: 0px;
+  border: 0;
   margin-bottom: 0;
   width: 100%;
 }
@@ -557,7 +557,12 @@ textarea {
   border-radius: 0;
   margin-top: 10px;
 }
-
+/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to allign ticks and
+   dropdown options
+*/
+.oppia-navbar-button-container > .dropdown-menu > li > a {
+  white-space: normal;
+}
 .btn.oppia-navbar-add-exploration-button {
   background-color: rgba(5, 190, 178, 0.9);
   color: rgba(255,255,255,0.9);
@@ -597,6 +602,21 @@ textarea {
   .oppia-navbar-add-exploration-button {
     display: none;
   }
+}
+
+.btn.oppia-unresolved-answer-button {
+  background-color: white;
+  border-radius: 12px;
+  color: black;
+  font-size: 14px;
+  margin: 4px;
+  padding: 8px 18px;
+  text-align: left;
+  width: auto;
+}
+
+.btn.oppia-unresolved-answer-button:hover {
+  background-color: #eee;
 }
 
 .oppia-gallery-tiles-area {
@@ -781,8 +801,8 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 0px;
-  position: absolute;
+  bottom: 0;
+  position: fixed;
   right: 25px;
 }
 
@@ -975,9 +995,20 @@ pre.oppia-pre-wrapped-text {
   z-index: 50;
 }
 
+.oppia-editor-trash-icon {
+  opacity: 0.2;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
+}
+
+.oppia-editor-trash-icon:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
 /* Styles for the state graph vizualization. */
 
-.oppia-graph-viz-container {
+.oppia-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
   height: 300px;
@@ -1104,7 +1135,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-graph-resize-button {
-  border: 0px;
+  border: 0;
   padding: 9px 10px 6px 10px;
   position: absolute;
   right: 2px;
@@ -1201,7 +1232,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-rule-header {
   color: rgb(120, 120, 120);
   overflow: hidden;
-  padding-left: 0px;
+  padding-left: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1256,9 +1287,9 @@ oppia-parameter {
 }
 
 .oppia-param-arrow-button {
-  border: 0px;
+  border: 0;
   font-size: 14px;
-  padding: 0px;
+  padding: 0;
 }
 
 .oppia-tutorial-tooltip {
@@ -1339,7 +1370,7 @@ md-card.oppia-dashboard-tile {
 ul.oppia-dashboard-tiles {
   list-style-type: none;
   margin-top: 30px;
-  padding-left: 0px;
+  padding-left: 0;
 }
 
 .oppia-large-modal-window .modal-dialog {
@@ -1377,7 +1408,7 @@ ul.oppia-dashboard-tiles {
 
 .oppia-splash-search-form {
   margin-top: 10px;
-  padding-right: 0px;
+  padding-right: 0;
 }
 
 .oppia-splash-search-input {
@@ -1549,7 +1580,7 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-gallery-modal .modal-body {
-  padding: 0px;
+  padding: 0;
 }
 .oppia-gallery-modal .modal-dialog {
   margin-top: 50px;
@@ -1669,7 +1700,7 @@ div#ng-curtain {
   color: #05a69a;
 }
 .oppia-navbar-profile-dropdown {
-  border: 0px;
+  border: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: 0;
@@ -1997,6 +2028,89 @@ div#ng-curtain {
   min-height: 80px;
 }
 
+/* Styles for the editor training interfaces. */
+
+.preview-conversation-skin-card-row-container {
+  margin-bottom: 17px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.preview-conversation-skin-card-row {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.preview-conversation-skin-row-avatar {
+  padding-right: 10px;
+  width: 30px;
+}
+
+.preview-conversation-skin-row-avatar-img {
+  height: 24px;
+  max-width: 24px;
+}
+
+.preview-conversation-skin-oppia-content {
+  padding-left: 15px;
+  padding-top: 2px;
+}
+
+.preview-conversation-skin-learner-input {
+  padding-left: 15px;
+}
+
+md-card.preview-conversation-skin-inline-interaction {
+  background-color: #f6f6f6;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  margin: -20px auto;
+  max-width: 560px;
+}
+
+md-card.preview-conversation-skin-supplemental-card {
+  background-color: #f6f6f6;
+  margin: -5px 0;
+  max-width: 560px;
+}
+
+.preview-conversation-skin-supplemental-interaction {
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.trained-feedback-selection-form-container {
+  margin-top: -5px;
+}
+
+.trained-feedback-selection-container {
+  border-bottom: thin solid #EEEEEE;
+  margin-bottom: 5px;
+}
+
+.trained-feedback-selection-container md-input-group.md-default-theme label {
+  border-bottom: 0;
+}
+
+.trained-feedback-selection {
+  background: none;
+  border: none;
+  color: rgba(0,0,0,0.5);
+  margin: 0;
+  padding-left: 0;
+  padding-top: 9px;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+
+.trained-feedback-selection:hover {
+  color: #00897B;
+
 /* Styles for gadget panels and editor. */
 
 .oppia-gadget-tile {
@@ -2021,36 +2135,17 @@ div#ng-curtain {
   font-weight: normal;
 }
 
-.oppia-right-editor-gadget-panel,
-.oppia-left-editor-gadget-panel,
 .oppia-bottom-editor-gadget-panel {
   border: 1px solid silver;
   color: #fff;
   padding: 4px;
   position: absolute;
-}
-
-.oppia-bottom-editor-gadget-panel {
   left: 37%;
   max-height: 135px;
   max-width: 400px;
   min-width: 150px;
   position: relative;
   top: 95%;
-}
-
-.oppia-right-editor-gadget-panel {
-  left: 50%;
-  margin-left: 355px;
-  top: 35px;
-  width: 150px;
-}
-
-.oppia-left-editor-gadget-panel {
-  margin-right: 355px;
-  right: 50%;
-  top: 35px;
-  width: 150px;
 }
 
 .oppia-gadget-delete-icon,

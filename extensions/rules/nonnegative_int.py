@@ -25,4 +25,4 @@ class Equals(base.NonnegativeIntRule):
     description = 'is equal to {{x|NonnegativeInt}}'
 
     def _evaluate(self, subject):
-        return subject == self.x
+        return self._fuzzify_truth_value(subject == self.x)
