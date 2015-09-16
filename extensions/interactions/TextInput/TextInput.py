@@ -45,8 +45,7 @@ class TextInput(base.BaseInteraction):
         'default_value': ''
     }, {
         'name': 'rows',
-        'description': (
-            'Number of rows'),
+        'description': 'Height (in rows)',
         'schema': {
             'type': 'int',
             'validators': [{

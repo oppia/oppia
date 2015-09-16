@@ -162,7 +162,7 @@
                    class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish Changes">
               <span class="hidden-sm hidden-xs">Publish Changes</span>
             </span>
-            <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+            <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
           </span>
           <span ng-if="isSaveInProgress">
             <span ng-if="isPrivate()">Saving...</span>
