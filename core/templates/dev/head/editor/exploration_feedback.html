@@ -139,7 +139,7 @@
                 <select ng-model="updatedStatus" ng-options="choice.id as choice.text for choice in STATUS_CHOICES"></select>
               </span>
               <br>
-              <button style="margin-top: 10px;" class="btn btn-success" ng-click="addMessage(currentThreadId, $parent.$parent.newMessageText, updatedStatus)" ng-disabled="isSendDisabled(updatedStatus)">
+              <button style="margin-top: 10px;" class="btn btn-success" ng-click="addMessage(currentThreadId, $parent.$parent.newMessageText, updatedStatus)" ng-disabled="isSendButtonDisabled($parent.$parent.newMessageText, updatedStatus)">
                 <span ng-if="messageSendingInProgress">Sending...</span>
                 <span ng-if="!messageSendingInProgress">Send</span>
               </button>
