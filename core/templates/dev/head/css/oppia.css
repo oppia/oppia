@@ -1011,7 +1011,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
-  height: 300px;
+  height: 400px;
   overflow-y: hidden;
   position: relative;
 }
@@ -1773,11 +1773,12 @@ div#ng-curtain {
 }
 
 .oppia-editor-sidebar {
+  max-width: 500px;
   padding: 7px 5px 0 5px;
   position: absolute;
   right: 15px;
   top: 28px;
-  width: 300px;
+  width: 100%;
 }
 .oppia-editor-sidebar accordion .panel {
   border-radius: 0;
