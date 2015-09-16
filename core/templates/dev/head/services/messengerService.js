@@ -79,6 +79,12 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
     EXPLORATION_RESET: 'explorationReset',
     EXPLORATION_COMPLETED: 'explorationCompleted',
     sendMessage: function(messageTitle, messageData) {
+      // TODO(sll): For the stateTransition and explorationCompleted events,
+      // we now send paramValues in the messageData. We should broadcast these
+      // to the parent page as well.
+      // TODO(sll): Delete/deprecate 'reset exploration' from the list of
+      // events sent to a container page.
+
       // Run each post-completion hook on exploration completion.
       if (messageTitle === 'explorationCompleted') {
         for (var i = 0; i < GLOBALS.POST_COMPLETION_HOOKS.length; i++) {

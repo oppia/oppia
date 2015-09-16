@@ -145,8 +145,6 @@ oppia.animation('.conversation-skin-animate-card-contents', function() {
 });
 
 
-// TODO(sll): delete/deprecate 'reset exploration' from the list of
-// events sent to a container page.
 oppia.directive('conversationSkin', [function() {
   return {
     restrict: 'E',
