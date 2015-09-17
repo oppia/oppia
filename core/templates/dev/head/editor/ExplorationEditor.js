@@ -454,7 +454,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   };
 
   $scope.saveChanges = function() {
-
     routerService.savePendingChanges();
 
     $scope.changeListSummaryUrl = (
