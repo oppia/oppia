@@ -454,15 +454,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   };
 
   $scope.saveChanges = function() {
-<<<<<<< HEAD
+    
     routerService.savePendingChanges();
-=======
-    $timeout(function() {
-      $scope.isSaveInProgress=true;
-      routerService.savePendingChanges();
-    },0);
->>>>>>> parent of f147c0d... Change button Save Draft to saving only when isSaveInProgress is equal to true
-
     $scope.changeListSummaryUrl = (
       '/createhandler/change_list_summary/' + explorationData.explorationId);
 
