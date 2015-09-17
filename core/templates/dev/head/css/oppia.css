@@ -53,8 +53,9 @@ md-input-group.md-default-theme label
   margin-bottom: 0;
 }
 
-.md-button-success {
-  color: #009688;
+.oppia-learner-continue-button {
+  color: #FFFFFF;
+  background-color: rgb(29, 59,164);
 }
 
 /* Bootstrap overrides and additions. */
