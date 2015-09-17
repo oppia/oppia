@@ -454,8 +454,13 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   };
 
   $scope.saveChanges = function() {
+<<<<<<< HEAD
     
     routerService.savePendingChanges();
+=======
+    routerService.savePendingChanges();
+
+>>>>>>> parent of 04aa127... prevent multiple modal from opening Fixes #762
     $scope.changeListSummaryUrl = (
       '/createhandler/change_list_summary/' + explorationData.explorationId);
 
