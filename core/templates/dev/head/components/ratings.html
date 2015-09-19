@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="rating/fromValue">
   <span style="<[getCursorStyle()]>" ng-mouseleave="leaveArea()">
-    <i ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="fa <[star.cssClass]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)"></i>
+    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="fa <[star.cssClass]>" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)"></span>
   </span>
 </script>
 
