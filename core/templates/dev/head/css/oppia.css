@@ -1121,12 +1121,16 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
+  background: none;
+  border: 0;
+  color: #000;
   cursor: pointer;
+  height: 20px;
   opacity: 0.5;
   position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 20px;
+  right: 8px;
+  top: 8px;
+  width: 30px;
 }
 .oppia-delete-response-button,
 .oppia-delete-rule-button {

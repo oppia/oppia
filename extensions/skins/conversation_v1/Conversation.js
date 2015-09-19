@@ -145,8 +145,6 @@ oppia.animation('.conversation-skin-animate-card-contents', function() {
 });
 
 
-// TODO(sll): delete/deprecate 'reset exploration' from the list of
-// events sent to a container page.
 oppia.directive('conversationSkin', [function() {
   return {
     restrict: 'E',
@@ -280,6 +278,8 @@ oppia.directive('conversationSkin', [function() {
         _recomputeAndResetPanels();
         if (_nextFocusLabel && index === $scope.transcript.length - 1) {
           focusService.setFocus(_nextFocusLabel);
+        } else {
+          focusService.setFocus($scope.activeCard.contentHtmlFocusLabel);
         }
       };
 
@@ -298,6 +298,7 @@ oppia.directive('conversationSkin', [function() {
         $scope.transcript.push({
           stateName: stateName,
           contentHtml: contentHtml,
+          contentHtmlFocusLabel: focusService.generateFocusLabel(),
           interactionHtml: interactionHtml,
           interactionIsInline: interactionIsInline,
           interactionIsDisabled: false,

@@ -6,7 +6,7 @@
     Off-screen preview of the next card in order to pre-determine the target
     height for the card content transition animation.
   -->
-  <md-card class="conversation-skin-tutor-card" style="position: absolute; left: -30000px; top: -30000px;">
+  <md-card class="conversation-skin-tutor-card" style="position: absolute; left: -30000px; top: -30000px;" aria-hidden="true">
     <div id="futurePreview">
       <div class="conversation-skin-tutor-card-top-section">
         <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
@@ -39,18 +39,20 @@
       <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
                ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': !activeCard.interactionIsInline && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
-          <span class="glyphicon glyphicon-comment conversation-skin-tutor-card-feedback-toggle"
-                popover-placement="<[getFeedbackPopoverPlacement()]>"
-                popover-template="popover/feedback" popover-trigger="click"
-                tooltip="Feedback" tooltip-placement="bottom"
-                state-name="<[activeCard.stateName]>">
-          </span>
+          <span class="sr-only">Leave feedback on this card</span>
+          <button class="conversation-skin-tutor-card-feedback-toggle"
+                  popover-placement="<[getFeedbackPopoverPlacement()]>"
+                  popover-template="popover/feedback" popover-trigger="click"
+                  tooltip="Feedback" tooltip-placement="bottom"
+                  state-name="<[activeCard.stateName]>">
+            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+          </button>
         </div>
 
         <div class="conversation-skin-animate-card-contents" ng-class="{'animate-card-change': startCardChangeAnimation}">
           <div class="conversation-skin-tutor-card-top-section">
-            <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
-            <div class="protractor-test-conversation-content" angular-html-bind="activeCard.contentHtml">
+            <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png" alt="">
+            <div class="protractor-test-conversation-content" angular-html-bind="activeCard.contentHtml" focus-on="<[activeCard.contentHtmlFocusLabel]>">
             </div>
           </div>
 
@@ -97,7 +99,7 @@
           -->
           <div ng-if="!waitingForOppiaFeedback && (activeCard.interactionHtml || waitingForContinueButtonClick) && currentProgressDotIndex === transcript.length - 1">
             <div class="conversation-skin-inline-interaction">
-              <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>">
+              <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>" alt="">
               <div ng-if="waitingForContinueButtonClick">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
@@ -148,7 +150,12 @@
   <div class="conversation-skin-card-switcher" ng-if="panels.length >= 2">
     <div class="conversation-skin-card-switcher-thumbnails-container">
       <span ng-repeat="panelName in panels">
-        <img class="conversation-skin-card-switcher-thumbnail img-circle" ng-src="<[getThumbnailSrc(panelName)]>" ng-click="setVisiblePanel(panelName)" ng-class="{'conversation-skin-card-switcher-thumbnail-active': isPanelVisible(panelName)}">
+        <a ng-click="setVisiblePanel(panelName)">
+          <img class="conversation-skin-card-switcher-thumbnail img-circle"
+               alt="<[panelName]>"
+               ng-src="<[getThumbnailSrc(panelName)]>"
+               ng-class="{'conversation-skin-card-switcher-thumbnail-active': isPanelVisible(panelName)}">
+        </a>
       </span>
     </div>
   </div>
@@ -156,7 +163,7 @@
 
 <script type="text/ng-template" id="components/answerFeedbackPair">
   <div class="conversation-skin-learner-answer-container">
-    <img class="conversation-skin-user-avatar" ng-src="<[profilePicture()]>">
+    <img class="conversation-skin-user-avatar" ng-src="<[profilePicture()]>" alt="">
     <div ng-if="shortAnswer()">
       <div popover-placement="bottom" popover-template="popover/answer" popover-trigger="click" style="cursor: pointer;">
         <div class="conversation-skin-learner-answer" angular-html-bind="shortAnswer()">
@@ -170,7 +177,7 @@
   </div>
 
   <div class="conversation-skin-oppia-feedback-container" ng-if="feedback() !== ''">
-    <img class="conversation-skin-oppia-avatar img-circle" src="/images/general/o_black_72px.png">
+    <img class="conversation-skin-oppia-avatar img-circle" src="/images/general/o_black_72px.png" alt="">
 
     <div class="conversation-skin-oppia-feedback">
       <div ng-if="feedback() === null">
