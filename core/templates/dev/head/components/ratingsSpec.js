@@ -48,7 +48,7 @@ describe('Ratings from value directive', function() {
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star');
-    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-half');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 1.7;
@@ -58,6 +58,30 @@ describe('Ratings from value directive', function() {
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o');
     expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o');
     expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
+
+    ctrlScope.ratingValue = 1.9;
+    scope.$digest();
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
+
+    ctrlScope.ratingValue = 2.25;
+    scope.$digest();
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-half');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
+
+    ctrlScope.ratingValue = 4.3;
+    scope.$digest();
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-half');
   });
 });
 
