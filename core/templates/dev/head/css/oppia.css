@@ -62,8 +62,9 @@ md-input-group.md-default-theme label
   background: rgb(29, 59, 164);
 }
 
-button.md-button.md-default-theme.oppia-learner-continue-button:focus {
-  background-color: rgb(29, 59, 164);
+button.md-button.md-default-theme.oppia-learner-continue-button:focus,
+button.md-button.md-default-theme.oppia-learner-continue-button:hover {
+  background-color: #115FD4;
 }
 
 /* Bootstrap overrides and additions. */
