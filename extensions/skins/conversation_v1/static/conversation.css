@@ -326,4 +326,31 @@ md-card.conversation-skin-supplemental-card {
   md-card.conversation-skin-tutor-card {
     width: 100%;
   }
+
+  /* 
+    This is needed to position avatars inside the card for small screen devices/
+    when card is 100% wide
+  */ 
+  .conversation-skin-initial-oppia-avatar,
+  .conversation-skin-oppia-avatar,
+  .conversation-skin-user-avatar {
+    left: 3px;
+  }
+
+  .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
+  .conversation-skin-tutor-card-bottom-section .conversation-skin-oppia-avatar,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+    left: -51px;
+  }
+  .conversation-skin-tutor-card-top-section {
+    padding: 36px 36px 24px 54px;
+  }
+  .conversation-skin-tutor-card-bottom-section,
+  .conversation-skin-tutor-card-middle-section {
+    padding: 0px 36px 2px 54px;
+  }
+  .conversation-skin-inline-interaction {
+    padding: 16px 36px 24px 54px;
+  }
 }
