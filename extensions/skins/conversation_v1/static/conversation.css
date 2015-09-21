@@ -328,13 +328,13 @@ md-card.conversation-skin-supplemental-card {
   }
 
   /* 
-    This is needed to position avatars inside the card when in small screen/
-    When card is 100% wide
+    This is needed to position avatars inside the card for small screen devices/
+    when card is 100% wide
   */ 
   .conversation-skin-initial-oppia-avatar,
   .conversation-skin-oppia-avatar,
-  .conversation-skin-user-avatar{
-    left:3px;
+  .conversation-skin-user-avatar {
+    left: 3px;
   }
 
   .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
