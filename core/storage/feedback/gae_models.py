@@ -264,7 +264,7 @@ class SuggestionModel(base_models.BaseModel):
         """
         instance_id = '.'.join([exploration_id, thread_id])
         if cls.get_by_id(instance_id):
-            raise Exception('There is already a feedback thread with the given'
+            raise Exception('There is already a feedback thread with the given '
                             'thread id: %s' % instance_id)
         return cls(id=instance_id, author_id=author_id,
                    exploration_id=exploration_id,
@@ -278,7 +278,8 @@ class SuggestionModel(base_models.BaseModel):
         exploration ID and an optional status.
 
         If no status is specified all suggestions matching the given
-        epxloration are returned.
+        epxloration are returned. Returns an empty list if there are no
+        matching suggestions.
         """
         all_suggestions_for_exploration = cls.get_all().filter(
             cls.exploration_id == exploration_id)

@@ -17,28 +17,46 @@
 __author__ = 'Shantanu Bhowmik'
 
 from core.platform import models
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(base_models, feedback_models)=models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.feedback])
 import test_utils
+
+
+CREATED_ON_FIELD = 'created_on'
 
 
 class SuggestionModelTest(test_utils.GenericTestBase):
     """Tests the SuggestionModel class."""
 
-    def load_suggestions(self):
-        feedback_models.SuggestionModel.create('exp_id', 'thread_id1',
+    def setUp(self):
+        super(SuggestionModelTest, self).setUp()
+        base_models.BaseModel.created_on._auto_now = False
+        base_models.BaseModel.last_updated._auto_now = False
+        feedback_models.SuggestionModel.create('exp_id1', 'thread_id1',
                                                'author_id', 1, 'state_name',
                                                {'old_content': {}})
-        feedback_models.SuggestionModel.create('exp_id', 'thread_id2',
+        feedback_models.SuggestionModel.create('exp_id1', 'thread_id2',
                                                'author_id', 1, 'state_name',
                                                {'old_content': {}},
                                                feedback_models.STATUS_ACCEPTED)
+        feedback_models.SuggestionModel.create('exp_id2', 'thread_id2',
+                                               'author_id', 1, 'state_name',
+                                               {'old_content': {}})
+
+    def get_suggestion_models_for_test(self, suggestions_list):
+        updated_suggestions_list = []
+        for suggestion in suggestions_list:
+            suggestion_dict = suggestion.to_dict()
+            if CREATED_ON_FIELD in suggestion_dict:
+                suggestion_dict.pop(CREATED_ON_FIELD)
+            updated_suggestions_list.append(suggestion_dict)
+        return updated_suggestions_list
 
     def test_create_success(self):
-        self.load_suggestions()        
-    
-        suggestion = feedback_models.SuggestionModel.get_all().fetch()[0]
+        suggestion = feedback_models.SuggestionModel.get_by_exp_id_and_status(
+            'exp_id1')[0]
  
-        self.assertEqual(suggestion.exploration_id, 'exp_id')
+        self.assertEqual(suggestion.exploration_id, 'exp_id1')
         self.assertEqual(suggestion.author_id, 'author_id')
         self.assertEqual(suggestion.exploration_version, 1)
         self.assertEqual(suggestion.state_name, 'state_name')
@@ -46,39 +64,61 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.status, feedback_models.STATUS_NEW)
 
     def test_create_failure(self):
-        self.load_suggestions()        
-
-        with self.assertRaises(Exception):
-            feedback_models.SuggestionModel.create('exp_id', 
+        with self.assertRaisesRegexp(Exception, 'There is already a feedback '
+                                     'thread with the given thread id: '
+                                     'exp_id1.thread_id1'):
+            feedback_models.SuggestionModel.create('exp_id1', 
                                                    'thread_id1', 'author_id', 1, 
                                                    'state_name', 
                                                    {'old_content': {}})
 
     def test_get_by_exp_id_and_status_status_set(self):
-        self.load_suggestions() 
-
-        expected_suggestions = (feedback_models.SuggestionModel.get_all().filter(
-            feedback_models.SuggestionModel.status == 
-            feedback_models.STATUS_ACCEPTED).fetch())
+        expected_suggestions = [feedback_models.SuggestionModel(
+            id='exp_id1.thread_id2',
+            author_id=u'author_id',
+            deleted=False,
+            exploration_id=u'exp_id1',
+            exploration_version=1,
+            state_name=u'state_name',
+            state_content={u'old_content': {}},
+            status=u'accepted')]
         actual_suggestions = (feedback_models.SuggestionModel
-            .get_by_exp_id_and_status('exp_id', 
+            .get_by_exp_id_and_status('exp_id1', 
                                       feedback_models.STATUS_ACCEPTED))
         
-        self.assertEqual(expected_suggestions, actual_suggestions)
+        self.assertEqual(self.get_suggestion_models_for_test(
+            expected_suggestions),
+                         self.get_suggestion_models_for_test(
+            actual_suggestions))
 
     def test_get_by_exp_id_and_status_status_not_set(self):
-        self.load_suggestions() 
-
-        expected_suggestions = feedback_models.SuggestionModel.get_all().fetch()
+        expected_suggestions = [feedback_models.SuggestionModel(
+            id='exp_id1.thread_id1',
+            author_id=u'author_id',
+            deleted=False,
+            exploration_id=u'exp_id1',
+            exploration_version=1,
+            state_name=u'state_name',
+            state_content={u'old_content': {}},
+            status=u'new'), feedback_models.SuggestionModel(
+            id='exp_id1.thread_id2',
+            author_id=u'author_id',
+            deleted=False,
+            exploration_id=u'exp_id1',
+            exploration_version=1,
+            state_name=u'state_name',
+            state_content={u'old_content': {}},
+            status=u'accepted')]
         actual_suggestions = (feedback_models.SuggestionModel
-            .get_by_exp_id_and_status('exp_id'))
+            .get_by_exp_id_and_status('exp_id1'))
 
-        self.assertEqual(expected_suggestions, actual_suggestions)
+        self.assertEqual(self.get_suggestion_models_for_test(
+            expected_suggestions),
+                         self.get_suggestion_models_for_test(
+            actual_suggestions))
 
     def test_get_by_exp_id_and_status_empty_list(self):
-        self.load_suggestions() 
-
         actual_suggestions = (feedback_models.SuggestionModel
-            .get_by_exp_id_and_status('exp_id2'))
+            .get_by_exp_id_and_status('exp_id3'))
 
         self.assertEqual([], actual_suggestions)
