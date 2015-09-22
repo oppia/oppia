@@ -44,8 +44,6 @@ class ScoreBar(base.BaseGadget):
         },
         'default_value': 100
     }, {
-        # TODO(anuzis): Validate that the paramName corresponds to a valid
-        # parameter name in the exploration.
         'name': 'paramName',
         'description': 'The parameter name this score bar follows.',
         'schema': {
