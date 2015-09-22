@@ -71,7 +71,8 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.exploration_version, 1)
         self.assertEqual(suggestion.state_name, 'state_name')
         self.assertEqual(suggestion.state_content, {'old_content': {}})
-        self.assertEqual(suggestion.status, feedback_models.SUGGESTION_STATUS_NEW)
+        self.assertEqual(suggestion.status, 
+                         feedback_models.SUGGESTION_STATUS_NEW)
 
     def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
         with self.assertRaisesRegexp(Exception, 'There is already a feedback '
