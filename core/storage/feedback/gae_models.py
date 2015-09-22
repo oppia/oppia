@@ -25,6 +25,7 @@ import utils
 
 from google.appengine.ext import ndb
 
+# Alloed feedback thread statuses.
 STATUS_CHOICES_OPEN = 'open'
 STATUS_CHOICES_FIXED = 'fixed'
 STATUS_CHOICES_IGNORED = 'ignored'
@@ -37,6 +38,10 @@ STATUS_CHOICES = [
     STATUS_CHOICES_COMPLIMENT,
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
+# Allowed suggestion statuses.
+STATUS_NEW = 'new'
+STATUS_ACCEPTED = 'accepted'
+STATUS_REJECTED = 'rejected'
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -227,11 +232,6 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         ).put()
 
 
-STATUS_NEW = 'new'
-STATUS_ACCEPTED = 'accepted'
-STATUS_REJECTED = 'rejected'
-
-
 class SuggestionModel(base_models.BaseModel):
     """Suggestions made by learners.
     
@@ -278,7 +278,7 @@ class SuggestionModel(base_models.BaseModel):
         exploration ID and an optional status.
 
         If no status is specified all suggestions matching the given
-        epxloration are returned. Returns an empty list if there are no
+        exploration are returned. Returns an empty list if there are no
         matching suggestions.
         """
         all_suggestions_for_exploration = cls.get_all().filter(

@@ -17,12 +17,14 @@
 __author__ = 'Shantanu Bhowmik'
 
 from core.platform import models
-(base_models, feedback_models)=models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.feedback])
+(feedback_models,)=models.Registry.import_models([models.NAMES.feedback])
 import test_utils
 
 
 CREATED_ON_FIELD = 'created_on'
+LAST_UPDATED_FIELD = 'last_updated'
+DELETED_FIELD = 'deleted'
+FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 
 
 class SuggestionModelTest(test_utils.GenericTestBase):
@@ -30,8 +32,6 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SuggestionModelTest, self).setUp()
-        base_models.BaseModel.created_on._auto_now = False
-        base_models.BaseModel.last_updated._auto_now = False
         feedback_models.SuggestionModel.create('exp_id1', 'thread_id1',
                                                'author_id', 1, 'state_name',
                                                {'old_content': {}})
@@ -43,19 +43,25 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                                                'author_id', 1, 'state_name',
                                                {'old_content': {}})
 
-    def get_suggestion_models_for_test(self, suggestions_list):
+    def _get_suggestion_models_for_test(self, suggestions_list):
+        """Removes fields that are set to default values in the base model and
+        are thus missing from the stubs."""
+
         updated_suggestions_list = []
         for suggestion in suggestions_list:
             suggestion_dict = suggestion.to_dict()
-            if CREATED_ON_FIELD in suggestion_dict:
-                suggestion_dict.pop(CREATED_ON_FIELD)
+            for field in FIELDS_NOT_REQUIRED: 
+                if field in suggestion_dict:
+                    suggestion_dict.pop(field)
             updated_suggestions_list.append(suggestion_dict)
         return updated_suggestions_list
 
     def test_create_success(self):
-        suggestion = feedback_models.SuggestionModel.get_by_exp_id_and_status(
-            'exp_id1')[0]
- 
+        suggestions = feedback_models.SuggestionModel.get_by_exp_id_and_status(
+            'exp_id1')
+        suggestion = suggestions[0]
+
+        self.assertEqual(len(suggestions), 2) 
         self.assertEqual(suggestion.exploration_id, 'exp_id1')
         self.assertEqual(suggestion.author_id, 'author_id')
         self.assertEqual(suggestion.exploration_version, 1)
@@ -63,7 +69,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.state_content, {'old_content': {}})
         self.assertEqual(suggestion.status, feedback_models.STATUS_NEW)
 
-    def test_create_failure(self):
+    def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
         with self.assertRaisesRegexp(Exception, 'There is already a feedback '
                                      'thread with the given thread id: '
                                      'exp_id1.thread_id1'):
@@ -75,47 +81,42 @@ class SuggestionModelTest(test_utils.GenericTestBase):
     def test_get_by_exp_id_and_status_status_set(self):
         expected_suggestions = [feedback_models.SuggestionModel(
             id='exp_id1.thread_id2',
-            author_id=u'author_id',
-            deleted=False,
-            exploration_id=u'exp_id1',
+            author_id='author_id',
+            exploration_id='exp_id1',
             exploration_version=1,
-            state_name=u'state_name',
-            state_content={u'old_content': {}},
-            status=u'accepted')]
-        actual_suggestions = (feedback_models.SuggestionModel
-            .get_by_exp_id_and_status('exp_id1', 
-                                      feedback_models.STATUS_ACCEPTED))
+            state_name='state_name',
+            state_content={'old_content': {}},
+            status='accepted')]
+        actual_suggestions = (
+            feedback_models.SuggestionModel.get_by_exp_id_and_status(
+                'exp_id1', status=feedback_models.STATUS_ACCEPTED))
         
-        self.assertEqual(self.get_suggestion_models_for_test(
-            expected_suggestions),
-                         self.get_suggestion_models_for_test(
-            actual_suggestions))
+        self.assertEqual(
+            self._get_suggestion_models_for_test(expected_suggestions),
+            self._get_suggestion_models_for_test(actual_suggestions))
 
     def test_get_by_exp_id_and_status_status_not_set(self):
         expected_suggestions = [feedback_models.SuggestionModel(
             id='exp_id1.thread_id1',
-            author_id=u'author_id',
-            deleted=False,
-            exploration_id=u'exp_id1',
+            author_id='author_id',
+            exploration_id='exp_id1',
             exploration_version=1,
-            state_name=u'state_name',
-            state_content={u'old_content': {}},
-            status=u'new'), feedback_models.SuggestionModel(
+            state_name='state_name',
+            state_content={'old_content': {}},
+            status='new'), feedback_models.SuggestionModel(
             id='exp_id1.thread_id2',
-            author_id=u'author_id',
-            deleted=False,
-            exploration_id=u'exp_id1',
+            author_id='author_id',
+            exploration_id='exp_id1',
             exploration_version=1,
-            state_name=u'state_name',
-            state_content={u'old_content': {}},
-            status=u'accepted')]
+            state_name='state_name',
+            state_content={'old_content': {}},
+            status='accepted')]
         actual_suggestions = (feedback_models.SuggestionModel
             .get_by_exp_id_and_status('exp_id1'))
 
-        self.assertEqual(self.get_suggestion_models_for_test(
-            expected_suggestions),
-                         self.get_suggestion_models_for_test(
-            actual_suggestions))
+        self.assertEqual(
+            self._get_suggestion_models_for_test(expected_suggestions),
+            self._get_suggestion_models_for_test(actual_suggestions))
 
     def test_get_by_exp_id_and_status_empty_list(self):
         actual_suggestions = (feedback_models.SuggestionModel
