@@ -27,7 +27,10 @@
   <div class="row text-input-container">
     <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <input type="text" ng-model="answer" class="form-control" placeholder="Type answer here">
+        <input ng-hide="rows > 1" type="text" ng-model="answer" class="form-control" placeholder="{{placeholder}}" autofocus/>
+      <div ng-show="rows > 1">
+        <schema-based-editor schema="schema" local-value="answer" label-for-focus-target="labelForFocusTarget">
+      </div>
       </div>
       <div ng-show="rows > 1">
         <button type="submit" class="btn btn-default" style="margin-top: 15px; margin-left: 16px;">
