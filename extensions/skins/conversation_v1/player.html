@@ -202,6 +202,21 @@
         margin-left: 0;
       }
     }
+    @-webkit-keyframes oppia-animate-bounce-dot  {
+      0% { -webkit-transform: scale(1); }
+      50% { -webkit-transform: scale(0.9); }
+      0% { -webkit-transform: scale(1); }
+    }
+    @-moz-keyframes oppia-animate-bounce-dot  {
+      0% { -webkit-transform: scale(1); }
+      50% { -webkit-transform: scale(0.9); }
+      0% { -webkit-transform: scale(1); }
+    }
+    @-o-keyframes oppia-animate-bounce-dot  {
+      0% { -webkit-transform: scale(1); }
+      50% { -webkit-transform: scale(0.9); }
+      0% { -webkit-transform: scale(1); }
+    }
 
     .oppia-progress-arrow {
       color: #ccc;
@@ -230,6 +245,26 @@
       background-color: #ccc;
       cursor: pointer;
     }
+    .oppia-progress-dot-gradient-left{
+      background: -webkit-linear-gradient(left,#fff,#ccc);
+      background: -o-linear-gradient(left,#fff, #ccc);
+      background: -moz-linear-gradient(left,#fff, #ccc);
+      background: linear-gradient(left,#fff, #ccc);
+      animation:oppia-animate-bounce-dot 1s linear 0s infinite ;
+      -moz-animation: oppia-animate-bounce-dot 1s linear 0s infinite ; /* Firefox */
+      -webkit-animation: oppia-animate-bounce-dot 1s linear 0s infinite ; /* Safari and Chrome */
+      -o-animation: oppia-animate-bounce-dot 1s linear 0s infinite ; /* Opera */
+    }
+    .oppia-progress-dot-gradient-right{
+      background: -webkit-linear-gradient(right,#fff,#ccc);
+      background: -o-linear-gradient(right,#fff, #ccc);
+      background: -moz-linear-gradient(right,#fff, #ccc);
+      background: linear-gradient(right,#fff, #ccc);
+      -moz-animation: oppia-animate-bounce-dot 1s linear 0s infinite ; /* Firefox */
+      -webkit-animation: oppia-animate-bounce-dot 1s linear 0s infinite ; /* Safari and Chrome */
+      -o-animation: oppia-animate-bounce-dot 1s linear 0s infinite ; /* Opera */
+    }
+
 
     .oppia-progress-dot-list {
       list-style-type: none;
@@ -241,6 +276,10 @@
 
     .oppia-animate-progress-dot {
       display: inline-block;
+      vertical-align: middle;
+    }
+    .oppia-animate-progress-dot-hidden {
+      display: none;
       vertical-align: middle;
     }
     .oppia-animate-progress-dot.ng-enter {
@@ -258,11 +297,13 @@
       <span class=" glyphicon glyphicon-arrow-left">
       </span>
     </li>
-    <li ng-repeat="dot in dots track by $index" class="oppia-animate-progress-dot">
+    <li ng-repeat="dot in dots | sliceDots:currentDotIndex  track by $index"
+        ng-class="dot.isVisible ? 'oppia-animate-progress-dot': 'oppia-animate-progress-dot-hidden'">
       <span class="oppia-progress-dot oppia-progress-dot-active"
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
       </span>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
+            ng-class="'oppia-progress-dot-gradient-'+ dot.hiddindDotsPosition"
             ng-if="$index !== currentDotIndex"
             ng-click="changeActiveDot($index)">
       </span>

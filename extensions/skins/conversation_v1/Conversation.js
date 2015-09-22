@@ -646,3 +646,41 @@ oppia.directive('progressDots', [function() {
     }]
   };
 }]);
+oppia.filter('sliceDots', function() {
+
+  return function(input, currentDotIndex) {
+    var _maximumNumberOfDotsShown = 18;
+    var _numberOfDots = input.length;
+    angular.forEach(input,function(value,key) {
+      value.isVisible = false;
+      value.hiddindDotsPosition = null;
+    });
+
+   if(_numberOfDots > _maximumNumberOfDotsShown) {
+
+    if(currentDotIndex < _numberOfDots - _maximumNumberOfDotsShown) {
+        var last = currentDotIndex+ _maximumNumberOfDotsShown;
+        for(var i = currentDotIndex; i<last; i++) {
+          input[i].isVisible = true;
+        }
+        input[last-1].hiddindDotsPosition = 'right';
+      } else {
+
+        var _start = _numberOfDots - _maximumNumberOfDotsShown
+        for(var i=_start; i<_numberOfDots;  i++) {
+          input[i].isVisible = true;
+        }
+        if(_start !== currentDotIndex ) {
+          input[_start].hiddindDotsPosition = 'left';
+        }
+      }
+      return input;
+    } else {
+
+      angular.forEach(input,function(value,key) {
+        value.isVisible = true;
+      });
+      return input;
+    }
+  };
+});
