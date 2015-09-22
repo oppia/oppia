@@ -25,7 +25,7 @@ import utils
 
 from google.appengine.ext import ndb
 
-# Alloed feedback thread statuses.
+# Allowed feedback thread statuses.
 STATUS_CHOICES_OPEN = 'open'
 STATUS_CHOICES_FIXED = 'fixed'
 STATUS_CHOICES_IGNORED = 'ignored'
@@ -39,9 +39,9 @@ STATUS_CHOICES = [
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
 # Allowed suggestion statuses.
-STATUS_NEW = 'new'
-STATUS_ACCEPTED = 'accepted'
-STATUS_REJECTED = 'rejected'
+SUGGESTION_STATUS_NEW = 'new'
+SUGGESTION_STATUS_ACCEPTED = 'accepted'
+SUGGESTION_STATUS_REJECTED = 'rejected'
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -248,15 +248,15 @@ class SuggestionModel(base_models.BaseModel):
     state_name = ndb.StringProperty(required=True, indexed=True)
     # Current status of the suggestion.
     status = ndb.StringProperty(indexed=True,
-                                choices=[STATUS_NEW,
-                                         STATUS_ACCEPTED,
-                                         STATUS_REJECTED],
+                                choices=[SUGGESTION_STATUS_NEW,
+                                         SUGGESTION_STATUS_ACCEPTED,
+                                         SUGGESTION_STATUS_REJECTED],
                                 required=True)
     state_content = ndb.JsonProperty(required=True, indexed=False)
 
     @classmethod
     def create(cls, exploration_id, thread_id, author_id, exploration_version,
-               state_name, state_content, status=STATUS_NEW):
+               state_name, state_content, status=SUGGESTION_STATUS_NEW):
         """Creates a new SuggestionModel entry.
 
         Throws an exception if a suggestion with the given thread id already
@@ -288,4 +288,4 @@ class SuggestionModel(base_models.BaseModel):
                 feconf.DEFAULT_QUERY_LIMIT)
         else:
             return all_suggestions_for_exploration.filter(
-               cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
