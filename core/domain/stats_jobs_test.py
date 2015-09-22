@@ -90,19 +90,22 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id = 'eid'
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
             time.sleep(1)
-            stats_jobs._STATE_COUNTER_CUTOFF_DATE = datetime.datetime.now()
+            stats_jobs._STATE_COUNTER_CUTOFF_DATE = datetime.datetime.utcnow()
             original_init_state = exploration.init_state_name
-            state = 'New init state'
-            exploration.rename_state(original_init_state, state)
+            new_init_state_name = 'New init state'
+            exploration.rename_state(original_init_state, new_init_state_name)
             exp_services._save_exploration('owner', exploration, '', [])
             exp_version = 2
-            state2 = 'sid2'
+            state2_name = 'sid2'
 
-            self._record_state_hit(exp_id, exp_version, state, 'session1')
-            self._record_state_hit(exp_id, exp_version, state, 'session2')
+            self._record_state_hit(
+                exp_id, exp_version, new_init_state_name, 'session1')
+            self._record_state_hit(
+                exp_id, exp_version, new_init_state_name, 'session2')
             self._create_state_counter(exp_id, original_init_state, 18)
-            self._record_state_hit(exp_id, exp_version, state2, 'session1')
-            self._create_state_counter(exp_id, state2, 9)
+            self._record_state_hit(
+                exp_id, exp_version, state2_name, 'session1')
+            self._create_state_counter(exp_id, state2_name, 9)
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -111,23 +114,28 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, exp_version)['state_hit_counts']
-            self.assertEqual(state_hit_counts[state]['first_entry_count'], 2)
-            self.assertEqual(state_hit_counts[state2]['first_entry_count'], 1)
+            self.assertEqual(
+                state_hit_counts[new_init_state_name]['first_entry_count'], 2)
+            self.assertEqual(
+                state_hit_counts[state2_name]['first_entry_count'], 1)
 
             output_model = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
             state_hit_counts = output_model['state_hit_counts']
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
-            self.assertEqual(state_hit_counts[state2]['first_entry_count'], 9)
+            self.assertEqual(
+                state_hit_counts[state2_name]['first_entry_count'], 9)
             self.assertEqual(output_model['start_exploration_count'], 18)
 
             state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._ALL_VERSIONS_STRING)['state_hit_counts']
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
-            self.assertEqual(state_hit_counts[state]['first_entry_count'], 2)
-            self.assertEqual(state_hit_counts[state2]['first_entry_count'], 10)
+            self.assertEqual(
+                state_hit_counts[new_init_state_name]['first_entry_count'], 2)
+            self.assertEqual(
+                state_hit_counts[state2_name]['first_entry_count'], 10)
 
     def test_no_completion(self):
         with self.swap(
