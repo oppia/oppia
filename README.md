@@ -4,8 +4,11 @@ Oppia is an online learning tool that enables anyone to easily create and share 
 
 Oppia is written using Python and AngularJS, and is built on top of Google App Engine.
 
-  * Community site: [Oppia.org](https://www.oppia.org)
-  * Full user documentation: [oppia.github.io](https://oppia.github.io/)
+  * [Oppia.org community site](https://www.oppia.org)
+  * [Documentation](https://oppia.github.io/)
+  * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
+  * [Developer mailing list](http://groups.google.com/group/oppia-dev)
+  * [File an issue](https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!)
 
 <p align="center">
   <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank">
@@ -58,3 +61,11 @@ Please report security issues directly to admin@oppia.org.
 ## License
 
 The Oppia code is released under the [Apache v2 license](https://github.com/oppia/oppia/blob/master/LICENSE).
+
+
+## Keeping in touch
+
+  * [Blog](https://oppiablog.blogspot.com/)
+  * [Discussion forum](http://groups.google.com/group/oppia)
+  * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
+  * Social media: [G+](https://plus.google.com/109898456505810251700/about), [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)

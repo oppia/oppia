@@ -43,5 +43,11 @@ describe('Base controller', function() {
       var isEmpty = scope.isEmpty(b);
       expect(isEmpty).toEqual(true);
     });
+
+    it('should have matching fuzzy rule constants',
+        inject(function($injector) {
+      expect($injector.get('DEFAULT_FUZZY_RULE').rule_type).toEqual(
+        $injector.get('FUZZY_RULE_TYPE'));
+    }));
   });
 });
