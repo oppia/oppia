@@ -653,7 +653,7 @@ oppia.filter('sliceDots', function() {
     var _numberOfDots = input.length;
     angular.forEach(input,function(value,key) {
       value.isVisible = false;
-      value.hiddindDotsPosition = null;
+      value.hidingDotsStartingPosition = null;
     });
 
    if(_numberOfDots > _maximumNumberOfDotsShown) {
@@ -663,7 +663,7 @@ oppia.filter('sliceDots', function() {
         for(var i = currentDotIndex; i<last; i++) {
           input[i].isVisible = true;
         }
-        input[last-1].hiddindDotsPosition = 'right';
+        input[last-1].hidingDotsStartingPosition = 'right';
       } else {
 
         var _start = _numberOfDots - _maximumNumberOfDotsShown
@@ -671,7 +671,7 @@ oppia.filter('sliceDots', function() {
           input[i].isVisible = true;
         }
         if(_start !== currentDotIndex ) {
-          input[_start].hiddindDotsPosition = 'left';
+          input[_start].hidingDotsStartingPosition = 'left';
         }
       }
       return input;

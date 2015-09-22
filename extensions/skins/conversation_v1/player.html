@@ -303,7 +303,7 @@
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
       </span>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
-            ng-class="'oppia-progress-dot-gradient-'+ dot.hiddindDotsPosition"
+            ng-class="'oppia-progress-dot-gradient-'+ dot.hidingDotsStartingPosition"
             ng-if="$index !== currentDotIndex"
             ng-click="changeActiveDot($index)">
       </span>
