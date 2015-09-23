@@ -1,31 +1,54 @@
 <style>
   .multiple-choice-form-container {
-    margin-top: -5px;
-  }
-
-  .multiple-choice-option-container {
-    border-bottom: thin solid #EEEEEE;
-    margin-bottom: 5px;
-  }
-
-  .multiple-choice-option-container md-input-group.md-default-theme label {
-    border-bottom: 0px;
+    margin-top: 0px;
   }
 
   .multiple-choice-option {
     background: none;
     border: none;
-    color: rgba(0,0,0,0.5);
+    color: #0D48A1;
     margin: 0;
     padding-left: 0;
-    padding-top: 9px;
+    padding-top: 15px;
     text-align: left;
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
 
   .multiple-choice-option:hover {
-    color: #00897B;
+    color: #115FD4;
+  }
+
+  .multiple-choice-option:hover .inner-radio-button {
+    width: 8px;
+    height: 8px;
+    background-color: #115FD4;
+    border-radius: 50%;
+    display: block;
+    margin: 2px;
+  }
+
+  .multiple-choice-option:hover .outer-radio-button {
+    border-color: #115FD4;
+  }
+
+  .multiple-choice-option-container {
+    margin-bottom: 5px;
+  }
+
+  .multiple-choice-radio-container {
+    padding-right: 5px;
+    display: inline-block;
+  }
+
+  .outer-radio-button {
+    width: 16px;
+    height: 16px;
+    display: block;
+    float: left;
+    border: 2px solid #0D48A1;
+    border-radius: 50%;
+    margin-bottom: -2px;
   }
 </style>
 
@@ -34,6 +57,11 @@
     <form ng-submit="submitAnswer(answer)">
       <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
         <button class="multiple-choice-option" ng-click="submitAnswer($index)">
+          <div class="multiple-choice-radio-container">
+            <span class="outer-radio-button">
+              <span class="inner-radio-button"></span>
+            </span>
+          </div>
           <span angular-html-bind="choice"></span>
         </button>
       </div>
