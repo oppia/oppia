@@ -647,7 +647,7 @@ oppia.directive('progressDots', [function() {
         }
       };
 
-      /* This is need to watch any change for both number of dots and currentDot. */
+      /* This is needed to watch any change for both number of dots and currentDotIndex. */
       $scope.$watchGroup(['dots', 'currentDotIndex'], function(oldValue, newValue) {
         if(newValue !== oldValue) {
           if($scope.dots.length > $scope.MAX_DOTS) {
