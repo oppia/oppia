@@ -131,9 +131,9 @@ md-card.conversation-skin-tutor-card {
 .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
   left: -56px;
-  top: -7px;
-  /* This is needed to prevent overlapping of avatars*/
+  /* This is needed to prevent overlapping of avatars. */
   margin-top: 10px;
+  top: -7px;
 }
 
 .conversation-skin-interaction-clickable-instructions {
@@ -143,9 +143,9 @@ md-card.conversation-skin-tutor-card {
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
   margin-bottom: 30px;
-  position: relative;
-  /* This is needed to align content in-line with avatars*/
+  /* This is needed to align content in-line with avatars. */
   padding-top: 10px;
+  position: relative;
 }
 
 .conversation-skin-tutor-card-feedback-toggle-container {

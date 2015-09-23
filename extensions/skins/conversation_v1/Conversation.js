@@ -605,7 +605,10 @@ oppia.directive('progressDots', [function() {
     templateUrl: 'components/progressDots',
     controller: ['$scope', function($scope) {
 
+      $scope.MAX_DOTS = 4;
       $scope.dots = [];
+      $scope.currentDotIndex = null;
+
       var initialDotCount = $scope.getNumDots();
       for (var i = 0; i < initialDotCount; i++) {
         $scope.dots.push({});
@@ -643,44 +646,25 @@ oppia.directive('progressDots', [function() {
           $scope.changeActiveDot($scope.currentDotIndex + 1);
         }
       };
+
+      /* This is need to watch any change for both number of dots and currentDot. */
+      $scope.$watchGroup(['dots', 'currentDotIndex'], function(oldValue, newValue) {
+        if(newValue !== oldValue) {
+          if($scope.dots.length > $scope.MAX_DOTS) {
+            if($scope.currentDotIndex < $scope.dots.length - $scope.MAX_DOTS) {
+              $scope.leftmostVisibleDotIndex = $scope.currentDotIndex;
+              $scope.rightmostVisibleDotIndex = $scope.leftmostVisibleDotIndex + $scope.MAX_DOTS;
+            } else {
+              $scope.leftmostVisibleDotIndex = $scope.dots.length - $scope.MAX_DOTS;
+              $scope.rightmostVisibleDotIndex = $scope.dots.length;
+            }
+          } else{
+            $scope.leftmostVisibleDotIndex = 0;
+            $scope.rightmostVisibleDotIndex = $scope.MAX_DOTS;
+          }
+        }
+      });
+
     }]
   };
 }]);
-oppia.filter('sliceDots', function() {
-
-  return function(input, currentDotIndex) {
-    var _maximumNumberOfDotsShown = 18;
-    var _numberOfDots = input.length;
-    angular.forEach(input,function(value,key) {
-      value.isVisible = false;
-      value.hidingDotsStartingPosition = null;
-    });
-
-   if(_numberOfDots > _maximumNumberOfDotsShown) {
-
-    if(currentDotIndex < _numberOfDots - _maximumNumberOfDotsShown) {
-        var last = currentDotIndex+ _maximumNumberOfDotsShown;
-        for(var i = currentDotIndex; i<last; i++) {
-          input[i].isVisible = true;
-        }
-        input[last-1].hidingDotsStartingPosition = 'right';
-      } else {
-
-        var _start = _numberOfDots - _maximumNumberOfDotsShown
-        for(var i=_start; i<_numberOfDots;  i++) {
-          input[i].isVisible = true;
-        }
-        if(_start !== currentDotIndex ) {
-          input[_start].hidingDotsStartingPosition = 'left';
-        }
-      }
-      return input;
-    } else {
-
-      angular.forEach(input,function(value,key) {
-        value.isVisible = true;
-      });
-      return input;
-    }
-  };
-});
