@@ -27,6 +27,16 @@
   .multiple-choice-option:hover {
     color: #00897B;
   }
+
+  .radio{
+    line-height: 49px;
+    display: inline-block;
+    height: 13px;
+    width: 13px;
+    border: 2px solid black;
+    border-radius: 50%;
+    margin: 15px 9px 0px 10px;
+  }
 </style>
 
 <script type="text/ng-template" id="interaction/MultipleChoiceInput">
@@ -34,6 +44,7 @@
     <form ng-submit="submitAnswer(answer)">
       <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
         <button class="multiple-choice-option" ng-click="submitAnswer($index)">
+          <span class="radio"></span>
           <span angular-html-bind="choice"></span>
         </button>
       </div>
