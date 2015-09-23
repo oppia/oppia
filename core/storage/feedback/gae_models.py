@@ -25,6 +25,7 @@ import utils
 
 from google.appengine.ext import ndb
 
+# Allowed feedback thread statuses.
 STATUS_CHOICES_OPEN = 'open'
 STATUS_CHOICES_FIXED = 'fixed'
 STATUS_CHOICES_IGNORED = 'ignored'
@@ -37,6 +38,10 @@ STATUS_CHOICES = [
     STATUS_CHOICES_COMPLIMENT,
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
+# Allowed suggestion statuses.
+SUGGESTION_STATUS_NEW = 'new'
+SUGGESTION_STATUS_ACCEPTED = 'accepted'
+SUGGESTION_STATUS_REJECTED = 'rejected'
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -64,6 +69,8 @@ class FeedbackThreadModel(base_models.BaseModel):
     subject = ndb.StringProperty(indexed=False)
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
+    # Specifies whether this thread has a related learner suggestion.
+    has_suggestion = ndb.BooleanProperty(indexed=False, default=False)
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
@@ -223,3 +230,62 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             num_open_threads=num_open_threads,
             num_total_threads=num_total_threads
         ).put()
+
+
+class SuggestionModel(base_models.BaseModel):
+    """Suggestions made by learners.
+    
+    The id of each instance is the id of the corresponding thread. 
+    """ 
+
+    # ID of the user who submitted the suggestion.
+    author_id = ndb.StringProperty(required=True, indexed=True)
+    # ID of the corresponding exploration.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration version for which the suggestion was made.
+    exploration_version = ndb.IntegerProperty(required=True, indexed=True)
+    # Name of the corresponding state.
+    state_name = ndb.StringProperty(required=True, indexed=True)
+    # Current status of the suggestion.
+    status = ndb.StringProperty(indexed=True,
+                                choices=[SUGGESTION_STATUS_NEW,
+                                         SUGGESTION_STATUS_ACCEPTED,
+                                         SUGGESTION_STATUS_REJECTED],
+                                required=True)
+    state_content = ndb.JsonProperty(required=True, indexed=False)
+
+    @classmethod
+    def create(cls, exploration_id, thread_id, author_id, exploration_version,
+               state_name, state_content, status=SUGGESTION_STATUS_NEW):
+        """Creates a new SuggestionModel entry.
+
+        Throws an exception if a suggestion with the given thread id already
+        exists.
+        """
+        instance_id = '.'.join([exploration_id, thread_id])
+        if cls.get_by_id(instance_id):
+            raise Exception('There is already a feedback thread with the given '
+                            'thread id: %s' % instance_id)
+        return cls(id=instance_id, author_id=author_id,
+                   exploration_id=exploration_id,
+                   exploration_version=exploration_version,
+                   state_name=state_name, status=status,
+                   state_content=state_content).put()
+
+    @classmethod
+    def get_by_exp_id_and_status(cls, exploration_id, status=None):
+        """Gets a list of SuggestionModel objects matching the given
+        exploration ID and an optional status.
+
+        If no status is specified all suggestions matching the given
+        exploration are returned. Returns an empty list if there are no
+        matching suggestions.
+        """
+        all_suggestions_for_exploration = cls.get_all().filter(
+            cls.exploration_id == exploration_id)
+        if status is None:
+            return all_suggestions_for_exploration.fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
+        else:
+            return all_suggestions_for_exploration.filter(
+                cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
