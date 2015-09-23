@@ -605,7 +605,7 @@ oppia.directive('progressDots', [function() {
     templateUrl: 'components/progressDots',
     controller: ['$scope', function($scope) {
 
-      $scope.MAX_DOTS = 4;
+      $scope.MAX_DOTS = 18;
       $scope.dots = [];
       $scope.currentDotIndex = null;
 
