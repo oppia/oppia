@@ -1,10 +1,10 @@
 <style>
-  /* The following is needed so that the radio button does not show */
-  input[type="radio"] {
+  /* The following is needed so that the radio button does not show. */
+  .item-selection-input-radio-button {
     display: none;
   }
 
-  md-checkbox {
+  .item-selection-input-checkbox {
     margin: 5px;
   }
 
@@ -34,41 +34,46 @@
   .item-selection-input-item:hover {
     color: #00897B;
   }
-
 </style>
 
 <script type="text/ng-template" id="interaction/ItemSelectionInput">
   <div class="item-selection-input-form-container">
     <form ng-submit="submitAnswer()">
       <div class="item-selection-input-container" ng-repeat="choice in choices">
-        <label class="item-selection-input-item" ng-switch="displayCheckboxes">
-          <div ng-switch-when="true">
-            <md-checkbox ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
+        <label class="item-selection-input-item">
+          <div ng-if="displayCheckboxes">
+            <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
               ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" aria-label="choice">
               <span angular-html-bind="choice"></span>
             </md-checkbox>
           </div>
 
-          <div ng-switch-when="false">
-            <!--  Using radio input so that the ng-model will change in the backend when clicked -->
-            <input type="radio" value="true" ng-model="userSelections[choice]" ng-change="submitAnswer(userSelections)" aria-label="choice">
-            <span angular-html-bind="choice"></span>
+          <div ng-if="!displayCheckboxes">
+            <input type="radio" value="true" ng-model="userSelections[choice]" ng-change="submitAnswer(userSelections)" aria-label="choice" class="item-selection-input-radio-button">
+            <div angular-html-bind="choice" style="cursor: pointer; width: 100%;"></div>
           </div>
         </label>
       </div>
+
       <!-- The following *three* ng-if divs will only show if maxAllowableSelectionCount is at least 2. If maxAllowableSelectionCount
-      is 1, the choices will be buttons rather than checkboxes -->
+      is 1, the choices will be buttons rather than checkboxes. -->
       <div ng-if="displayCheckboxes && notEnoughSelections">
-        <!-- The following will display the least number choices needed to submit, if the least required number of choices
-        is one, it will print: You will need to select at least one choice. -->
-        <small>You need to select at least <span ng-if="minAllowableSelectionCount > 1" ng-bind="minAllowableSelectionCount"></span><span ng-if="minAllowableSelectionCount == 1">one choice</span>.
+        <small>
+          Please select at least
+          <span ng-if="minAllowableSelectionCount > 1" ng-bind="minAllowableSelectionCount"></span>
+          <span ng-if="minAllowableSelectionCount == 1">one choice</span>.
         </small>
       </div>
       <div ng-if="displayCheckboxes && preventAdditionalSelections">
-        <small>You you can only select at most <span ng-bind="maxAllowableSelectionCount"></span> choices.</small>
+        <small>
+          At most <[maxAllowableSelectionCount]> choice<[maxAllowableSelectionCount !== 1 ? 's' : '']> may be selected.
+        </small>
       </div>
       <md-button ng-if="displayCheckboxes" class="md-button-success"
-        ng-click="submitAnswer(userSelections)" aria-label="Submit" ng-disabled="notEnoughSelections">Submit</md-button>
+                 ng-click="submitAnswer(userSelections)" aria-label="Submit"
+                 ng-disabled="notEnoughSelections">
+        Submit
+      </md-button>
     </form>
   </div>
 </script>
