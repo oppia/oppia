@@ -48,6 +48,10 @@ class SetOfUnicodeStringRule(rule_domain.Rule):
     subject_type = objects.SetOfUnicodeString
 
 
+class SetOfHtmlStringRule(rule_domain.Rule):
+    subject_type = objects.SetOfHtmlString
+
+
 class UnicodeStringRule(rule_domain.Rule):
     subject_type = objects.UnicodeString
 

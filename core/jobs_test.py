@@ -366,7 +366,6 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(DummyJobManager.get_error(job2_id))
 
 
-TEST_INPUT_DATA = [(1, 2), (3, 4), (1, 5)]
 SUM_MODEL_ID = 'all_data_id'
 
 
@@ -398,7 +397,6 @@ class TestAdditionJobManager(TestDeferredJobManager):
 
 class FailingAdditionJobManager(TestDeferredJobManager):
     """Test job that stores stuff in SumModel and then fails."""
-    IS_VALID_JOB_CLASS = True
 
     @classmethod
     def _run(cls, additional_job_params):

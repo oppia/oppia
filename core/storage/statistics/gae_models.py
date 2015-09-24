@@ -28,14 +28,9 @@ import utils
 
 from google.appengine.ext import ndb
 
-MAX_ANSWER_HASH_LEN = 100
-
 # TODO(bhenning): Everything is handler name submit; therefore, it is
 # pointless and should be removed.
 _OLD_SUBMIT_HANDLER_NAME = 'submit'
-
-def hash_answer(answer):
-    return utils.convert_to_hash(answer, MAX_ANSWER_HASH_LEN)
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -64,10 +59,6 @@ class StateCounterModel(base_models.BaseModel):
         if not counter:
             counter = cls(id=instance_id)
         return counter
-
-    def get_exploration_id_and_state_name(self):
-        first_dot_loc = self.id.find('.')
-        return self.id[:first_dot_loc], self.id[first_dot_loc + 1:]
 
 
 class StateRuleAnswerLogModel(base_models.BaseModel):
@@ -390,6 +381,11 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     - session_id: ID of current student's session
     - params: current parameter values, in the form of a map of parameter name
               to its value
+    NOTE TO DEVELOPERS: Unlike other events, this event does not have a
+    client_time_spent_in_secs. Instead, it is the reference event for
+    all other client_time_spent_in_secs values, which each represent the
+    amount of time between this event (i.e., the learner entering the
+    state) and the other event.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1

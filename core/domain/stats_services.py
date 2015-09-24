@@ -80,6 +80,29 @@ def get_state_rules_stats(exploration_id, state_name):
     return results
 
 
+def get_top_state_rule_answers(
+        exploration_id, state_name, rule_str_list, top_answer_count_per_rule):
+    """Returns a list of top answers (by submission frequency) submitted to the
+    given state in the given exploration which were mapped to any of the rules
+    listed in 'rule_str_list'. The number of answers returned is the number of
+    rule spec strings based in multiplied by top_answer_count_per_rule.
+    """
+    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+        exploration_id, [{
+            'state_name': state_name,
+            'rule_str': rule_str
+        } for rule_str in rule_str_list])
+
+    all_top_answers = []
+    for answer_log in answer_logs:
+        top_answers = answer_log.get_top_answers(top_answer_count_per_rule)
+        all_top_answers += [
+            {'value': top_answer[0], 'count': top_answer[1]}
+            for top_answer in top_answers
+        ]
+    return all_top_answers
+
+
 def get_state_improvements(exploration_id, exploration_version):
     """Returns a list of dicts, each representing a suggestion for improvement
     to a particular state.

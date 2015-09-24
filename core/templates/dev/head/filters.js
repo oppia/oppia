@@ -45,19 +45,44 @@ oppia.filter('camelCaseToHyphens', [function() {
 }]);
 
 // Filter that truncates long descriptors.
-// TODO(sll): Strip out HTML tags before truncating.
-oppia.filter('truncate', [function() {
+oppia.filter('truncate', ['$filter', function($filter) {
   return function(input, length, suffix) {
-    if (!input)
+    if (!input) {
       return '';
-    if (isNaN(length))
+    }
+    if (isNaN(length)) {
       length = 70;
-    if (suffix === undefined)
+    }
+    if (suffix === undefined) {
       suffix = '...';
-    if (!angular.isString(input))
+    }
+    if (!angular.isString(input)) {
       input = String(input);
-    return (input.length <= length ? input
-            : input.substring(0, length - suffix.length) + suffix);
+    }
+    input = $filter('convertToPlainText')(input);
+    return (
+      input.length <= length ? input : (
+        input.substring(0, length - suffix.length) + suffix));
+  };
+}]);
+
+oppia.filter('truncateAtFirstLine', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
+    // Normalize line endings then split using the normalized delimiter.
+    var lines = input.replace(pattern, '\n').split('\n');
+    var nonemptyLineIndex = -1;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].length != 0) {
+        nonemptyLineIndex = i;
+        break;
+      }
+    }
+    return (nonemptyLineIndex != -1 ? lines[nonemptyLineIndex] : '');
   };
 }]);
 
@@ -159,11 +184,24 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput and ImageClickInput
+      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
       if (choices) {
-        for (var i = 0; i < choices.length; i++) {
-          if (choices[i].val === inputs[varName]) {
-            replacementText = '\'' + choices[i].label + '\'';
+        if (varType === 'SetOfHtmlString') {
+          replacementText = '[';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
+            }
+          }
+          replacementText += ']';
+        } else {
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
           }
         }
       // TODO(sll): Generalize this to use the inline string representation of
@@ -224,11 +262,12 @@ oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
     strippedText = strippedText.replace('&nbsp;', ' ');
-    strippedText = strippedText.trim();
-    if (strippedText.length === 0) {
-      return input;
-    } else {
+
+    var trimmedText = strippedText.trim();
+    if (trimmedText.length === 0) {
       return strippedText;
+    } else {
+      return trimmedText;
     }
   };
 }]);

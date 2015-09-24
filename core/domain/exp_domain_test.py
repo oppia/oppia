@@ -56,6 +56,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: %s
@@ -70,6 +71,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: New state
@@ -130,6 +132,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -148,6 +151,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -166,6 +170,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -909,6 +914,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
             }],
             'interaction': {
                 'answer_groups': [],
+                'confirmed_unclassified_answers': [],
                 'customization_args': {},
                 'default_outcome': {
                     'dest': 'New state',
@@ -1542,7 +1548,88 @@ states_schema_version: 5
 tags: []
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V8
+    YAML_CONTENT_V9 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 9
+skin_customizations:
+  panels_contents:
+    bottom: []
+    left: []
+    right: []
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      id: EndExploration
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+states_schema_version: 6
+tags: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V9
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1592,6 +1679,12 @@ tags: []
             'eid', 'A title', 'A category', self.YAML_CONTENT_V8)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v9(self):
+        """Test direct loading from a v9 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V9)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -1611,8 +1704,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'value': content_str,
                 }],
                 'interaction': {
-                    'customization_args': {},
                     'answer_groups': [],
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {},
                     'default_outcome': {
                         'dest': dest_name,
                         'feedback': [],

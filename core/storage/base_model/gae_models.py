@@ -235,7 +235,17 @@ class VersionedModel(BaseModel):
         """Makes this instance into a reconstitution of the given snapshot."""
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         snapshot_dict = snapshot_model.content
-        return self._reconstitute(snapshot_dict)
+        reconstituted_model = self._reconstitute(snapshot_dict)
+        # TODO(sll): The 'created_on' and 'last_updated' values here will be
+        # slightly different from the values the entity model would have had,
+        # since they correspond to the corresponding fields for the snapshot
+        # content model instead. Figure out whether this is a problem or not,
+        # and whether we need to record the contents of those fields in the
+        # actual entity model (in which case we also need a way to deal with
+        # old snapshots that don't have this information).
+        reconstituted_model.created_on = snapshot_model.created_on
+        reconstituted_model.last_updated = snapshot_model.last_updated
+        return reconstituted_model
 
     @classmethod
     def _get_snapshot_id(cls, instance_id, version_number):

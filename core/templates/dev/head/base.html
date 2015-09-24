@@ -71,6 +71,8 @@
         DEFAULT_LANGUAGE_CODE: JSON.parse(
           '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
         RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
+        /* A list of functions to be called when an exploration is completed. */
+        POST_COMPLETION_HOOKS: [],
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
 
@@ -111,92 +113,99 @@
                     </a>
                   </div>
 
-                  <div class="navbar-header pull-right">
-                    <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-                      {% if username %}
-                        <li class="dropdown pull-right">
-                          <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
-                            <div class="oppia-navbar-profile-picture-container">
-                              {% if profile_picture_data_url %}
-                                <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
-                              {% else %}
-                                <img ng-if="profileDropdownIsActive" src="/images/general/user_mint_48px.png" class="oppia-navbar-profile-picture">
-                                <img ng-if="!profileDropdownIsActive" src="/images/general/user_white_48px.png" class="oppia-navbar-profile-picture">
-                              {% endif %}
-                              <span class="caret" style="margin-top: 10px;"></span>
+                  {% if nav_mode != 'signup' %}
+                    <div class="navbar-header pull-right">
+                      <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+                        {% if username %}
+                          <li class="dropdown pull-right">
+                            <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                              <div class="oppia-navbar-profile-picture-container">
+                                {% if profile_picture_data_url %}
+                                  <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
+                                {% else %}
+                                  <img ng-if="profileDropdownIsActive" src="/images/general/user_mint_48px.png" class="oppia-navbar-profile-picture">
+                                  <img ng-if="!profileDropdownIsActive" src="/images/general/user_white_48px.png" class="oppia-navbar-profile-picture">
+                                {% endif %}
+                                <span class="caret" style="margin-top: 10px;"></span>
 
-                              <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
-                                <span class="oppia-navbar-dashboard-indicator-text">
-                                  <[numUnseenNotifications]>
-                                </span>
-                              </div>
-
-                              {% if is_admin or is_moderator %}
-                                <div class="oppia-navbar-role-indicator">
-                                  {% if is_admin %}
-                                    <!-- "right: 4px;" is necessary here but not in moderator to prevent 'A' from appearing off-center because 'A' is slightly thinner than 'M' in this font -->
-                                    <span class="oppia-navbar-role-text" style="right: 4px;">A</span>
-                                  {% elif is_moderator %}
-                                    <span class="oppia-navbar-role-text">M</span>
-                                  {% endif %}
+                                <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
+                                  <span class="oppia-navbar-dashboard-indicator-text">
+                                    <[numUnseenNotifications]>
+                                  </span>
                                 </div>
-                              {% endif %}
-                            </div>
-                          </a>
-                          <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
-                            <li>
-                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
-                                My Explorations
-                              </a>
-                            </li>
-                            <li>
-                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
-                                Notifications
-                                <span ng-if="numUnseenNotifications > 0">
-                                  (<[numUnseenNotifications]>)
-                                </span>
-                              </a>
-                            </li>
-                            <li>
-                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">Preferences</a>
-                            </li>
 
-                            {% if is_moderator %}
+                                <div style="display: none;" class="oppia-user-email">
+                                  {{user_email}}
+                                </div>
+
+                                {% if is_admin or is_moderator %}
+                                  <div class="oppia-navbar-role-indicator">
+                                    {% if is_admin %}
+                                      <!-- "right: 4px;" is necessary here but not in moderator to prevent 'A' from appearing off-center because 'A' is slightly thinner than 'M' in this font -->
+                                      <span class="oppia-navbar-role-text" style="right: 4px;">A</span>
+                                    {% elif is_moderator %}
+                                      <span class="oppia-navbar-role-text">M</span>
+                                    {% endif %}
+                                  </div>
+                                {% endif %}
+                              </div>
+                            </a>
+                            <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
-                                  Moderator Page
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
+                                  My Explorations
                                 </a>
                               </li>
-                            {% endif %}
-                            {% if is_super_admin %}
                               <li>
-                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
-                                  Admin Page
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
+                                  Notifications
+                                  <span ng-if="numUnseenNotifications > 0">
+                                    (<[numUnseenNotifications]>)
+                                  </span>
                                 </a>
                               </li>
-                            {% endif %}
-                            <li>
-                              <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
-                            </li>
-                          </ul>
-                        </li>
-                      {% elif not user_email %}
-                        <li class="dropdown oppia-clickable-dropdown pull-right">
-                          <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
-                            Sign in
-                            <span class="caret"></span>
-                          </a>
-                          <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                            <li>
-                              <a href="{{login_url}}" style="padding: 0; width: 200px;">
-                                <img src="/images/signin/Red-signin-Long-base-44dp.png">
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
-                      {% endif %}
-                    </ul>
-                  </div>
+                              <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">Preferences</a>
+                              </li>
+
+                              {% if is_moderator %}
+                                <li>
+                                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
+                                    Moderator Page
+                                  </a>
+                                </li>
+                              {% endif %}
+                              {% if is_super_admin %}
+                                <li>
+                                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
+                                    Admin Page
+                                  </a>
+                                </li>
+                              {% endif %}
+                              <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
+                              </li>
+                            </ul>
+                          </li>
+                        {% else %}
+                          <li class="dropdown oppia-clickable-dropdown pull-right">
+                            <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
+                              Sign in
+                              <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                              <li>
+                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
+                                  <img src="/images/signin/Red-signin-Long-base-44dp.png">
+                                </a>
+                              </li>
+                            </ul>
+                          </li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  {% endif %}
+
                   <div class="collapse navbar-collapse ng-cloak">
                     {% block navbar_breadcrumb %}
                     {% endblock navbar_breadcrumb %}
@@ -252,5 +261,6 @@
     {% block footer_js %}
     {% endblock footer_js %}
 
+    {{BEFORE_END_BODY_TAG_HOOK}}
   </body>
 </html>
