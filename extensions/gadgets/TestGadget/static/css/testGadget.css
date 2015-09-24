@@ -1,0 +1,24 @@
+.oppia-test-gadget-container {
+  background: #fff;
+  height: 100%;
+  width: 140px;
+}
+
+.oppia-test-gadget-title {
+  background: #05a69a;
+  color: #fff;
+  font-size: 28px;
+  margin: auto;
+  text-align: center;
+}
+
+.oppia-test-gadget-resource {
+  border-top: 1px solid #eee; 
+  color: #05a69a;
+  cursor: pointer;
+  font-size: 13px;
+  height: 50px;
+  padding-top: 10px;
+  text-align: center;
+  word-wrap: break-word;
+}

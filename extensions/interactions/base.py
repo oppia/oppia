@@ -79,6 +79,8 @@ class BaseInteraction(object):
     # Whether this interaction should be considered terminal, i.e. it ends
     # the exploration. Defaults to False.
     is_terminal = False
+    # Whether this interaction supports training and fuzzy classification.
+    is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -89,6 +91,11 @@ class BaseInteraction(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
+    # Instructions for using this interaction, to be shown to the learner. Only
+    # relevant for supplemental interactions.
+    instructions = None
+    # Whether the answer is long, and would benefit from being summarized.
+    needs_summary = False
 
     @property
     def id(self):
@@ -115,8 +122,7 @@ class BaseInteraction(object):
                 self.answer_type).normalize(answer)
 
         raise Exception(
-            'No answer type initialized for interaction %s' %
-            (self.name))
+            'No answer type initialized for interaction %s' % self.name)
 
     @property
     def _stats_log_template(self):
@@ -163,12 +169,15 @@ class BaseInteraction(object):
             'description': self.description,
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
+            'is_trainable': self.is_trainable,
+            'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
+            'instructions': self.instructions,
         }
 
         # Add information about rule descriptions corresponding to the answer

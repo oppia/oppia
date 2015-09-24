@@ -39,3 +39,8 @@
     </div>
   </div>
 </script>
+
+<script type="text/ng-template" id="shortResponse/LogicProof">
+  <span ng-if="answer.correct">Correct: <pre><[answer.displayed_proof[0] | truncateAtFirstLine]></pre></span>
+  <span ng-if="!answer.correct">Incorrect: <pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre></span>
+</script>

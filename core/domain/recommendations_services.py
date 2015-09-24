@@ -234,8 +234,16 @@ def update_topic_similarities(data):
     save_topic_similarities(topic_similarities_dict)
 
 
-def get_item_similarity(reference_exp_id, compared_exp_id):
-    """Returns the ranking of compared_exp_id to reference_exp_id as a
+def get_item_similarity(
+        reference_exp_category,
+        reference_exp_language_code,
+        reference_exp_owner_ids,
+        compared_exp_category,
+        compared_exp_language_code,
+        compared_exp_last_updated,
+        compared_exp_owner_ids,
+        compared_exp_status):
+    """Returns the ranking of compared_exp to reference_exp as a
     recommendation. This returns a value between 0.0 to 10.0. A higher value
     indicates the compared_exp is a better recommendation as an exploration to
     start after completing reference_exp.
@@ -245,38 +253,22 @@ def get_item_similarity(reference_exp_id, compared_exp_id):
     compared_exp is increased if it is publicized or is newly updated. It
     returns 0.0 if compared_exp is private."""
 
-    try:
-        reference_exp_summary = exp_services.get_exploration_summary_by_id(
-            reference_exp_id)
-    except:
-        raise Exception('Invalid reference_exp_id %s' % reference_exp_id)
-
-    try:
-        compared_exp_summary = exp_services.get_exploration_summary_by_id(
-            compared_exp_id)
-    except:
-        raise Exception('Invalid compared_exp_id %s' % compared_exp_id)
-
     similarity_score = 0
 
-    if (compared_exp_summary.status ==
-            rights_manager.EXPLORATION_STATUS_PRIVATE):
+    if (compared_exp_status == rights_manager.EXPLORATION_STATUS_PRIVATE):
         return 0
-    elif (compared_exp_summary.status ==
-            rights_manager.EXPLORATION_STATUS_PUBLICIZED):
+    elif (compared_exp_status == rights_manager.EXPLORATION_STATUS_PUBLICIZED):
         similarity_score += 1
 
     similarity_score += get_topic_similarity(
-        reference_exp_summary.category, compared_exp_summary.category) * 5
-    if reference_exp_summary.owner_ids == compared_exp_summary.owner_ids:
+        reference_exp_category, compared_exp_category) * 5
+    if reference_exp_owner_ids == compared_exp_owner_ids:
         similarity_score += 1
-    if (reference_exp_summary.language_code ==
-            compared_exp_summary.language_code):
+    if (reference_exp_language_code == compared_exp_language_code):
         similarity_score += 2
 
     time_now = datetime.datetime.utcnow()
-    time_delta_days = int(
-        (time_now - compared_exp_summary.exploration_model_last_updated).days)
+    time_delta_days = int((time_now - compared_exp_last_updated).days)
     if time_delta_days <= 7:
         similarity_score += 1
 

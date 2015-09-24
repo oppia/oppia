@@ -73,6 +73,11 @@ class ExplorationRecommendationsMRJobManager(
     def map(item):
         from core.domain import exp_services
         from core.domain import recommendations_services
+        from core.domain import rights_manager
+
+        # Only process the exploration if it is not private
+        if item.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+            return
 
         # Note: There is a threshold so that bad recommendations will be
         # discarded even if an exploration has few similar explorations.
@@ -81,11 +86,26 @@ class ExplorationRecommendationsMRJobManager(
         exp_summary_id = item.id
         exp_summaries_dict = (
             exp_services.get_non_private_exploration_summaries())
-        for compared_exp_id in exp_summaries_dict:
+
+        # Note: This is needed because the exp_summaries_dict is sometimes
+        # different from the summaries in the datastore, especially when
+        # new explorations are added.
+        if exp_summary_id not in exp_summaries_dict:
+            return
+
+        reference_exp_summary = exp_summaries_dict[exp_summary_id]
+        for compared_exp_id, compared_exp_summary in exp_summaries_dict.iteritems():
             if compared_exp_id != exp_summary_id:
                 similarity_score = (
                     recommendations_services.get_item_similarity(
-                        exp_summary_id, compared_exp_id))
+                        reference_exp_summary.category,
+                        reference_exp_summary.language_code,
+                        reference_exp_summary.owner_ids,
+                        compared_exp_summary.category,
+                        compared_exp_summary.language_code,
+                        compared_exp_summary.exploration_model_last_updated,
+                        compared_exp_summary.owner_ids,
+                        compared_exp_summary.status))
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
                     yield (exp_summary_id, {
                         'similarity_score': similarity_score,

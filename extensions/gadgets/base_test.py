@@ -24,6 +24,7 @@ import string
 
 from core.domain import dependency_registry
 from core.domain import gadget_registry
+from core.domain import obj_services
 from core.tests import test_utils
 from extensions.gadgets import base
 import feconf
@@ -112,18 +113,47 @@ class GadgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(gadget_dict['customization_arg_specs'], [
             {
                 'name': 'title',
-                'description': 'A text title of the test gadget.',
+                'description': 'Optional title for the test gadget',
                 'schema': {
                     'type': 'unicode',
                 },
                 'default_value': ''
             }, {
-                'name': 'floors',
-                'description': 'A test attribute of the gadget.',
+                'name': 'adviceObjects',
+                'description': 'Title and content for each tip.',
                 'schema': {
-                    'type': 'int',
+                    'type': 'list',
+                    'validators': [{
+                        'id': 'has_length_at_least',
+                        'min_value': 1,
+                    }, {
+                        'id': 'has_length_at_most',
+                        'max_value': 3,
+                    }],
+                    'items': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'adviceTitle',
+                            'description': 'Tip title',
+                            'schema': {
+                                'type': 'unicode',
+                                'validators': [{
+                                    'id': 'is_nonempty',
+                                }]
+                            },
+                        }, {
+                            'name': 'adviceHtml',
+                            'description': 'Advice content',
+                            'schema': {
+                                'type': 'html',
+                            },
+                        }]
+                    }
                 },
-                'default_value': 1
+                'default_value': [{
+                    'adviceTitle': 'Tip title',
+                    'adviceHtml': ''
+                }]
             }])
 
     def test_default_gadgets_are_valid(self):

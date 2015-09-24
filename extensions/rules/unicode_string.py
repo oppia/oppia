@@ -27,28 +27,30 @@ class Equals(base.UnicodeStringRule):
     description = 'is equal to {{x|UnicodeString}}'
 
     def _evaluate(self, subject):
-        return subject.lower() == self.x.lower()
+        return self._fuzzify_truth_value(subject.lower() == self.x.lower())
 
 
 class CaseSensitiveEquals(base.UnicodeStringRule):
     description = 'is equal to {{x|UnicodeString}}, taking case into account'
 
     def _evaluate(self, subject):
-        return subject == self.x
+        return self._fuzzify_truth_value(subject == self.x)
 
 
 class StartsWith(base.UnicodeStringRule):
     description = 'starts with {{x|UnicodeString}}'
 
     def _evaluate(self, subject):
-        return subject.lower().startswith(self.x.lower())
+        return self._fuzzify_truth_value(
+            subject.lower().startswith(self.x.lower()))
 
 
 class Contains(base.UnicodeStringRule):
     description = 'contains {{x|UnicodeString}}'
 
     def _evaluate(self, subject):
-        return subject.lower().find(self.x.lower()) != -1
+        return self._fuzzify_truth_value(
+            subject.lower().find(self.x.lower()) != -1)
 
 
 class MatchesBase64EncodedFile(base.UnicodeStringRule):
@@ -57,4 +59,5 @@ class MatchesBase64EncodedFile(base.UnicodeStringRule):
         '{{filepath|UnicodeString}}')
 
     def _evaluate(self, subject):
-        return base64.b64decode(subject) == self.fs.get(self.filepath)
+        return self._fuzzify_truth_value(
+            base64.b64decode(subject) == self.fs.get(self.filepath))

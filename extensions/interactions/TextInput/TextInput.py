@@ -23,8 +23,11 @@ class TextInput(base.BaseInteraction):
     name = 'Text Input'
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
+    is_trainable = True
     _dependency_ids = []
     answer_type = 'NormalizedString'
+    instructions = None
+    needs_summary = False
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
@@ -42,8 +45,7 @@ class TextInput(base.BaseInteraction):
         'default_value': ''
     }, {
         'name': 'rows',
-        'description': (
-            'Number of rows'),
+        'description': 'Height (in rows)',
         'schema': {
             'type': 'int',
             'validators': [{

@@ -36,10 +36,8 @@ var oppia = angular.module(
 // Set default headers for POST and PUT requests.
 // Add an interceptor to convert requests to strings and to log and show
 // warnings for error responses.
-// Disable ng-animate for carousel: see
-//     https://github.com/angular-ui/bootstrap/issues/1565
-oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
-    function($interpolateProvider, $httpProvider, $animateProvider) {
+oppia.config(['$interpolateProvider', '$httpProvider',
+    function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
@@ -72,8 +70,6 @@ oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
       };
     }
   ]);
-
-  $animateProvider.classNameFilter(/carousel/);
 }]);
 
 oppia.config(['$provide', function($provide) {
@@ -270,10 +266,13 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
         $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
         _nextLabelToFocusOn = null;
       });
+    },
+    // Generates a random string (to be used as a focus label).
+    generateFocusLabel: function() {
+      return Math.random().toString(36).slice(2);
     }
   };
 }]);
-
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
@@ -287,6 +286,17 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    }
+  };
+}]);
+
+// Service for computing the window dimensions.
+oppia.factory('windowDimensionsService', ['$window', function($window) {
+  return {
+    getWidth: function() {
+      return (
+        $window.innerWidth || document.documentElement.clientWidth ||
+        document.body.clientWidth);
     }
   };
 }]);

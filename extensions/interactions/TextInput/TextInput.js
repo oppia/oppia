@@ -25,8 +25,10 @@ oppia.directive('oppiaInteractiveTextInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/TextInput',
-      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
+      controller: ['$scope', '$attrs', 'focusService',
+          function($scope, $attrs, focusService) {
+        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -54,13 +56,25 @@ oppia.directive('oppiaInteractiveTextInput', [
   }
 ]);
 
-
 oppia.directive('oppiaResponseTextInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/TextInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseTextInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/TextInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
       }]

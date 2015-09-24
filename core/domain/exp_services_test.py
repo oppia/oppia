@@ -47,6 +47,12 @@ import utils
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed
 
+TEST_GADGETS = {
+    'TestGadget': {
+        'dir': os.path.join(feconf.GADGETS_DIR, 'TestGadget')
+    }
+}
+
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
@@ -381,8 +387,6 @@ schema_version: %d
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   %s:
     content:
@@ -390,6 +394,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -408,6 +413,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -442,8 +448,6 @@ schema_version: %d
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   %s:
     content:
@@ -451,6 +455,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -469,6 +474,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -579,6 +585,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -600,6 +607,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -622,6 +630,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -2129,7 +2138,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         {
             'cmd': 'add_gadget',
             'gadget_dict': {
-                'gadget_type': 'AdviceBar',
+                'gadget_type': 'TestGadget',
                 'visible_in_states': ['First Card renamed'],
                 'customization_args': {
                     'adviceObjects': {
@@ -2142,9 +2151,9 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                         'value': 'a'
                     }
                 },
-                'gadget_name': 'AdviceBar'
+                'gadget_name': 'TestGadget'
             },
-            'panel_name': 'left'
+            'panel_name': 'bottom'
         }
     ]
 
@@ -2171,17 +2180,17 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 'title': {'value': 'a'}
             },
             'cmd': 'edit_gadget_property',
-            'gadget_name': 'AdviceBar',
+            'gadget_name': 'TestGadget',
             'property_name': 'gadget_customization_args'
         }, {
             'new_value': ['First Card renamed'],
             'old_value': ['First Card renamed'],
             'cmd': 'edit_gadget_property',
-            'gadget_name': 'AdviceBar',
+            'gadget_name': 'TestGadget',
             'property_name': 'gadget_visibility'
         }, {
             'cmd': 'delete_gadget',
-            'gadget_name': 'AdviceBar'
+            'gadget_name': 'TestGadget'
         }
     ]
 
@@ -2189,7 +2198,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         {
             'cmd': 'add_gadget',
             'gadget_dict': {
-                'gadget_type': 'AdviceBar',
+                'gadget_type': 'TestGadget',
                 'visible_in_states': ['First Card renamed'],
                 'customization_args': {
                     'adviceObjects': {
@@ -2199,9 +2208,9 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                     },
                     'title': {'value': 'a'}
                 },
-                'gadget_name': 'AdviceBar'
+                'gadget_name': 'TestGadget'
             },
-            'panel_name': 'left'
+            'panel_name': 'bottom'
         }, {
             'new_value': [{
                 'type': 'text', 'value': '<p>EDITED CONTENT here 2</p>'
@@ -2214,7 +2223,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
             'property_name': 'content'
         }, {
             'cmd': 'delete_gadget',
-            'gadget_name': 'AdviceBar'
+            'gadget_name': 'TestGadget'
         }
     ]
 
@@ -2353,17 +2362,18 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
 
         expected_result = copy.deepcopy(
             ChangeListSummaryUnitTests.BASE_CHANGE_SUMMARY_DATA_STRUCTURE)
-        expected_result['added_gadgets'] = ['AdviceBar']
+        expected_result['added_gadgets'] = ['TestGadget']
 
         self.assertEqual(actual_result, expected_result)
 
         # Apply changes from list three so future changes can be applied.
-        exp_services.update_exploration(
-            self.ALBERT_ID,
-            self.EXP_ID,
-            ChangeListSummaryUnitTests.CHANGE_LIST_THREE,
-            "a commit message")
-        self.exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
+            exp_services.update_exploration(
+                self.ALBERT_ID,
+                self.EXP_ID,
+                ChangeListSummaryUnitTests.CHANGE_LIST_THREE,
+                "a commit message")
+            self.exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         # CHANGE_LIST_FOUR
         actual_result = exp_services.get_summary_of_change_list(
@@ -2372,9 +2382,9 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         )
         expected_result = copy.deepcopy(
             ChangeListSummaryUnitTests.BASE_CHANGE_SUMMARY_DATA_STRUCTURE)
-        expected_result['deleted_gadgets'] = ['AdviceBar']
+        expected_result['deleted_gadgets'] = ['TestGadget']
         expected_result['gadget_property_changes'] = {
-            'AdviceBar': {
+            'TestGadget': {
                 'gadget_customization_args': {
                     'new_value': {
                         'adviceObjects': {
@@ -2451,8 +2461,6 @@ schema_version: %d
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   END:
     content:
@@ -2460,6 +2468,7 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
@@ -2473,6 +2482,7 @@ states:
       value: ''
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -2502,7 +2512,7 @@ tags: []
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.
-        old_exp_model = self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v0(
             self.OLD_EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Create standard exploration that should not be converted.
@@ -2546,7 +2556,7 @@ tags: []
         _EXP_ID = 'exp_id2'
 
         # Create a exploration with states schema version 0.
-        old_exp_model = self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v0(
             _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Load the exploration without using the conversion pipeline. All of
@@ -2680,7 +2690,7 @@ tags: []
 
         # Create a exploration with states schema version 0 and an old states
         # blob.
-        old_exp_model = self.save_new_exp_with_states_schema_v0(
+        self.save_new_exp_with_states_schema_v0(
             _EXP_ID, self.ALBERT_ID, 'Old Title')
 
         # Ensure the exploration was converted.

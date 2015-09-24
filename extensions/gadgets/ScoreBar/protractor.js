@@ -19,15 +19,16 @@
 var objects = require('../../objects/protractor.js');
 
 var customizeGadget = function(elem, title, maxVal, targetParam) {
-  elem.element(by.name('form.gadgetSchemaForm')
-    ).all(by.tagName('schema-based-unicode-editor')).then(function(items) {
+  elem.element(by.name('form.gadgetSchemaForm'))
+    .all(by.tagName('schema-based-unicode-editor')).then(function(items) {
       objects.UnicodeStringEditor(items[0]).setValue(title);
-      objects.UnicodeStringEditor(items[1]).setValue(targetParam);
     });
 
+  objects.ParameterNameEditor(elem).setValue(targetParam);
+
   objects.IntEditor(
-    elem.element(by.tagName('schema-based-int-editor'))
-  ).setValue(maxVal);
+    elem.element(by.tagName('schema-based-int-editor')))
+    .setValue(maxVal);
 };
 
 var expectGadgetPreviewDetailsToMatch = function(elem, title) {
