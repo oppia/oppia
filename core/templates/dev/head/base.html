@@ -71,6 +71,8 @@
         DEFAULT_LANGUAGE_CODE: JSON.parse(
           '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
         RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
+        /* A list of functions to be called when an exploration is completed. */
+        POST_COMPLETION_HOOKS: [],
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
 
@@ -130,6 +132,10 @@
                                   <span class="oppia-navbar-dashboard-indicator-text">
                                     <[numUnseenNotifications]>
                                   </span>
+                                </div>
+
+                                <div style="display: none;" class="oppia-user-email">
+                                  {{user_email}}
                                 </div>
 
                                 {% if is_admin or is_moderator %}
@@ -255,5 +261,6 @@
     {% block footer_js %}
     {% endblock footer_js %}
 
+    {{BEFORE_END_BODY_TAG_HOOK}}
   </body>
 </html>

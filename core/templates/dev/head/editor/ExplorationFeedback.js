@@ -146,6 +146,11 @@ oppia.controller('ExplorationFeedback', [
     });
   };
 
+  $scope.isSendButtonDisabled = function(newMessageText, updatedStatus) {
+    return $scope.messageSendingInProgress || (
+      !$scope.newMessageText && $scope.currentThreadData.status == updatedStatus);
+  };
+
   // We do not permit 'Duplicate' as a valid status for now, since it should
   // require the id of the duplicated thread to be specified.
   $scope.STATUS_CHOICES = [

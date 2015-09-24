@@ -234,5 +234,6 @@ class LogoutPageTest(test_utils.GenericTestBase):
             current_page))
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
-        self.assertTrue(datetime.datetime.now() > datetime.datetime.strptime(
-            expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
+        self.assertTrue(
+            datetime.datetime.utcnow() > datetime.datetime.strptime(
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))

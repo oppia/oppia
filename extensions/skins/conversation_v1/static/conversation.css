@@ -42,8 +42,13 @@ html, body {
   margin: 0 auto;
   position: fixed;
   right: 0;
-  top: 56px;
   z-index: 100;
+}
+.conversation-skin-progress-dots-not-iframed {
+  top: 56px;
+}
+.conversation-skin-progress-dots-iframed {
+  top: 6px;
 }
 
 .conversation-skin-initial-oppia-avatar,
@@ -157,8 +162,12 @@ md-card.conversation-skin-tutor-card {
   width: 20px;
 }
 .conversation-skin-tutor-card-feedback-toggle {
+  background: none;
+  border: 0;
+  color: #000;
   cursor: pointer;
   height: 20px;
+  margin-left: -5px;
   opacity: 0.4;
 }
 .conversation-skin-tutor-card-feedback-toggle:hover {
@@ -327,5 +336,32 @@ md-card.conversation-skin-supplemental-card {
   md-card.conversation-skin-supplemental-card,
   md-card.conversation-skin-tutor-card {
     width: 100%;
+  }
+
+  /*
+    This is needed to position avatars inside the card for small screen devices/
+    when card is 100% wide
+  */
+  .conversation-skin-initial-oppia-avatar,
+  .conversation-skin-oppia-avatar,
+  .conversation-skin-user-avatar {
+    left: 3px;
+  }
+
+  .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
+  .conversation-skin-tutor-card-bottom-section .conversation-skin-oppia-avatar,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+    left: -51px;
+  }
+  .conversation-skin-tutor-card-top-section {
+    padding: 36px 36px 24px 54px;
+  }
+  .conversation-skin-tutor-card-bottom-section,
+  .conversation-skin-tutor-card-middle-section {
+    padding: 0px 36px 2px 54px;
+  }
+  .conversation-skin-inline-interaction {
+    padding: 16px 36px 24px 54px;
   }
 }

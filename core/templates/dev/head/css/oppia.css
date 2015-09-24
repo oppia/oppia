@@ -57,6 +57,16 @@ md-input-group.md-default-theme label
   color: #009688;
 }
 
+.md-button.oppia-learner-continue-button {
+  color: #ffffff;
+  background: #0D48A1;
+}
+
+button.md-button.md-default-theme.oppia-learner-continue-button:focus,
+button.md-button.md-default-theme.oppia-learner-continue-button:hover {
+  background-color: #115FD4;
+}
+
 /* Bootstrap overrides and additions. */
 html {
   /*
@@ -112,6 +122,16 @@ a:focus {
 
 input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-invalid {
   border-bottom-color: #F44336;
+}
+
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+::-moz-placeholder {
+  font-style: italic;
+}
+::-ms-input-placeholder {
+  font-style: italic;
 }
 
 /* Change the color of odd-numbered lines in a table. */
@@ -1011,7 +1031,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
-  height: 300px;
+  height: 400px;
   overflow-y: hidden;
   position: relative;
 }
@@ -1111,12 +1131,16 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
+  background: none;
+  border: 0;
+  color: #000;
   cursor: pointer;
+  height: 20px;
   opacity: 0.5;
   position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 20px;
+  right: 8px;
+  top: 8px;
+  width: 30px;
 }
 .oppia-delete-response-button,
 .oppia-delete-rule-button {
@@ -1773,11 +1797,12 @@ div#ng-curtain {
 }
 
 .oppia-editor-sidebar {
+  max-width: 500px;
   padding: 7px 5px 0 5px;
   position: absolute;
   right: 15px;
   top: 28px;
-  width: 300px;
+  width: 100%;
 }
 .oppia-editor-sidebar accordion .panel {
   border-radius: 0;
