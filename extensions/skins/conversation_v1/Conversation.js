@@ -174,10 +174,9 @@ oppia.directive('conversationSkin', [function() {
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
-      // The user's profile picture will be replaced with the dataURI
-      // representation of the user-uploaded profile image, if it exists.
-      $scope.profilePicture = '/images/general/user_blue_72px.png';
       $scope.explorationCompleted = false;
+
+      $scope.oppiaAvatarImageUrl = oppiaPlayerService.getOppiaAvatarImageUrl();
 
       $scope.activeCard = null;
       $scope.numProgressDots = 0;
@@ -193,6 +192,11 @@ oppia.directive('conversationSkin', [function() {
       $scope.panels = [];
       $scope.PANEL_TUTOR = 'tutor';
       $scope.PANEL_INTERACTION = 'interaction';
+
+      $scope.profilePicture = '/images/general/user_blue_72px.png';
+      oppiaPlayerService.getUserProfileImage().then(function(result) {
+        $scope.profilePicture = result;
+      });
 
       // If the exploration is iframed, send data to its parent about its
       // height so that the parent can be resized as necessary.
@@ -572,10 +576,6 @@ oppia.directive('conversationSkin', [function() {
       ratingService.init(function(userRating) {
         $scope.userRating = userRating;
       });
-
-      oppiaPlayerService.getUserProfileImage().then(function(result) {
-        $scope.profilePicture = result;
-      });
     }]
   };
 }]);
@@ -587,6 +587,7 @@ oppia.directive('answerFeedbackPair', [function() {
     scope: {
       answer: '&',
       feedback: '&',
+      oppiaAvatarImageUrl: '&',
       profilePicture: '&',
       shortAnswer: '&'
     },

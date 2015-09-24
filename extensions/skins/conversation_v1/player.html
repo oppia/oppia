@@ -9,7 +9,7 @@
   <md-card class="conversation-skin-tutor-card" style="position: absolute; left: -30000px; top: -30000px;" aria-hidden="true">
     <div id="futurePreview">
       <div class="conversation-skin-tutor-card-top-section">
-        <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png">
+        <img class="conversation-skin-initial-oppia-avatar" ng-src="<[oppiaAvatarImageUrl]>">
         <div angular-html-bind="upcomingContentHtml">
         </div>
       </div>
@@ -51,7 +51,7 @@
 
         <div class="conversation-skin-animate-card-contents" ng-class="{'animate-card-change': startCardChangeAnimation}">
           <div class="conversation-skin-tutor-card-top-section">
-            <img class="conversation-skin-initial-oppia-avatar" src="/images/general/o_black_72px.png" alt="">
+            <img class="conversation-skin-initial-oppia-avatar" ng-src="<[oppiaAvatarImageUrl]>" alt="">
             <div class="protractor-test-conversation-content" angular-html-bind="activeCard.contentHtml" focus-on="<[activeCard.contentHtmlFocusLabel]>">
             </div>
           </div>
@@ -76,7 +76,8 @@
                 <answer-feedback-pair profile-picture="profilePicture"
                                       answer="responsePair.learnerAnswer"
                                       short-answer="responsePair.shortLearnerAnswer"
-                                      feedback="responsePair.oppiaFeedback">
+                                      feedback="responsePair.oppiaFeedback"
+                                      oppia-avatar-image-url="oppiaAvatarImageUrl">
                 </answer-feedback-pair>
               </div>
             </div>
@@ -87,7 +88,8 @@
             <answer-feedback-pair profile-picture="profilePicture"
                                   answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].learnerAnswer"
                                   short-answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].shortLearnerAnswer"
-                                  feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback">
+                                  feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback"
+                                  oppia-avatar-image-url="oppiaAvatarImageUrl">
             </answer-feedback-pair>
           </div>
 
@@ -163,7 +165,7 @@
 
 <script type="text/ng-template" id="components/answerFeedbackPair">
   <div class="conversation-skin-learner-answer-container">
-    <img class="conversation-skin-user-avatar" ng-src="<[profilePicture()]>" alt="">
+    <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
     <div ng-if="shortAnswer()">
       <div popover-placement="bottom" popover-template="popover/answer" popover-trigger="click" style="cursor: pointer;">
         <div class="conversation-skin-learner-answer" angular-html-bind="shortAnswer()">
@@ -177,7 +179,7 @@
   </div>
 
   <div class="conversation-skin-oppia-feedback-container" ng-if="feedback() !== ''">
-    <img class="conversation-skin-oppia-avatar img-circle" src="/images/general/o_black_72px.png" alt="">
+    <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
 
     <div class="conversation-skin-oppia-feedback">
       <div ng-if="feedback() === null">
