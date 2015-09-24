@@ -282,6 +282,7 @@
       <span class="oppia-progress-dot oppia-progress-dot-active"
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
       </span>
+      <md-tooltip>Card #<[$index+1]></md-tooltip>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
             ng-class="$index === leftmostVisibleDotIndex && $index !== 0 ? 'oppia-progress-dot-gradient-left':
                       $index === rightmostVisibleDotIndex && $index !== dots.length-1 ?
