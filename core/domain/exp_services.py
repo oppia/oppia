@@ -647,7 +647,12 @@ class EntityChangeListSummarizer(object):
                     continue
                 elif entity_name in self.deleted_entities:
                     self.changed_entities.append(entity_name)
-                    del self.property_changes[entity_name]
+                    # TODO(sll/anuzis): Refactor logic behind this method.
+                    # Without this defensive if, it's possible to produce a
+                    # KeyError bug by adding, saving, deleting and re-adding
+                    # a gadget with default settings.
+                    if entity_name in self.property_changes:
+                        del self.property_changes[entity_name]
                     self.deleted_entities.remove(entity_name)
                 else:
                     self.added_entities.append(entity_name)
