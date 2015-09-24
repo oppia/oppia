@@ -32,12 +32,9 @@ oppia.directive('oppiaGadgetScoreBar', [
         $scope.scoreBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj($attrs.paramNameWithValue);
 
-        // TODO(anuzis): This function produces an error in the Edit mode of
-        // the Editor view because no parameters are initialized in
-        // learnerParamsService. We evaluated showing a default score if the
-        // function fails, but the importance of showing a default score is
-        // TBD depending on the final ScoreBar aesthetic Amit suggests for
-        // the new learner view.
+        // TODO(anuzis): Refactor to return a default value or show a static
+        // image in the Editor view where learnerParamsService does not yet
+        // have parameters initialized.
         $scope.getScoreValue = function() {
           return learnerParamsService.getValue($scope.scoreBarParamName);
         };

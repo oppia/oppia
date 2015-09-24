@@ -16,16 +16,22 @@
  * @fileoverview End-to-end testing utilities for the TestGadget gadget.
  */
 
+// TODO(anuzis): Oppia's current skin doesn't have a gadget panel with
+// dimensions able to render the AdviceBar-like TestGadget. Determine if
+// there's still value in offering an AdviceBar-like gadget when gadget
+// panels are updated with new functionality supporting different display
+// options.
+
 var customizeGadget = function(elem, testCustomization) {
-  return; // TODO(anuzis): TestGadget should perform a customization.
+  return; // TODO(anuzis): Implement.
 };
 
 var expectGadgetPreviewDetailsToMatch = function(elem, testCustomization) {
-  return; // TODO(anuzis): TestGadget should perform a customization.
+  return; // TODO(anuzis): Implement.
 };
 
 var expectGadgetDetailsToMatch = function(elem, testCustomization) {
-  return; // TODO(anuzis): TestGadget should perform a customization.
+  return; // TODO(anuzis): Implement.
 };
 
 exports.customizeGadget = customizeGadget;

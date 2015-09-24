@@ -34,23 +34,6 @@ oppia.directive('oppiaGadgetAdviceBar', [
         $scope.adviceBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj($attrs.adviceObjectsWithValue);
 
-        // TODO(anuzis): Update this method to suit the front-end API Sean and
-        // Vishal determine is best when it's decided.
-        $scope.validate = function() {
-          var tipCount = $scope.adviceBarResources.length;
-          if (tipCount > _MAX_TIP_COUNT) {
-            var validationError = 'AdviceBars are limited to ' +
-              _MAX_TIP_COUNT + ' tip' + (_MAX_TIP_COUNT>1 ? 's' : '') + '.';
-            return validationError;
-          } else if (tipCount < _MIN_TIP_COUNT) {
-            var validationError = 'AdviceBars need at least ' +
-              _MIN_TIP_COUNT + ' tip' + (_MIN_TIP_COUNT>1 ? 's' : '') + '.';
-            return validationError;
-          } else {
-            return '';
-          }
-        };
-
         $scope.overlayAdviceModal = function(adviceResourceIndex) {
           $modal.open({
             templateUrl: '../extensions/gadgets/AdviceBar/static/html/advice_overlay.html',

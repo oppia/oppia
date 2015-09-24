@@ -22,12 +22,3 @@
   text-align: center;
   word-wrap: break-word;
 }
-
-.oppia-advice-resource-image {
-  background: url('../images/AdviceBarResourceIcon.png');
-  background-repeat: no-repeat;
-  display: none;/* TODO(anuzis): update per final UX. */
-  height: 50px;
-  margin: auto;
-  width: 70px;
-}
