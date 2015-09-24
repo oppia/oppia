@@ -27,9 +27,11 @@
 </script>
 
 <script type="text/ng-template" id="response/ImageClickInput">
-  <div ng-mouseover="onMouseoverDiv($event)"
-    ng-mouseout="onMouseoutDiv($event)"
-    ng-mousemove="onMousemoveDiv($event)">
-    (Clicks on image)
+  <div>
+    <[clickRegionLabel]>
   </div>
+</script>
+
+<script type="text/ng-template" id="shortResponse/ImageClickInput">
+  <span><[clickRegionLabel]></span>
 </script>

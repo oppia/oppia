@@ -115,6 +115,12 @@ def _migrate_states_schema(versioned_exploration_states):
             versioned_exploration_states)
         exploration_states_schema_version = 5
 
+    # Check for conversion to v6.
+    if exploration_states_schema_version == 5:
+        exp_domain.Exploration.update_states_v5_to_v6_from_model(
+            versioned_exploration_states)
+        exploration_states_schema_version = 6
+
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -161,8 +167,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version, exploration_model.created_on,
-        exploration_model.last_updated)
+        exploration_model.version, created_on=exploration_model.created_on,
+        last_updated=exploration_model.last_updated)
 
 
 def get_exploration_summary_from_model(exp_summary_model):
@@ -492,6 +498,10 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     state.update_interaction_default_outcome(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
+                    state.update_interaction_confirmed_unclassified_answers(
+                        change.new_value)
             elif change.cmd == exp_domain.CMD_ADD_GADGET:
                 exploration.add_gadget(change.gadget_dict, change.panel_name)
             elif change.cmd == exp_domain.CMD_RENAME_GADGET:
@@ -637,7 +647,12 @@ class EntityChangeListSummarizer(object):
                     continue
                 elif entity_name in self.deleted_entities:
                     self.changed_entities.append(entity_name)
-                    del self.property_changes[entity_name]
+                    # TODO(sll/anuzis): Refactor logic behind this method.
+                    # Without this defensive if, it's possible to produce a
+                    # KeyError bug by adding, saving, deleting and re-adding
+                    # a gadget with default settings.
+                    if entity_name in self.property_changes:
+                        del self.property_changes[entity_name]
                     self.deleted_entities.remove(entity_name)
                 else:
                     self.added_entities.append(entity_name)

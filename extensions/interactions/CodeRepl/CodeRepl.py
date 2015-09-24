@@ -23,8 +23,11 @@ class CodeRepl(base.BaseInteraction):
     name = 'Code Editor'
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable = True
     _dependency_ids = ['jsrepl', 'codemirror']
     answer_type = 'CodeEvaluation'
+    instructions = 'Type code in the editor'
+    needs_summary = True
 
     # Language options 'lua' and 'scheme' have been removed for possible
     # later re-release.

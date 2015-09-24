@@ -23,7 +23,6 @@ import os
 
 from extensions import domain
 import feconf
-import jinja_utils
 import schema_utils
 import utils
 

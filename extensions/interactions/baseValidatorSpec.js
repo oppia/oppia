@@ -704,15 +704,15 @@ describe('Interaction validator', function() {
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please clarify the default outcome so it less confusing ' +
-          'to the user.'
+        'message': 'please clarify the default outcome so it is less ' +
+          'confusing to the user.'
       }]);
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please clarify the default outcome so it less confusing ' +
-          'to the user.'
+        'message': 'please clarify the default outcome so it is less ' +
+          'confusing to the user.'
       }]);
     });
   });

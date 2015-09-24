@@ -298,11 +298,11 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         }
         cycle_5_graph = {
             'vertices': [
-                {'x': 0.0, 'y': 10.0, 'label': ''}, 
-                {'x': 50.0, 'y': 10.0, 'label': ''}, 
-                {'x': 23.0, 'y': 31.0, 'label': ''}, 
-                {'x': 14.0, 'y': 5.0, 'label': ''}, 
-                {'x': 200.0, 'y': 1000.0, 'label': ''}, 
+                {'x': 0.0, 'y': 10.0, 'label': ''},
+                {'x': 50.0, 'y': 10.0, 'label': ''},
+                {'x': 23.0, 'y': 31.0, 'label': ''},
+                {'x': 14.0, 'y': 5.0, 'label': ''},
+                {'x': 200.0, 'y': 1000.0, 'label': ''},
             ],
             'edges': [
                 {'src': 0, 'dst': 1, 'weight': 1},
@@ -320,7 +320,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (empty_graph, empty_graph),
             (cycle_5_graph, cycle_5_graph),
         ]
-        
+
         invalid_values = [None, 1, {}, 'string', {
             'vertices': [],
             'edges': []
@@ -388,4 +388,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 21)
+        self.assertEquals(count, 26)

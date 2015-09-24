@@ -193,8 +193,8 @@ describe('Change list service', function() {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState1');
       var gadgetDict = {
-        'gadget_type': 'AdviceBar',
-        'gadget_name': 'AdviceBar 1',
+        'gadget_type': 'TestGadget',
+        'gadget_name': 'TestGadget 1',
         'customization_args': {
           'adviceObjects': {
             'value': [{
@@ -217,8 +217,8 @@ describe('Change list service', function() {
         }, {
           cmd: 'add_gadget',
           gadget_dict: {
-            'gadget_type': 'AdviceBar',
-            'gadget_name': 'AdviceBar 1',
+            'gadget_type': 'TestGadget',
+            'gadget_name': 'TestGadget 1',
             'customization_args': {
               'adviceObjects': {
                 'value': [{
@@ -513,8 +513,8 @@ describe('New exploration gadgets service', function() {
         'description': 'A visual score bar that can represent progress or success.',
         'name': 'ScoreBar'
       },
-      'AdviceBar': {
-        'type': 'AdviceBar',
+      'TestGadget': {
+        'type': 'TestGadget',
         'width_px': 100,
         'customization_arg_specs': [{
           'name': 'title',
@@ -562,13 +562,13 @@ describe('New exploration gadgets service', function() {
         }],
         'height_px': 300,
         'description': 'Allows learners to receive advice from predefined tips.',
-        'name': 'AdviceBar'
+        'name': 'TestGadget'
       }
     };
     var skinCustomizationsData = {
       'panels_contents': {
         'left': [{
-          'gadget_name': 'AdviceBar1',
+          'gadget_name': 'TestGadget1',
           'visible_in_states': [
             'Example1',
             'Example2'
@@ -584,11 +584,11 @@ describe('New exploration gadgets service', function() {
               }]
             }
           },
-          'gadget_type': 'AdviceBar'
+          'gadget_type': 'TestGadget'
         }],
         'bottom': [],
         'right': [{
-          'gadget_name': 'AdviceBar2',
+          'gadget_name': 'TestGadget2',
           'visible_in_states': [
             'Example2'
           ],
@@ -603,13 +603,13 @@ describe('New exploration gadgets service', function() {
               }]
             }
           },
-          'gadget_type': 'AdviceBar'
+          'gadget_type': 'TestGadget'
         }]
       }
     };
     var gadgetData = {
-      gadget_type: 'AdviceBar',
-      gadget_name: 'NewAdviceBar',
+      gadget_type: 'TestGadget',
+      gadget_name: 'NewTestGadget',
       customization_args: {
         'title': {
           'value': 'TIP3'
@@ -670,7 +670,7 @@ describe('New exploration gadgets service', function() {
       egs.init(skinCustomizationsData);
       egs.handleStateDeletion('Example1');
 
-      expect(egs.getGadgets()['AdviceBar1'].visible_in_states).toEqual(
+      expect(egs.getGadgets()['TestGadget1'].visible_in_states).toEqual(
         ['Example2']
       );
     });
@@ -679,7 +679,7 @@ describe('New exploration gadgets service', function() {
       egs.init(skinCustomizationsData);
       egs.handleStateRenaming('Example2', 'newStateName');
 
-      expect(egs.getGadgets()['AdviceBar2'].visible_in_states).toEqual(
+      expect(egs.getGadgets()['TestGadget2'].visible_in_states).toEqual(
         ['newStateName']
       );
     });
@@ -693,9 +693,9 @@ describe('New exploration gadgets service', function() {
     it('init on valid data', function() {
       egs.init(skinCustomizationsData);
       expect(egs.getPanels()).toEqual({
-        'left': ['AdviceBar1'],
+        'left': ['TestGadget1'],
         'bottom': [],
-        'right': ['AdviceBar2']
+        'right': ['TestGadget2']
       });
     });
 
@@ -703,9 +703,9 @@ describe('New exploration gadgets service', function() {
       egs.init(skinCustomizationsData);
       egs.addGadget(gadgetData, 'right');
       expect(egs.getPanels()).toEqual({
-        'left': ['AdviceBar1'],
+        'left': ['TestGadget1'],
         'bottom': [],
-        'right': ['AdviceBar2', 'NewAdviceBar']
+        'right': ['TestGadget2', 'NewTestGadget']
       });
     });
 
@@ -718,7 +718,7 @@ describe('New exploration gadgets service', function() {
 
     it('should detect same gadget name before adding gadget', function() {
       egs.init(skinCustomizationsData);
-      gadgetData.gadget_name = 'AdviceBar1';
+      gadgetData.gadget_name = 'TestGadget1';
       egs.addGadget(gadgetData, 'right');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'A gadget with this name already exists.');
@@ -733,7 +733,7 @@ describe('New exploration gadgets service', function() {
 
     it('should detect if gadget is not visible in any state.', function() {
       egs.init(skinCustomizationsData);
-      egs.updateGadget('AdviceBar1', gadgetData['AdviceBar1'], []);
+      egs.updateGadget('TestGadget1', gadgetData['TestGadget1'], []);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'This gadget is not visible in any states.');
     });

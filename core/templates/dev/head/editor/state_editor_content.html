@@ -1,14 +1,12 @@
 <div class="oppia-pre-avatar-oppia">
-  <div ng-if="!contentMemento" class="protractor-test-edit-content"
+  <div ng-if="contentMemento === null" class="protractor-test-edit-content"
        ng-click="openStateContentEditor()"
        ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
     <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit Card Content">
     </span>
     <div class="oppia-state-content-display protractor-test-state-edit-content oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
       <span ng-show="content[0].value == ''" class="oppia-placeholder">
-        This is where you give initial context to the learner or ask a question.
-        In the space below, give the learner something to do and teach Oppia how
-        to respond.
+        This is the first card of your exploration. Use this space to introduce your topic and engage the learner, then ask them a question.
       </span>
       <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
     </div>
@@ -16,7 +14,7 @@
 </div>
 
 <!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
-<div ng-if="!!contentMemento" class="oppia-state-item-editor-div protractor-test-state-content-editor">
+<div ng-if="contentMemento !== null" class="oppia-state-item-editor-div protractor-test-state-content-editor">
   <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
   </schema-based-editor>
   <div style="margin-top: 2px;">
