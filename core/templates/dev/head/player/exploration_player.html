@@ -22,7 +22,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      {{exploration_title}}
+      <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -108,9 +108,9 @@
   <script type="text/ng-template" id="components/feedback">
     <div style="min-width: 250px;">
       <div ng-show="!feedbackSubmitted">
-        <div>
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" class="oppia-close-popover-button" ng-click="closePopover()">
-        </div>
+        <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png">
+        </button>
         <br>
 
         <div>
@@ -141,6 +141,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('services/explorationContextService.js') }}
+    {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}

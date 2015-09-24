@@ -270,6 +270,15 @@ download_files(
     NG_INFINITE_SCROLL_URL, NG_INFINITE_SCROLL_DST, NG_INFINITE_SCROLL_FILES)
 
 # Download all the frontend library zip files.
+MD_ICONIC_FONT_REV = '2.1.2'
+MD_ICONIC_FONT_ROOT_NAME = (
+    'material-design-iconic-font-%s' % MD_ICONIC_FONT_REV)
+MD_ICONIC_FONT_ZIP_URL = (
+    'https://github.com/zavoloklom/material-design-iconic-font'
+    '/archive/%s.zip' % MD_ICONIC_FONT_REV)
+MD_ICONIC_FONT_ZIP_ROOT_NAME = MD_ICONIC_FONT_ROOT_NAME
+MD_ICONIC_FONT_TARGET_ROOT_NAME = 'md-iconic-font-%s' % MD_ICONIC_FONT_REV
+
 BOWER_MATERIAL_REV = '0.6.0-rc1'
 BOWER_MATERIAL_ROOT_NAME = 'bower-material-%s' % BOWER_MATERIAL_REV
 BOWER_MATERIAL_ZIP_URL = (
@@ -291,15 +300,17 @@ SELECT2_ZIP_URL = (
 SELECT2_ZIP_ROOT_NAME = 'select2-%s' % SELECT2_REV
 SELECT2_TARGET_ROOT_NAME = 'select2-%s' % SELECT2_REV
 
-FONTAWESOME_REV='4.3.0'
+FONTAWESOME_REV = '4.4.0'
 FONTAWESOME_ZIP_URL = (
-    'http://fortawesome.github.io/Font-Awesome/assets/font-awesome-%s.zip' % FONTAWESOME_REV)
-FONTAWESOME_ZIP_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
+    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' %
+    FONTAWESOME_REV)
+FONTAWESOME_ZIP_ROOT_NAME = 'Font-Awesome-%s' % FONTAWESOME_REV
 FONTAWESOME_TARGET_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
 
 TEXTANGULAR_REV = '1.3.7'
 TEXTANGULAR_ZIP_URL = (
-    'https://github.com/fraywing/textAngular/archive/v%s.zip' % TEXTANGULAR_REV)
+    'https://github.com/fraywing/textAngular/archive/v%s.zip' %
+    TEXTANGULAR_REV)
 TEXTANGULAR_ZIP_ROOT_NAME = 'textAngular-%s' % TEXTANGULAR_REV
 TEXTANGULAR_TARGET_ROOT_NAME = 'textAngular-%s' % TEXTANGULAR_REV
 
@@ -370,6 +381,9 @@ NG_IMG_CROP_ZIP_URL = (
 NG_IMG_CROP_ZIP_ROOT_NAME = 'ngImgCrop-%s' % NG_IMG_CROP_REV
 NG_IMG_CROP_TARGET_ROOT_NAME = 'ng-img-crop-%s' % NG_IMG_CROP_REV
 
+download_and_unzip_files(
+    MD_ICONIC_FONT_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    MD_ICONIC_FONT_ZIP_ROOT_NAME, MD_ICONIC_FONT_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOWER_MATERIAL_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOWER_MATERIAL_ZIP_ROOT_NAME, BOWER_MATERIAL_TARGET_ROOT_NAME)

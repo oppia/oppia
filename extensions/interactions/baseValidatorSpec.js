@@ -660,7 +660,6 @@ describe('Interaction validator', function() {
       // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
-      // Set the min count to be greater than the total count.
       customizationArguments.minAllowableSelectionCount.value = 3;
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
@@ -818,15 +817,15 @@ describe('Interaction validator', function() {
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please clarify the default outcome so it less confusing ' +
-          'to the user.'
+        'message': 'please clarify the default outcome so it is less ' +
+          'confusing to the user.'
       }]);
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please clarify the default outcome so it less confusing ' +
-          'to the user.'
+        'message': 'please clarify the default outcome so it is less ' +
+          'confusing to the user.'
       }]);
     });
   });

@@ -25,35 +25,35 @@ class Equals(base.RealRule):
     description = 'is equal to {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject == self.x
+        return self._fuzzify_truth_value(subject == self.x)
 
 
 class IsLessThan(base.RealRule):
     description = 'is less than {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject < self.x
+        return self._fuzzify_truth_value(subject < self.x)
 
 
 class IsGreaterThan(base.RealRule):
     description = 'is greater than {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject > self.x
+        return self._fuzzify_truth_value(subject > self.x)
 
 
 class IsLessThanOrEqualTo(base.RealRule):
     description = 'is less than or equal to {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject <= self.x
+        return self._fuzzify_truth_value(subject <= self.x)
 
 
 class IsGreaterThanOrEqualTo(base.RealRule):
     description = 'is greater than or equal to {{x|Real}}'
 
     def _evaluate(self, subject):
-        return subject >= self.x
+        return self._fuzzify_truth_value(subject >= self.x)
 
 
 class IsInclusivelyBetween(base.RealRule):
@@ -63,7 +63,7 @@ class IsInclusivelyBetween(base.RealRule):
         assert self.a <= self.b
 
     def _evaluate(self, subject):
-        return self.a <= subject <= self.b
+        return self._fuzzify_truth_value(self.a <= subject <= self.b)
 
 
 class IsWithinTolerance(base.RealRule):

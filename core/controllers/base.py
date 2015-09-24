@@ -55,8 +55,21 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_head_tag_hook', {'type': 'unicode'},
+    'before_end_head_tag_hook', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
     'Code to insert just before the closing </head> tag in all pages.', '')
+BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
+    'before_end_body_tag_hook', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
+    'Code to insert just before the closing </body> tag in all pages.', '')
 
 OBJECT_EDITORS_JS = config_domain.ComputedProperty(
     'object_editors_js', {'type': 'unicode'},
@@ -342,7 +355,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         self.response.content_type = 'application/javascript; charset=utf-8'
-        self.response.headers['Content-Disposition'] = 'attachment'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -369,6 +383,8 @@ class BaseHandler(webapp2.RequestHandler):
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
+            'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
+                BEFORE_END_BODY_TAG_HOOK.value),
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),

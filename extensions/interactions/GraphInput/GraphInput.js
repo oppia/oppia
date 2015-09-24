@@ -28,9 +28,12 @@ oppia.directive('oppiaInteractiveGraphInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/GraphInput',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+      controller: ['$scope', '$element', '$attrs',
+          function($scope, $element, $attrs) {
         $scope.errorMessage = '';
-        $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
+        $scope.graph = {
+          'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false,
+          'isLabeled': false };
 
         $scope.submitGraph = function() {
           // angular.copy needed to strip $$hashkey from the graph
@@ -46,12 +49,15 @@ oppia.directive('oppiaInteractiveGraphInput', [
             return (str === 'true');
           }
           $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
-          $scope.canDeleteVertex = stringToBool($attrs.canDeleteVertexWithValue);
-          $scope.canEditVertexLabel = stringToBool($attrs.canEditVertexLabelWithValue);
+          $scope.canDeleteVertex = stringToBool(
+            $attrs.canDeleteVertexWithValue);
+          $scope.canEditVertexLabel = stringToBool(
+            $attrs.canEditVertexLabelWithValue);
           $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
           $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
           $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
-          $scope.canEditEdgeWeight = stringToBool($attrs.canEditEdgeWeightWithValue);
+          $scope.canEditEdgeWeight = stringToBool(
+            $attrs.canEditEdgeWeightWithValue);
         };
         $scope.init();
 
@@ -121,7 +127,8 @@ oppia.factory('graphDetailService', [function() {
 }]);
 
 oppia.directive('oppiaResponseGraphInput', [
-  'oppiaHtmlEscaper', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', function(oppiaHtmlEscaper, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
+  'oppiaHtmlEscaper', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+      function(oppiaHtmlEscaper, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},
@@ -145,6 +152,21 @@ oppia.directive('oppiaResponseGraphInput', [
   }
 ]);
 
+oppia.directive('oppiaShortResponseGraphInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/GraphInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        // TODO(bhenning): Improve this short response by using a small version
+        // of the graph image instead of an arbitrary label of vertices and
+        // edges.
+        $scope.graph = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);
 
 /*
  * Directive for graph-viz.
@@ -165,7 +187,7 @@ oppia.directive('graphViz', function() {
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', 
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
     function($scope, $element, $attrs, $document, focusService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
       var _MODES = {
         MOVE: 0,

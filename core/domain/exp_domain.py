@@ -52,6 +52,8 @@ STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
+STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS = (
+    'confirmed_unclassified_answers')
 # These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -167,7 +169,8 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME)
+        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+        STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS)
 
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
@@ -321,9 +324,12 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        param_list = [utils.to_ascii(val) for
-                      (key, val) in self.inputs.iteritems()]
-        return '%s(%s)' % (self.rule_type, ','.join(param_list))
+        if self.rule_type == rule_domain.FUZZY_RULE_TYPE:
+            return self.rule_type
+        else:
+            param_list = [utils.to_ascii(val) for
+                         (key, val) in self.inputs.iteritems()]
+            return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
@@ -604,6 +610,8 @@ class InteractionInstance(object):
                 self.default_outcome.to_dict()
                 if self.default_outcome is not None
                 else None),
+            'confirmed_unclassified_answers': (
+                self.confirmed_unclassified_answers),
             'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
         }
 
@@ -618,11 +626,12 @@ class InteractionInstance(object):
             [AnswerGroup.from_dict(h)
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
+            interaction_dict['confirmed_unclassified_answers'],
             [Fallback.from_dict(f) for f in interaction_dict['fallbacks']])
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-            default_outcome, fallbacks):
+            default_outcome, confirmed_unclassified_answers, fallbacks):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -632,6 +641,7 @@ class InteractionInstance(object):
         self.customization_args = customization_args
         self.answer_groups = answer_groups
         self.default_outcome = default_outcome
+        self.confirmed_unclassified_answers = confirmed_unclassified_answers
         self.fallbacks = fallbacks
 
     @property
@@ -702,7 +712,7 @@ class InteractionInstance(object):
         return cls(
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
-            Outcome(default_dest_state_name, [], {}), []
+            Outcome(default_dest_state_name, [], {}), [], []
         )
 
 
@@ -871,6 +881,7 @@ class State(object):
             'feedback': [],
             'param_changes': [],
         },
+        'confirmed_unclassified_answers': [],
         'fallbacks': [],
     }
 
@@ -886,7 +897,7 @@ class State(object):
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
-            interaction.fallbacks)
+            interaction.confirmed_unclassified_answers, interaction.fallbacks)
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         if not isinstance(self.content, list):
@@ -1002,6 +1013,15 @@ class State(object):
                 for feedback in self.interaction.default_outcome.feedback]
         else:
             self.interaction.default_outcome = None
+
+    def update_interaction_confirmed_unclassified_answers(
+            self, confirmed_unclassified_answers):
+        if not isinstance(confirmed_unclassified_answers, list):
+            raise Exception(
+                'Expected confirmed_unclassified_answers to be a list,'
+                ' received %s' % confirmed_unclassified_answers)
+        self.interaction.confirmed_unclassified_answers = (
+            confirmed_unclassified_answers)
 
     def update_interaction_fallbacks(self, fallbacks_list):
         if not isinstance(fallbacks_list, list):
@@ -1167,6 +1187,7 @@ class Exploration(object):
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
+                idict['confirmed_unclassified_answers'],
                 [Fallback.from_dict(f) for f in idict['fallbacks']])
 
             exploration.states[state_name] = state
@@ -1855,6 +1876,19 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v5_dict_to_v6_dict(cls, states_dict):
+        """Converts from version 5 to 6. Version 6 introduces a list of
+        confirmed unclassified answers. Those are answers which are confirmed to
+        be associated with the default outcome during classification.
+        """
+        for (state_name, sdict) in states_dict.iteritems():
+            interaction = sdict['interaction']
+            if 'confirmed_unclassified_answers' not in interaction:
+                interaction['confirmed_unclassified_answers'] = []
+
+        return states_dict
+
+    @classmethod
     def update_states_v0_to_v1_from_model(cls, versioned_exploration_states):
         """Converts from states schema version 0 to 1 of the states blob
         contained in the versioned exploration states dict provided.
@@ -1919,11 +1953,24 @@ class Exploration(object):
             versioned_exploration_states['states'])
         versioned_exploration_states['states'] = converted_states
 
+    @classmethod
+    def update_states_v5_to_v6_from_model(cls, versioned_exploration_states):
+        """Converts from states schema version 5 to 6 of the states blob
+        contained in the versioned exploration states dict provided.
+
+        Note that the versioned_exploration_states being passed in is modified
+        in-place.
+        """
+        versioned_exploration_states['states_schema_version'] = 6
+        converted_states = cls._convert_states_v5_dict_to_v6_dict(
+            versioned_exploration_states['states'])
+        versioned_exploration_states['states'] = converted_states
+
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 8
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 9
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -2032,6 +2079,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v8_dict_to_v9_dict(cls, exploration_dict):
+        """Converts a v8 exploration dict into a v9 exploration dict."""
+        exploration_dict['schema_version'] = 9
+
+        # Ensure this exploration is up-to-date with states schema v5.
+        exploration_dict['states'] = cls._convert_states_v5_dict_to_v6_dict(
+            exploration_dict['states'])
+
+        # Update the states schema version to reflect the above conversions to
+        # the states dict.
+        exploration_dict['states_schema_version'] = 6
+
+        return exploration_dict
+
+    @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string."""
         try:
@@ -2084,6 +2146,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v7_dict_to_v8_dict(
                 exploration_dict)
             exploration_schema_version = 8
+
+        if exploration_schema_version == 8:
+            exploration_dict = cls._convert_v8_dict_to_v9_dict(
+                exploration_dict)
+            exploration_schema_version = 9
 
         exploration_dict['id'] = exploration_id
         exploration_dict['title'] = title
