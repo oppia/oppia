@@ -649,20 +649,33 @@ oppia.directive('progressDots', [function() {
 
       /* This is needed to watch any change for both number of dots and currentDotIndex. */
       $scope.$watchGroup(['dots', 'currentDotIndex'], function(oldValue, newValue) {
-        if(newValue !== oldValue) {
-          if($scope.dots.length > $scope.MAX_DOTS) {
-            if($scope.currentDotIndex < $scope.dots.length - $scope.MAX_DOTS) {
-              $scope.leftmostVisibleDotIndex = $scope.currentDotIndex;
-              $scope.rightmostVisibleDotIndex = $scope.leftmostVisibleDotIndex + $scope.MAX_DOTS;
+
+        var HALF_DOTS_RANGE = Math.ceil($scope.MAX_DOTS/2);
+        var getDotsShown = function(i, currentDotIndex, maximumDotsShown, totalDots) {
+          if (maximumDotsShown < totalDots) {
+            if (totalDots - HALF_DOTS_RANGE < currentDotIndex) {
+                    return totalDots - maximumDotsShown + i;
+                  } else if (HALF_DOTS_RANGE < currentDotIndex) {
+                    return currentDotIndex - HALF_DOTS_RANGE + i;
+                  } else {
+                    return i;
+                  }
             } else {
-              $scope.leftmostVisibleDotIndex = $scope.dots.length - $scope.MAX_DOTS;
-              $scope.rightmostVisibleDotIndex = $scope.dots.length;
+              return i;
             }
-          } else{
-            $scope.leftmostVisibleDotIndex = 0;
-            $scope.rightmostVisibleDotIndex = $scope.MAX_DOTS;
+          };
+
+        if (newValue !== oldValue) {
+          var i = 0;
+          var dotsVisible = [];
+          while (i < $scope.MAX_DOTS && i < $scope.dots.length) {
+                var visibleDotIndex = getDotsShown(i, $scope.currentDotIndex, $scope.MAX_DOTS,$scope.dots.length);
+                dotsVisible.push(visibleDotIndex);
+                i ++;
+            }
+            $scope.leftmostVisibleDotIndex = dotsVisible[0];
+            $scope.rightmostVisibleDotIndex = dotsVisible[dotsVisible.length -1];
           }
-        }
       });
 
     }]

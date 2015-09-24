@@ -278,14 +278,14 @@
     </li>
     <li ng-repeat="dot in dots track by $index"
         class="oppia-animate-progress-dot"
-        ng-show="($index >= leftmostVisibleDotIndex && $index < rightmostVisibleDotIndex)" >
+        ng-show="$index >= leftmostVisibleDotIndex && $index <= rightmostVisibleDotIndex" >
       <span class="oppia-progress-dot oppia-progress-dot-active"
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
       </span>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
-            ng-class="($index === leftmostVisibleDotIndex && $index !== 0) ? 'oppia-progress-dot-gradient-left':
-                      ($index === rightmostVisibleDotIndex-1 && $index !== MAX_DOTS-1) ?
-                       'oppia-progress-dot-gradient-right' : null "
+            ng-class="$index === leftmostVisibleDotIndex && $index !== 0 ? 'oppia-progress-dot-gradient-left':
+                      $index === rightmostVisibleDotIndex && $index !== dots.length-1 ?
+                       'oppia-progress-dot-gradient-right' :''"
             ng-if="$index !== currentDotIndex"
             ng-click="changeActiveDot($index)">
       </span>
