@@ -1,6 +1,6 @@
 <style>
   .multiple-choice-form-container {
-    margin-top: 0px;
+    margin-top: -10px;
   }
 
   .multiple-choice-option {
@@ -19,16 +19,16 @@
     color: #115FD4;
   }
 
-  .multiple-choice-option:hover .inner-radio-button {
-    width: 8px;
-    height: 8px;
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
     background-color: #115FD4;
     border-radius: 50%;
     display: block;
+    height: 8px;
     margin: 2px;
+    width: 8px;
   }
 
-  .multiple-choice-option:hover .outer-radio-button {
+  .multiple-choice-option:hover .multiple-choice-outer-radio-button {
     border-color: #115FD4;
   }
 
@@ -37,18 +37,18 @@
   }
 
   .multiple-choice-radio-container {
-    padding-right: 5px;
     display: inline-block;
+    padding-right: 5px;
   }
 
-  .outer-radio-button {
-    width: 16px;
-    height: 16px;
-    display: block;
-    float: left;
+  .multiple-choice-outer-radio-button {
     border: 2px solid #0D48A1;
     border-radius: 50%;
+    display: block;
+    float: left;
+    height: 16px;
     margin-bottom: -2px;
+    width: 16px;
   }
 </style>
 
@@ -58,8 +58,8 @@
       <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
         <button class="multiple-choice-option" ng-click="submitAnswer($index)">
           <div class="multiple-choice-radio-container">
-            <span class="outer-radio-button">
-              <span class="inner-radio-button"></span>
+            <span class="multiple-choice-outer-radio-button">
+              <span class="multiple-choice-inner-radio-button"></span>
             </span>
           </div>
           <span angular-html-bind="choice"></span>
