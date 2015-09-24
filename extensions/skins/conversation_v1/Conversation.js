@@ -624,7 +624,7 @@ oppia.directive('progressDots', [function() {
           $scope.currentDotIndex = $scope.dots.length - 1;
           $scope.rightmostVisibleDotIndex = $scope.dots.length - 1;
           if ($scope.dots.length > $scope.MAX_DOTS) {
-            $scope.leftmostVisibleDotIndex = $scope.rightmostVisibleDotIndex - $scope.MAX_DOTS - 1;
+            $scope.leftmostVisibleDotIndex = $scope.rightmostVisibleDotIndex - $scope.MAX_DOTS + 1;
           } else {
             $scope.leftmostVisibleDotIndex = 0;
           }
