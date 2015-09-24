@@ -42,8 +42,13 @@ html, body {
   margin: 0 auto;
   position: fixed;
   right: 0;
-  top: 56px;
   z-index: 100;
+}
+.conversation-skin-progress-dots-not-iframed {
+  top: 56px;
+}
+.conversation-skin-progress-dots-iframed {
+  top: 6px;
 }
 
 .conversation-skin-initial-oppia-avatar,
@@ -327,10 +332,10 @@ md-card.conversation-skin-supplemental-card {
     width: 100%;
   }
 
-  /* 
+  /*
     This is needed to position avatars inside the card for small screen devices/
     when card is 100% wide
-  */ 
+  */
   .conversation-skin-initial-oppia-avatar,
   .conversation-skin-oppia-avatar,
   .conversation-skin-user-avatar {

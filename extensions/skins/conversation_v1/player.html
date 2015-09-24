@@ -25,7 +25,7 @@
   </md-card>
 
   <div role="main" style="margin: 0 auto; position: relative;">
-    <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex" class="conversation-skin-progress-dots">
+    <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex" class="conversation-skin-progress-dots" ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
 
     <div class="conversation-skin-cards-container conversation-skin-animate-cards" ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
