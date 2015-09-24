@@ -124,6 +124,16 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
   border-bottom-color: #F44336;
 }
 
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+::-moz-placeholder {
+  font-style: italic;
+}
+::-ms-input-placeholder {
+  font-style: italic;
+}
+
 /* Change the color of odd-numbered lines in a table. */
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
