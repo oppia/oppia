@@ -22,10 +22,10 @@ import utils
 
 
 class TestGadget(base.BaseGadget):
-    """Base gadget for testing and validation."""
+    """TestGadget is a simplified AdviceBar for testing purposes."""
 
     name = 'TestGadget'
-    description = 'Tests base gadget validation internals.'
+    description = 'Tests functionality allowing supplementary predefined tips.'
     height_px = 50
     width_px = 60
     _dependency_ids = []
@@ -33,29 +33,66 @@ class TestGadget(base.BaseGadget):
     _customization_arg_specs = [
         {
             'name': 'title',
-            'description': 'A text title of the test gadget.',
+            'description': 'Optional title for the test gadget',
             'schema': {
                 'type': 'unicode',
             },
             'default_value': ''
         }, {
-            'name': 'floors',
-            'description': 'A test attribute of the gadget.',
+            # TestGadget holds 1 or more adviceObjects, which include a title
+            # and text.
+            'name': 'adviceObjects',
+            'description': 'Title and content for each tip.',
             'schema': {
-                'type': 'int',
+                'type': 'list',
+                'validators': [{
+                    'id': 'has_length_at_least',
+                    'min_value': 1,
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': 3,
+                }],
+                'items': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'adviceTitle',
+                        'description': 'Tip title',
+                        'schema': {
+                            'type': 'unicode',
+                            'validators': [{
+                                'id': 'is_nonempty',
+                            }]
+                        },
+                    }, {
+                        'name': 'adviceHtml',
+                        'description': 'Advice content',
+                        'schema': {
+                            'type': 'html',
+                        },
+                    }]
+                }
             },
-            'default_value': 1
+            'default_value': [{
+                'adviceTitle': 'Tip title',
+                'adviceHtml': ''
+            }]
         }
     ]
 
-    # The TestGadget should not have more than 3 floors.
-    _MAX_FLOORS = 3
+    # Maximum and minimum number of tips that the TestGadget can hold.
+    _MAX_TIP_COUNT = 3
+    _MIN_TIP_COUNT = 1
 
     def validate(self, customization_args):
-        """Ensure TestGadget validates a proper config."""
-        floors = customization_args['floors']['value']
-        if floors > self._MAX_FLOORS:
+        """Ensure TestGadget retains reasonable config."""
+        tip_count = len(customization_args['adviceObjects']['value'])
+        if tip_count > self._MAX_TIP_COUNT:
             raise utils.ValidationError(
-                'TestGadgets are limited to %d floors, found %d.' % (
-                    self._MAX_FLOORS,
-                    floors))
+                'TestGadget is limited to %d tips, found %d.' % (
+                    self._MAX_TIP_COUNT,
+                    tip_count))
+        elif tip_count < self._MIN_TIP_COUNT:
+            raise utils.ValidationError(
+                'TestGadget requires at least %d tips, found %s.' % (
+                    self._MIN_TIP_COUNT,
+                    tip_count))

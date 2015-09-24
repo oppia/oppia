@@ -40,6 +40,10 @@ oppia.directive('parameterNameEditor', function($compile, warningsData) {
         $scope.localValue = $scope.availableParamNames[0];
       }
 
+      $scope.validate = function() {
+        return ($scope.availableParamNames.length === 0) ? false : true;
+      };
+
       $scope.SCHEMA = {
         type: 'unicode',
         choices: $scope.availableParamNames

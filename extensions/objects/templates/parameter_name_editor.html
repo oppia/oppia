@@ -1,6 +1,6 @@
-<span>
+<span ng-model="$parent.$parent.$parent.$parent.localValue" ui-validate="'validate($value)'">
   <span ng-if="availableParamNames.length === 0">
-    <em>No available parameters to follow.</em>
+    <em>No available parameters to follow. Please add one first.</em>
   </span>
 
   <span ng-if="availableParamNames.length > 0">
