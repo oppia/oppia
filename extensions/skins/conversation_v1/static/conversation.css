@@ -136,6 +136,8 @@ md-card.conversation-skin-tutor-card {
 .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
   left: -56px;
+  /* This is needed to prevent overlapping of avatars. */
+  margin-top: 10px;
   top: -7px;
 }
 
@@ -146,6 +148,8 @@ md-card.conversation-skin-tutor-card {
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
   margin-bottom: 30px;
+  /* This is needed to align content in-line with avatars. */
+  padding-top: 10px;
   position: relative;
 }
 
