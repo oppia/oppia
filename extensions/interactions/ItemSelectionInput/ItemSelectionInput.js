@@ -80,7 +80,19 @@ oppia.directive('oppiaResponseItemSelectionInput', [
       templateUrl: 'response/ItemSelectionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-        $scope.response = $scope.answer;
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseItemSelectionInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/ItemSelectionInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
       }]
     };
   }

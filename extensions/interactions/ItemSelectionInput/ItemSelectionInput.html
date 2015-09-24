@@ -55,29 +55,44 @@
         </label>
       </div>
 
-      <!-- The following *three* ng-if divs will only show if maxAllowableSelectionCount is at least 2. If maxAllowableSelectionCount
-      is 1, the choices will be buttons rather than checkboxes. -->
-      <div ng-if="displayCheckboxes && notEnoughSelections">
-        <small>
-          Please select at least
-          <span ng-if="minAllowableSelectionCount > 1" ng-bind="minAllowableSelectionCount"></span>
-          <span ng-if="minAllowableSelectionCount == 1">one choice</span>.
+      <!-- The following div will only show if maxAllowableSelectionCount is at
+        least 2. If maxAllowableSelectionCount is 1, the choices will be buttons
+        rather than checkboxes. -->
+      <div ng-if="displayCheckboxes">
+        <small class="pull-right">
+          <span ng-if="notEnoughSelections">
+            Please select at least
+            <span ng-if="minAllowableSelectionCount > 1"><[minAllowableSelectionCount]></span>
+            <span ng-if="minAllowableSelectionCount == 1">one choice</span>.
+          </span>
+
+          <span ng-if="preventAdditionalSelections">
+            At most <[maxAllowableSelectionCount]> choice<[maxAllowableSelectionCount !== 1 ? 's' : '']> may be selected.
+          </span>
         </small>
+
+        <md-button class="md-button-success"
+                   ng-click="submitAnswer(userSelections)" aria-label="Submit"
+                   ng-disabled="notEnoughSelections">
+          Submit
+        </md-button>
       </div>
-      <div ng-if="displayCheckboxes && preventAdditionalSelections">
-        <small>
-          At most <[maxAllowableSelectionCount]> choice<[maxAllowableSelectionCount !== 1 ? 's' : '']> may be selected.
-        </small>
-      </div>
-      <md-button ng-if="displayCheckboxes" class="md-button-success"
-                 ng-click="submitAnswer(userSelections)" aria-label="Submit"
-                 ng-disabled="notEnoughSelections">
-        Submit
-      </md-button>
     </form>
   </div>
 </script>
 
 <script type="text/ng-template" id="response/ItemSelectionInput">
-  <span angular-html-bind="response"></span>
+  <ul>
+    <li ng-repeat="response in answer track by $index">
+      <span angular-html-bind="response"></span>
+    </li>
+  </ul>
+</script>
+
+<script type="text/ng-template" id="shortResponse/ItemSelectionInput">
+  <ul>
+    <li ng-repeat="response in answer track by $index">
+      <span angular-html-bind="response"></span>
+    </li>
+  </ul>
 </script>

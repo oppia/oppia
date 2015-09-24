@@ -227,7 +227,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
           }
 
-          if (_answerChoices) {
+          if (varType === 'SetOfHtmlString') {
+            $scope.rule.inputs[varName] = [];
+          } else if (_answerChoices) {
             $scope.rule.inputs[varName] = angular.copy(_answerChoices[0].val);
           } else if (varType == 'Graph') {
             $scope.rule.inputs[varName] = {
@@ -237,8 +239,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isWeighted': false,
               'isLabeled': false
             };
-          } else if (varType == 'SetOfHtmlString') {
-            $scope.rule.inputs[varName] = [];
           } else {
             $scope.rule.inputs[varName] = '';
           }
