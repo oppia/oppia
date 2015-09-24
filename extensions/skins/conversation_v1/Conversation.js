@@ -624,11 +624,10 @@ oppia.directive('progressDots', [function() {
           $scope.currentDotIndex = $scope.dots.length - 1;
           $scope.rightmostVisibleDotIndex = $scope.dots.length - 1;
           if ($scope.dots.length > $scope.MAX_DOTS) {
-            $scope.leftmostVisibleDotIndex = $scope.rightmostVisibleDotIndex - $scope.MAX_DOTS;
+            $scope.leftmostVisibleDotIndex = $scope.rightmostVisibleDotIndex - $scope.MAX_DOTS - 1;
           } else {
             $scope.leftmostVisibleDotIndex = 0;
           }
-
         } else {
           throw Error(
             'Unexpected change to number of dots from ' + oldValue + ' to ' +
