@@ -133,13 +133,16 @@
   <span ng-model="localValue" ui-validate="'validate($value)'">
     <span ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <md-input-group class="long oppia-blue-on-focus md-default-theme" style="display: inline; position: relative;">
-          <input style="display: inline; height: 25px; width: 250px;" type="text" name="floatValue" ng-model="$parent.localValue"
-                 require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
+        <md-input-group class="md-default-theme" style="display: inline; position: relative;">
+          <input type="text" ng-model="$parent.localValue" class="form-control"
+                 name="floatValue" placeholder="Type a number" ng-disabled="isDisabled()"
+                 require-is-float apply-validation="validators()"
                  focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
-                 ng-blur="onBlur()" ng-focus="onFocus()">
+                 ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
 
-          <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce" style="font-size: 0.9em; left: 0; position: absolute; top: 25px;" tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
+          <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
+                style="font-size: 0.85em; left: 0; position: absolute;"
+                tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
             <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
               Please enter a valid decimal number.
             </span>
