@@ -678,3 +678,19 @@ class ClickOnImage(BaseObject):
             }
         }]
     }
+
+
+class SetOfHtmlString(BaseObject):
+    """A Set of Html Strings"""
+
+    description = "A list of Html strings."
+    edit_html_filename = 'set_of_html_string_editor'
+    edit_js_filename = 'SetOfHtmlStringEditor'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Html.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }]
+    }
