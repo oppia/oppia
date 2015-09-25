@@ -75,9 +75,11 @@ oppia.directive('ratingFromValue', [function() {
             ratingValue === undefined ? 'fa-star-o' :
             ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
             ratingValue < $scope.stars[i].value - 0.25 ? 'fa-star-half' : 'fa-star';
-            
+
           if ($scope.status === STATUS_ACTIVE && ratingValue >= $scope.stars[i].value) {
             $scope.stars[i].cssClass += ' oppia-rating-star-active';
+          } else {
+            $scope.stars[i].cssClass += ' oppia-rating-star-inactive';
           }
         }
       };

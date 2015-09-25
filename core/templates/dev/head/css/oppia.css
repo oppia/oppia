@@ -58,8 +58,9 @@ md-input-group.md-default-theme label
 }
 
 .md-button.oppia-learner-continue-button {
-  color: #ffffff;
   background: #0D48A1;
+  color: #ffffff;
+  padding: 6px 12px;
 }
 
 button.md-button.md-default-theme.oppia-learner-continue-button:focus,
@@ -96,6 +97,16 @@ body {
   margin: 0 auto;
   padding: 0;
   width: 100%;
+}
+
+/*
+  This counteracts the increased line-height of 1.846 introduced by
+  angular-material.css.
+  TODO(sll): This is ugly. We should try not to have it, perhaps after
+  angular-material has been upgraded.
+*/
+html p, body p {
+  margin-top: -5px;
 }
 
 h1, h2 {
@@ -2012,6 +2023,9 @@ div#ng-curtain {
 
 .oppia-rating-star-active {
   color: #FFD700;
+}
+.oppia-rating-star-inactive {
+  color: #FFF;
 }
 
 .oppia-transition-200 {
