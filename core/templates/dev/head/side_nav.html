@@ -26,7 +26,7 @@
       </a>
     </li>
 
-    {% if SHOW_FORUM_PAGE %}
+    {% if SHOW_CUSTOM_PAGES %}
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
           <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png" class="oppia-sidebar-menu-icon">
@@ -44,6 +44,24 @@
         </a>
       </li>
     {% endfor %}
+
+    {% if SHOW_CUSTOM_PAGES %}
+      <hr>
+
+      <li>
+        <a href="/terms">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
+          Terms of Use
+        </a>
+      </li>
+
+      <li>
+        <a href="/privacy">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
+          Privacy Policy
+        </a>
+      </li>
+    {% endif %}
   </ul>
 
   <div class="oppia-sidebar-footer">

@@ -401,7 +401,7 @@ class BaseHandler(webapp2.RequestHandler):
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
+            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
             'SIDEBAR_MENU_ADDITIONAL_LINKS': (
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
