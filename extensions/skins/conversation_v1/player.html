@@ -102,7 +102,7 @@
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
           -->
-          <div ng-if="!waitingForOppiaFeedback && (activeCard.interactionHtml || waitingForContinueButtonClick) && (!explorationCompleted || !isIframed) && currentProgressDotIndex === transcript.length - 1">
+          <div ng-if="!waitingForOppiaFeedback && (activeCard.interactionHtml || waitingForContinueButtonClick) && (!explorationCompleted || !isIframed || waitingForContinueButtonClick) && currentProgressDotIndex === transcript.length - 1">
             <div class="conversation-skin-inline-interaction">
               <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>" alt="">
               <div ng-if="waitingForContinueButtonClick">

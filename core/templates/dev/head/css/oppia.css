@@ -2195,7 +2195,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-gadget-edit-icon {
   color: #636363;
-  /*TODO(vjoisar):to be changed after finalized specs */
   display: none;
   position: absolute;
   right: 0;

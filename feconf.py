@@ -80,10 +80,6 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 # group.
 DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
-# Default valid parameter for instantiating Explorations when explicit
-# skin customizations aren't provided.
-DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
-
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # files.
@@ -195,6 +191,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'Continue',
         'EndExploration',
         'ImageClickInput',
+        'ItemSelectionInput',
         'MultipleChoiceInput',
         'TextInput'
     ],

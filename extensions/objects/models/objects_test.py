@@ -377,6 +377,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Graph, mappings, invalid_values)
 
+    def test_set_of_html_string(self):
+        """Tests objects of the type StringList"""
+
+        mappings = [(['abc', 'abb'], [u'abc', u'abb']), ([], [])]
+        invalid_values = ['123', {'a': 1}, 3.0, None, [3, 'a'], [1, 2, 1]]
+        self.check_normalization(
+            objects.SetOfHtmlString, mappings, invalid_values)
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -388,4 +396,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 26)
+        self.assertEquals(count, 27)

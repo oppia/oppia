@@ -325,6 +325,15 @@ oppia.controller('StateInteraction', [
       }
 
       $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
+    } else if ($scope.interactionId === 'ItemSelectionInput') {
+      $rootScope.$broadcast(
+        'updateAnswerChoices', currentCustomizationArgs['choices'].value.map(function(val, ind) {
+          return {
+            val: val,
+            label: val
+          };
+        })
+      );
     } else {
       $rootScope.$broadcast('updateAnswerChoices', null);
     }

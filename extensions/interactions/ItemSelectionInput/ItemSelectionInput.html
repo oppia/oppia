@@ -1,0 +1,98 @@
+<style>
+  /* The following is needed so that the radio button does not show. */
+  .item-selection-input-radio-button {
+    display: none;
+  }
+
+  .item-selection-input-checkbox {
+    margin: 5px;
+  }
+
+  .item-selection-input-form-container {
+    margin-top: -5px;
+  }
+  .item-selection-input-item {
+    background: none;
+    border: none;
+    color: rgba(0,0,0,0.5);
+    margin: 0;
+    padding-left: 0;
+    padding-top: 9px;
+    text-align: left;
+    /* This is needed so that images stay bounded by the container in Firefox. */
+    width: 100%;
+  }
+  .item-selection-input-container {
+    border-bottom: thin solid #EEEEEE;
+    margin-bottom: 5px;
+  }
+
+  .item-selection-input-container md-input-group.md-default-theme label {
+    border-bottom: 0px;
+  }
+
+  .item-selection-input-item:hover {
+    color: #00897B;
+  }
+</style>
+
+<script type="text/ng-template" id="interaction/ItemSelectionInput">
+  <div class="item-selection-input-form-container">
+    <form ng-submit="submitAnswer()">
+      <div class="item-selection-input-container" ng-repeat="choice in choices">
+        <label class="item-selection-input-item">
+          <div ng-if="displayCheckboxes">
+            <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
+              ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" aria-label="choice">
+              <span angular-html-bind="choice"></span>
+            </md-checkbox>
+          </div>
+
+          <div ng-if="!displayCheckboxes">
+            <input type="radio" value="true" ng-model="userSelections[choice]" ng-change="submitAnswer(userSelections)" aria-label="choice" class="item-selection-input-radio-button">
+            <div angular-html-bind="choice" style="cursor: pointer; width: 100%;"></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- The following div will only show if maxAllowableSelectionCount is at
+        least 2. If maxAllowableSelectionCount is 1, the choices will be buttons
+        rather than checkboxes. -->
+      <div ng-if="displayCheckboxes">
+        <small class="pull-right">
+          <span ng-if="notEnoughSelections">
+            Please select at least
+            <span ng-if="minAllowableSelectionCount > 1"><[minAllowableSelectionCount]></span>
+            <span ng-if="minAllowableSelectionCount == 1">one choice</span>.
+          </span>
+
+          <span ng-if="preventAdditionalSelections">
+            At most <[maxAllowableSelectionCount]> choice<[maxAllowableSelectionCount !== 1 ? 's' : '']> may be selected.
+          </span>
+        </small>
+
+        <md-button class="md-button-success"
+                   ng-click="submitAnswer(userSelections)" aria-label="Submit"
+                   ng-disabled="notEnoughSelections">
+          Submit
+        </md-button>
+      </div>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/ItemSelectionInput">
+  <ul>
+    <li ng-repeat="response in answer track by $index">
+      <span angular-html-bind="response"></span>
+    </li>
+  </ul>
+</script>
+
+<script type="text/ng-template" id="shortResponse/ItemSelectionInput">
+  <ul>
+    <li ng-repeat="response in answer track by $index">
+      <span angular-html-bind="response"></span>
+    </li>
+  </ul>
+</script>

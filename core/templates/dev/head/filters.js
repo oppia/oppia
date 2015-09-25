@@ -184,11 +184,24 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput and ImageClickInput
+      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
       if (choices) {
-        for (var i = 0; i < choices.length; i++) {
-          if (choices[i].val === inputs[varName]) {
-            replacementText = '\'' + choices[i].label + '\'';
+        if (varType === 'SetOfHtmlString') {
+          replacementText = '[';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
+            }
+          }
+          replacementText += ']';
+        } else {
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
           }
         }
       // TODO(sll): Generalize this to use the inline string representation of
