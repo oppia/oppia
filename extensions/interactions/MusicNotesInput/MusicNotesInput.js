@@ -150,10 +150,17 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var noteChoicesElt = $element.find('.oppia-music-input-note-choices');
         var staffContainerElt = $element.find('.oppia-music-input-staff');
 
-        // Sets grid positions and initializes the view after staff has loaded.
-        setTimeout(function() {
+        // Hides the staff and note before page is loaded.
+        $('.oppia-music-input-staff').css('display', 'none');
+        $('.oppia-music-input-natural-note').css('display', 'none');
+
+        // Sets grid positions, displays the staff and note,
+        // and then initializes the view after staff has loaded.
+        $(window).load(function() {
+          $('.oppia-music-input-staff').css('display', 'block');
           $scope.init();
-        }, 1000);
+          $('.oppia-music-input-natural-note').css('display', 'block');
+        });
 
         // When page is resized, all notes are removed from sequence and staff
         // and then repainted in their new corresponding positions.
