@@ -446,7 +446,7 @@ textarea {
 }
 
 .navbar-default .navbar-container {
-  background: #05a69a;
+  background: #009688;
   height: 56px;
 }
 
@@ -462,7 +462,7 @@ textarea {
 .navbar-default .navbar-nav .open > a:hover,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
-  color: #05a69a;
+  color: #009688;
 }
 
 .navbar-default .navbar-nav > li > a:hover,
@@ -471,13 +471,13 @@ textarea {
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
   background: #fff;
-  color: #05a69a;
+  color: #009688;
 }
 
 .navbar-default .navbar-nav > li.dropdown.open,
 .navbar-default .navbar-nav > li.dropdown.open > a {
   background: #fff;
-  color: #05a69a;
+  color: #009688;
 }
 
 .navbar-default .navbar-nav > .active > a,
@@ -507,7 +507,7 @@ textarea {
 }
 
 .oppia-share-dropdown-menu:hover .oppia-share-dropdown-toggle {
-  color: #05a69a;
+  color: #009688;
   background-color: white;
 }
 
@@ -522,7 +522,7 @@ textarea {
     display: block;
   }
   .nav .dropdown:hover > .dropdown-menu > li > a {
-    color: #05a69a;
+    color: #009688;
   }
   .nav .dropdown:hover > .dropdown-menu > li > a:hover {
     background-color: #eee;
@@ -1122,7 +1122,7 @@ pre.oppia-pre-wrapped-text {
   width: 30%;
 }
 .oppia-interaction-tile:hover {
-  outline: 2px solid #05A69A;
+  outline: 2px solid #009688;
 }
 .oppia-interaction-tile-name {
   border-top: 1px solid #ccc;
@@ -1358,7 +1358,7 @@ oppia-parameter {
 }
 
 .oppia-dashboard-status-green {
-  color: #05a69a;
+  color: #009688;
   font-weight: bold;
   text-transform: capitalize;
 }
@@ -1732,7 +1732,7 @@ div#ng-curtain {
 .oppia-navbar-profile .open > a:hover,
 .oppia-navbar-profile .open > a:focus {
   background-color: #fff;
-  color: #05a69a;
+  color: #009688;
 }
 .oppia-navbar-profile-dropdown {
   border: 0;
@@ -1741,7 +1741,7 @@ div#ng-curtain {
   margin-top: 0;
 }
 .oppia-navbar-profile-dropdown > li > a {
-  color: #05a69a;
+  color: #009688;
 }
 .oppia-navbar-profile-dropdown > li > a:hover,
 .oppia-navbar-profile-dropdown > li > a:focus {
@@ -2035,7 +2035,7 @@ div#ng-curtain {
 
 /* Styles for the feedback popover component in the learner view. */
 .oppia-feedback-popover-submit-btn-enabled {
-  color: #05a69a;
+  color: #009688;
 }
 .oppia-feedback-popover-textarea {
   border: 1px solid rgba(0,0,0,0.2);
