@@ -28,8 +28,8 @@ class ItemSelectionInput(base.BaseInteraction):
     answer_type = 'SetOfHtmlString'
 
     _customization_arg_specs = [{
-        'name': 'maxAllowableSelectionCount',
-        'description': 'Maximum number of selections permitted',
+        'name': 'minAllowableSelectionCount',
+        'description': 'Minimum number of selections permitted.',
         'schema': {
             'type': 'int',
             'validators': [{
@@ -39,8 +39,8 @@ class ItemSelectionInput(base.BaseInteraction):
         },
         'default_value': 1,
     }, {
-        'name': 'minAllowableSelectionCount',
-        'description': 'Minimum number of selections permitted.',
+        'name': 'maxAllowableSelectionCount',
+        'description': 'Maximum number of selections permitted',
         'schema': {
             'type': 'int',
             'validators': [{
