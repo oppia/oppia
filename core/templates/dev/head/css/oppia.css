@@ -2017,9 +2017,6 @@ div#ng-curtain {
 .oppia-rating-star-active {
   color: #FFD700;
 }
-.oppia-rating-star-inactive {
-  color: #FFF;
-}
 
 .oppia-transition-200 {
   -webkit-transition: all 200ms;

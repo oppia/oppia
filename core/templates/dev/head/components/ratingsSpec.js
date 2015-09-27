@@ -45,43 +45,43 @@ describe('Ratings from value directive', function() {
     ctrlScope.ratingValue = 4.2;
     scope.$digest();
     // Note the array here is zero-indexed but ratings are one-indexed
-    expect(ctrlScope.stars[0].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[1].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[2].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[3].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 1.7;
     scope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[1].cssClass).toBe('fa-star-half oppia-rating-star-inactive');
-    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
-    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
-    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star-half-o');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 1.9;
     scope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[1].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
-    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
-    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 2.25;
     scope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[1].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-half oppia-rating-star-inactive');
-    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
-    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o oppia-rating-star-inactive');
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star-half-o');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star-o');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 4.3;
     scope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[1].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[2].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[3].cssClass).toBe('fa-star oppia-rating-star-inactive');
-    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-half oppia-rating-star-inactive');
+    expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[3].cssClass).toBe('fa-star');
+    expect(ctrlScope.stars[4].cssClass).toBe('fa-star-half-o');
   });
 });
 
@@ -115,7 +115,7 @@ describe('Ratings from frequencies directive', function() {
     ).toBe(undefined);
 
     expect(
-      ctrlScope.computeAverageRating({'1': 0, '2': 1, '3': 1, '4': 0, '5': 2})
+      ctrlScope.computeAverageRating({'1': 0, '2': 1, '3': 1, '4': 0, '5': 0})
     ).toBe(undefined);
   });
 
