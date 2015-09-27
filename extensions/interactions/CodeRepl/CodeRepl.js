@@ -128,8 +128,13 @@ oppia.directive('oppiaResponseCodeRepl', [
       restrict: 'E',
       scope: {},
       templateUrl: 'response/CodeRepl',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+
+        if ($scope.answer.error) {
+          $scope.errorFocusLabel = focusService.generateFocusLabel();
+          focusService.setFocus($scope.errorFocusLabel);
+        }
       }]
     };
   }

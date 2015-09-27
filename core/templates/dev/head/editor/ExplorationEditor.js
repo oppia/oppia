@@ -186,10 +186,10 @@ oppia.controller('ExplorationEditor', [
     selector: _ID_TUTORIAL_STATE_CONTENT,
     heading: 'Content',
     text: (
-      'An Oppia exploration is a one-on-one conversation that is divided ' +
-      'into several \'cards\'. A card consists of Oppia asking a question, and the ' +
-      'learner responding.<br><br>' +
-      'This is where you can tell Oppia what to say to the learner at the beginning.'),
+      'An Oppia exploration is a conversation between a tutor and a ' +
+      'learner that is divided into several \'cards\'.<br><br>' +
+      'The first part of a card is the <b>content</b>. Here, you can set ' +
+      'the scene and ask the learner a question.'),
     placement: 'right'
   }, {
     type: 'function',
@@ -453,6 +453,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     }
   };
 
+  // This flag is used to ensure only one save exploration modal can be open at
+  // any one time.
+  var _modalIsOpen = false;
+
   $scope.saveChanges = function() {
     routerService.savePendingChanges();
 
@@ -496,6 +500,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       warningsData.clear();
+
+      // If the modal is open, do not open another one.
+      if (_modalIsOpen) {
+        return;
+      }
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
@@ -629,6 +638,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         ]
       });
 
+      // Modal is Opened
+      _modalIsOpen = true;
+      
       modalInstance.opened.then(function(data) {
         // The $timeout seems to be needed in order to give the modal time to
         // render.
@@ -639,6 +651,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
       modalInstance.result.then(function(commitMessage) {
         $scope.isSaveInProgress = true;
+        _modalIsOpen = false;
 
         var changeList = changeListService.getChangeList();
         explorationData.save(changeList, commitMessage, function() {
@@ -650,6 +663,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         }, function() {
           $scope.isSaveInProgress = false;
         });
+      }, function() {
+        _modalIsOpen = false;
       });
     });
   };

@@ -30,7 +30,7 @@
       <pre><[answer.output]></pre>
     </span>
 
-    <span ng-if="answer.error">
+    <span ng-if="answer.error" focus-on="<[errorFocusLabel]>">
       <font color=red>Error: <[answer.error]></font><br>
     </span>
 
@@ -41,5 +41,5 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/CodeRepl">
-  <span><pre><[answer.code | truncateAtFirstLine]></pre></span>
+  <span><pre><[answer.code | truncateAtFirstLine]>...</pre></span>
 </script>

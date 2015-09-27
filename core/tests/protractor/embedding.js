@@ -50,6 +50,7 @@ describe('Embedding', function() {
         forms.toRichText('Right! Why do you think it is 6?'));
       player.expectExplorationToNotBeOver();
       player.submitAnswer('TextInput', 'factorial');
+      player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
     };
 

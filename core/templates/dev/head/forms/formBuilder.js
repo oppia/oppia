@@ -1199,18 +1199,19 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
     controller: [
-        '$scope', '$filter', '$timeout', 'parameterSpecsService',
-        function($scope, $filter, $timeout, parameterSpecsService) {
+        '$scope', '$filter', '$timeout', 'parameterSpecsService', 'focusService',
+        function($scope, $filter, $timeout, parameterSpecsService, focusService) {
       $scope.hasLoaded = false;
-      $scope.isInputInFocus = false;
+      $scope.isUserCurrentlyTyping = false;
       $scope.hasFocusedAtLeastOnce = false;
+
+      $scope.labelForErrorFocusTarget = focusService.generateFocusLabel();
 
       $scope.validate = function(localValue) {
         return $filter('isFloat')(localValue) !== undefined;
       };
 
       $scope.onFocus = function() {
-        $scope.isInputInFocus = true;
         $scope.hasFocusedAtLeastOnce = true;
         if ($scope.onInputFocus) {
           $scope.onInputFocus();
@@ -1218,7 +1219,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       };
 
       $scope.onBlur = function() {
-        $scope.isInputInFocus = false;
+        $scope.isUserCurrentlyTyping = false;
         if ($scope.onInputBlur) {
           $scope.onInputBlur();
         }
@@ -1243,7 +1244,14 @@ oppia.directive('schemaBasedFloatEditor', [function() {
 
       $scope.onKeypress = function(evt) {
         if (evt.keyCode === 13) {
-          $scope.$emit('submittedSchemaBasedFloatForm');
+          if (Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
+            $scope.isUserCurrentlyTyping = false;
+            focusService.setFocus($scope.labelForErrorFocusTarget);
+          } else {
+            $scope.$emit('submittedSchemaBasedFloatForm');
+          }
+        } else {
+          $scope.isUserCurrentlyTyping = true;
         }
       };
 

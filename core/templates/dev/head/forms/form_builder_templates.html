@@ -139,7 +139,7 @@
                  focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
                  ng-blur="onBlur()" ng-focus="onFocus()">
 
-          <span ng-if="hasLoaded && !isInputInFocus && hasFocusedAtLeastOnce" style="font-size: 0.9em; left: 0; position: absolute; top: 25px;">
+          <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce" style="font-size: 0.9em; left: 0; position: absolute; top: 25px;" tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
             <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
               Please enter a valid decimal number.
             </span>
