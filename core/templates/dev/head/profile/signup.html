@@ -48,7 +48,7 @@
               </span>
               <div style="height: 18px; width: 550px;">
                 <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
-                  <[warningText | translate]>
+                  <[warningI18nCode | translate]>
                 </span>
               </div>
             </div>
@@ -81,9 +81,9 @@
 
         <hr>
 
-        <p style="font-size: 1em;" translate translate-value-sitename="{{SITE_NAME}}">
+        <span style="font-size: 1em;" translate translate-values="{sitename: '{{SITE_NAME}}'}">
           I18N_SIGNUP_SITE_DESCRIPTION
-        </p>
+        </span>
 
         <div class="checkbox">
           <label>
@@ -97,7 +97,7 @@
 
         <br>
 
-        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms || submissionInProcess" translate>
+        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningI18nCode || !agreedToTerms || submissionInProcess" translate>
           I18N_SIGNUP_BUTTON_SUBMIT
         </button>
       </form>

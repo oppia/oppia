@@ -31,7 +31,7 @@ oppia.controller('Signup', [
 
   var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
-  $scope.warningText = '';
+  $scope.warningI18nCode = '';
   $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
   $scope.submissionInProcess = false;
 
@@ -70,12 +70,12 @@ oppia.controller('Signup', [
     warningsData.clear();
     $scope.blurredAtLeastOnce = true;
     $scope.updateWarningText(username);
-    if (!$scope.warningText) {
+    if (!$scope.warningI18nCode) {
       $http.post('usernamehandler/data', {
         username: $scope.username
       }).success(function(data) {
         if (data.username_is_taken) {
-          $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN'
+          $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN'
         }
       });
     }
@@ -89,19 +89,19 @@ oppia.controller('Signup', [
     var oppia = /oppia/i;
 
     if (!username) {
-      $scope.warningText = 'I18N_SIGNUP_ERROR_NO_USERNAME';
+      $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
     } else if (username.indexOf(' ') !== -1) {
-      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
+      $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
     } else if (username.length > 50) {
-      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
+      $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
     } else if (!alphanumeric.test(username)) {
-      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
+      $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
     } else if (admin.test(username)) {
-      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
+      $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
     } else if (oppia.test(username)) {
-      $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
+      $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
     } else {
-      $scope.warningText = '';
+      $scope.warningI18nCode = '';
     }
   };
 
@@ -115,7 +115,7 @@ oppia.controller('Signup', [
       return;
     }
 
-    if (!$scope.hasUsername && $scope.warningText) {
+    if (!$scope.hasUsername && $scope.warningI18nCode) {
       return;
     }
 

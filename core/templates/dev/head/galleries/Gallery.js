@@ -286,7 +286,7 @@ oppia.controller('SearchBar', [
     }
   };
   // Non translatable parts of the html strings, like numbers or user names.
-  $scope.nonTranslatableStrings = {}
+  $scope.translationData = {}
 
   // Update the description, numSelections and summary fields of the relevant
   // entry of $scope.selectionDetails.
@@ -309,7 +309,7 @@ oppia.controller('SearchBar', [
       totalCount === 1 ? selectedItems[0] :
       'I18N_GALLERY_N_' + itemsName.toUpperCase());
 
-    $scope.nonTranslatableStrings[itemsName] = {totalCount: totalCount}
+    $scope.translationData[itemsName + 'Count'] = totalCount
 
     $scope.selectionDetails[itemsType].description = (
       selectedItems.length > 0 ? selectedItems.join(', ') :

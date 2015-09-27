@@ -24,9 +24,9 @@ var gallery = require('../protractor_utils/gallery.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var checkForTranslationIds = function (selector) {
-  element(by.css('.oppia-base-container')).then(function (value) {
-    value.getInnerHtml().then(function (promiseValue) {
+var checkForTranslationIds = function(selector) {
+  element(by.css('.oppia-base-container')).then(function(value) {
+    value.getInnerHtml().then(function(promiseValue) {
       expect(promiseValue).not.toContain('I18N_GALLERY');
     });
   });

@@ -28,7 +28,7 @@ oppia.controller('I18nFooter', [
     function($scope, $translate, SUPPORTED_LANGUAGES) {
   $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   // Changes the language of the translations.
-  $scope.changeLanguage = function (langCode) {
+  $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
 }]);

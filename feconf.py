@@ -454,3 +454,9 @@ ALL_LANGUAGE_CODES = [{
 # Defaults for topic similarities
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
+
+LANGUAGES_SUPPORTED = [{
+    'name': 'English', 'code': 'en',
+}, {
+    'name': u'Español', 'code': 'es',
+}]
