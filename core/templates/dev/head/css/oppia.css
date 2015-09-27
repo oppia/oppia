@@ -120,8 +120,9 @@ a:focus {
   outline-style: none;
 }
 
+/* Change the all borders of an input to red when there is validation errors. */
 input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-invalid {
-  border-bottom-color: #F44336;
+  border-color: #F44336;
 }
 
 /* Change the color of odd-numbered lines in a table. */

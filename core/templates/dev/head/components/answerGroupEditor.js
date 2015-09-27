@@ -404,6 +404,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
           return outcome.dest == PLACEHOLDER_OUTCOME_DEST;
         };
 
+        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
         $scope.destChoices = [];
         $scope.$watch(explorationStatesService.getStates, function(newValue) {
           var _currentStateName = editorContextService.getActiveStateName();
