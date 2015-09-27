@@ -7,7 +7,6 @@ branches:
   only:
   - master
   - develop
-  - travisci
 
 env:
   matrix:
