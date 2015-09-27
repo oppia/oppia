@@ -980,13 +980,6 @@ pre.oppia-pre-wrapped-text {
 .oppia-editable-section {
   cursor: pointer;
   position: relative;
-  -webkit-transition: all 200ms;
-  transition: all 200ms;
-}
-
-.oppia-editable-section:hover {
-  -webkit-transition: all 200ms;
-  transition: all 200ms;
 }
 
 .oppia-editable-section:hover .oppia-state-content-display,
