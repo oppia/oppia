@@ -15,7 +15,7 @@
 /**
  * @fileoverview Clearing-house for protractor test utilities for gadgets.
  *
- * @author Michael Anuzis(anuzis@gmail.com)
+ * @author Michael Anuzis (anuzis@gmail.com)
  */
 
 /* Each gadgets's protractor file must implement the following:

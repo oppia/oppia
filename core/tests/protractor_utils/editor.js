@@ -270,7 +270,7 @@ var addGadget = function(panelName, gadgetType, gadgetName) {
 
 };
 
-// currentName must exist.
+// Callers should ensure that a gadget with currentName exists.
 var renameGadget = function(currentName, newName) {
   element(by.css('.protractor-test-rename-' + currentName + '-gadget-icon'))
     .click();
@@ -283,15 +283,14 @@ var renameGadget = function(currentName, newName) {
     by.css('.protractor-test-gadget-rename-confirmation-button')).click();
 };
 
-// gadgetName must exist.
+// Callers should ensure that a gadget with gadgetName exists.
 var deleteGadget = function(gadgetName) {
   element(by.css('.protractor-test-delete-' + gadgetName + '-gadget-icon'))
     .click();
   general.waitForSystem(2000); // wait for modal popup.
-  element(by.cssContainingText('.btn-danger', 'Delete Gadget')).click();
+  element(by.css('.protractor-test-delete-gadget-button')).click();
 };
 
-// This method is a precursor to other methods like adjusting visibility.
 var openGadgetEditorModal = function(gadgetName) {
   element(by.css('.protractor-test-edit-' + gadgetName + '-gadget')).click();
 };

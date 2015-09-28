@@ -96,11 +96,11 @@ html, body {
 
 .conversation-skin-bottom-gadget-panel {
   bottom: 4px;
+  left: 0;
+  margin: 0 auto;
   max-height: 135px;
   max-width: 400px;
   min-width: 150px;
-  left: 0;
-  margin: 0 auto;
   position: fixed;
   right: 0;
   width: 360px;

@@ -385,7 +385,9 @@ describe('Full exploration editor', function() {
   });
 });
 
-describe('Gadget editor', function() {
+// NOTE: Gadgets are disabled by default. Enable when running gadget-specific
+// integration tests.
+xdescribe('Gadget editor', function() {
   it('should allow adding a gadget that is visible in the editor preview ' +
        'and player view.', function() {
     users.createUser('gadgetuser1@example.com', 'gadgetuser1');

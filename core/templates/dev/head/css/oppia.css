@@ -2161,16 +2161,16 @@ md-card.preview-conversation-skin-supplemental-card {
   font-weight: normal;
 }
 
+/* TODO(anuzis): Remove in gadgets UI update. */
 .oppia-bottom-editor-gadget-panel {
   border: 1px solid silver;
   color: #fff;
-  padding: 4px;
-  position: absolute;
   left: 37%;
   max-height: 135px;
   max-width: 400px;
   min-width: 150px;
-  position: relative;
+  padding: 4px;
+  position: absolute;
   top: 95%;
 }
 
