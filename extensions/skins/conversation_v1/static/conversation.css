@@ -80,13 +80,13 @@ html, body {
   margin-bottom: -4px;
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
-  -0-transition: all 0.2s;
+  -o-transition: all 0.2s;
   transition: 0.2s;
 }
 .coversation-skin-responses-dropdown-icon-rotated {
   -webkit-transform: rotate(90deg);
   -moz-transform: rotate(90deg);
-  -0-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
   transform: rotate(90deg);
 }
 .conversation-skin-responses-dropdown-container {
