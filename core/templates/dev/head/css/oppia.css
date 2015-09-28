@@ -2143,7 +2143,6 @@ md-card.preview-conversation-skin-supplemental-card {
   cursor: pointer;
   display: inline-block;
   margin: 5px;
-  outline: 1px solid #aaa;
   vertical-align: top;
   width: 25%;
 }
@@ -2151,7 +2150,6 @@ md-card.preview-conversation-skin-supplemental-card {
   outline: 2px solid #05A69A;
 }
 .oppia-gadget-tile-name {
-  border-top: 1px solid #ccc;
   padding: 3px 0;
   position: relative;
   text-align: center;
@@ -2159,19 +2157,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-gadget-customization-editor label {
   font-weight: normal;
-}
-
-/* TODO(anuzis): Remove in gadgets UI update. */
-.oppia-bottom-editor-gadget-panel {
-  border: 1px solid silver;
-  color: #fff;
-  left: 37%;
-  max-height: 135px;
-  max-width: 400px;
-  min-width: 150px;
-  padding: 4px;
-  position: absolute;
-  top: 95%;
 }
 
 .oppia-gadget-delete-icon,

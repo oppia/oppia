@@ -219,9 +219,6 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }]
 
 ALLOWED_GADGETS = {
-    'AdviceBar': {
-        'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
-    },
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },

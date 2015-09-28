@@ -27,6 +27,7 @@ class ScoreBar(base.BaseGadget):
     description = 'A visual score bar that can represent progress or success.'
     height_px = 100
     width_px = 250
+    gadget_panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [{

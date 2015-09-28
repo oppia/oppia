@@ -28,6 +28,13 @@ class AdviceBar(base.BaseGadget):
     description = 'Allows learners to receive advice from predefined tips.'
     height_px = 300
     width_px = 100
+    # TODO(anuzis): AdviceBar doesn't fit any panels in the current Oppia
+    # view. It's listed as bottom here to temporarily pass validation, but
+    # is disabled in the feconf.py ALLOWED_GADGETS to prevent it from being
+    # displayed. We might remove the gadget entirely, but are preserving it
+    # temporarily in case it would be useful in a subsequent release with
+    # expanded gadget panel functionality.
+    gadget_panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [

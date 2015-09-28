@@ -1098,13 +1098,13 @@ oppia.factory('explorationGadgetsService', [
      * Confirms if a panel can accept a new gadget considering its capacity
      * and the gadget's size requirements given its customization arguments.
      */
-    canAddGadgetTo: function(panelName, gadgetData) {
-      var visibilityMap = _getGadgetsVisibilityMap(panelName);
+    canAddGadgetTo: function(gadgetData) {
+      var visibilityMap = _getGadgetsVisibilityMap(gadgetData.gadget_panel);
       var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name);
 
       if(canAdd) {
         canAdd = gadgetValidationService.canAddGadget(
-          panelName, gadgetData, visibilityMap);
+          gadgetData, visibilityMap);
       }
       return canAdd;
     },
@@ -1231,11 +1231,13 @@ oppia.factory('explorationGadgetsService', [
       currentGadgetData.visible_in_states = angular.copy(newVisibleInStates);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
     },
-    addGadget: function(gadgetData, panelName) {
+    addGadget: function(gadgetData) {
 
-      if(!_panels.hasOwnProperty(panelName)) {
+      // Defense-in-depth: This warning should never happen with panel names
+      // hard coded and validated on the backend.
+      if(!_panels.hasOwnProperty(gadgetData.gadget_panel)) {
         warningsData.addWarning(
-          'Attempted to add to a non-existent panel: ' + panelName);
+          'Attempted add to a non-existent panel: ' + gadgetData.gadget_panel);
         return;
       }
 
@@ -1244,9 +1246,15 @@ oppia.factory('explorationGadgetsService', [
         return;
       }
       _gadgets[gadgetData.gadget_name] = gadgetData;
-      _panels[panelName].push(gadgetData.gadget_name);
+      _panels[gadgetData.gadget_panel].push(gadgetData.gadget_name);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
-      changeListService.addGadget(gadgetData, panelName);
+      // REFACTORING(anuzis): panelName formerly passed as 2nd arg below.
+      // Temporarily passing from shared encapsulating variable to see if it
+      // works before refactoring further downstream.
+      // UPDATE: Confirmed this works. @sll: What's your feedback on this
+      // general approach? Should we encapsulate gadget_panel in gadgetData
+      // then pass it in as a single argument here?
+      changeListService.addGadget(gadgetData, gadgetData.gadget_panel);
     },
     /**
      * Function that opens a modal to confirm gadget delete.

@@ -1,8 +1,5 @@
 <link rel="stylesheet" type="text/css" href="/extensions/gadgets/ScoreBar/static/css/scoreBar.css">
 
 <script type="text/ng-template" id="gadget/ScoreBar">
-  <div class="gauge">
-    <div class="title protractor-test-scorebar-title"><[scoreBarTitle]></div>
-    <progressbar class="fill protractor-test-scorebar-progressbar" max="maxValue" value="getScoreValue()"></progressbar>
-  </div>
+    <progressbar class="protractor-test-scorebar-progressbar" max="maxValue" value="getScoreValue()"><span class="scorebar-title protractor-test-scorebar-title"><[scoreBarTitle]><span></progressbar>
 </script>

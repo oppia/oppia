@@ -232,11 +232,11 @@ var expectCannotDeleteInteraction = function() {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant gadget editor.
-var addGadget = function(panelName, gadgetType, gadgetName) {
+var addGadget = function(gadgetType, gadgetName) {
 
-  // Bring up the gadget insertion modal for the specified panel.
+  // Bring up the gadget insertion modal.
   element(
-    by.css('.protractor-test-' + panelName + '-panel-insert-gadget-button'))
+    by.css('.protractor-test-add-gadget-button'))
     .click();
 
   general.waitForSystem(2000);
@@ -255,8 +255,8 @@ var addGadget = function(panelName, gadgetType, gadgetName) {
   var elem = element(by.css('.protractor-test-gadget-customization-editor'));
   var customizationArgs = [elem];
 
-  if (arguments.length > 3) {
-    for (var i = 3; i < arguments.length; i++) {
+  if (arguments.length > 2) {
+    for (var i = 2; i < arguments.length; i++) {
       customizationArgs.push(arguments[i]);
     }
     gadgets.getGadget(gadgetType).customizeGadget.apply(

@@ -42,6 +42,11 @@ class BaseGadget(object):
     height_px = 0
     # Width of the gadget in pixels.
     width_px = 0
+    # The gadget panel in which this gadget shows up in the learner view.
+    # This must match the name of a stationary gadget panel in the skin.
+    # Example: 'bottom'. In the future, this property may offer other options
+    # like 'draggable'.
+    gadget_panel = ''
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -98,6 +103,7 @@ class BaseGadget(object):
             'name': self.name,
             'height_px': self.height_px,
             'width_px': self.width_px,
+            'gadget_panel': self.gadget_panel,
             'description': self.description,
             'customization_arg_specs': [{
                 'name': ca_spec.name,

@@ -107,8 +107,8 @@ class GadgetUnitTests(test_utils.GenericTestBase):
 
         gadget_dict = gadget.to_dict()
         self.assertItemsEqual(gadget_dict.keys(), [
-            'type', 'name', 'height_px', 'width_px', 'description',
-            'customization_arg_specs',])
+            'type', 'name', 'height_px', 'width_px', 'gadget_panel',
+            'description', 'customization_arg_specs',])
         self.assertEqual(gadget_dict['type'], TEST_GADGET_TYPE)
         self.assertEqual(gadget_dict['customization_arg_specs'], [
             {

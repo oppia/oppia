@@ -1,64 +1,74 @@
 <div ng-controller="GadgetEditor">
-  <div ng-repeat="(panelName, panelContents) in panels"
-       class="oppia-<[panelName]>-editor-gadget-panel protractor-test-<[panelName]>-editor-gadget-panel">
-    <div class="oppia-insert-gadget-button protractor-test-<[panelName]>-panel-insert-gadget-button"
-         ng-click="addNewGadget(panelName)">
-      + Insert Gadget
-    </div>
+  <span style="font-size: 14px;">
+    <strong>Gadgets (Advanced)</strong>
+  </span>
+  <span class="glyphicon glyphicon-info-sign" tooltip="These can be reused throughout an exploration." tooltip-placement="bottom" style="font-size: 12px; padding-left: 18px;"></span>
 
-    <!-- TODO(vjoisar): Hide if no hidden gadgets -->
-    <div class="oppia-gadget-dropdown-toggle">
-      <span class="caret"></span>
-      <div class="oppia-hidden-gadgets-container">
-        <div class="oppia-hidden-gadget" ng-repeat="gadgetName in panelContents"
-             ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) == -1">
-          <div class="oppia-gadget-name"
-               ng-click="editGadget(gadgetName)">
-            <[gadgetName]>
+  <md-card style="background-color: white; margin: 20px 0px; padding: 10px 10px;" class="md-default-theme">
+
+    <div ng-repeat="(panelName, panelContents) in panels"
+         class="protractor-test-gadget-editor">
+
+      <div>
+        <button type="button" class="btn btn-default btn-xs protractor-test-add-gadget-button" ng-click="addNewGadget()">
+          Add Gadget
+        </button>
+      </div>
+
+      <!-- TODO(vjoisar): Hide if no hidden gadgets -->
+      <div class="oppia-gadget-dropdown-toggle">
+        <span class="caret"></span>
+        <div class="oppia-hidden-gadgets-container">
+          <div class="oppia-hidden-gadget" ng-repeat="gadgetName in panelContents"
+               ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) == -1">
+            <div class="oppia-gadget-name"
+                 ng-click="editGadget(gadgetName)">
+              <[gadgetName]>
+            </div>
+            <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
+                  class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
+            </span>
           </div>
+        </div>
+      </div>
+
+      <div class="oppia-visible-gadgets-container">
+        <div ng-repeat="gadgetName in panelContents"
+             ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) > -1">
           <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
                 class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
           </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="oppia-visible-gadgets-container">
-      <div ng-repeat="gadgetName in panelContents"
-           ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) > -1">
-        <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
-              class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
-        </span>
-        <span title="Rename <[gadgetName]>"
-              ng-click="changeActiveGadgetNameEditor(gadgetName)"
-              class="glyphicon glyphicon-pencil oppia-gadget-rename-icon protractor-test-rename-<[gadgetName]>-gadget-icon">
-        </span>
-        <span ng-show="originalNameForRenamedGadget == gadgetName"
-              class="oppia-rename-gadget-form">
-          <input type="text" ng-model="newNameForRenamedGadget" class="protractor-test-gadget-rename-text-input">
-          <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
-                  ng-click="renameGadget(newNameForRenamedGadget)">
-          </button>
-          <button class="btn btn-xs glyphicon glyphicon-remove"
-                  ng-click="changeActiveGadgetNameEditor()">
-          </button>
-        </span>
-        <div class="oppia-gadget-preview-container protractor-test-edit-<[gadgetName]>-gadget" title="Edit <[gadgetName]>"
-             ng-click="editGadget(gadgetName)">
-          <oppia-gadget-preview
-            gadget-type="gadgets[gadgetName].gadget_type"
-            gadget-name="gadgetName" style="pointer-events: none;"
-            gadget-customization-args="gadgets[gadgetName].customization_args"
-            class="protractor-test-<[gadgetName]>-gadget"
-            visible-in-states="gadgets[gadgetName].visible_in_states">
-          </oppia-gadget-preview>
-          <span title="Edit Gadget Content"
-                class="glyphicon glyphicon-edit oppia-gadget-edit-icon">
+          <span title="Rename <[gadgetName]>"
+                ng-click="changeActiveGadgetNameEditor(gadgetName)"
+                class="glyphicon glyphicon-pencil oppia-gadget-rename-icon protractor-test-rename-<[gadgetName]>-gadget-icon">
           </span>
+          <span ng-show="originalNameForRenamedGadget == gadgetName"
+                class="oppia-rename-gadget-form">
+            <input type="text" ng-model="newNameForRenamedGadget" class="protractor-test-gadget-rename-text-input">
+            <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
+                    ng-click="renameGadget(newNameForRenamedGadget)">
+            </button>
+            <button class="btn btn-xs glyphicon glyphicon-remove"
+                    ng-click="changeActiveGadgetNameEditor()">
+            </button>
+          </span>
+          <div class="oppia-gadget-preview-container protractor-test-edit-<[gadgetName]>-gadget" title="Edit <[gadgetName]>"
+               ng-click="editGadget(gadgetName)">
+            <oppia-gadget-preview
+              gadget-type="gadgets[gadgetName].gadget_type"
+              gadget-name="gadgetName" style="pointer-events: none;"
+              gadget-customization-args="gadgets[gadgetName].customization_args"
+              class="protractor-test-<[gadgetName]>-gadget"
+              visible-in-states="gadgets[gadgetName].visible_in_states">
+            </oppia-gadget-preview>
+            <span title="Edit Gadget Content"
+                  class="glyphicon glyphicon-edit oppia-gadget-edit-icon">
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </md-card>
 </div>
 
 <script type="text/ng-template" id="modals/customizeGadget">
@@ -74,9 +84,7 @@
     <div ng-if="!gadgetDict.gadget_type" ng-cloak>
       <div class="oppia-gadget-tile"
             ng-repeat="(gadgetType, gadget) in ALLOWED_GADGETS"
-            ng-click="onChangeGadgetType(gadgetType)"
-            ng-if="GADGET_SPECS[gadgetType].width_px <= currentPanelSpec.width &&
-                   GADGET_SPECS[gadgetType].height_px <= currentPanelSpec.height">
+            ng-click="onChangeGadgetType(gadgetType)">
         <img ng-src="/extensions/gadgets/<[gadgetType]>/static/images/<[gadgetType]>.png">
         <div class="oppia-gadget-tile-name protractor-test-<[gadgetType]>-gadget-selection-modal">
           <[gadgetType]>

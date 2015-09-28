@@ -33,7 +33,6 @@
 var GADGETS = {
   AdviceBar: require('./AdviceBar/protractor.js'),
   ScoreBar: require('./ScoreBar/protractor.js'),
-  TestGadget: require('./TestGadget/protractor.js'),
 };
 
 var getGadget = function(gadgetType) {

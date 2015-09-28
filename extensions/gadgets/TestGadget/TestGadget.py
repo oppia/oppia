@@ -28,6 +28,7 @@ class TestGadget(base.BaseGadget):
     description = 'Tests functionality allowing supplementary predefined tips.'
     height_px = 50
     width_px = 60
+    gadget_panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [

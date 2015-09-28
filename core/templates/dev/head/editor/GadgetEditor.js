@@ -44,17 +44,17 @@ oppia.controller('GadgetEditor', [
     explorationGadgetsService.deleteGadget(gadgetName, true);
   };
 
-  $scope.addNewGadget = function(panelName) {
+  $scope.addNewGadget = function() {
     // Initializing gadget with default values.
     var gadgetData = {
       gadget_type: '',
       gadget_name: '',
-      panel_name: panelName,
+      gadget_panel: '',
       customization_args: {},
       visible_in_states: [editorContextService.getActiveStateName()]
     };
     _openCustomizeGadgetModal(gadgetData, function(gadgetData) {
-      explorationGadgetsService.addGadget(gadgetData, panelName);
+      explorationGadgetsService.addGadget(gadgetData);
     });
   };
 
@@ -100,7 +100,7 @@ oppia.controller('GadgetEditor', [
   };
 
   /**
-   * @param {Object} gadgetEditData is a dict representing the gadget
+   * @param {Object} gadgetDict is a dict representing the gadget
    *    being edited. It has the following keys: gadget_type, gadget_name,
    *    customization_args and visible_in_states.
    *    If the gadget's type is an empty string (''), it means no gadget is
@@ -127,8 +127,6 @@ oppia.controller('GadgetEditor', [
 
         $scope.ALLOWED_GADGETS = GLOBALS.ALLOWED_GADGETS;
         $scope.GADGET_SPECS = GADGET_SPECS;
-        $scope.currentPanelSpec = GLOBALS.SKIN_SPECS[
-          explorationSkinIdService.savedMemento][gadgetDict.panel_name];
         var _initializeCustomizationArgs = function(gadgetType) {
           var gadgetSpec = GADGET_SPECS[gadgetType];
           $scope.customizationArgSpecs = gadgetSpec.customization_arg_specs;
@@ -149,6 +147,8 @@ oppia.controller('GadgetEditor', [
         $scope.gadgetDict = gadgetDict;
         if (gadgetDict.gadget_type) {
           _initializeCustomizationArgs(gadgetDict.gadget_type);
+          gadgetDict.gadget_panel = GADGET_SPECS[
+            gadgetDict.gadget_type]['gadget_panel'];
         }
         // if gadget dict has gadget_type on initialization, we are editing
         // a gadget, else adding a new one.
@@ -186,15 +186,13 @@ oppia.controller('GadgetEditor', [
         };
 
         $scope.save = function() {
-          var panelName = $scope.gadgetDict.panel_name;
-          // TODO(anuzis/vjoisar): Add form validation that is dynamic
-          //    for all gadgets which depends on its customization args.
+          $scope.gadgetDict.gadget_panel = GLOBALS.GADGET_SPECS[
+            $scope.gadgetDict.gadget_type]['gadget_panel'];
 
           // When adding a new gadget do all the validation to check
           // if it can be added before dismissing the modal.
           if (!$scope.isEditingGadget &&
-              !explorationGadgetsService.canAddGadgetTo(
-                panelName, $scope.gadgetDict)) {
+              !explorationGadgetsService.canAddGadgetTo($scope.gadgetDict)) {
             return;
           }
           $modalInstance.close($scope.gadgetDict);

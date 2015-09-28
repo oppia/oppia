@@ -404,7 +404,6 @@ xdescribe('Gadget editor', function() {
     editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
-      'bottom', // panel
       'ScoreBar', // type
       'PowerScoreBar', // name
       'Power Level!!!', // title
@@ -463,7 +462,6 @@ xdescribe('Gadget editor', function() {
     editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
-      'bottom', // panel
       'ScoreBar', // type
       'PowerScoreBar', // name
       'Power Level!!!', // title
@@ -511,7 +509,6 @@ xdescribe('Gadget editor', function() {
     editor.addParameterChange('powerlevel', 3000);
 
     editor.addGadget(
-      'bottom', // panel
       'ScoreBar', // type
       'PowerScoreBar', // name
       'Power Level!!!', // title

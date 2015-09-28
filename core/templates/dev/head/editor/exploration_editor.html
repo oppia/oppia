@@ -333,9 +333,6 @@
           <div class="col-lg-9 col-md-9 col-sm-9">
             <div>
               {% include 'editor/state_editor.html' %}
-              {% if SHOW_GADGETS_EDITOR %}
-                {% include 'editor/gadget_editor.html' %}
-              {% endif %}
             </div>
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
@@ -345,6 +342,9 @@
               </div>
               <div>
                 {% include 'editor/sidebar_state_parameter_changes.html' %}
+                {% if SHOW_GADGETS_EDITOR %}
+                  {% include 'editor/gadget_editor.html' %}
+                {% endif %}
               </div>
             </div>
           </div>
