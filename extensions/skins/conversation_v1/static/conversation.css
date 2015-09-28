@@ -83,7 +83,7 @@ html, body {
   -o-transition: all 0.2s;
   transition: 0.2s;
 }
-.coversation-skin-responses-dropdown-icon-rotated {
+.conversation-skin-responses-dropdown-icon-rotated {
   -webkit-transform: rotate(90deg);
   -moz-transform: rotate(90deg);
   -o-transform: rotate(90deg);
