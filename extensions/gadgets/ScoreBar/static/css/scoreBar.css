@@ -1,4 +1,4 @@
- .gauge {
+.gauge {
   background: url('../images/gauge.png') center no-repeat;
   font-family: 'Open Sans', Arial, Helvetica, sans-serif;
   font-size: 14px;
@@ -6,7 +6,7 @@
   margin: 0 auto;
   position: relative;
   width: 378px;
- }
+}
 
 .fill {
   height: 7px;
@@ -17,7 +17,7 @@
 }
 
 .title {
-  color: #000;
+  color: #eee;
   position: absolute;
   text-align: center;
   width: 100%;

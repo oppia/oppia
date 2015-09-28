@@ -649,7 +649,15 @@ class EntityChangeListSummarizer(object):
                     continue
                 elif entity_name in self.deleted_entities:
                     self.changed_entities.append(entity_name)
-                    del self.property_changes[entity_name]
+                    # TODO(sll): This logic doesn't make sense for the
+                    # following sequence of events: (a) an existing
+                    # non-default entity is deleted, (b) a new default entity
+                    # with the same name is created. Rewrite this method to
+                    # take that case into account (or, better still, delete it
+                    # altogether and use the frontend history diff
+                    # functionality instead).
+                    if entity_name in self.property_changes:
+                        del self.property_changes[entity_name]
                     self.deleted_entities.remove(entity_name)
                 else:
                     self.added_entities.append(entity_name)

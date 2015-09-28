@@ -47,8 +47,6 @@ schema_version: %d
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   %s:
     content:
@@ -110,13 +108,12 @@ param_specs: {}
 schema_version: %d
 skin_customizations:
   panels_contents:
-    bottom: []
-    left:
+    bottom:
       - customization_args:
-          characters:
-            value: 2
-          floors:
-            value: 1
+          adviceObjects:
+            value:
+              - adviceTitle: b
+                adviceHtml: <p>c</p>
           title:
             value: The Test Gadget!
         gadget_type: TestGadget
@@ -124,7 +121,6 @@ skin_customizations:
         visible_in_states:
           - New state
           - Second state
-    right: []
 states:
   %s:
     content:
@@ -199,9 +195,15 @@ TEST_GADGETS = {
 }
 
 TEST_GADGET_CUSTOMIZATION_ARGS = {
-    'characters': {'value': 2},
-    'floors': {'value': 1},
-    'title': {'value': 'The Test Gadget!'}
+    'adviceObjects': {
+        'value': [{
+            'adviceTitle': 'b',
+            'adviceHtml': '<p>c</p>'
+        }]
+    },
+    'title': {
+        'value': 'The Test Gadget!'
+    }
 }
 
 TEST_GADGET_DICT = {
@@ -704,7 +706,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
             gadget_instance = exploration.skin_instance.panel_contents_dict[
-                'left'][0]
+                'bottom'][0]
 
             # Force a GadgetInstance to require certain state names.
             gadget_instance.visible_in_states.extend(['DEF', 'GHI'])
@@ -727,19 +729,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.states['GHI'] = ghi_state
             exploration.validate()
 
-            exploration.skin_instance.panel_contents_dict['right'].append(
-                gadget_instance)
+            # Force a gadget name collision.
+            gadget_instance.visible_in_states = ['DEF']
+            exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
+            exploration.skin_instance.panel_contents_dict[
+                'bottom'][1].visible_in_states = ['GHI']
             with self.assertRaisesRegexp(
                     utils.ValidationError,
                     'ATestGadget gadget instance name must be unique.'):
                 exploration.validate()
-            exploration.skin_instance.panel_contents_dict['right'].pop()
+            exploration.skin_instance.panel_contents_dict['bottom'].pop()
 
-            gadget_instance.visible_in_states.extend(['GHI'])
+            gadget_instance.visible_in_states.extend(['DEF'])
             with self.assertRaisesRegexp(
                     utils.ValidationError,
                     'TestGadget specifies visibility repeatedly for state: '
-                    'GHI'):
+                    'DEF'):
                 exploration.validate()
 
             # Remove duplicate state.
@@ -762,7 +767,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
             gadget_instance = exploration.skin_instance.panel_contents_dict[
-                'left'][0]
+                'bottom'][0]
             gadget_instance.validate()
 
             gadget_instance.name = ''
@@ -839,7 +844,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'AnotherGadget', 'GadgetUniqueName1', [], {}
         )
         exploration_with_gadgets.skin_instance.panel_contents_dict[
-            'right'].append(another_gadget)
+            'bottom'].append(another_gadget)
         self.assertEqual(
             exploration_with_gadgets.get_gadget_types(),
             ['AnotherGadget', 'TestGadget']
@@ -995,7 +1000,8 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         EXP_ID = 'An exploration_id'
         exploration_with_gadgets = exp_domain.Exploration.from_yaml(
             EXP_ID, 'A title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
-        generated_yaml = exploration_with_gadgets.to_yaml()
+        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
+            generated_yaml = exploration_with_gadgets.to_yaml()
 
         generated_yaml_as_dict = utils.dict_from_yaml(generated_yaml)
         sample_yaml_as_dict = utils.dict_from_yaml(
@@ -1250,8 +1256,6 @@ schema_version: 5
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   (untitled state):
     content:
@@ -1318,8 +1322,6 @@ schema_version: 6
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   (untitled state):
     content:
@@ -1483,8 +1485,6 @@ schema_version: 8
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   (untitled state):
     content:
@@ -1561,8 +1561,6 @@ schema_version: 9
 skin_customizations:
   panels_contents:
     bottom: []
-    left: []
-    right: []
 states:
   (untitled state):
     content:
@@ -1848,12 +1846,12 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
             'eid', 'A title', 'A category')
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            exploration.add_gadget(TEST_GADGET_DICT, 'left')
+            exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
 
             self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'left'][0].type, TEST_GADGET_DICT['gadget_type'])
+                'bottom'][0].type, TEST_GADGET_DICT['gadget_type'])
             self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'left'][0].name, TEST_GADGET_DICT['gadget_name'])
+                'bottom'][0].name, TEST_GADGET_DICT['gadget_name'])
 
             with self.assertRaisesRegexp(
                     ValueError, 'Gadget NotARealGadget does not exist.'):
@@ -1862,11 +1860,11 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
             exploration.rename_gadget(
                 TEST_GADGET_DICT['gadget_name'], 'ANewName')
             self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'left'][0].name, 'ANewName')
+                'bottom'][0].name, 'ANewName')
 
-            # Add another gadget on the right.
+            # Add another gadget.
             with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-                exploration.add_gadget(TEST_GADGET_DICT, 'right')
+                exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
 
             self.assertEqual(
                 exploration.get_all_gadget_names(),
@@ -1880,16 +1878,17 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
             gadget_instance = exploration.get_gadget_instance_by_name(
                 'ANewName')
             self.assertIs(
-                exploration.skin_instance.panel_contents_dict['left'][0],
+                exploration.skin_instance.panel_contents_dict['bottom'][0],
                 gadget_instance
             )
 
             panel_name = exploration._get_panel_name_for_gadget('ANewName')
-            self.assertEqual(panel_name, 'left')
+            self.assertEqual(panel_name, 'bottom')
 
             exploration.delete_gadget('ANewName')
+            exploration.delete_gadget('ATestGadget')
             self.assertEqual(exploration.skin_instance.panel_contents_dict[
-                'left'], [])
+                'bottom'], [])
             with self.assertRaisesRegexp(
                     ValueError, 'Gadget ANewName does not exist.'):
                 exploration.delete_gadget('ANewName')
@@ -1902,16 +1901,14 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
         'skin_id': 'conversation_v1',
         'skin_customizations': {
             'panels_contents': {
-                'bottom': [],
-                'left': [
+                'bottom': [
                     {
                         'customization_args': TEST_GADGET_CUSTOMIZATION_ARGS,
                         'gadget_type': 'TestGadget',
                         'gadget_name': 'ATestGadget',
                         'visible_in_states': ['New state', 'Second state']
                     }
-                ],
-                'right': []
+                ]
             }
         }
     }
@@ -1930,7 +1927,7 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
         skin_instance = exp_domain.SkinInstance('conversation_v1', None)
         self.assertEqual(
             skin_instance.panel_contents_dict,
-            {'bottom': [], 'left': [], 'right': []}
+            {'bottom': []}
         )
 
         skin_instance = exp_domain.SkinInstance('snapshots_v1', None)
@@ -1957,7 +1954,7 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skin_instance_as_instance.skin_id, 'conversation_v1')
         self.assertEqual(
             sorted(skin_instance_as_instance.panel_contents_dict.keys()),
-            ['bottom', 'left', 'right'])
+            ['bottom'])
 
 
 class GadgetInstanceUnitTests(test_utils.GenericTestBase):
@@ -1968,13 +1965,8 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
 
-        # Assert left and bottom panels have 1 GadgetInstance. Right has 0.
         self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
-            'left']), 1)
-        self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
-            'bottom']), 0)
-        self.assertEqual(len(exploration.skin_instance.panel_contents_dict[
-            'right']), 0)
+            'bottom']), 1)
 
     def test_gadget_instance_properties(self):
         """Test accurate representation of gadget properties."""
@@ -1983,7 +1975,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict = exploration.skin_instance.panel_contents_dict
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            test_gadget_instance = panel_contents_dict['left'][0]
+            test_gadget_instance = panel_contents_dict['bottom'][0]
 
         self.assertEqual(test_gadget_instance.height, 50)
         self.assertEqual(test_gadget_instance.width, 60)
@@ -1999,7 +1991,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         panel_contents_dict = exploration.skin_instance.panel_contents_dict
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            test_gadget_instance = panel_contents_dict['left'][0]
+            test_gadget_instance = panel_contents_dict['bottom'][0]
 
         # Validation against sample YAML should pass without error.
         exploration.validate()
@@ -2013,23 +2005,31 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
             with self.assertRaisesRegexp(
                     utils.ValidationError,
-                    'Size exceeded: left panel width of 4600 exceeds limit of '
-                    '100'):
+                    'Size exceeded: bottom panel width of 4600 exceeds limit of '
+                    '350'):
                 exploration.validate()
 
         # Assert internal validation against CustomizationArgSpecs.
-        test_gadget_instance.customization_args['floors']['value'] = 5
+        test_gadget_instance.customization_args[
+            'adviceObjects']['value'].extend(
+                [
+                    {'adviceTitle': 'test_title', 'adviceHtml': 'test html'},
+                    {'adviceTitle': 'another_title', 'adviceHtml': 'more html'},
+                    {'adviceTitle': 'third_title', 'adviceHtml': 'third html'}
+                ]
+            )
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                'TestGadgets are limited to 3 floors, found 5.'):
+                'TestGadget is limited to 3 tips, found 4.'):
             test_gadget_instance.validate()
-        test_gadget_instance.customization_args['floors']['value'] = 1
+        test_gadget_instance.customization_args[
+            'adviceObjects']['value'].pop()
 
         # Assert that too many gadgets in a panel raise a ValidationError.
-        panel_contents_dict['left'].append(test_gadget_instance)
+        panel_contents_dict['bottom'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                '\'left\' panel expected at most 1 gadget, but 2 gadgets are '
+                '\'bottom\' panel expected at most 1 gadget, but 2 gadgets are '
                 'visible in state \'New state\'.'):
             exploration.validate()
 
@@ -2046,7 +2046,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', 'Title', 'Category', SAMPLE_YAML_CONTENT_WITH_GADGETS)
         panel_contents_dict = exploration.skin_instance.panel_contents_dict
-        test_gadget_instance = panel_contents_dict['left'][0]
+        test_gadget_instance = panel_contents_dict['bottom'][0]
 
         test_gadget_as_dict = test_gadget_instance.to_dict()
 

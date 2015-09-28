@@ -29,29 +29,26 @@ class ScoreBar(base.BaseGadget):
     width_px = 250
     _dependency_ids = []
 
-    _customization_arg_specs = [
-        {
-            'name': 'title',
-            'description': 'Optional title for the score bar (e.g. "Score")',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': 'Score'
-        }, {
-            'name': 'maxValue',
-            'description': 'Maximum value (bar fills as a % of this value)',
-            'schema': {
-                'type': 'int',
-            },
-            'default_value': 100
-        }, {
-            # TODO(anuzis): Validate that the paramName corresponds to a valid
-            # parameter name in the exploration.
-            'name': 'paramName',
-            'description': 'The parameter name this score bar follows.',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }
-    ]
+    _customization_arg_specs = [{
+        'name': 'title',
+        'description': 'Optional title for the score bar (e.g. "Score")',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': 'Score'
+    }, {
+        'name': 'maxValue',
+        'description': 'Maximum value (bar fills as a % of this value)',
+        'schema': {
+            'type': 'int',
+        },
+        'default_value': 100
+    }, {
+        'name': 'paramName',
+        'description': 'The parameter name this score bar follows.',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'ParameterName',
+        },
+        'default_value': ''
+    }]

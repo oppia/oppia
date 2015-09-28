@@ -247,10 +247,10 @@ class EditorTest(BaseEditorControllerTest):
                 return [_create_answer(value) for value in arg]
 
             # Load the fuzzy rules demo exploration.
-            exp_services.load_demo('16')
+            exp_services.load_demo('15')
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
             self.assertEqual(
                 exploration_dict['exploration']['title'],
                 'Demonstrating fuzzy rules')
@@ -265,27 +265,27 @@ class EditorTest(BaseEditorControllerTest):
                     'interaction']['id'], 'TextInput')
 
             # Input happy since there is an explicit rule checking for that.
-            result_dict = self.submit_answer('16', state_name, 'happy')
+            result_dict = self.submit_answer('15', state_name, 'happy')
 
             # Input text not at all similar to happy (default outcome).
-            self.submit_answer('16', state_name, 'sad')
+            self.submit_answer('15', state_name, 'sad')
 
             # Input cheerful: this is current training data and falls under the
             # fuzzy rule.
-            self.submit_answer('16', state_name, 'cheerful')
+            self.submit_answer('15', state_name, 'cheerful')
 
             # Input joyful: this is not training data but will be classified
             # under the fuzzy rule.
-            self.submit_answer('16', state_name, 'joyful')
+            self.submit_answer('15', state_name, 'joyful')
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/create/16')
+            response = self.testapp.get('/create/15')
             csrf_token = self.get_csrf_token_from_response(response)
-            url = str('/createhandler/training_data/16/%s' % state_name)
+            url = str('/createhandler/training_data/15/%s' % state_name)
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # Only two of the four submitted answers should be unhandled.
             response_dict = self.get_json(url)
@@ -295,7 +295,7 @@ class EditorTest(BaseEditorControllerTest):
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -312,7 +312,7 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('joyful'))
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # If one of the values is added to the training data of a fuzzy
             # rule, then it should not be returned as an unhandled answer.
@@ -323,7 +323,7 @@ class EditorTest(BaseEditorControllerTest):
                 rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
             rule_spec['inputs']['training_data'].append('joyful')
 
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -346,11 +346,11 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('sad'))
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # If both are classified, then nothing should be returned
             # unhandled.
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -365,7 +365,7 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(response_dict['unhandled_answers'], [])
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # If one of the existing training data elements in the fuzzy rule
             # is removed (5 in this case), but it is not backed up by an
@@ -374,7 +374,7 @@ class EditorTest(BaseEditorControllerTest):
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             del rule_spec['inputs']['training_data'][1]
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,

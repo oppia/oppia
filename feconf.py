@@ -254,12 +254,6 @@ DEMO_EXPLORATIONS = [
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
-    # TODO(anuzis): Replace about_oppia.yaml with this dev version when gadget
-    # visibility by state is functional. Currently an AdviceBar gadget that
-    # should only display on the Helsinki map state is visible during the
-    # entire exploration as a dev demo.
-    ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
-     'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
@@ -315,6 +309,9 @@ PLAY_TYPE_NORMAL = 'normal'
 
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
+
+# Advanced feature in development.
+SHOW_GADGETS_EDITOR = False
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
