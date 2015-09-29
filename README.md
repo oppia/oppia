@@ -1,4 +1,4 @@
-# Oppia
+# Oppia [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://codecov.io/github/oppia/oppia/coverage.svg?branch=develop)](https://codecov.io/github/oppia/oppia/?branch=develop)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing and get feedback.
 
