@@ -217,7 +217,8 @@ def create_new_exploration_rights(exploration_id, committer_id):
         viewable_if_private=exploration_rights.viewable_if_private,
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
-    subscription_services.subscribe_to_activity(committer_id, exploration_id)
+    subscription_services.subscribe_to_exploration(
+        committer_id, exploration_id)
 
 
 def get_exploration_rights(exploration_id):
@@ -285,8 +286,10 @@ def _get_activity_rights(activity_type, activity_id):
         elif activity_type == ACTIVITY_TYPE_COLLECTION:
             return get_collection_rights(activity_id)
     except Exception:
-        pass
-    return None
+        return None
+    raise Exception(
+        'Cannot get activity rights for unknown activity type: %s' % (
+            activity_type))
 
 
 class Actor(object):
@@ -680,7 +683,7 @@ def assign_role_for_exploration(
         committer_id, assignee_id, new_role, exploration_id,
         ACTIVITY_TYPE_EXPLORATION)
     if new_role in [ROLE_OWNER, ROLE_EDITOR]:
-        subscription_services.subscribe_to_activity(
+        subscription_services.subscribe_to_exploration(
             assignee_id, exploration_id)
 
 

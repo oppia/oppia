@@ -435,7 +435,7 @@ class Collection(object):
 
     def delete_node(self, exploration_id):
         node_index = self._find_node(exploration_id)
-        if node_index == None:
+        if node_index is None:
             raise ValueError(
                 'Exploration is not part of this collection: %s' %
                 exploration_id)

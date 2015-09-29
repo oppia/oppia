@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core import jobs_registry
+from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_jobs
 from core.domain import exp_services
@@ -63,24 +64,33 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         ModifiedRecentUpdatesAggregator]
 
-    def _get_expected_exploration_created_dict(
-            self, user_id, exp_id, exp_title, last_updated_ms):
+    def _get_expected_activity_created_dict(
+            self, user_id, activity_id, activity_title, activity_type,
+            commit_type, last_updated_ms):
         return {
-            'activity_id': exp_id,
-            'activity_title': exp_title,
+            'activity_id': activity_id,
+            'activity_title': activity_title,
             'author_id': user_id,
             'last_updated_ms': last_updated_ms,
             'subject': (
-                'New exploration created with title \'%s\'.' % exp_title),
-            'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                'New %s created with title \'%s\'.' % (
+                    activity_type, activity_title)),
+            'type': commit_type,
         }
 
-    def _get_most_recent_snapshot_created_on_ms(self, exp_id):
+    def _get_most_recent_exp_snapshot_created_on_ms(self, exp_id):
         most_recent_snapshot = exp_services.get_exploration_snapshots_metadata(
             exp_id)[-1]
         return most_recent_snapshot['created_on_ms']
 
-    def test_basic_computation(self):
+    def _get_most_recent_collection_snapshot_created_on_ms(
+            self, collection_id):
+        most_recent_snapshot = (
+            collection_services.get_collection_snapshots_metadata(
+                collection_id)[-1])
+        return most_recent_snapshot['created_on_ms']
+
+    def test_basic_computation_for_explorations(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
@@ -91,7 +101,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             expected_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -106,10 +116,12 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
-                self._get_expected_exploration_created_dict(
-                    USER_ID, EXP_ID, EXP_TITLE, expected_last_updated_ms))
+                self._get_expected_activity_created_dict(
+                    USER_ID, EXP_ID, EXP_TITLE, 'exploration',
+                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                    expected_last_updated_ms))
 
-    def test_basic_computation_ignores_automated_commits(self):
+    def test_basic_computation_ignores_automated_exploration_commits(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
@@ -125,7 +137,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(exploration.version, 1)
 
             v1_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # Start migration job on all explorations, including this one.
             job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
@@ -137,7 +149,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(exploration.version, 2)
 
             v2_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # Run the aggregator.
             ModifiedRecentUpdatesAggregator.start_computation()
@@ -153,8 +165,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(recent_notifications[0],
-                self._get_expected_exploration_created_dict(
-                    USER_ID, EXP_ID, EXP_TITLE, v1_last_updated_ms))
+                self._get_expected_activity_created_dict(
+                    USER_ID, EXP_ID, EXP_TITLE, 'exploration',
+                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT, v1_last_updated_ms))
             self.assertLess(
                 recent_notifications[0]['last_updated_ms'], v2_last_updated_ms)
 
@@ -163,7 +176,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             exp_services.update_exploration(
                 ANOTHER_USER_ID, EXP_ID, [], 'Update exploration')
             v3_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -184,7 +197,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': 'Update exploration',
             }], recent_notifications)
 
-    def test_basic_computation_with_an_update_after_creation(self):
+    def test_basic_computation_with_an_update_after_exploration_is_created(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
@@ -200,7 +213,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             exp_services.update_exploration(
                 ANOTHER_USER_ID, EXP_ID, [], 'Update exploration')
             expected_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -232,7 +245,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             last_updated_ms_before_deletion = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
             exp_services.delete_exploration(USER_ID, EXP_ID)
 
             ModifiedRecentUpdatesAggregator.start_computation()
@@ -260,7 +273,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 last_updated_ms_before_deletion,
                 recent_notifications[0]['last_updated_ms'])
 
-    def test_multiple_commits_and_feedback_messages(self):
+    def test_multiple_exploration_commits_and_feedback_messages(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
@@ -279,7 +292,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 category='Category')
 
             exp1_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_1_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_1_ID))
 
             # User gives feedback on it.
             feedback_services.create_thread(
@@ -294,7 +307,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 EXP_2_ID, self.EDITOR_ID, title=EXP_2_TITLE,
                 category='Category')
             exp2_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_2_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_2_ID))
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -307,8 +320,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     self.EDITOR_ID)[1])
             self.assertEqual([(
-                self._get_expected_exploration_created_dict(
-                    self.EDITOR_ID, EXP_2_ID, EXP_2_TITLE,
+                self._get_expected_activity_created_dict(
+                    self.EDITOR_ID, EXP_2_ID, EXP_2_TITLE, 'exploration',
+                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                     exp2_last_updated_ms)
             ), {
                 'activity_id': EXP_1_ID,
@@ -318,12 +332,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }, (
-                self._get_expected_exploration_created_dict(
-                    self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE,
+                self._get_expected_activity_created_dict(
+                    self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE, 'exploration',
+                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                     exp1_last_updated_ms)
             )], recent_notifications)
 
-    def test_making_feedback_thread_does_not_subscribe_to_exp(self):
+    def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
@@ -345,7 +360,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
             exp_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
@@ -376,8 +391,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
             expected_exploration_created_notification_dict = (
-                self._get_expected_exploration_created_dict(
-                    user_a_id, EXP_ID, EXP_TITLE, exp_last_updated_ms))
+                self._get_expected_activity_created_dict(
+                    user_a_id, EXP_ID, EXP_TITLE, 'exploration',
+                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                    exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
             self.assertEqual(recent_notifications_for_user_a, [
@@ -389,7 +406,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 expected_feedback_thread_notification_dict,
             ])
 
-    def test_subscribing_to_exp_subscribes_to_its_feedback_threads(self):
+    def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
@@ -411,7 +428,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
             exp_last_updated_ms = (
-                self._get_most_recent_snapshot_created_on_ms(EXP_ID))
+                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
@@ -446,8 +463,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
             expected_exploration_created_notification_dict = (
-                self._get_expected_exploration_created_dict(
-                    user_a_id, EXP_ID, EXP_TITLE, exp_last_updated_ms))
+                self._get_expected_activity_created_dict(
+                    user_a_id, EXP_ID, EXP_TITLE, 'exploration',
+                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                    exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
             self.assertEqual(recent_notifications_for_user_a, [
@@ -460,11 +479,128 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 expected_exploration_created_notification_dict,
             ])
 
+    def test_basic_computation_for_collections(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            COLLECTION_ID = 'cid'
+            COLLECTION_TITLE = 'Title'
+            USER_ID = 'user_id'
+
+            self.save_new_default_collection(
+                COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
+            expected_last_updated_ms = (
+                self._get_most_recent_collection_snapshot_created_on_ms(
+                    COLLECTION_ID))
+
+            ModifiedRecentUpdatesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
+
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
+            self.assertEqual(len(recent_notifications), 1)
+            self.assertEqual(
+                recent_notifications[0],
+                self._get_expected_activity_created_dict(
+                    USER_ID, COLLECTION_ID, COLLECTION_TITLE, 'collection',
+                    feconf.UPDATE_TYPE_COLLECTION_COMMIT,
+                    expected_last_updated_ms))
+
+    def test_basic_computation_with_an_update_after_collection_is_created(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            COLLECTION_ID = 'cid'
+            COLLECTION_TITLE = 'Title'
+            USER_ID = 'user_id'
+            ANOTHER_USER_ID = 'another_user_id'
+
+            self.save_new_default_collection(
+                COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
+            # Another user makes a commit; this, too, shows up in the
+            # original user's dashboard.
+            collection_services.update_collection(
+                ANOTHER_USER_ID, COLLECTION_ID, [{
+                    'cmd': 'edit_collection_property',
+                    'property_name': 'title',
+                    'new_value': 'A new title'
+                }], 'Update collection')
+            expected_last_updated_ms = (
+                self._get_most_recent_collection_snapshot_created_on_ms(
+                    COLLECTION_ID))
+
+            ModifiedRecentUpdatesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
+
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
+            self.assertEqual([{
+                'type': feconf.UPDATE_TYPE_COLLECTION_COMMIT,
+                'last_updated_ms': expected_last_updated_ms,
+                'activity_id': COLLECTION_ID,
+                'activity_title': 'A new title',
+                'author_id': ANOTHER_USER_ID,
+                'subject': 'Update collection',
+            }], recent_notifications)
+
+    def test_basic_computation_works_if_collection_is_deleted(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            COLLECTION_ID = 'cid'
+            COLLECTION_TITLE = 'Title'
+            USER_ID = 'user_id'
+
+            self.save_new_default_collection(
+                COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
+            last_updated_ms_before_deletion = (
+                self._get_most_recent_collection_snapshot_created_on_ms(
+                    COLLECTION_ID))
+            collection_services.delete_collection(USER_ID, COLLECTION_ID)
+
+            ModifiedRecentUpdatesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
+
+            recent_notifications = (
+                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                    USER_ID)[1])
+            self.assertEqual(len(recent_notifications), 1)
+            self.assertEqual(sorted(recent_notifications[0].keys()), [
+                'activity_id', 'activity_title', 'author_id',
+                'last_updated_ms', 'subject', 'type'])
+            self.assertDictContainsSubset({
+                'type': feconf.UPDATE_TYPE_COLLECTION_COMMIT,
+                'activity_id': COLLECTION_ID,
+                'activity_title': COLLECTION_TITLE,
+                'author_id': USER_ID,
+                'subject': feconf.COMMIT_MESSAGE_COLLECTION_DELETED,
+            }, recent_notifications[0])
+            self.assertLess(
+                last_updated_ms_before_deletion,
+                recent_notifications[0]['last_updated_ms'])
+
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
     EXP_ID = 'exp_id'
     EXP_ID_2 = 'exp_id_2'
+    COLLECTION_ID = 'col_id'
+    COLLECTION_ID_2 = 'col_id_2'
+    COLLECTION_EXP_ID = 'col_exp_id'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'
@@ -501,7 +637,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
                 subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_activity', self._null_fn):
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn):
             # User A creates and saves a new valid exploration.
             self.save_new_valid_exploration(
                 self.EXP_ID, self.user_a_id, end_state_name='End')
@@ -529,7 +666,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
                 subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_activity', self._null_fn):
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 self.EXP_ID, None, self.user_b_id, 'subject', 'text')
@@ -558,7 +696,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
                 subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_activity', self._null_fn):
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID, self.user_b_id,
@@ -590,7 +729,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
                 subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_activity', self._null_fn):
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn):
             # User A creates and saves another valid exploration.
             self.save_new_valid_exploration(self.EXP_ID_2, self.user_a_id)
 
@@ -608,7 +748,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
                 subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_activity', self._null_fn):
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID, self.user_b_id,
@@ -641,7 +782,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
                 subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_activity', self._null_fn):
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID)
@@ -649,6 +791,108 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
 
         # User A is not subscribed to the exploration.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_a_subscriptions_model, None)
+
+    def test_collection_subscription(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection',
+                self._null_fn):
+            # User A creates and saves a new valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID, self.user_a_id,
+                exploration_id=self.COLLECTION_EXP_ID)
+
+            # User A adds user B as an editor to the collection.
+            rights_manager.assign_role_for_collection(
+                self.user_a_id, self.COLLECTION_ID, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+            # User A adds user C as a viewer of the collection.
+            rights_manager.assign_role_for_collection(
+                self.user_a_id, self.COLLECTION_ID, self.user_c_id,
+                rights_manager.ROLE_VIEWER)
+
+        self._run_one_off_job()
+
+        # Users A and B are subscribed to the collection. User C is not.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(
+            user_a_subscriptions_model.collection_ids, [self.COLLECTION_ID])
+        # User A is also subscribed to the exploration within the collection
+        # because they created both.
+        self.assertEqual(
+            sorted(user_a_subscriptions_model.activity_ids), [
+                self.COLLECTION_EXP_ID, self.EXP_ID])
+        self.assertEqual(
+            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID])
+        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_c_subscriptions_model, None)
+
+    def test_two_collections(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection',
+                self._null_fn):
+            # User A creates and saves a new valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID, self.user_a_id,
+                exploration_id=self.COLLECTION_EXP_ID)
+
+            # User A creates and saves another valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID_2, self.user_a_id,
+                exploration_id=self.COLLECTION_EXP_ID)
+
+        self._run_one_off_job()
+
+        # User A is subscribed to two collections.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+
+        self.assertEqual(
+            sorted(user_a_subscriptions_model.collection_ids),
+            sorted([self.COLLECTION_ID, self.COLLECTION_ID_2]))
+
+    def test_deleted_collection(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_exploration',
+                self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection',
+                self._null_fn):
+            # User A creates and saves a new collection.
+            self.save_new_default_collection(
+                self.COLLECTION_ID, self.user_a_id)
+
+            # User A deletes the collection.
+            collection_services.delete_collection(
+                self.user_a_id, self.COLLECTION_ID)
+
+            # User A deletes the exploration from earlier.
+            exp_services.delete_exploration(self.user_a_id, self.EXP_ID)
+
+        self._run_one_off_job()
+
+        # User A is not subscribed to the collection.
         user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_a_id, strict=False)
         self.assertEqual(user_a_subscriptions_model, None)
