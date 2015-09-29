@@ -22,7 +22,8 @@ from core.domain import feedback_jobs
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.exploration])
 import feconf
 import utils
 
@@ -172,3 +173,94 @@ def get_thread_analytics(exploration_id):
     """
     return feedback_jobs.FeedbackAnalyticsAggregator.get_thread_analytics(
         exploration_id)
+
+def create_suggestion(exploration_id, author_id, exploration_version,
+                      state_name, suggestion_content):
+    """Creates a new SuggestionModel object and the corresponding
+    FeedbackThreadModel object."""
+
+    thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
+        exploration_id)
+    (feedback_models.SuggestionModel
+        .create(exploration_id, thread_id, author_id, exploration_version,
+                state_name, suggestion_content))
+    thread = feedback_models.FeedbackThreadModel.create(
+        exploration_id, thread_id)
+    thread.has_suggestion = True
+    thread.exploration_id = exploration_id
+    thread.state_name = state_name
+    thread.original_author_id = author_id
+    thread.status = feedback_models.STATUS_CHOICES_OPEN
+    thread.subject = "SUGGESTION"
+    thread.put()
+
+
+def get_suggestion(exploration_id, thread_id):
+    return feedback_models.SuggestionModel.get(
+        _get_instance_id(thread_id, exploration_id))
+
+
+def get_suggestion_threads(exploration_id, only_pending_required):
+    """Returns a list of all threads that have a pending suggestion, for a
+    given exploration. Returns an empty list if no such threads exist."""
+
+    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    if only_pending_required == True:
+        pending_suggestion_threads = []
+        for thread in threads:
+            if thread.has_suggestion == True:
+                if feedback_models.SuggestionModel.get(
+                    thread.id).status == feedback_models.SUGGESTION_STATUS_NEW:
+                    pending_suggestion_threads.append(thread)
+        return pending_suggestion_threads
+    else:
+        return threads
+
+	
+def _get_instance_id(thread_id, exploration_id):
+    return '.'.join([exploration_id, thread_id])
+
+	
+def _is_suggestion_valid(thread_id, exploration_id):
+    """Check if the suggestion is still valid. A suggestion is  considered
+    invalid if the exploration version has updated since the suggestion was
+    made."""
+
+    return (feedback_models.SuggestionModel.get(
+        id=_get_instance_id(thread_id, exploration_id)).exploration_version ==
+        exp_models.ExpSummaryModel.get(id=exploration_id).version)
+
+
+def accept_suggestion(editor_user_id, change_list, thread_id, exploration_id):
+    """If the suggestion is valid, accepts it by updating the exploration.
+    Raises an exception if the exploration is not valid."""
+
+    from core.domain import exp_services
+
+    if _is_suggestion_valid(thread_id, exploration_id):
+        commit_message = ("Accepted suggestion: %s" % 
+            _get_instance_id(thread_id, exploration_id))
+        exp_services.update_exploration(
+            editor_user_id, exploration_id, change_list, commit_message)
+        suggestion = get_suggestion(exploration_id, thread_id)
+        suggestion.status = feedback_models.SUGGESTION_STATUS_ACCEPTED
+        suggestion.put()
+        thread = (feedback_models.FeedbackThreadModel.
+            get_by_exp_and_thread_id(exploration_id, thread_id))
+        thread.status = feedback_models.STATUS_CHOICES_FIXED
+        thread.put()
+    else:
+        reject_suggestion(thread_id, exploration_id)
+        raise Exception('Suggestion Invalid')
+
+
+def reject_suggestion(thread_id, exploration_id):
+    """Set the state of a suggetion to REJECTED."""
+
+    suggestion = get_suggestion(exploration_id, thread_id)
+    suggestion.status = feedback_models.SUGGESTION_STATUS_REJECTED
+    suggestion.put()
+    thread = (feedback_models.FeedbackThreadModel.
+        get_by_exp_and_thread_id(exploration_id, thread_id))
+    thread.status = feedback_models.STATUS_CHOICES_IGNORED
+    thread.put()
