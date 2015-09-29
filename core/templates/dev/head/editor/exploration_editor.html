@@ -34,7 +34,8 @@
 
   <style>
     html, body {
-      background-color: #eee;
+      background: url('/images/general/background.png') no-repeat center center fixed;
+      background-size: cover;
     }
   </style>
 
@@ -301,10 +302,10 @@
 
       <div ng-show="getTabStatuses().active === 'main'">
         <div class="row">
-          <div class="col-lg-9 col-md-9 col-sm-9">
+          <div class="col-lg-8 col-md-8 col-sm-8">
             {% include 'editor/state_editor.html' %}
           </div>
-          <div class="col-lg-3 col-md-3 col-sm-3">
+          <div class="col-lg-4 col-md-4 col-sm-4">
             <div class="oppia-editor-sidebar hidden-xs hidden-sm">
               <div>
                 {% include 'editor/exploration_graph.html' %}
