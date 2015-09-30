@@ -713,7 +713,7 @@ oppia.controller('InformationCard', function ($scope, $modal) {
         // TODO(Makonda) get real view counts.
         var _NumberOfViews = 487666;
         $scope.informationCardBackgroundCcs = {
-          'background-image': 'url('+oppiaPlayerService.getInfocardImageUrl()+')'
+          'background-image': 'url('+ oppiaPlayerService.getInfocardImageUrl() +')'
         };
         $scope.explorationId = oppiaPlayerService.getExplorationId();
         $scope.serverName = window.location.protocol + '//' + window.location.host;
