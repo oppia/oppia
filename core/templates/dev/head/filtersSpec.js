@@ -166,7 +166,7 @@ describe('Testing filters', function() {
 
     expect(filter(' A   single line with spaces at either end. ')).toEqual(
       ' A   single line with spaces at either end. ');
-    expect(filter('Single line\nMultiple lines\nStuff')).toEqual('Single line');
+    expect(filter('a\nb\nc')).toEqual('a...');
     expect(filter('Removes newline at end\n')).toEqual(
       'Removes newline at end');
     expect(filter('\nRemoves newline at beginning.')).toEqual(
@@ -178,6 +178,6 @@ describe('Testing filters', function() {
     // TODO(bhenning): There could be some merit in also testing cross-platform
     // line endings (since the pattern in filter applies to them). Only one is
     // tested here.
-    expect(filter('Single line\r\nWindows EOL')).toEqual('Single line');
+    expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
   }));
 });

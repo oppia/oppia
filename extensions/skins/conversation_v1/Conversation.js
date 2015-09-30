@@ -174,10 +174,9 @@ oppia.directive('conversationSkin', [function() {
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
-      // The user's profile picture will be replaced with the dataURI
-      // representation of the user-uploaded profile image, if it exists.
-      $scope.profilePicture = '/images/general/user_blue_72px.png';
       $scope.explorationCompleted = false;
+
+      $scope.oppiaAvatarImageUrl = oppiaPlayerService.getOppiaAvatarImageUrl();
 
       $scope.activeCard = null;
       $scope.numProgressDots = 0;
@@ -193,6 +192,11 @@ oppia.directive('conversationSkin', [function() {
       $scope.panels = [];
       $scope.PANEL_TUTOR = 'tutor';
       $scope.PANEL_INTERACTION = 'interaction';
+
+      $scope.profilePicture = '/images/general/user_blue_72px.png';
+      oppiaPlayerService.getUserProfileImage().then(function(result) {
+        $scope.profilePicture = result;
+      });
 
       // If the exploration is iframed, send data to its parent about its
       // height so that the parent can be resized as necessary.
@@ -572,10 +576,6 @@ oppia.directive('conversationSkin', [function() {
       ratingService.init(function(userRating) {
         $scope.userRating = userRating;
       });
-
-      oppiaPlayerService.getUserProfileImage().then(function(result) {
-        $scope.profilePicture = result;
-      });
     }]
   };
 }]);
@@ -587,6 +587,7 @@ oppia.directive('answerFeedbackPair', [function() {
     scope: {
       answer: '&',
       feedback: '&',
+      oppiaAvatarImageUrl: '&',
       profilePicture: '&',
       shortAnswer: '&'
     },
@@ -605,6 +606,7 @@ oppia.directive('progressDots', [function() {
     templateUrl: 'components/progressDots',
     controller: ['$scope', function($scope) {
 
+      $scope.MAX_DOTS = 18;
       $scope.dots = [];
       var initialDotCount = $scope.getNumDots();
       for (var i = 0; i < initialDotCount; i++) {
@@ -621,6 +623,12 @@ oppia.directive('progressDots', [function() {
         } else if (newValue === oldValue + 1) {
           $scope.dots.push({});
           $scope.currentDotIndex = $scope.dots.length - 1;
+          $scope.rightmostVisibleDotIndex = $scope.dots.length - 1;
+          if ($scope.dots.length > $scope.MAX_DOTS) {
+            $scope.leftmostVisibleDotIndex = $scope.rightmostVisibleDotIndex - $scope.MAX_DOTS + 1;
+          } else {
+            $scope.leftmostVisibleDotIndex = 0;
+          }
         } else {
           throw Error(
             'Unexpected change to number of dots from ' + oldValue + ' to ' +
@@ -634,15 +642,24 @@ oppia.directive('progressDots', [function() {
 
       $scope.decrementCurrentDotIndex = function() {
         if ($scope.currentDotIndex > 0) {
+          if ($scope.currentDotIndex === $scope.leftmostVisibleDotIndex) {
+            $scope.leftmostVisibleDotIndex = $scope.leftmostVisibleDotIndex - 1;
+            $scope.rightmostVisibleDotIndex = $scope.rightmostVisibleDotIndex - 1;
+          }
           $scope.changeActiveDot($scope.currentDotIndex - 1);
         }
       };
 
       $scope.incrementCurrentDotIndex = function() {
         if ($scope.currentDotIndex < $scope.dots.length - 1) {
+          if ($scope.currentDotIndex === $scope.rightmostVisibleDotIndex) {
+            $scope.rightmostVisibleDotIndex = $scope.rightmostVisibleDotIndex + 1;
+            $scope.leftmostVisibleDotIndex = $scope.leftmostVisibleDotIndex + 1;
+          }
           $scope.changeActiveDot($scope.currentDotIndex + 1);
         }
       };
+
     }]
   };
 }]);

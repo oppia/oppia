@@ -150,8 +150,11 @@
         </select>
       </span>
     </div>
-    <span ng-if="isCreatingNewState(outcome)">
-      <input type="text" focus-on="newStateNameInputField" ng-model="outcome.newStateName" class="form-control ng-pristine ng-valid ng-scope ng-touched protractor-test-add-state-input" tabindex="0" aria-invalid="false" required>
-    </span>
+    <ng-form name="newStateNameForm">
+      <span ng-if="isCreatingNewState(outcome)">
+        <input type="text" focus-on="newStateNameInputField" name="newStateName" ng-model="outcome.newStateName" class="form-control protractor-test-add-state-input" tabindex="0" aria-invalid="false" ng-pattern="newStateNamePattern" required>
+      </span>
+      <p ng-show="newStateNameForm.newStateName.$error.pattern" class="help-block oppia-form-error" style="font-size: 0.85em;">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+    </ng-form>
   </div>
 </script>

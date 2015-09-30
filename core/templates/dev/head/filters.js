@@ -75,14 +75,22 @@ oppia.filter('truncateAtFirstLine', [function() {
     var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
     // Normalize line endings then split using the normalized delimiter.
     var lines = input.replace(pattern, '\n').split('\n');
-    var nonemptyLineIndex = -1;
+    var firstNonemptyLineIndex = -1;
+    var otherNonemptyLinesExist = false;
     for (var i = 0; i < lines.length; i++) {
-      if (lines[i].length != 0) {
-        nonemptyLineIndex = i;
-        break;
+      if (lines[i].length > 0) {
+        if (firstNonemptyLineIndex === -1) {
+          firstNonemptyLineIndex = i;
+        } else {
+          otherNonemptyLinesExist = true;
+          break;
+        }
       }
     }
-    return (nonemptyLineIndex != -1 ? lines[nonemptyLineIndex] : '');
+    var suffix = otherNonemptyLinesExist ? '...' : '';
+    return (
+      firstNonemptyLineIndex !== -1 ?
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -184,11 +192,24 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput and ImageClickInput
+      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
       if (choices) {
-        for (var i = 0; i < choices.length; i++) {
-          if (choices[i].val === inputs[varName]) {
-            replacementText = '\'' + choices[i].label + '\'';
+        if (varType === 'SetOfHtmlString') {
+          replacementText = '[';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
+            }
+          }
+          replacementText += ']';
+        } else {
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
           }
         }
       // TODO(sll): Generalize this to use the inline string representation of

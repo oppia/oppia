@@ -89,7 +89,7 @@ class ForumPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_FORUM_PAGE:
+        if not feconf.SHOW_CUSTOM_PAGES:
             raise self.PageNotFoundException
 
         # Note: if you are working in the development environment and
@@ -107,3 +107,25 @@ class ForumPage(base.BaseHandler):
             'on_localhost': netloc.startswith('localhost'),
         })
         self.render_template('pages/forum.html')
+
+
+class TermsPage(base.BaseHandler):
+    """Page with terms and conditions."""
+
+    def get(self):
+        """Handles GET requests."""
+        if not feconf.SHOW_CUSTOM_PAGES:
+            raise self.PageNotFoundException
+
+        self.render_template('pages/terms.html')
+
+
+class PrivacyPage(base.BaseHandler):
+    """Page with privacy policy."""
+
+    def get(self):
+        """Handles GET requests."""
+        if not feconf.SHOW_CUSTOM_PAGES:
+            raise self.PageNotFoundException
+
+        self.render_template('pages/privacy.html')

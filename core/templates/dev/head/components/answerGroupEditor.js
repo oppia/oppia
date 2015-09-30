@@ -154,6 +154,8 @@ oppia.directive('answerGroupEditor', [function() {
           return [getDefaultInputValue('Real'), getDefaultInputValue('Real')];
         case 'ListOfUnicodeString':
         case 'SetOfUnicodeString':
+        case 'SetOfHtmlString':
+          return [];
         case 'MusicPhrase':
           return [];
         case 'CheckedProof':
@@ -404,6 +406,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
           return outcome.dest == PLACEHOLDER_OUTCOME_DEST;
         };
 
+        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
         $scope.destChoices = [];
         $scope.$watch(explorationStatesService.getStates, function(newValue) {
           var _currentStateName = editorContextService.getActiveStateName();

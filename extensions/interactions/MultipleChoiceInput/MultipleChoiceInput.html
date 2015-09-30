@@ -1,31 +1,55 @@
 <style>
   .multiple-choice-form-container {
-    margin-top: -5px;
-  }
-
-  .multiple-choice-option-container {
-    border-bottom: thin solid #EEEEEE;
-    margin-bottom: 5px;
-  }
-
-  .multiple-choice-option-container md-input-group.md-default-theme label {
-    border-bottom: 0px;
+    margin-left: -15px;
+    margin-top: -10px;
   }
 
   .multiple-choice-option {
     background: none;
     border: none;
-    color: rgba(0,0,0,0.5);
+    color: #0D48A1;
     margin: 0;
     padding-left: 0;
-    padding-top: 9px;
+    padding-top: 15px;
     text-align: left;
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
 
   .multiple-choice-option:hover {
-    color: #00897B;
+    color: #115FD4;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
+    background-color: #115FD4;
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-outer-radio-button {
+    border-color: #115FD4;
+  }
+
+  .multiple-choice-option-container {
+    margin-bottom: 5px;
+  }
+
+  .multiple-choice-radio-container {
+    display: inline-block;
+    padding-right: 5px;
+  }
+
+  .multiple-choice-outer-radio-button {
+    border: 2px solid #0D48A1;
+    border-radius: 50%;
+    display: block;
+    float: left;
+    height: 16px;
+    margin-bottom: -2px;
+    width: 16px;
   }
 </style>
 
@@ -34,7 +58,21 @@
     <form ng-submit="submitAnswer(answer)">
       <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
         <button class="multiple-choice-option" ng-click="submitAnswer($index)">
-          <span angular-html-bind="choice"></span>
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                <div class="multiple-choice-radio-container">
+                  <span class="multiple-choice-outer-radio-button">
+                    <span class="multiple-choice-inner-radio-button"></span>
+                  </span>
+                </div>
+              </div>
+              <!-- With col-xs-11, the choice text gets pushed to the next line on small screens. So we use col-xs-10 instead. -->
+              <div class="col-lg-11 col-md-11 col-sm-11 col-xs-10">
+                <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
+              </div>
+            </div>
+          </div>
         </button>
       </div>
     </form>

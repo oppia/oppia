@@ -355,7 +355,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         self.response.content_type = 'application/javascript; charset=utf-8'
-        self.response.headers['Content-Disposition'] = 'attachment'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -400,7 +401,7 @@ class BaseHandler(webapp2.RequestHandler):
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
+            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
             'SIDEBAR_MENU_ADDITIONAL_LINKS': (
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,

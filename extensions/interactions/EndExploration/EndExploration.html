@@ -19,9 +19,14 @@
   </div>
 
   <div ng-if="!isIframed">
-    <a href="/">
+    <a href="/" ng-if="!isInEditorPreviewMode">
       <md-button class="md-button-success">
         Return to gallery
+      </md-button>
+    </a>
+    <a href="#/gui" ng-if="isInEditorPreviewMode">
+      <md-button class="md-button-success">
+        Return to editor
       </md-button>
     </a>
   </div>

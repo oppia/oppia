@@ -1,0 +1,42 @@
+language: python
+
+python:
+- 2.7
+
+branches:
+  only:
+  - master
+  - develop
+
+env:
+  matrix:
+  - BACKEND_TEST=true JS_TEST=false
+  - BACKEND_TEST=false JS_TEST=true
+
+before_install:
+- pip install codecov
+- export CHROME_BIN=chromium-browser
+- export DISPLAY=:99.0
+- bash -e /etc/init.d/xvfb start
+
+install:
+- set -e
+- pushd $TRAVIS_BUILD_DIR
+- source scripts/setup.sh || exit 1
+- source scripts/setup_gae.sh || exit 1
+- mkdir -p $GOOGLE_APP_ENGINE_HOME
+- curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip
+  -o gae-download.zip
+- unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
+- rm gae-download.zip
+# Travis aborts test run if nothing is printed back to STDOUT for some time.
+# -x is used to avoid that.
+- if [[ $BACKEND_TEST == 'true' ]]; then bash -x scripts/install_third_party.sh; fi
+
+script:
+- if [[ $BACKEND_TEST == 'true' ]]; then bash scripts/test.sh --generate_coverage_report;
+  fi
+- if [[ $JS_TEST == 'true' ]]; then bash -x scripts/run_js_tests.sh; fi
+
+after_success:
+- if [[ $BACKEND_TEST == 'true' ]]; then codecov; fi

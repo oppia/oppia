@@ -152,7 +152,7 @@ oppia.factory('oppiaPlayerService', [
   var explorationDataUrl = (
     '/explorehandler/init/' + _explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
-  var _isLoggedIn = false;
+  var _isLoggedIn = GLOBALS.userIsLoggedIn;
   var _exploration = null;
 
   learnerParamsService.init({});
@@ -341,7 +341,6 @@ oppia.factory('oppiaPlayerService', [
           _exploration = data.exploration;
           _infoCardImageUrl = data.info_card_image_url;
           version = data.version,
-          _isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
@@ -522,6 +521,9 @@ oppia.factory('oppiaPlayerService', [
         deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
       }
       return deferred.promise;
+    },
+    getOppiaAvatarImageUrl: function() {
+      return '/images/avatar/oppia-avatar.png';
     }
   };
 }]);
