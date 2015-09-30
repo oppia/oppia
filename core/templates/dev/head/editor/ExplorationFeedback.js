@@ -13,77 +13,55 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the exploration feedback tab.
+ * @fileoverview Controller, services, and directives for the exploration
+ * feedback tab.
  *
  * @author kashida@google.com (Koji Ashida)
  */
 
 oppia.controller('ExplorationFeedback', [
-    '$scope', '$http', '$modal', '$rootScope', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
-    function($scope, $http, $modal, $rootScope, warningsData, explorationData, oppiaDatetimeFormatter) {
-  var expId = explorationData.explorationId;
-  var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
-  var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
+    '$scope', '$http', '$modal', '$timeout', '$rootScope', 'warningsData',
+    'oppiaDatetimeFormatter', 'threadStatusRepresentationService',
+    'feedbackThreadDataService',
+    function(
+      $scope, $http, $modal, $timeout, $rootScope, warningsData,
+      oppiaDatetimeFormatter, threadStatusRepresentationService,
+      feedbackThreadDataService) {
 
-  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
+  $scope.STATUS_CHOICES = threadStatusRepresentationService.STATUS_CHOICES;
+  $scope.threadData = feedbackThreadDataService.data;
+  $scope.getLabelClass = threadStatusRepresentationService.getLabelClass;
+  $scope.getHumanReadableStatus = (
+    threadStatusRepresentationService.getHumanReadableStatus);
+  $scope.getLocaleAbbreviatedDatetimeString = (
+    oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+
+  $scope.activeThread = null;
+  $rootScope.loadingMessage = 'Loading';
+  $scope.tmpMessage = {
+    status: null,
+    text: ''
   };
 
-  $scope._getThreadById = function(threadId) {
-    for (var i = 0; i < $scope.threads.length; i++) {
-      if ($scope.threads[i].thread_id == threadId) {
-        return $scope.threads[i];
-      }
-    }
-    return null;
+  var _resetTmpMessageFields = function() {
+    $scope.tmpMessage.status = $scope.activeThread ? $scope.activeThread.status : null;
+    $scope.tmpMessage.text = '';
   };
 
-  $scope._getThreadList = function(successCallback) {
-    $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
-      $scope.threads = data.threads;
-      if (successCallback) {
-        successCallback();
-      }
-    });
-  };
-
-  $scope._createThread = function(newThreadSubject, newThreadText) {
-    $http.post(THREAD_LIST_HANDLER_URL, {
-      state_name: null,
-      subject: newThreadSubject,
-      text: newThreadText
-    }).success(function() {
-      $scope._getThreadList();
-      $scope.setCurrentThread(null);
-    });
-  };
-
-  $scope.setCurrentThread = function(threadId) {
-    if (threadId === null) {
-      $scope.currentThreadId = null;
-      $scope.currentThreadData = null;
-      $scope.currentThreadMessages = null;
-      $scope.updatedStatus = null;
-      return;
-    }
-
-    $http.get(THREAD_HANDLER_PREFIX + threadId).success(function(data) {
-      $scope.currentThreadId = threadId;
-      $scope.currentThreadData = $scope._getThreadById(threadId);
-      $scope.currentThreadMessages = data.messages;
-      $scope.updatedStatus = $scope.currentThreadData.status;
-    });
+  $scope.clearActiveThread = function() {
+    $scope.activeThread = null;
+    _resetTmpMessageFields();
   };
 
   $scope.showCreateThreadModal = function() {
-    warningsData.clear();
-
     $modal.open({
       templateUrl: 'modals/editorFeedbackCreateThread',
       backdrop: true,
       resolve: {},
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.newThreadSubject = '';
+        $scope.newThreadText = '';
+
         $scope.create = function(newThreadSubject, newThreadText) {
           if (!newThreadSubject) {
             warningsData.addWarning('Please specify a thread subject.');
@@ -94,11 +72,6 @@ oppia.controller('ExplorationFeedback', [
             return;
           }
 
-          // Clear the form variables so that they are empty on the next load
-          // of the modal.
-          $scope.newThreadSubject = '';
-          $scope.newThreadText = '';
-
           $modalInstance.close({
             newThreadSubject: newThreadSubject,
             newThreadText: newThreadText
@@ -107,53 +80,155 @@ oppia.controller('ExplorationFeedback', [
 
         $scope.cancel = function() {
           $modalInstance.dismiss('cancel');
-          warningsData.clear();
         };
       }]
     }).result.then(function(result) {
-      $scope._createThread(result.newThreadSubject, result.newThreadText);
+      feedbackThreadDataService.createNewThread(
+        result.newThreadSubject, result.newThreadText, function() {
+          $scope.clearActiveThread();
+        });
     });
   };
 
-  $scope.getLabelClass = function(status) {
-    if (status === 'open') {
-      return 'label label-info';
-    } else {
-      return 'label label-default';
-    }
-  };
-
-  $scope.newMessageText = '';
-  $scope.addMessage = function(threadId, newMessageText, updatedStatus) {
+  $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
     if (threadId === null) {
-      warningsData.addWarning(
-        'Current thread ID not set. Required to create a message');
+      warningsData.addWarning('Cannot add message to thread with ID: null.');
       return;
     }
+    if (!tmpStatus) {
+      warningsData.addWarning('Invalid message status: ' + tmpStatus);
+      return;
+    }
+
     $scope.messageSendingInProgress = true;
-    $http.post(THREAD_HANDLER_PREFIX + threadId, {
-      updated_status: (
-        updatedStatus !== $scope.currentThreadData.status ? updatedStatus : null),
-      updated_subject: null,
-      text: newMessageText
-    }).success(function() {
-      $scope.currentThreadData.status = updatedStatus;
-      $scope.setCurrentThread(threadId);
+    feedbackThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
+      _resetTmpMessageFields();
       $scope.messageSendingInProgress = false;
-      $scope.newMessageText = '';
-    }).error(function(data) {
+    }, function() {
       $scope.messageSendingInProgress = false;
     });
   };
 
-  $scope.isSendButtonDisabled = function(newMessageText, updatedStatus) {
-    return $scope.messageSendingInProgress || (
-      !$scope.newMessageText && $scope.currentThreadData.status == updatedStatus);
+  $scope.setActiveThread = function(threadId) {
+    feedbackThreadDataService.loadMessagesFromBackend(threadId);
+
+    for (var i = 0; i < $scope.threadData.threadList.length; i++) {
+      if ($scope.threadData.threadList[i].thread_id === threadId) {
+        $scope.activeThread = $scope.threadData.threadList[i];
+        break;
+      }
+    }
+
+    $scope.tmpMessage.status = $scope.activeThread.status;
   };
 
+  // Initial load of the thread list on page load.
+  $scope.clearActiveThread();
+  feedbackThreadDataService.reloadFromBackend(function() {
+    $timeout(function() {
+      $rootScope.loadingMessage = '';
+    }, 500);
+  });
+}]);
+
+
+oppia.factory('feedbackThreadDataService', [
+    '$http', 'explorationData', function($http, explorationData) {
+  var expId = explorationData.explorationId;
+  var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
+  var _THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
+
+  // All the threads for this exploration. This is a list whose entries are
+  // objects, each representing threads. The 'messages' key of this object
+  // is updated lazily.
+  var _data = {
+    threadList: []
+  };
+
+  var _reloadFromBackend = function(successCallback) {
+    $http.get(_THREAD_LIST_HANDLER_URL).success(function(data) {
+      _data.threadList = data.threads;
+      console.log('a');
+      if (successCallback) {
+        successCallback();
+      }
+    });
+  };
+
+  var _loadMessagesFromBackend = function(threadId) {
+    $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+      for (var i = 0; i < _data.threadList.length; i++) {
+        if (_data.threadList[i].thread_id === threadId) {
+          _data.threadList[i].messages = data.messages;
+          break;
+        }
+      }
+    });
+  };
+
+  return {
+    data: _data,
+    reloadFromBackend: function(successCallback) {
+      _reloadFromBackend(successCallback);
+    },
+    loadMessagesFromBackend: function(threadId) {
+      _loadMessagesFromBackend(threadId);
+    },
+    createNewThread: function(newSubject, newText, successCallback) {
+      $http.post(_THREAD_LIST_HANDLER_URL, {
+        state_name: null,
+        subject: newSubject,
+        text: newText
+      }).success(function() {
+        _reloadFromBackend();
+        if (successCallback) {
+          successCallback();
+        }
+      });
+    },
+    addNewMessage: function(threadId, newMessage, newStatus, successCallback, errorCallback) {
+      var url = _THREAD_HANDLER_PREFIX + threadId;
+      var thread = null;
+
+      for (var i = 0; i < _data.threadList.length; i++) {
+        if (_data.threadList[i].thread_id === threadId) {
+          thread = _data.threadList[i];
+          thread.status = newStatus;
+          break;
+        }
+      }
+
+      // This is only set if the status has changed.
+      var updatedStatus = null;
+      if (newStatus !== thread.status) {
+        updatedStatus = newStatus;
+      }
+
+      var payload = {
+        updated_status: newStatus,
+        updated_subject: null,
+        text: newMessage
+      };
+
+      $http.post(url, payload).success(function(data) {
+        _loadMessagesFromBackend(threadId);
+
+        if (successCallback) {
+          successCallback();
+        }
+      }).error(function(data) {
+        if (errorCallback) {
+          errorCallback();
+        }
+      });
+    }
+  };
+}]);
+
+oppia.factory('threadStatusRepresentationService', [function() {
   // We do not permit 'Duplicate' as a valid status for now, since it should
   // require the id of the duplicated thread to be specified.
-  $scope.STATUS_CHOICES = [
+  var _STATUS_CHOICES = [
     {id: 'open', text: 'Open'},
     {id: 'fixed', text: 'Fixed'},
     {id: 'ignored', text: 'Ignored'},
@@ -161,23 +236,48 @@ oppia.controller('ExplorationFeedback', [
     {id: 'not_actionable', text: 'Not Actionable'}
   ];
 
-  $scope.getHumanReadableStatus = function(status) {
-    for (var i = 0; i < $scope.STATUS_CHOICES.length; i++) {
-      if ($scope.STATUS_CHOICES[i].id === status) {
-        return $scope.STATUS_CHOICES[i].text;
+  return {
+    STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
+    getLabelClass: function(status) {
+      if (status === 'open') {
+        return 'label label-info';
+      } else {
+        return 'label label-default';
       }
+    },
+    getHumanReadableStatus: function(status) {
+      for (var i = 0; i < _STATUS_CHOICES.length; i++) {
+        if (_STATUS_CHOICES[i].id === status) {
+          return _STATUS_CHOICES[i].text;
+        }
+      }
+      return '';
     }
-    return '';
   };
+}]);
 
-  $rootScope.loadingMessage = 'Loading';
+oppia.directive('threadSummaryTable', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      onClickRow: '=',
+      threads: '&'
+    },
+    templateUrl: 'feedback/threadSummaryTable',
+    controller: [
+      '$scope', 'threadStatusRepresentationService', 'oppiaDatetimeFormatter',
+      function($scope, threadStatusRepresentationService, oppiaDatetimeFormatter) {
 
-  // Initial load of the thread list.
-  $scope.currentThreadId = null;
-  $scope.currentThreadData = null;
-  $scope.currentThreadMessages = null;
-  $scope.updatedStatus = null;
-  $scope._getThreadList(function() {
-    $rootScope.loadingMessage = '';
-  });
+      $scope.getLabelClass = function(status) {
+        return threadStatusRepresentationService.getLabelClass(status);
+      };
+
+      $scope.getHumanReadableStatus = function(status) {
+        return threadStatusRepresentationService.getHumanReadableStatus(status);
+      };
+
+      $scope.getLocaleAbbreviatedDatetimeString = (
+        oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+    }]
+  };
 }]);
