@@ -160,11 +160,11 @@ class SearchRankerMRJobManager(
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
-    versions. This job will load all existing explorations from NDB and
-    immediately store them back into NDB. The loading process of an exploration
-    in exp_services automatically performs schema updating. This job persists
-    that conversion work, keeping explorations up-to-date and enhancing the
-    load time of new explorations.
+    versions. This job will load all existing explorations from the data store
+    and immediately store them back into the data store. The loading process of
+    an exploration in exp_services automatically performs schema updating. This
+    job persists that conversion work, keeping explorations up-to-date and
+    improving the load time of new explorations.
     """
 
     @classmethod

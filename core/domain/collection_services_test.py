@@ -994,7 +994,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[0])
 
-        #TODO(frederikcreemers@gmail.com) test max_age here.
+    # TODO(frederikcreemers@gmail.com) test max_age here.
 
     def test_paging(self):
         all_commits, cursor, more = (
