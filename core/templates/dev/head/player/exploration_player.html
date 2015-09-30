@@ -19,11 +19,13 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCardCtrl">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
+    <li ng-click="showDialog()" tooltip="Information Card" tooltip-placement="bottom">
+    <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon"></li>
   </ul>
 {% endblock navbar_breadcrumb %}
 
@@ -103,6 +105,83 @@
 
   <script type="text/ng-template" id="popover/feedback">
     <feedback-popup></feedback-popup>
+  </script>
+
+  <script type="text/ng-template" id="popover/informationCard">
+    <md-card class="md-padding">
+      <div ng-style="informationCardBackgroundCcs" class="information-card-logo-thumbnail">
+        <h2 class="information-card-title"><[explorationCardTitle]></h2>
+      </div>
+      <div class="information-card-content">
+        <p>The titles of Washed Outs breakthrough song and the first single from Paracosm share the two most important.</p>
+        <ul layout="row" class="card-metrics" layout-align="space-between center">
+          <li><span class="fa fa-star fa-lg"></span>
+            <[explorationRatings]>
+          </li>
+          <li><span class="fa fa-eye fa-lg"></span>
+            <[viewsCount]>
+          </li>
+          <li><span class="fa fa-clock-o fa-lg"></span>
+            <[lastModifiedDate | date: 'MM/dd/yyyy']>
+          </li>
+          <li layout="row" layout-align="space-between center">
+            <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
+            <ul style="padding:5px;" layout="row">
+              <li><img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt=""></li>
+              <li><img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
+              <li ng-if='explorationContributors.length > 2' class="circle">
+                <[explorationContributors.length - 2]>+</li>
+            </ul>
+          </li>
+        </ul>
+        <div class="social-media-and-tags" layout="row">
+          <div flex="55">
+            <md-content layout="row">
+              <div class="oppia-tag-icon"><img src="/third_party/static/material-design-icons-1.0.1/ic_tag.png"></div>
+              <md-chips>
+                <md-chips>
+                  <md-chip ng-repeat="tag in explorationTags | limitTo: 3">
+                    <[tag]>,</md-chip>
+                  <md-chips>
+                    <md-chip ng-if='explorationTags.length > 3'>
+                      <[explorationTags.length - 3]>+more</md-chip>
+                  </md-chips>
+          </div>
+          <div flex="45">
+            <ul layout="row" layout-align="end center">
+              <li>
+                <a href="" ng-click="showEmbedExplorationModal(explorationId)">
+                  <img src="/third_party/static/material-design-icons-1.0.1/ic_share_black_48dp.png">
+                </a>
+              </li>
+              <li>
+                <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" target="_window">
+                  <img src="/images/general/gplus.png" alt="Google+">
+                </a>
+              </li>
+              <li>
+                <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" target="_window">
+                  <img src='/images/general/fb.png' alt="Facebook">
+                </a>
+              </li>
+              <li>
+                <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
+                  <img src="/images/general/twitter.png" alt="Twitter">
+                </a>
+              </li>
+              <li>
+                <a href="" ng-click="showEmbedExplorationModal(explorationId)">
+                  <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png">
+      </button>
+    </md-card>
   </script>
 
   <script type="text/ng-template" id="components/feedback">

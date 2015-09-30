@@ -692,3 +692,63 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
     }]
   };
 }]);
+
+oppia.controller('InformationCardCtrl', function ($scope, $modal) {
+
+  $scope.showDialog = function () {
+
+    var modalInstance = $modal.open({
+      animation:true,
+      templateUrl: 'popover/informationCard',
+      windowClass: 'oppia-modal-information-card',
+      controller: ['$scope', '$http', '$modal', '$modalInstance','oppiaPlayerService', 'ratingService',
+                   'oppiaHtmlEscaper', 'embedExplorationButtonService',
+                    function ($scope, $http, $modal, $modalInstance, oppiaPlayerService, ratingService, oppiaHtmlEscaper,
+                     embedExplorationButtonService) {
+        // TODO(Makonda) get real view counts.
+        var _NumberOfViews = 487666;
+        $scope.informationCardBackgroundCcs= {
+          background: 'url(/images/gallery/exploration_background_gunmetal_large.png)'
+        };
+        $scope.explorationId = oppiaPlayerService.getExplorationId();
+        $scope.serverName = window.location.protocol + '//' + window.location.host;
+        $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+          GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+        $scope.explorationRatings = ratingService.getUserRating() !== null ? ratingService.getUserRating() : 0;
+        $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
+
+        $scope.explorationTags = ['Mathematics','Combinatorics','Counting','Algebra','Enumerations','Algorithm'];
+
+        var viewersNumberFilter = function (viewersNumber) {
+          // Nine Zeroes for Billions
+          return Math.abs(Number(viewersNumber)) >= 1.0e+9
+
+               ? (Math.abs(Number(viewersNumber)) / 1.0e+9).toFixed(1) + "B"
+               // Six Zeroes for Millions 
+               : Math.abs(Number(viewersNumber)) >= 1.0e+6
+
+               ? (Math.abs(Number(viewersNumber)) / 1.0e+6).toFixed(1) + "M"
+               // Three Zeroes for Thousands
+               : Math.abs(Number(viewersNumber)) >= 1.0e+3
+
+               ? (Math.abs(Number(viewersNumber)) / 1.0e+3).toFixed(1) + "K"
+
+               : Math.abs(Number(viewersNumber));
+             };
+
+        $scope.viewsCount = viewersNumberFilter(_NumberOfViews);
+        $scope.lastModifiedDate = new Date();
+        // TODO(Makonda) get  exploration contributors 
+        $scope.explorationContributors = ["Sean","Ben","Amit","Google","Sunu","Ed"];
+        $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
+        $scope.cancel = function () {
+          $modalInstance.dismiss();
+        }
+        
+      }]
+    });
+
+    modalInstance.result.then(function () {}, function () {});
+  };
+
+});

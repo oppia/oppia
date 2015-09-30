@@ -427,6 +427,11 @@ textarea {
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
 }
+.oppia-navbar-breadcrumb-icon {
+  height: 22px;
+  margin: 0 16px 0 8px;
+  width: 22px;
+}
 
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
@@ -2139,4 +2144,91 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection:hover {
   color: #00897B;
+}
+
+.oppia-modal-information-card .modal-dialog {
+ width: 400px;
+ margin:100px auto;
+}
+
+.oppia-modal-information-card .modal-dialog .modal-content md-card {
+  margin: 0;
+  padding: 0;
+}
+.information-card-title{
+  bottom: 0;
+  color: white;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  position:absolute;
+}
+.information-card-logo-thumbnail {
+  height: 300px;
+  position: relative;
+  padding: 20px;
+  background-repeat: no-repeat;
+  background-size:cover;  
+}
+.information-card-content{
+  padding: 10px 20px 10px 20px;
+}
+.information-card-content p {
+  display: block;
+  position: relative;
+  line-height: 1;
+  word-spacing: 0;
+  font-size: 1.0em;
+  padding: 10px 0; 
+}
+.information-card-content .card-metrics {
+ padding: 0;
+ margin-top: 10px;
+}
+.information-card-content .card-metrics li {
+  list-style-type: none;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+.information-card-content .card-metrics li img {
+  height: 24px;
+  width: 24px;
+  margin-right: 2px;
+}
+.circle {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  padding-top: 3px;
+  background: #888;
+  border-color: black; 
+}
+.information-card-content .card-metrics li .fa{
+  margin-right: 5px;
+  font-size: 24px;
+}
+.social-media-and-tags {
+  margin-top:20px
+}
+.social-media-and-tags ul li {
+  list-style-type: none;
+}
+.social-media-and-tags md-chips md-chip,
+.social-media-and-tags md-chips md-chips md-chip{
+  font-size: 12px;
+  line-height: 1em;
+  padding: 0;
+  margin: 0;
+}
+.oppia-tag-icon {
+  width:48px;
+  padding-top:6px;
+}
+.social-media-and-tags ul li a img {
+  height:20px;
+  width:20px;
+  border-radius: 2px;
+  margin: 3px;
 }
