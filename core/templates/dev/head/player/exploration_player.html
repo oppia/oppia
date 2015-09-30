@@ -19,12 +19,12 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCardCtrl">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCard">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showDialog()" tooltip="Information Card" tooltip-placement="bottom">
+    <li ng-click="showInformationCard()" tooltip="Information Card" tooltip-placement="bottom">
     <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon"></li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -109,43 +109,32 @@
 
   <script type="text/ng-template" id="popover/informationCard">
     <md-card class="md-padding">
-      <div ng-style="informationCardBackgroundCcs" class="information-card-logo-thumbnail">
-        <h2 class="information-card-title"><[explorationCardTitle]></h2>
+      <div ng-style="informationCardBackgroundCcs" class="oppia-information-card-logo-thumbnail">
+        <h2 class="oppia-information-card-title"><[explorationCardTitle]></h2>
       </div>
-      <div class="information-card-content">
+      <div class="oppia-information-card-content">
         <p>The titles of Washed Outs breakthrough song and the first single from Paracosm share the two most important.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
-          <li><span class="fa fa-star fa-lg"></span>
-            <[explorationRatings]>
-          </li>
-          <li><span class="fa fa-eye fa-lg"></span>
-            <[viewsCount]>
-          </li>
-          <li><span class="fa fa-clock-o fa-lg"></span>
-            <[lastModifiedDate | date: 'MM/dd/yyyy']>
-          </li>
-          <li layout="row" layout-align="space-between center">
+          <li><span class="fa fa-star fa-lg"></span><[explorationRatings]></li>
+          <li><span class="fa fa-eye fa-lg"></span><[viewsCount]></li>
+          <li><span class="fa fa-clock-o fa-lg"></span><[lastModifiedDate | date: 'MM/dd/yyyy']></li>
+          <ul layout="row" layout-align="space-between center" class="oppia-exploration-contributors-profile">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
-            <ul style="padding:5px;" layout="row">
-              <li><img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt=""></li>
-              <li><img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
-              <li ng-if='explorationContributors.length > 2' class="circle">
-                <[explorationContributors.length - 2]>+</li>
-            </ul>
-          </li>
+            <li><img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt=""></li>
+            <li><img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
+            <li ng-if='explorationContributors.length > 2' class="oppia-contributors-more-circle">
+              <[explorationContributors.length - 2]>+</li>
+          </ul>
         </ul>
-        <div class="social-media-and-tags" layout="row">
+        <div class="oppia-social-media-and-tags" layout="row">
           <div flex="55">
             <md-content layout="row">
-              <div class="oppia-tag-icon"><img src="/third_party/static/material-design-icons-1.0.1/ic_tag.png"></div>
-              <md-chips>
-                <md-chips>
-                  <md-chip ng-repeat="tag in explorationTags | limitTo: 3">
-                    <[tag]>,</md-chip>
-                  <md-chips>
-                    <md-chip ng-if='explorationTags.length > 3'>
-                      <[explorationTags.length - 3]>+more</md-chip>
-                  </md-chips>
+              <div class="oppia-tag-icon"><span class="fa fa-tags fa-lg"></span></div>
+              <md-chips layout-align="center center">
+                  <md-chip ng-repeat="tag in explorationTags | limitTo: 2"><[tag]>,</md-chip>
+                  <md-chip ng-if='explorationTags.length > 2'><[explorationTags.length - 2]>+more</md-chip>
+              </md-chips>
+            </md-content>
           </div>
           <div flex="45">
             <ul layout="row" layout-align="end center">
@@ -179,7 +168,7 @@
         </div>
       </div>
       <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_white_48dp.png">
       </button>
     </md-card>
   </script>

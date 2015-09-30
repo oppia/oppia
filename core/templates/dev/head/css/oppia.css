@@ -2148,88 +2148,105 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-modal-information-card .modal-dialog {
- width: 400px;
- margin:100px auto;
+  margin: 100px auto;
+  width: 400px;
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content md-card {
   margin: 0;
   padding: 0;
 }
-.information-card-title{
+
+.oppia-information-card-title {
   bottom: 0;
   color: white;
-  margin: 0;
-  padding: 0;
   font-weight: bold;
+  margin: 10px 0;
+  padding: 0;
   position:absolute;
 }
-.information-card-logo-thumbnail {
-  height: 300px;
-  position: relative;
-  padding: 20px;
+
+.oppia-information-card-logo-thumbnail {
   background-repeat: no-repeat;
-  background-size:cover;  
+  background-size: cover;
+  height: 300px;
+  padding: 20px;
+  position: relative; 
 }
-.information-card-content{
+
+.oppia-information-card-content {
   padding: 10px 20px 10px 20px;
 }
-.information-card-content p {
+
+.oppia-information-card-content p {
   display: block;
-  position: relative;
-  line-height: 1;
-  word-spacing: 0;
   font-size: 1.0em;
-  padding: 10px 0; 
+  line-height: 1;
+  padding: 10px 0;
+  position: relative;
+  word-spacing: 0; 
 }
-.information-card-content .card-metrics {
- padding: 0;
+
+.oppia-information-card-content .card-metrics {
  margin-top: 10px;
+ padding: 0;
 }
-.information-card-content .card-metrics li {
-  list-style-type: none;
-  font-weight: bold;
+
+.oppia-information-card-content .card-metrics li {
   font-size: 12px;
-  text-align: center;
-}
-.information-card-content .card-metrics li img {
-  height: 24px;
-  width: 24px;
-  margin-right: 2px;
-}
-.circle {
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  text-align: center;
-  padding-top: 3px;
-  background: #888;
-  border-color: black; 
-}
-.information-card-content .card-metrics li .fa{
-  margin-right: 5px;
-  font-size: 24px;
-}
-.social-media-and-tags {
-  margin-top:20px
-}
-.social-media-and-tags ul li {
+  font-weight: bold;
   list-style-type: none;
+  text-align: center;
 }
-.social-media-and-tags md-chips md-chip,
-.social-media-and-tags md-chips md-chips md-chip{
+
+.oppia-information-card-content .card-metrics ul img {
+  height: 24px;
+  margin-right: 2px;
+  width: 24px;
+}
+
+.oppia-contributors-more-circle {
+  background: #888;
+  border-radius: 50%;
+  border-color: black;
+  height: 24px;
+  padding-top: 3px;
+  text-align: center; 
+  width: 24px;
+}
+
+.oppia-information-card-content .card-metrics li .fa {
+  font-size: 24px;
+  margin-right: 5px;
+}
+
+.oppia-social-media-and-tags {
+  margin-top: 20px
+}
+
+.oppia-social-media-and-tags md-chips md-chip {
   font-size: 12px;
   line-height: 1em;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
+
 .oppia-tag-icon {
-  width:48px;
-  padding-top:6px;
+  padding-top: 6px;
+  width: 28px;
 }
-.social-media-and-tags ul li a img {
-  height:20px;
-  width:20px;
+
+.oppia-social-media-and-tags ul li {
+  list-style-type: none;
+}
+
+.oppia-social-media-and-tags ul li a img {
   border-radius: 2px;
+  height: 20px;
   margin: 3px;
+  width: 20px;
+}
+
+.oppia-exploration-contributors-profile {
+  padding: 0;
 }

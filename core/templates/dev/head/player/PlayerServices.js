@@ -560,7 +560,7 @@ oppia.factory('ratingService', [
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
-    function(
+    function (
       $scope, $http, $modal, oppiaHtmlEscaper,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -693,21 +693,23 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
   };
 }]);
 
-oppia.controller('InformationCardCtrl', function ($scope, $modal) {
+oppia.controller('InformationCard', function ($scope, $modal) {
 
-  $scope.showDialog = function () {
+  $scope.showInformationCard = function () {
 
     var modalInstance = $modal.open({
-      animation:true,
+      animation: true,
       templateUrl: 'popover/informationCard',
       windowClass: 'oppia-modal-information-card',
       controller: ['$scope', '$http', '$modal', '$modalInstance','oppiaPlayerService', 'ratingService',
                    'oppiaHtmlEscaper', 'embedExplorationButtonService',
-                    function ($scope, $http, $modal, $modalInstance, oppiaPlayerService, ratingService, oppiaHtmlEscaper,
-                     embedExplorationButtonService) {
+                    function (
+                      $scope, $http, $modal, $modalInstance, oppiaPlayerService, ratingService, oppiaHtmlEscaper,
+                      embedExplorationButtonService) {
+
         // TODO(Makonda) get real view counts.
         var _NumberOfViews = 487666;
-        $scope.informationCardBackgroundCcs= {
+        $scope.informationCardBackgroundCcs = {
           background: 'url(/images/gallery/exploration_background_gunmetal_large.png)'
         };
         $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -717,6 +719,7 @@ oppia.controller('InformationCardCtrl', function ($scope, $modal) {
         $scope.explorationRatings = ratingService.getUserRating() !== null ? ratingService.getUserRating() : 0;
         $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
+        // TODO(Makonda)get tags for exploration
         $scope.explorationTags = ['Mathematics','Combinatorics','Counting','Algebra','Enumerations','Algorithm'];
 
         var viewersNumberFilter = function (viewersNumber) {
