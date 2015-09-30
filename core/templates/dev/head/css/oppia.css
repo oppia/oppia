@@ -2152,7 +2152,12 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 400px;
 }
 
+.oppia-modal-information-card .modal-dialog .modal-content {
+  border-radius: 0;
+}
+
 .oppia-modal-information-card .modal-dialog .modal-content md-card {
+  border-radius:0;
   margin: 0;
   padding: 0;
 }
@@ -2167,6 +2172,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-information-card-logo-thumbnail {
+  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   height: 300px;
@@ -2188,8 +2194,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-information-card-content .card-metrics {
- margin-top: 10px;
- padding: 0;
+  margin-top: 10px;
+  padding: 0;
 }
 
 .oppia-information-card-content .card-metrics li {
@@ -2231,6 +2237,16 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
+.oppia-information-card-tooltip-more {
+  color: blue;
+}
+
+/* This is needed to overide the maximum width of tooltip
+   otherwise  breaks when you have longer text in tooltip */
+.tooltip-inner {
+  max-width: 420px;
+}
+
 .oppia-tag-icon {
   padding-top: 6px;
   width: 28px;
@@ -2245,6 +2261,19 @@ md-card.preview-conversation-skin-supplemental-card {
   height: 20px;
   margin: 3px;
   width: 20px;
+}
+
+.oppia-contributors-dropdown {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: 24px;
+  padding: 0;
+  width: 28px;
+}
+
+.oppia-contributors-dropdown li {
+  margin-bottom: 2px;
 }
 
 .oppia-exploration-contributors-profile {

@@ -362,6 +362,9 @@ oppia.factory('oppiaPlayerService', [
     getExplorationId: function() {
       return _explorationId;
     },
+    getInfocardImageUrl: function () {
+      return _infoCardImageUrl;
+    },
     getExplorationTitle: function() {
       return _exploration.title;
     },
@@ -710,7 +713,7 @@ oppia.controller('InformationCard', function ($scope, $modal) {
         // TODO(Makonda) get real view counts.
         var _NumberOfViews = 487666;
         $scope.informationCardBackgroundCcs = {
-          background: 'url(/images/gallery/exploration_background_gunmetal_large.png)'
+          'background-image': 'url('+oppiaPlayerService.getInfocardImageUrl()+')'
         };
         $scope.explorationId = oppiaPlayerService.getExplorationId();
         $scope.serverName = window.location.protocol + '//' + window.location.host;
@@ -721,6 +724,7 @@ oppia.controller('InformationCard', function ($scope, $modal) {
 
         // TODO(Makonda)get tags for exploration
         $scope.explorationTags = ['Mathematics','Combinatorics','Counting','Algebra','Enumerations','Algorithm'];
+        $scope.explorationDescription = "The titles of Washed Outs breakthrough song and the first single from"
 
         var viewersNumberFilter = function (viewersNumber) {
           // Nine Zeroes for Billions
@@ -741,6 +745,12 @@ oppia.controller('InformationCard', function ($scope, $modal) {
 
         $scope.viewsCount = viewersNumberFilter(_NumberOfViews);
         $scope.lastModifiedDate = new Date();
+        $scope.onMouseoverDropdownMenu = function(evt) {
+          angular.element(evt.currentTarget).parent().addClass('open');
+        };
+        $scope.onMouseoutDropdownMenu = function(evt) {
+          angular.element(evt.currentTarget).parent().removeClass('open');
+        };
         // TODO(Makonda) get  exploration contributors 
         $scope.explorationContributors = ["Sean","Ben","Amit","Google","Sunu","Ed"];
         $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
