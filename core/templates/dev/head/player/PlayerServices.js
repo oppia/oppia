@@ -331,7 +331,7 @@ oppia.factory('oppiaPlayerService', [
         _lastTimeUpdated = data[data.length - 1].created_on_ms;
       }).error(function () {
         warningsData.addWarning(
-            data.error || 'There was an error loading the exploration history');
+            response.error || 'There was an error loading the exploration history');
         });
       // This is needed to get statistics of the exprolation 
       $http.get(infocardStatisticUrl).success(function(data) {
@@ -764,7 +764,6 @@ oppia.controller('InformationCard', function ($scope, $modal) {
                       embedExplorationButtonService) {
 
         var _informationCardData = oppiaPlayerService.getInformationCardData();
-        console.log(_informationCardData);
         $scope.serverName = window.location.protocol + '//' + window.location.host;
         $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
           GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
