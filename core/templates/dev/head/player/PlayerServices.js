@@ -333,6 +333,7 @@ oppia.factory('oppiaPlayerService', [
         warningsData.addWarning(
             response.error || 'There was an error loading the exploration history');
         });
+
       // This is needed to get statistics of the exprolation 
       $http.get(infocardStatisticUrl).success(function(data) {
         // Only get number of viewers who started an exploration
@@ -341,8 +342,7 @@ oppia.factory('oppiaPlayerService', [
         warningsData.addWarning(
             data.error || 'There was an error loading the exploration statistics');
         });
-
-    };
+  };
 
   return {
     // This should only be used in editor preview mode.
