@@ -28,27 +28,78 @@ class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):
     def test_output_equals_rule(self):
         rule = code_evaluation.OutputEquals('1')
 
-        self.assertTrue(rule.eval({
+        self.assertFuzzyTrue(rule.eval({
             'code': 'hello',
             'output': '1',
             'evaluation': '',
             'error': ''
         }))
-        self.assertTrue(rule.eval({
+        self.assertFuzzyTrue(rule.eval({
             'code': 'hello',
             'output': '\n1\n     ',
             'evaluation': '',
             'error': ''
         }))
-        self.assertFalse(rule.eval({
+        self.assertFuzzyFalse(rule.eval({
             'code': 'hello',
             'output': '',
             'evaluation': '',
             'error': ''
         }))
-        self.assertFalse(rule.eval({
+        self.assertFuzzyFalse(rule.eval({
             'code': 'hello',
             'output': 'bad output',
+            'evaluation': '',
+            'error': ''
+        }))
+
+    def test_fuzzy_matches_rule(self):
+        rule = code_evaluation.FuzzyMatches([{
+            'code': 'def func():\n    return 1\nprint func()',
+            'output': '1',
+            'evaluation': '',
+            'error': ''
+        }])
+
+        # The same code should match.
+        self.assertFuzzyTrue(rule.eval({
+            'code': 'def func():\n    return 1\nprint func()',
+            'output': '1',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        # Extra whitespacing should not matter for the fuzzy match.
+        self.assertFuzzyTrue(rule.eval({
+            'code': '\ndef func():\n  return 1\n\n\nprint func()\n',
+            'output': '1',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        # Comments should make no difference for the comparison.
+        self.assertFuzzyTrue(rule.eval({
+            'code': (
+                '# A func that returns 1.\ndef func():\n    return 1\n\n# Now '
+                'print it.\nprint func()'),
+            'output': '1',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        # Renaming the identifiers should fail due to the current fuzzy rule
+        # not doing very intelligent normalization.
+        self.assertFuzzyFalse(rule.eval({
+            'code': 'def ret_one():\n    return 1\nprint ret_one()',
+            'output': '1',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        # Different code should not match.
+        self.assertFuzzyFalse(rule.eval({
+            'code': 'print (1+2)',
+            'output': '1',
             'evaluation': '',
             'error': ''
         }))

@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import datetime
 import json
 
 from core import jobs
@@ -31,6 +32,13 @@ from google.appengine.ext import ndb
 
 _NO_SPECIFIED_VERSION_STRING = 'none'
 _ALL_VERSIONS_STRING = 'all'
+# This date represents the date we stopped using StateCounterModel.
+# This is here because StateCounterModel did not explicitly record
+# a start event. It only used the hit count for the start state.
+# This means that we need to figure out what the start state was
+# during the StateCounterModel time period so that we can select the
+# correct state hits to count as starts.
+_STATE_COUNTER_CUTOFF_DATE = datetime.datetime(2014, 10, 11, 0, 0, 0)
 
 # States with this name used to be treated as a pseudoend state, but are not
 # anymore. This is kept here until the stats job may be updated to work with
@@ -218,15 +226,27 @@ class StatisticsMRJobManager(
     @staticmethod
     def reduce(key, stringified_values):
         from core.domain import exp_services
+
         exploration = None
-        (exp_id, version) = key.split(':')
+        exp_id, version = key.split(':')
         try:
-            if version not in [
-                    _NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
+            if version == _NO_SPECIFIED_VERSION_STRING:
+                exploration = exp_services.get_exploration_by_id(exp_id)
+
+                # Rewind to the last commit before the transition from
+                # StateCounterModel.
+                current_version = exploration.version
+                while (exploration.last_updated > _STATE_COUNTER_CUTOFF_DATE
+                       and current_version > 1):
+                    current_version -= 1
+                    exploration = exp_models.ExplorationModel.get_version(
+                        exp_id, current_version)
+            elif version == _ALL_VERSIONS_STRING:
+                exploration = exp_services.get_exploration_by_id(exp_id)
+            else:
                 exploration = exp_services.get_exploration_by_id(
                     exp_id, version=version)
-            else:
-                exploration = exp_services.get_exploration_by_id(exp_id)
+
         except base_models.BaseModel.EntityNotFoundError:
             return
 
@@ -363,6 +383,7 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                 yield (
                     StatisticsAudit._STATE_COUNTER_ERROR_KEY,
                     'Less than 0: %s %d' % (item.key, item.first_entry_count))
+            return
         # Older versions of ExplorationAnnotations didn't store exp_id
         # This is short hand for making sure we get ones updated most recently
         else:

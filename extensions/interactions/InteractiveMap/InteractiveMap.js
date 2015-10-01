@@ -33,7 +33,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
         $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
 
         // This is required in order to avoid the following bug:
-        //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
+        //   http://stackoverflow.com/questions/18769287
         window.setTimeout(function() {
           google.maps.event.trigger($scope.map, 'resize');
         }, 100);
@@ -62,7 +62,6 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
   }
 ]);
 
-
 oppia.directive('oppiaResponseInteractiveMap', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
@@ -70,14 +69,32 @@ oppia.directive('oppiaResponseInteractiveMap', [
       scope: {},
       templateUrl: 'response/InteractiveMap',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
-        var latLongPair = $scope.answer[0] + ',' + $scope.answer[1];
+        var latLongPair = _answer[0] + ',' + _answer[1];
         $scope.staticMapUrl =
           'https://maps.googleapis.com/maps/api/staticmap?' +
           'center=' + latLongPair + '&zoom=4&size=500x400' +
           '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
           latLongPair + '&sensor=false';
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseInteractiveMap', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/InteractiveMap',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
+        $scope.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+        $scope.formattedCoords += ', ';
+        $scope.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
+        $scope.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
       }]
     };
   }

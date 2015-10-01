@@ -25,6 +25,7 @@ class GraphInput(base.BaseInteraction):
     name = 'Graph Theory'
     description = 'Allows learners to create and manipulate graphs.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable = True
     _dependency_ids = []
     answer_type = 'Graph'
 

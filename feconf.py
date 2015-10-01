@@ -43,7 +43,6 @@ RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-OBJECTS_DIR = os.path.join('extensions', 'objects')
 SKINS_TEMPLATES_DIR = os.path.join('extensions', 'skins')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
 FRONTEND_TEMPLATES_DIR = os.path.join(
@@ -58,7 +57,7 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 5
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 6
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -82,6 +81,11 @@ FEEDBACK_TAB_PAGE_SIZE = 20
 DEFAULT_INIT_STATE_NAME = 'First Card'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# The threshold the truth value of an evaluated answer group must equal or
+# exceed in order to be considered a better classification than the default
+# group.
+DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
 # Default valid parameter for instantiating Explorations when explicit
 # skin customizations aren't provided.
@@ -263,6 +267,7 @@ DEMO_EXPLORATIONS = [
     # entire exploration as a dev demo.
     ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
      'Welcome'),
+    ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
 DEMO_COLLECTIONS = [
@@ -270,9 +275,7 @@ DEMO_COLLECTIONS = [
 ]
 
 # TODO(sll): Add all other URLs here.
-CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
-CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
@@ -285,10 +288,8 @@ GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
 LEARN_GALLERY_URL = '/learn'
-LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
-PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_URL = '/signup'
@@ -297,13 +298,13 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
-NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
 NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
+NAV_MODE_SIGNUP = 'signup'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -335,6 +336,9 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
+
+# Unfinished feature.
+SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'

@@ -164,13 +164,13 @@ oppia.controller('ExplorationEditor', [
       'Click \'Next\' to learn how to use the exploration editor.<br><br> ' +
       'You might also find these resources helpful for creating your exploration: ' +
       '<ul>'+
-      '<li><a href="/editor_tutorial" target="_blank">' +
+      '<li><a href="https://oppia.github.io/#/AWorkedExample" target="_blank">' +
       '        Walkthrough of the Oppia Editor' +
       '</a></li>' +
-      '<li><a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">' +
+      '<li><a href="https://oppia.github.io/#/PlanningAnExploration" target="_blank">' +
       '        Planning Your Exploration' +
       '</a></li>' +
-      '<li><a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">' +
+      '<li><a href="https://oppia.github.io/#/DesignTips" target="_blank">' +
       '        Exploration Design Tips' +
       '</li>' +
       '</ul>')
@@ -569,7 +569,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
               'answer_groups': 'Responses',
-              'default_outcome': 'Default outcome'
+              'default_outcome': 'Default outcome',
+              'confirmed_unclassified_answers': 'Confirmed unclassified answers'
             }
 
             // An ordered list of state properties that determines the order in which

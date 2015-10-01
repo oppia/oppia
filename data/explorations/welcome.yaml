@@ -6,7 +6,7 @@ language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: 8
 skin_customizations:
   panels_contents: {}
 states:
@@ -20,8 +20,8 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Estimate 100:
     content:
@@ -45,8 +45,8 @@ states:
         - No; try again. Remember, multiplication by ten can be done by just adding
           a zero at the end.
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Finding Helsinki:
     content:
@@ -97,8 +97,8 @@ states:
         feedback:
         - That is rather far away! Try zooming into Finland.
         param_changes: []
+      fallbacks: []
       id: InteractiveMap
-      triggers: []
     param_changes: []
   Numeric input:
     content:
@@ -163,23 +163,18 @@ states:
         - If you got here, something's gone a bit wrong with this exploration. Sorry
           about that. If you're wondering, the answer is 121.
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Things you can do:
     content:
     - type: text
-      value: "That's a very quick sample of Oppia. For more sample explorations, check\
-        \ out the gallery .<div><br></div><div>If you want to add custom question\
-        \ types, or run your own instance of Oppia, have a look at our code site:</div><div>\_\
-        \ \_\_<br></div>\_ \_\_<oppia-noninteractive-link open_link_in_same_window-with-value=\"\
-        \" url-with-value=\"&amp;quot;https://code.google.com/p/oppia/&amp;quot;\"\
-        ></oppia-noninteractive-link><div><br></div><div>You can also create new explorations,\
-        \ like this one, by clicking on the \"Create a new exploration\" button in\
-        \ the gallery.</div><br><div>We hope you enjoy using Oppia. If you have feedback,\
-        \ let us know! You can find our discussion forum at\_<oppia-noninteractive-link\
-        \ open_link_in_same_window-with-value=\"\" url-with-value=\"&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;\"\
-        ></oppia-noninteractive-link>.</div>"
+      value: <p>That's a very quick sample of Oppia. For more sample explorations,
+        check out the gallery. You can also create new explorations, like this one,
+        by clicking on the "Create exploration" button in the gallery.</p><br><div>We
+        hope you enjoy using Oppia. If you have feedback, please let us know at our
+        <oppia-noninteractive-link open_link_in_same_window-with-value="false" text-with-value="&amp;quot;discussion
+        forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>!</div><p></p>
     interaction:
       answer_groups: []
       customization_args:
@@ -189,17 +184,17 @@ states:
         dest: END
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   Welcome!:
     content:
     - type: text
-      value: Hi, welcome to Oppia!<br><br>Oppia is a tool that helps you create interactive
-        learning activities that can be continually improved over time. You can find
-        more information at <oppia-noninteractive-link open_link_in_same_window-with-value="true"
-        url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link>.<br><br>But
-        first, do you know where the name 'Oppia' comes from?<br><br>
+      value: <p>Hi, welcome to Oppia! <oppia-noninteractive-link open_link_in_same_window-with-value="false"
+        text-with-value="&amp;quot;Oppia&amp;quot;" url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
+        is a tool that helps you create interactive learning activities that can be
+        continually improved over time.<br><br>Incidentally, do you know where the
+        name 'Oppia' comes from?<br></p>
     interaction:
       answer_groups:
       - outcome:
@@ -233,8 +228,8 @@ states:
         - Hm, it certainly looks like it! But it's actually a word from a different
           language.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   What language:
     content:
@@ -430,8 +425,8 @@ states:
         - Sorry, nope, we didn't get it from {{answer}}. Here's a hint, though. It's
           a European language you're looking for.
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 5
 tags: []

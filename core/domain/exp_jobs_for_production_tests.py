@@ -32,7 +32,7 @@ from google.appengine.ext import ndb
 
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    ExpCopy = ndb.JsonProperty(repeated=True)
+    pass
 
 
 class ExpCopiesAggregator(jobs.BaseContinuousComputationManager):

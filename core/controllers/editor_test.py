@@ -26,6 +26,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import rights_manager
+from core.domain import rule_domain
 from core.tests import test_utils
 import feconf
 
@@ -43,7 +44,6 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -241,6 +241,159 @@ class EditorTest(BaseEditorControllerTest):
 
         self.logout()
 
+    def test_untrained_answers_handler(self):
+        with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
+            def _create_answer(value, count=1):
+                return {'value': value, 'count': count}
+            def _create_training_data(*arg):
+                return [_create_answer(value) for value in arg]
+
+            # Load the fuzzy rules demo exploration.
+            exp_services.load_demo('16')
+            rights_manager.release_ownership_of_exploration(
+                feconf.SYSTEM_COMMITTER_ID, '16')
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+            self.assertEqual(
+                exploration_dict['exploration']['title'],
+                'Demonstrating fuzzy rules')
+
+            # This test uses the interaction which supports numeric input.
+            state_name = 'text'
+
+            self.assertIn(
+                state_name, exploration_dict['exploration']['states'])
+            self.assertEqual(
+                exploration_dict['exploration']['states'][state_name][
+                    'interaction']['id'], 'TextInput')
+
+            # Input happy since there is an explicit rule checking for that.
+            result_dict = self.submit_answer('16', state_name, 'happy')
+
+            # Input text not at all similar to happy (default outcome).
+            self.submit_answer('16', state_name, 'sad')
+
+            # Input cheerful: this is current training data and falls under the
+            # fuzzy rule.
+            self.submit_answer('16', state_name, 'cheerful')
+
+            # Input joyful: this is not training data but will be classified
+            # under the fuzzy rule.
+            self.submit_answer('16', state_name, 'joyful')
+
+            # Log in as an editor.
+            self.login(self.EDITOR_EMAIL)
+            response = self.testapp.get('/create/16')
+            csrf_token = self.get_csrf_token_from_response(response)
+            url = str('/createhandler/training_data/16/%s' % state_name)
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # Only two of the four submitted answers should be unhandled.
+            response_dict = self.get_json(url)
+            self.assertEqual(
+                response_dict['unhandled_answers'],
+                _create_training_data('joyful', 'sad'))
+
+            # If the confirmed unclassified answers is trained for one of the
+            # values, it should no longer show up in unhandled answers.
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        'new_value': ['sad']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(
+                response_dict['unhandled_answers'],
+                _create_training_data('joyful'))
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # If one of the values is added to the training data of a fuzzy
+            # rule, then it should not be returned as an unhandled answer.
+            state = exploration_dict['exploration']['states'][state_name]
+            answer_group = state['interaction']['answer_groups'][1]
+            rule_spec = answer_group['rule_specs'][0]
+            self.assertEqual(
+                rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
+            rule_spec['inputs']['training_data'].append('joyful')
+
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        'new_value': []
+                    }, {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                        'new_value': state['interaction']['answer_groups']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(
+                response_dict['unhandled_answers'],
+                _create_training_data('sad'))
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # If both are classified, then nothing should be returned
+            # unhandled.
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        'new_value': ['sad']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(response_dict['unhandled_answers'], [])
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # If one of the existing training data elements in the fuzzy rule
+            # is removed (5 in this case), but it is not backed up by an
+            # answer, it will not be returned as potential training data.
+            state = exploration_dict['exploration']['states'][state_name]
+            answer_group = state['interaction']['answer_groups'][1]
+            rule_spec = answer_group['rule_specs'][0]
+            del rule_spec['inputs']['training_data'][1]
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                        'new_value': state['interaction']['answer_groups']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(response_dict['unhandled_answers'], [])
+
+            self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
@@ -251,6 +404,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -269,6 +423,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -287,6 +442,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -308,6 +464,7 @@ param_changes: []
   value: ''
 interaction:
   answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
       value: ''
@@ -323,7 +480,6 @@ param_changes: []
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):
-
         self.login(self.EDITOR_EMAIL)
         self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -672,7 +828,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     COLLABORATOR2_USERNAME = 'collab2'
     COLLABORATOR3_EMAIL = 'collaborator3@example.com'
     COLLABORATOR3_USERNAME = 'collab3'
-    VIEWER2_EMAIL = 'viewer2@example.com'
 
     def test_exploration_rights_handler(self):
         """Test exploration rights handler."""
