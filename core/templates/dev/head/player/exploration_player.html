@@ -109,12 +109,12 @@
 
   <script type="text/ng-template" id="popover/informationCard">
     <md-card class="md-padding">
-      <div ng-style="informationCardBackgroundCcs" class="oppia-information-card-logo-thumbnail">
+      <div ng-style="infoCardBackgroundImage" class="oppia-information-card-logo-thumbnail">
         <h2 class="oppia-information-card-title"><[explorationCardTitle]></h2>
       </div>
 
       <div class="oppia-information-card-content">
-        <p><[explorationDescription]></p>
+        <p><[explorationDescription | truncate:100]></p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
             <span class="fa fa-star fa-lg"></span><[explorationRatings]></li>
@@ -124,19 +124,20 @@
             <span class="fa fa-clock-o fa-lg"></span><[lastModifiedDate | date: 'MM/dd/yyyy']></li>
           <ul layout="row" layout-align="space-between center" class="oppia-exploration-contributors-profile">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
-            <li><img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt=""></li>
-            <li><img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
+            <li ng-repeat="contributor in explorationContributors| limitTo: 2">
+              <img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
+            
             <li ng-if='explorationContributors.length > 2' class="oppia-contributors-more-circle dropdown">
               <a href="" class="dropdown-toggle"
-                  ng-mouseover="onMouseoverDropdownMenu($event)" data-toggle="dropdown">
-                  <[explorationContributors.length - 2]>+</a>
+                ng-mouseover="onMouseoverDropdownMenu($event)" data-toggle="dropdown">
+                <[explorationContributors.length - 2]>+</a>
               <ul class="dropdown-menu oppia-contributors-dropdown" role="menu"
-                  ng-mouseleave="onMouseoutDropdownMenu($event)">
-                  <li ng-repeat="conributor in explorationContributors | limitTo: explorationContributors.length-2: 3">
-                    <img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt="">
-                  </li>
+                ng-mouseleave="onMouseoutDropdownMenu($event)">
+                <li ng-repeat="conributor in explorationContributors | limitTo: explorationContributors.length-2: 3">
+                  <img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt="">
+                </li>
               </ul>
              </li>
           </ul>

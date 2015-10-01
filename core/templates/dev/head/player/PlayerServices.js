@@ -147,6 +147,11 @@ oppia.factory('oppiaPlayerService', [
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _infoCardImageUrl = null;
+  var _explorationObjective = null;
+  var _explorationTags = [];
+  var _explorationContributors = [];
+  var _lastTimeUpdated = null;
+  var _viewersCount = null;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
@@ -302,6 +307,43 @@ oppia.factory('oppiaPlayerService', [
     }
   };
 
+  var _loadInitialInformationCardData = function(successCallback) {
+
+      var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
+      var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
+      var infocardStatisticUrl = '/createhandler/statistics/' +  _explorationId + '/all';
+
+      // This is needed to get exploration objective/goal,contributors. 
+      // and exploration tags 
+      $http.get(infoCardDataUrl).success(function(data) {
+        _explorationObjective = data.objective;
+        _explorationTags = data.tags;
+        _explorationContributors = data.rights.owner_names.concat(data.rights.editor_names);
+      }).error(function () {
+        warningsData.addWarning(
+            data.error || 'There was an error loading the exploration information.');
+        });
+
+      // This is needed to get exploration snapshots.
+      $http.get(infoCardSnapshotsUrl).success(function(response) {
+        var data = response.snapshots;
+        //only get last published chages/get changes from the last snapshot.
+        _lastTimeUpdated = data[data.length - 1].created_on_ms;
+      }).error(function () {
+        warningsData.addWarning(
+            data.error || 'There was an error loading the exploration history');
+        });
+      // This is needed to get statistics of the exprolation 
+      $http.get(infocardStatisticUrl).success(function(data) {
+        // Only get number of viewers who started an exploration
+        _viewersCount = data.num_starts;
+      }).error(function () {
+        warningsData.addWarning(
+            data.error || 'There was an error loading the exploration statistics');
+        });
+
+    };
+
   return {
     // This should only be used in editor preview mode.
     populateExploration: function(exploration) {
@@ -335,6 +377,7 @@ oppia.factory('oppiaPlayerService', [
             (GLOBALS.CATEGORIES_TO_COLORS[_exploration.category] || 'teal') +
             '_large.png');
           _loadInitialState(successCallback);
+          _loadInitialInformationCardData(successCallback);
         }
       } else {
         $http.get(explorationDataUrl).success(function(data) {
@@ -344,6 +387,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
+          _loadInitialInformationCardData(successCallback);
           $rootScope.$broadcast('playerServiceInitialized');
           messengerService.sendMessage(
             messengerService.EXPLORATION_LOADED, null);
@@ -362,8 +406,17 @@ oppia.factory('oppiaPlayerService', [
     getExplorationId: function() {
       return _explorationId;
     },
-    getInfocardImageUrl: function () {
-      return _infoCardImageUrl;
+    getInformationCardData: function() {
+      informationCardData = {
+        explorationTags: _explorationTags,
+        infoCardImageUrl: _infoCardImageUrl,
+        explorationObjective: _explorationObjective,
+        lastTimeUpdated: _lastTimeUpdated,
+        explorationContributors : _explorationContributors,
+        viewersCount: _viewersCount
+      };
+
+      return informationCardData;
     },
     getExplorationTitle: function() {
       return _exploration.title;
@@ -710,21 +763,23 @@ oppia.controller('InformationCard', function ($scope, $modal) {
                       $scope, $http, $modal, $modalInstance, oppiaPlayerService, ratingService, oppiaHtmlEscaper,
                       embedExplorationButtonService) {
 
-        // TODO(Makonda) get real view counts.
-        var _NumberOfViews = 487666;
-        $scope.informationCardBackgroundCcs = {
-          'background-image': 'url('+ oppiaPlayerService.getInfocardImageUrl() +')'
-        };
-        $scope.explorationId = oppiaPlayerService.getExplorationId();
+        var _informationCardData = oppiaPlayerService.getInformationCardData();
+        console.log(_informationCardData);
         $scope.serverName = window.location.protocol + '//' + window.location.host;
         $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
           GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
-        $scope.explorationRatings = ratingService.getUserRating() !== null ? ratingService.getUserRating() : 0;
         $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
-        // TODO(Makonda)get tags for exploration
-        $scope.explorationTags = ['Mathematics','Combinatorics','Counting','Algebra','Enumerations','Algorithm'];
-        $scope.explorationDescription = "The titles of Washed Outs breakthrough song and the first single from"
+        $scope.explorationId = oppiaPlayerService.getExplorationId();
+        $scope.infoCardBackgroundImage = {
+          'background-image': 'url('+ _informationCardData.infoCardImageUrl +')'
+        };
+        $scope.explorationRatings = ratingService.getUserRating() !== null ? ratingService.getUserRating() : 0;
+        $scope.explorationTags = _informationCardData.explorationTags;
+        $scope.explorationDescription = _informationCardData.explorationObjective;
+        $scope.explorationContributors = _informationCardData.explorationContributors;
+        $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
+        $scope.lastModifiedDate = _informationCardData.lastTimeUpdated;
 
         var viewersNumberFilter = function (viewersNumber) {
           // Nine Zeroes for Billions
@@ -743,17 +798,13 @@ oppia.controller('InformationCard', function ($scope, $modal) {
                : Math.abs(Number(viewersNumber));
              };
 
-        $scope.viewsCount = viewersNumberFilter(_NumberOfViews);
-        $scope.lastModifiedDate = new Date();
+        $scope.viewsCount = viewersNumberFilter(_informationCardData.viewersCount);
         $scope.onMouseoverDropdownMenu = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
         };
         $scope.onMouseoutDropdownMenu = function(evt) {
           angular.element(evt.currentTarget).parent().removeClass('open');
         };
-        // TODO(Makonda) get  exploration contributors 
-        $scope.explorationContributors = ["Sean","Ben","Amit","Google","Sunu","Ed"];
-        $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
         $scope.cancel = function () {
           $modalInstance.dismiss();
         }
