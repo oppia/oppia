@@ -94,7 +94,9 @@ oppia.directive('oppiaResponseImageClickInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'response/ImageClickInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: [
+          '$scope', '$attrs', 'oppiaHtmlEscaper',
+          function($scope, $attrs, oppiaHtmlEscaper) {
         var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
         $scope.clickRegionLabel = '(Clicks on ' + (

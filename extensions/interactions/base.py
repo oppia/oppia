@@ -91,6 +91,11 @@ class BaseInteraction(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
+    # Instructions for using this interaction, to be shown to the learner. Only
+    # relevant for supplemental interactions.
+    instructions = None
+    # Whether the answer is long, and would benefit from being summarized.
+    needs_summary = False
 
     @property
     def id(self):
@@ -165,12 +170,14 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
+            'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
+            'instructions': self.instructions,
         }
 
         # Add information about rule descriptions corresponding to the answer

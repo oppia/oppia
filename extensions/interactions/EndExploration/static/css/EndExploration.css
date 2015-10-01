@@ -30,12 +30,3 @@
   position: relative;
   text-align: center;
 }
-
-.oppia-end-exploration-recommendation-introduction {
-  font-size: 1.25em;
-  padding: 20px 10px 10px 10px;
-}
-
-.oppia-end-exploration-gallery-button {
-  padding: 20px 10px 10px 0;
-}

@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-0-0-rc-4
+version: 2-0-0
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -8,7 +8,7 @@ instance_class: F4
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
   # Modify the 'version' field above to match this.
-  OPPIA_VERSION: '2.0.0.rc.4'
+  OPPIA_VERSION: '2.0.0'
 
 builtins:
 - appstats: on

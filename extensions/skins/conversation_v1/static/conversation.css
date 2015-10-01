@@ -19,7 +19,12 @@
   mode.
 */
 html, body {
+  background: url('/images/general/background.png') no-repeat center center fixed;
   background-color: #eee;
+  color: rgba(0,0,0,0.87);
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.0em;
+  background-size: cover;
 }
 
 /*
@@ -27,162 +32,344 @@ html, body {
   All classes below should start with .conversation-skin
  */
 
+/* Overwrite the default color for the 'Loading...' message. */
+.oppia-loading-fullpage {
+  color: #fff;
+}
+
+.conversation-skin-progress-dots {
+  left: 0;
+  margin: 0 auto;
+  position: fixed;
+  right: 0;
+  z-index: 100;
+}
+.conversation-skin-progress-dots-not-iframed {
+  top: 56px;
+}
+.conversation-skin-progress-dots-iframed {
+  top: 6px;
+}
+
+.conversation-skin-initial-oppia-avatar,
+.conversation-skin-oppia-avatar,
+.conversation-skin-user-avatar {
+  position: absolute;
+}
+.conversation-skin-initial-oppia-avatar {
+  height: 36px;
+  left: -18px;
+  top: 30px;
+  width: 36px;
+}
+.conversation-skin-oppia-avatar {
+  height: 36px;
+  left: -18px;
+  top: -9px;
+  width: 36px;
+}
+.conversation-skin-user-avatar {
+  height: 36px;
+  left: -18px;
+  top: 12px;
+  width: 36px;
+}
+
+.conversation-skin-responses-dropdown-icon {
+  font-size: 10px;
+  margin-bottom: -4px;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: 0.2s;
+}
+.conversation-skin-responses-dropdown-icon-rotated {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.conversation-skin-responses-dropdown-container {
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  line-height: 0.1em;
+  margin: 0 auto 30px auto;
+  text-align: center;
+  width: 90%;
+}
+.conversation-skin-responses-dropdown-text {
+  background-color: #fff;
+  color: #888;
+  font-size: 0.8em;
+  padding: 0 10px;
+}
+
+/* TODO(sll): Add the relevant CSS rules here once gadgets are brought into the
+   learner view. */
+.conversation-skin-main-gadget-panel {
+
+}
+
 .conversation-skin-cards-container {
-  margin-bottom: 50px;
-}
-
-.conversation-skin-exploration-intro-card {
-  background-color: rgb(255,255,255);
-  font-family: 'Roboto';
-  margin: 20px auto;
-  max-height: 567px;
-  max-width: 560px;
-  padding: 0px;
-  text-align: center;
-}
-
-
-.conversation-skin-left-gadget-panel {
-  margin-right: 285px;
-  max-width: 200px;
-  position: fixed;
-  right: 50%;
-  top: 76px;
-}
-
-.conversation-skin-right-gadget-panel {
-  margin-left: 285px;
-  max-width: 200px;
-  position: fixed;
-  left: 50%;
-  top: 76px;
-}
-
-.conversation-skin-card-row-container {
-  margin-bottom: 17px;
-  table-layout: fixed;
-  width: 100%;
-}
-
-.conversation-skin-card-row {
-  margin-bottom: 20px;
-  margin-top: 20px;
-  width: 100%;
-}
-
-.conversation-skin-row-avatar {
-  padding-right: 10px;
-  width: 30px;
-}
-
-.conversation-skin-row-avatar-img {
-  height: 24px;
-  max-width: 24px;
-}
-
-.conversation-skin-exploration-header {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
-  font-size: 1.25em;
-  text-align: center;
-  height: 30%;
-  margin-top: -13.9%;
-  padding-bottom: 1%;
-  padding-top: 1%;
-  position: relative;
-}
-
-.conversation-skin-iframe-container {
-  -webkit-overflow-scrolling: touch;
+  margin: 0 auto;
+  /* This is the width of the main card, plus the width of the supplemental
+     card, plus a 12px margin between them.
+  */
+  max-width: 1084px;
 }
 
 /* 'md-card' is needed to ensure that this takes precedence over the default
    Material Design stylesheet. */
-md-card.conversation-skin-card {
-  background: rgb(255,255,255);
-  margin: 20px auto;
-  margin-top: -5px;
-  max-width: 560px;
-  padding: 40px 60px 27px 22px;
+md-card.conversation-skin-tutor-card {
+  background: rgb(255, 255, 255);
+  left: 0;
+  margin: 44px auto 24px auto;
+  max-width: 472px;
+  padding: 0;
   position: relative;
+  right: 0;
   text-align: left;
+  width: 472px;
 }
 
-.conversation-skin-card-feedback-toggle-container {
+.conversation-skin-tutor-card-top-section {
+  padding: 36px 36px 24px 36px;
+}
+.conversation-skin-tutor-card-bottom-section,
+.conversation-skin-tutor-card-middle-section {
+  margin-top: 8px;
+  padding: 0px 36px 2px 36px;
+}
+
+.conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
+.conversation-skin-tutor-card-bottom-section .conversation-skin-oppia-avatar,
+.conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+  left: -56px;
+  /* This is needed to prevent overlapping of avatars. */
+  margin-top: 10px;
+  top: -7px;
+}
+
+.conversation-skin-interaction-clickable-instructions {
+  cursor: pointer;
+}
+
+.conversation-skin-learner-answer-container,
+.conversation-skin-oppia-feedback-container {
+  margin-bottom: 30px;
+  /* This is needed to align content in-line with avatars. */
+  padding-top: 10px;
+  position: relative;
+}
+
+.conversation-skin-tutor-card-feedback-toggle-container {
   position: absolute;
   right: 10px;
   top: 11px;
   width: 20px;
 }
-.conversation-skin-card-feedback-toggle {
+.conversation-skin-tutor-card-feedback-toggle {
+  background: none;
+  border: 0;
+  color: #000;
   cursor: pointer;
   height: 20px;
+  margin-left: -5px;
   opacity: 0.4;
 }
-.conversation-skin-card-feedback-toggle:hover {
+.conversation-skin-tutor-card-feedback-toggle:hover {
   opacity: 0.8;
 }
 
-.conversation-skin-learner-input {
-  padding-left: 15px;
+.conversation-skin-inline-interaction {
+  background: rgba(0, 0, 0, 0.04);
+  padding: 16px 36px 24px 36px;
+  position: relative;
 }
 
 .conversation-skin-learner-answer {
-  color: #579287;
-  padding-left: 15px;
-  width: 100%;
-  word-wrap: break-word;
+  color: #0D4781;
 }
-
-.conversation-skin-oppia-content {
-  padding-left: 15px;
-  padding-top: 2px;
-}
-
+.conversation-skin-learner-answer,
 .conversation-skin-oppia-feedback {
-  padding-left: 15px;
-  text-align: left;
-  width: 100%;
   word-wrap: break-word;
 }
 
-.conversation-skin-loading-dots {
-  text-align: center;
-}
-.conversation-skin-loading-dots > .oppia-loading-dot-one,
-.conversation-skin-loading-dots > .oppia-loading-dot-two,
-.conversation-skin-loading-dots > .oppia-loading-dot-three {
-  background-color: black;
+.conversation-skin-feedback-dot-one,
+.conversation-skin-feedback-dot-two,
+.conversation-skin-feedback-dot-three {
+  background-color: #666;
   display: inline-block;
-  height: 10px;
-  margin: 10px;
-  width: 10px;
+  height: 2px;
+  width: 2px;
+}
+.conversation-skin-feedback-dot-one {
+  animation: dot 1.5s infinite;
+  animation-delay: 0.0s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.0s;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.0s;
+  opacity: 0;
+}
+.conversation-skin-feedback-dot-two {
+  animation: dot 1.5s infinite;
+  animation-delay: 0.3s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.3s;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.3s;
+  opacity: 0;
+}
+.conversation-skin-feedback-dot-three {
+  animation: dot 1.5s infinite;
+  animation-delay: 0.6s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.6s;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.6s;
+  opacity: 0;
 }
 
-/* 'md-card' is needed to ensure that this takes precedence over the default
-   Material Design stylesheet. */
-md-card.conversation-skin-inline-interaction {
-  background-color: #f6f6f6;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  margin: -20px auto;
-  max-width: 560px;
-}
-
-.conversation-skin-supplemental-interaction {
+.conversation-skin-supplemental-card-container {
+  display: inline-block;
   margin: 0 auto;
-  max-width: 560px;
+  position: absolute;
+  width: 100%;
+}
+
+.conversation-skin-right-card-container {
+  margin-left: 12px;
+  width: 600px;
 }
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
-  margin: -5px 0;
-  max-width: 560px;
+  left: 0;
+  margin: 44px auto;
+  position: absolute;
+  right: 0;
+  width: 600px;
+}
+
+.conversation-skin-right-card-container md-card.conversation-skin-supplemental-card-fixed {
+  left: inherit;
+  margin-top: 8px;
+  position: fixed;
+  right: inherit;
+}
+
+.conversation-skin-supplemental-card-overlay {
+  background: #eee;
+  height: 100%;
+  left: 0;
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 3;
 }
 
 .conversation-skin-final-ratings {
   padding-top: 20px;
   text-align: center;
+}
+
+.conversation-skin-left-card {
+  float: left;
+  margin-left: 0;
+}
+
+.conversation-skin-card-switcher {
+  background: #009688;
+  bottom: 0;
+  height: 50px;
+  position: fixed;
+  width: 100%;
+}
+.conversation-skin-card-switcher-thumbnails-container {
+  height: 100%;
+  margin: auto;
+  text-align: center;
+  width: 100%;
+}
+.conversation-skin-card-switcher-thumbnail {
+  border: 1px solid black;
+  cursor: pointer;
+  height: 40px;
+  margin-top: 2px;
+  width: 40px;
+}
+.conversation-skin-card-switcher-thumbnail-active {
+  border: 3px solid #0d47a1;
+  cursor: default;
+  height: 46px;
+  margin-top: 2px;
+  width: 46px;
+}
+
+.conversation-skin-tutor-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-tutor-card.ng-hide-remove.ng-hide-remove-active,
+.conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
+  -webkit-transition: all ease-out 0.4s;
+  transition: all ease-out 0.4s;
+}
+
+.conversation-skin-tutor-card.ng-hide {
+  opacity: 0;
+  transform: translateX(-1000px);
+}
+
+.conversation-skin-supplemental-card.ng-hide {
+  opacity: 0;
+  transform: translateX(1000px);
+}
+
+@media(max-width: 1119px) {
+  /*
+    This is needed so that the left/right animation works smoothly with a
+    supplemental interaction on small screens. However, it needs the extra
+    'has-subsidiary-cards' class in order to avoid the final ratings section
+    displaying at the top of the page.
+  */
+  md-card.conversation-skin-tutor-card.conversation-skin-has-subsidiary-cards {
+    position: absolute;
+  }
+}
+
+@media(max-width: 600px) {
+  .conversation-skin-right-card-container,
+  md-card.conversation-skin-supplemental-card,
+  md-card.conversation-skin-tutor-card {
+    width: 100%;
+  }
+
+  /*
+    This is needed to position avatars inside the card for small screen devices/
+    when card is 100% wide
+  */
+  .conversation-skin-initial-oppia-avatar,
+  .conversation-skin-oppia-avatar,
+  .conversation-skin-user-avatar {
+    left: 3px;
+  }
+
+  .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
+  .conversation-skin-tutor-card-bottom-section .conversation-skin-oppia-avatar,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+    left: -51px;
+  }
+  .conversation-skin-tutor-card-top-section {
+    padding: 36px 36px 24px 54px;
+  }
+  .conversation-skin-tutor-card-bottom-section,
+  .conversation-skin-tutor-card-middle-section {
+    padding: 0px 36px 2px 54px;
+  }
+  .conversation-skin-inline-interaction {
+    padding: 16px 36px 24px 54px;
+  }
 }

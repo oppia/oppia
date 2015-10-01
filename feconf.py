@@ -162,8 +162,8 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
-# Whether to include a page with the Oppia discussion forum.
-SHOW_FORUM_PAGE = True
+# Whether to include the forum, terms and privacy pages.
+SHOW_CUSTOM_PAGES = True
 
 # User id and username for exploration migration bot.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
@@ -199,6 +199,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'Continue',
         'EndExploration',
         'ImageClickInput',
+        'ItemSelectionInput',
         'MultipleChoiceInput',
         'TextInput'
     ],

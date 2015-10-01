@@ -23,7 +23,7 @@
 oppia.factory('ratingVisibilityService', [function() {
   return {
     areRatingsShown: function(ratingFrequencies) {
-      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
+      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 3;
 
       var totalNumber = 0;
       for (var value in ratingFrequencies) {
@@ -59,7 +59,7 @@ oppia.directive('ratingFromValue', [function() {
       var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
         return {
-          cssClass: 'glyphicon-star-empty',
+          cssClass: 'fa-star-o',
           value: starValue
         };
       });
@@ -72,10 +72,10 @@ oppia.directive('ratingFromValue', [function() {
       var displayValue = function(ratingValue) {
         for (var i = 0; i < $scope.stars.length; i++) {
           $scope.stars[i].cssClass =
-            ratingValue === undefined ? 'glyphicon-star-empty' :
-            ratingValue < $scope.stars[i].value  - 0.5 ?
-            'glyphicon-star-empty' :
-            'glyphicon-star';
+            ratingValue === undefined ? 'fa-star-o' :
+            ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
+            ratingValue < $scope.stars[i].value - 0.25 ? 'fa-star-half-o' : 'fa-star';
+
           if ($scope.status === STATUS_ACTIVE && ratingValue >= $scope.stars[i].value) {
             $scope.stars[i].cssClass += ' oppia-rating-star-active';
           }

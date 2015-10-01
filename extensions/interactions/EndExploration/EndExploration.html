@@ -2,9 +2,7 @@
 
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="recommendedExplorationIds.length > 0">
-    <span class="oppia-end-exploration-recommendation-introduction">
-      Other explorations you might enjoy:
-    </span>
+    Other explorations you might enjoy:
     <div style="color: red;" ng-repeat="expId in invalidExpIds" ng-if="isInEditorPreviewMode">
       <strong>Error:</strong> no published exploration found with ID '<[expId]>'
     </div>
@@ -20,9 +18,16 @@
     </div>
   </div>
 
-  <div ng-if="!isIframed" class="oppia-end-exploration-gallery-button">
-    <a class="btn btn-default" href="/" style="font-size: 1.1em;">
-      Return to gallery
+  <div ng-if="!isIframed">
+    <a href="/" ng-if="!isInEditorPreviewMode">
+      <md-button class="md-button-success">
+        Return to gallery
+      </md-button>
+    </a>
+    <a href="#/gui" ng-if="isInEditorPreviewMode">
+      <md-button class="md-button-success">
+        Return to editor
+      </md-button>
     </a>
   </div>
 </script>
