@@ -887,15 +887,18 @@ md-card.oppia-gallery-tile {
   padding: 6px;
 }
 
+.oppia-editor-header {
+  font-size: 16px;
+  margin-top: 35px;
+}
+
 .oppia-editor-cards-container {
   margin: auto;
   max-width: 700px;
 }
 .oppia-editor-card-with-avatar {
   background: rgb(255,255,255);
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 20px;
+  margin: 20px auto 0 auto;
   max-width: 700px;
   padding: 0;
 }
@@ -1008,8 +1011,8 @@ pre.oppia-pre-wrapped-text {
   font-size: 16px;
   opacity: 0.2;
   position: absolute;
-  right: -20px;
-  top: 5px;
+  right: -22px;
+  top: 3px;
   -webkit-transition: all 200ms;
   transition: all 200ms;
 }
