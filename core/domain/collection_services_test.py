@@ -115,6 +115,9 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                     }
                 })
 
+    def test_get_collection_summaries_matching_query(self):
+        pass
+
 
 class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
     """Test creation and deletion methods."""
@@ -987,14 +990,13 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
             self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[-7])
 
     def test_get_next_page_of_all_non_private_commits(self):
+        # TODO(frederikcreemers@gmail.com) test max_age here.
         all_commits = (
             collection_services.get_next_page_of_all_non_private_commits()[0])
         self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[0])
-
-    # TODO(frederikcreemers@gmail.com) test max_age here.
 
     def test_paging(self):
         all_commits, cursor, more = (

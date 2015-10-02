@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core import jobs_registry
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_jobs
@@ -596,11 +597,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
-    EXP_ID = 'exp_id'
+    EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
-    COLLECTION_ID = 'col_id'
+    COLLECTION_ID_1 = 'col_id_1'
     COLLECTION_ID_2 = 'col_id_2'
-    COLLECTION_EXP_ID = 'col_exp_id'
+    EXP_ID_FOR_COLLECTION_1 = 'id_of_exp_in_collection_1'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'
@@ -641,7 +642,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User A creates and saves a new valid exploration.
             self.save_new_valid_exploration(
-                self.EXP_ID, self.user_a_id, end_state_name='End')
+                self.EXP_ID_1, self.user_a_id, end_state_name='End')
 
     def test_null_case(self):
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -670,10 +671,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                self.EXP_ID, None, self.user_b_id, 'subject', 'text')
+                self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
-            thread_id = (
-                feedback_services.get_threadlist(self.EXP_ID)[0]['thread_id'])
+            thread_id = feedback_services.get_threadlist(
+                self.EXP_ID_1)[0]['thread_id']
             feedback_services.create_message(
                 thread_id, self.user_c_id, None, None, 'more text')
 
@@ -700,11 +701,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID, self.user_b_id,
+                self.user_a_id, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID, self.user_c_id,
+                self.user_a_id, self.EXP_ID_1, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
@@ -718,9 +719,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID])
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID])
+            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
         self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
@@ -742,7 +743,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             sorted(user_a_subscriptions_model.activity_ids),
-            sorted([self.EXP_ID, self.EXP_ID_2]))
+            sorted([self.EXP_ID_1, self.EXP_ID_2]))
 
     def test_community_owned_exploration(self):
         with self.swap(
@@ -752,15 +753,15 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID, self.user_b_id,
+                self.user_a_id, self.EXP_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # The exploration becomes community-owned.
-            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID)
+            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
-                self.user_a_id, self.EXP_ID)
+                self.user_a_id, self.EXP_ID_1)
             # User C edits the exploration.
             exp_services.update_exploration(
-                self.user_c_id, self.EXP_ID, [], 'Update exploration')
+                self.user_c_id, self.EXP_ID_1, [], 'Update exploration')
 
         self._run_one_off_job()
 
@@ -773,9 +774,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID])
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID])
+            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_deleted_exploration(self):
@@ -786,7 +787,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
 
             # User A deletes the exploration.
-            exp_services.delete_exploration(self.user_a_id, self.EXP_ID)
+            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
 
         self._run_one_off_job()
 
@@ -806,16 +807,16 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User A creates and saves a new valid collection.
             self.save_new_valid_collection(
-                self.COLLECTION_ID, self.user_a_id,
-                exploration_id=self.COLLECTION_EXP_ID)
+                self.COLLECTION_ID_1, self.user_a_id,
+                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
 
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID, self.user_b_id,
+                self.user_a_id, self.COLLECTION_ID_1, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID, self.user_c_id,
+                self.user_a_id, self.COLLECTION_ID_1, self.user_c_id,
                 rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
@@ -829,14 +830,14 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.collection_ids, [self.COLLECTION_ID])
+            user_a_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
         # User A is also subscribed to the exploration within the collection
         # because they created both.
         self.assertEqual(
             sorted(user_a_subscriptions_model.activity_ids), [
-                self.COLLECTION_EXP_ID, self.EXP_ID])
+                self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
         self.assertEqual(
-            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID])
+            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
         self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
@@ -852,13 +853,13 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User A creates and saves a new valid collection.
             self.save_new_valid_collection(
-                self.COLLECTION_ID, self.user_a_id,
-                exploration_id=self.COLLECTION_EXP_ID)
+                self.COLLECTION_ID_1, self.user_a_id,
+                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
 
             # User A creates and saves another valid collection.
             self.save_new_valid_collection(
                 self.COLLECTION_ID_2, self.user_a_id,
-                exploration_id=self.COLLECTION_EXP_ID)
+                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
 
         self._run_one_off_job()
 
@@ -868,7 +869,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             sorted(user_a_subscriptions_model.collection_ids),
-            sorted([self.COLLECTION_ID, self.COLLECTION_ID_2]))
+            sorted([self.COLLECTION_ID_1, self.COLLECTION_ID_2]))
 
     def test_deleted_collection(self):
         with self.swap(
@@ -881,14 +882,14 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self._null_fn):
             # User A creates and saves a new collection.
             self.save_new_default_collection(
-                self.COLLECTION_ID, self.user_a_id)
+                self.COLLECTION_ID_1, self.user_a_id)
 
             # User A deletes the collection.
             collection_services.delete_collection(
-                self.user_a_id, self.COLLECTION_ID)
+                self.user_a_id, self.COLLECTION_ID_1)
 
             # User A deletes the exploration from earlier.
-            exp_services.delete_exploration(self.user_a_id, self.EXP_ID)
+            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
 
         self._run_one_off_job()
 
@@ -896,3 +897,47 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_a_id, strict=False)
         self.assertEqual(user_a_subscriptions_model, None)
+
+    def test_adding_exploration_to_collection(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection',
+                self._null_fn):
+            # UserB creates and saves a new collection.
+            self.save_new_default_collection(
+                self.COLLECTION_ID_1, self.user_b_id)
+
+            # User B adds the exploration created by user A to the collection.
+            collection_services.update_collection(
+                self.user_b_id, self.COLLECTION_ID_1, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': self.EXP_ID_1
+                }], 'Add new exploration to collection.')
+
+        # Users A and B have no subscriptions (to either explorations or
+        # collections).
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id, strict=False)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        self.assertEqual(user_a_subscriptions_model, None)
+        self.assertEqual(user_b_subscriptions_model, None)
+
+        self._run_one_off_job()
+
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+
+        # User B should be subscribed to the collection and user A to the
+        # exploration.
+        self.assertEqual(
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+        self.assertEqual(
+            user_a_subscriptions_model.collection_ids, [])
+        self.assertEqual(
+            user_b_subscriptions_model.activity_ids, [])
+        self.assertEqual(
+            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])

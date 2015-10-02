@@ -285,11 +285,13 @@ def _get_activity_rights(activity_type, activity_id):
             return get_exploration_rights(activity_id)
         elif activity_type == ACTIVITY_TYPE_COLLECTION:
             return get_collection_rights(activity_id)
+        else:
+            logging.error(
+                'Cannot get activity rights for unknown activity type: %s' % (
+                    activity_type))
+            return None
     except Exception:
         return None
-    raise Exception(
-        'Cannot get activity rights for unknown activity type: %s' % (
-            activity_type))
 
 
 class Actor(object):

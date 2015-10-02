@@ -69,16 +69,14 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_admin).can_play(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
-            rights_manager.Actor(
-                self.user_id_admin).can_view(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
+            rights_manager.Actor(self.user_id_admin).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_edit(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
         self.assertTrue(
-            rights_manager.Actor(
-                self.user_id_admin).can_delete(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
+            rights_manager.Actor(self.user_id_admin).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '1'))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
@@ -110,9 +108,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_admin).can_edit(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
         self.assertTrue(
-            rights_manager.Actor(
-                self.user_id_admin).can_delete(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
+            rights_manager.Actor(self.user_id_admin).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
 
     def test_ownership_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -442,6 +439,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_EMAIL])
 
         self.COLLECTION_ID = 'collection_id'
+        self.EXP_ID_FOR_COLLECTION = 'exp_id_for_collection'
 
     def test_demo_collection(self):
         collection_services.load_demo('0')
@@ -465,16 +463,14 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_admin).can_play(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, '0'))
         self.assertTrue(
-            rights_manager.Actor(
-                self.user_id_admin).can_view(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, '0'))
+            rights_manager.Actor(self.user_id_admin).can_view(
+                rights_manager.ACTIVITY_TYPE_COLLECTION, '0'))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_edit(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, '0'))
         self.assertTrue(
-            rights_manager.Actor(
-                self.user_id_admin).can_delete(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, '0'))
+            rights_manager.Actor(self.user_id_admin).can_delete(
+                rights_manager.ACTIVITY_TYPE_COLLECTION, '0'))
 
     def test_ownership_of_collection(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
@@ -537,8 +533,11 @@ class CollectionRightsTests(test_utils.GenericTestBase):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
 
     def test_inviting_collaborator_to_collection(self):
-        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.user_id_a,
+            exploration_id=self.EXP_ID_FOR_COLLECTION)
 
+        # Verify initial editor permissions for the collection.
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_play(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
@@ -552,10 +551,31 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_b).can_delete(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
 
+        # Verify initial editor permissions for the exploration within the
+        # collection.
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+
+        # User A adds user B to the collection as an editor.
         rights_manager.assign_role_for_collection(
             self.user_id_a, self.COLLECTION_ID, self.user_id_b,
             rights_manager.ROLE_EDITOR)
 
+        # Ensure User B is now an editor of the collection.
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_play(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
@@ -568,10 +588,32 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_delete(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
+
+        # Ensure User B is not an editor of the exploration within the
+        # collection.
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
 
     def test_inviting_playtester_to_collection(self):
-        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.user_id_a,
+            exploration_id=self.EXP_ID_FOR_COLLECTION)
 
+        # Verify initial viewer permissions for the collection.
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_play(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
@@ -585,10 +627,31 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_b).can_delete(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
 
+        # Verify initial viewer permissions for the exploration within the
+        # collection.
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+
+        # User A adds user B to the collection as a viewer.
         rights_manager.assign_role_for_collection(
             self.user_id_a, self.COLLECTION_ID, self.user_id_b,
             rights_manager.ROLE_VIEWER)
 
+        # Ensure User B is now a viewer of the collection.
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_play(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
@@ -601,6 +664,25 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_delete(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, self.COLLECTION_ID))
+
+        # Ensure User B cannot view the exploration just because he/she has
+        # access to the collection containing it.
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_FOR_COLLECTION))
 
     def test_setting_rights_of_collection(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)

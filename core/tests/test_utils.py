@@ -312,13 +312,14 @@ class TestBase(unittest.TestCase):
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE,
             end_state_name=None):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category)
+            exploration_id, title, category, language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
         exploration.objective = objective

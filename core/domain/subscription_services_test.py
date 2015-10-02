@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -318,3 +319,33 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
             [COLLECTION_ID])
+
+    def test_adding_exploration_to_collection_does_not_create_subscription(self):
+        COLLECTION_ID = 'col_id'
+        EXP_ID = 'exp_id'
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
+
+        # The author is subscribed to the collection but to no explorations.
+        self.assertEqual(
+            self._get_collection_ids_subscribed_to(self.owner_id),
+            [COLLECTION_ID])
+        self.assertEqual(
+            self._get_exploration_ids_subscribed_to(self.owner_id), [])
+
+        # Another author creates an exploration.
+        self.save_new_valid_exploration(EXP_ID, self.owner_2_id)
+
+        # If the collection author adds the exploration to his/her collection,
+        # the collection author should not be subscribed to the exploration nor
+        # should the exploration author be subscribed to the collection.
+        collection_services.update_collection(self.owner_id, COLLECTION_ID, [{
+            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+            'exploration_id': EXP_ID
+        }], 'Add new exploration to collection.')
+
+        # Ensure subscriptions are as expected.
+        self.assertEqual(
+            self._get_collection_ids_subscribed_to(self.owner_id),
+            [COLLECTION_ID])
+        self.assertEqual(
+            self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])

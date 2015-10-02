@@ -40,7 +40,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     """A continuous-computation job that computes a list of recent updates
     of explorations and feedback threads to show on a user's dashboard.
 
-    This job does not have a working realtime component. The
+    This job does not have a working realtime component: the
     RecentUpdatesRealtimeModel does nothing. There will be a delay in
     propagating new updates to the dashboard; the length of the delay will be
     approximately the time it takes a batch job to run.
@@ -95,11 +95,45 @@ class RecentUpdatesMRJobManager(
 
     @staticmethod
     def _get_most_recent_activity_commits(
-            activity_model_cls, activity_ids_list, tracked_models_for_feedback,
+            activity_model_cls, activity_ids_list,
             activity_type, commit_type, delete_type):
+        """Gets and returns a list of dicts representing the most recent
+        commits made for each activity represented by each ID provided in the
+        activity_ids_list parameter. These are the latest commits made by users
+        to each activity (that is, it will skip over any automated commits such
+        as those from the Oppia migration bot).
+
+        Args:
+            activity_model_cls: The storage layer object for an activity, such
+                as exp_models.ExplorationModel.
+            activity_ids_list: A list of activity IDs (such as exploration IDS)
+                for which the latest commits will be retrieved.
+            activity_type: The type (string) of activity being referenced, such
+                as 'exploration' or 'collection'.
+            commit_type: This (string) represents the activity update commit
+                type, such as feconf.UPDATE_TYPE_EXPLORATION_COMMIT.
+            delete_type: This (string) represents the activity delete commit
+                type, such as feconf.COMMIT_MESSAGE_EXPLORATION_DELETED.
+
+        Returns:
+            A tuple with two entries: A list of dictionaries with the following
+            keys, where each entry in the list is added for each activity loaded
+            from the list of activity IDs and a list which contains valid
+            activity model instances which may be mapped to feedback threads.
+            Following are the keys of the dictionary (first part of the tuple):
+                - type: The type of update commit type.
+                - activity_id: The ID of the activity for this commit.
+                - activity_title: The title of the activity.
+                - author_id: The author who made the commit.
+                - last_update_ms: When the commit was created.
+                - subject: The commit message, otherwise the delete commit type
+                  if the activity has been deleted.
+        """
         most_recent_commits = []
         activity_models = activity_model_cls.get_multi(
             activity_ids_list, include_deleted=True)
+
+        tracked_models_for_feedback = []
 
         for ind, activity_model in enumerate(activity_models):
             if activity_model is None:
@@ -140,7 +174,7 @@ class RecentUpdatesMRJobManager(
             if not activity_model.deleted:
                 tracked_models_for_feedback.append(activity_model)
 
-        return most_recent_commits
+        return (most_recent_commits, tracked_models_for_feedback)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -156,12 +190,10 @@ class RecentUpdatesMRJobManager(
         collection_ids_list = item.collection_ids
         feedback_thread_ids_list = item.feedback_thread_ids
 
-        tracked_exp_models_for_feedback = []
-        most_recent_activity_commits = (
+        (most_recent_activity_commits, tracked_exp_models_for_feedback) = (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
                 exp_models.ExplorationModel, exploration_ids_list,
-                tracked_exp_models_for_feedback, 'exploration',
-                feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                'exploration', feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED))
 
         for exp_model in tracked_exp_models_for_feedback:
@@ -170,13 +202,13 @@ class RecentUpdatesMRJobManager(
                 if thread['thread_id'] not in feedback_thread_ids_list:
                     feedback_thread_ids_list.append(thread['thread_id'])
 
-        # TODO(bhenning): Implement a solution to having feedback threasd for
+        # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
         most_recent_activity_commits += (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
-                collection_models.CollectionModel, collection_ids_list, [],
+                collection_models.CollectionModel, collection_ids_list,
                 'collection', feconf.UPDATE_TYPE_COLLECTION_COMMIT,
-                feconf.COMMIT_MESSAGE_COLLECTION_DELETED))
+                feconf.COMMIT_MESSAGE_COLLECTION_DELETED))[0]
 
         for recent_activity_commit_dict in most_recent_activity_commits:
             yield (reducer_key, recent_activity_commit_dict)
