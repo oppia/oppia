@@ -2266,19 +2266,6 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 20px;
 }
 
-.oppia-contributors-dropdown {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  min-width: 24px;
-  padding: 0;
-  width: 28px;
-}
-
-.oppia-contributors-dropdown li {
-  margin-bottom: 2px;
-}
-
 .oppia-exploration-contributors-profile {
   padding: 0;
 }

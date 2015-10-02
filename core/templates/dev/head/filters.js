@@ -336,4 +336,34 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
     }
     return summary;
   }
-}])
+}]);
+
+oppia.filter('appendMetrixPrefix', [function() {
+  return function (input) {
+    return Math.abs(Number(input)) >= 1.0e+9
+
+    // Nine Zeroes for Billions
+    ? (Math.abs(Number(input)) / 1.0e+9).toFixed(1) + "B"
+
+    // Six Zeroes for Millions
+    : Math.abs(Number(input)) >= 1.0e+6
+
+    ? (Math.abs(Number(input)) / 1.0e+6).toFixed(1) + "M"
+    // Three Zeroes for Thousands
+    : Math.abs(Number(input)) >= 1.0e+3
+
+    ? (Math.abs(Number(input)) / 1.0e+3).toFixed(1) + "K"
+
+    : Math.abs(Number(input));
+  };
+}]);
+
+oppia.filter('formattedObjective', [function() {
+  return function(objective, maxNumberOfCharacters) {
+    objective = objective.trim();
+    if(objective.length > maxNumberOfCharacters){
+      objective = objective.substring(0, maxNumberOfCharacters) + '...';
+    }
+    return objective.charAt(0).toUpperCase() + objective.slice(1);
+  }
+}]);

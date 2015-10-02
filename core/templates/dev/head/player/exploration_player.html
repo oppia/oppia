@@ -25,56 +25,14 @@
       <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom">
-    <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon"></li>
+      <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon">
+    </li>
   </ul>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
   <div ng-controller="LearnerLocalNav">
     <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
-      <li class="dropdown">
-        <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
-          <span class="glyphicon glyphicon-share"></span>
-        </a>
-        <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-          {% if SHARING_OPTIONS['gplus'] %}
-            <li>
-              <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
-                 onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')"
-                 target="_window" tooltip="Google+" tooltip-placement="left">
-                <img src="/images/general/gplus.png" alt="Google+">
-              </a>
-            </li>
-          {% endif %}
-
-          {% if SHARING_OPTIONS['facebook'] %}
-            <li>
-              <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button"
-                 onclick="return !window.open(this.href, '', 'height=336, width=640')"
-                 target="_window" tooltip="Facebook" tooltip-placement="left">
-                <img src='/images/general/fb.png' alt="Facebook">
-              </a>
-            </li>
-          {% endif %}
-
-          {% if SHARING_OPTIONS['twitter'] %}
-            <li>
-              <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>"
-                 onclick="return !window.open(this.href, '', 'height=460, width=640')"
-                 target="_window" tooltip="Twitter" tooltip-placement="left">
-                <img src="/images/general/twitter.png" alt="Twitter">
-              </a>
-            </li>
-          {% endif %}
-
-          <li>
-            <a href="" ng-click="showEmbedExplorationModal(explorationId)"
-               tooltip="Embed" tooltip-placement="left">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
-            </a>
-          </li>
-        </ul>
-      </li>
       <li popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
         <a href="" tooltip="Feedback" tooltip-placement="bottom">
           <span class="glyphicon glyphicon-comment"></span>
@@ -114,32 +72,27 @@
       </div>
 
       <div class="oppia-information-card-content">
-        <p><[explorationDescription | truncate:98]></p>
+        <p><[explorationDescription | formattedObjective: 95]></p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
             <span class="fa fa-star fa-lg"></span><[explorationRatings]></li>
           <li>
-            <span class="fa fa-eye fa-lg"></span><[viewsCount]></li>
+            <span class="fa fa-eye fa-lg"></span><[viewsCount | appendMetrixPrefix]></li>
           <li>
             <span class="fa fa-clock-o fa-lg"></span><[lastModifiedDate | date: 'MM/dd/yyyy']></li>
           <ul layout="row" layout-align="space-between center" class="oppia-exploration-contributors-profile">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
-            <li ng-repeat="contributor in explorationContributors| limitTo: 2">
+            <li ng-repeat="contributor in explorationContributors| limitTo: 2"
+              tooltip="<[contributor]>" tooltip-placement="top">
               <img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
             
-            <li ng-if='explorationContributors.length > 2' class="oppia-contributors-more-circle dropdown">
-              <a href="" class="dropdown-toggle"
-                ng-mouseover="onMouseoverDropdownMenu($event)" data-toggle="dropdown">
-                <[explorationContributors.length - 2]>+</a>
-              <ul class="dropdown-menu oppia-contributors-dropdown" role="menu"
-                ng-mouseleave="onMouseoutDropdownMenu($event)">
-                <li ng-repeat="conributor in explorationContributors | limitTo: explorationContributors.length-2: 3">
-                  <img class="img-circle" ng-src="/images/general/user_blue_72px.png" alt="">
-                </li>
-              </ul>
-             </li>
+            <li ng-if='explorationContributors.length > 2' class="oppia-contributors-more-circle"
+              tooltip-append-to-body=true tooltip="<[explorationContributors.slice(2).join()]>"
+              tooltip-placement="top">+<[explorationContributors.length - 2]></li>
+            <li ng-if='explorationContributors.length < 1' tooltip="public"
+              tooltip-placement="top"><span class="fa fa-globe fa-lg"></span></li>
           </ul>
         </ul>
         <div class="oppia-social-media-and-tags" layout="row">
@@ -163,21 +116,31 @@
                   <img src="/third_party/static/material-design-icons-1.0.1/ic_share_black_48dp.png">
                 </a>
               </li>
-              <li>
-                <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" target="_window">
-                  <img src="/images/general/gplus.png" alt="Google+">
-                </a>
-              </li>
-              <li>
-                <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" target="_window">
-                  <img src='/images/general/fb.png' alt="Facebook">
-                </a>
-              </li>
-              <li>
-                <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
-                  <img src="/images/general/twitter.png" alt="Twitter">
-                </a>
-              </li>
+
+              {% if SHARING_OPTIONS['gplus'] %}
+                <li>
+                  <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" target="_window">
+                    <img src="/images/general/gplus.png" alt="Google+">
+                  </a>
+                </li>
+              {% endif %}
+
+              {% if SHARING_OPTIONS['facebook'] %}
+                <li>
+                  <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" target="_window">
+                    <img src='/images/general/fb.png' alt="Facebook">
+                  </a>
+                </li>
+              {% endif %}
+
+              {% if SHARING_OPTIONS['twitter'] %}
+                <li>
+                  <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
+                    <img src="/images/general/twitter.png" alt="Twitter">
+                  </a>
+                </li>
+              {% endif %}
+
               <li>
                 <a href="" ng-click="showEmbedExplorationModal(explorationId)">
                   <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">

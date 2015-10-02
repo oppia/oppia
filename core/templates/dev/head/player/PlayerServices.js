@@ -311,7 +311,7 @@ oppia.factory('oppiaPlayerService', [
 
       var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
       var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
-      var infocardStatisticUrl = '/createhandler/statistics/' +  _explorationId + '/all';
+      var infocardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
 
       // This is needed to get exploration objective/goal,contributors. 
       // and exploration tags 
@@ -335,7 +335,7 @@ oppia.factory('oppiaPlayerService', [
         });
 
       // This is needed to get statistics of the exprolation 
-      $http.get(infocardStatisticUrl).success(function(data) {
+      $http.get(infocardStatisticsUrl).success(function(data) {
         // Only get number of viewers who started an exploration
         _viewersCount = data.num_starts;
       }).error(function () {
@@ -407,7 +407,7 @@ oppia.factory('oppiaPlayerService', [
       return _explorationId;
     },
     getInformationCardData: function() {
-      informationCardData = {
+      var informationCardData = {
         explorationTags: _explorationTags,
         infoCardImageUrl: _infoCardImageUrl,
         explorationObjective: _explorationObjective,
@@ -780,24 +780,7 @@ oppia.controller('InformationCard', function ($scope, $modal) {
         $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
         $scope.lastModifiedDate = _informationCardData.lastTimeUpdated;
 
-        var viewersNumberFilter = function (viewersNumber) {
-          // Nine Zeroes for Billions
-          return Math.abs(Number(viewersNumber)) >= 1.0e+9
-
-               ? (Math.abs(Number(viewersNumber)) / 1.0e+9).toFixed(1) + "B"
-               // Six Zeroes for Millions 
-               : Math.abs(Number(viewersNumber)) >= 1.0e+6
-
-               ? (Math.abs(Number(viewersNumber)) / 1.0e+6).toFixed(1) + "M"
-               // Three Zeroes for Thousands
-               : Math.abs(Number(viewersNumber)) >= 1.0e+3
-
-               ? (Math.abs(Number(viewersNumber)) / 1.0e+3).toFixed(1) + "K"
-
-               : Math.abs(Number(viewersNumber));
-             };
-
-        $scope.viewsCount = viewersNumberFilter(_informationCardData.viewersCount);
+        $scope.viewsCount = _informationCardData.viewersCount;
         $scope.onMouseoverDropdownMenu = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
         };

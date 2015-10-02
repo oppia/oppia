@@ -94,7 +94,7 @@
                     <span style="font-weight: bold;">&middot;</span>
                     <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
                       <span ng-if="exploration.objective">
-                        <[getFormattedObjective(exploration.objective)]>
+                        <[exploration.objective | formattedObjective: 105]>
                       </span>
                       <span ng-if="!exploration.objective">
                         <em>No objective specified.</em>

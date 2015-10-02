@@ -22,11 +22,6 @@ oppia.controller('MyExplorations', [
     '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'ratingVisibilityService',
     function($scope, $http, $rootScope, oppiaDatetimeFormatter, ratingVisibilityService) {
 
-  $scope.getFormattedObjective = function(objective) {
-    objective = objective.trim();
-    return objective.charAt(0).toUpperCase() + objective.slice(1);
-  };
-
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);

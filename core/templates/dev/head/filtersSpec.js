@@ -35,6 +35,8 @@ describe('Testing filters', function() {
     'convertToPlainText',
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
+    'appendMetrixPrefix',
+    'formattedObjective',
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -179,5 +181,37 @@ describe('Testing filters', function() {
     // line endings (since the pattern in filter applies to them). Only one is
     // tested here.
     expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
+  }));
+
+  it('should append metrix prefix  to large  number ', inject(function($filter) {
+    var filter = $filter('appendMetrixPrefix');
+
+    expect(filter(100)).toEqual(100);
+    expect(filter(1720)).toEqual('1.7K');
+    expect(filter(2306200)).toEqual('2.3M');
+
+    expect(filter(12389654281)).toEqual('12.4B');
+    expect(filter(897978581123)).toEqual('898.0B');
+    expect(filter(476678)).toEqual('476.7K');
+
+  }));
+
+  it('should capitalize first letter and trancate objective ', inject(function($filter) {
+    var filter = $filter('formattedObjective');
+
+    expect(filter('remove New line', 4)).toEqual('Remo...');
+    // If maximum number of character are not specified
+    // return whole objective but first letter capitalize.
+    expect(filter('capitalize first letter and trancate')).toEqual('Capitalize first letter and trancate');
+    expect(filter('a single sentence with more than twenty one characters', 21)).toEqual(
+      'A single sentence wit...');
+
+    expect(filter('a single sentence with more than twenty one characters and all will be shown')).toEqual(
+      'A single sentence with more than twenty one characters and all will be shown');
+    expect(filter('remove New line', 6)).toEqual('Remove...');
+    // If maximum characters is greater than objective length
+    // return whole objective.
+    expect(filter('please do not test empty string', 100)).toEqual('Please do not test empty string');
+
   }));
 });
