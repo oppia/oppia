@@ -72,7 +72,10 @@
       </div>
 
       <div class="oppia-information-card-content">
-        <p><[explorationDescription | formattedObjective: 95]></p>
+        <p ng-if="explorationDescription">
+          <[explorationDescription | formattedObjective: 95]>
+        </p>
+        <p ng-if="!explorationDescription">No objective specified.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
             <span class="fa fa-star fa-lg"></span><[explorationRatings]></li>
