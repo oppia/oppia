@@ -2269,3 +2269,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-exploration-contributors-profile {
   padding: 0;
 }
+
+.oppia-public-owned-icon {
+  color: #009688;
+}
