@@ -170,12 +170,6 @@ class StringClassifier(object):
             statez['updates'] += statez_inc['updates']
             statez['computes'] += statez_inc['computes']
 
-        print (
-            '%d / %d = %f' %
-            (statez['updates'], statez['computes'],
-                float(statez['updates']) / statez['computes'])
-        )
-
         return statez
 
     def _get_probabilities(self, d):
