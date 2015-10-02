@@ -212,7 +212,7 @@ oppia.factory('validatorsService', [
           if (showWarnings) {
             warningsData.addWarning(
              'Invalid input. Please use a non-empty description consisting ' +
-             'of alphanumeric characters, underscores, spaces and/or hyphens.'
+             'of alphanumeric characters, spaces and/or hyphens.'
             );
           }
           return false;

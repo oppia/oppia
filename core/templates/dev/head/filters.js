@@ -75,14 +75,22 @@ oppia.filter('truncateAtFirstLine', [function() {
     var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
     // Normalize line endings then split using the normalized delimiter.
     var lines = input.replace(pattern, '\n').split('\n');
-    var nonemptyLineIndex = -1;
+    var firstNonemptyLineIndex = -1;
+    var otherNonemptyLinesExist = false;
     for (var i = 0; i < lines.length; i++) {
-      if (lines[i].length != 0) {
-        nonemptyLineIndex = i;
-        break;
+      if (lines[i].length > 0) {
+        if (firstNonemptyLineIndex === -1) {
+          firstNonemptyLineIndex = i;
+        } else {
+          otherNonemptyLinesExist = true;
+          break;
+        }
       }
     }
-    return (nonemptyLineIndex != -1 ? lines[nonemptyLineIndex] : '');
+    var suffix = otherNonemptyLinesExist ? '...' : '';
+    return (
+      firstNonemptyLineIndex !== -1 ?
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 

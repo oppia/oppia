@@ -752,8 +752,8 @@ describe('New state template service', function() {
     var NEW_STATE_NAME = 'new state name';
 
     beforeEach(inject(function($injector) {
-      // TODO(sll): Make this match the dict in the backend so that there
-      // is a single source of truth.
+      // TODO(sll): Find a way to have this and the backend dict read from the
+      // same single source of truth.
       GLOBALS.NEW_STATE_TEMPLATE = {
         content: [{type: 'text', value: ''}],
         interaction: {

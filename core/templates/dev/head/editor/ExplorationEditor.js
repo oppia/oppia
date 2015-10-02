@@ -19,8 +19,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// TODO(sll): Move all hardcoded strings to the top of the file.
-
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
 oppia.constant('GADGET_SPECS', window.GLOBALS ? GLOBALS.GADGET_SPECS : {});
@@ -697,7 +695,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
       // Modal is Opened
       _modalIsOpen = true;
-      
+
       modalInstance.opened.then(function(data) {
         // The $timeout seems to be needed in order to give the modal time to
         // render.

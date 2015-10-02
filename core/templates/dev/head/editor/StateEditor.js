@@ -21,11 +21,11 @@
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
   'editabilityService', 'explorationStatesService', 'stateInteractionIdService',
-  'INTERACTION_SPECS',
+  'INTERACTION_SPECS', 'explorationInitStateNameService',
   function(
     $scope, $rootScope, editorContextService, changeListService,
     editabilityService, explorationStatesService, stateInteractionIdService,
-    INTERACTION_SPECS) {
+    INTERACTION_SPECS, explorationInitStateNameService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html'
@@ -34,6 +34,12 @@ oppia.controller('StateEditor', [
   $scope.isCurrentStateTerminal = false;
   $scope.isInteractionIdSet = false;
   $scope.isInteractionShown = false;
+
+  $scope.isCurrentStateInitialState = function() {
+    return (
+      editorContextService.getActiveStateName() ===
+      explorationInitStateNameService.savedMemento);
+  };
 
   $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
@@ -286,7 +292,6 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
           _trainingDataCounts.push(unhandledAnswer.count);
         }
         $rootScope.$broadcast('updatedTrainingData');
-        console.debug('Received training data: ', _trainingDataAnswers);
       });
     },
 
