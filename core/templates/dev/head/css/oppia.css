@@ -2269,17 +2269,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-left: 10px;
 }
 
-.oppia-hidden-gadgets-container {
-  background: #fff;
-  color: #fff;
-  left: -9999px;
-  min-height: 150px;
-  padding: 5px;
-  position: absolute;
-  width: 140px;
-}
-
-.oppia-hidden-gadgets-container .oppia-gadget-name {
+.oppia-gadget-name {
   cursor: pointer;
   margin-bottom: 5px;
 }

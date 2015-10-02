@@ -33,18 +33,23 @@ oppia.directive('oppiaGadget', function() {
     restrict: 'E',
     scope: {
       gadgetType: '&',
+      gadgetName: '&',
       gadgetCustomizationArgs: '&',
       showInStates: '&'
     },
     templateUrl: 'components/gadget',
     controller: [
-        '$scope', '$filter', 'oppiaPlayerService', 'extensionTagAssemblerService',
-        function($scope, $filter, oppiaPlayerService, extensionTagAssemblerService) {
+        '$scope', '$filter', 'oppiaHtmlEscaper', 'oppiaPlayerService',
+        'extensionTagAssemblerService',
+        function($scope, $filter, oppiaHtmlEscaper, oppiaPlayerService,
+          extensionTagAssemblerService) {
 
       var el = $(
         '<oppia-gadget-' + $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
       el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
         el, $scope.gadgetCustomizationArgs());
+      el.attr('gadget-name',
+        oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
       $scope.gadgetHtml = ($('<div>').append(el)).html();
 
       $scope.$watch(function() {

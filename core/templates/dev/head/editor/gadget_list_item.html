@@ -1,4 +1,27 @@
 <script type="text/ng-template" id="editor/gadgetListItem">
+  <!-- REFACTORING(anuzis): Make functional. -->
+  <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
+        class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
+  </span>
+  <span title="Rename <[gadgetName]>"
+        ng-click="changeActiveGadgetNameEditor(gadgetName)"
+        class="glyphicon glyphicon-pencil oppia-gadget-rename-icon protractor-test-rename-<[gadgetName]>-gadget-icon">
+  </span>
+  <span ng-show="originalNameForRenamedGadget == gadgetName"
+        class="oppia-rename-gadget-form">
+    <input type="text" ng-model="newNameForRenamedGadget" class="protractor-test-gadget-rename-text-input">
+    <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
+            ng-click="renameGadget(newNameForRenamedGadget)">
+    </button>
+    <button class="btn btn-xs glyphicon glyphicon-remove"
+            ng-click="changeActiveGadgetNameEditor()">
+    </button>
+  </span>
+
   <div angular-html-bind="gadgetListItemHtml">
   </div>
+
+  <span title="Edit Gadget Content"
+    class="glyphicon glyphicon-edit oppia-gadget-edit-icon">
+  </span>
 </script>

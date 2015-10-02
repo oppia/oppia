@@ -28,8 +28,7 @@ oppia.directive('oppiaGadgetScoreBar', [
       templateUrl: 'gadget/ScoreBar',
       controller: ['$scope', '$attrs', function ($scope, $attrs) {
 
-        // REFACTORING(anuzis): GadgetName needs to be available in the learner view.
-        // $scope.scoreBarName = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
+        $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj($attrs.gadgetName);
         $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj($attrs.maxValueWithValue);
         $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj($attrs.paramNameWithValue);
 

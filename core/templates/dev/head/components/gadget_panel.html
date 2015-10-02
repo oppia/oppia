@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="components/gadgetPanel">
-  <div ng-repeat="gadgetSpec in panelContents()">
-    <oppia-gadget class="protractor-test-<[gadgetSpec.gadget_type]>-gadget" gadget-type="gadgetSpec.gadget_type" gadget-customization-args="gadgetSpec.customization_args" show-in-states="gadgetSpec.visible_in_states">
+  <div ng-repeat="gadgetInstance in panelContents()">
+    <oppia-gadget class="protractor-test-<[gadgetInstance.gadget_type]>-gadget" gadget-type="gadgetInstance.gadget_type" gadget-name="gadgetInstance.gadget_name" gadget-customization-args="gadgetInstance.customization_args" show-in-states="gadgetInstance.visible_in_states">
     </oppia-gadget>
   </div>
 </script>
