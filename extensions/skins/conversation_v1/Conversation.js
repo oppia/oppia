@@ -33,7 +33,7 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
     },
     leave: function(element, done) {
       element.slideUp();
-    },
+    }
   };
 });
 

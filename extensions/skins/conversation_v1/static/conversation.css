@@ -311,7 +311,8 @@ md-card.conversation-skin-supplemental-card {
   margin-top: 2px;
   width: 46px;
 }
-.conversation-skin-responses-animate-slide{
+.conversation-skin-responses-animate-slide {
+  max-width: 528px;
   padding-right: 56px;
   width: 528px;
 }
