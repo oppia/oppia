@@ -24,22 +24,15 @@ import utils
 class TestGadget(base.BaseGadget):
     """TestGadget is a simplified AdviceBar for testing purposes."""
 
-    name = 'TestGadget'
+    short_description = 'Test Gadget'
     description = 'Tests functionality allowing supplementary predefined tips.'
     height_px = 50
     width_px = 60
-    gadget_panel = 'bottom'
+    panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [
         {
-            'name': 'title',
-            'description': 'Optional title for the test gadget',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }, {
             # TestGadget holds 1 or more adviceObjects, which include a title
             # and text.
             'name': 'adviceObjects',

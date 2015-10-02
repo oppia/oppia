@@ -487,7 +487,7 @@ describe('Exploration gadgets service', function() {
       'ScoreBar': {
         'type': 'ScoreBar',
         'width_px': 250,
-        'gadget_panel': 'bottom',
+        'panel': 'bottom',
         'customization_arg_specs': [{
           'name': 'title',
           'description': 'Optional title for the score bar (e.g. \'Score\')',
@@ -517,7 +517,7 @@ describe('Exploration gadgets service', function() {
       'TestGadget': {
         'type': 'TestGadget',
         'width_px': 100,
-        'gadget_panel': 'bottom',
+        'panel': 'bottom',
         'customization_arg_specs': [{
           'name': 'title',
           'description': 'Optional title for the advice bar (e.g. \'Tips\')',
@@ -593,7 +593,7 @@ describe('Exploration gadgets service', function() {
     var gadgetData = {
       gadget_type: 'TestGadget',
       gadget_name: 'NewTestGadget',
-      gadget_panel: 'bottom',
+      panel: 'bottom',
       customization_args: {
         'title': {
           'value': 'TIP3'
@@ -677,7 +677,7 @@ describe('Exploration gadgets service', function() {
 
     it('should detect non existent panel when adding gadget', function() {
       egs.init(skinCustomizationsData);
-      gadgetData.gadget_panel = 'unknown_panel';
+      gadgetData.panel = 'unknown_panel';
       egs.addGadget(gadgetData);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Attempted add to a non-existent panel: unknown_panel');
@@ -686,7 +686,7 @@ describe('Exploration gadgets service', function() {
     it('should detect same gadget name before adding gadget', function() {
       egs.init(skinCustomizationsData);
       gadgetData.gadget_name = 'TestGadget1';
-      gadgetData.gadget_panel = 'bottom';
+      gadgetData.panel = 'bottom';
       egs.addGadget(gadgetData);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'A gadget with this name already exists.');

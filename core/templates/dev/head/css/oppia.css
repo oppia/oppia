@@ -2239,8 +2239,9 @@ md-card.preview-conversation-skin-supplemental-card {
   position: relative;
 }
 
-.oppia-gadget-preview-container {
+.oppia-gadget-list-container {
   cursor: pointer;
+  margin-bottom: 5px;
 }
 
 .oppia-gadget-name-panel,

@@ -158,9 +158,9 @@ oppia.factory('gadgetValidationService', [
      * @returns {boolean} True if the gadget can be added, false otherwise.
      */
     canAddGadget: function(gadgetData, visibilityMap) {
-      var currentPanelSpec = _getPanelSpecs(gadgetData.gadget_panel);
+      var currentPanelSpec = _getPanelSpecs(gadgetData.panel);
       var gadgetType = gadgetData.gadget_type;
-      var panelName = gadgetData.gadget_panel;
+      var panelName = gadgetData.panel;
       var customizationArgs = gadgetData.customization_args;
       var visibleInStates = gadgetData.visible_in_states;
       // Check if gadgetData is valid.

@@ -258,7 +258,6 @@ class ConversationV1(BaseSkin):
         'obj_type': 'Boolean'
     }]
 
-
 class SnapshotsV1(BaseSkin):
     skin_id = 'snapshots_v1'
     skin_name = 'Snapshots'

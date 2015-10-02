@@ -18,6 +18,7 @@
 
 var objects = require('../../objects/protractor.js');
 
+// REFACTORING(anuzis): use name instead of title
 var customizeGadget = function(elem, title, maxVal, targetParam) {
   elem.element(by.name('form.gadgetSchemaForm'))
     .all(by.tagName('schema-based-unicode-editor')).then(function(items) {
@@ -31,13 +32,13 @@ var customizeGadget = function(elem, title, maxVal, targetParam) {
     .setValue(maxVal);
 };
 
-var expectGadgetPreviewDetailsToMatch = function(elem, title) {
-  expect(elem.element(by.css('.protractor-test-scorebar-title')).getText()).toBe(title);
+var expectGadgetPreviewDetailsToMatch = function(elem, name) {
+  expect(elem.element(by.css('.protractor-test-scorebar-name')).getText()).toBe(name);
 };
 
-var expectGadgetDetailsToMatch = function(elem, title) {
-  expect(elem.element(by.css('.protractor-test-scorebar-title'))
-    .getText()).toBe(title);
+var expectGadgetDetailsToMatch = function(elem, name) {
+  expect(elem.element(by.css('.protractor-test-scorebar-name'))
+    .getText()).toBe(name);
 };
 
 exports.customizeGadget = customizeGadget;

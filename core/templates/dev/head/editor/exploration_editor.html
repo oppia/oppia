@@ -412,7 +412,7 @@
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/visualizations.html' %}
   {% include 'components/gadget_panel.html' %}
-  {% include 'editor/gadget_preview.html' %}
+  {% include 'editor/gadget_list_item.html' %}
 
 {% endblock content %}
 
@@ -443,7 +443,7 @@
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/GadgetValidationService.js') }}
-    {{ include_js_file('editor/GadgetPreview.js') }}
+    {{ include_js_file('editor/GadgetListItem.js') }}
     {{ include_js_file('editor/GadgetEditor.js') }}
     {{ include_js_file('editor/StateInteraction.js') }}
     {{ include_js_file('player/PlayerServices.js') }}

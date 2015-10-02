@@ -49,7 +49,7 @@ oppia.controller('GadgetEditor', [
     var gadgetData = {
       gadget_type: '',
       gadget_name: '',
-      gadget_panel: '',
+      panel: '',
       customization_args: {},
       visible_in_states: [editorContextService.getActiveStateName()]
     };
@@ -102,7 +102,7 @@ oppia.controller('GadgetEditor', [
   /**
    * @param {Object} gadgetDict is a dict representing the gadget
    *    being edited. It has the following keys: gadget_type, gadget_name,
-   *    customization_args and visible_in_states.
+   *    panel, customization_args, and visible_in_states.
    *    If the gadget's type is an empty string (''), it means no gadget is
    *    selected, and the gadget selector should be shown.
    * @param {Function} successCallback Success callback when modal is dismissed.
@@ -147,8 +147,8 @@ oppia.controller('GadgetEditor', [
         $scope.gadgetDict = gadgetDict;
         if (gadgetDict.gadget_type) {
           _initializeCustomizationArgs(gadgetDict.gadget_type);
-          gadgetDict.gadget_panel = GADGET_SPECS[
-            gadgetDict.gadget_type]['gadget_panel'];
+          gadgetDict.panel = GADGET_SPECS[
+            gadgetDict.gadget_type]['panel'];
         }
         // if gadget dict has gadget_type on initialization, we are editing
         // a gadget, else adding a new one.
@@ -186,13 +186,14 @@ oppia.controller('GadgetEditor', [
         };
 
         $scope.save = function() {
-          $scope.gadgetDict.gadget_panel = GLOBALS.GADGET_SPECS[
-            $scope.gadgetDict.gadget_type]['gadget_panel'];
+          $scope.gadgetDict.panel = GLOBALS.GADGET_SPECS[
+            $scope.gadgetDict.gadget_type]['panel'];
 
           // When adding a new gadget do all the validation to check
           // if it can be added before dismissing the modal.
           if (!$scope.isEditingGadget &&
-              !explorationGadgetsService.canAddGadgetTo($scope.gadgetDict)) {
+              !explorationGadgetsService.canAddGadgetToItsPanel(
+                $scope.gadgetDict)) {
             return;
           }
           $modalInstance.close($scope.gadgetDict);

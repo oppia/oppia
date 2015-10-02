@@ -23,30 +23,24 @@ from extensions.gadgets import base
 class ScoreBar(base.BaseGadget):
     """Gadget for providing a ScoreBar."""
 
-    name = 'ScoreBar'
+    short_description = 'Score Bar'
     description = 'A visual score bar that can represent progress or success.'
     height_px = 100
     width_px = 250
-    gadget_panel = 'bottom'
+    panel = 'bottom'
     _dependency_ids = []
 
-    _customization_arg_specs = [{
-        'name': 'title',
-        'description': 'Optional title for the score bar (e.g. "Score")',
-        'schema': {
-            'type': 'unicode',
-        },
-        'default_value': 'Score'
-    }, {
+    _customization_arg_specs = [
+    {
         'name': 'maxValue',
-        'description': 'Maximum value (bar fills as a % of this value)',
+        'description': 'Maximum value (the bar fills up to this value)',
         'schema': {
             'type': 'int',
         },
         'default_value': 100
     }, {
         'name': 'paramName',
-        'description': 'The parameter name this score bar follows.',
+        'description': 'Which parameter should this score bar follow?',
         'schema': {
             'type': 'custom',
             'obj_type': 'ParameterName',

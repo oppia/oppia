@@ -340,13 +340,12 @@ oppia.factory('changeListService', [
      * is correctly formed
      *
      * @param {object} gadgetData The dict containing new gadget information.
-     * @param {string} panelName The panel where the gadget is being added.
      */
-    addGadget: function(gadgetData, panelName) {
+    addGadget: function(gadgetData) {
       this._addChange({
         cmd: CMD_ADD_GADGET,
         gadget_dict: gadgetData,
-        panel_name: panelName
+        panel_name: gadgetData['panel']
       });
     },
     /**
@@ -1098,8 +1097,8 @@ oppia.factory('explorationGadgetsService', [
      * Confirms if a panel can accept a new gadget considering its capacity
      * and the gadget's size requirements given its customization arguments.
      */
-    canAddGadgetTo: function(gadgetData) {
-      var visibilityMap = _getGadgetsVisibilityMap(gadgetData.gadget_panel);
+    canAddGadgetToItsPanel: function(gadgetData) {
+      var visibilityMap = _getGadgetsVisibilityMap(gadgetData.panel);
       var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name);
 
       if(canAdd) {
@@ -1235,9 +1234,9 @@ oppia.factory('explorationGadgetsService', [
 
       // Defense-in-depth: This warning should never happen with panel names
       // hard coded and validated on the backend.
-      if(!_panels.hasOwnProperty(gadgetData.gadget_panel)) {
+      if(!_panels.hasOwnProperty(gadgetData.panel)) {
         warningsData.addWarning(
-          'Attempted add to a non-existent panel: ' + gadgetData.gadget_panel);
+          'Attempted add to a non-existent panel: ' + gadgetData.panel);
         return;
       }
 
@@ -1246,15 +1245,9 @@ oppia.factory('explorationGadgetsService', [
         return;
       }
       _gadgets[gadgetData.gadget_name] = gadgetData;
-      _panels[gadgetData.gadget_panel].push(gadgetData.gadget_name);
+      _panels[gadgetData.panel].push(gadgetData.gadget_name);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
-      // REFACTORING(anuzis): panelName formerly passed as 2nd arg below.
-      // Temporarily passing from shared encapsulating variable to see if it
-      // works before refactoring further downstream.
-      // UPDATE: Confirmed this works. @sll: What's your feedback on this
-      // general approach? Should we encapsulate gadget_panel in gadgetData
-      // then pass it in as a single argument here?
-      changeListService.addGadget(gadgetData, gadgetData.gadget_panel);
+      changeListService.addGadget(gadgetData);
     },
     /**
      * Function that opens a modal to confirm gadget delete.

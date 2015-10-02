@@ -224,6 +224,9 @@ ALLOWED_GADGETS = {
     },
 }
 
+# Gadgets subclasses must specify a valid panel option from this list.
+ALLOWED_GADGET_PANELS = ['bottom']
+
 # Demo explorations to load on startup. The id assigned to each exploration
 # is based on the index of the exploration in this list, so if you want to
 # add a new exploration and preserve the existing ids, add that exploration
@@ -308,7 +311,7 @@ PLAY_TYPE_NORMAL = 'normal'
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 
 # Advanced feature in development.
-SHOW_GADGETS_EDITOR = False
+SHOW_GADGETS_EDITOR = True
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False

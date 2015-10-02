@@ -764,6 +764,7 @@ class GadgetInstance(object):
         self.type = gadget_type
 
         # Author-facing unique name to distinguish instances in the Editor UI.
+        # Gadgets may use this name as a title in learner facing UI as well.
         self.name = gadget_name
 
         # List of State name strings where this Gadget is visible.
@@ -837,7 +838,7 @@ class GadgetInstance(object):
         if self.visible_in_states == []:
             raise utils.ValidationError(
                 '%s gadget not visible in any states.' % (
-                    self.gadget.name))
+                    self.name))
 
         # Validate state name visibility isn't repeated within each gadget.
         if len(self.visible_in_states) != len(set(self.visible_in_states)):
@@ -904,7 +905,7 @@ class SkinInstance(object):
         gadget panels for each panel specified in the skin.
         """
         self.skin_id = skin_id
-        # panel_contents_dict has gadget_panel_name strings as keys and
+        # panel_contents_dict has panel_name strings as keys and
         # lists of GadgetInstance instances as values.
         self.panel_contents_dict = {}
 
