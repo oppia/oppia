@@ -148,7 +148,6 @@ oppia.factory('feedbackThreadDataService', [
   var _reloadFromBackend = function(successCallback) {
     $http.get(_THREAD_LIST_HANDLER_URL).success(function(data) {
       _data.threadList = data.threads;
-      console.log('a');
       if (successCallback) {
         successCallback();
       }
@@ -226,8 +225,6 @@ oppia.factory('feedbackThreadDataService', [
 }]);
 
 oppia.factory('threadStatusRepresentationService', [function() {
-  // We do not permit 'Duplicate' as a valid status for now, since it should
-  // require the id of the duplicated thread to be specified.
   var _STATUS_CHOICES = [
     {id: 'open', text: 'Open'},
     {id: 'fixed', text: 'Fixed'},
@@ -265,17 +262,11 @@ oppia.directive('threadSummaryTable', [function() {
     },
     templateUrl: 'feedback/threadSummaryTable',
     controller: [
-      '$scope', 'threadStatusRepresentationService', 'oppiaDatetimeFormatter',
-      function($scope, threadStatusRepresentationService, oppiaDatetimeFormatter) {
-
-      $scope.getLabelClass = function(status) {
-        return threadStatusRepresentationService.getLabelClass(status);
-      };
-
-      $scope.getHumanReadableStatus = function(status) {
-        return threadStatusRepresentationService.getHumanReadableStatus(status);
-      };
-
+        '$scope', 'threadStatusRepresentationService', 'oppiaDatetimeFormatter',
+        function($scope, threadStatusRepresentationService, oppiaDatetimeFormatter) {
+      $scope.getLabelClass = threadStatusRepresentationService.getLabelClass;
+      $scope.getHumanReadableStatus = (
+        threadStatusRepresentationService.getHumanReadableStatus);
       $scope.getLocaleAbbreviatedDatetimeString = (
         oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
     }]
