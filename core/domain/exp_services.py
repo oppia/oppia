@@ -1044,10 +1044,9 @@ def delete_demo(exploration_id):
 def load_demo(exploration_id):
     """Loads a demo exploration.
 
-    The resulting exploration will have version 2 (one for its initial
-    creation and one for its subsequent modification.)
+    The resulting exploration will have two commits in its history (one for its
+    initial creation and one for its subsequent modification.)
     """
-    # TODO(sll): Speed this method up. It is too slow.
     delete_demo(exploration_id)
 
     if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):

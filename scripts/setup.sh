@@ -84,7 +84,9 @@ fi
 export NPM_INSTALL="$NPM_CMD install"
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ -f "/usr/bin/google-chrome" ]; then
+if [[ $TRAVIS == 'true' ]]; then
+  export CHROME_BIN="chromium-browser"
+elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then

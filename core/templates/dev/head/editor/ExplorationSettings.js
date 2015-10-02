@@ -139,8 +139,7 @@ oppia.controller('ExplorationSettings', [
     explorationWarningsService.updateWarnings();
   };
 
-  // TODO(sll): Modify this so that it works correctly when discarding changes
-  // to the default skin id.
+  // TODO(sll): Remove this, once we get rid of the skins functionality.
   $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
     if (oldValue !== undefined && !angular.equals(newValue, oldValue)) {
       changeListService.editExplorationProperty(

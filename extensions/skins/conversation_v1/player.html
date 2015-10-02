@@ -60,12 +60,7 @@
             <h4 class="conversation-skin-responses-dropdown-container" ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
                 Previous responses
-                <span ng-if="!arePreviousResponsesShown">
-                  <span class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"></span>
-                </span>
-                <span ng-if="arePreviousResponsesShown">
-                  <span class="glyphicon glyphicon-triangle-bottom conversation-skin-responses-dropdown-icon"></span>
-                </span>
+                <span ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}" class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"></span>
               </span>
             </h4>
           </div>
