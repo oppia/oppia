@@ -26,7 +26,7 @@ var TIME_PADDING_MSEC = 250;
 var TIME_SCROLL_MSEC = 600;
 
 
-oppia.animation('.conversation-previous-responses-animate-slide', function() {
+oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     enter: function(element, done) {
       element.hide().slideDown()
