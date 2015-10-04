@@ -43,6 +43,11 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def _validate_instance(self, string_classifier):
         self.assertEquals('_alpha' in dir(self.string_classifier), True)
         self.assertEquals('_beta' in dir(self.string_classifier), True)
+        
+        for d in xrange(self.string_classifier._doc_count):
+            self.assertEquals(len(self.string_classifier._l_dc[d]),
+                len(self.string_classifier._w_dc[d]))
+
         self.assertEquals(
             len(self.string_classifier._label_to_id),
             self.string_classifier._label_count)
@@ -52,7 +57,6 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             len(self.string_classifier._w_dc),
             self.string_classifier._doc_count)
-        self.assertEquals(len(self.string_classifier._w_dc[0]), 5)
         self.assertEquals(
             len(self.string_classifier._b_dl),
             self.string_classifier._doc_count)
@@ -62,7 +66,6 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             len(self.string_classifier._l_dc),
             self.string_classifier._doc_count)
-        self.assertEquals(len(self.string_classifier._l_dc[0]), 5)
         self.assertEquals(
             len(self.string_classifier._c_dl),
             self.string_classifier._doc_count)
@@ -122,6 +125,13 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._label_count, label_count + 1)
         self.string_classifier._get_label_id('_non_existent_label_2')
         self.assertEquals(self.string_classifier._label_count, label_count + 2)
+
+    def test_reload_valid_state(self):
+        self.string_classifier.load_examples(self._NEW_EXAMPLES)
+        self.assertEquals(self.string_classifier._label_count, 1)
+        self.assertEquals(self.string_classifier._doc_count, 2)
+        self.assertEquals(self.string_classifier._word_count, 9)
+        self._validate_instance(self.string_classifier)
 
     def test_training(self):
         doc_ids = self.string_classifier.add_examples(self._NEW_EXAMPLES)
