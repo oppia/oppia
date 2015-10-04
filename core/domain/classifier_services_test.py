@@ -32,7 +32,8 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
 
     _NEW_EXAMPLES = [
         ['i only eat fish and vegetables', []],
-        ['pets are friends', []]
+        ['pets are friends', []],
+        ['a b c d e f g h i j k l m n o p q r s t u v w x y z', []]
     ]
 
     def setUp(self):
@@ -43,9 +44,10 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def _validate_instance(self, string_classifier):
         self.assertEquals('_alpha' in dir(self.string_classifier), True)
         self.assertEquals('_beta' in dir(self.string_classifier), True)
-        
+
         for d in xrange(self.string_classifier._doc_count):
-            self.assertEquals(len(self.string_classifier._l_dc[d]),
+            self.assertEquals(
+                len(self.string_classifier._l_dc[d]),
                 len(self.string_classifier._w_dc[d]))
 
         self.assertEquals(
@@ -91,18 +93,24 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def test_add_doc(self):
         self.string_classifier.add_examples(self._NEW_EXAMPLES)
         self.assertEquals(self.string_classifier._label_count, 3)
-        self.assertEquals(self.string_classifier._doc_count, 5)
-        self.assertEquals(self.string_classifier._word_count, 12)
+        self.assertEquals(self.string_classifier._doc_count, 6)
+        self.assertEquals(self.string_classifier._word_count, 37)
         self._validate_instance(self.string_classifier)
 
     def test_model_save_load(self):
-        self.assertEquals(self.string_classifier._doc_count, 3)
+        self.assertEquals(
+            self.string_classifier._doc_count,
+            len(self._EXAMPLES))
         model = self.string_classifier.to_dict()
         model['_doc_count'] = 9
         self.assertEquals(model['_doc_count'], 9)
-        self.assertEquals(self.string_classifier._doc_count, 3)
+        self.assertEquals(
+            self.string_classifier._doc_count,
+            len(self._EXAMPLES))
         self.string_classifier.add_examples(self._NEW_EXAMPLES)
-        self.assertEquals(self.string_classifier._doc_count, 5)
+        self.assertEquals(
+            self.string_classifier._doc_count,
+            len(self._EXAMPLES) + len(self._NEW_EXAMPLES))
         self.assertEquals(model['_doc_count'], 9)
         self.string_classifier.from_dict(model)
         self.assertEquals(self.string_classifier._doc_count, 9)
@@ -129,8 +137,10 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def test_reload_valid_state(self):
         self.string_classifier.load_examples(self._NEW_EXAMPLES)
         self.assertEquals(self.string_classifier._label_count, 1)
-        self.assertEquals(self.string_classifier._doc_count, 2)
-        self.assertEquals(self.string_classifier._word_count, 9)
+        self.assertEquals(
+            self.string_classifier._doc_count,
+            len(self._NEW_EXAMPLES))
+        self.assertEquals(self.string_classifier._word_count, 34)
         self._validate_instance(self.string_classifier)
 
     def test_training(self):
@@ -139,4 +149,6 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(predicted_label, 'food')
         predicted_label = self.string_classifier.predict_label(doc_ids[1])
         self.assertEquals(predicted_label, 'pets')
+        predicted_label = self.string_classifier.predict_label(doc_ids[2], 0.7)
+        self.assertEquals(predicted_label, '_default')
         self._validate_instance(self.string_classifier)

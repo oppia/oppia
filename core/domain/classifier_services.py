@@ -144,8 +144,7 @@ class StringClassifier(object):
                 prob_l = (
                     labels *
                     coeff_a * (self._c_dl[d] + self._alpha) *
-                    coeff_b * (self._c_lw[:, w] + self._beta)
-                )
+                    coeff_b * (self._c_lw[:, w] + self._beta))
                 new_l = numpy.random.multinomial(
                     1, prob_l / prob_l.sum()
                     ).argmax()
@@ -207,8 +206,7 @@ class StringClassifier(object):
 
         label_set = set(
             ['_default'] +
-            [label for label_list in labels for label in label_list]
-        )
+            [label for label_list in labels for label in label_list])
 
         self._label_count = len(label_set)
         self._label_to_id = dict(zip(label_set, xrange(self._label_count)))
@@ -250,8 +248,7 @@ class StringClassifier(object):
             (
                 self._b_dl,
                 [self._get_label_vector(label_list) for label_list in labels]
-            ),
-            axis=0)
+            ), axis=0)
         self._w_dc.extend([map(self._get_word_id, doc) for doc in docs])
         self._c_dl = numpy.concatenate(
             (self._c_dl, numpy.zeros(
