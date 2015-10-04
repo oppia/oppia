@@ -26,6 +26,16 @@ oppia.controller('Signup', [
              $translatePartialLoader, warningsData, urlService,
              focusService) {
 
+  $translate('I18N_SIGNUP_PAGE_TITLE', 'I18N_SIGNUP_PAGE_SUBTITLE')
+   .then(function (translatedPageTitle) {
+    $rootScope.pageTitle = translatedPageTitle;
+  });
+
+  $rootScope.$on('$translateChangeSuccess', function (event, data) {
+   $rootScope.pageTitle = ($translate.instant('I18N_SIGNUP_PAGE_SUBTITLE') +
+     ' - ' + $translate.instant('I18N_SIGNUP_PAGE_TITLE'));
+  });
+
   $translatePartialLoader.addPart('signup');
   $translate.refresh();
 

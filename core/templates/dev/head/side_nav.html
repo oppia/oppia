@@ -8,21 +8,21 @@
     <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
       <a href="/">
         <img src="/third_party/static/material-design-icons-1.0.1/ic_home_black_48dp.png" class="oppia-sidebar-menu-icon">
-        <span translate>I18N_SIDEBAR_HOME_LINK</span>
+        <span translate="I18N_SIDEBAR_HOME_LINK"></span>
       </a>
     </li>
 
     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
       <a href="/about">
         <img src="/third_party/static/material-design-icons-1.0.1/ic_help_black_48dp.png" class="oppia-sidebar-menu-icon">
-        <span translate>I18N_SIDEBAR_HOME_ABOUT</span>
+        <span translate="I18N_SIDEBAR_HOME_ABOUT"></span>
       </a>
     </li>
 
     <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
       <a href="/participate">
         <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
-        <span translate>I18N_SIDEBAR_PARTICIPATION_PLAYBOOK</span>
+        <span translate="I18N_SIDEBAR_PARTICIPATION_PLAYBOOK"></span>
       </a>
     </li>
 
@@ -30,7 +30,7 @@
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
           <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png" class="oppia-sidebar-menu-icon">
-          <span translate>I18N_SIDEBAR_FORUM</span>
+          <span translate="I18N_SIDEBAR_FORUM"></span>
         </a>
       </li>
     {% endif %}
@@ -49,7 +49,7 @@
   <div class="oppia-sidebar-footer">
     {% if SOCIAL_MEDIA_BUTTONS %}
       <div>
-        <span>I18N_SIDEBAR_FOLLOW_US</span>:
+        <span="I18N_SIDEBAR_FOLLOW_US"></span>:
       </div>
       {% for button in SOCIAL_MEDIA_BUTTONS %}
         <a href="{{button['link']}}" target="_blank">

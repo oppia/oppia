@@ -116,6 +116,13 @@ oppia.factory('searchService', [
   };
 }]);
 
+// Construct a translation id from a name and a prefix.
+// Ex: 'categories', 'art' -> 'I18N_GALLERY_CATEGORIES_ART'
+var _get_i18n_id = function(prefix, name) {
+  i18n_id = 'I18N_GALLERY_'+ prefix.toUpperCase() + '_' + name.toUpperCase().replace(' ', '_');
+  return i18n_id;
+}
+
 oppia.controller('Gallery', [
     '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
     '$translate', '$translatePartialLoader', 'createExplorationButtonService',
@@ -129,8 +136,19 @@ oppia.controller('Gallery', [
       urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService,
       ratingVisibilityService) {
 
+  $translate('I18N_GALLERY_PAGE_TITLE', 'I18N_GALLERY_PAGE_SUBTITLE')
+   .then(function (translatedPageTitle) {
+    $rootScope.pageTitle = translatedPageTitle;
+  });
+
+  $rootScope.$on('$translateChangeSuccess', function (event, data) {
+   $rootScope.pageTitle = ($translate.instant('I18N_GALLERY_PAGE_TITLE') +
+     ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
+  });
+
   $translatePartialLoader.addPart('gallery');
   $translate.refresh();
+
 
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
@@ -143,6 +161,7 @@ oppia.controller('Gallery', [
   });
 
   $scope.CAROUSEL_INTERVAL = 3500;
+
   $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
 
   // Preload images, otherwise they will only start showing up some time after
@@ -152,6 +171,7 @@ oppia.controller('Gallery', [
   for (var i = 0; i < $scope.CAROUSEL_SLIDES.length; i++) {
     var pic = new Image();
     pic.src = '/images/splash/' + $scope.CAROUSEL_SLIDES[i].image_filename;
+    $scope.CAROUSEL_SLIDES[i].topic = 'I18N_GALLERY_SUBTITLE_COLOR_' + $scope.CAROUSEL_SLIDES[i].topic;
   }
 
   $scope.getFormattedObjective = function(objective) {
@@ -202,10 +222,19 @@ oppia.controller('Gallery', [
 
   $scope.allExplorationsInOrder = [];
 
+  // Transforms the category name of each exploration into a translation id
+  var _add_translation_ids = function(allExplorationsInOrder) {
+    for (var i = 0; i < allExplorationsInOrder.length; i++) {
+      allExplorationsInOrder[i].i18nCategory = _get_i18n_id('categories',
+        allExplorationsInOrder[i].category);
+    }
+  }
+
   // Called when the page loads, and after every search query.
   var _refreshGalleryData = function(data, hasPageFinishedLoading) {
     $scope.searchIsLoading = false;
     $scope.allExplorationsInOrder = data.explorations_list;
+    _add_translation_ids($scope.allExplorationsInOrder);
     $scope.finishedLoadingPage = hasPageFinishedLoading;
     $rootScope.loadingMessage = '';
   };
@@ -218,6 +247,7 @@ oppia.controller('Gallery', [
       searchService.loadMoreData(function(data, hasPageFinishedLoading) {
         $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
           data.explorations_list);
+        _add_translation_ids($scope.allExplorationsInOrder);
         $scope.finishedLoadingPage = hasPageFinishedLoading;
         $scope.pageLoaderIsBusy = false;
       });
@@ -256,13 +286,13 @@ oppia.controller('SearchBar', [
   $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
     return {
       id: categoryName,
-      text: 'I18N_GALLERY_CATEGORIES_' + categoryName.toUpperCase().replace(' ', '_')
+      text: _get_i18n_id('categories', categoryName)
     }
   });
   $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
     return {
       id: languageItem.code,
-      text: 'I18N_GALLERY_LANGUAGES_' + languageItem.code.toUpperCase()
+      text: _get_i18n_id('languages', languageItem.code)
     };
   });
 
@@ -311,9 +341,18 @@ oppia.controller('SearchBar', [
 
     $scope.translationData[itemsName + 'Count'] = totalCount
 
-    $scope.selectionDetails[itemsType].description = (
-      selectedItems.length > 0 ? selectedItems.join(', ') :
-      'All ' + itemsName + ' selected');
+    // TODO(milit): When the language changes, the translations wont change
+    // until the user changes the selection and this function is re-executed.
+    if (selectedItems.length > 0) {
+      var translatedItems = [];
+      for (var i = 0; i < selectedItems.length; i++) {
+        translatedItems.push($translate.instant(selectedItems[i]));
+      };
+      $scope.selectionDetails[itemsType].description = translatedItems.join(', ');
+    } else {
+      $scope.selectionDetails[itemsType].description = ('I18N_GALLERY_ALL_' +
+        itemsName.toUpperCase() + '_SELECTED');
+    }
   };
 
   $scope.toggleSelection = function(itemsType, optionName) {

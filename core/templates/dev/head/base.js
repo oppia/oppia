@@ -56,14 +56,18 @@ oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
+    '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log', '$translate', '$translatePartialLoader',
     'warningsData', 'activeInputData', 'messengerService',
-    function($scope, $http, $rootScope, $window, $timeout, $document, $log,
+    function($scope, $http, $rootScope, $window, $timeout, $document, $log, $translate, $translatePartialLoader,
              warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
+
+  $translatePartialLoader.addPart('sidenav');
+  $translatePartialLoader.addPart('topnav');
+  $translate.refresh()
 
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';

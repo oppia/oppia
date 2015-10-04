@@ -65,8 +65,10 @@ oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
         },
         responseError: function(response) {
           $log.error(response.data);
-          warningsData.addWarning(
-            response.data.error || 'Error communicating with server.');
+          if (response.data) {
+            warningsData.addWarning(
+              response.data.error || 'Error communicating with server.');
+          }
           return $q.reject(response);
         }
       };
