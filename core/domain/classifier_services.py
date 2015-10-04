@@ -16,6 +16,7 @@
 
 import copy
 import operator
+import pickle
 
 import numpy
 
@@ -63,7 +64,7 @@ class StringClassifier(object):
         a new id to the word and returns it."""
         try:
             return self._word_to_id[word]
-        except:
+        except KeyError as ke:
             self._word_to_id[word] = self._word_count
             self._word_count += 1
         return self._word_to_id[word]
@@ -73,7 +74,7 @@ class StringClassifier(object):
         a new id to the label and returns it."""
         try:
             return self._label_to_id[label]
-        except:
+        except KeyError as ke:
             self._label_to_id[label] = self._label_count
             self._label_count += 1
         return self._label_to_id[label]
@@ -100,10 +101,14 @@ class StringClassifier(object):
         self._c_lw[l, w] += val
         self._c_l[l] += val
 
-    def _init_docs(self, doc_ids=None):
-        """Initialize data for given docs (defaults to all)."""
+    def _get_doc_ids(self, doc_ids):
         if doc_ids is None:
             doc_ids = xrange(self._doc_count)
+        return doc_ids
+
+    def _init_docs(self, doc_ids=None):
+        """Initialize data for given docs (defaults to all)."""
+        doc_ids = self._get_doc_ids(doc_ids)
 
         for d in doc_ids:
             doc, labels = self._get_record(d)
@@ -117,8 +122,7 @@ class StringClassifier(object):
 
     def _infer_docs(self, doc_ids):
         """Runs iterative inference on given docs (default all)."""
-        if doc_ids is None:
-            doc_ids = xrange(self._doc_count)
+        doc_ids = self._get_doc_ids(doc_ids)
 
         statez = {
             'updates': 0,
@@ -193,8 +197,7 @@ class StringClassifier(object):
 
     def _train_docs(self, iterations=25, doc_ids=None):
         """Trains given docs (default all) for a number of iterations."""
-        if doc_ids is None:
-            doc_ids = xrange(self._doc_count)
+        doc_ids = self._get_doc_ids(doc_ids)
 
         for i in xrange(iterations):
             statez = self._infer_docs(doc_ids)

@@ -16,9 +16,10 @@
 
 from core.domain import classifier_services
 
-import numpy
 import test_utils
 import utils
+
+import numpy
 
 
 class StringClassifierUnitTests(test_utils.GenericTestBase):
@@ -43,84 +44,84 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals('_alpha' in dir(self.string_classifier), True)
         self.assertEquals('_beta' in dir(self.string_classifier), True)
         self.assertEquals(
-            len(self.string_classifier._i_l),
-            self.string_classifier._cl)
+            len(self.string_classifier._label_to_id),
+            self.string_classifier._label_count)
         self.assertEquals(
-            len(self.string_classifier._i_w),
-            self.string_classifier._cw)
+            len(self.string_classifier._word_to_id),
+            self.string_classifier._word_count)
         self.assertEquals(
             len(self.string_classifier._w_dc),
-            self.string_classifier._cd)
+            self.string_classifier._doc_count)
         self.assertEquals(len(self.string_classifier._w_dc[0]), 5)
         self.assertEquals(
             len(self.string_classifier._b_dl),
-            self.string_classifier._cd)
+            self.string_classifier._doc_count)
         self.assertEquals(
             len(self.string_classifier._b_dl[0]),
-            self.string_classifier._cl)
+            self.string_classifier._label_count)
         self.assertEquals(
             len(self.string_classifier._l_dc),
-            self.string_classifier._cd)
+            self.string_classifier._doc_count)
         self.assertEquals(len(self.string_classifier._l_dc[0]), 5)
         self.assertEquals(
             len(self.string_classifier._c_dl),
-            self.string_classifier._cd)
+            self.string_classifier._doc_count)
         self.assertEquals(
             len(self.string_classifier._c_dl[0]),
-            self.string_classifier._cl)
+            self.string_classifier._label_count)
         self.assertEquals(
             len(self.string_classifier._c_lw),
-            self.string_classifier._cl)
+            self.string_classifier._label_count)
         self.assertEquals(
             len(self.string_classifier._c_lw[0]),
-            self.string_classifier._cw)
+            self.string_classifier._word_count)
         self.assertEquals(
             len(self.string_classifier._c_l),
-            self.string_classifier._cl)
+            self.string_classifier._label_count)
 
     def test_valid_state(self):
-        self.assertEquals(self.string_classifier._cl, 3)
-        self.assertEquals(self.string_classifier._cd, 3)
-        self.assertEquals(self.string_classifier._cw, 10)
+        self.assertEquals(self.string_classifier._label_count, 3)
+        self.assertEquals(self.string_classifier._doc_count, 3)
+        self.assertEquals(self.string_classifier._word_count, 10)
         self._validate_instance(self.string_classifier)
 
     def test_add_doc(self):
         self.string_classifier.add_examples(self._NEW_EXAMPLES)
-        self.assertEquals(self.string_classifier._cl, 3)
-        self.assertEquals(self.string_classifier._cd, 5)
-        self.assertEquals(self.string_classifier._cw, 12)
+        self.assertEquals(self.string_classifier._label_count, 3)
+        self.assertEquals(self.string_classifier._doc_count, 5)
+        self.assertEquals(self.string_classifier._word_count, 12)
         self._validate_instance(self.string_classifier)
 
     def test_model_save_load(self):
-        self.assertEquals(self.string_classifier._cd, 3)
+        self.assertEquals(self.string_classifier._doc_count, 3)
         model = self.string_classifier.to_dict()
-        model['_cd'] = 9
-        self.assertEquals(model['_cd'], 9)
-        self.assertEquals(self.string_classifier._cd, 3)
+        model['_doc_count'] = 9
+        self.assertEquals(model['_doc_count'], 9)
+        self.assertEquals(self.string_classifier._doc_count, 3)
         self.string_classifier.add_examples(self._NEW_EXAMPLES)
-        self.assertEquals(self.string_classifier._cd, 5)
-        self.assertEquals(model['_cd'], 9)
+        self.assertEquals(self.string_classifier._doc_count, 5)
+        self.assertEquals(model['_doc_count'], 9)
         self.string_classifier.from_dict(model)
-        self.assertEquals(self.string_classifier._cd, 9)
-        self.assertEquals(model['_cd'], 9)
+        self.assertEquals(self.string_classifier._doc_count, 9)
+        self.assertEquals(model['_doc_count'], 9)
 
     def test_get_word_id(self):
-        word_count = self.string_classifier._cw
+        word_count = self.string_classifier._word_count
         self.string_classifier._get_word_id('_non_existent_word_1')
-        self.assertEquals(self.string_classifier._cw, word_count + 1)
+        self.assertEquals(self.string_classifier._word_count, word_count + 1)
         self.string_classifier._get_word_id('i')
-        self.assertEquals(self.string_classifier._cw, word_count + 1)
+        self.assertEquals(self.string_classifier._word_count, word_count + 1)
         self.string_classifier._get_word_id('_non_existent_word_2')
-        self.assertEquals(self.string_classifier._cw, word_count + 2)
+        self.assertEquals(self.string_classifier._word_count, word_count + 2)
 
     def test_get_label_id(self):
-        label_count = self.string_classifier._cl
+        label_count = self.string_classifier._label_count
         self.string_classifier._get_label_id('_non_existent_label_1')
-        self.assertEquals(self.string_classifier._cl, label_count + 1)
+        self.assertEquals(self.string_classifier._label_count, label_count + 1)
         self.string_classifier._get_label_id('food')
-        self.assertEquals(self.string_classifier._cl, label_count + 1)
+        self.assertEquals(self.string_classifier._label_count, label_count + 1)
         self.string_classifier._get_label_id('_non_existent_label_2')
-        self.assertEquals(self.string_classifier._cl, label_count + 2)
+        self.assertEquals(self.string_classifier._label_count, label_count + 2)
 
     def test_training(self):
         doc_ids = self.string_classifier.add_examples(self._NEW_EXAMPLES)
