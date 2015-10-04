@@ -37,7 +37,10 @@ var defaultTranslations = {
     'I18N_SIDEBAR_PARTICIPATION_PLAYBOOK': 'Participation Playbook',
     'I18N_SIDEBAR_FORUM': 'Forum',
     'I18N_SIDEBAR_FOLLOW_US': 'Follow Us',
-    'I18N_SIDEBAR_ADDITIONAL_LINK_SITE_FEEDBACK': 'Site Feedback'
+    'I18N_SIDEBAR_ADDITIONAL_LINK_SITE_FEEDBACK': 'Site Feedback',
+    'I18N_TOPNAV_SIGN_IN': 'Sign in',
+    'I18N_SIGNUP_REGISTRATION': 'Registration',
+    'I18N_SIGNUP_LOADING': 'Loading'
 };
 
 oppia.constant('SUPPORTED_LANGUAGES', {
