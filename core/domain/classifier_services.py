@@ -182,6 +182,11 @@ class StringClassifier(object):
                 return l, prob_l / (1 - default_prob), probs_l
         return '_default', default_prob / (1 - default_prob), probs_l
 
+    def _validate_label(self, label):
+        """Checks that labels don't begin with underscore."""
+        if label[0] == '_':
+            raise Exception('Label %s cannot begin with underscore.' % label)
+
     def _parse_examples(self, examples):
         """Splits examples into docs (split on spaces) and labels."""
         docs = []
@@ -190,6 +195,7 @@ class StringClassifier(object):
             doc = example[0].split()
             if len(doc) > 0:
                 docs.append(doc)
+                map(self._validate_label, example[1])
                 labels.append(example[1])
         return docs, labels
 
@@ -202,11 +208,11 @@ class StringClassifier(object):
 
     def load_examples(self, examples, iterations=25):
         """Sets new examples. Overwrites existing ones."""
-        docs, labels = self._parse_examples(examples)
+        docs, labels_list = self._parse_examples(examples)
 
         label_set = set(
             ['_default'] +
-            [label for label_list in labels for label in label_list])
+            [label for labels in labels_list for label in labels])
 
         self._label_count = len(label_set)
         self._label_to_id = dict(zip(label_set, xrange(self._label_count)))
@@ -217,7 +223,7 @@ class StringClassifier(object):
         self._doc_count = len(docs)
 
         self._b_dl = numpy.array(
-            map(self._get_label_vector, labels), dtype=int)
+            map(self._get_label_vector, labels_list), dtype=int)
         self._w_dc = [map(self._get_word_id, doc) for doc in docs]
         self._l_dc = []
         self._c_dl = numpy.zeros(
@@ -231,44 +237,45 @@ class StringClassifier(object):
 
     def add_examples(self, examples, iterations=5):
         """Adds examples. Old examples are preserved."""
-        docs, labels = self._parse_examples(examples)
+        docs, labels_list = self._parse_examples(examples)
 
         last_label_count = self._label_count
         last_doc_count = self._doc_count
         last_word_count = self._word_count
 
-        [map(self._get_label_id, label_list) for label_list in labels]
+        [map(self._get_label_id, labels) for labels in labels_list]
         self._doc_count += len(docs)
 
-        self._b_dl = numpy.concatenate(
-            (self._b_dl, numpy.zeros(
-                (last_doc_count, self._label_count - last_label_count),
-                dtype=int)), axis=1)
-        self._b_dl = numpy.concatenate(
-            (
-                self._b_dl,
-                [self._get_label_vector(label_list) for label_list in labels]
-            ), axis=0)
-        self._w_dc.extend([map(self._get_word_id, doc) for doc in docs])
-        self._c_dl = numpy.concatenate(
-            (self._c_dl, numpy.zeros(
-                (last_doc_count, self._label_count - last_label_count),
-                dtype=int)), axis=1)
-        self._c_dl = numpy.concatenate(
-            (self._c_dl, numpy.zeros(
-                (self._doc_count - last_doc_count, self._label_count),
-                dtype=int)), axis=0)
-        self._c_lw = numpy.concatenate(
-            (self._c_lw, numpy.zeros(
-                (last_label_count, self._word_count - last_word_count),
-                dtype=int)), axis=1)
-        self._c_lw = numpy.concatenate(
-            (self._c_lw, numpy.zeros(
-                (self._label_count - last_label_count, self._word_count),
-                dtype=int)), axis=0)
-        self._c_l = numpy.concatenate(
-            (self._c_l, numpy.zeros(
-                self._label_count - last_label_count, dtype=int)))
+        if len(examples) > 0:
+            self._b_dl = numpy.concatenate(
+                (self._b_dl, numpy.zeros(
+                    (last_doc_count, self._label_count - last_label_count),
+                    dtype=int)), axis=1)
+            self._b_dl = numpy.concatenate(
+                (
+                    self._b_dl,
+                    [self._get_label_vector(labels) for labels in labels_list]
+                ), axis=0)
+            self._w_dc.extend([map(self._get_word_id, doc) for doc in docs])
+            self._c_dl = numpy.concatenate(
+                (self._c_dl, numpy.zeros(
+                    (last_doc_count, self._label_count - last_label_count),
+                    dtype=int)), axis=1)
+            self._c_dl = numpy.concatenate(
+                (self._c_dl, numpy.zeros(
+                    (self._doc_count - last_doc_count, self._label_count),
+                    dtype=int)), axis=0)
+            self._c_lw = numpy.concatenate(
+                (self._c_lw, numpy.zeros(
+                    (last_label_count, self._word_count - last_word_count),
+                    dtype=int)), axis=1)
+            self._c_lw = numpy.concatenate(
+                (self._c_lw, numpy.zeros(
+                    (self._label_count - last_label_count, self._word_count),
+                    dtype=int)), axis=0)
+            self._c_l = numpy.concatenate(
+                (self._c_l, numpy.zeros(
+                    self._label_count - last_label_count, dtype=int)))
 
         for d in xrange(last_doc_count, self._doc_count):
             self._init_docs([d])

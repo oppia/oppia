@@ -90,12 +90,18 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._word_count, 10)
         self._validate_instance(self.string_classifier)
 
-    def test_add_doc(self):
+    def test_add_examples(self):
         self.string_classifier.add_examples(self._NEW_EXAMPLES)
         self.assertEquals(self.string_classifier._label_count, 3)
         self.assertEquals(self.string_classifier._doc_count, 6)
         self.assertEquals(self.string_classifier._word_count, 37)
         self._validate_instance(self.string_classifier)
+
+    def test_empty_load(self):
+        self.string_classifier.load_examples([])
+
+    def test_empty_add(self):
+        self.string_classifier.add_examples([])
 
     def test_model_save_load(self):
         self.assertEquals(
@@ -133,6 +139,12 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._label_count, label_count + 1)
         self.string_classifier._get_label_id('_non_existent_label_2')
         self.assertEquals(self.string_classifier._label_count, label_count + 2)
+
+    def test_label_begins_with_underscore(self):
+        self.string_classifier.add_examples([['example doc', ['good_label']]])
+        with self.assertRaises(Exception):
+            self.string_classifier.add_examples(
+                [['example doc', ['_bad_label']]])
 
     def test_reload_valid_state(self):
         self.string_classifier.load_examples(self._NEW_EXAMPLES)
