@@ -16,7 +16,6 @@
 
 import copy
 import operator
-import pickle
 
 import numpy
 
