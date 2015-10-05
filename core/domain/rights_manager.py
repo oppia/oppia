@@ -221,11 +221,12 @@ def create_new_exploration_rights(exploration_id, committer_id):
         committer_id, exploration_id)
 
 
-def get_exploration_rights(exploration_id):
+def get_exploration_rights(exploration_id, strict=True):
     """Retrieves the rights for this exploration from the datastore."""
-    model = exp_models.ExplorationRightsModel.get(exploration_id)
+    model = exp_models.ExplorationRightsModel.get(
+        exploration_id, strict=strict)
     if model is None:
-        raise Exception('This exploration does not exist.')
+        return None
     return _get_activity_rights_from_model(model, ACTIVITY_TYPE_EXPLORATION)
 
 
@@ -261,11 +262,12 @@ def create_new_collection_rights(collection_id, committer_id):
     subscription_services.subscribe_to_collection(committer_id, collection_id)
 
 
-def get_collection_rights(collection_id):
+def get_collection_rights(collection_id, strict=True):
     """Retrieves the rights for this collection from the datastore."""
-    model = collection_models.CollectionRightsModel.get(collection_id)
+    model = collection_models.CollectionRightsModel.get(
+        collection_id, strict=strict)
     if model is None:
-        raise Exception('This collection does not exist.')
+        return None
     return _get_activity_rights_from_model(model, ACTIVITY_TYPE_COLLECTION)
 
 
@@ -285,15 +287,9 @@ def _get_activity_rights(activity_type, activity_id):
     provided is unknown, an Exception is raised.
     """
     if activity_type == ACTIVITY_TYPE_EXPLORATION:
-        try:
-            return get_exploration_rights(activity_id)
-        except Exception:
-            return None
+        return get_exploration_rights(activity_id, strict=False)
     elif activity_type == ACTIVITY_TYPE_COLLECTION:
-        try:
-            return get_collection_rights(activity_id)
-        except Exception:
-            return None
+        return get_collection_rights(activity_id, strict=False)
     else:
         raise Exception(
             'Cannot get activity rights for unknown activity type: %s' % (

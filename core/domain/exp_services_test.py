@@ -292,7 +292,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self._summaries_to_ids(exp_summaries),
             [self.EXP_ID_0, self.EXP_ID_3])
 
-    def test_exploration_summaries_pagination_and_fully_gallery(self):
+    def test_exploration_summaries_pagination_in_filled_gallery(self):
         # Ensure the maximum number of explorations that can fit on the gallery
         # page is maintained by the summaries function.
         with self.swap(feconf, 'GALLERY_PAGE_SIZE', 3):

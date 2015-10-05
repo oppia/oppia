@@ -125,8 +125,9 @@ class RecentUpdatesMRJobManager(
                     - activity_title: The title of the activity.
                     - author_id: The author who made the commit.
                     - last_update_ms: When the commit was created.
-                    - subject: The commit message, otherwise the delete commit
-                      type if the activity has been deleted.
+                    - subject: The commit message, otherwise (if the activity
+                      has been deleted) a message indicating that the activity
+                      was deleted.
                 - A list containing valid activity model instances which are
                   mappable to feedback threads
         """
@@ -303,6 +304,13 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                                 'id': item.id
                             })
         elif isinstance(item, collection_models.CollectionRightsModel):
+            # NOTE TO DEVELOPERS: Although the code handling subscribing to
+            # collections is very similar to the code above for explorations,
+            # it is not abstracted out due to the majority of the coding being
+            # yield statements. These must happen inside the generator method
+            # (which is this method) and, as a result, there is little common
+            # code between the two code blocks which can be effectively
+            # abstracted.
             if item.deleted:
                 return
 

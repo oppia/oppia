@@ -277,9 +277,9 @@ def get_collection_summaries_matching_ids(collection_ids):
             collection_ids)]
 
 
-# TODO(bhenning): Update this function to support matching the query also to
-# explorations contained within this collection and introduce tests to verify
-# this behavior.
+# TODO(bhenning): Update this function to support also matching the query to
+# explorations contained within this collection. Introduce tests to verify this
+# behavior.
 def get_collection_summaries_matching_query(query_string, cursor=None):
     """Returns a list with all collection summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
