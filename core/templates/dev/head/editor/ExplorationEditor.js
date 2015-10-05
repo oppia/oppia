@@ -19,8 +19,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// TODO(sll): Move all hardcoded strings to the top of the file.
-
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
 
@@ -164,13 +162,13 @@ oppia.controller('ExplorationEditor', [
       'Click \'Next\' to learn how to use the exploration editor.<br><br> ' +
       'You might also find these resources helpful for creating your exploration: ' +
       '<ul>'+
-      '<li><a href="/editor_tutorial" target="_blank">' +
+      '<li><a href="https://oppia.github.io/#/AWorkedExample" target="_blank">' +
       '        Walkthrough of the Oppia Editor' +
       '</a></li>' +
-      '<li><a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">' +
+      '<li><a href="https://oppia.github.io/#/PlanningAnExploration" target="_blank">' +
       '        Planning Your Exploration' +
       '</a></li>' +
-      '<li><a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">' +
+      '<li><a href="https://oppia.github.io/#/DesignTips" target="_blank">' +
       '        Exploration Design Tips' +
       '</li>' +
       '</ul>')
@@ -186,10 +184,10 @@ oppia.controller('ExplorationEditor', [
     selector: _ID_TUTORIAL_STATE_CONTENT,
     heading: 'Content',
     text: (
-      'An Oppia exploration is a one-on-one conversation that is divided ' +
-      'into several \'cards\'. A card consists of Oppia asking a question, and the ' +
-      'learner responding.<br><br>' +
-      'This is where you can tell Oppia what to say to the learner at the beginning.'),
+      'An Oppia exploration is a conversation between a tutor and a ' +
+      'learner that is divided into several \'cards\'.<br><br>' +
+      'The first part of a card is the <b>content</b>. Here, you can set ' +
+      'the scene and ask the learner a question.'),
     placement: 'right'
   }, {
     type: 'function',
@@ -453,6 +451,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     }
   };
 
+  // This flag is used to ensure only one save exploration modal can be open at
+  // any one time.
+  var _modalIsOpen = false;
+
   $scope.saveChanges = function() {
     routerService.savePendingChanges();
 
@@ -496,6 +498,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       warningsData.clear();
+
+      // If the modal is open, do not open another one.
+      if (_modalIsOpen) {
+        return;
+      }
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
@@ -569,7 +576,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
               'answer_groups': 'Responses',
-              'default_outcome': 'Default outcome'
+              'default_outcome': 'Default outcome',
+              'confirmed_unclassified_answers': 'Confirmed unclassified answers'
             }
 
             // An ordered list of state properties that determines the order in which
@@ -628,6 +636,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         ]
       });
 
+      // Modal is Opened
+      _modalIsOpen = true;
+
       modalInstance.opened.then(function(data) {
         // The $timeout seems to be needed in order to give the modal time to
         // render.
@@ -638,6 +649,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
       modalInstance.result.then(function(commitMessage) {
         $scope.isSaveInProgress = true;
+        _modalIsOpen = false;
 
         var changeList = changeListService.getChangeList();
         explorationData.save(changeList, commitMessage, function() {
@@ -649,6 +661,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         }, function() {
           $scope.isSaveInProgress = false;
         });
+      }, function() {
+        _modalIsOpen = false;
       });
     });
   };

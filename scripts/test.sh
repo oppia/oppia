@@ -80,10 +80,10 @@ fi
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
     echo Checking whether coverage is installed in $TOOLS_DIR
-    if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
+    if [ ! -d "$TOOLS_DIR/coverage-4.0" ]; then
       echo Installing coverage
       rm -rf $TOOLS_DIR/coverage
-      curl --silent https://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -o coverage.tar.gz
+      curl --silent https://pypi.python.org/packages/source/c/coverage/coverage-4.0.tar.gz#md5=13e119b1f111c22b613c3d5cd19a95ac -o coverage.tar.gz
       tar xvzf coverage.tar.gz -C $TOOLS_DIR
       rm coverage.tar.gz
     fi
@@ -94,7 +94,7 @@ python scripts/backend_tests.py $@
 
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
-    python $COVERAGE_HOME/coverage -c
+    python $COVERAGE_HOME/coverage combine
     python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/*" --show-missing
   fi
 done

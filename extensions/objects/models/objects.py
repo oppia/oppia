@@ -199,6 +199,17 @@ class CodeEvaluation(BaseObject):
     }
 
 
+class ListOfCodeEvaluation(BaseObject):
+    """Class for lists of CodeEvaluations."""
+
+    description = 'A list of code and its evaluation results.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CodeEvaluation.SCHEMA
+    }
+
+
 class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
@@ -210,6 +221,17 @@ class CoordTwoDim(BaseObject):
         'type': 'list',
         'len': 2,
         'items': Real.SCHEMA,
+    }
+
+
+class ListOfCoordTwoDim(BaseObject):
+    """Class for lists of CoordTwoDims."""
+
+    description = 'A list of 2D coordinates.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CoordTwoDim.SCHEMA
     }
 
 
@@ -253,6 +275,21 @@ class NormalizedString(BaseObject):
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'normalize_spaces'
+        }]
+    }
+
+
+class SetOfNormalizedString(BaseObject):
+    """Class for sets of NormalizedStrings."""
+
+    description = (
+        'A set (a list with unique elements) of whitespace-collapsed strings.')
+
+    SCHEMA = {
+        'type': 'list',
+        'items': NormalizedString.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }
 
@@ -519,6 +556,17 @@ class Graph(BaseObject):
         return raw
 
 
+class ListOfGraph(BaseObject):
+    """Class for lists of Graphs."""
+
+    description = 'A list of graphs.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Graph.SCHEMA
+    }
+
+
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
 
@@ -628,5 +676,21 @@ class ClickOnImage(BaseObject):
                 'type': 'list',
                 'items': UnicodeString.SCHEMA
             }
+        }]
+    }
+
+
+class SetOfHtmlString(BaseObject):
+    """A Set of Html Strings"""
+
+    description = "A list of Html strings."
+    edit_html_filename = 'set_of_html_string_editor'
+    edit_js_filename = 'SetOfHtmlStringEditor'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Html.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }

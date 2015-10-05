@@ -64,8 +64,8 @@ EMAIL_FOOTER = config_domain.ConfigProperty(
     'You can unsubscribe from these emails from the '
     '<a href="https://www.example.com">Preferences</a> page.')
 # NOTE TO DEVELOPERS: post-signup emails will not be sent if this placeholder
-# is left unmodified. If this policy changes, the deployment instructions at
-# https://code.google.com/p/oppia/wiki/DeployingOppia should be updated.
+# is left unmodified. If this policy changes, this should be documented in the
+# wiki.
 SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
     'signup_email_content', EMAIL_CONTENT_SCHEMA,
     'Content of email sent after a new user signs up. (The email body should '
