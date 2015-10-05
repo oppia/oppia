@@ -55,11 +55,12 @@ class HomePageTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 200)
+        # The string I18N_TOPNAV_SIGN_IN cannot be part of the inner text of
+        # the tag, but can appear as an attribute value.
         response.mustcontain(
             'I18N_TOPNAV_NOTIFICATIONS', 'I18N_TOPNAV_LOGOUT',
             self.get_expected_logout_url('/'),
-            no=['I18N_TOPNAV_SIGN_IN', 'I18N_GALLERY_PAGE_SUBTITLE',
-                self.get_expected_login_url('/')])
+            no=['>I18N_TOPNAV_SIGN_IN<', self.get_expected_login_url('/')])
         self.logout()
 
 

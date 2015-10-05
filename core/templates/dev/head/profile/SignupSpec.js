@@ -78,28 +78,28 @@ describe('Signup controller', function() {
 
     it('should show warning if no username provided', function($http) {
       scope.updateWarningText('');
-      expect(scope.warningText).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
+      expect(scope.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
 
       scope.submitPrerequisitesForm(false);
-      expect(scope.warningText).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
+      expect(scope.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
     });
 
     it('should show warning if username is too long', function($http) {
       scope.updateWarningText(
         'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
-      expect(scope.warningText).toEqual(
+      expect(scope.warningI18nCode).toEqual(
         'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS');
     });
 
     it('should show warning if username has non-alphanumeric characters', function($http) {
       scope.updateWarningText('a-a');
-      expect(scope.warningText).toEqual(
+      expect(scope.warningI18nCode).toEqual(
         'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
     });
 
     it('should show warning if username has \'admin\' in it', function($http) {
       scope.updateWarningText('administrator');
-      expect(scope.warningText).toEqual(
+      expect(scope.warningI18nCode).toEqual(
         'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
     });
   });

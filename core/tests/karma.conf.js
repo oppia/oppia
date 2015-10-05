@@ -26,8 +26,10 @@ module.exports = function(config) {
       'third_party/static/textAngular-1.3.7/src/textAngularSetup.js',
       // 'third_party/static/textAngular-1.3.7/src/textAngular-sanitize.js',
       'third_party/static/textAngular-1.3.7/dist/textAngular-rangy.min.js',
-      'third_party/static/bower-angular-translate-2.4.2/angular-translate.js',
+      'third_party/static/bower-angular-translate-2.8.0/angular-translate.js',
       'third_party/static/bower-angular-translate-loader-partial-2.7.2/angular-translate-loader-partial.js',
+      'third_party/static/bower-angular-cookies-1.3.6/angular-cookies.min.js',
+      'third_party/static/bower-angular-translate-storage-cookie-2.8.1/angular-translate-storage-cookie.min.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
