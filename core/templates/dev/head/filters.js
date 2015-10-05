@@ -364,11 +364,11 @@ oppia.filter('summarizeNumber', [function() {
 }]);
 
 oppia.filter('truncateAndCapitalize', [function() {
-  return function(objective, maxNumberOfCharacters) {
-    objective = objective.trim();
-    if(objective.length > maxNumberOfCharacters) {
-      objective = objective.substring(0, maxNumberOfCharacters) + '...';
+  return function(input, maxNumberOfCharacters) {
+    input = input.trim();
+    if(input.length > maxNumberOfCharacters) {
+      input = input.substring(0, maxNumberOfCharacters) + '...';
     }
-    return objective.charAt(0).toUpperCase() + objective.slice(1);
+    return input.charAt(0).toUpperCase() + input.slice(1);
   }
 }]);
