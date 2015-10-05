@@ -47,6 +47,18 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.EXP_ID = 'exp_id'
 
+    def test_get_exploration_rights_for_nonexistent_exploration(self):
+        NON_EXP_ID = 'this_exp_does_not_exist_id'
+
+        with self.assertRaisesRegexp(
+                Exception,
+                'Entity for class ExplorationRightsModel with id '
+                'this_exp_does_not_exist_id not found'):
+            rights_manager.get_exploration_rights(NON_EXP_ID)
+
+        self.assertIsNone(
+            rights_manager.get_exploration_rights(NON_EXP_ID, strict=False))
+
     def test_demo_exploration(self):
         exp_services.load_demo('1')
         rights_manager.release_ownership_of_exploration(
@@ -440,6 +452,18 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         self.COLLECTION_ID = 'collection_id'
         self.EXP_ID_FOR_COLLECTION = 'exp_id_for_collection'
+
+    def test_get_collection_rights_for_nonexistent_collection(self):
+        NON_COL_ID = 'this_collection_does_not_exist_id'
+
+        with self.assertRaisesRegexp(
+                Exception,
+                'Entity for class CollectionRightsModel with id '
+                'this_collection_does_not_exist_id not found'):
+            rights_manager.get_collection_rights(NON_COL_ID)
+
+        self.assertIsNone(
+            rights_manager.get_collection_rights(NON_COL_ID, strict=False))
 
     def test_demo_collection(self):
         collection_services.load_demo('0')
