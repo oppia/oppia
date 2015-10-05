@@ -66,9 +66,7 @@ class StringClassifier(object):
     def _get_word_id(self, word):
         """Returns a word's id if it exists, otherwise assigns
         a new id to the word and returns it."""
-        try:
-            return self._word_to_id[word]
-        except KeyError as ke:
+        if word not in self._word_to_id:
             self._word_to_id[word] = self._word_count
             self._word_count += 1
         return self._word_to_id[word]
@@ -76,9 +74,7 @@ class StringClassifier(object):
     def _get_label_id(self, label):
         """Returns a label's id if it exists, otherwise assigns
         a new id to the label and returns it."""
-        try:
-            return self._label_to_id[label]
-        except KeyError as ke:
+        if label not in self._label_to_id:
             self._label_to_id[label] = self._label_count
             self._label_count += 1
         return self._label_to_id[label]
