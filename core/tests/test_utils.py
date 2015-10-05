@@ -379,13 +379,14 @@ class TestBase(unittest.TestCase):
         }])
 
     def save_new_default_collection(
-            self, collection_id, owner_id, title='A title'):
+            self, collection_id, owner_id, title='A title',
+            category='A category', objective='An objective'):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, 'A category', 'An objective')
+            collection_id, title, category, objective)
         collection_services.save_new_collection(owner_id, collection)
         return collection
 

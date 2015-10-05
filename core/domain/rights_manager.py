@@ -280,18 +280,24 @@ def is_collection_public(collection_id):
 
 
 def _get_activity_rights(activity_type, activity_id):
-    try:
-        if activity_type == ACTIVITY_TYPE_EXPLORATION:
+    """This function returns None if this function fails to retrieve the rights
+    object for a given activity based on its type. If the activity_type value
+    provided is unknown, an Exception is raised.
+    """
+    if activity_type == ACTIVITY_TYPE_EXPLORATION:
+        try:
             return get_exploration_rights(activity_id)
-        elif activity_type == ACTIVITY_TYPE_COLLECTION:
-            return get_collection_rights(activity_id)
-        else:
-            logging.error(
-                'Cannot get activity rights for unknown activity type: %s' % (
-                    activity_type))
+        except Exception:
             return None
-    except Exception:
-        return None
+    elif activity_type == ACTIVITY_TYPE_COLLECTION:
+        try:
+            return get_collection_rights(activity_id)
+        except Exception:
+            return None
+    else:
+        raise Exception(
+            'Cannot get activity rights for unknown activity type: %s' % (
+                activity_type))
 
 
 class Actor(object):

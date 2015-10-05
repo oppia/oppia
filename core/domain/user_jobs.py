@@ -96,7 +96,7 @@ class RecentUpdatesMRJobManager(
     @staticmethod
     def _get_most_recent_activity_commits(
             activity_model_cls, activity_ids_list,
-            activity_type, commit_type, delete_type):
+            activity_type, commit_type, delete_commit_message):
         """Gets and returns a list of dicts representing the most recent
         commits made for each activity represented by each ID provided in the
         activity_ids_list parameter. These are the latest commits made by users
@@ -112,22 +112,23 @@ class RecentUpdatesMRJobManager(
                 as 'exploration' or 'collection'.
             commit_type: This (string) represents the activity update commit
                 type, such as feconf.UPDATE_TYPE_EXPLORATION_COMMIT.
-            delete_type: This (string) represents the activity delete commit
-                type, such as feconf.COMMIT_MESSAGE_EXPLORATION_DELETED.
+            delete_commit_message: This (string) represents the commit message
+                to use when an activity is found to be deleted, such as
+                feconf.COMMIT_MESSAGE_EXPLORATION_DELETED.
 
         Returns:
-            A tuple with two entries: A list of dictionaries with the following
-            keys, where each entry in the list is added for each activity loaded
-            from the list of activity IDs and a list which contains valid
-            activity model instances which may be mapped to feedback threads.
-            Following are the keys of the dictionary (first part of the tuple):
-                - type: The type of update commit type.
-                - activity_id: The ID of the activity for this commit.
-                - activity_title: The title of the activity.
-                - author_id: The author who made the commit.
-                - last_update_ms: When the commit was created.
-                - subject: The commit message, otherwise the delete commit type
-                  if the activity has been deleted.
+            A tuple with two entries:
+                - A list (one entry per activity ID) of dictionaries with the
+                  following keys:
+                    - type: The value of the commit_type argument.
+                    - activity_id: The ID of the activity for this commit.
+                    - activity_title: The title of the activity.
+                    - author_id: The author who made the commit.
+                    - last_update_ms: When the commit was created.
+                    - subject: The commit message, otherwise the delete commit
+                      type if the activity has been deleted.
+                - A list containing valid activity model instances which are
+                  mappable to feedback threads
         """
         most_recent_commits = []
         activity_models = activity_model_cls.get_multi(
@@ -163,7 +164,7 @@ class RecentUpdatesMRJobManager(
                 'author_id': metadata_obj['committer_id'],
                 'last_updated_ms': metadata_obj['created_on_ms'],
                 'subject': (
-                    delete_type
+                    delete_commit_message
                     if activity_model.deleted
                     else metadata_obj['commit_message']
                 ),

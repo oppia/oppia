@@ -904,7 +904,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_collection',
                 self._null_fn):
-            # UserB creates and saves a new collection.
+            # User B creates and saves a new collection.
             self.save_new_default_collection(
                 self.COLLECTION_ID_1, self.user_b_id)
 

@@ -118,27 +118,108 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                 }
             })
 
-    def test_get_exploration_summaries_matching_query(self):
-        EXP_ID_0 = '0_en_arch_bridges_in_england'
-        EXP_ID_1 = '1_fi_arch_sillat_suomi'
-        EXP_ID_2 = '2_en_welcome_introduce_oppia'
-        EXP_ID_3 = '3_en_welcome_introduce_oppia_interactions'
-        EXP_ID_4 = '4_en_welcome_gadgets'
-        EXP_ID_5 = '5_fi_welcome_vempain'
-        EXP_ID_6 = '6_en_languages_learning_basic_verbs_in_spanish'
 
-        def _summaries_to_ids(exp_summaries):
-            return sorted([exp_summary.id for exp_summary in exp_summaries])
+class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
+    """Tests exploration query methods which operate on ExplorationSummary
+    objects.
+    """
+    EXP_ID_0 = '0_en_arch_bridges_in_england'
+    EXP_ID_1 = '1_fi_arch_sillat_suomi'
+    EXP_ID_2 = '2_en_welcome_introduce_oppia'
+    EXP_ID_3 = '3_en_welcome_introduce_oppia_interactions'
+    EXP_ID_4 = '4_en_welcome_gadgets'
+    EXP_ID_5 = '5_fi_welcome_vempain'
+    EXP_ID_6 = '6_en_languages_learning_basic_verbs_in_spanish'
+    EXP_ID_7 = '7_en_languages_private_exploration_in_spanish'
 
-        def _create_search_query(terms, categories, languages):
-            query = ' '.join(terms)
-            if categories:
-                query += ' category=(' + ' OR '.join([
-                    '"%s"' % category for category in categories]) + ')'
-            if languages:
-                query += ' language_code=(' + ' OR '.join([
-                    '"%s"' % language for language in languages]) + ')'
-            return query
+    def setUp(self):
+        super(ExplorationSummaryQueriesUnitTests, self).setUp()
+
+        # Setup the explorations to fit into 2 different categoriers and 2
+        # different language groups. Also, ensure 2 of them have similar
+        # titles.
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.OWNER_ID, title='Bridges in England',
+            category='Architecture', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.OWNER_ID, title='Sillat Suomi',
+            category='Architecture', language_code='fi')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.OWNER_ID, title='Introduce Oppia',
+            category='Welcome', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.OWNER_ID,
+            title='Introduce Interactions in Oppia',
+            category='Welcome', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_4, self.OWNER_ID, title='Welcome to Gadgets',
+            category='Welcome', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_5, self.OWNER_ID, title='Tervetuloa gadgetien Oppia',
+            category='Welcome', language_code='fi')
+        self.save_new_valid_exploration(
+            self.EXP_ID_6, self.OWNER_ID,
+            title='Learning basic verbs in Spanish',
+            category='Languages', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_7, self.OWNER_ID,
+            title='Private exploration in Spanish',
+            category='Languages', language_code='en')
+
+        # Publish explorations 0-6. Private explorations should not show up in
+        # a search query, even if they're indexed.
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID_6)
+
+        # Add the explorations to the search index.
+        exp_services.index_explorations_given_ids([
+            self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
+            self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
+
+    def _summaries_to_ids(self, exp_summaries):
+        return sorted([exp_summary.id for exp_summary in exp_summaries])
+
+    def _create_search_query(self, terms, categories, languages):
+        query = ' '.join(terms)
+        if categories:
+            query += ' category=(' + ' OR '.join([
+                '"%s"' % category for category in categories]) + ')'
+        if languages:
+            query += ' language_code=(' + ' OR '.join([
+                '"%s"' % language for language in languages]) + ')'
+        return query
+
+    def test_get_exploration_summaries_with_no_query(self):
+        # An empty query should return all explorations.
+        (exp_summaries, search_cursor) = (
+            exp_services.get_exploration_summaries_matching_query(''))
+        self.assertEqual(self._summaries_to_ids(exp_summaries), [
+            self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
+            self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
+        ]);
+        self.assertIsNone(search_cursor)
+
+    def test_get_exploration_summaries_with_deleted_explorations(self):
+        # Ensure a deleted exploration does not show up in search results.
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_0)
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_1)
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_3)
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_5)
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_6)
+
+        (exp_summaries, search_cursor) = (
+            exp_services.get_exploration_summaries_matching_query(''))
+        self.assertEqual(
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_2, self.EXP_ID_4])
+
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_2)
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_4)
 
         # If no explorations are loaded, a blank query should not get any
         # explorations.
@@ -146,120 +227,72 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.get_exploration_summaries_matching_query(''),
             ([], None))
 
-        # Setup the explorations to fit into 2 different categoriers and 2
-        # different language groups. Also, ensure 2 of them have similar
-        # titles.
-        self.save_new_valid_exploration(
-            EXP_ID_0, self.OWNER_ID, title='Bridges in England',
-            category='Architecture', language_code='en')
-        self.save_new_valid_exploration(
-            EXP_ID_1, self.OWNER_ID, title='Sillat Suomi',
-            category='Architecture', language_code='fi')
-        self.save_new_valid_exploration(
-            EXP_ID_2, self.OWNER_ID, title='Introduce Oppia',
-            category='Welcome', language_code='en')
-        self.save_new_valid_exploration(
-            EXP_ID_3, self.OWNER_ID, title='Introduce Interactions in Oppia',
-            category='Welcome', language_code='en')
-        self.save_new_valid_exploration(
-            EXP_ID_4, self.OWNER_ID, title='Welcome to Gadgets',
-            category='Welcome', language_code='en')
-        self.save_new_valid_exploration(
-            EXP_ID_5, self.OWNER_ID, title='Tervetuloa gadgetien Oppia',
-            category='Welcome', language_code='fi')
-        self.save_new_valid_exploration(
-            EXP_ID_6, self.OWNER_ID, title='Learning basic verbs in Spanish',
-            category='Languages', language_code='en')
-
-        # Add the explorations to the search index.
-        exp_services.index_explorations_given_ids([
-            EXP_ID_0, EXP_ID_1, EXP_ID_2, EXP_ID_3, EXP_ID_4, EXP_ID_5,
-            EXP_ID_6])
-
-        # Private explorations should not show up in a search query, even if
-        # they're indexed.
-        self.assertEqual(
-            exp_services.get_exploration_summaries_matching_query(''),
-            ([], None))
-
-        # Publish all of the explorations.
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_0)
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_1)
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_2)
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_3)
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_4)
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_5)
-        rights_manager.publish_exploration(self.OWNER_ID, EXP_ID_6)
-
-        # Add the explorations to the search index.
-        exp_services.index_explorations_given_ids([
-            EXP_ID_0, EXP_ID_1, EXP_ID_2, EXP_ID_3, EXP_ID_4, EXP_ID_5,
-            EXP_ID_6])
-
-        # An empty query should return all explorations.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(''))
-        self.assertEqual(_summaries_to_ids(exp_summaries), [
-            EXP_ID_0, EXP_ID_1, EXP_ID_2, EXP_ID_3, EXP_ID_4, EXP_ID_5,
-            EXP_ID_6
-        ]);
-        self.assertIsNone(search_cursor)
-
+    def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query([], ['Architecture'], [])))
+                self._create_search_query([], ['Architecture'], [])))
         self.assertEqual(
-            _summaries_to_ids(exp_summaries), [EXP_ID_0, EXP_ID_1])
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_0, self.EXP_ID_1])
 
         # Search for explorations in Finnish.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query([], [], ['fi'])))
+                self._create_search_query([], [], ['fi'])))
         self.assertEqual(
-            _summaries_to_ids(exp_summaries), [EXP_ID_1, EXP_ID_5])
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_1, self.EXP_ID_5])
 
         # Search for Finnish explorations in the 'Architecture' category.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query([], ['Architecture'], ['fi'])))
-        self.assertEqual(_summaries_to_ids(exp_summaries), [EXP_ID_1])
+                self._create_search_query([], ['Architecture'], ['fi'])))
+        self.assertEqual(
+            self._summaries_to_ids(exp_summaries), [self.EXP_ID_1])
 
         # Search for explorations containing 'Oppia'.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query(['Oppia'], [], [])))
+                self._create_search_query(['Oppia'], [], [])))
         self.assertEqual(
-            _summaries_to_ids(exp_summaries), [EXP_ID_2, EXP_ID_3, EXP_ID_5])
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
 
-        # Search for exploration containing 'Oppia' and 'Introduce'
+        # Search for explorations containing 'Oppia' and 'Introduce'.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query(['Oppia', 'Introduce'], [], [])))
+                self._create_search_query(['Oppia', 'Introduce'], [], [])))
         self.assertEqual(
-            _summaries_to_ids(exp_summaries), [EXP_ID_2, EXP_ID_3])
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_2, self.EXP_ID_3])
 
         # Search for explorations containing 'England' in English.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query(['England'], [], ['en'])))
-        self.assertEqual(_summaries_to_ids(exp_summaries), [EXP_ID_0])
+                self._create_search_query(['England'], [], ['en'])))
+        self.assertEqual(
+            self._summaries_to_ids(exp_summaries), [self.EXP_ID_0])
 
         # Search for explorations containing 'in'.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query(['in'], [], [])))
-        self.assertEqual(_summaries_to_ids(exp_summaries),
-            [EXP_ID_0, EXP_ID_3, EXP_ID_6])
+                self._create_search_query(['in'], [], [])))
+        self.assertEqual(
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
 
         # Search for explorations containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
         (exp_summaries, search_cursor) = (
             exp_services.get_exploration_summaries_matching_query(
-                _create_search_query(['in'], ['Architecture', 'Welcome'], [])))
-        self.assertEqual(_summaries_to_ids(exp_summaries),
-            [EXP_ID_0, EXP_ID_3])
+                self._create_search_query(
+                    ['in'], ['Architecture', 'Welcome'], [])))
+        self.assertEqual(
+            self._summaries_to_ids(exp_summaries),
+            [self.EXP_ID_0, self.EXP_ID_3])
 
+    def test_exploration_summaries_pagination_and_fully_gallery(self):
         # Ensure the maximum number of explorations that can fit on the gallery
         # page is maintained by the summaries function.
         with self.swap(feconf, 'GALLERY_PAGE_SIZE', 3):
@@ -275,7 +308,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                     '', None))
             self.assertEqual(len(exp_summaries), 3)
             self.assertIsNotNone(search_cursor)
-            found_exp_ids += _summaries_to_ids(exp_summaries)
+            found_exp_ids += self._summaries_to_ids(exp_summaries)
 
             # Page 2: 3 more explorations.
             (exp_summaries, search_cursor) = (
@@ -283,7 +316,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                     '', search_cursor))
             self.assertEqual(len(exp_summaries), 3)
             self.assertIsNotNone(search_cursor)
-            found_exp_ids += _summaries_to_ids(exp_summaries)
+            found_exp_ids += self._summaries_to_ids(exp_summaries)
 
             # Page 3: 1 final exploration.
             (exp_summaries, search_cursor) = (
@@ -291,24 +324,12 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                     '', search_cursor))
             self.assertEqual(len(exp_summaries), 1)
             self.assertIsNone(search_cursor)
-            found_exp_ids += _summaries_to_ids(exp_summaries)
+            found_exp_ids += self._summaries_to_ids(exp_summaries)
 
             # Validate all explorations were seen.
             self.assertEqual(sorted(found_exp_ids), [
-                EXP_ID_0, EXP_ID_1, EXP_ID_2, EXP_ID_3, EXP_ID_4, EXP_ID_5,
-                EXP_ID_6])
-
-        # Ensure a deleted exploration does not show up in search results.
-        exp_services.delete_exploration(self.OWNER_ID, EXP_ID_0)
-        exp_services.delete_exploration(self.OWNER_ID, EXP_ID_1)
-        exp_services.delete_exploration(self.OWNER_ID, EXP_ID_3)
-        exp_services.delete_exploration(self.OWNER_ID, EXP_ID_5)
-        exp_services.delete_exploration(self.OWNER_ID, EXP_ID_6)
-
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(''))
-        self.assertEqual(
-            _summaries_to_ids(exp_summaries), [EXP_ID_2, EXP_ID_4])
+                self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
+                self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):

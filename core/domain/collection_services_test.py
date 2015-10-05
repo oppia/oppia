@@ -115,8 +115,183 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                     }
                 })
 
-    def test_get_collection_summaries_matching_query(self):
-        pass
+
+class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
+    """Tests collection query methods which operate on CollectionSummary
+    objects.
+    """
+    COL_ID_0 = '0_arch_bridges_in_england'
+    COL_ID_1 = '1_welcome_introduce_oppia'
+    COL_ID_2 = '2_welcome_introduce_oppia_interactions'
+    COL_ID_3 = '3_welcome_gadgets'
+    COL_ID_4 = '4_languages_learning_basic_verbs_in_spanish'
+    COL_ID_5 = '5_languages_private_collection_in_spanish'
+
+    def setUp(self):
+        super(CollectionSummaryQueriesUnitTests, self).setUp()
+
+        # Setup the collections to fit into 2 different categoriers. Ensure 2 of
+        # them have similar titles.
+        self.save_new_default_collection(
+            self.COL_ID_0, self.OWNER_ID, title='Bridges in England',
+            category='Architecture')
+        self.save_new_default_collection(
+            self.COL_ID_1, self.OWNER_ID, title='Introduce Oppia',
+            category='Welcome')
+        self.save_new_default_collection(
+            self.COL_ID_2, self.OWNER_ID,
+            title='Introduce Interactions in Oppia', category='Welcome')
+        self.save_new_default_collection(
+            self.COL_ID_3, self.OWNER_ID, title='Welcome to Gadgets',
+            category='Welcome')
+        self.save_new_default_collection(
+            self.COL_ID_4, self.OWNER_ID,
+            title='Learning basic verbs in Spanish', category='Languages')
+        self.save_new_default_collection(
+            self.COL_ID_5, self.OWNER_ID,
+            title='Private collection in Spanish', category='Languages')
+
+        # Publish collections 0-4. Private collections should not show up in
+        # a search query, even if they're indexed.
+        rights_manager.publish_collection(self.OWNER_ID, self.COL_ID_0)
+        rights_manager.publish_collection(self.OWNER_ID, self.COL_ID_1)
+        rights_manager.publish_collection(self.OWNER_ID, self.COL_ID_2)
+        rights_manager.publish_collection(self.OWNER_ID, self.COL_ID_3)
+        rights_manager.publish_collection(self.OWNER_ID, self.COL_ID_4)
+
+        # Add the collections to the search index.
+        collection_services.index_collections_given_ids([
+            self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
+            self.COL_ID_4])
+
+    def _summaries_to_ids(self, col_summaries):
+        return sorted([col_summary.id for col_summary in col_summaries])
+
+    def _create_search_query(self, terms, categories):
+        query = ' '.join(terms)
+        if categories:
+            query += ' category=(' + ' OR '.join([
+                '"%s"' % category for category in categories]) + ')'
+        return query
+
+    def test_get_collection_summaries_with_no_query(self):
+        # An empty query should return all collections.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(''))
+        self.assertEqual(self._summaries_to_ids(col_summaries), [
+            self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
+            self.COL_ID_4
+        ]);
+        self.assertIsNone(search_cursor)
+
+    def test_get_collection_summaries_with_deleted_collections(self):
+        # Ensure a deleted collection does not show up in search results.
+        collection_services.delete_collection(self.OWNER_ID, self.COL_ID_0)
+        collection_services.delete_collection(self.OWNER_ID, self.COL_ID_2)
+        collection_services.delete_collection(self.OWNER_ID, self.COL_ID_4)
+
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(''))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries),
+            [self.COL_ID_1, self.COL_ID_3])
+
+        collection_services.delete_collection(self.OWNER_ID, self.COL_ID_1)
+        collection_services.delete_collection(self.OWNER_ID, self.COL_ID_3)
+
+        # If no collections are loaded, a blank query should not get any
+        # collections.
+        self.assertEqual(
+            collection_services.get_collection_summaries_matching_query(''),
+            ([], None))
+
+    def test_search_collection_summaries(self):
+        # Search within the 'Architecture' category.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(
+                self._create_search_query([], ['Architecture'])))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries), [self.COL_ID_0])
+
+        # Search for collections containing 'Oppia'.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(
+                self._create_search_query(['Oppia'], [])))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries),
+            [self.COL_ID_1, self.COL_ID_2])
+
+        # Search for collections containing 'Oppia' and 'Introduce'.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(
+                self._create_search_query(['Oppia', 'Introduce'], [])))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries),
+            [self.COL_ID_1, self.COL_ID_2])
+
+        # Search for collections containing 'England'.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(
+                self._create_search_query(['England'], [])))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries), [self.COL_ID_0])
+
+        # Search for collections containing 'in'.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(
+                self._create_search_query(['in'], [])))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries),
+            [self.COL_ID_0, self.COL_ID_2, self.COL_ID_4])
+
+        # Search for collections containing 'in' in the 'Architecture' and
+        # 'Welcome' categories.
+        (col_summaries, search_cursor) = (
+            collection_services.get_collection_summaries_matching_query(
+                self._create_search_query(
+                    ['in'], ['Architecture', 'Welcome'])))
+        self.assertEqual(
+            self._summaries_to_ids(col_summaries),
+            [self.COL_ID_0, self.COL_ID_2])
+
+    def test_collection_summaries_pagination_and_fully_gallery(self):
+        # Ensure the maximum number of collections that can fit on the gallery
+        # page is maintained by the summaries function.
+        with self.swap(feconf, 'GALLERY_PAGE_SIZE', 2):
+            # Need to load 3 pages to find all of the collections. Since the
+            # returned order is arbitrary, we need to concatenate the results
+            # to ensure all collections are returned. We validate the correct
+            # length is returned each time.
+            found_col_ids = []
+
+            # Page 1: 2 initial collections.
+            (col_summaries, search_cursor) = (
+                collection_services.get_collection_summaries_matching_query(
+                    '', None))
+            self.assertEqual(len(col_summaries), 2)
+            self.assertIsNotNone(search_cursor)
+            found_col_ids += self._summaries_to_ids(col_summaries)
+
+            # Page 2: 2 more collections.
+            (col_summaries, search_cursor) = (
+                collection_services.get_collection_summaries_matching_query(
+                    '', search_cursor))
+            self.assertEqual(len(col_summaries), 2)
+            self.assertIsNotNone(search_cursor)
+            found_col_ids += self._summaries_to_ids(col_summaries)
+
+            # Page 3: 1 final collection.
+            (col_summaries, search_cursor) = (
+                collection_services.get_collection_summaries_matching_query(
+                    '', search_cursor))
+            self.assertEqual(len(col_summaries), 1)
+            self.assertIsNone(search_cursor)
+            found_col_ids += self._summaries_to_ids(col_summaries)
+
+            # Validate all collections were seen.
+            self.assertEqual(sorted(found_col_ids), [
+                self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
+                self.COL_ID_4])
 
 
 class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
