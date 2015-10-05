@@ -137,8 +137,10 @@ md-card.conversation-skin-tutor-card {
 }
 .conversation-skin-tutor-card-bottom-section,
 .conversation-skin-tutor-card-middle-section {
+  left: -56px;
   margin-top: 8px;
   padding: 0px 36px 2px 36px;
+  position: relative;
 }
 
 .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
@@ -157,9 +159,12 @@ md-card.conversation-skin-tutor-card {
 
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
+  left: 56px;
+  margin-right: -56px;
   margin-bottom: 30px;
   /* This is needed to align content in-line with avatars. */
   padding-top: 10px;
+  padding-right: 56px;
   position: relative;
 }
 

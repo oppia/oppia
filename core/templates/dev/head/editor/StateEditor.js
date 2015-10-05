@@ -292,7 +292,6 @@ oppia.factory('trainingDataService', ['$rootScope', '$http', 'responsesService',
           _trainingDataCounts.push(unhandledAnswer.count);
         }
         $rootScope.$broadcast('updatedTrainingData');
-        console.debug('Received training data: ', _trainingDataAnswers);
       });
     },
 
