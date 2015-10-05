@@ -67,7 +67,7 @@
 
   <script type="text/ng-template" id="popover/informationCard">
     <md-card class="md-padding">
-      <div ng-style="infoCardBackgroundImage" class="oppia-info-card-logo-thumbnail">
+      <div ng-style="infoCardBackgroundImageCss" class="oppia-info-card-logo-thumbnail">
         <h2 class="oppia-info-card-title"><[explorationCardTitle]></h2>
       </div>
 
@@ -78,24 +78,33 @@
         <p ng-if="!explorationDescription">No objective specified.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
-            <span class="fa fa-star fa-lg"></span><[explorationRatings]></li>
+            <span class="fa fa-star fa-lg"></span>
+            <[explorationRatings]>
+          </li>
           <li>
-            <span class="fa fa-eye fa-lg"></span><[viewsCount | summarizeNumber]></li>
+            <span class="fa fa-eye fa-lg"></span>
+            <[viewersCount | summarizeNonnegativeNumber]>
+          </li>
           <li>
-            <span class="fa fa-clock-o fa-lg"></span><[lastModifiedDate | date: 'MM/dd/yyyy']></li>
+            <span class="fa fa-clock-o fa-lg"></span>
+            <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
+          </li>
           <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
-            <li ng-repeat="contributor in explorationContributors| limitTo: 2"
-              tooltip="<[contributor]>" tooltip-placement="top">
-              <img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt=""></li>
+            <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
+              tooltip="<[ContributorUsername]>" tooltip-placement="top">
+              <img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt="">
+            </li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
             
-            <li ng-if='explorationContributors.length > 2' class="oppia-contributors-more-circle"
-              tooltip-append-to-body=true tooltip="<[explorationContributors.slice(2).join()]>"
-              tooltip-placement="top">+<[explorationContributors.length - 2]></li>
-            <li ng-if='explorationContributors.length < 1' tooltip="public" tooltip-placement="top">
-              <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span></li>
+            <li ng-if='explorationContributorUsernames.length > 2' class="oppia-contributors-more-circle"
+              tooltip-append-to-body=true tooltip="<[explorationContributorUsernames.slice(2).join()]>"
+              tooltip-placement="top">+<[explorationContributorUsernames.length - 2]></li>
+            <li ng-if='explorationContributorUsernames.length === 0'
+                tooltip="Community-editable" tooltip-placement="top">
+              <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
+            </li>
           </ul>
         </ul>
         <div class="oppia-info-card-bottom-row" layout="row">
@@ -108,19 +117,14 @@
                    tooltip-placement="right">
                     <[explorationTags.length - 2]>+ more tags</md-chip>
                   <md-chip><[explorationTags.slice(0,2).join()]></md-chip>
-                  <md-chip ng-if="explorationTags.length < 1">This exploration has no tags<md-chip>
+                  <md-chip ng-if="explorationTags.length === 0">This exploration has no tags<md-chip>
               </md-chips>
             </md-content>
           </div>
           <div flex="45">
             <ul layout="row" layout-align="end center">
-              <li>
-                <a href="" ng-click="showEmbedExplorationModal(explorationId)">
-                  <img src="/third_party/static/material-design-icons-1.0.1/ic_share_black_48dp.png">
-                </a>
-              </li>
 
-              {% if SHARING_OPTIONS['gplus'] %}
+            {% if SHARING_OPTIONS['gplus'] %}
                 <li>
                   <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" target="_window">
                     <img src="/images/general/gplus.png" alt="Google+">

@@ -35,7 +35,7 @@ describe('Testing filters', function() {
     'convertToPlainText',
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
-    'summarizeNumber',
+    'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
   ];
 
@@ -185,7 +185,7 @@ describe('Testing filters', function() {
 
   it('should summarize large number to maximum of four significant figures and append metrix prefix',
        inject(function($filter) {
-    var filter = $filter('summarizeNumber');
+    var filter = $filter('summarizeNonnegativeNumber');
 
     expect(filter(100)).toEqual(100);
     expect(filter(1720)).toEqual('1.7K');

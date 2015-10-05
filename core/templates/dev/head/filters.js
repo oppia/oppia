@@ -340,26 +340,28 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
 
 // Filter that summarizes large number to nearly four significant figures and
 // one decimal place also appends metrix prefix(K for Thousands, M for Millions and B for Billions)
-// example 167656 becomes 167.7K
-oppia.filter('summarizeNumber', [function() {
+// example 167656 becomes 167.7K.
+// Users of this filter should ensure that the input is a non-negative number.
+oppia.filter('summarizeNonnegativeNumber', [function() {
   return function (input) {
+    input = Number(input)
     // Nine Zeroes for Billions
-    return Math.abs(Number(input)) >= 1.0e+9
+    return input >= 1.0e+9
     // Example 146008788788 becomes 146.0B
-    ? (Math.abs(Number(input)) / 1.0e+9).toFixed(1) + "B"
+    ? (input / 1.0e+9).toFixed(1) + 'B'
 
     // Six Zeroes for Millions
-    : Math.abs(Number(input)) >= 1.0e+6
+    : input >= 1.0e+6
     // Example 146008788 becomes 146.0M
-    ? (Math.abs(Number(input)) / 1.0e+6).toFixed(1) + "M"
+    ? (input / 1.0e+6).toFixed(1) + 'M'
 
     // Three Zeroes for Thousands
-    : Math.abs(Number(input)) >= 1.0e+3
+    : input >= 1.0e+3
     // Example 146008 becomes 146.0K
-    ? (Math.abs(Number(input)) / 1.0e+3).toFixed(1) + "K"
+    ? (input / 1.0e+3).toFixed(1) + 'K'
     // For small number it should return number as it is
     // Example 12 becomes 12
-    : Math.abs(Number(input));
+    : input;
   };
 }]);
 
