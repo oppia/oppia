@@ -35,8 +35,8 @@ describe('Testing filters', function() {
     'convertToPlainText',
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
-    'appendMetrixPrefix',
-    'formattedObjective',
+    'summarizeNumber',
+    'truncateAndCapitalize',
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -183,8 +183,9 @@ describe('Testing filters', function() {
     expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
   }));
 
-  it('should append metrix prefix  to large  number ', inject(function($filter) {
-    var filter = $filter('appendMetrixPrefix');
+  it('should summarize large number to maximum of four significant figures and append metrix prefix',
+       inject(function($filter) {
+    var filter = $filter('summarizeNumber');
 
     expect(filter(100)).toEqual(100);
     expect(filter(1720)).toEqual('1.7K');
@@ -196,8 +197,8 @@ describe('Testing filters', function() {
 
   }));
 
-  it('should capitalize first letter and trancate objective ', inject(function($filter) {
-    var filter = $filter('formattedObjective');
+  it('should capitalize first letter and truncate string ', inject(function($filter) {
+    var filter = $filter('truncateAndCapitalize');
 
     expect(filter('remove New line', 4)).toEqual('Remo...');
     // If maximum number of character are not specified

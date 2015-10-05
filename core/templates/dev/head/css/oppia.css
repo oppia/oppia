@@ -428,7 +428,6 @@ textarea {
 }
 
 .oppia-navbar-breadcrumb-icon {
-  cursor: pointer;
   height: 20px;
   margin: 0 12px 4px 12px;
   width: 20px;
@@ -2166,7 +2165,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-information-card-title {
+.oppia-info-card-title {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -2175,7 +2174,7 @@ md-card.preview-conversation-skin-supplemental-card {
   position:absolute;
 }
 
-.oppia-information-card-logo-thumbnail {
+.oppia-info-card-logo-thumbnail {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -2184,11 +2183,11 @@ md-card.preview-conversation-skin-supplemental-card {
   position: relative; 
 }
 
-.oppia-information-card-content {
+.oppia-info-card-content {
   padding: 10px 20px 10px 20px;
 }
 
-.oppia-information-card-content p {
+.oppia-info-card-content p {
   display: block;
   font-size: 1.0em;
   line-height: 1;
@@ -2197,18 +2196,23 @@ md-card.preview-conversation-skin-supplemental-card {
   word-spacing: 0; 
 }
 
-.oppia-information-card-content .card-metrics {
+.oppia-info-card-content .card-metrics {
   margin-top: 10px;
   padding: 0;
 }
 
-.oppia-information-card-content .card-metrics li {
+.oppia-info-card-content .card-metrics li {
   font-size: 14px;
   list-style-type: none;
   text-align: center;
 }
 
-.oppia-information-card-content .card-metrics ul img {
+.oppia-info-card-content .card-metrics li .fa {
+  font-size: 24px;
+  margin-right: 5px;
+}
+
+.oppia-info-card-content .card-metrics ul img {
   height: 24px;
   margin-right: 2px;
   width: 24px;
@@ -2224,23 +2228,29 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 24px;
 }
 
-.oppia-information-card-content .card-metrics li .fa {
-  font-size: 24px;
-  margin-right: 5px;
-}
-
-.oppia-social-media-and-tags {
+.oppia-info-card-bottom-row {
   margin-top: 20px
 }
 
-.oppia-social-media-and-tags md-chips md-chip {
+.oppia-info-card-bottom-row md-chips md-chip {
   font-size: 12px;
   line-height: 1em;
   margin: 0;
   padding: 0;
 }
 
-.oppia-information-card-tooltip-more {
+.oppia-info-card-bottom-row ul li {
+  list-style-type: none;
+}
+
+.oppia-info-card-bottom-row ul li a img {
+  border-radius: 2px;
+  height: 20px;
+  margin: 3px;
+  width: 20px;
+}
+
+.oppia-info-card-tooltip-more {
   color: blue;
 }
 
@@ -2250,26 +2260,15 @@ md-card.preview-conversation-skin-supplemental-card {
   max-width: 420px;
 }
 
-.oppia-tag-icon {
+.oppia-info-card-tag-icon {
   padding-top: 6px;
   width: 28px;
 }
 
-.oppia-social-media-and-tags ul li {
-  list-style-type: none;
-}
-
-.oppia-social-media-and-tags ul li a img {
-  border-radius: 2px;
-  height: 20px;
-  margin: 3px;
-  width: 20px;
-}
-
-.oppia-exploration-contributors-profile {
+.oppia-info-card-exploration-contributors-profile {
   padding: 0;
 }
 
-.oppia-public-owned-icon {
+.oppia-info-card-community-editable-icon {
   color: #009688;
 }

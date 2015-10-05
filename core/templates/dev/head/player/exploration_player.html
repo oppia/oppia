@@ -24,7 +24,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom">
+    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
       <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon">
     </li>
   </ul>
@@ -67,23 +67,23 @@
 
   <script type="text/ng-template" id="popover/informationCard">
     <md-card class="md-padding">
-      <div ng-style="infoCardBackgroundImage" class="oppia-information-card-logo-thumbnail">
-        <h2 class="oppia-information-card-title"><[explorationCardTitle]></h2>
+      <div ng-style="infoCardBackgroundImage" class="oppia-info-card-logo-thumbnail">
+        <h2 class="oppia-info-card-title"><[explorationCardTitle]></h2>
       </div>
 
-      <div class="oppia-information-card-content">
+      <div class="oppia-info-card-content">
         <p ng-if="explorationDescription">
-          <[explorationDescription | formattedObjective: 95]>
+          <[explorationDescription | truncateAndCapitalize: 95]>
         </p>
         <p ng-if="!explorationDescription">No objective specified.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
             <span class="fa fa-star fa-lg"></span><[explorationRatings]></li>
           <li>
-            <span class="fa fa-eye fa-lg"></span><[viewsCount | appendMetrixPrefix]></li>
+            <span class="fa fa-eye fa-lg"></span><[viewsCount | summarizeNumber]></li>
           <li>
             <span class="fa fa-clock-o fa-lg"></span><[lastModifiedDate | date: 'MM/dd/yyyy']></li>
-          <ul layout="row" layout-align="space-between center" class="oppia-exploration-contributors-profile">
+          <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
             <li ng-repeat="contributor in explorationContributors| limitTo: 2"
               tooltip="<[contributor]>" tooltip-placement="top">
@@ -94,16 +94,16 @@
             <li ng-if='explorationContributors.length > 2' class="oppia-contributors-more-circle"
               tooltip-append-to-body=true tooltip="<[explorationContributors.slice(2).join()]>"
               tooltip-placement="top">+<[explorationContributors.length - 2]></li>
-            <li ng-if='explorationContributors.length < 1' tooltip="public"
-              tooltip-placement="top"><span class="fa fa-globe fa-lg oppia-public-owned-icon"></span></li>
+            <li ng-if='explorationContributors.length < 1' tooltip="public" tooltip-placement="top">
+              <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span></li>
           </ul>
         </ul>
-        <div class="oppia-social-media-and-tags" layout="row">
+        <div class="oppia-info-card-bottom-row" layout="row">
           <div flex="55">
             <md-content layout="row">
-              <div class="oppia-tag-icon"><span class="fa fa-tags fa-lg"></span></div>
+              <div class="oppia-info-card-tag-icon"><span class="fa fa-tags fa-lg"></span></div>
               <md-chips layout-align="center center">
-                  <md-chip ng-if='explorationTags.length > 2' class="oppia-information-card-tooltip-more"
+                  <md-chip ng-if='explorationTags.length > 2' class="oppia-info-card-tooltip-more"
                    tooltip-append-to-body=true tooltip="<[explorationTags.slice(2).join()]>"
                    tooltip-placement="right">
                     <[explorationTags.length - 2]>+ more tags</md-chip>
