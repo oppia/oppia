@@ -49,21 +49,39 @@ oppia.constant('SUPPORTED_LANGUAGES', {
 });
 
 oppia.controller('I18nFooter', [
-    '$scope', '$translate', 'SUPPORTED_LANGUAGES',
-    function($scope, $translate, SUPPORTED_LANGUAGES) {
+    '$rootScope', '$scope', '$translate', 'SUPPORTED_LANGUAGES',
+    function($rootScope, $scope, $translate, SUPPORTED_LANGUAGES) {
   $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   // Changes the language of the translations.
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
+  // After loading default translations, change the language for the storaged
+  // language if necessary
+  $rootScope.$on('$translateLoadingSuccess', function (event, args) {
+    var currentLang = $translate.proposedLanguage() || $translate.use();
+    $translate.use(currentLang);
+  });
 }]);
 
 oppia.config([
-    '$translateProvider',
-    function($translateProvider) {
+    '$translateProvider', 'SUPPORTED_LANGUAGES',
+    function($translateProvider, SUPPORTED_LANGUAGES) {
+  var availableLanguageKeys = [];
+  var availableLanguageKeysMap = {};
+  for (var prop in SUPPORTED_LANGUAGES) {
+    availableLanguageKeys.push(prop);
+    availableLanguageKeysMap[prop + '*'] = prop;
+  };
+  availableLanguageKeysMap['*'] = 'en';
+  $translateProvider.registerAvailableLanguageKeys(
+    availableLanguageKeys, availableLanguageKeysMap);
+
   $translateProvider.translations('en', defaultTranslations);
-  $translateProvider.preferredLanguage('en');
   $translateProvider.fallbackLanguage('en');
+
+  $translateProvider.determinePreferredLanguage();
+  $translateProvider.useCookieStorage();
 
   $translateProvider.useLoader('$translatePartialLoader', {
     urlTemplate: '/i18n/{part}/{lang}.json'

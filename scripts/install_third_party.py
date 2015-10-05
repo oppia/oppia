@@ -102,6 +102,9 @@ def download_and_unzip_files(
                 z.extractall(target_parent_dir)
 
         # Rename the target directory.
+        print os.path.join(target_parent_dir, zip_root_name)
+        print os.path.join(target_parent_dir, target_root_name)
+        print os.listdir(target_parent_dir)
         os.rename(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))
@@ -299,6 +302,27 @@ BOWER_ANGULAR_TRANSLATE_LOADER_PARTIAL_ZIP_ROOT_NAME = (
 BOWER_ANGULAR_TRANSLATE_LOADER_PARTIAL_TARGET_ROOT_NAME = (
     BOWER_ANGULAR_TRANSLATE_LOADER_PARTIAL_ROOT_NAME)
 
+BOWER_ANGULAR_COOKIES_REV = '1.3.6'
+BOWER_ANGULAR_COOKIES_ROOT_NAME = (
+    'bower-angular-cookies-%s' % BOWER_ANGULAR_COOKIES_REV)
+BOWER_ANGULAR_COOKIES_ZIP_URL = (
+    'https://api.github.com/repos/angular/bower-angular-cookies/zipball/v%s'
+    % BOWER_ANGULAR_COOKIES_REV)
+BOWER_ANGULAR_COOKIES_ZIP_ROOT_NAME = ('angular-bower-angular-cookies-0c6a2fe')
+BOWER_ANGULAR_COOKIES_TARGET_ROOT_NAME = BOWER_ANGULAR_COOKIES_ROOT_NAME
+
+BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_REV = '2.8.1'
+BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ROOT_NAME = (
+    'bower-angular-translate-storage-cookie-%s' %
+    BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_REV)
+BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ZIP_URL = (
+    'https://github.com/PascalPrecht/bower-angular-translate-storage-cookie/archive/%s.zip'
+    % BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_REV)
+BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ZIP_ROOT_NAME = (
+    BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ROOT_NAME)
+BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_TARGET_ROOT_NAME = (
+    BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ROOT_NAME)
+
 HAMMER_JS_REV = '2.0.4'
 HAMMER_JS_ROOT_NAME = 'hammer.js-%s' % HAMMER_JS_REV
 HAMMER_JS_ZIP_URL = (
@@ -405,6 +429,16 @@ download_and_unzip_files(
     THIRD_PARTY_STATIC_DIR,
     BOWER_ANGULAR_TRANSLATE_LOADER_PARTIAL_ZIP_ROOT_NAME,
     BOWER_ANGULAR_TRANSLATE_LOADER_PARTIAL_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    BOWER_ANGULAR_COOKIES_ZIP_URL,
+    THIRD_PARTY_STATIC_DIR,
+    BOWER_ANGULAR_COOKIES_ZIP_ROOT_NAME,
+    BOWER_ANGULAR_COOKIES_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ZIP_URL,
+    THIRD_PARTY_STATIC_DIR,
+    BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_ZIP_ROOT_NAME,
+    BOWER_ANGULAR_TRANSLATE_STORAGE_COOKIE_TARGET_ROOT_NAME)
 download_and_unzip_files(
     HAMMER_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     HAMMER_JS_ZIP_ROOT_NAME, HAMMER_JS_TARGET_ROOT_NAME)

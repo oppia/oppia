@@ -80,7 +80,11 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
-    browserName: 'chrome'
+    browserName: 'chrome',
+    chromeOptions: {
+      args: [ 'lang=en-EN' ],
+      prefs: {intl: { accept_languages: "en-EN" }},
+    },
   },
 
   // If you would like to run more than one instance of webdriver on the same

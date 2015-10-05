@@ -162,6 +162,7 @@ describe('Gallery view', function() {
     users.logout();
 
     browser.get('/gallery');
+    expect(browser.getTitle()).toEqual('Gallery - Oppia');
     general.ensurePageHasNoTranslationIds();
 
     // Filter gallery explorations
