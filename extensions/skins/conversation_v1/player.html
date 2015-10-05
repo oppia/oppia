@@ -113,8 +113,10 @@
                   </div>
                 </div>
                 <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_INTERACTION)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
-                  (<[activeCard.interactionInstructions]>)
-                  <i class="zmdi zmdi-arrow-right"></i>
+                  <button style="background: inherit; border: none;">
+                    (<[activeCard.interactionInstructions]>)
+                    <i class="zmdi zmdi-arrow-right"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -273,7 +275,8 @@
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
         ng-click="decrementCurrentDotIndex()">
-      <span class=" glyphicon glyphicon-arrow-left">
+      <span class="sr-only">Back</span>
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">
       </span>
     </li>
     <li ng-repeat="dot in dots track by $index"
@@ -294,7 +297,8 @@
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
         ng-click="incrementCurrentDotIndex()">
-      <span class=" glyphicon glyphicon-arrow-right">
+      <span class="sr-only">Forward</span>
+      <span class=" glyphicon glyphicon-arrow-right" aria-hidden="true">
       </span>
     </li>
   </ul>
