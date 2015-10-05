@@ -67,21 +67,21 @@ class StringClassifier(object):
         """Returns a word's id if it exists, otherwise assigns
         a new id to the word and returns it."""
         if word not in self._word_to_id:
-            self._word_to_id[word] = self._word_count
-            self._word_count += 1
+            self._word_to_id[word] = self._num_words
+            self._num_words += 1
         return self._word_to_id[word]
 
     def _get_label_id(self, label):
         """Returns a label's id if it exists, otherwise assigns
         a new id to the label and returns it."""
         if label not in self._label_to_id:
-            self._label_to_id[label] = self._label_count
-            self._label_count += 1
+            self._label_to_id[label] = self._num_labels
+            self._num_labels += 1
         return self._label_to_id[label]
 
-    def _get_record(self, doc_id):
+    def _get_record(self, d):
         """Given a doc id, return the doc and labels."""
-        return self._w_dp[doc_id], self._b_dl[doc_id]
+        return self._w_dp[d], self._b_dl[d]
 
     def _get_label_vector(self, labels):
         """Returns a vector specifying which labels
@@ -89,8 +89,8 @@ class StringClassifier(object):
         # When we see an empty label list, predicting on all labels
         # is assumed (versus having to pass all the labels each prediction)
         if len(labels) == 0:
-            return numpy.ones(self._label_count)
-        label_vector = numpy.zeros(self._label_count)
+            return numpy.ones(self._num_labels)
+        label_vector = numpy.zeros(self._num_labels)
         for label in labels:
             label_vector[self._get_label_id(label)] = 1
         # Always set default label
@@ -107,7 +107,7 @@ class StringClassifier(object):
 
     def _get_doc_ids(self, doc_ids):
         if doc_ids is None:
-            doc_ids = xrange(self._doc_count)
+            doc_ids = xrange(self._num_docs)
         return doc_ids
 
     def _init_docs(self, doc_ids=None):
@@ -135,16 +135,16 @@ class StringClassifier(object):
 
         for d in doc_ids:
             doc, labels = self._get_record(d)
-            for c, w in enumerate(doc):
-                l = self._l_dp[d][c]
+            for p, w in enumerate(doc):
+                l = self._l_dp[d][p]
 
                 self._update_counting_matrices(d, w, l, False)
 
                 # Gibbs update of labels
                 coeff_a = 1.0 / (
-                    self._c_dl[d].sum() + self._label_count * self._alpha)
+                    self._c_dl[d].sum() + self._num_labels * self._alpha)
                 coeff_b = 1.0 / (
-                    self._c_lw.sum(axis=1) + self._word_count * self._beta)
+                    self._c_lw.sum(axis=1) + self._num_words * self._beta)
                 prob_l = (
                     labels *
                     coeff_a * (self._c_dl[d] + self._alpha) *
@@ -156,7 +156,7 @@ class StringClassifier(object):
                 if l != new_l:
                     statez['updates'] += 1
 
-                self._l_dp[d][c] = new_l
+                self._l_dp[d][p] = new_l
                 self._update_counting_matrices(d, w, new_l)
 
         return statez
@@ -228,23 +228,23 @@ class StringClassifier(object):
             [self._DEFAULT_LABEL] +
             [label for labels in labels_list for label in labels])
 
-        self._label_count = len(label_set)
-        self._label_to_id = dict(zip(label_set, xrange(self._label_count)))
+        self._num_labels = len(label_set)
+        self._label_to_id = dict(zip(label_set, xrange(self._num_labels)))
 
-        self._word_count = 0
+        self._num_words = 0
         self._word_to_id = {}
 
-        self._doc_count = len(docs)
+        self._num_docs = len(docs)
 
         self._b_dl = numpy.array(
             map(self._get_label_vector, labels_list), dtype=int)
         self._w_dp = [map(self._get_word_id, doc) for doc in docs]
         self._l_dp = []
         self._c_dl = numpy.zeros(
-            (self._doc_count, self._label_count), dtype=int)
+            (self._num_docs, self._num_labels), dtype=int)
         self._c_lw = numpy.zeros(
-            (self._label_count, self._word_count), dtype=int)
-        self._c_l = numpy.zeros(self._label_count, dtype=int)
+            (self._num_labels, self._num_words), dtype=int)
+        self._c_l = numpy.zeros(self._num_labels, dtype=int)
 
         self._init_docs()
         self._train_docs(iterations)
@@ -255,18 +255,18 @@ class StringClassifier(object):
         Returns the doc ids of examples added, in the same order."""
         docs, labels_list = self._parse_examples(examples)
 
-        last_label_count = self._label_count
-        last_doc_count = self._doc_count
-        last_word_count = self._word_count
+        last_num_labels = self._num_labels
+        last_num_docs = self._num_docs
+        last_num_words = self._num_words
 
-        # Increments _label_count with any new labels
+        # Increments _num_labels with any new labels
         [map(self._get_label_id, labels) for labels in labels_list]
-        self._doc_count += len(docs)
+        self._num_docs += len(docs)
 
         if len(examples) > 0:
             self._b_dl = numpy.concatenate(
                 (self._b_dl, numpy.zeros(
-                    (last_doc_count, self._label_count - last_label_count),
+                    (last_num_docs, self._num_labels - last_num_labels),
                     dtype=int)), axis=1)
             self._b_dl = numpy.concatenate(
                 (self._b_dl, [
@@ -275,29 +275,29 @@ class StringClassifier(object):
             self._w_dp.extend([map(self._get_word_id, doc) for doc in docs])
             self._c_dl = numpy.concatenate(
                 (self._c_dl, numpy.zeros(
-                    (last_doc_count, self._label_count - last_label_count),
+                    (last_num_docs, self._num_labels - last_num_labels),
                     dtype=int)), axis=1)
             self._c_dl = numpy.concatenate(
                 (self._c_dl, numpy.zeros(
-                    (self._doc_count - last_doc_count, self._label_count),
+                    (self._num_docs - last_num_docs, self._num_labels),
                     dtype=int)), axis=0)
             self._c_lw = numpy.concatenate(
                 (self._c_lw, numpy.zeros(
-                    (last_label_count, self._word_count - last_word_count),
+                    (last_num_labels, self._num_words - last_num_words),
                     dtype=int)), axis=1)
             self._c_lw = numpy.concatenate(
                 (self._c_lw, numpy.zeros(
-                    (self._label_count - last_label_count, self._word_count),
+                    (self._num_labels - last_num_labels, self._num_words),
                     dtype=int)), axis=0)
             self._c_l = numpy.concatenate(
                 (self._c_l, numpy.zeros(
-                    self._label_count - last_label_count, dtype=int)))
+                    self._num_labels - last_num_labels, dtype=int)))
 
-        for d in xrange(last_doc_count, self._doc_count):
+        for d in xrange(last_num_docs, self._num_docs):
             self._init_docs([d])
             self._train_docs(iterations, [d])
 
-        return xrange(last_doc_count, self._doc_count)
+        return xrange(last_num_docs, self._num_docs)
 
     def predict_label(self, d, threshold=0.5):
         """Calculates predicted label for a doc."""
@@ -308,9 +308,9 @@ class StringClassifier(object):
         model = {}
         model['_alpha'] = copy.deepcopy(self._alpha)
         model['_beta'] = copy.deepcopy(self._beta)
-        model['_label_count'] = copy.deepcopy(self._label_count)
-        model['_doc_count'] = copy.deepcopy(self._doc_count)
-        model['_word_count'] = copy.deepcopy(self._word_count)
+        model['_num_labels'] = copy.deepcopy(self._num_labels)
+        model['_num_docs'] = copy.deepcopy(self._num_docs)
+        model['_num_words'] = copy.deepcopy(self._num_words)
         model['_label_to_id'] = copy.deepcopy(self._label_to_id)
         model['_word_to_id'] = copy.deepcopy(self._word_to_id)
         model['_w_dp'] = copy.deepcopy(self._w_dp)
@@ -325,9 +325,9 @@ class StringClassifier(object):
         """Converts a dict model into a classifier."""
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
-        self._label_count = copy.deepcopy(model['_label_count'])
-        self._doc_count = copy.deepcopy(model['_doc_count'])
-        self._word_count = copy.deepcopy(model['_word_count'])
+        self._num_labels = copy.deepcopy(model['_num_labels'])
+        self._num_docs = copy.deepcopy(model['_num_docs'])
+        self._num_words = copy.deepcopy(model['_num_words'])
         self._label_to_id = copy.deepcopy(model['_label_to_id'])
         self._word_to_id = copy.deepcopy(model['_word_to_id'])
         self._w_dp = copy.deepcopy(model['_w_dp'])
