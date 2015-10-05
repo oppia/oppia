@@ -2180,10 +2180,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-gadget-edit-icon {
   color: #636363;
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 80%;
+  right: 20px;
+  top: 4px;
 }
 
 .oppia-gadget-content {

@@ -10,39 +10,23 @@
       <div class="oppia-visible-gadgets-container">
         <div ng-repeat="gadgetName in panelContents"
              ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) > -1">
-          <!--
-          REFACTORING(anuzis): Ensure edit and delete icons show up for each gadget listed.
-          REFACTORING(anuzis): use http://getbootstrap.com/css/#tables-striped per row.
-          <span title="Delete <[gadgetName]>" ng-click="deleteGadget(gadgetName)"
-                class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
-          </span>
-          <span title="Rename <[gadgetName]>"
-                ng-click="changeActiveGadgetNameEditor(gadgetName)"
-                class="glyphicon glyphicon-pencil oppia-gadget-rename-icon protractor-test-rename-<[gadgetName]>-gadget-icon">
-          </span>
-          <span ng-show="originalNameForRenamedGadget == gadgetName"
-                class="oppia-rename-gadget-form">
-            <input type="text" ng-model="newNameForRenamedGadget" class="protractor-test-gadget-rename-text-input">
-            <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
-                    ng-click="renameGadget(newNameForRenamedGadget)">
-            </button>
-            <button class="btn btn-xs glyphicon glyphicon-remove"
-                    ng-click="changeActiveGadgetNameEditor()">
-            </button>
-          </span>
-          -->
-          <div class="oppia-gadget-list-container protractor-test-edit-<[gadgetName]>-gadget" title="Edit <[gadgetName]>"
-               ng-click="editGadget(gadgetName)">
+          <div class="oppia-gadget-list-container" ng-click="editGadget(gadgetName)">
             <oppia-gadget-list-item
-              gadget-type="gadgets[gadgetName].gadget_type"
+              gadget-short-description="GADGET_SPECS[gadgets[gadgetName].gadget_type].short_description"
               gadget-name="gadgetName" style="pointer-events: none;"
-              class="protractor-test-<[gadgetName]>-gadget"
+              class="protractor-test-<[gadgetName]>-gadget">
             </oppia-gadget-list-item>
-            <!--
-            <span title="Edit Gadget Content"
-                  class="glyphicon glyphicon-edit oppia-gadget-edit-icon">
+          </div>
+          <!-- TODO(anuzis): Update CSS for Edit and Delete buttons to not overlay each other...
+          Mirroring the parameter panel's CSS pattern doesn't quite work. Specifically, adding the
+          following classes to the surrounding div: class="col-lg-4 col-md-4 col-sm-4".
+          Additionally, editing gadget icon CSS directly continues to render on a shared point. -->
+          <div>
+            <span title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
+              class="glyphicon glyphicon-pencil oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">
             </span>
-            -->
+            <span title="Delete Gadget (<[gadgetName]>)" ng-click="deleteGadget(gadgetName)" class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
+            </span>
           </div>
         </div>
       </div>
@@ -60,9 +44,24 @@
     <h3 ng-if="!gadgetDict.gadget_type">
       Add a gadget
     </h3>
-    <h3 ng-if="gadgetDict.gadget_type">
-      Customize Gadget (<[gadgetDict.gadget_name]>)
-    </h3>
+    <div ng-if="gadgetDict.gadget_type">
+      <strong style="font-size:1.2em;">
+        <[gadgetDict.gadget_type]>
+        <span class="protractor-test-open-gadget-name-editor" ng-show="!SHOW_GADGET_NAME_EDITOR" ng-click="openGadgetNameEditor()">
+          (<[gadgetDict.gadget_name]>)
+          <span class="glyphicon glyphicon-pencil" title="Edit Gadget Name"></span>
+        </span>
+      </strong>
+      <span ng-show="SHOW_GADGET_NAME_EDITOR" class="oppia-rename-gadget-form">
+        <input type="text" ng-model="newNameForRenamedGadget" class="protractor-test-gadget-rename-text-input">
+        <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
+                ng-click="renameGadget(newNameForRenamedGadget)">
+        </button>
+        <button class="btn btn-xs glyphicon glyphicon-remove protractor-test-cancel-gadget-name-editor"
+                ng-click="cancelGadgetNameEditor()">
+        </button>
+      </span>
+    </div>
   </div>
   <div class="modal-body">
     <div ng-if="!gadgetDict.gadget_type" ng-cloak>

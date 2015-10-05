@@ -970,10 +970,10 @@ oppia.factory('stateCustomizationArgsService', [
 oppia.factory('explorationGadgetsService', [
     '$log', '$modal', '$filter', '$location', '$rootScope',
     'changeListService', 'editorContextService', 'warningsData',
-    'gadgetValidationService',
+    'gadgetValidationService', 'GADGET_SPECS',
     function($log, $modal, $filter, $location, $rootScope,
              changeListService, editorContextService, warningsData,
-             gadgetValidationService) {
+             gadgetValidationService, GADGET_SPECS) {
   // _gadgets is a JS object with gadget_instance.name strings as keys
   // and each gadget_instance's data as values.
   var _gadgets = null;
@@ -992,10 +992,10 @@ oppia.factory('explorationGadgetsService', [
   };
 
   var _generateUniqueGadgetName = function(gadgetType) {
-    if (!_gadgets.hasOwnProperty(gadgetType)) {
-      return gadgetType;
+    var baseGadgetName = GADGET_SPECS[gadgetType].short_description;
+    if (!_gadgets.hasOwnProperty(baseGadgetName)) {
+      return baseGadgetName;
     } else {
-      var baseGadgetName = gadgetType;
       var uniqueInteger = 2;
       var generatedGadgetName = baseGadgetName + uniqueInteger;
       while (_gadgets.hasOwnProperty(generatedGadgetName)) {

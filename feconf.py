@@ -310,7 +310,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 
-# Advanced feature in development.
+# Advanced feature.
 SHOW_GADGETS_EDITOR = False
 
 # Unlaunched feature.

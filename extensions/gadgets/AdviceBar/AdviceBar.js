@@ -31,7 +31,6 @@ oppia.directive('oppiaGadgetAdviceBar', [
       restrict: 'E',
       templateUrl: 'gadget/AdviceBar',
       controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
-        $scope.adviceBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj($attrs.adviceObjectsWithValue);
 
         $scope.overlayAdviceModal = function(adviceResourceIndex) {

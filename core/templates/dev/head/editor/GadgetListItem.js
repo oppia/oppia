@@ -22,18 +22,26 @@
   return {
     restrict: 'E',
     scope: {
-      gadgetType: '&',
+      gadgetShortDescription: '&',
       gadgetName: '&'
     },
     templateUrl: 'editor/gadgetListItem',
     controller: [
         '$scope', '$filter', function($scope, $filter) {
 
+      // A gadget list item shows the gadget's short description by default.
+      // If a gadget has been renamed or if multiple gadgets of the same type
+      // exist the gadget's name is shown in parenthesis following it's
+      // description.
+      //
+      // Examples:
+      // 'Score Bar'                    // Gadget with default name
+      // 'Score Bar (Current Score)'    // Gadget renamed to 'Current Score'
       $scope.gadgetListItemHtml = function() {
-        if ($scope.gadgetType() == $scope.gadgetName()) {
-          return $scope.gadgetName();
+        if ($scope.gadgetShortDescription() == $scope.gadgetName()) {
+          return $scope.gadgetShortDescription();
         } else {
-          return $scope.gadgetType() + ' (' + $scope.gadgetName() + ')';
+          return $scope.gadgetShortDescription() + ' (' + $scope.gadgetName() + ')';
         }
       };
 

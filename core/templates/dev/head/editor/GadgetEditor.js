@@ -25,6 +25,8 @@ oppia.controller('GadgetEditor', [
     function($scope, $modal, $log, editorContextService,
       explorationGadgetsService, GADGET_SPECS) {
 
+  $scope.GADGET_SPECS = GADGET_SPECS;
+
   $scope.$on('gadgetsChangedOrInitialized', function(evt) {
     $scope.refreshGadgetsInfo();
   });
@@ -45,7 +47,7 @@ oppia.controller('GadgetEditor', [
   };
 
   $scope.addNewGadget = function() {
-    // Initializing gadget with default values.
+    // Initializing gadgetData with required keys.
     var gadgetData = {
       gadget_type: '',
       gadget_name: '',
@@ -69,34 +71,6 @@ oppia.controller('GadgetEditor', [
       explorationGadgetsService.updateGadget(
         gadgetName, newCustomizationArgs, newVisibleInStates);
     });
-  };
-
-  $scope.renameGadget = function(newGadgetName) {
-    if (!($scope.originalNameForRenamedGadget && newGadgetName)) {
-      $log.info('Data missing to rename gadget. Old name: ' +
-        $scope.originalNameForRenamedGadget + ' New name: ' + newGadgetName);
-    } else if ($scope.originalNameForRenamedGadget != newGadgetName) {
-      explorationGadgetsService.renameGadget(
-        $scope.originalNameForRenamedGadget, newGadgetName);
-    }
-    // hide the editor form;
-    $scope.changeActiveGadgetNameEditor();
-  };
-
-  /**
-   * This displays and hides the gadget name editor form.
-   * @param {string} currentGadgetName The name of the gadget that needs to be
-   *   renamed to display the form. Or null if the form is to be hidden.
-   */
-  $scope.changeActiveGadgetNameEditor = function(currentGadgetName) {
-    // $scope.originalNameForRenamedGadget is null if no gadget is currently
-    // being renamed, otherwise it is set to the original name of the gadget
-    // currently being renamed. At most one gadget can be renamed at a time.
-    // If a new gadget name editor is opened, the previous one is closed and
-    // changes are not saved.
-    var currentGadgetName = currentGadgetName || '';
-    $scope.originalNameForRenamedGadget = currentGadgetName;
-    $scope.newNameForRenamedGadget = currentGadgetName;
   };
 
   /**
@@ -127,6 +101,8 @@ oppia.controller('GadgetEditor', [
 
         $scope.ALLOWED_GADGETS = GLOBALS.ALLOWED_GADGETS;
         $scope.GADGET_SPECS = GADGET_SPECS;
+        $scope.SHOW_GADGET_NAME_EDITOR = false;
+
         var _initializeCustomizationArgs = function(gadgetType) {
           var gadgetSpec = GADGET_SPECS[gadgetType];
           $scope.customizationArgSpecs = gadgetSpec.customization_arg_specs;
@@ -143,6 +119,31 @@ oppia.controller('GadgetEditor', [
           $scope.$broadcast('schemaBasedFormsShown');
           $scope.form = {};
         }
+
+        $scope.renameGadget = function(newGadgetName) {
+          var originalName = $scope.gadgetDict.gadget_name;
+          if (originalName != newGadgetName) {
+            // Record the change.
+            explorationGadgetsService.renameGadget(
+              originalName, newGadgetName);
+            // Update the name's state within the customization modal.
+            $scope.gadgetDict.gadget_name = newGadgetName;
+          }
+          $scope.SHOW_GADGET_NAME_EDITOR = false;
+        };
+
+        $scope.openGadgetNameEditor = function() {
+          $scope.SHOW_GADGET_NAME_EDITOR = true;
+          // Prefill the rename input box with the current name.
+          $scope.newNameForRenamedGadget = $scope.gadgetDict.gadget_name;
+        };
+
+        $scope.cancelGadgetNameEditor = function() {
+          // Clear value.
+          $scope.newNameForRenamedGadget = '';
+          // Hide the editor window.
+          $scope.SHOW_GADGET_NAME_EDITOR = false;
+        };
 
         $scope.gadgetDict = gadgetDict;
         if (gadgetDict.gadget_type) {

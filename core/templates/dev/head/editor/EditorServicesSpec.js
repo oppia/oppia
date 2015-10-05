@@ -208,8 +208,7 @@ describe('Change list service', function() {
         },
         'visible_in_states': ['newState1']
       };
-      var panelName = 'left';
-      cls.addGadget(gadgetDict, panelName);
+      cls.addGadget(gadgetDict);
       expect(cls.getChangeList()).toEqual([
         {
           cmd: 'add_state',
@@ -232,7 +231,6 @@ describe('Change list service', function() {
             },
             'visible_in_states': ['newState1']
           },
-          panel_name: 'left'
         }
       ]);
     });
