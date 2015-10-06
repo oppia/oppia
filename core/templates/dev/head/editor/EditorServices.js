@@ -983,9 +983,9 @@ oppia.factory('explorationGadgetsService', [
   var _panels = null;
 
   var _getPanelNameFromGadgetName = function(gadgetName) {
-    for (var panelName in _panels) {
-      if (_panels[panelName].indexOf(gadgetName) != -1 ) {
-        return panelName;
+    for (var panel in _panels) {
+      if (_panels[panel].indexOf(gadgetName) != -1 ) {
+        return panel;
       }
     }
     $log.info(gadgetName + ' gadget does not exist in any panel.');
@@ -1006,9 +1006,9 @@ oppia.factory('explorationGadgetsService', [
     }
   };
 
-  var _getAllGadgetsInstancesForPanel = function(panelName) {
+  var _getAllGadgetsInstancesForPanel = function(panel) {
     var panelGadgets = [];
-    var gadgetsInCurrentPanel = _panels[panelName];
+    var gadgetsInCurrentPanel = _panels[panel];
     for (var i = 0; i < gadgetsInCurrentPanel.length; i++) {
       panelGadgets.push(_gadgets[gadgetsInCurrentPanel[i]]);
     }
@@ -1020,8 +1020,8 @@ oppia.factory('explorationGadgetsService', [
    * values are lists of gadget instances representing the gadgets visible in
    * that state for the given panel.
    */
-  var _getGadgetsVisibilityMap = function(panelName) {
-    var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panelName);
+  var _getGadgetsVisibilityMap = function(panel) {
+    var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panel);
     var visibilityMap = {};
     for (var i = 0; i < gadgetInstanceList.length; i++) {
       var gadgetInstance = angular.copy(gadgetInstanceList[i]);
@@ -1057,15 +1057,15 @@ oppia.factory('explorationGadgetsService', [
   var _initGadgetsAndPanelsData = function(panelsContents) {
     _panels = {};
     _gadgets = {};
-    for (var panelName in panelsContents) {
-      _panels[panelName] = [];
+    for (var panel in panelsContents) {
+      _panels[panel] = [];
       // Append the name of each gadget instance in the panel.
-      for (var i = 0; i < panelsContents[panelName].length; i++) {
-        _panels[panelName].push(
-          panelsContents[panelName][i].gadget_name
+      for (var i = 0; i < panelsContents[panel].length; i++) {
+        _panels[panel].push(
+          panelsContents[panel][i].gadget_name
         );
-        var gadgetName = panelsContents[panelName][i].gadget_name;
-        _gadgets[gadgetName] = angular.copy(panelsContents[panelName][i]);
+        var gadgetName = panelsContents[panel][i].gadget_name;
+        _gadgets[gadgetName] = angular.copy(panelsContents[panel][i]);
       }
     }
   };
@@ -1080,10 +1080,10 @@ oppia.factory('explorationGadgetsService', [
       }
       _initGadgetsAndPanelsData(skinCustomizationsData.panels_contents);
       var isValid = false;
-      for (var panelName in _panels) {
-        var visibilityMap = _getGadgetsVisibilityMap(panelName);
+      for (var panel in _panels) {
+        var visibilityMap = _getGadgetsVisibilityMap(panel);
         isValid = gadgetValidationService.validatePanel(
-          panelName, visibilityMap);
+          panel, visibilityMap);
         // validatePanel(...) should have added the warning to warningsData.
         if (!isValid) {
           return;

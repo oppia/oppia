@@ -5,7 +5,7 @@
   <span class="glyphicon glyphicon-info-sign" tooltip="These can be reused throughout an exploration." tooltip-placement="bottom" style="font-size: 12px; padding-left: 18px;"></span>
 
   <md-card style="background-color: white; margin: 20px 0px; padding: 10px 10px;" class="md-default-theme">
-    <div ng-repeat="(panelName, panelContents) in panels"
+    <div ng-repeat="(panel, panelContents) in panels"
          class="protractor-test-gadget-editor">
       <div class="oppia-visible-gadgets-container">
         <div ng-repeat="gadgetName in panelContents"
