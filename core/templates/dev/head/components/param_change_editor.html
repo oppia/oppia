@@ -22,7 +22,7 @@
             </value-generator-editor>
             <br>
 
-            <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1" ng-click="commitParamChange(activeItem)">
+            <input class="btn btn-success protractor-test-save-param-change-button" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1" ng-click="commitParamChange(activeItem)">
             <div style="color: red;" aria-live="assertive" ng-if="INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
               The name '<[tmpParamChange.name]>' is reserved. Please choose another name.
             </div>
@@ -59,7 +59,7 @@
   </div>
 
   <div ng-if="isEditable">
-    <button type="button" class="btn btn-default btn-xs" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()">
+    <button type="button" class="btn btn-default btn-xs protractor-test-add-param-button" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()">
       Add parameter change
     </button>
   </div>

@@ -61,6 +61,24 @@ class Registry(object):
         return cls._skins_dict.keys()
 
     @classmethod
+    def get_all_skin_classes(cls):
+        """Get a dict mapping skin ids to skin classes."""
+        if not cls._skins_dict:
+            cls._refresh_registry()
+        return copy.deepcopy(cls._skins_dict)
+
+    @classmethod
+    def get_all_specs(cls):
+        """Get a dict mapping skin ids to their gadget panels properties."""
+        if not cls._skins_dict:
+            cls._refresh_registry()
+        specs_dict = {}
+        classes_dict = cls.get_all_skin_classes()
+        for skin_id in classes_dict:
+            specs_dict[skin_id] = classes_dict[skin_id].panels_properties
+        return specs_dict
+
+    @classmethod
     def get_skin_templates(cls, skin_ids):
         """Returns the concatanated HTML for the given skins.
 
