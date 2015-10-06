@@ -1,24 +1,8 @@
- .gauge {
-   margin: 10px auto 30px;
-   width: 378px;
-   height: 74px;
-   background: url('../images/gauge.png') center no-repeat;
-   font-size: 14px;
-   font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-   position: relative;
- }
-
-.fill {
-  position: relative;
-  left: 15px;
-  top: 33px;
-  width: 345px;
-  height: 7px;
+.scorebar-progressbar {
+  background-color: #9c9ea7;
 }
 
-.title {
-  position: absolute;
-  top: 65px;
-  text-align: center;
-  width: 100%;
+.scorebar-label {
+  color: #eee;
+  white-space:nowrap;
 }

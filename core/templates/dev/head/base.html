@@ -29,7 +29,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="msapplication-config" content="none">
+
+    <!-- Tiles for Internet Explorer. -->
+    <meta name="application-name" content="{{SITE_NAME}}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-square70x70logo" content="{{DOMAIN_URL}}/images/logo/msapplication-tiny.png">
+    <meta name="msapplication-square150x150logo" content="{{DOMAIN_URL}}/images/logo/msapplication-square.png">
+    <meta name="msapplication-wide310x150logo" content="{{DOMAIN_URL}}/images/logo/msapplication-wide.png">
+    <meta name="msapplication-square310x310logo" content="{{DOMAIN_URL}}/images/logo/msapplication-large.png">
+
     <!-- The itemprops are for G+ sharing. -->
     <meta itemprop="name" content="{{meta_name}}">
     <meta itemprop="description" content="{{meta_description}}">
@@ -60,12 +68,12 @@
             null,
           {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
-        EXPLORATION_STATUS_PRIVATE: JSON.parse(
-          '{{EXPLORATION_STATUS_PRIVATE|js_string}}'),
-        EXPLORATION_STATUS_PUBLIC: JSON.parse(
-          '{{EXPLORATION_STATUS_PUBLIC|js_string}}'),
-        EXPLORATION_STATUS_PUBLICIZED: JSON.parse(
-          '{{EXPLORATION_STATUS_PUBLICIZED|js_string}}'),
+        ACTIVITY_STATUS_PRIVATE: JSON.parse(
+          '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
+        ACTIVITY_STATUS_PUBLIC: JSON.parse(
+          '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
+        ACTIVITY_STATUS_PUBLICIZED: JSON.parse(
+          '{{ACTIVITY_STATUS_PUBLICIZED|js_string}}'),
         ALL_LANGUAGE_CODES: JSON.parse(
           '{{ALL_LANGUAGE_CODES|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(

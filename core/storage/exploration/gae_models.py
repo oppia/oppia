@@ -27,11 +27,6 @@ import feconf
 from google.appengine.ext import ndb
 
 
-EXPLORATION_STATUS_PRIVATE = 'private'
-EXPLORATION_STATUS_PUBLIC = 'public'
-EXPLORATION_STATUS_PUBLICIZED = 'publicized'
-
-
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
     pass
@@ -79,9 +74,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     # Schema storing specifications of the contents of any gadget panels,
     # along with associated customizations for each gadget instance.
-    skin_customizations = ndb.JsonProperty(
-        default=feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
-        indexed=False)
+    skin_customizations = ndb.JsonProperty(required=True, indexed=False)
 
     # The version of the states blob schema.
     states_schema_version = ndb.IntegerProperty(
@@ -141,7 +134,7 @@ class ExplorationModel(base_models.VersionedModel):
             post_commit_status=exp_rights.status,
             post_commit_community_owned=exp_rights.community_owned,
             post_commit_is_private=(
-                exp_rights.status == EXPLORATION_STATUS_PRIVATE)
+                exp_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
         ).put_async()
 
 
@@ -186,11 +179,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default=EXPLORATION_STATUS_PRIVATE, indexed=True,
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            EXPLORATION_STATUS_PRIVATE,
-            EXPLORATION_STATUS_PUBLIC,
-            EXPLORATION_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.ACTIVITY_STATUS_PUBLIC,
+            feconf.ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -230,7 +223,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == EXPLORATION_STATUS_PRIVATE)
+                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
 
@@ -336,11 +329,11 @@ class ExpSummaryModel(base_models.BaseModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default=EXPLORATION_STATUS_PRIVATE, indexed=True,
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            EXPLORATION_STATUS_PRIVATE,
-            EXPLORATION_STATUS_PUBLIC,
-            EXPLORATION_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.ACTIVITY_STATUS_PUBLIC,
+            feconf.ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -361,7 +354,7 @@ class ExpSummaryModel(base_models.BaseModel):
     def get_non_private(cls):
         """Returns an iterable with non-private exp summary models."""
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != EXPLORATION_STATUS_PRIVATE
+            ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ExpSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -372,7 +365,7 @@ class ExpSummaryModel(base_models.BaseModel):
         viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == EXPLORATION_STATUS_PRIVATE
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,

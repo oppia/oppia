@@ -302,8 +302,7 @@ SELECT2_TARGET_ROOT_NAME = 'select2-%s' % SELECT2_REV
 
 FONTAWESOME_REV = '4.4.0'
 FONTAWESOME_ZIP_URL = (
-    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' %
-    FONTAWESOME_REV)
+    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' % FONTAWESOME_REV)
 FONTAWESOME_ZIP_ROOT_NAME = 'Font-Awesome-%s' % FONTAWESOME_REV
 FONTAWESOME_TARGET_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
 
