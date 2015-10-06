@@ -186,6 +186,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
     },
+    'Hints': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Hints')
+    },
     'Video': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
