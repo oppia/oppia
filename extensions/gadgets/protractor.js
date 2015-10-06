@@ -22,9 +22,6 @@
  * customizeGadget: a function that receives an element containing the
  *   gadget editor followed by some number of arguments used to customize the
  *   gadget in question (e.g options for the ScoreBar).
- * expectGadgetPreviewDetailsToMatch: a function that receives arguments
- *   describing the way the gadget is expected to look in the editor preview,
- *   which is run in the editor to verify the gadget actually looks this way.
  * expectGadgetDetailsToMatch: a function that receives arguments
  *   describing the way the gadget is expected to look, and is run in the
  *   player to verify the gadget actually looks this way.

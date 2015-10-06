@@ -2153,7 +2153,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 },
                 'gadget_name': 'TestGadget'
             },
-            'panel_name': 'bottom'
+            'panel': 'bottom'
         }
     ]
 
@@ -2210,7 +2210,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 },
                 'gadget_name': 'TestGadget'
             },
-            'panel_name': 'bottom'
+            'panel': 'bottom'
         }, {
             'new_value': [{
                 'type': 'text', 'value': '<p>EDITED CONTENT here 2</p>'

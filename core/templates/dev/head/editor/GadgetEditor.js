@@ -148,7 +148,7 @@ oppia.controller('GadgetEditor', [
         $scope.gadgetDict = gadgetDict;
         if (gadgetDict.gadget_type) {
           _initializeCustomizationArgs(gadgetDict.gadget_type);
-          gadgetDict.panel = GADGET_SPECS[
+          gadgetDict['panel'] = GADGET_SPECS[
             gadgetDict.gadget_type]['panel'];
         }
         // if gadget dict has gadget_type on initialization, we are editing
@@ -187,7 +187,7 @@ oppia.controller('GadgetEditor', [
         };
 
         $scope.save = function() {
-          $scope.gadgetDict.panel = GLOBALS.GADGET_SPECS[
+          $scope.gadgetDict['panel'] = GLOBALS.GADGET_SPECS[
             $scope.gadgetDict.gadget_type]['panel'];
 
           // When adding a new gadget do all the validation to check

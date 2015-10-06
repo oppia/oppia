@@ -10,12 +10,15 @@
       <div class="oppia-visible-gadgets-container">
         <div ng-repeat="gadgetName in panelContents"
              ng-if="gadgets[gadgetName].visible_in_states.indexOf(activeStateName) > -1">
-          <div class="oppia-gadget-list-container" ng-click="editGadget(gadgetName)">
-            <oppia-gadget-list-item
-              gadget-short-description="GADGET_SPECS[gadgets[gadgetName].gadget_type].short_description"
-              gadget-name="gadgetName" style="pointer-events: none;"
-              class="protractor-test-<[gadgetName]>-gadget">
-            </oppia-gadget-list-item>
+          <div class="oppia-gadget-list-container" >
+            <button type="button" style="background: inherit; border: none;"
+                class="protractor-test-<[gadgets[gadgetName].gadget_type]>-list-item"
+                ng-click="editGadget(gadgetName)">
+              <[GADGET_SPECS[gadgets[gadgetName].gadget_type].short_description]>
+              <span ng-show="GADGET_SPECS[gadgets[gadgetName].gadget_type].short_description != gadgetName">
+                (<[gadgetName]>)
+              </span>
+            </button>
             <span title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
               class="glyphicon glyphicon-pencil oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">
             </span>

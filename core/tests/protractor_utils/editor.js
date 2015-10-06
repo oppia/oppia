@@ -272,7 +272,8 @@ var addGadget = function(gadgetType, gadgetName) {
 
 // Callers should ensure that a gadget with currentName exists.
 var renameGadget = function(currentName, newName) {
-  element(by.css('.protractor-test-rename-' + currentName + '-gadget-icon'))
+  openGadgetEditorModal(currentName);
+  element(by.css('.protractor-test-open-gadget-name-editor'))
     .click();
   var gadgetNameInput = element(
     by.css('.protractor-test-gadget-rename-text-input'));
@@ -281,6 +282,7 @@ var renameGadget = function(currentName, newName) {
   });
   element(
     by.css('.protractor-test-gadget-rename-confirmation-button')).click();
+  saveAndCloseGadgetEditorModal();
 };
 
 // Callers should ensure that a gadget with gadgetName exists.
@@ -330,22 +332,22 @@ var disableGadgetVisibilityForState = function(stateName) {
     })
 };
 
-// This can receive additional arguments for the gadget's customizationArgs.
-// Keep in mind this method applies to a gadget preview which may not be
-// fully operational.
-var expectGadgetPreviewToMatch = function(gadgetType, gadgetName) {
-  // Convert additional arguments to an array to send on.
-  var args = [element(
-    by.css('.protractor-test-' + gadgetName + '-gadget'))];
-  for (var i = 2; i < arguments.length; i++) {
-    args.push(arguments[i]);
+// Verifies a gadget's short description and name show up as expected
+// in the gadgets sidebar.
+var expectGadgetListNameToMatch = function(
+    gadgetType, gadgetShortDescription, gadgetName) {
+  var expectedListName;
+  if (gadgetShortDescription == gadgetName) {
+    expectedListName = gadgetName;
+  } else {
+    expectedListName = gadgetShortDescription + ' (' + gadgetName + ')';
   }
-  gadgets.getGadget(gadgetType).
-    expectGadgetPreviewDetailsToMatch.apply(null, args);
+  expect(element(by.css('.protractor-test-' + gadgetType + '-list-item'))
+    .getText()).toBe(expectedListName);
 };
 
-var expectGadgetWithNameDoesNotExist = function(gadgetName) {
-  expect(element.all(by.css('.protractor-test-' + gadgetName + '-gadget'))
+var expectGadgetWithNameDoesNotExist = function(gadgetType, gadgetName) {
+  expect(element.all(by.css('.protractor-test-' + gadgetType + '-list-item'))
     .count()).toBe(0);
 };
 
@@ -1028,7 +1030,7 @@ exports.addGadget = addGadget;
 exports.renameGadget = renameGadget;
 exports.deleteGadget = deleteGadget;
 
-exports.expectGadgetPreviewToMatch = expectGadgetPreviewToMatch;
+exports.expectGadgetListNameToMatch = expectGadgetListNameToMatch;
 exports.expectGadgetWithNameDoesNotExist = expectGadgetWithNameDoesNotExist;
 
 exports.openGadgetEditorModal = openGadgetEditorModal;

@@ -345,7 +345,7 @@ oppia.factory('changeListService', [
       this._addChange({
         cmd: CMD_ADD_GADGET,
         gadget_dict: gadgetData,
-        panel_name: gadgetData['panel']
+        panel: gadgetData['panel']
       });
     },
     /**

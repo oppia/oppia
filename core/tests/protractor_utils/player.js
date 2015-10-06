@@ -58,7 +58,7 @@ var expectGadgetToMatch = function(gadgetType) {
   // Convert additional arguments to an array to send on.
   var args = [element(
     by.css('.protractor-test-' + gadgetType + '-gadget'))];
-  for (var i = 2; i < arguments.length; i++) {
+  for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   gadgets.getGadget(gadgetType).

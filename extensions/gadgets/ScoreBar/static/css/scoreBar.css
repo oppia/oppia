@@ -1,4 +1,8 @@
-.scorebar-name {
+.scorebar-progressbar {
+	background-color: #9c9ea7;
+}
+
+.scorebar-label {
   color: #eee;
   white-space:nowrap;
 }

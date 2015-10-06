@@ -1877,8 +1877,8 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
                 gadget_instance
             )
 
-            panel_name = exploration._get_panel_name_for_gadget('ANewName')
-            self.assertEqual(panel_name, 'bottom')
+            panel = exploration._get_panel_for_gadget('ANewName')
+            self.assertEqual(panel, 'bottom')
 
             exploration.delete_gadget('ANewName')
             exploration.delete_gadget('ATestGadget')
