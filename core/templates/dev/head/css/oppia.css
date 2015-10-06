@@ -2221,10 +2221,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-rename-gadget-form {
   background-color: white;
-  border-bottom: 1px solid gray;
   color: rgba(0, 0, 0, 0.73);
-  height: 55px;
-  margin-bottom: 100%;
+  margin-left: 4px;
   position: absolute;
   z-index: 1;
 }
@@ -2240,6 +2238,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-gadget-list-container {
   cursor: pointer;
   margin-bottom: 5px;
+  position: relative;
 }
 
 .oppia-gadget-name-panel,
@@ -2249,8 +2248,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-gadget-state-visibility-panel {
-  border-bottom: 1px solid gray;
-  margin-bottom: 10px;
   /* To clear the float */
   overflow: auto;
   width: 100%;

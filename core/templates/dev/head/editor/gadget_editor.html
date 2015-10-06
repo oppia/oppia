@@ -16,12 +16,6 @@
               gadget-name="gadgetName" style="pointer-events: none;"
               class="protractor-test-<[gadgetName]>-gadget">
             </oppia-gadget-list-item>
-          </div>
-          <!-- TODO(anuzis): Update CSS for Edit and Delete buttons to not overlay each other...
-          Mirroring the parameter panel's CSS pattern doesn't quite work. Specifically, adding the
-          following classes to the surrounding div: class="col-lg-4 col-md-4 col-sm-4".
-          Additionally, editing gadget icon CSS directly continues to render on a shared point. -->
-          <div>
             <span title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
               class="glyphicon glyphicon-pencil oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">
             </span>
