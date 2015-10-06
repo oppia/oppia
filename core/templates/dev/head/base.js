@@ -18,6 +18,53 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.constant('CATEGORY_LIST', [
+  'Architecture',
+  'Art',
+  'Biology',
+  'Business',
+  'Chemistry',
+  'Computing',
+  'Economics',
+  'Education',
+  'Engineering',
+  'Environment',
+  'Geography',
+  'Government',
+  'Hobbies',
+  'Languages',
+  'Law',
+  'Life Skills',
+  'Mathematics',
+  'Medicine',
+  'Music',
+  'Philosophy',
+  'Physics',
+  'Programming',
+  'Psychology',
+  'Puzzles',
+  'Reading',
+  'Religion',
+  'Sport',
+  'Statistics',
+  'Welcome'
+]);
+
+// We use a slash because this character is forbidden in a state name.
+oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
+
+oppia.constant('DEFAULT_RULE_NAME', 'Default');
+
+oppia.constant('FUZZY_RULE_TYPE', 'FuzzyMatches');
+
+oppia.constant('DEFAULT_FUZZY_RULE', {
+  'rule_type': 'FuzzyMatches',
+  'inputs': {
+    'training_data': []
+  }
+})
+
+oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
 // Global utility methods.
 oppia.controller('Base', [
@@ -33,17 +80,19 @@ oppia.controller('Base', [
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
 
-  // Show the number of unseen notifications in the navbar and page title,
-  // unless the user is already on the dashboard page.
-  $http.get('/notificationshandler').success(function(data) {
-    if ($window.location.pathname !== '/') {
-      $scope.numUnseenNotifications = data.num_unseen_notifications;
-      if ($scope.numUnseenNotifications > 0) {
-        $window.document.title = (
-          '(' + $scope.numUnseenNotifications + ') ' + $window.document.title);
+  if (GLOBALS.userIsLoggedIn) {
+    // Show the number of unseen notifications in the navbar and page title,
+    // unless the user is already on the dashboard page.
+    $http.get('/notificationshandler').success(function(data) {
+      if ($window.location.pathname !== '/') {
+        $scope.numUnseenNotifications = data.num_unseen_notifications;
+        if ($scope.numUnseenNotifications > 0) {
+          $window.document.title = (
+            '(' + $scope.numUnseenNotifications + ') ' + $window.document.title);
+        }
       }
-    }
-  });
+    });
+  }
 
   /**
    * Checks if an object is empty.
@@ -113,6 +162,18 @@ oppia.controller('Base', [
     }
     $scope.$apply();
   });
+
+  $scope.profileDropdownIsActive = false;
+
+  $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().addClass('open');
+    $scope.profileDropdownIsActive = true;
+  };
+
+  $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().removeClass('open');
+    $scope.profileDropdownIsActive = false;
+  };
 
   $scope.onMouseoverDropdownMenu = function(evt) {
     angular.element(evt.currentTarget).parent().addClass('open');

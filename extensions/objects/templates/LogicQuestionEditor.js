@@ -21,7 +21,7 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'LogicQuestion';
       };
       $compile(element.contents())(scope);
     },
@@ -32,17 +32,17 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       $scope.alwaysEditable = true;
       $scope.localValue = {
         assumptionsString: logicProofShared.displayExpressionArray(
-          $scope.$parent.value.assumptions, 
+          $scope.$parent.value.assumptions,
           logicProofData.BASE_STUDENT_LANGUAGE.operators),
         targetString: logicProofShared.displayExpression(
-          $scope.$parent.value.results[0], 
+          $scope.$parent.value.results[0],
           logicProofData.BASE_STUDENT_LANGUAGE.operators),
         errorMessage: '',
         proofString: $scope.$parent.value.default_proof_string
       };
 
       // NOTE: we use ng-change rather than $watch because the latter runs in
-      // response to any change to the watched value, and we only want to 
+      // response to any change to the watched value, and we only want to
       // respond to changes made by the user.
       $scope.changeAssumptions = function() {
         $scope.convertThenBuild('logicQuestionAssumptions', 'assumptionsString');
@@ -57,23 +57,23 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       $scope.convertThenBuild = function(elementID, nameOfString) {
         var element = document.getElementById(elementID);
         var cursorPosition = element.selectionEnd;
-        $scope.localValue[nameOfString] = 
+        $scope.localValue[nameOfString] =
           logicProofConversion.convertToLogicCharacters(
             $scope.localValue[nameOfString]);
         $scope.buildQuestion();
-        // NOTE: angular will reset the position of the cursor after this 
+        // NOTE: angular will reset the position of the cursor after this
         // function runs, so we need to delay our re-resetting.
         setTimeout(function() {
           element.selectionEnd = cursorPosition;
-        }, 2);  
+        }, 2);
       };
 
       $scope.buildQuestion = function() {
         try {
           builtQuestion = angular.copy(
             logicProofTeacher.buildQuestion(
-              $scope.localValue.assumptionsString, 
-              $scope.localValue.targetString, 
+              $scope.localValue.assumptionsString,
+              $scope.localValue.targetString,
               LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
           $scope.$parent.value = {
             assumptions: builtQuestion.assumptions,

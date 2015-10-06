@@ -20,18 +20,9 @@ __author__ = 'Sean Lip'
 
 import os
 
+from extensions import domain
 import feconf
 import utils
-
-
-class CustomizationArgSpec(object):
-    """Value object for an RTE component customization arg specification."""
-
-    def __init__(self, name, description, schema, default_value):
-        self.name = name
-        self.description = description
-        self.schema = schema
-        self.default_value = default_value
 
 
 class BaseRichTextComponent(object):
@@ -54,6 +45,9 @@ class BaseRichTextComponent(object):
     # The tooltip for the icon in the rich-text editor. Overridden in
     # subclasses.
     tooltip = ''
+    # Whether the component is large enough to discourage its use when the
+    # rich-text editor is intended to be lightweight.
+    is_complex = False
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -69,7 +63,7 @@ class BaseRichTextComponent(object):
     @property
     def customization_arg_specs(self):
         return [
-            CustomizationArgSpec(**cas)
+            domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
@@ -92,7 +86,7 @@ class BaseRichTextComponent(object):
         """
         return {
             'backend_name': self.name,
-            'customization_args': [{
+            'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
@@ -100,5 +94,6 @@ class BaseRichTextComponent(object):
             } for ca_spec in self.customization_arg_specs],
             'frontend_name': self.frontend_name,
             'icon_data_url': self.icon_data_url,
+            'is_complex': self.is_complex,
             'tooltip': self.tooltip,
         }

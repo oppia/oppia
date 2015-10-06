@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Utilities for user creation, login and privileging when
- * carrrying out end-to-end testing with protractor.
+ * carrying out end-to-end testing with protractor.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
@@ -43,33 +43,30 @@ var logout = function() {
   driver.findElement(protractor.By.id('submit-logout')).click();
 };
 
-// This will fail if the user already has a username.
-var registerAsEditor = function(username) {
-  browser.get('/gallery');
-  element(by.css('.protractor-test-create-exploration')).click();
+// The user needs to log in immediately before this method is called. Note
+// that this will fail if the user already has a username.
+var _completeSignup = function(username) {
+  browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A4445%2F');
   element(by.css('.protractor-test-username-input')).sendKeys(username);
   element(by.css('.protractor-test-agree-to-terms-checkbox')).click();
   element(by.css('.protractor-test-register-user')).click();
-  // The create modal needs time to load.
-  browser.waitForAngular();
-  general.waitForSystem();
-  element(by.css('.protractor-test-cancel-create')).click();
 };
 
 var createUser = function(email, username) {
   login(email);
-  registerAsEditor(username);
+  _completeSignup(username);
+  general.waitForSystem();
   logout();
 };
 
 var createAndLoginUser = function(email, username) {
   login(email);
-  registerAsEditor(username);
+  _completeSignup(username);
 };
 
 var createModerator = function(email, username) {
   login(email, true);
-  registerAsEditor(username);
+  _completeSignup(username);
   admin.editConfigProperty(
       'Email addresses of moderators', 'List', function(listEditor) {
     listEditor.addItem('Unicode').setValue(email);
@@ -79,7 +76,7 @@ var createModerator = function(email, username) {
 
 var createAdmin = function(email, username) {
   login(email, true);
-  registerAsEditor(username);
+  _completeSignup(username);
   admin.editConfigProperty(
       'Email addresses of admins', 'List', function(listEditor) {
     listEditor.addItem('Unicode').setValue(email);

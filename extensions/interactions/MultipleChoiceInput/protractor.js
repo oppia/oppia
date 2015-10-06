@@ -40,7 +40,7 @@ var expectInteractionDetailsToMatch = function(elem, richTextInstructionsArray) 
     expect(optionElements.length).toEqual(richTextInstructionsArray.length);
     for (var i = 0; i < optionElements.length; i++) {
       forms.expectRichText(
-        optionElements[i].element(by.xpath('./button/span'))
+        optionElements[i].element(by.css('.protractor-test-multiple-choice-option'))
       ).toMatch(richTextInstructionsArray[i]);
     }
   });

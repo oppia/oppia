@@ -4,284 +4,208 @@
   About
 {% endblock subtitle %}
 
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      About
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
 {% block content %}
-  <script>
-    /*
-      Navigate to the active tab on page load, if one is specified in the
-      location hash.
-    */
-    $(function() {
-      var activeTab = $('[href=#' + location.hash.substring(2) + ']');
-      activeTab && activeTab.tab('show');
-    });
-  </script>
+  <div class="oppia-page-cards-container">
+    <md-card class="oppia-page-card oppia-long-text">
 
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8">
-        <div class="tabbable">
-          <ul class="nav nav-tabs about-tabs">
-            <li class="active"><a href="#what-is-oppia" data-toggle="tab">What is Oppia?</a></li>
-            <li><a href="#how-to-use" data-toggle="tab">How Oppia works</a></li>
-            <li><a href="#publication-criteria" data-toggle="tab">Exploration publishing criteria</a></li>
-            <li><a href="#publication-policies" data-toggle="tab">Publication Policies</a></li>
-            <li><a href="#contact" data-toggle="tab">Contact</a></li>
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane active" id="what-is-oppia">
-              <div class="oppia-about">
-                <h2>What is Oppia?</h2>
-                <p>
-                  Oppia is a tool for creating interactive online activities that enable students to learn by doing. Its creators believe that this is often a more effective and efficient way of learning than either watching videos or reading texts, since it allows the student to engage more deeply with the activity in a way that videos or books often do not.
-                </p>
-                <p>
-                  Oppia aims to simulate the one-on-one interaction that a student has with a teacher by capturing and generalizing “interaction dialogues.” For instance, a teacher might ask the student a question, and the student then responds in some way -- by either volunteering an answer, or saying that he/she is stuck. The teacher then responds in a way that is as helpful to the student as possible. However, the teacher will often not have time to address every individual misconception. Furthermore, it usually takes significant effort to figure out an appropriate response that helps a student get unstuck without denying them the experience of working through the problem and coming to terms with their misunderstanding. In many cases this effort will have already been expended by another teacher in a different school who is faced with the same question. If teachers use Oppia to record such interactions, they can share their knowledge with more students without duplicating effort.
-                </p>
-                <p>
-                  We hope that having some of the student’s work addressed automatically will lighten the teacher’s load and help them focus on the questions that require a human’s response, as well as provide quick feedback to the student that would make the learning experience more enjoyable. Over time, as Oppia becomes able to address more misconceptions and understand more varied student inputs, we hope that it will become an increasingly useful and valuable resource for students and teachers worldwide.
-                </p>
+      {% if ABOUT_PAGE_YOUTUBE_VIDEO_ID %}
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ABOUT_PAGE_YOUTUBE_VIDEO_ID}}?rel=0" frameborder="0" allowfullscreen>
+        </iframe>
+      {% endif %}
 
-                <h2>About this site</h2>
-                <p>
-                This site ({{SITE_NAME}}) is a hosted version of the <a href="https://code.google.com/p/oppia">Oppia codebase</a>. It is designed to foster the creation of a set of really good explorations that are freely available to anyone and that include a wide range of topics.
-                </p>
+      <a class="oppia-about-anchor" name="our-mission"></a>
+      <h3>Our Mission</h3>
 
-                <p>
-                  Creators, editors, and readers of explorations as well as developers of the codebase are recognized as the Oppia community. In the spirit of maintaining {{SITE_NAME}} as a service for learners by learners, community members are encouraged to participate in the discussion <a href="{{SITE_FORUM_URL}}">forum</a> and to peruse the <a href="/site_guidelines">community guidelines</a>.
-                </p>
+      <p>
+        To help anyone learn anything they want in an effective and enjoyable way.
+      </p>
 
-                <p>
-                  Please be aware that this site is maintained by a group of volunteers in their spare time. Things may go wrong, and we apologize in advance if they do. If you want to take backups of your work, you can do so by downloading the explorations as zip files from the exploration editor pages. Also, if you want to help, let us know! You can email the site admins at <u>{{ADMIN_EMAIL_ADDRESS}}</u>.
-                </p>
+      <a class="oppia-about-anchor" name="meet-oppia"></a>
+      <h3 style="margin-top: 40px;">Meet Oppia</h3>
 
-                <p>
-                  Much of the code powering this site is written by Google engineers. However, {{SITE_NAME}} is not a Google product, and Google bears no responsibility for the content of this website.
-                </p>
+      <p>
+        Oppia is a free, open-source learning platform. Full of interactive activities
+        called 'explorations', Oppia helps curious minds learn and teach.
+      </p>
 
-                <h2>Credits</h2>
-                <p>
-                  The open-source codebase powering Oppia has been contributed to by many people. These include:
-                  <ul>
-                    <li>Abraham Mgowano</li>
-                    <li>Alex Gower</li>
-                    <li>Amit Deutsch</li>
-                    <li>Angela Park</li>
-                    <li>Chase Albert</li>
-                    <li>Chin Zhan Xiong</li>
-                    <li>Frederik Creemers</li>
-                    <li>Jacob Davis</li>
-                    <li>Jasper Deng</li>
-                    <li>Jeremy Emerson</li>
-                    <li>Jerry Chen</li>
-                    <li>Karen Rustad</li>
-                    <li>Kevin Lee</li>
-                    <li>Koji Ashida</li>
-                    <li>Manas Tungare</li>
-                    <li>Marcel Schmittfull</li>
-                    <li>Michael Mossey</li>
-                    <li>Michael Wagner</li>
-                    <li>Phil Wagner</li>
-                    <li>Philip Hayes</li>
-                    <li>Reinaldo Aguiar</li>
-                    <li>Samara Trilling</li>
-                    <li>Sean Lip</li>
-                    <li>Shantanu Bhowmik</li>
-                    <li>Stephanie Federwisch</li>
-                    <li>Tarashish Mishra</li>
-                    <li>Wilson Hong</li>
-                    <li>Xinyu Wu</li>
-                    <li>Yana Malysheva</li>
-                  </ul>
-                </p>
-                <p>
-                  The maintainers of {{SITE_NAME}} are also very grateful for feedback, ideas and suggestions from Albert Gural, Alex Kauffmann, Amy Latten, Brett Barros, Catherine Colman, John Cox, John Orr, Michael Anuzis, Mike Gainer, Neil Fraser, Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros and Vikrant Nanda.
-                </p>
+      <strong>Learn</strong>
+      <p>
+        Oppia recreates the experience of one-on-one tutoring. It adapts to your
+        needs and lets you learn in the best way possible &mdash; by doing.
+      </p>
 
-                <p>
-                  We have lots of plans for the future! If you'd like to help, you'd be very welcome, and we'd be delighted to help you get started. Feel free to reach out to us at the <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev</a> Google Group, or by contacting {{ADMIN_EMAIL_ADDRESS}}.
-                </p>
+      <strong>Teach</strong>
+      <p>
+        Oppia enables you to share your knowledge with people worldwide. Anyone can create
+        and contribute to an exploration. Find out more in our <a href="/participate">participation playbook</a>.
+      </p>
 
-                <a name="license"></a>
-                <h2>License</h2>
-                <p>
-                  Oppia is an open source project, and its <a href="https://code.google.com/p/oppia/">code</a> is released under an <a href="https://www.apache.org/licenses/">Apache 2.0</a> license. See the <a href="https://code.google.com/p/oppia/">Google code site</a> for more details.
-                </p>
-                <p>
-                  The textual content of explorations on this site, as well as image files included with them, are licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/legalcode">CC-BY-SA 4.0</a> with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and 3(a)(2)). That is, if you reuse content from this site, we encourage you to include a link to the exploration page from which the content originated, but do not require it.
-                </p>
-                <span>
-                  <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">All explorations on {{SITE_NAME}}</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                </span>
-              </div>
-            </div>
+      <a class="oppia-about-anchor" name="contact"></a>
+      <h3 style="margin-top: 40px;">Contacting Us</h3>
 
-            <div class="tab-pane" id="how-to-use">
-              <div class="oppia-about">
-                <h1>How Oppia works</h1>
-                <p>
-                  The main units of learning in Oppia are called explorations. These are multi-stage interactive activities that attempt to engage readers in a learning conversation and provide formative feedback along the way.
-                </p>
-                <p>
-                  Any user of Oppia, logged-in or otherwise, can play through, browse, and search for any <a href="/learn">public explorations</a>. To create or edit explorations, a user will need to be logged-in and to author his/her work under a stable username.
-                </p>
-                <p>
-                  Responses submitted to explorations are stored anonymously. The anonymized responses are shown to exploration creators and editors, so that the explorations can be improved over time.
-                </p>
+      <p>
+        <strong>For site questions:</strong> Post to our <a href="{{SITE_FORUM_URL}}">forum</a>.
+      </p>
+      <p>
+        <strong>To get involved:</strong> Reach out via our
+        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev</a>
+        Google Group, or by contacting {{CONTACT_EMAIL_ADDRESS}}. We'd be delighted
+        to work with you!
+      </p>
+      <p>
+        <strong>For bugs and feature requests:</strong> Create an issue on our
+        <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!">Oppia bug tracker</a>.
+        or get in touch via the
+        <a href="https://groups.google.com/forum/#!forum/oppia-dev">developers' forum</a>.
+      </p>
+      <p>
+        <strong>For sensitive issues</strong> (for example, reporting a security bug):
+        Write to {{CONTACT_EMAIL_ADDRESS}}.
+      </p>
 
-                <h2 id="community">Community Guidelines</h2>
-                <ol>
-                  <li style="line-height: 25px;">
-                    Ownership of explorations is temporary and eventually reverts to the Oppia community (see <a href="#lifecycle" target="_self">Lifecycle of an Exploration</a> for more details). The idea is to make it easy for the explorations on this site to improve continuously.
-                  </li>
-                  <li style="line-height: 25px;">
-                    Please exercise judgement before publishing an exploration. Every exploration on this site should have significant educational value, and should not contain advertising, spam, vandalism or abuse.
-                  </li>
-                  <li style="line-height: 25px;">
-                    Creating multiple usernames, using explorations to trick users, or circumventing site features that are meant to encourage the improvement of explorations are examples of antisocial behavior that may result in account suspension.
-                  </li>
-                  <li style="line-height: 25px;">
-                    For contentious topics and clarifications on guidelines, please use the Oppia discussion forum.
-                  </li>
-                  <li style="line-height: 25px;">
-                    The governance model for Oppia comprises site admins and moderators. Site admins manage and have overall responsibility for the site; they are the final arbitrators on any dispute. Moderators suggest and review major edits for explorations, and enforce the behavioral norms described within these community guidelines.
-                  </li>
-                </ol>
-                <br>
+      <a class="oppia-about-anchor" name="license"></a>
+      <h3>License</h3>
 
-                <h2 id="lifecycle">Lifecycle of an Exploration</h2>
-                <p>
-                  All explorations hosted on the site should ultimately be improved to the point where they are effective, enjoyable learning experiences. More specifically, an exploration goes through three stages as it becomes ready for learners to use:
-                  <ul>
-                    <li style="line-height: 25px;">
-                      Each exploration starts out as <strong>private</strong>: only the creator of the exploration, any editors they assign, invited playtesters, and the site moderators can see it.
-                    </li>
-                    <li style="line-height: 25px;">
-                      Once the creators of the exploration are ready for it to be publicly playtested, they can publish the exploration, at which point its status changes to <strong>public</strong>. The exploration becomes viewable in the gallery. Community members can see and play the exploration, and leave feedback and suggestions.
-                    </li>
-                    <li style="line-height: 25px;">
-                      Once the exploration satisfies the <a href="site_guidelines#/publication-criteria">criteria for featured status</a>, the exploration is officially marked in the gallery as <strong>featured</strong>.
-                    </li>
-                  </ul>
-                </p>
-                <p>
-                  The editors of an exploration can retain exclusive editing rights as long as they continue to maintain the exploration and respond to feedback and change suggestions in a timely manner. Otherwise, the exploration will be considered 'orphaned' and ownership of it will revert to the community, who will then be able to collectively improve the exploration over time. The owner(s) of an exploration may also choose to release ownership to the community at any time.
-                </p>
-              </div>
-            </div>
+      <p>
+        All content in Oppia's explorations is licensed under
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode">CC-BY-SA 4.0</a>
+        with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and 3(a)(2)).
+        If you reuse content from this site, we encourage you to include a link to the
+        relevant exploration page, but do not require it.
+      </p>
+      <p>
+        The software powering Oppia is open source, and its
+        <a href="https://github.com/oppia/oppia/">code</a> is released under an
+        <a href="https://www.apache.org/licenses/">Apache 2.0</a> license.
+      </p>
 
-            <div class="tab-pane" id="publication-criteria">
-              <div class="oppia-about">
-                <h1>Exploration publishing criteria</h1>
-                <p>
-                  In order to ensure that Oppia is filled with high-quality explorations that do a good job of helping people learn something new, there are some minimal criteria for publishing an exploration and, later, for moving it to the "featured" stage. These are described below:
-                </p>
+      <a class="oppia-about-foundation" name="foundation"></a>
+      <h3>The Oppia Foundation</h3>
+      <p>
+        The Oppia website and source code are supported by the Oppia
+        Foundation, a non-profit public benefit corporation of the State of
+        California.
+      </p>
+      <p>
+        The directors of the Foundation are Amit Deutsch, Jacob Davis and Sean
+        Lip. The Foundation's
+        <a href="https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing">
+          bylaws and minutes
+        </a>
+        are available to read. If you wish to contact the Foundation, please
+        email {{CONTACT_EMAIL_ADDRESS}}.
+      </p>
 
-                <h2>Publication criteria</h2>
-                <p>
-                  The following criteria for publishing an exploration are meant to ensure that published explorations can be playtested meaningfully, and that it is possible to continue developing and refining these explorations to move towards being featured. These criteria are intended to be objective and precise, so that it is easy for anyone to determine whether a particular exploration fits the criteria.
-                </p>
+      <a class="oppia-about-anchor" name="credits"></a>
+      <h3>Credits</h3>
+      <p>
+        Many people have contributed to the open-source codebase powering Oppia.
+        Thanks to:
+      </p>
 
-                <p>
-                  <ul>
-                    <li style="line-height: 25px;">
-                      <strong>It teaches something.</strong> The exploration should present information that is new to the target audience, and not just test knowledge that its target audience is already assumed to have.
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>It teaches more than a single factoid.</strong> The information presented should be either "deep" - an involved and tricky concept that has nuances and depth to it, or "broad" - a collection of related interesting facts that the learner can understand and remember better after playing through the exploration.
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>It provides informative feedback.</strong> The feedback that it provides to the players should be more than just "Correct" or "Incorrect"; it should provide (or guide players toward) the reasoning about why something is right or wrong, and how to correct it if necessary. An exploration should be more than just a quiz!
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>It doesn't duplicate an existing published exploration</strong>. It's fine to teach the same thing using a significantly different way of teaching, but if a new exploration teaches the exact same things as an existing one, in the same way, then the effort would be better spent submitting feedback to, and improving, the existing one.
-                    </li>
-                  </ul>
-                </p>
+      <ul style="font-size: 0.8em;">
+        <li>Abraham Mgowano</li>
+        <li>Alex Gower</li>
+        <li>Allan Zhou</li>
+        <li>Amit Deutsch</li>
+        <li>Andrey Mironyuk</li>
+        <li>Angela Park</li>
+        <li>Barnabas Makonda</li>
+        <li>Ben Henning</li>
+        <li>Ben Targan</li>
+        <li>Chase Albert</li>
+        <li>Chin Zhan Xiong</li>
+        <li>Debanshu Bhaumik</li>
+        <li>Edward Allison</li>
+        <li>Elizabeth Kemp</li>
+        <li>Estelle Lee</li>
+        <li>Frederik Creemers</li>
+        <li>Jacob Davis</li>
+        <li>Jasper Deng</li>
+        <li>Jeremy Emerson</li>
+        <li>Jérôme (zolk232)</li>
+        <li>Jerry Chen</li>
+        <li>Karen Rustad</li>
+        <li>Kevin Lee</li>
+        <li>Koji Ashida</li>
+        <li>Kumari Shalini</li>
+        <li>Manas Tungare</li>
+        <li>Marcel Schmittfull</li>
+        <li>Michael Anuzis</li>
+        <li>Michael Mossey</li>
+        <li>Michael Wagner</li>
+        <li>Milagro Teruel</li>
+        <li>Mungo Dewar</li>
+        <li>Phil Wagner</li>
+        <li>Philip Hayes</li>
+        <li>Reinaldo Aguiar</li>
+        <li>Samara Trilling</li>
+        <li>Scott Junner</li>
+        <li>Sean Lip</li>
+        <li>Shafqat Dulal</li>
+        <li>Shantanu Bhowmik</li>
+        <li>Stephanie Federwisch</li>
+        <li>Stephen Chiang</li>
+        <li>Tarashish Mishra</li>
+        <li>Wilson Hong</li>
+        <li>Xinyu Wu</li>
+        <li>Yana Malysheva</li>
+        <li>Yuan Gu</li>
+        <li>Zoe Madden-Wood</li>
+      </ul>
 
-                <h2>"Featured" criteria</h2>
-                <p>
-                  The criteria for featuring an exploration are meant to ensure that featured explorations are educational, interesting to our learners, and make appropriate use of the interactive, discovery-based learning style that the Oppia tool enables. The <a href="https://code.google.com/p/oppia/wiki/DesignTips">Design Tips</a> wiki page has some constructive advice on how to create explorations that fit these criteria, especially how to design useful, formative feedback.
-                </p>
-
-                <p>
-                  <ul>
-                    <li style="line-height: 25px;">
-                      <strong>Understanding, not memorization.</strong> Does the exploration attempt to teach some interesting concept, or does it merely provide facts for the student to memorize?
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>Learning, not assessment.</strong> Does the exploration present new concepts to the learners, or does it simply quiz them on some set of topics? (Even if a quiz later gives out the right answers, this does not necessarily help a learner master the new concepts effectively.)
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>Learn by doing.</strong> How is the new information presented to the learner? Does he have a chance to reason about the concepts himself, try out using them, and receive feedback on what he did?
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>Formative feedback.</strong> Does the feedback that you provide to the learner give him new useful insights into the problem? Does it find a good middle ground between simply telling the user he's wrong (or right), and giving the entire answer away? Do the feedback rules cover a wide range of possible answers and misconceptions? Is there a catch-all default rule that nevertheless tries to guide the learner toward a good solution?
-                    </li>
-                    <li style="line-height: 25px;">
-                      <strong>Complete and polished.</strong> Is the exploration free of typos, factual errors and bugs? Is the text well-written and easy to read? Does the exploration deliver all the content it has promised to the learner, either within the exploration or as stated the learning objective?
-                    </li>
-                  </ul>
-                </p>
-              </div>
-            </div>
-
-            <div class="tab-pane" id="publication-policies">
-              <div class="oppia-about">
-                <h1>Publication policies</h1>
-                <p>
-                  The following policies help Oppia moderators enforce the criteria for publishing and featuring explorations. All explorations hosted on {{SITE_NAME}} should ultimately be improved to the point where they satisfy these criteria.
-                </p>
-                <h2>Publishing an exploration</h2>
-                <p>
-                  Any owner of a private exploration can make the decision to publish an exploration at any time. However, if the published exploration does not fit the <a href="site_guidelines#/publication-criteria">publication criteria</a>, the site moderators may unpublish or delete it, at their discretion. (The norm is to unpublish; deletion is only likely to happen in egregious cases, such as outright spam.)
-                </p>
-                <h2>Editing rights</h2>
-                <p>
-                  Explorations are meant to be polished and developed until they can be featured. An exploration that has not been edited for a prolonged period may be considered "orphaned", and ownership of it may revert to the community at large (at moderator discretion), so that {{SITE_NAME}} community members can continue to improve it.
-                </p>
-                <p>
-                  Note that when you embed a particular version of your exploration in your site, this embedded version will not change unless the original exploration on {{SITE_NAME}} is unpublished or deleted. In particular, even if you or other community members make further additions or changes to the exploration on {{SITE_NAME}}, the version embedded on your website will remain the same.
-                </p>
-
-                <h2>Releasing an exploration</h2>
-                <p>
-                  Currently, the process of releasing an exploration is moderator-driven, though we hope to make it more community-driven in the future. When an owner of the exploration - or anybody else involved in the process - thinks the exploration is ready to be featured, they can post to the <a href="{{MODERATOR_REQUEST_FORUM_URL}}" target="_blank">Moderator Requests forum</a> with a request for moderator review. A moderator will play through the exploration, look at its structure, and decide whether it fits the Featured <a href="site_guidelines#/publication-criteria">criteria</a>. If it does, then the exploration will be marked as featured. If it does not, the moderator will make a series of specific suggestions on how to make the exploration conform to the criteria, and work with the creator(s) in that forum thread to get it polished and ready to be featured.
-                </p>
-              </div>
-            </div>
-
-            <div class="tab-pane" id="contact">
-              <div class="oppia-about">
-
-                <h1>Contacting the Oppia team</h1>
-                <p>
-                  Thank you for your interest in Oppia!
-                </p>
-
-                <p>
-                  If you have a question relating to this site, you can get in touch
-                  by posting to our <a href="{{SITE_FORUM_URL}}">forum</a>.
-                </p>
-
-                <p>
-                  If there is a specific bug or feature request
-                  you would like to let us know about that is relevant to the
-                  open-source Oppia codebase, please create an issue on the
-                  <a href="https://code.google.com/p/oppia/issues/list">Oppia bug tracker</a>. You can also get in touch with the developers of the open-source Oppia codebase via the <a href="https://groups.google.com/forum/#!forum/oppia-dev">developers' forum</a>.
-                </p>
-
-                <p>
-                  If you need to contact the admins privately (for example, in order to report
-                  a security bug), you can email them at {{ADMIN_EMAIL_ADDRESS}}. Please
-                  use the above two channels where possible, though, since you are
-                  likely to get a faster response there.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <p>
+        The Oppia development team is also grateful for the feedback, ideas,
+        help and suggestions by Alex Kauffmann, Allison Barros, Amy Latten,
+        Brett Barros, John Cox, John Orr, Katie Berlent, Michael Wawszczak,
+        Mike Gainer, Neil Fraser, Noah Falstein, Nupur Jain, Peter Norvig,
+        Philip Guo, Piotr Mitros, Rahim Nathwani, Robyn Choo, Tricia Ngoon,
+        Vikrant Nanda and Vinamrata Singal.
+      </p>
+    </md-card>
   </div>
 
+  <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
+    <strong>About Oppia</strong>
+    <p><a href="#our-mission">Our Mission</a></p>
+    <p><a href="#meet-oppia">Meet Oppia</a></p>
+    <p><a href="#contact">Contacting Us</a></p>
+    <p><a href="#license">License</a></p>
+    <p><a href="#foundation">Foundation</a></p>
+    <p><a href="#credits">Credits</a></p>
+  </div>
+
+  <script>
+    // This scrolls the page to the anchor clicked on in the quick links menu.
+    $('a[href*=#]:not([href=#])').click(function() {
+      if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
+        var target = $('[name=' + this.hash.slice(1) +']');
+        if (target.length) {
+          $('html,body').animate({
+            scrollTop: target.offset().top
+          }, 1000);
+          return false;
+        }
+      }
+    });
+  </script>
 {% endblock %}

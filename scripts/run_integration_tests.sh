@@ -20,6 +20,11 @@
 #
 # Run this script from the oppia root folder:
 #   bash scripts/run_js_integration_tests.sh
+# Optional arguments:
+#   --sharding=true/false Disables/Enables parallelization of protractor tests.
+#   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
+# Sharding must be disabled (either by passing in false to --sharding or 1 to
+# --sharding-instances) if running any tests in isolation (iit or ddescribe).
 # The root folder MUST be named 'oppia'.
 # It runs integration tests.
 
@@ -40,8 +45,9 @@ function cleanup {
 
   if [ -d "../protractor-screenshots" ]; then
     echo ""
-    echo "You can view screenshots of the failed tests in"
-    echo "../protractor-screenshots/"
+    echo "  Note: If ADD_SCREENSHOT_REPORTER is set to true in"
+    echo "  core/tests/protractor.conf.js, you can view screenshots"
+    echo "  of the failed tests in ../protractor-screenshots/"
     echo ""
   fi
 
@@ -90,6 +96,13 @@ if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
   echo Installing Protractor
   $NPM_INSTALL protractor@1.2.0
 fi
+# Ensure the Protractor version is set to 1.2.0 in the current branch until the
+# update to Protractor v2 is merged into 'develop'.
+PROTRACTOR_VERSION=$($NPM_CMD list protractor)
+if [[ $PROTRACTOR_VERSION != *"1.2.0"* ]]; then
+  echo Changing Protractor version to 1.2.0.
+  $NPM_INSTALL protractor@1.2.0
+fi
 
 echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
@@ -128,5 +141,43 @@ if [ -d "../protractor-screenshots" ]; then
   rm -r ../protractor-screenshots
 fi
 
-# Run the integration tests.
-$NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+# Parse additional command line arguments that may be passed to protractor.
+# Credit: http://stackoverflow.com/questions/192249
+SHARDING=true
+SHARD_INSTANCES=5
+for i in "$@"; do
+  # Match each space-separated argument passed to the shell file to a separate
+  # case label, based on a pattern. E.g. Match to -sharding=*, where the
+  # asterisk refers to any characters following the equals sign, other than
+  # whitespace.
+  case $i in
+    --sharding=*)
+    # Extract the value right of the equal sign by substringing the $i variable
+    # at the equal sign.
+    # http://tldp.org/LDP/abs/html/string-manipulation.html
+    SHARDING="${i#*=}"
+    # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
+    shift
+    ;;
+
+    --sharding-instances=*)
+    SHARD_INSTANCES="${i#*=}"
+    shift
+    ;;
+
+    *)
+    echo Error: Unknown command line option: $i
+    ;;
+  esac
+done
+
+# Run the integration tests. The conditional is used to run protractor without
+# any sharding parameters if it is disabled. This helps with isolated tests.
+# Isolated tests do not work properly unless no sharding parameters are passed
+# in at all.
+# TODO(bhenning): Figure out if this is a bug with protractor.
+if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+else
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES
+fi

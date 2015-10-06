@@ -17,7 +17,7 @@ oppia.directive('realEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'Real';
       };
       $compile(element.contents())(scope);
     },
@@ -28,6 +28,12 @@ oppia.directive('realEditor', function($compile, warningsData) {
       $scope.schema = {
         type: 'float'
       };
+
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        if ($scope.$parent.value === '') {  // A new rule
+          $scope.$parent.value = 0.0;
+        }
+      });
 
       if ($scope.$parent.value === '') {
         $scope.$parent.value = 0.0;

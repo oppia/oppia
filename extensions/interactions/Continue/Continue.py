@@ -21,16 +21,16 @@ class Continue(base.BaseInteraction):
     """Interaction that takes the form of a simple 'Continue' button."""
 
     name = 'Continue Button'
-    category = 'Basic Input'
     description = 'A simple \'go to next state\' button.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Null'}]
+    answer_type = 'Null'
+    instructions = None
+    needs_summary = False
 
     _customization_arg_specs = [{
         'name': 'buttonText',
-        'description': 'The text to display on the button.',
+        'description': 'Button label',
         'schema': {
             'type': 'unicode',
         },

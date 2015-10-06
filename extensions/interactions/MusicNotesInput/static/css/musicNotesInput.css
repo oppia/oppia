@@ -26,7 +26,7 @@
   background: rgba(0, 0, 0, 0.04); /* Color of noteChoices box */
   width: 5%;
   padding: 2.3% 9% 5.83% 1.1%;
-  margin-bottom: 5.9%;
+  margin-bottom: 15px;
   border: 0.2em solid #333;
   -moz-border-radius: 11%;
   -webkit-border-radius: 11%;
@@ -109,5 +109,14 @@
 }
 
 .oppia-music-input-control-buttons {
-  padding: 40% 0 5% 17.2%;
+  padding: 40% 0 5% 2%;
+}
+
+.oppia-music-input-btn {
+  padding: 6px 10px;
+}
+
+.oppia-music-input-play-btn {
+  margin-left: -55px;
+  margin-top: 0;
 }

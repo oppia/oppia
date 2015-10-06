@@ -1,5 +1,4 @@
 <div ng-controller="ExplorationStatistics">
-  <h2>Statistics</h2>
   <div ng-if="!hasTabLoaded" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
@@ -7,38 +6,34 @@
     <span class="oppia-loading-dot-three">.</span>
   </div>
   <div ng-if="hasTabLoaded">
-    <div ng-if="hasExplorationBeenVisited">
-      <div>Show stats for version:
-        <select class="oppia-select"
-                ng-change="onSelectExplorationVersion(currentVersion)"
-                ng-model="currentVersion"
-                ng-options="version for version in versions">
-        </select>
-      </div>
-      <div class="col-lg-11 col-md-11 col-sm-11">
-        <h4>Exploration Completion Rate</h4>
-        <bar-chart data="chartData" options="COMPLETION_RATE_CHART_OPTIONS">
-        </bar-chart>
+    <md-card class="oppia-editor-card">
+      <div ng-if="hasExplorationBeenVisited">
+        <div class="oppia-statistics-display">
+          <h3>Exploration Completion Rate</h3>
+          <bar-chart data="chartData"
+                     options="COMPLETION_RATE_CHART_OPTIONS">
+          </bar-chart>
 
-        <h4>Common learner paths</h4>
-        <div style="font-size: smaller" ng-if="lastUpdated">
-          <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
-        </div>
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-              <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+          <h3>Common learner paths</h3>
+          <div style="font-size: smaller" ng-if="lastUpdated">
+            <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div ng-if="!hasExplorationBeenVisited">
-      <em>
-        This exploration has not been visited by anyone yet, so there are no statistics to display.
-      </em>
-    </div>
+      <div ng-if="!hasExplorationBeenVisited">
+        <em>
+          This exploration has not been visited by anyone yet, so there are no statistics to display.
+        </em>
+      </div>
+    </md-card>
   </div>
 </div>
 

@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  {{ title }}
+  {{ exploration_title }}
 {% endblock subtitle %}
 
 {% block header_js %}
   {{ super() }}
   {% if exploration_version %}
     <script type="text/javascript">
+      GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
+      GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+      GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
-      GLOBALS.interactionDisplayModes = JSON.parse('{{interaction_display_modes|js_string}}');
     </script>
   {% endif %}
 
@@ -20,117 +22,135 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      {{exploration_title}}
+      <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
-      ng-controller="LearnerLocalNav">
-    <!-- TODO(sll): Implement this, and change the title and color accordingly after doing so. -->
-    <li class="dropdown">
-      <a href="#" title="Share (not yet implemented)" class="dropdown-toggle" data-toggle="dropdown"> 
-        <span class="glyphicon glyphicon-share" style="color: #666"></span>
-      </a>
-    </li>
-    <li>
-      <a href="#" title="Give feedback" ng-click="showFeedbackModal()">
-        <span class="glyphicon glyphicon-comment"></span>
-      </a>
-    </li>
-    <li>
-      <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-    </li>
-  </ul>
+  <div ng-controller="LearnerLocalNav">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
+      <li class="dropdown">
+        <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle oppia-share-dropdown-toggle" data-toggle="dropdown">
+          <span class="glyphicon glyphicon-share"></span>
+        </a>
+        <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+          {% if SHARING_OPTIONS['gplus'] %}
+            <li>
+              <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
+                 onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')"
+                 target="_window" tooltip="Google+" tooltip-placement="left">
+                <img src="/images/general/gplus.png" alt="Google+">
+              </a>
+            </li>
+          {% endif %}
+
+          {% if SHARING_OPTIONS['facebook'] %}
+            <li>
+              <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button"
+                 onclick="return !window.open(this.href, '', 'height=336, width=640')"
+                 target="_window" tooltip="Facebook" tooltip-placement="left">
+                <img src='/images/general/fb.png' alt="Facebook">
+              </a>
+            </li>
+          {% endif %}
+
+          {% if SHARING_OPTIONS['twitter'] %}
+            <li>
+              <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>"
+                 onclick="return !window.open(this.href, '', 'height=460, width=640')"
+                 target="_window" tooltip="Twitter" tooltip-placement="left">
+                <img src="/images/general/twitter.png" alt="Twitter">
+              </a>
+            </li>
+          {% endif %}
+
+          <li>
+            <a href="" ng-click="showEmbedExplorationModal(explorationId)"
+               tooltip="Embed" tooltip-placement="left">
+              <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+        <a href="" tooltip="Feedback" tooltip-placement="bottom">
+          <span class="glyphicon glyphicon-comment"></span>
+        </a>
+      </li>
+      {% if can_edit %}
+        <li>
+          <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+            <span class="glyphicon glyphicon-pencil"></span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
 {% endblock local_top_nav_options %}
 
 {% block content %}
   {{ skin_tag }}
+
   <br><br><br>
 
-  <script type="text/ng-template" id="modals/playerFeedback">
-    <div class="modal-header">
-      <h3>Give Feedback to the Exploration Editor</h3>
-    </div>
+  {% if not iframed %}
+    {% include 'attribution_guide.html' %}
+  {% endif %}
 
-    <div class="modal-body">
-      <p>
-        <em>
-          This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
-        </em>
-      </p>
+  {% include 'components/exploration_embed_button.html' %}
+  {% include 'components/ratings.html' %}
 
-      <div role="form">
-        <div class="form-group">
-          <label for="subject">Subject</label>
-          <input type="text" class="form-control" id="subject" ng-model="subject">
+  <script type="text/ng-template" id="popover/feedback">
+    <feedback-popup></feedback-popup>
+  </script>
+
+  <script type="text/ng-template" id="components/feedback">
+    <div style="min-width: 250px;">
+      <div ng-show="!feedbackSubmitted">
+        <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png">
+        </button>
+        <br>
+
+        <div>
+          <textarea ng-model="feedbackText" rows="5" class="oppia-feedback-popover-textarea" placeholder="Leave feedback for the authors..." focus-on="<[feedbackPopoverId]>">
+          </textarea>
         </div>
-        <label for="feedback">Feedback</label>
-        <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-        <!-- Note that, for this to use the correct $scope.relatedTo, it must be an ng-show and not an ng-if. -->
-        <div ng-show="currentStateName !== 'END'">
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
-              This feedback relates to the current question.
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
-              This feedback relates to the exploration as a whole.
-            </label>
-          </div>
-        </div>
-        <div ng-show="isLoggedIn">
-          <hr>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" ng-model="isSubmitterAnonymized">
-              Give feedback anonymously
-            </label>
-          </div>
+
+        <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
+        <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;" ng-click="saveFeedback()" ng-disabled="!feedbackText">Submit</md-button>
+        <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
+          <label>
+            <input type="checkbox" ng-model="isSubmitterAnonymized">
+            Stay Anonymous
+          </label>
         </div>
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
+      <div ng-show="feedbackSubmitted">
+        Thank you for the feedback!
+      </div>
     </div>
   </script>
 
-  <script type="text/ng-template" id="modals/playerFeedbackConfirmation">
-    <div class="modal-header">
-      <h3>Thank you for giving feedback</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        Your feedback has been successfully submitted, and the exploration editors will see it when they next visit the exploration editing page.
-      </p>
-      <p>
-        Thank you for helping to improve this exploration!
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Close</button>
-    </div>
-  </script>
+  {% include 'components/gadget_panel.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('services/explorationContextService.js') }}
+    {{ include_js_file('services/explorationServices.js') }}
+    {{ include_js_file('components/gadgetPanel.js') }}
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
+    {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 
   {{ skin_templates }}
   {{ interaction_templates }}
+  {{ gadget_templates }}
 {% endblock footer_js %}

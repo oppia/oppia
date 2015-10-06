@@ -18,20 +18,37 @@
 
 __author__ = 'Zhan Xiong Chin'
 
+from core.domain import rule_domain
 from extensions.rules import base
 import itertools
 
-# Constructs adjacency lists from a Graph object
-def construct_adjacency_lists(graph):
+GRAPH_ADJACENCY_MODE_DIRECTED = 'directed'
+GRAPH_ADJACENCY_MODE_INVERTED = 'inverted'
+GRAPH_ADJACENCY_MODE_UNDIRECTED = 'undirected'
+
+def construct_adjacency_lists(graph, mode = GRAPH_ADJACENCY_MODE_DIRECTED):
+    """Constructs adjacency lists from a Graph object and a string indicating the chosen mode.
+
+    Depending on the mode chosen, it either:
+    - Adds all edges to the lists (directed)
+    - Inverts all edges and adds them to the lists (inverted)
+    - Adds both edges from above two modes to the lists, as though 
+    the graph were undirected (undirected)"""
     adjacency_lists = [[] for v in graph['vertices']]
+    if not graph['isDirected']:
+        # if a graph is undirected, all modes work the same way anyway
+        mode = GRAPH_ADJACENCY_MODE_UNDIRECTED
     for edge in graph['edges']:
-        adjacency_lists[edge['src']].append(edge['dst'])
-        if not graph['isDirected']:
+        if (mode == GRAPH_ADJACENCY_MODE_DIRECTED or 
+            mode == GRAPH_ADJACENCY_MODE_UNDIRECTED):
+            adjacency_lists[edge['src']].append(edge['dst'])
+        if (mode == GRAPH_ADJACENCY_MODE_INVERTED or
+            mode == GRAPH_ADJACENCY_MODE_UNDIRECTED):
             adjacency_lists[edge['dst']].append(edge['src'])
     return adjacency_lists
 
-# Constructs adjacency matrices from a Graph object
 def construct_adjacency_matrix(graph):
+    """Constructs adjacency matrices from a Graph object."""
     adjacency_matrix = [[None for v in graph['vertices']] for v in graph['vertices']]
     for edge in graph['edges']:
         weight = edge['weight'] if graph['isWeighted'] else 1
@@ -40,77 +57,157 @@ def construct_adjacency_matrix(graph):
             adjacency_matrix[edge['dst']][edge['src']] = weight
     return adjacency_matrix
 
+def mark_visited(start_vertex, adjacency_lists, is_visited):
+    """Takes the index of the starting vertex, a list of adjacency lists, and a visited list
+and marks the index of all vertices reachable from the starting vertex in the visited list."""
+    is_visited[start_vertex] = True
+    for next_vertex in adjacency_lists[start_vertex]:
+        if not is_visited[next_vertex]:
+            mark_visited(next_vertex, adjacency_lists, is_visited)
 
-# TODO(czx): Handle the directed case?
-class IsConnected(base.GraphRule):
-    description = 'is a connected graph'
-    is_generic = False
+def is_strongly_connected(graph):
+    """Takes a Graph object and returns whether it is strongly connected."""
+    # Uses depth first search on each vertex to try and visit every other vertex from 0
+    # in both the normal and inverted adjacency lists
+    if len(graph['vertices']) == 0:
+        return True
+    adjacency_lists = construct_adjacency_lists(graph)
+    inverted_adjacency_lists = construct_adjacency_lists(graph, GRAPH_ADJACENCY_MODE_INVERTED)
+    is_visited = [False for v in graph['vertices']]
+    mark_visited(0, adjacency_lists, is_visited)
+    is_visited_in_inverse = [False for v in graph['vertices']]
+    mark_visited(0, inverted_adjacency_lists, is_visited_in_inverse)
+    return not ((False in is_visited) or (False in is_visited_in_inverse))
 
-    def _evaluate(self, subject):
-        # Uses depth first search to ensure that we can visit all vertices in one pass
-        if len(subject['vertices']) == 0:
-            return True
-        def search_component(current_vertex, adjacency_lists, is_visited):
-            is_visited[current_vertex] = True
-            for next_vertex in adjacency_lists[current_vertex]:
-                if not is_visited[next_vertex]:
-                    search_component(next_vertex, adjacency_lists, is_visited)
-        
-        is_visited = [False for v in subject['vertices']]
-        adjacency_lists = construct_adjacency_lists(subject)
-        search_component(0, adjacency_lists, is_visited)
-        return not (False in is_visited)
+def is_weakly_connected(graph):
+    """Takes a Graph object and returns whether it is weakly connected."""
+    # Generates adjacency lists assuming graph is undirected, then uses depth first search 
+    # on 0 to try and reach every other vertex
+    if len(graph['vertices']) == 0:
+        return True
+    adjacency_lists = construct_adjacency_lists(graph, GRAPH_ADJACENCY_MODE_UNDIRECTED)
+    is_visited = [False for v in graph['vertices']]
+    mark_visited(0, adjacency_lists, is_visited)
+    return not (False in is_visited)
 
 
-class IsAcyclic(base.GraphRule):
-    description = 'is an acyclic graph'
-    is_generic = False
-
-    def _evaluate(self, subject):
-        NOT_VISITED = 0
-        STILL_VISITING = 1
-        IS_VISITED = 2
-        # Uses depth first search to ensure that we never have an edge to an ancestor in the search tree
-        def find_cycle(current_vertex, previous_vertex, adjacency_lists, is_visited):
-            is_visited[current_vertex] = STILL_VISITING
-            for next_vertex in adjacency_lists[current_vertex]:
-                if next_vertex == previous_vertex and subject['isDirected'] == False:
-                    continue
-                if is_visited[next_vertex] == STILL_VISITING:
+def is_acyclic(graph):
+    NOT_VISITED = 0
+    STILL_VISITING = 1
+    IS_VISITED = 2
+    # Uses depth first search to ensure that we never have an edge to an ancestor in the search tree
+    def find_cycle(current_vertex, previous_vertex, adjacency_lists, is_visited):
+        is_visited[current_vertex] = STILL_VISITING
+        for next_vertex in adjacency_lists[current_vertex]:
+            if next_vertex == previous_vertex and graph['isDirected'] == False:
+                continue
+            if is_visited[next_vertex] == STILL_VISITING:
+                return False
+            elif is_visited[next_vertex] == IS_VISITED:
+                continue
+            else:
+                if not find_cycle(next_vertex, current_vertex, adjacency_lists, is_visited):
                     return False
-                elif is_visited[next_vertex] == IS_VISITED:
-                    continue
-                else:
-                    if not find_cycle(next_vertex, current_vertex, adjacency_lists, is_visited):
-                        return False
-            is_visited[current_vertex] = IS_VISITED
-            return True
-
-        is_visited = [NOT_VISITED for v in subject['vertices']]
-        adjacency_lists = construct_adjacency_lists(subject)
-        for start_vertex in xrange(len(subject['vertices'])):
-            if not is_visited[start_vertex]:
-                if not find_cycle(start_vertex, -1, adjacency_lists, is_visited):
-                    return False
+        is_visited[current_vertex] = IS_VISITED
         return True
 
+    is_visited = [NOT_VISITED for v in graph['vertices']]
+    adjacency_lists = construct_adjacency_lists(graph)
+    for start_vertex in xrange(len(graph['vertices'])):
+        if not is_visited[start_vertex]:
+            if not find_cycle(start_vertex, -1, adjacency_lists, is_visited):
+                return False
+    return True
 
-class IsRegular(base.GraphRule):
-    description = 'is a regular graph'
+
+def is_regular(graph):
+    if len(graph['vertices']) == 0:
+        return True
+    # Checks that every vertex has outdegree and indegree equal to the first
+    adjacency_lists = construct_adjacency_lists(graph)
+    outdegree_counts = [len(l) for l in adjacency_lists]
+    indegree_counts = [0 for l in adjacency_lists]
+    for l in adjacency_lists:
+        for destination_vertex in l:
+            indegree_counts[destination_vertex] += 1
+    return (
+        all(indegree == indegree_counts[0] for indegree in indegree_counts) and 
+        all(outdegree == outdegree_counts[0] for outdegree in outdegree_counts)
+    )
+
+
+class HasGraphProperty(base.GraphRule):
+    description = 'is {{p|GraphProperty}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        if len(subject['vertices']) == 0:
-            return True
-        # Checks that every vertex has outdegree and indegree equal to the first
-        adjacency_lists = construct_adjacency_lists(subject)
-        outdegree_counts = [len(l) for l in adjacency_lists]
-        indegree_counts = [0 for l in adjacency_lists]
-        for l in adjacency_lists:
-            for destination_vertex in l:
-                indegree_counts[destination_vertex] += 1
-        return (
-            all(indegree == indegree_counts[0] for indegree in indegree_counts) and 
-            all(outdegree == outdegree_counts[0] for outdegree in outdegree_counts)
-        )
+        if self.p == 'strongly_connected':
+            return is_strongly_connected(subject)
+        elif self.p == 'weakly_connected':
+            return is_weakly_connected(subject)
+        elif self.p == 'acyclic':
+            return is_acyclic(subject)
+        elif self.p == 'regular':
+            return is_regular(subject)
+        else:
+            return False
 
+# TODO(czx): Speed up the isomorphism checker?
+def _is_isomorphic(graph1, graph2):
+    if len(graph1['vertices']) != len(graph2['vertices']):
+        return rule_domain.CERTAIN_FALSE_VALUE
+
+    # Construct adjacency matrices
+    def construct_adjacency_matrix(graph):
+        ret = [[None for v in graph['vertices']] for v in graph['vertices']]
+        for edge in graph['edges']:
+            weight = edge['weight'] if graph['isWeighted'] else 1
+            ret[edge['src']][edge['dst']] = weight
+            if not graph['isDirected']:
+                ret[edge['dst']][edge['src']] = weight
+        return ret
+    adj = construct_adjacency_matrix(graph1)
+    adj2 = construct_adjacency_matrix(graph2)
+
+    # Check against every permutation of vertices. 
+    # The new index of vertex i in graph2 is perm[i].
+    num_vertices = len(graph2['vertices'])
+    for perm in itertools.permutations(range(num_vertices)):
+        # Test matching labels
+        if (graph1['isLabeled'] or graph2['isLabeled']) and any([
+                graph2['vertices'][i]['label'] !=
+                graph1['vertices'][perm[i]]['label']
+                for i in xrange(num_vertices)]):
+            continue
+
+        # Test isomorphism
+        found_isomorphism = True
+        for i in xrange(num_vertices):
+            for j in xrange(num_vertices):
+                if adj[perm[i]][perm[j]] != adj2[i][j]:
+                    found_isomorphism = False
+                    break
+            if not found_isomorphism:
+                break
+        if found_isomorphism:
+            return rule_domain.CERTAIN_TRUE_VALUE
+    return rule_domain.CERTAIN_FALSE_VALUE
+
+
+class IsIsomorphicTo(base.GraphRule):
+    description = 'is isomorphic to {{g|Graph}}, including matching labels'
+
+    def _evaluate(self, subject):
+        return _is_isomorphic(subject, self.g)
+
+
+class FuzzyMatches(base.GraphRule):
+    description = 'is similar to {{training_data|ListOfGraph}}'
+
+    def _evaluate(self, subject):
+        # This passes if the input graph is isomorphic to any of the graphs in
+        # the training data.
+        for possibility in self.training_data:
+            if _is_isomorphic(subject, possibility):
+                return self._fuzzify_truth_value(True)
+        return self._fuzzify_truth_value(False)

@@ -29,15 +29,23 @@ class Link(base.BaseRichTextComponent):
     _customization_arg_specs = [{
         'name': 'url',
         'description': (
-            'The URL for this link. It must start with http:// or https://'),
+            'The link URL. It must start with http:// or https://'),
         'schema': {
             'type': 'custom',
             'obj_type': 'SanitizedUrl',
         },
         'default_value': 'https://www.example.com',
     }, {
+        'name': 'text',
+        'description': (
+            'The link text. If left blank, the link URL will be used.'),
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
+    }, {
         'name': 'open_link_in_same_window',
-        'description': 'Open the linked page in the same window?',
+        'description': 'Open the link in the same window?',
         'schema': {
             'type': 'bool'
         },

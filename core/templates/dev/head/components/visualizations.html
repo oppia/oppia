@@ -30,7 +30,7 @@
     }
 
     .oppia-graph-viz .node rect {
-      fill: beige;
+      fill: #fff;
       pointer-events: all;
       stroke: rgb(0, 0, 0);
       -moz-transition: all 0.15s;
@@ -38,27 +38,18 @@
       -o-transition: all 0.15s;
       transition: all 0.15s;
     }
-    .oppia-graph-viz .node rect.init-node {
-      fill: #bbedb1;
-    }
-    .oppia-graph-viz .node rect.end-node {
-      fill: green;
+    .oppia-graph-viz .node rect.terminal-node {
+      fill: green; /* terminal nodes are green to signify them */
     }
     .oppia-graph-viz .node rect.bad-node {
-      fill: pink;
+      fill: #F35F55;
     }
-    .oppia-graph-viz .node rect.normal-node:hover,
+    .oppia-graph-viz .node rect.current-node:hover,
     .oppia-graph-viz .node rect.init-node:hover,
-    .oppia-graph-viz .node rect.bad-node:hover {
-      fill: blue;
-    }
-
-    .oppia-graph-viz .highlight {
-      fill: #FFFFC2;
-      fill-opacity: 1;
-      stroke: #DDD;
-      stroke-width: 1;
-      stroke-opacity: 1;
+    .oppia-graph-viz .node rect.terminal-node:hover,
+    .oppia-graph-viz .node rect.bad-node:hover,
+    .oppia-graph-viz .node rect.normal-node:hover {
+      fill: #C8C4C4;
     }
 
     .oppia-graph-viz .clickable {
@@ -95,15 +86,16 @@
               </g>
 
               <g class="node protractor-test-node" ng-repeat="node in nodeList">
-                <rect rx="4" ry="4" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
+                <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
+                      class="protractor-test-node-background <[node.nodeClass]>"
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                      ng-class="{clickable: canNavigateToNode(node.id), 'init-node': node.isInitNode, 'end-node': node.isEndNode, 'bad-node': node.isBadNode, 'normal-node': node.isNormalNode}"
+                      ng-class="{'clickable': canNavigateToNode(node.id)}"
                       ng-attr-style="<[node.style]>"
-                      ng-click="onClickFunction(node.id)" class="protractor-test-node-background">
+                      ng-click="onClickFunction(node.id)">
                 </rect>
                 <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
-                  <tspan><[getTruncatedLabel(node.label)]></tspan>
+                  <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
                   <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
                 </text>
                 <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
@@ -118,9 +110,8 @@
                   </text>
                 </g>
                 <g ng-if="highlightStates && isStateFlagged(node.id)">
-                  <rect ng-click="onClickFunction(node.id)" class="highlight"
+                  <rect ng-click="onClickFunction(node.id)" class="highlight clickable"
                         width="22" height="22" ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                        ng-class="{clickable: node.id != finalStateId}"
                         ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
@@ -133,10 +124,10 @@
             </g>
 
             <g ng-if="opacityMap">
-              <rect width="210" height="70" ng-attr-x="<[GRAPH_WIDTH - 210]>" y="10" style="fill: transparent; stroke: black;">
+              <rect width="210" height="70" ng-attr-x="<[GRAPH_WIDTH - 250]>" y="10" style="fill: transparent; stroke: black;">
               </rect>
 
-              <rect width="190" height="20" ng-attr-x="<[GRAPH_WIDTH - 200]>" y="20"
+              <rect width="190" height="20" ng-attr-x="<[GRAPH_WIDTH - 240]>" y="20"
                     class="legend-bar">
               </rect>
 

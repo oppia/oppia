@@ -23,25 +23,28 @@ from core.tests import test_utils
 import feconf
 
 
-SITE_NAME = 'sitename.org'
+SITE_FORUM_URL = 'siteforum.url'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
 
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(AdminIntegrationTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
     def test_admin_page(self):
         """Test that the admin page shows the expected sections."""
-        # Login as an admin.
-        self.login(self.EDITOR_EMAIL, is_super_admin=True)
-
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
-
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Performance Counters',
             'Total processing time for all JSON responses',
             'Configuration',
             'Reload a single exploration',
-            'counting.yaml')
+            'three_balls')
 
         self.logout()
 
@@ -66,7 +69,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 
-        ANNOUNCEMENT_TEXT = self.UNICODE_TEST_STRING
+        TEST_STRING = self.UNICODE_TEST_STRING
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -75,13 +78,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': ''
-        }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
+            'value': editor.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
+        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.EDITOR_PAGE_ANNOUNCEMENT.name: ANNOUNCEMENT_TEXT
+                editor.MODERATOR_REQUEST_FORUM_URL.name: TEST_STRING
             }
         }
         self.post_json('/adminhandler', payload, csrf_token)
@@ -89,8 +92,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': ANNOUNCEMENT_TEXT
-        }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
+            'value': TEST_STRING
+        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         self.logout()
 
@@ -98,8 +101,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that the correct variables show up on the about page."""
         # Navigate to the about page. The site name is not set.
         response = self.testapp.get('/about')
-        self.assertIn('SITE_NAME', response.body)
-        self.assertNotIn(SITE_NAME, response.body)
+        self.assertIn('https://site/forum/url', response.body)
+        self.assertNotIn(SITE_FORUM_URL, response.body)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -107,31 +110,34 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                pages.SITE_NAME.name: SITE_NAME
+                pages.SITE_FORUM_URL.name: SITE_FORUM_URL
             }
         }, csrf_token)
         self.logout()
 
         # Navigate to the splash page. The site name is set.
         response = self.testapp.get('/about')
-        self.assertNotIn('SITE_NAME', response.body)
-        self.assertIn(SITE_NAME, response.body)
+        self.assertNotIn('https://site/forum/url', response.body)
+        self.assertIn(SITE_FORUM_URL, response.body)
 
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""
 
+        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup('superadmin@example.com', 'superadm1n')
+        self.signup(BOTH_MODERATOR_AND_ADMIN_EMAIL, 'moderatorandadm1n')
+
         # Navigate to any page. The role is not set.
-        self.testapp.get('/').mustcontain(
-            no=['(Moderator)', '(Admin)', '/moderator', '/admin'])
+        self.testapp.get('/').mustcontain(no=['/moderator', '/admin'])
 
         # Log in as a superadmin. This gives access to /admin.
         self.login('superadmin@example.com', is_super_admin=True)
-        self.testapp.get('/').mustcontain(
-            '/admin', no=['(Moderator)', '(Admin)', '/moderator'])
+        self.testapp.get('/').mustcontain('/admin', no=['/moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
-        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -148,18 +154,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-            '(Moderator)', '/moderator', no=['(Admin)', '/admin'])
+            '/moderator', no=['/admin'])
         self.logout()
 
         # Log in as an admin.
         self.login(self.ADMIN_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-            '(Admin)', '/moderator', no=['(Moderator)', '/admin'])
+            '/moderator', no=['/admin'])
         self.logout()
 
         # Log in as a both-moderator-and-admin. Only '(Admin)' is shown in the
         # navbar.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-             '(Admin)', '/moderator', no=['(Moderator)', '/admin'])
+             '/moderator', no=['/admin'])
         self.logout()

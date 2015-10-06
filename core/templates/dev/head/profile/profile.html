@@ -4,28 +4,50 @@
   Profile
 {% endblock subtitle %}
 
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Profile
+      <span class="oppia-navbar-breadcrumb-separator" style="padding-left: 10px;"></span>
+      {{user_username}}
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
 {% block content %}
-  <div class="container" ng-controller="Profile">
+  <div class="container">
     <div class="row">
-      <div class="oppia-gallery-frame">
-        <div>
-          <strong>Email address</strong>: {{user_email}}
-          <br><br>
-          <strong>Username</strong>:
-          {% if username %}
-            {{username}}
-          {% else %}
-            <em>Not yet selected</em>
-          {% endif %}
+      <h1>Profile: {{user_username}}</h1>
+    </div>
+
+    <div class="row">
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Picture</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            {% if user_pic_data_url %}
+              <img src="{{user_pic_data_url}}" class="img-thumbnail">
+            {% else %}
+              <img src="/images/general/no_profile_picture.png" class="img-thumbnail">
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Bio</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            {% if user_bio %}
+              {{user_bio}}
+            {% else %}
+              <em>This user has not supplied a bio yet.</em>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
   </div>
 {% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <script>
-    {{ include_js_file('/profile/Profile.js') }}
-  </script>
-{% endblock footer_js %}

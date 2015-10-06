@@ -259,9 +259,9 @@ describe('Exploration rights service', function() {
     beforeEach(inject(function($injector) {
       ers = $injector.get('explorationRightsService');
 
-      GLOBALS.EXPLORATION_STATUS_PRIVATE = 'private';
-      GLOBALS.EXPLORATION_STATUS_PUBLIC = 'public';
-      GLOBALS.EXPLORATION_STATUS_PUBLICIZED = 'publicized';
+      GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
+      GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';
+      GLOBALS.ACTIVITY_STATUS_PUBLICIZED = 'publicized';
     }));
 
     it('correctly initializes the service', function() {
@@ -329,30 +329,24 @@ describe('New state template service', function() {
     var NEW_STATE_NAME = 'new state name';
 
     beforeEach(inject(function($injector) {
-      GLOBALS = {
-        NEW_STATE_TEMPLATE: {
-          content: [{type: 'text', value: ''}],
-          interaction: {
-            customization_args: {
-              rows: {value: 1},
-              placeholder: {value: 'Type your answer here.'}
-            },
-            handlers: [{
-              name: 'submit',
-              rule_specs: [{
-                dest: '(untitled state)',
-                definition: {rule_type: 'default'},
-                feedback: [],
-                param_changes: [],
-                description: 'Default',
-              }],
-            }],
-            id: 'TextInput',
-            sticky: false
+      // TODO(sll): Find a way to have this and the backend dict read from the
+      // same single source of truth.
+      GLOBALS.NEW_STATE_TEMPLATE = {
+        content: [{type: 'text', value: ''}],
+        interaction: {
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: 'Type your answer here.'}
           },
-          param_changes: [],
-          unresolved_answers: {},
-        }
+          default_outcome: {
+            dest: '(untitled state)',
+            feedback: [],
+            param_changes: []
+          },
+          id: 'TextInput'
+        },
+        param_changes: [],
+        unresolved_answers: {},
       };
       nsts = $injector.get('newStateTemplateService');
     }));
@@ -365,18 +359,12 @@ describe('New state template service', function() {
             rows: {value: 1},
             placeholder: {value: 'Type your answer here.'}
           },
-          handlers: [{
-            name: 'submit',
-            rule_specs: [{
-              dest: NEW_STATE_NAME,
-              definition: {rule_type: 'default'},
-              feedback: [],
-              param_changes: [],
-              description: 'Default'
-            }]
-          }],
-          id: 'TextInput',
-          sticky: false
+          default_outcome: {
+            dest: NEW_STATE_NAME,
+            feedback: [],
+            param_changes: []
+          },
+          id: 'TextInput'
         },
         param_changes: [],
         unresolved_answers: {}

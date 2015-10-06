@@ -13,18 +13,18 @@
 // limitations under the License.
 
 
-oppia.directive('coordTwoDimEditor', function($compile, warningsData) {
+oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'CoordTwoDim';
       };
       $compile(element.contents())(scope);
     },
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
+    controller: function($scope, $timeout) {
       $scope.schemaLatitude = {
         type: 'float',
         validators: [{
@@ -47,9 +47,58 @@ oppia.directive('coordTwoDimEditor', function($compile, warningsData) {
         }]
       };
 
-      if ($scope.$parent.value === '') {
+      var updateMarker = function(lat, lng) {
+        var latLng = new google.maps.LatLng(lat, lng);
+
+        $timeout(function() {
+          if ($scope.mapMarker) {
+            $scope.mapMarker.setPosition(latLng);
+          } else {
+            $scope.mapMarker = new google.maps.Marker({
+              map: $scope.map,
+              position: latLng
+            });
+          }
+        }, 10);
+      };
+
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        if ($scope.$parent.value === '') {  // A new rule
+          $scope.$parent.value = [0.0, 0.0];
+        }
+
+        if (!angular.equals(newValue, oldValue)) {
+          updateMarker(newValue[0], newValue[1]);
+        }
+      });
+
+      if ($scope.$parent.value === '') {  // A new rule
         $scope.$parent.value = [0.0, 0.0];
       }
+
+      // This is required in order to avoid the following bug:
+      //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
+      $timeout(function() {
+        updateMarker($scope.$parent.value[0], $scope.$parent.value[1]);
+        if ($scope.map) {
+          google.maps.event.trigger($scope.map, 'resize');
+        }
+      }, 100);
+
+      $scope.mapOptions = {
+        center: new google.maps.LatLng(
+          $scope.$parent.value[0],
+          $scope.$parent.value[1]
+        ),
+        zoom: 0,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+
+      $scope.registerClick = function($event, $params) {
+        var latLng = $params[0].latLng;
+        updateMarker(latLng.lat(), latLng.lng());
+        $scope.$parent.value = [latLng.lat(), latLng.lng()];
+      };
     }
   };
-});
+}]);

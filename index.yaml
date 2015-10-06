@@ -53,10 +53,20 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: ExplorationRecommendationsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: ExplorationRightsModel
   properties:
   - name: deleted
   - name: status
+
+- kind: FeedbackAnalyticsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
 
 - kind: FeedbackMessageModel
   properties:
@@ -72,6 +82,11 @@ indexes:
     direction: desc
 
 - kind: RecentUpdatesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: SearchRankerRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on

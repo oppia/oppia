@@ -26,6 +26,8 @@ from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import recommendations_services
+from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -86,6 +88,8 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
+        demo_exploration_ids = [
+            ind for ind in enumerate(feconf.DEMO_EXPLORATIONS)]
         demo_explorations = [
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
@@ -124,11 +128,10 @@ class AdminPage(base.BaseHandler):
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
             'demo_explorations': demo_explorations,
+            'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
-            'object_editors_js': jinja2.utils.Markup(
-                editor.OBJECT_EDITORS_JS.value),
             'one_off_job_specs': one_off_job_specs,
             'recent_job_data': recent_job_data,
             'rte_components_html': jinja2.utils.Markup(
@@ -166,8 +169,9 @@ class AdminHandler(base.BaseHandler):
                 logging.info(
                     '[ADMIN] %s reloaded exploration %s' %
                     (self.user_id, exploration_id))
-                exp_services.delete_demo(unicode(exploration_id))
                 exp_services.load_demo(unicode(exploration_id))
+            elif self.payload.get('action') == 'clear_search_index':
+                exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
@@ -210,6 +214,9 @@ class AdminHandler(base.BaseHandler):
                     if klass.__name__ == computation_type:
                         klass.stop_computation(self.user_id)
                         break
+            elif self.payload.get('action') == 'upload_topic_similarities':
+                data = self.payload.get('data')
+                recommendations_services.update_topic_similarities(data)
 
             self.render_json({})
         except Exception as e:
@@ -229,3 +236,15 @@ class AdminJobOutput(base.BaseHandler):
         self.render_json({
             'output': jobs.get_job_output(job_id)
         })
+
+
+class AdminTopicsCsvDownloadHandler(base.BaseHandler):
+    """Retrieves topic similarity data for download."""
+
+    @require_super_admin
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/csv'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=topic_similarities.csv')
+        self.response.write(
+            recommendations_services.get_topic_similarities_as_csv())

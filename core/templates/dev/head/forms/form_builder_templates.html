@@ -16,21 +16,27 @@
                            local-value="$parent.localValue" is-disabled="isDisabled()"
                            allow-expressions="allowExpressions()"
                            validators="schema().validators"
-                           label-for-focus-target="labelForFocusTarget()">
+                           label-for-focus-target="labelForFocusTarget()"
+                           on-input-blur="onInputBlur"
+                           on-input-focus="onInputFocus">
   </schema-based-int-editor>
 
   <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
                              local-value="$parent.localValue" is-disabled="isDisabled()"
                              allow-expressions="allowExpressions()"
                              validators="schema().validators"
-                             label-for-focus-target="labelForFocusTarget()">
+                             label-for-focus-target="labelForFocusTarget()"
+                             on-input-blur="onInputBlur"
+                             on-input-focus="onInputFocus">
   </schema-based-float-editor>
 
   <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices"
                                local-value="$parent.localValue" is-disabled="isDisabled()"
                                validators="schema().validators" ui-config="schema().ui_config"
                                allow-expressions="allowExpressions()"
-                               label-for-focus-target="labelForFocusTarget()">
+                               label-for-focus-target="labelForFocusTarget()"
+                               on-input-blur="onInputBlur"
+                               on-input-focus="onInputFocus">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices"
@@ -99,9 +105,11 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <md-text-float type="number" ng-model="$parent.localValue" class="long" ng-disabled="isDisabled()"
-                     required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>">
-      </md-text-float>
+      <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0px;">
+        <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
+               required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
+               ng-blur="onInputBlur()" ng-focus="onInputFocus()">
+      </md-input-group>
     </span>
 
     <span ng-if="allowExpressions()">
@@ -122,13 +130,30 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <span>
-    <span class="input-group" ng-form="floatForm">
+  <span ng-model="localValue" ui-validate="'validate($value)'">
+    <span ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <md-text-float type="text" name="floatValue" ng-model="$parent.localValue" class="long" 
-                       require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
-                       focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)">
-        </md-text-float>
+        <input type="text" ng-model="$parent.localValue" class="form-control"
+               name="floatValue" placeholder="Type a number" ng-disabled="isDisabled()"
+               require-is-float apply-validation="validators()"
+               focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
+               ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
+
+        <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
+              style="font-size: 0.85em; position: absolute;"
+              tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
+          <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
+            Please enter a valid decimal number.
+          </span>
+          <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
+                class="oppia-form-error" aria-live="assertive">
+            Please enter a number that is at least <[getMinValue()]>.
+          </span>
+          <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
+                class="oppia-form-error" aria-live="assertive">
+            Please enter a number that is at most <[getMaxValue()]>.
+          </span>
+        </span>
       </span>
 
       <span ng-if="allowExpressions()">
@@ -145,18 +170,6 @@
         </span>
       </span>
     </span>
-
-    <span ng-if="floatForm.floatValue.$error.isFloat" class="oppia-form-error" aria-live="assertive">
-      Please enter a valid decimal number.
-    </span>
-    <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
-          class="oppia-form-error" aria-live="assertive">
-      Please enter a number that is at least <[getMinValue()]>.
-    </span>
-    <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
-          class="oppia-form-error" aria-live="assertive">
-      Please enter a number that is at most <[getMaxValue()]>.
-    </span>
   </span>
 </script>
 
@@ -167,18 +180,20 @@
               rows="<[getRows()]>"
               placeholder="<[getPlaceholder()]>"
               ng-disabled="isDisabled()"
-              class="form-control" focus-on="<[labelForFocusTarget()]>">
+              class="form-control" focus-on="<[labelForFocusTarget()]>"
+              ng-blur="onInputBlur()"
+              ng-focus="onInputFocus()">
     </textarea>
 
-    <md-text-float class="long" ng-if="!getCodingMode() && !getRows()" 
-           type="text"
-           ng-model="$parent.$parent.localValue"
-           label="<[getPlaceholder()]>"
-           ng-disabled="isDisabled()"
-           ng-keypress="onKeypress($event)"
-           focus-on="<[labelForFocusTarget()]>">
-    </md-text-float>
+    <span ng-if="!getCodingMode() && !getRows()">
+      <input type="text" ng-disabled="isDisabled()" class="form-control"
+             ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
+             ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
+             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"
+             style="display: inline;">
+    </span>
 
+    <!-- Note that we do not yet support ng-blur for the code editor. -->
     <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
       <div ui-codemirror
            ng-model="$parent.$parent.localValue"
@@ -188,6 +203,7 @@
     </div>
   </span>
 
+  <!-- Note that we do not yet support ng-blur for the expression editor. -->
   <span ng-if="allowExpressions()">
     <span ng-if="isDisabled()"
           ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
@@ -203,8 +219,9 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="!isDisabled()" html-content="$parent.localValue" size="<[getSize()]>">
-  </rich-text-editor>
+  <text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue"
+                    ui-config="uiConfig()">
+  </text-angular-rte>
   <span ng-if="isDisabled()"
         ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
         ng-bind-html="localValue">
@@ -230,16 +247,19 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/list">
-  <table class="table">
+  <table style="width: 100%;">
     <tr ng-repeat="item in localValue track by $index">
       <td>
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
-                             label-for-focus-target="getFocusLabel($index)">
+                             label-for-focus-target="getFocusLabel($index)"
+                             on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
+                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
-      <td ng-if="!len && (!minListLength || localValue.length > minListLength)">
-        <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button" ng-click="deleteElement($index)"
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength)" style="vertical-align: top;">
+        <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button"
+                ng-click="deleteElement($index)"
                 ng-disabled="isDisabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
@@ -248,12 +268,19 @@
     </tr>
   </table>
 
+  <div ng-if="showDuplicatesWarning && hasDuplicates()" class="oppia-form-error" aria-live="assertive">
+    Please ensure that the list has no duplicates.
+  </div>
+
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
-  <button ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
-          type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
-          ng-disabled="isDisabled()" style="margin-left: 8px;">
-    <[addElementText]>
-  </button>
+  <div style="height: 30px; margin-top: 4px;">
+    <button ng-show="!isOneLineInput || isAddItemButtonPresent"
+            ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
+            type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
+            ng-disabled="isDisabled()" style="margin-left: 0;">
+      <[addElementText]>
+    </button>
+  </div>
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/custom">
@@ -360,11 +387,13 @@
   </div>
 
   <div class="modal-body">
+    <!-- Provide a sink to move the focus into while the modal loads. -->
+    <input ng-if="modalIsLoading" type="text" focus-on="tmpFocusPoint">
     <form name="form.schemaForm">
-      <div ng-repeat="customizationArg in customizationArgsList">
-        <strong><[customizationArg.description]></strong>
-        <div>
-          <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+      <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index" style="margin-bottom: 25px;">
+        <strong><[customizationArgSpec.description]></strong>
+        <div style="margin-top: 15px;">
+          <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
           </schema-based-editor>
         </div>
       </div>

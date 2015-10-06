@@ -27,23 +27,36 @@ oppia.directive('oppiaInteractiveContinue', [
       scope: {},
       templateUrl: 'interaction/Continue',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj($attrs.buttonTextWithValue);
+        $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.buttonTextWithValue);
 
         $scope.submitAnswer = function() {
-          $scope.$parent.$parent.submitAnswer($scope.buttonText, 'submit');
+          $scope.$parent.$parent.submitAnswer('(' + $scope.buttonText + ')');
         };
       }]
     };
   }
 ]);
 
-
 oppia.directive('oppiaResponseContinue', [function() {
   return {
     restrict: 'E',
     scope: {},
     templateUrl: 'response/Continue',
-    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
+    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper',
+        function($scope, $attrs, oppiaHtmlEscaper) {
+      $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+    }]
+  };
+}]);
+
+oppia.directive('oppiaShortResponseContinue', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'shortResponse/Continue',
+    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper',
+        function($scope, $attrs, oppiaHtmlEscaper) {
       $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
     }]
   };

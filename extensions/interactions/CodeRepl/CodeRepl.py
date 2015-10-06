@@ -20,19 +20,20 @@ from extensions.interactions import base
 class CodeRepl(base.BaseInteraction):
     """Interaction that allows programs to be input."""
 
-    name = 'Code'
-    category = 'Custom'
+    name = 'Code Editor'
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable = True
     _dependency_ids = ['jsrepl', 'codemirror']
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'CodeEvaluation'}]
+    answer_type = 'CodeEvaluation'
+    instructions = 'Type code in the editor'
+    needs_summary = True
 
     # Language options 'lua' and 'scheme' have been removed for possible
     # later re-release.
     _customization_arg_specs = [{
         'name': 'language',
-        'description': 'Programming language to evaluate the code in.',
+        'description': 'Programming language',
         'schema': {
             'type': 'unicode',
             'choices': [
@@ -42,17 +43,17 @@ class CodeRepl(base.BaseInteraction):
         'default_value': 'python'
     }, {
         'name': 'placeholder',
-        'description': 'The initial code displayed in the code input field.',
+        'description': 'Initial code displayed',
         'schema': {
             'type': 'unicode',
             'ui_config': {
                 'coding_mode': 'none',
             },
         },
-        'default_value': '[Type your code here.]'
+        'default_value': '# Type your code here.'
     }, {
         'name': 'preCode',
-        'description': 'Code to prepend to the reader\'s submission.',
+        'description': 'Code to prepend to the learner\'s submission',
         'schema': {
             'type': 'unicode',
             'ui_config': {
@@ -62,7 +63,7 @@ class CodeRepl(base.BaseInteraction):
         'default_value': ''
     }, {
         'name': 'postCode',
-        'description': 'Code to append after the reader\'s submission.',
+        'description': 'Code to append after the learner\'s submission',
         'schema': {
             'type': 'unicode',
             'ui_config': {

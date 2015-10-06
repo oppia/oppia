@@ -20,7 +20,6 @@ __author__ = 'Sean Lip'
 
 import copy
 import operator
-import re
 
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -55,7 +54,7 @@ class StateRuleAnswerLog(object):
         Args:
             exploration_id: the exploration id
             rule_data: a list of dicts, each with the following keys:
-                (state_name, handler_name, rule_str).
+                (state_name, rule_str).
         """
         # TODO(sll): Should each rule_str be unicode instead?
         answer_log_models = (
@@ -65,11 +64,10 @@ class StateRuleAnswerLog(object):
                 for answer_log_model in answer_log_models]
 
     @classmethod
-    def get(cls, exploration_id, state_name, handler_name, rule_str):
+    def get(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
         return cls.get_multi(exploration_id, [{
             'state_name': state_name,
-            'handler_name': handler_name,
             'rule_str': rule_str
         }])[0]
 

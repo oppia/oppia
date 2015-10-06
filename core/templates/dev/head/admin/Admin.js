@@ -22,6 +22,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
   $scope.adminJobOutputUrl = '/adminjoboutput';
+  $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
   $scope.configProperties = {};
 
   $scope.showJobOutput = false;
@@ -116,8 +117,28 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     });
   };
 
+  $scope.clearSearchIndex = function() {
+    if ($scope.message.startsWith('Processing...')) {
+      return;
+    }
+
+    if (!confirm('This action is irreversible. Are you sure?')) {
+      return;
+    }
+
+    $scope.message = 'Processing...';
+
+    $http.post($scope.adminHandlerUrl, {
+      action: 'clear_search_index'
+    }).success(function(data) {
+      $scope.message = 'Index successfully cleared.';
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
+
   $scope.reloadExploration = function(explorationId) {
-    if ($scope.message == 'Processing...') {
+    if ($scope.message.startsWith('Processing...')) {
       return;
     }
 
@@ -135,6 +156,46 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
+  };
+
+  $scope.reloadAllExplorations = function() {
+    if ($scope.message.startsWith('Processing...')) {
+      return;
+    }
+
+    if (!confirm('This action is irreversible. Are you sure?')) {
+      return;
+    }
+
+    var numSucceeded = 0;
+    var numFailed = 0;
+    var numTried = 0;
+    $scope.message = 'Processing...';
+    var printResult = function() {
+      if (numTried < GLOBALS.DEMO_EXPLORATION_IDS.length) {
+        $scope.message = 'Processing...' + numTried + '/' + GLOBALS.DEMO_EXPLORATION_IDS.length;
+        return;
+      }
+      $scope.message = 'Reloaded ' + GLOBALS.DEMO_EXPLORATION_IDS.length + ' explorations: ' +
+        numSucceeded + ' succeeded, ' + numFailed + ' failed.';
+    };
+
+    for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
+      var exploration = GLOBALS.DEMO_EXPLORATION_IDS[i];
+
+      $http.post($scope.adminHandlerUrl, {
+        action: 'reload_exploration',
+        exploration_id: exploration[0]
+      }).success(function(data) {
+        ++numSucceeded;
+        ++numTried;
+        printResult();
+      }).error(function(errorResponse) {
+        ++numFailed;
+        ++numTried;
+        printResult();
+      });
+    }
   };
 
   $scope.startNewJob = function(jobType) {
@@ -192,5 +253,26 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
+  };
+
+  $scope.uploadTopicSimilaritiesFile = function() {
+    var file = document.getElementById('topicSimilaritiesFile').files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var data = e.target.result;
+      $http.post($scope.adminHandlerUrl, {
+        action: 'upload_topic_similarities',
+        data: data
+      }).success(function(data) {
+        $scope.message = 'Topic similarities uploaded successfully.';
+      }).error(function(errorResponse) {
+        $scope.message = 'Server error: ' + errorResponse.error;
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  $scope.downloadTopicSimilaritiesFile = function() {
+    window.location.href = $scope.adminTopicsCsvDownloadHandlerUrl;
   };
 }]);

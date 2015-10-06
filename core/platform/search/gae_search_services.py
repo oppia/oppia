@@ -108,12 +108,9 @@ def _dict_to_search_document(d):
     language_code = d.get('language_code')
 
     fields = []
-
     for key, value in d.iteritems():
-        if key == 'id' or key == 'rank' or key == 'language_code':
-            continue
-
-        fields += _make_fields(key, value)
+        if key not in ['id', 'rank']:
+            fields += _make_fields(key, value)
 
     doc = gae_search.Document(
         doc_id=doc_id, fields=fields, rank=rank, language=language_code)
@@ -157,7 +154,8 @@ def _validate_list(key, value):
                 ' type %s.' % (i, key, type(element)))
 
 
-def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
+def delete_documents_from_index(
+        doc_ids, index, retries=DEFAULT_NUM_RETRIES):
     """Deletes documents from an index.
 
     Args:
@@ -201,7 +199,27 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
         raise SearchFailureError(e)
 
 
-def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
+def clear_index(index_name):
+    """Clears an index completely.
+
+    WARNING: This does all the clearing in-request, and may therefore fail if
+    there are too many entries in the index.
+
+    Args:
+      - index: the name of the index to delete the document from, a string.
+    """
+    index = gae_search.Index(index_name)
+
+    while True:
+        doc_ids = [
+            document.doc_id for document in index.get_range(ids_only=True)]
+        if not doc_ids:
+            break
+
+        index.delete(doc_ids)
+
+
+def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
            sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 
@@ -246,14 +264,22 @@ def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
         cursor=gae_cursor,
         ids_only=ids_only,
         sort_options=sort_options)
-    query = gae_search.Query(query_string, options=options)
+
+    try:
+        query = gae_search.Query(query_string, options=options)
+    except gae_search.QueryError as e:
+        # This can happen for query strings like "NOT" or a string that
+        # contains backslashes.
+        logging.exception('Could not parse query string %s' % query_string)
+        return [], None
+
     index = gae_search.Index(index)
 
     try:
         logging.debug('attempting a search with query %s' % query)
         results = index.search(query)
     except gae_search.TransientError as e:
-        logging.exception('something went wrng while searching.')
+        logging.exception('something went wrong while searching.')
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))
             return search(

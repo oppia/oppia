@@ -1,9 +1,8 @@
 <div ng-controller="SidebarStateName">
-  Name:
   <span class="protractor-test-state-name-container">
     <span ng-if="editabilityService.isEditable()">
       <span ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable-section">
-        <strong><[stateName]></strong>
+        <strong style="font-size: 1.2em;"><[stateName]></strong>
         <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Name"></span>
       </span>
 

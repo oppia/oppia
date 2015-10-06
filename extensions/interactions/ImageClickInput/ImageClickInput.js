@@ -21,38 +21,72 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$rootScope', '$sce', 'oppiaHtmlEscaper', function($rootScope, $sce, oppiaHtmlEscaper) {
+  '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
+  function($sce, oppiaHtmlEscaper, explorationContextService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/ImageClickInput',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue);
+      controller: ['$scope', '$element', '$attrs',
+          function($scope, $element, $attrs) {
+        var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.imageAndRegionsWithValue);
+        $scope.highlightRegionsOnHover =
+          ($attrs.highlightRegionsOnHoverWithValue === 'true');
         $scope.filepath = imageAndRegions.imagePath;
-        $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + $rootScope.explorationId + '/' +
-          encodeURIComponent($scope.filepath)
-        );
-        $scope.onClickImage = function(event) {
+        $scope.imageUrl = (
+          $scope.filepath ?
+          $sce.trustAsResourceUrl(
+            '/imagehandler/' + explorationContextService.getExplorationId() +
+            '/' + encodeURIComponent($scope.filepath)) : null);
+        $scope.mouseX = 0;
+        $scope.mouseY = 0;
+        $scope.currentlyHoveredRegions = [];
+        $scope.allRegions = imageAndRegions.labeledRegions;
+        $scope.getRegionDimensions = function(index) {
           var image = $($element).find('.oppia-image-click-img');
-          var mouseX = (event.pageX - image.offset().left) / image.width();
-          var mouseY = (event.pageY - image.offset().top) / image.height();
-          var answer = [];
-          for (var i = 0; i < imageAndRegions.imageRegions.length; i++) {
-            var region = imageAndRegions.imageRegions[i];
-            var regionArea = region.region.regionArea;
-            if (regionArea[0][0] <= mouseX && mouseX <= regionArea[1][0] &&
-                regionArea[0][1] <= mouseY && mouseY <= regionArea[1][1]) {
-              answer.push(region.label);
+          var labeledRegion = imageAndRegions.labeledRegions[index];
+          var regionArea = labeledRegion.region.area;
+          return {
+            left: regionArea[0][0] * image.width(),
+            top: regionArea[0][1] * image.height(),
+            width: (regionArea[1][0] - regionArea[0][0]) * image.width(),
+            height: (regionArea[1][1] - regionArea[0][1]) * image.height(),
+          };
+        };
+        $scope.getRegionDisplay = function(label) {
+          if ($scope.currentlyHoveredRegions.indexOf(label) === -1) {
+            return 'none';
+          } else {
+            return 'inline';
+          }
+        };
+        $scope.onMousemoveImage = function(event) {
+          var image = $($element).find('.oppia-image-click-img');
+          $scope.mouseX = (event.pageX - image.offset().left) / image.width();
+          $scope.mouseY = (event.pageY - image.offset().top) / image.height();
+          $scope.currentlyHoveredRegions = [];
+          for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
+            var labeledRegion = imageAndRegions.labeledRegions[i];
+            var regionArea = labeledRegion.region.area;
+            if (regionArea[0][0] <= $scope.mouseX &&
+                $scope.mouseX <= regionArea[1][0] &&
+                regionArea[0][1] <= $scope.mouseY &&
+                $scope.mouseY <= regionArea[1][1]) {
+              $scope.currentlyHoveredRegions.push(labeledRegion.label);
             }
           }
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
-        }
+        };
+        $scope.onClickImage = function(event) {
+          $scope.$parent.$parent.submitAnswer({
+            clickPosition: [$scope.mouseX, $scope.mouseY],
+            clickedRegions: $scope.currentlyHoveredRegions
+          });
+        };
       }]
     };
   }
 ]);
-
 
 oppia.directive('oppiaResponseImageClickInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
@@ -60,8 +94,30 @@ oppia.directive('oppiaResponseImageClickInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'response/ImageClickInput',
-      controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      controller: [
+          '$scope', '$attrs', 'oppiaHtmlEscaper',
+          function($scope, $attrs, oppiaHtmlEscaper) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+
+        $scope.clickRegionLabel = '(Clicks on ' + (
+          _answer.clickedRegions.length > 0 ?
+          '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseImageClickInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/ImageClickInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.clickRegionLabel = (
+          _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
+          'Clicked on image');
       }]
     };
   }

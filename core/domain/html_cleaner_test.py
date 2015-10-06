@@ -100,3 +100,31 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
                 '\n\nOriginal text: %s' % datum[0])
+
+
+class HtmlStripperUnitTests(test_utils.GenericTestBase):
+    """Test the HTML stripper."""
+
+    def test_strip_html_tags(self):
+        TEST_DATA = [(
+            '<a href="http://www.google.com">Hello</a>',
+            'Hello',
+        ), (
+            'Just some text 12345',
+            'Just some text 12345',
+        ), (
+            '<code>Unfinished HTML',
+            'Unfinished HTML',
+        ), (
+            '<br/>',
+            '',
+        ), (
+            'A big mix <div>Hello</div> Yes <span>No</span>',
+            'A big mix Hello Yes No',
+        ), (
+            'Text with\nnewlines',
+            'Text with\nnewlines',
+        )]
+
+        for datum in TEST_DATA:
+            self.assertEqual(html_cleaner.strip_html_tags(datum[0]), datum[1])

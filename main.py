@@ -31,7 +31,6 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
-from core.controllers import services
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
@@ -62,16 +61,6 @@ class WarmupHandler(base.BaseHandler):
 
 # Regex for base64 id encoding
 r = '[A-Za-z0-9=_-]+'
-
-
-def generate_static_url_tuples():
-    static_urls = []
-    url_tuples = []
-    for url in feconf.PATH_MAP:
-        static_urls.append(url + '.+')
-    for url in static_urls:
-        url_tuples.append((url, resources.StaticFileHandler))
-    return url_tuples
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -140,23 +129,41 @@ urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     get_redirect_route(
-        r'/dashboard', home.DashboardPage, 'dashboard_page'),
+        r'/notifications_dashboard', home.NotificationsDashboardPage,
+        'notifications_dashboard_handler'),
     get_redirect_route(
-        r'/dashboardhandler/data', home.DashboardHandler,
-        'dashboard_handler'),
+        r'/notificationsdashboardhandler/data',
+        home.NotificationsDashboardHandler,
+        'notifications_dashboard_handler'),
+    get_redirect_route(
+        r'/my_explorations', home.MyExplorationsPage, 'my_explorations_page'),
+    get_redirect_route(
+        r'/myexplorationshandler/data', home.MyExplorationsHandler,
+        'my_explorations_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
-        r'/site_guidelines', pages.AboutPage, 'redirect_to_about_page'),
+        r'/editor_tutorial', pages.EditorTutorialPage, 'editor_tutorial_page'),
+    get_redirect_route(
+        r'/participate', pages.ParticipatePage, 'participate_page'),
+    get_redirect_route(
+        r'/site_guidelines', pages.ParticipatePage,
+        'redirect_to_participate_page'),
     get_redirect_route(
         r'/contact', pages.AboutPage, 'redirect_to_about_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
+    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
+    get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
     get_redirect_route(
         r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output'),
+    get_redirect_route(
+        r'/admintopicscsvdownloadhandler',
+        admin.AdminTopicsCsvDownloadHandler,
+        'admin_topics_csv_download_handler'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
@@ -167,14 +174,6 @@ urls = [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
-    get_redirect_route(
-        r'/interaction_repository/data',
-        resources.InteractionRepositoryHandler,
-        'interaction_repository_handler'),
-    get_redirect_route(
-        r'/rich_text_component_repository/data',
-        resources.RteComponentRepositoryHandler,
-        'rte_component_repository_handler'),
 
     get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
@@ -193,24 +192,30 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
-        galleries.GalleryLoginRedirector, 'gallery_redirect'),
-    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
+    get_redirect_route(
+        r'/explorationsummarieshandler/data',
+        galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
-    get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
-        r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
+        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_URL,
-        profile.EditorPrerequisitesPage, 'editor_prerequisites_page'),
+        r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
-        profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+        r'/preferenceshandler/data', profile.PreferencesHandler,
+        'preferences_handler'),
+    get_redirect_route(
+        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
+        'profle_picture_handler'),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler,
+        'signup_handler'),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL,
         profile.UsernameCheckHandler, 'username_check_handler'),
@@ -241,11 +246,20 @@ urls = [
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
     get_redirect_route(
+        r'/explorehandler/exploration_complete_event/<exploration_id>',
+        reader.ExplorationCompleteEventHandler, 'reader_complete_handler'),
+    get_redirect_route(
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler, 'reader_leave_handler'),
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),
+    get_redirect_route(
+        r'/explorehandler/rating/<exploration_id>',
+        reader.RatingHandler, 'rating_handler'),
+    get_redirect_route(
+        r'/explorehandler/recommendations/<exploration_id>',
+        reader.RecommendationsHandler, 'recommendations_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
@@ -268,6 +282,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
+    get_redirect_route(
+        r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
+        editor.UntrainedAnswersHandler, 'training_data_handler'),
     get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
@@ -316,10 +333,10 @@ urls = [
         'notifications_handler'),
 
     get_redirect_route(
-        r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
+        r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
 
     get_redirect_route(
-        r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
+        r'/logout', base.LogoutPage, 'logout_page_handler'),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),

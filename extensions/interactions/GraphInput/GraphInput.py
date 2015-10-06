@@ -22,17 +22,18 @@ from extensions.interactions import base
 class GraphInput(base.BaseInteraction):
     """Interaction for evaluating graphs."""
 
-    name = 'Graph'
-    category = 'Custom'
+    name = 'Graph Theory'
     description = 'Allows learners to create and manipulate graphs.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable = True
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Graph'}]
+    answer_type = 'Graph'
+    instructions = 'Create a graph'
+    needs_summary = True
 
     _customization_arg_specs = [{
         'name': 'graph',
-        'description': 'The initial graph.',
+        'description': 'Initial graph',
         'schema': {
             'type': 'custom',
             'obj_type': 'Graph',
@@ -66,49 +67,49 @@ class GraphInput(base.BaseInteraction):
         }
     }, {
         'name': 'canAddVertex',
-        'description': 'Allow learner to add vertices.',
+        'description': 'Allow learner to add vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canDeleteVertex',
-        'description': 'Allow learner to delete vertices.',
+        'description': 'Allow learner to delete vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canMoveVertex',
-        'description': 'Allow learner to move vertices.',
+        'description': 'Allow learner to move vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canEditVertexLabel',
-        'description': 'Allow learner to edit vertex labels.',
+        'description': 'Allow learner to edit vertex labels',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canAddEdge',
-        'description': 'Allow learner to add edges.',
+        'description': 'Allow learner to add edges',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canDeleteEdge',
-        'description': 'Allow learner to delete edges.',
+        'description': 'Allow learner to delete edges',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canEditEdgeWeight',
-        'description': 'Allow learner to edit edge weights.',
+        'description': 'Allow learner to edit edge weights',
         'schema': {
             'type': 'bool',
         },

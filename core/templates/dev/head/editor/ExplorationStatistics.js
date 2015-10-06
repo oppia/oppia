@@ -30,7 +30,8 @@ oppia.controller('ExplorationStatistics', [
     legendPosition: 'right',
     width: 500
   };
-  $scope.EXPLORATION_STATS_VERSION_ALL = 'all';
+  var _EXPLORATION_STATS_VERSION_ALL = 'all';
+  $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
@@ -38,11 +39,11 @@ oppia.controller('ExplorationStatistics', [
 
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
-    $scope.refreshExplorationStatistics($scope.EXPLORATION_STATS_VERSION_ALL);
+    $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
     $scope.explorationVersionUrl = '/createhandler/statisticsversion/' + explorationData.explorationId;
     $http.get($scope.explorationVersionUrl).then(function(response) {
       $scope.versions = response.data.versions;
-      $scope.currentVersion = $scope.EXPLORATION_STATS_VERSION_ALL;
+      $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
     });
   });
 
@@ -50,15 +51,8 @@ oppia.controller('ExplorationStatistics', [
   $scope.refreshExplorationStatistics = function(version) {
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId
       + '/' + version;
-    $http.get($scope.explorationStatisticsUrl).then(function(response) {      
-      var versionString;
-      if (version == 'all' || version == 'none') {
-        versionString = '';
-      } else {
-        versionString = '?v=' + version;
-      }
-      var explorationDataUrl = '/createhandler/data/' 
-       + explorationData.explorationId + versionString;
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      var explorationDataUrl = '/createhandler/data/' + explorationData.explorationId;
 
       $http.get(explorationDataUrl).then(function(response) {
         var states = response.data.states;
@@ -85,6 +79,10 @@ oppia.controller('ExplorationStatistics', [
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
       };
+      // TODO(bhenning): before, there was a special opacity computed for the
+      // ending (numCompletions/numVisits), should we do this for all
+      // terminal nodes, instead? If so, explorationStatesService needs to be
+      // able to provide whether given states are terminal
       for (var stateName in explorationStatesService.getStates()) {
         var visits = 0;
         if ($scope.stateStats.hasOwnProperty(stateName)) {
@@ -93,8 +91,6 @@ oppia.controller('ExplorationStatistics', [
         $scope.statsGraphOpacities[stateName] = Math.max(
           visits / numVisits, 0.05);
       }
-      $scope.statsGraphOpacities[END_DEST] = Math.max(
-        numCompletions / numVisits, 0.05);
 
       $scope.highlightStates = {};
       improvements.forEach(function(impItem) {
@@ -109,14 +105,8 @@ oppia.controller('ExplorationStatistics', [
     });
   };
 
-  $scope.onSelectExplorationVersion = function(version) {
-    $scope.refreshExplorationStatistics(version);
-  };
-
   $scope.onClickStateInStatsGraph = function(stateName) {
-    if (stateName !== END_DEST) {
-      $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
-    }
+    $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
   };
 
   $scope.showStateStatsModal = function(stateName, improvementType) {
@@ -127,7 +117,7 @@ oppia.controller('ExplorationStatistics', [
     ).then(function(response) {
       $modal.open({
         templateUrl: 'modals/stateStats',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           stateName: function() {
             return stateName;

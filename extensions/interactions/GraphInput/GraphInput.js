@@ -20,19 +20,24 @@
  * followed by the name of the arg.
  */
 
+oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
+
 oppia.directive('oppiaInteractiveGraphInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/GraphInput',
-      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+      controller: ['$scope', '$element', '$attrs',
+          function($scope, $element, $attrs) {
         $scope.errorMessage = '';
-        $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
+        $scope.graph = {
+          'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false,
+          'isLabeled': false };
 
         $scope.submitGraph = function() {
           // angular.copy needed to strip $$hashkey from the graph
-          $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph), 'submit');
+          $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph));
         };
         $scope.resetGraph = function() {
           updateGraphFromJSON($attrs.graphWithValue);
@@ -44,12 +49,15 @@ oppia.directive('oppiaInteractiveGraphInput', [
             return (str === 'true');
           }
           $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
-          $scope.canDeleteVertex = stringToBool($attrs.canDeleteVertexWithValue);
-          $scope.canEditVertexLabel = stringToBool($attrs.canEditVertexLabelWithValue);
+          $scope.canDeleteVertex = stringToBool(
+            $attrs.canDeleteVertexWithValue);
+          $scope.canEditVertexLabel = stringToBool(
+            $attrs.canEditVertexLabelWithValue);
           $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
           $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
           $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
-          $scope.canEditEdgeWeight = stringToBool($attrs.canEditEdgeWeightWithValue);
+          $scope.canEditEdgeWeight = stringToBool(
+            $attrs.canEditEdgeWeightWithValue);
         };
         $scope.init();
 
@@ -119,7 +127,8 @@ oppia.factory('graphDetailService', [function() {
 }]);
 
 oppia.directive('oppiaResponseGraphInput', [
-  'oppiaHtmlEscaper', 'graphDetailService', function(oppiaHtmlEscaper, graphDetailService) {
+  'oppiaHtmlEscaper', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+      function(oppiaHtmlEscaper, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},
@@ -129,6 +138,7 @@ oppia.directive('oppiaResponseGraphInput', [
 
         $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
         $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+        $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
 
         $scope.getDirectedEdgeArrowPoints = function(index) {
           return graphDetailService.getDirectedEdgeArrowPoints($scope.graph, index);
@@ -137,6 +147,22 @@ oppia.directive('oppiaResponseGraphInput', [
           return graphDetailService.getEdgeCentre($scope.graph, index);
         };
 
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseGraphInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/GraphInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        // TODO(bhenning): Improve this short response by using a small version
+        // of the graph image instead of an arbitrary label of vertices and
+        // edges.
+        $scope.graph = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
       }]
     };
   }
@@ -161,7 +187,8 @@ oppia.directive('graphViz', function() {
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', function($scope, $element, $attrs, $document, focusService, graphDetailService) {
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+    function($scope, $element, $attrs, $document, focusService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
@@ -207,7 +234,7 @@ oppia.directive('graphViz', function() {
         // by label more natural, by moving the vertex according to the difference
         // from the original position. Otherwise, mouse-dragging by label will make
         // the vertex awkwardly jump to the mouse.
-        if ($scope.state.currentlyDraggedVertex !== null) {
+        if ($scope.state.currentlyDraggedVertex !== null && ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
           $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = $scope.state.vertexDragStartX + ($scope.state.mouseX - $scope.state.mouseDragStartX);
           $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = $scope.state.vertexDragStartY + ($scope.state.mouseY - $scope.state.mouseDragStartY);
         }

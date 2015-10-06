@@ -6,53 +6,89 @@ language_code: en
 objective: start speaking Spanish
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 7
+skin_customizations:
+  panels_contents: {}
 states:
   Adios:
     content:
     - type: text
-      value: "\xA1Ay! \xBF\xA150 pesos para una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
+      value: "\xA1Ay! \xBF\xA150 pesos por una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
         \xA1Adi\xF3s!"
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: adios
-            name: Contains
-            rule_type: atomic
-            subject: answer
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Adios
           feedback:
           - Don't forget your accent marks next time!
           param_changes: []
-        - definition:
-            inputs:
-              x: "adi\xF3s"
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: adios
+          rule_type: Contains
+      - outcome:
           dest: END
           feedback: []
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Adios
-          feedback:
-          - Say goodbye
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+        rule_specs:
+        - inputs:
+            x: "adi\xF3s"
+          rule_type: Contains
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Adios
+        feedback:
+        - Say goodbye
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
   Colores:
     content:
     - type: text
       value: "\xBFDe qu\xE9 colores son las manzanas?"
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Colores
+          feedback:
+          - Apples aren't black unless they are rotten...and they aren't blue
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '0'
+          rule_type: Equals
+      - outcome:
+          dest: Colores
+          feedback:
+          - Orange and white...not quite
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '1'
+          rule_type: Equals
+      - outcome:
+          dest: Adios
+          feedback:
+          - "\xA1S\xED! That's right -- apples are red and green."
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '2'
+          rule_type: Equals
+      - outcome:
+          dest: Colores
+          feedback:
+          - Yellow and gray? Apples?
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '3'
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -61,257 +97,250 @@ states:
           - rojo y verde
           - amarillo y gris
           - I don't know
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: '0'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Colores
-          feedback:
-          - Apples aren't black unless they are rotten...and they aren't blue
-          param_changes: []
-        - definition:
-            inputs:
-              x: '1'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Colores
-          feedback:
-          - Orange and white...not quite
-          param_changes: []
-        - definition:
-            inputs:
-              x: '2'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Adios
-          feedback:
-          - "\xA1S\xED! That's right -- apples are red and green."
-          param_changes: []
-        - definition:
-            inputs:
-              x: '3'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Colores
-          feedback:
-          - Yellow and gray? Apples?
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Colores
-          feedback:
-          - 'Colores is easy to translate.
+      default_outcome:
+        dest: Colores
+        feedback:
+        - 'Colores is easy to translate.
 
-            manzanas is apples.
+          manzanas is apples.
 
-            So this is asking, what colors are apples?'
-          param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+          So this is asking, what colors are apples?'
+        param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
   Como meaning:
     content:
     - type: text
-      value: "So, \"te llamas\" looks a lot like \"me llamo.\"\n<br>And this sentence\
-        \ is a question.\n<br>What would \"\xBFC\xF3mo te llamas?\" mean?"
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: what is your name?
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      value: "Now, \"te llamas\" looks a lot like \"me llamo.\"\nAnd this sentence\
+        \ is a question.\n<br><br>What do you think \"\xBFC\xF3mo te llamas?\" means?"
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Me llamo
           feedback:
           - 'Yes!
 
             So, let''s try this again...Introduce yourself.'
           param_changes: []
-        - definition:
-            inputs:
-              x: what do you call yourself?
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: what is your name?
+          rule_type: Equals
+      - outcome:
           dest: Me llamo
           feedback:
           - 'Great!
 
             So, let''s try this again...Introduce yourself.'
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Me llamo
-          feedback:
-          - 'So this means "What is your name?"
+        rule_specs:
+        - inputs:
+            x: what do you call yourself?
+          rule_type: Equals
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Me llamo
+        feedback:
+        - 'So this means "What is your name?"
 
-            So, let''s try this again...Introduce yourself.'
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+          So, let''s try this again...Introduce yourself.'
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
+    param_changes: []
   Hola:
     content:
     - type: text
-      value: "Let's speak Spanish. If you ever don't understand what is being said,\
-        \ just type or select \"I don't know\"\n<br><br>\n\xA1Hola!"
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: hola!
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      value: "Let's speak some Spanish! I'll say something in Spanish, and you can\
+        \ respond in Spanish. OK?<br><br>\n\xA1Hola!"
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Me llamo
           feedback:
           - 'Don''t forget: Spanish uses inverted exclamation points at the beginning
             of sentences as well as the ending exclamation point.'
           param_changes: []
-        - definition:
-            inputs:
-              x: hola
-            name: Contains
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: hola!
+          rule_type: Equals
+      - outcome:
           dest: Me llamo
           feedback: []
           param_changes: []
-        - definition:
-            inputs:
-              x: hola
-            name: FuzzyEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: hola
+          rule_type: Contains
+      - outcome:
           dest: Hola
           feedback:
           - Check your spelling!
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Hola
-          feedback:
-          - Hola means Hello. Say Hello back (in Spanish).
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+        rule_specs:
+        - inputs:
+            x: hola
+          rule_type: FuzzyEquals
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Hola
+        feedback:
+        - Hola means Hello. Say Hello back (in Spanish).
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
   Me llamo:
     content:
     - type: text
       value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: me llamo es
-            name: StartsWith
-            rule_type: atomic
-            subject: answer
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Me llamo
           feedback:
           - You've got one too many verbs.
           param_changes: []
-        - definition:
-            inputs:
-              x: me llamo
-            name: StartsWith
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: me llamo es
+          rule_type: StartsWith
+      - outcome:
           dest: Supermercado
           feedback: []
           param_changes: []
-        - definition:
-            inputs:
-              x: mi nombre es
-            name: StartsWith
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: me llamo
+          rule_type: StartsWith
+      - outcome:
           dest: Supermercado
           feedback: []
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Me llamo meaning
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+        rule_specs:
+        - inputs:
+            x: mi nombre es
+          rule_type: StartsWith
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Me llamo meaning
+        feedback: []
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
   Me llamo meaning:
     content:
     - type: text
-      value: Can you say what "Me llamo" means?
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: my name is
-            name: Equals
-            rule_type: atomic
-            subject: answer
+      value: (What do you think "Me llamo" means?)
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Como meaning
           feedback:
           - That's right!
           param_changes: []
-        - definition:
-            inputs:
-              x: i am called
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: my name is
+          rule_type: Equals
+      - outcome:
           dest: Como meaning
           feedback:
           - Literally, yes, but it can also be translated as "My name is."
           param_changes: []
-        - definition:
-            inputs:
-              x: i call myself
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: i am called
+          rule_type: Equals
+      - outcome:
           dest: Como meaning
           feedback:
           - Literally, yes, but it can also be translated as "My name is."
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Como meaning
-          feedback:
-          - 'Me llamo means "My name is"
+        rule_specs:
+        - inputs:
+            x: i call myself
+          rule_type: Equals
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Como meaning
+        feedback:
+        - 'Me llamo means "My name is"
 
-            So "Me llamo Oppia" means "My name is Oppia".'
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+          So "Me llamo Oppia" means "My name is Oppia".'
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
   Supermercado:
     content:
     - type: text
       value: "\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\
         ?"
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Supermercado
+          feedback:
+          - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\nYou can't\
+            \ buy windows in a supermarket. If you need more help, select \"I don't\
+            \ know\""
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '0'
+          rule_type: Equals
+      - outcome:
+          dest: Supermercado
+          feedback:
+          - "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\nYou can't\
+            \ buy cars in a supermarket. If you need more help, select \"I don't know\""
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '1'
+          rule_type: Equals
+      - outcome:
+          dest: Colores
+          feedback:
+          - Yes! You can buy apples in a supermarket.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '2'
+          rule_type: Equals
       customization_args:
         choices:
           value:
@@ -319,49 +348,15 @@ states:
           - Coches
           - Manzanas
           - I don't know
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: '0'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Supermercado
-          feedback:
-          - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\nYou can't\
-            \ buy windows in a supermarket. If you need more help, select \"I don't\
-            \ know\""
-          param_changes: []
-        - definition:
-            inputs:
-              x: '1'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Supermercado
-          feedback:
-          - "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\nYou can't\
-            \ buy cars in a supermarket. If you need more help, select \"I don't know\""
-          param_changes: []
-        - definition:
-            inputs:
-              x: '2'
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Colores
-          feedback:
-          - Yes! You can buy apples in a supermarket.
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Supermercado
-          feedback:
-          - 'Supermercado is supermarket.
+      default_outcome:
+        dest: Supermercado
+        feedback:
+        - 'Supermercado is supermarket.
 
-            What can you buy at a supermarket?'
-          param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+          What can you buy at a supermarket?'
+        param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
+states_schema_version: 4
+tags: []

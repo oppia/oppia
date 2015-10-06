@@ -1,13 +1,14 @@
 application: oppiaserver
-version: 1-2-12
+version: 2-0-0
 runtime: python27
 api_version: 1
 threadsafe: false
+instance_class: F4
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
   # Modify the 'version' field above to match this.
-  OPPIA_VERSION: '1.2.12'
+  OPPIA_VERSION: '2.0.0'
 
 builtins:
 - appstats: on
@@ -62,6 +63,12 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /extensions/gadgets/(.*)/static/(.*)
+  static_files: extensions/gadgets/\1/static/\2
+  upload: extensions/gadgets/(.*)/static/(.*)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /extensions/interactions/(.*)/static/(.*)
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*)
@@ -81,7 +88,7 @@ handlers:
   http_headers:
     Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.0.0/mapreduce/lib/pipeline/ui/images
+  static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP

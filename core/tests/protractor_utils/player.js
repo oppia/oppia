@@ -21,6 +21,7 @@
 
 var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('./forms.js');
+var general = require('./general.js');
 
 var restartExploration = function() {
   element(by.css('.protractor-test-restart-exploration')).click();
@@ -53,37 +54,41 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction's detail checker.
-var expectInteractionToMatch = function(interactionName) {
+var expectInteractionToMatch = function(interactionId) {
   // Convert additional arguments to an array to send on.
   var args = [element(by.css('.protractor-test-conversation-input'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  interactions.getInteraction(interactionName).
+  interactions.getInteraction(interactionId).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
 // `answerData` is a variable that is passed to the corresponding interaction's
 // protractor utilities. Its definition and type are interaction-specific.
-var submitAnswer = function(interactionName, answerData) {
-  interactions.getInteraction(interactionName).submitAnswer(
-    element.all(by.css('.protractor-test-conversation-input')).last(),
+var submitAnswer = function(interactionId, answerData) {
+  // The .first() targets the inline interaction, if it exists. Otherwise,
+  // it will get the supplemental interaction.
+  interactions.getInteraction(interactionId).submitAnswer(
+    element.all(by.css('.protractor-test-conversation-input')).first(),
     answerData);
+  general.waitForSystem();
 };
 
+var clickThroughToNextCard = function(interactionId, answerData) {
+  element(by.css('.protractor-test-continue-to-next-card-button')).click();
+};
 
 var expectExplorationToBeOver = function() {
   expect(
-    element.all(by.css('.protractor-test-conversation-finished')).last().
-      isDisplayed()
-  ).toBe(true);
+    element.all(by.css('.protractor-test-conversation-content')).last().getText()
+  ).toEqual('Congratulations, you have finished!');
 };
 
 var expectExplorationToNotBeOver = function() {
   expect(
-    element.all(by.css('.protractor-test-conversation-finished')).last().
-      isDisplayed()
-  ).toBe(false);
+    element.all(by.css('.protractor-test-conversation-content')).last().getText()
+  ).not.toEqual('Congratulations, you have finished!');
 };
 
 exports.restartExploration = restartExploration;
@@ -94,6 +99,7 @@ exports.expectLatestFeedbackToMatch = expectLatestFeedbackToMatch;
 
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
+exports.clickThroughToNextCard = clickThroughToNextCard;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;

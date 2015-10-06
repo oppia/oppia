@@ -3,45 +3,75 @@
     <div class="oppia-sidebar-logo-container">
     </div>
   </div>
-  {% if nav_mode in ['explore', 'create'] %}
-    <ul>
-      {% if username %}
-        <li {% if nav_mode == 'home' %}class="active"{% endif %}>
-          <a href="/dashboard">
-            <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
-            Dashboard
-            <span ng-if="numUnseenNotifications > 0">
-              (<[numUnseenNotifications]>)
-            </span>
-          </a>
-        </li>
-      {% endif %}
 
-      {% if SHOW_FORUM_PAGE %}
-        <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-          <a href="/forum">
-            <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
-            Forum
-          </a>
-        </li>
-      {% endif %}
+  <ul>
+    <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
+      <a href="/">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_home_black_48dp.png" class="oppia-sidebar-menu-icon">
+        Home
+      </a>
+    </li>
 
-      <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-        <a href="/about">
-          <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
-          About
+    <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+      <a href="/about">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_help_black_48dp.png" class="oppia-sidebar-menu-icon">
+        About
+      </a>
+    </li>
+
+    <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
+      <a href="/participate">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
+        Participation Playbook
+      </a>
+    </li>
+
+    {% if SHOW_CUSTOM_PAGES %}
+      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+        <a href="/forum">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png" class="oppia-sidebar-menu-icon">
+          Forum
         </a>
       </li>
-    </ul>
-  {% else %}
-    <ul>
+    {% endif %}
+
+    {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
       <li>
-        <!-- TODO(sll): Replace this with actual content. -->
-        <a href="#">
-          <span class="glyphicon glyphicon-remove oppia-sidebar-menu-icon"></span>
-          Nothing here yet!
+        <a href="{{additional_link['link']}}" target="_blank">
+          <img src="/images/sidebar/{{additional_link['icon_filename']}}"
+                 class="oppia-sidebar-menu-icon">
+          {{additional_link['name']}}
         </a>
       </li>
-    </ul>
-  {% endif %}
+    {% endfor %}
+
+    {% if SHOW_CUSTOM_PAGES %}
+      <hr>
+
+      <li>
+        <a href="/terms">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
+          Terms of Use
+        </a>
+      </li>
+
+      <li>
+        <a href="/privacy">
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
+          Privacy Policy
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+
+  <div class="oppia-sidebar-footer">
+    {% if SOCIAL_MEDIA_BUTTONS %}
+      <div>Follow Us:</div>
+      {% for button in SOCIAL_MEDIA_BUTTONS %}
+        <a href="{{button['link']}}" target="_blank">
+          <img src="/images/social/{{button['icon_filename']}}">
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
 </nav>

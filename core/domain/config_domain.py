@@ -17,37 +17,53 @@
 __author__ = 'Sean Lip'
 
 
-from core.domain import obj_services
 from core.domain import user_services
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
+import schema_utils
 
 
 COMPUTED_PROPERTY_PREFIX = 'computed:'
 
+SET_OF_STRINGS_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'unicode',
+    },
+    'validators': [{
+        'id': 'is_uniquified',
+    }],
+}
+
 
 class ConfigProperty(object):
-    """A property with a name and a default value."""
+    """A property with a name and a default value.
 
-    ALLOWED_TYPES = frozenset([
-        'UnicodeString', 'Html', 'SetOfUnicodeString', 'Boolean'])
+    NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
+    these names:
+    - admin_email_address
+    - banner_alt_text
+    - contribute_gallery_page_announcement
+    - editor_page_announcement
+    - editor_prerequisites_agreement
+    - full_site_url
+    - splash_page_exploration_id
+    - splash_page_exploration_version
+    """
 
     def refresh_default_value(self, default_value):
         pass
 
-    def __init__(self, name, obj_type, description, default_value):
-        if not obj_type in self.ALLOWED_TYPES:
-            raise Exception('Bad config property obj_type: %s' % obj_type)
-
+    def __init__(self, name, schema, description, default_value):
         if name in Registry._config_registry:
             raise Exception('Property with name %s already exists' % name)
 
         self._name = name
-        self._obj_type = obj_type
+        self._schema = schema
         self._description = description
-        self._default_value = obj_services.Registry.get_object_class_by_type(
-            self._obj_type).normalize(default_value)
+        self._default_value = schema_utils.normalize_against_schema(
+            default_value, self._schema)
 
         Registry._config_registry[self.name] = self
 
@@ -57,8 +73,7 @@ class ConfigProperty(object):
 
     @property
     def schema(self):
-        return obj_services.Registry.get_object_class_by_type(
-            self._obj_type).SCHEMA
+        return self._schema
 
     @property
     def description(self):
@@ -86,8 +101,7 @@ class ConfigProperty(object):
         return self.default_value
 
     def normalize(self, value):
-        return obj_services.Registry.get_object_class_by_type(
-            self._obj_type).normalize(value)
+        return schema_utils.normalize_against_schema(value, self._schema)
 
 
 class ComputedProperty(ConfigProperty):
@@ -97,14 +111,14 @@ class ComputedProperty(ConfigProperty):
         memcache_services.delete_multi([self.name])
         self._default_value = self.fn(*self.args)
 
-    def __init__(self, name, obj_type, description, fn, *args):
+    def __init__(self, name, schema, description, fn, *args):
         self.fn = fn
         self.args = args
 
         default_value = self.fn(*self.args)
         super(ComputedProperty, self).__init__(
             '%s%s' % (COMPUTED_PROPERTY_PREFIX, name),
-            obj_type, description, default_value)
+            schema, description, default_value)
 
     @property
     def value(self):
@@ -192,18 +206,18 @@ def update_moderator_ids():
 
 
 ADMIN_IDS = ComputedProperty(
-    'admin_ids', 'SetOfUnicodeString', 'Admin ids', update_admin_ids)
+    'admin_ids', SET_OF_STRINGS_SCHEMA, 'Admin ids', update_admin_ids)
 MODERATOR_IDS = ComputedProperty(
-    'moderator_ids', 'SetOfUnicodeString', 'Moderator ids',
+    'moderator_ids', SET_OF_STRINGS_SCHEMA, 'Moderator ids',
     update_moderator_ids)
 
 ADMIN_EMAILS = ConfigProperty(
-    'admin_emails', 'SetOfUnicodeString', 'Email addresses of admins', [])
+    'admin_emails', SET_OF_STRINGS_SCHEMA, 'Email addresses of admins', [])
 MODERATOR_EMAILS = ConfigProperty(
-    'moderator_emails', 'SetOfUnicodeString', 'Email addresses of moderators',
+    'moderator_emails', SET_OF_STRINGS_SCHEMA, 'Email addresses of moderators',
     [])
 BANNED_USERNAMES = ConfigProperty(
     'banned_usernames',
-    'SetOfUnicodeString',
+    SET_OF_STRINGS_SCHEMA,
     'Banned usernames (editing permissions for these users have been removed)',
     [])

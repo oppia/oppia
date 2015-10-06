@@ -19,8 +19,8 @@
  */
 
 oppia.controller('ExplorationFeedback', [
-    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
-    function($scope, $http, $modal, warningsData, explorationData, oppiaDatetimeFormatter) {
+    '$scope', '$http', '$modal', '$rootScope', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
+    function($scope, $http, $modal, $rootScope, warningsData, explorationData, oppiaDatetimeFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
@@ -39,9 +39,12 @@ oppia.controller('ExplorationFeedback', [
     return null;
   };
 
-  $scope._getThreadList = function() {
+  $scope._getThreadList = function(successCallback) {
     $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
       $scope.threads = data.threads;
+      if (successCallback) {
+        successCallback();
+      }
     });
   };
 
@@ -78,7 +81,7 @@ oppia.controller('ExplorationFeedback', [
 
     $modal.open({
       templateUrl: 'modals/editorFeedbackCreateThread',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {},
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.create = function(newThreadSubject, newThreadText) {
@@ -143,6 +146,11 @@ oppia.controller('ExplorationFeedback', [
     });
   };
 
+  $scope.isSendButtonDisabled = function(newMessageText, updatedStatus) {
+    return $scope.messageSendingInProgress || (
+      !$scope.newMessageText && $scope.currentThreadData.status == updatedStatus);
+  };
+
   // We do not permit 'Duplicate' as a valid status for now, since it should
   // require the id of the duplicated thread to be specified.
   $scope.STATUS_CHOICES = [
@@ -162,10 +170,14 @@ oppia.controller('ExplorationFeedback', [
     return '';
   };
 
+  $rootScope.loadingMessage = 'Loading';
+
   // Initial load of the thread list.
   $scope.currentThreadId = null;
   $scope.currentThreadData = null;
   $scope.currentThreadMessages = null;
   $scope.updatedStatus = null;
-  $scope._getThreadList();
+  $scope._getThreadList(function() {
+    $rootScope.loadingMessage = '';
+  });
 }]);

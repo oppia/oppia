@@ -19,11 +19,15 @@
 __author__ = 'Sean Lip'
 
 import copy
+import datetime
 import feconf
 import re
 import types
 
 from core.controllers import base
+from core.domain import exp_services
+from core.platform import models
+current_user_services = models.Registry.import_current_user_services()
 from core.tests import test_utils
 import main
 
@@ -32,6 +36,17 @@ import webtest
 
 
 class BaseHandlerTest(test_utils.GenericTestBase):
+
+    def test_dev_indicator_appears_in_dev_and_not_in_production(self):
+        """Test dev indicator appears in dev and not in production."""
+
+        with self.swap(feconf, 'DEV_MODE', True):
+            response = self.testapp.get('/gallery')
+            self.assertIn('<div class="oppia-dev-mode">', response.body)
+
+        with self.swap(feconf, 'DEV_MODE', False):
+            response = self.testapp.get('/gallery')
+            self.assertNotIn('<div class="oppia-dev-mode">', response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -47,6 +62,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
+            self.log_line(
+                'Fetched %s with status code %s' % (url, response.status_int))
             self.assertIn(response.status_int, [200, 302, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
@@ -167,8 +184,8 @@ class EscapingTest(test_utils.GenericTestBase):
         def get(self):
             """Handles GET requests."""
             self.values.update({
-                'ADMIN_EMAIL_ADDRESS': ['<[angular_tag]>'],
-                'SITE_NAME': 'x{{51 * 3}}y',
+                'CONTACT_EMAIL_ADDRESS': ['<[angular_tag]>'],
+                'SITE_FORUM_URL': 'x{{51 * 3}}y',
             })
             self.render_template('pages/about.html')
 
@@ -201,3 +218,22 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
         self.assertNotIn('<script>', response.body)
         self.assertNotIn('马', response.body)
+
+
+class LogoutPageTest(test_utils.GenericTestBase):
+
+    def test_logout_page(self):
+        """Tests for logout handler."""
+        exp_services.load_demo('0')
+        # Logout with valid query arg. This test only validates that the login
+        # cookies have expired after hitting the logout url.
+        current_page = '/explore/0'
+        response = self.testapp.get(current_page)
+        self.assertEqual(response.status_int, 200)
+        response = self.testapp.get(current_user_services.create_logout_url(
+            current_page))
+        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+
+        self.assertTrue(
+            datetime.datetime.utcnow() > datetime.datetime.strptime(
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))

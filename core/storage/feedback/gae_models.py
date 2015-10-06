@@ -203,3 +203,23 @@ class FeedbackMessageModel(base_models.BaseModel):
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
+
+
+class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
+    """Model for storing feedback thread analytics for an exploration.
+
+    The key of each instance is the exploration id.
+    """
+    # The number of open feedback threads filed against this exploration.
+    num_open_threads = ndb.IntegerProperty(default=None, indexed=True)
+    # Total number of feedback threads filed against this exploration.
+    num_total_threads = ndb.IntegerProperty(default=None, indexed=True)
+
+    @classmethod
+    def create(cls, id, num_open_threads, num_total_threads):
+        """Creates a new FeedbackAnalyticsModel entry."""
+        cls(
+            id=id,
+            num_open_threads=num_open_threads,
+            num_total_threads=num_total_threads
+        ).put()

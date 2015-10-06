@@ -27,7 +27,7 @@ oppia.factory('createExplorationButtonService', [
     _getCreateModalInstance: function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         templateUrl: 'modals/galleryCreateNew',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           categoriesForDropdown: function() {
             var result = [];
@@ -97,13 +97,13 @@ oppia.factory('createExplorationButtonService', [
               }
 
               if (!title) {
-                $scope.warningText = 'Please specify an exploration title.';
+                $scope.warningText = 'Please enter an exploration title.';
                 return false;
               }
 
               if (!validatorsService.isValidEntityName(title, false)) {
-                $scope.warningText = 'Exploration titles should only consist of ' +
-                  'letters, numbers, hyphens and spaces.';
+                $scope.warningText = 'Please use ' +
+                  'letters, numbers, hyphens and spaces only.';
                 return false;
               }
 

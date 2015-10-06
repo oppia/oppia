@@ -27,11 +27,6 @@ import feconf
 from google.appengine.ext import ndb
 
 
-EXPLORATION_STATUS_PRIVATE = 'private'
-EXPLORATION_STATUS_PUBLIC = 'public'
-EXPLORATION_STATUS_PUBLICIZED = 'publicized'
-
-
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
     pass
@@ -61,7 +56,13 @@ class ExplorationModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = ndb.StringProperty(
         default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
-    # Skill tags associated with this exploration.
+    # Tags (topics, skills, concepts, etc.) associated with this
+    # exploration.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
+    # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
+    # caused GAE to raise an error on fetching a specific version of the
+    # exploration model.
+    # TODO(sll): Fix this error and remove this property.
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
     blurb = ndb.TextProperty(default='', indexed=False)
@@ -71,6 +72,15 @@ class ExplorationModel(base_models.VersionedModel):
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = ndb.StringProperty(default='conversation_v1')
 
+    # Schema storing specifications of the contents of any gadget panels,
+    # along with associated customizations for each gadget instance.
+    skin_customizations = ndb.JsonProperty(
+        default=feconf.DEFAULT_SKIN_CUSTOMIZATIONS,
+        indexed=False)
+
+    # The version of the states blob schema.
+    states_schema_version = ndb.IntegerProperty(
+        required=True, default=0, indexed=True)
     # The name of the initial state of this exploration.
     init_state_name = ndb.StringProperty(required=True, indexed=False)
     # A dict representing the states of this exploration. This dict should
@@ -126,7 +136,7 @@ class ExplorationModel(base_models.VersionedModel):
             post_commit_status=exp_rights.status,
             post_commit_community_owned=exp_rights.community_owned,
             post_commit_is_private=(
-                exp_rights.status == EXPLORATION_STATUS_PRIVATE)
+                exp_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
         ).put_async()
 
 
@@ -171,11 +181,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default=EXPLORATION_STATUS_PRIVATE, indexed=True,
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            EXPLORATION_STATUS_PRIVATE,
-            EXPLORATION_STATUS_PUBLIC,
-            EXPLORATION_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.ACTIVITY_STATUS_PUBLIC,
+            feconf.ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -215,7 +225,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == EXPLORATION_STATUS_PRIVATE)
+                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
 
@@ -260,10 +270,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
-    def get_commit(cls, exploration_id, version):
-        return cls.get_by_id('exploration-%s-%s' % (exploration_id, version))
-
-    @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
@@ -291,7 +297,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     A ExpSummaryModel instance stores the following information:
 
-        id, title, category, objective, language_code, skill_tags,
+        id, title, category, objective, language_code, tags,
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.
@@ -308,8 +314,11 @@ class ExpSummaryModel(base_models.BaseModel):
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = ndb.StringProperty(
         required=True, indexed=True)
-    # Skill tags associated with this exploration.
-    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+    # Tags associated with this exploration.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
+
+    # Aggregate user-assigned ratings of the exploration
+    ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
@@ -322,11 +331,11 @@ class ExpSummaryModel(base_models.BaseModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default=EXPLORATION_STATUS_PRIVATE, indexed=True,
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            EXPLORATION_STATUS_PRIVATE,
-            EXPLORATION_STATUS_PUBLIC,
-            EXPLORATION_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.ACTIVITY_STATUS_PUBLIC,
+            feconf.ACTIVITY_STATUS_PUBLICIZED
         ]
     )
 
@@ -347,7 +356,7 @@ class ExpSummaryModel(base_models.BaseModel):
     def get_non_private(cls):
         """Returns an iterable with non-private exp summary models."""
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != EXPLORATION_STATUS_PRIVATE
+            ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ExpSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -358,7 +367,7 @@ class ExpSummaryModel(base_models.BaseModel):
         viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == EXPLORATION_STATUS_PRIVATE
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,

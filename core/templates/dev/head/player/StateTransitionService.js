@@ -78,6 +78,27 @@ oppia.factory('expressionInterpolationService', [
         }
         throw e;
       }
+    },
+    // This works for both unicode and HTML.
+    getParamsFromString: function(sourceString) {
+      var matches = sourceString.match(/{{([^}]*)}}/g) || [];
+
+      var allParams = [];
+      for (var i = 0; i < matches.length; i++) {
+        // Trim the '{{' and '}}'.
+        matches[i] = matches[i].substring(2, matches[i].length - 2);
+
+        var params = expressionEvaluatorService.getParamsUsedInExpression(
+          $filter('convertHtmlToUnicode')(matches[i]));
+
+        for (var j = 0; j < params.length; j++) {
+          if (allParams.indexOf(params[j]) === -1) {
+            allParams.push(params[j]);
+          }
+        }
+      }
+
+      return allParams.sort();
     }
   };
 }]);
@@ -93,7 +114,7 @@ oppia.factory('stateTransitionService', [
 
   // Evaluate feedback.
   var makeFeedback = function(feedbacks, envs) {
-    var feedbackHtml = feedbacks.length > 0 ? randomFromArray(feedbacks) : '';
+    var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
     return expressionInterpolationService.processHtml(feedbackHtml, envs);
   };
 
@@ -161,10 +182,10 @@ oppia.factory('stateTransitionService', [
       }
     },
     // Returns null when failed to evaluate.
-    getNextStateData: function(ruleSpec, newState, answer) {
+    getNextStateData: function(outcome, newState, answer) {
       var oldParams = learnerParamsService.getAllParams();
       oldParams.answer = answer;
-      var feedback = makeFeedback(ruleSpec.feedback, [oldParams]);
+      var feedback = makeFeedback(outcome.feedback, [oldParams]);
       if (feedback === null) {
         return null;
       }
@@ -176,8 +197,7 @@ oppia.factory('stateTransitionService', [
         return null;
       }
 
-      var question = (
-        newState ? makeQuestion(newState, [newParams, {answer: 'answer'}]) : '');
+      var question = makeQuestion(newState, [newParams, {answer: 'answer'}]);
       if (question === null) {
         return null;
       }
@@ -186,7 +206,6 @@ oppia.factory('stateTransitionService', [
       // TODO(sll): Remove the 'answer' key from newParams.
       newParams.answer = answer;
       return {
-        finished: ruleSpec.dest === 'END',
         params: newParams,
         feedback_html: feedback,
         question_html: question

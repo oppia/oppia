@@ -71,10 +71,6 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
             [('x', objects.Real), ('y', objects.UnicodeString)]
         )
 
-    def test_rule_is_generic(self):
-        self.assertTrue(rule_domain.is_generic('Real', 'IsGreaterThan'))
-        self.assertFalse(rule_domain.is_generic('UnicodeString', 'Equals'))
-
 
 class RuleDataUnitTests(test_utils.GenericTestBase):
     """Tests for the actual rules in extensions/."""
@@ -94,8 +90,11 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                 param_list = rule_domain.get_param_list(clazz.description)
 
                 for (param_name, param_obj_type) in param_list:
-                    # TODO(sll): Get rid of this special case.
-                    if param_obj_type.__name__ == 'NonnegativeInt':
+                    # TODO(sll): Get rid of these special cases.
+                    if param_obj_type.__name__ in [
+                            'NonnegativeInt', 'ListOfGraph',
+                            'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
+                            'SetOfNormalizedString']:
                         continue
 
                     self.assertTrue(
@@ -105,3 +104,21 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                 clses.append(clazz)
 
         self.assertTrue(at_least_one_rule_found)
+
+
+class RuleFunctionUnitTests(test_utils.GenericTestBase):
+    """Test for functions involving rules."""
+
+    def test_get_description_strings_for_obj_type(self):
+        rule_descriptions = rule_domain.get_description_strings_for_obj_type(
+            'UnicodeString')
+        self.assertEqual(rule_descriptions, {
+            'CaseSensitiveEquals': (
+                'is equal to {{x|UnicodeString}}, taking case into account'),
+            'Contains': 'contains {{x|UnicodeString}}',
+            'Equals': 'is equal to {{x|UnicodeString}}',
+            'MatchesBase64EncodedFile': (
+                'has same content as the file located at '
+                '{{filepath|UnicodeString}}'),
+            'StartsWith': 'starts with {{x|UnicodeString}}',
+        })

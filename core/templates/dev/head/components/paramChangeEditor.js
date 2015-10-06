@@ -42,7 +42,7 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
 
       $scope.DEFAULT_CUSTOMIZATION_ARGS = {
         'Copier': {
-          value: '[New parameter value]',
+          value: '',
           parse_with_jinja: true
         },
         'RandomSelector': {
@@ -59,15 +59,14 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
       // The 0-based index of the parameter change item that is currently active for
       // editing, or -1 if no item is active.
       $scope.activeItem = -1;
-      // TODO(sll): Move these lists (of value generators without init_args)
-      // somewhere more global.
+
       $scope.ALLOWED_KEYS = {
         'Copier': ['value', 'parse_with_jinja'],
         'RandomSelector': ['list_of_values'],
       };
       $scope.PREAMBLE_TEXT = {
-        'Copier': 'by setting it to',
-        'RandomSelector': 'by picking, at random, one of'
+        'Copier': 'should be changed to',
+        'RandomSelector': 'should be one of'
       };
       $scope.HUMAN_READABLE_ARGS_RENDERERS = {
         'Copier': function(customization_args) {

@@ -7,7 +7,8 @@
     {% include 'header_js_libs.html' %}
     <script>
       var GLOBALS = {
-        csrf_token: JSON.parse('{{csrf_token|js_string}}')
+        csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}')
       }
     </script>
   </head>
@@ -35,6 +36,9 @@
           </span>
         </div>
       {% endfor %}
+      <button type="button" class="btn btn-default protractor-test-reload-all-explorations-button" ng-click="reloadAllExplorations()">
+        Reload All Explorations
+      </button>
     </div>
 
     <h3>Jobs</h3>
@@ -203,6 +207,26 @@
       {% endfor %}
     </ul>
 
+    <h3>Search Index</h3>
+
+    <button ng-click="clearSearchIndex()">Clear Search Index</button>
+
+    <h3>Topic Similarities</h3>
+
+    <div>
+      Upload a csv file:<br>
+      The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
+      <input type="file" id="topicSimilaritiesFile">
+      <button ng-click="uploadTopicSimilaritiesFile()">Upload</button><br>
+      <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+    </div>
+
+    {% if DEV_MODE %}
+      <div class="oppia-dev-mode">
+        Development Mode
+      </div>
+    {% endif %}
+
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
 
@@ -216,7 +240,6 @@
       {{ include_js_file('forms/formBuilder.js') }}
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
-      {{ object_editors_js }}
       {{ value_generators_js }}
     </script>
 

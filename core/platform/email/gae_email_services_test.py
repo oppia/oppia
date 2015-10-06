@@ -31,15 +31,13 @@ class EmailTests(test_utils.GenericTestBase):
         # Emails are not sent if the CAN_SEND_EMAILS_TO_ADMIN setting
         # is not turned on.
         with self.swap(feconf, 'CAN_SEND_EMAILS_TO_ADMIN', False):
-            gae_email_services.send_mail_to_admin(
-                'sender@example.com', 'subject', 'body')
+            gae_email_services.send_mail_to_admin('subject', 'body')
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(0, len(messages))
 
         with self.swap(feconf, 'CAN_SEND_EMAILS_TO_ADMIN', True):
-            gae_email_services.send_mail_to_admin(
-                'sender@example.com', 'subject', 'body')
+            gae_email_services.send_mail_to_admin('subject', 'body')
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(1, len(messages))

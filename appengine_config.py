@@ -33,7 +33,7 @@ def webapp_add_wsgi_middleware(app):
     This also sets the level of appstats log messages to 'debug' by
     monkey-patching. For details, see:
 
-        http://stackoverflow.com/questions/4305243/disable-appstats-logging
+        https://stackoverflow.com/questions/4305243/disable-appstats-logging
     """
     from google.appengine.ext.appstats import recording
 
@@ -70,13 +70,19 @@ def webapp_add_wsgi_middleware(app):
 ROOT_PATH = os.path.dirname(__file__)
 
 THIRD_PARTY_LIBS = [
-    os.path.join(ROOT_PATH, 'third_party/bleach-1.2.2'),
-    os.path.join(ROOT_PATH, 'third_party/html5lib-python-0.95'),
-    os.path.join(ROOT_PATH, 'third_party/gae-mapreduce-1.9.0.0'),
-    os.path.join(ROOT_PATH, 'third_party/gae-cloud-storage-1.9.0.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'bleach-1.2.2'),
+    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-0.95'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.17.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.15.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
 ]
 
 for lib_path in THIRD_PARTY_LIBS:
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
+
+# Required, otherwise MapReduce third-party library will throw errors.
+os.environ['PYTHONPATH'] = ','.join(sys.path)

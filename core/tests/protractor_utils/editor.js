@@ -24,13 +24,38 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
+// constants
+var _OPTION_CREATE_NEW = 'A New Card Called...';
+
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
-  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+  element.all(by.css('.skipBtn')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
     } else if (buttons.length !== 0) {
       throw 'Expected to find at most one \'exit tutorial\' button';
+    }
+  });
+};
+
+var progressInTutorial = function() {
+  // Progress to the next instruction in the tutorial.
+  element.all(by.css('.nextBtn')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else {
+      throw 'Expected to find exactly one \'next\' button';
+    }
+  });
+};
+
+var finishTutorial = function() {
+  // Finish the tutorial
+  element(by.buttonText('Finish')).then(function(button) {
+    if (button) {
+      button.click();
+    } else {
+      throw 'Expected to find exactly one \'Finish\' button';
     }
   });
 };
@@ -40,7 +65,7 @@ var exitTutorialIfNecessary = function() {
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
   // Click a neutral element in order to dismiss any warnings.
-  element(by.css('.protractor-test-state-editor-oppia-avatar')).click();
+  element(by.css('.protractor-test-editor-neutral-element')).click();
 };
 
 var navigateToPreviewTab = function() {
@@ -61,12 +86,16 @@ var setStateName = function(name) {
   nameElement.element(by.css('.protractor-test-state-name-input')).
     sendKeys(name);
   nameElement.element(by.css('.protractor-test-state-name-submit')).click();
+  // Wait for the state to refresh.
+  general.waitForSystem();
+};
+
+var _getStateName = function() {
+  return element(by.css('.protractor-test-state-name-container')).getText();
 };
 
 var expectCurrentStateToBe = function(name) {
-  expect(
-    element(by.css('.protractor-test-state-name-container')).getText()
-  ).toMatch(name);
+  expect(_getStateName()).toMatch(name);
 };
 
 // CONTENT
@@ -75,6 +104,7 @@ var expectCurrentStateToBe = function(name) {
 // can then use to alter the state content, for example by calling
 // .appendBoldText(...).
 var setContent = function(richTextInstructions) {
+  general.waitForSystem();
   element(by.css('.protractor-test-state-edit-content')).click();
   var richTextEditor = forms.RichTextEditor(
     element(by.css('.protractor-test-state-content-editor')));
@@ -110,37 +140,91 @@ var expectContentTextToEqual = function(text) {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
-var setInteraction = function(interactionName) {
-  element(by.css('.protractor-test-select-interaction-id')).
-    element(by.css('option[value=' + interactionName + ']')).click();
+var setInteraction = function(interactionId) {
+  element(by.css('.protractor-test-delete-interaction')).isPresent().then(function(isVisible) {
+    // If there is already an interaction present, delete it.
+    if (isVisible) {
+      element(by.css('.protractor-test-delete-interaction')).click();
+      // Click through the "are you sure?" warning.
+      element(by.css('.protractor-test-confirm-delete-interaction')).click();
+    }
+  });
+
+  general.waitForSystem();
+
+  element(by.css('.protractor-test-open-add-interaction-modal')).click();
+
+  general.waitForSystem();
+
+  var interactionElem = element(by.css(
+    '.protractor-test-interaction-tile-' + interactionId));
+
+  // Try to find the interaction in one of the tabs.
+  element.all(by.css('.protractor-test-interaction-tab')).map(function(tabElem) {
+    tabElem.click();
+    return interactionElem.isDisplayed().then(function(isInteractionVisible) {
+      if (isInteractionVisible) {
+        return tabElem;
+      }
+    })
+  }).then(function(tabElems) {
+    var interactionTileFound = false;
+    for (var i = 0; i < tabElems.length; i++) {
+      if (tabElems[i]) {
+        interactionTileFound = true;
+        tabElems[i].click();
+        interactionElem.click();
+        break;
+      }
+    }
+
+    if (!interactionTileFound) {
+      throw 'Could not find interaction with id ' + interactionId;
+    }
+  });
+
+  var elem = element(by.css('.protractor-test-interaction-editor'));
+  var customizationArgs = [elem];
 
   if (arguments.length > 1) {
-    element(by.css('.protractor-test-edit-interaction')).click();
-
-    var elem = element(by.css('.protractor-test-interaction-editor'));
-    var args = [elem];
     for (var i = 1; i < arguments.length; i++) {
-      args.push(arguments[i]);
+      customizationArgs.push(arguments[i]);
     }
-    interactions.getInteraction(interactionName).customizeInteraction.apply(
-      null, args);
-
-    element(by.css('.protractor-test-save-interaction')).click();
+    interactions.getInteraction(interactionId).customizeInteraction.apply(
+      null, customizationArgs);
   }
+
+  element(by.css('.protractor-test-save-interaction')).click();
+  // Wait for the customization modal to close.
+  general.waitForSystem();
+
+  // If the "Add Response" modal opens, close it.
+  var headerElem = element(by.css('.protractor-test-add-response-modal-header'));
+  headerElem.isPresent().then(function(isVisible) {
+    if (isVisible) {
+      element(by.css('.protractor-test-close-add-response-modal')).click();
+      general.waitForSystem();
+    }
+  });
 };
 
 // Likewise this can receive additional arguments.
 // Note that this refers to the interaction displayed in the editor tab (as
 // opposed to the preview tab, which uses the corresponding function in
 // player.js).
-var expectInteractionToMatch = function(interactionName) {
+var expectInteractionToMatch = function(interactionId) {
   // Convert additional arguments to an array to send on.
   var args = [element(by.css('.protractor-test-interaction'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  interactions.getInteraction(interactionName).
+  interactions.getInteraction(interactionId).
     expectInteractionDetailsToMatch.apply(null, args);
+};
+
+var expectCannotDeleteInteraction = function() {
+  expect(element(by.css(
+    '.protractor-test-delete-interaction')).isPresent()).toBeFalsy();
 };
 
 // RULES
@@ -150,14 +234,14 @@ var expectInteractionToMatch = function(interactionName) {
 // should be specified after the ruleName as additional arguments. For example
 // with interaction 'NumericInput' and rule 'Equals' then there is a single
 // parameter which the given answer is required to equal.
-var _selectRule = function(ruleElement, interactionName, ruleName) {
+var _selectRule = function(ruleElement, interactionId, ruleName) {
   var parameterValues = [];
   for (var i = 3; i < arguments.length; i++) {
     parameterValues.push(arguments[i]);
   }
 
   var ruleDescription = rules.getDescription(
-    interactions.getInteraction(interactionName).answerObjectType, ruleName);
+    interactions.getInteraction(interactionId).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
@@ -182,7 +266,7 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
 
   expect(parameterValues.length).toEqual(parameterTypes.length);
 
-  ruleElement.element(by.css('.protractor-test-rule-description')).click();
+  ruleElement.element(by.css('.protractor-test-answer-description')).click();
 
   element.all(by.id('select2-drop')).map(function(selectorElement) {
     selectorElement.element(by.cssContainingText(
@@ -196,11 +280,11 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
   // Now we enter the parameters
   for (var i = 0; i < parameterValues.length; i++) {
     var parameterElement = ruleElement.all(
-      by.css('.protractor-test-rule-description-fragment'
+      by.css('.protractor-test-answer-description-fragment'
     )).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
 
-    if (interactionName === 'MultipleChoiceInput') {
+    if (interactionId === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt
       parameterElement.element(
         by.cssContainingText('option', parameterValues[i])
@@ -211,103 +295,223 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
   }
 };
 
-// This clicks the "add new rule" button and then selects the rule type and
+var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
+  var feedbackEditor = forms.RichTextEditor(
+    feedbackEditorElem.element(by.css('.protractor-test-feedback-bubble')));
+  feedbackEditor.clear();
+  richTextInstructions(feedbackEditor);
+};
+
+var _setOutcomeDest = function(destEditorElem, destName, createDest) {
+  var destinationElement =
+    destEditorElem.element(by.css('.protractor-test-dest-bubble'));
+
+  var targetOption = createDest ? _OPTION_CREATE_NEW : destName;
+  _getStateName().then(function(name) {
+    if (name == destName) {
+      // Looping, change the target option.
+      targetOption = '(try again)';
+    }
+
+    destinationElement.element(
+      by.cssContainingText('option', targetOption)).click();
+
+    if (createDest) {
+      element(by.css('.protractor-test-add-state-input')).sendKeys(destName);
+    }
+  });
+};
+
+// This clicks the "add new response" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
-var addRule = function(interactionName, ruleName) {
-  // This button will not be shown if the rule editor section is already open.
-  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
-    if (buttons.length === 1) {
-      buttons[0].click();
+//
+// Note that feedbackInstructions may be null (which means 'specify no
+// feedback'), and only represents a single feedback element.
+//
+// - 'destStateName' is the state name to select as the destination.
+// - 'createState' specifies the destination state should be created within the
+//   dialog as part of adding this rule.
+var addResponse = function(interactionId, feedbackInstructions, destStateName,
+    createState, ruleName) {
+
+  // Open the "Add Response" modal if it is not already open.
+  var headerElem = element(by.css('.protractor-test-add-response-modal-header'));
+  headerElem.isPresent().then(function(isVisible) {
+    if (!isVisible) {
+      element(by.css('.protractor-test-open-add-response-modal')).click();
+      general.waitForSystem();
     }
   });
 
-  element(by.css('.protractor-test-add-rule')).click();
-  var ruleElement = element(by.css('.protractor-test-temporary-rule'))
-  var args = [ruleElement];
-  for (var i = 0; i < arguments.length; i++) {
+  // Set the rule description.
+  var ruleElement = element(by.css('.protractor-test-add-response-details'));
+  var args = [ruleElement, interactionId];
+  for (var i = 4; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   _selectRule.apply(null, args);
-  ruleElement.element(by.css('.protractor-test-save-rule')).click();
+
+  if (feedbackInstructions) {
+    // Set feedback contents.
+    _setOutcomeFeedback(ruleElement, feedbackInstructions);
+  }
+
+  // If the destination is being changed, open the corresponding editor.
+  if (destStateName) {
+    // Set destination contents.
+    _setOutcomeDest(ruleElement, destStateName, createState);
+  }
+
+  // Close new response modal.
+  element(by.css('.protractor-test-add-new-response')).click();
+
+  // Wait for modal to close.
+  general.waitForSystem();
 };
 
-// Rules are zero-indexed; 'default' denotes the default rule.
-var RuleEditor = function(ruleNum) {
-  // This button will not be shown if the rule editor section is already open.
-  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
-    if (buttons.length === 1) {
-      buttons[0].click();
-    }
-  });
+var setDefaultOutcome = function(feedbackInstructions,
+    destStateName, createState) {
+  // Select the default response.
+  var editor = ResponseEditor('default');
 
-  var elem = (ruleNum === 'default') ?
-    element(by.css('.protractor-test-default-rule')):
-    element.all(by.css('.protractor-test-rule-block')).get(ruleNum);
+  if (feedbackInstructions) {
+    editor.setFeedback(feedbackInstructions);
+  }
 
-  // This button will not be shown if the rule editor is already open.
-  elem.all(by.css('.protractor-test-edit-rule')).then(function(buttons) {
-    if (buttons.length === 1) {
-      buttons[0].click();
-    } else if (buttons.length !== 0) {
-      throw 'In editor.editRule(), expected to find at most 1 edit-rule ' +
-        'button per rule; found ' + buttons.length + ' instead.';
+  // If the destination is being changed, open the corresponding editor.
+  if (destStateName) {
+    editor.setDestination(destStateName, createState);
+  }
+
+  // Wait for feedback and/or destination editors to finish saving.
+  general.waitForSystem();
+};
+
+
+// Rules are zero-indexed; 'default' denotes the default outcome.
+var ResponseEditor = function(responseNum) {
+  var headerElem;
+  if (responseNum === 'default') {
+    headerElem = element(by.css('.protractor-test-default-response-tab'));
+  } else {
+    headerElem = element.all(by.css('.protractor-test-response-tab')).get(
+      responseNum);
+  }
+
+  var responseBodyElem = element(
+    by.css('.protractor-test-response-body-' + responseNum));
+  responseBodyElem.isPresent().then(function(isVisible) {
+    if (!isVisible) {
+      headerElem.click();
     }
   });
 
   return {
-    // Any number of parameters may be specified after the ruleName
-    setDescription: function(interactionName, ruleName) {
-      var args = [elem];
-      for (var i = 0; i < arguments.length; i++) {
+    setFeedback: function(richTextInstructions) {
+      // Begin editing feedback.
+      element(by.css('.protractor-test-open-outcome-feedback-editor')).click();
+
+      // Set feedback contents.
+      var feedbackElement = element(by.css(
+        '.protractor-test-edit-outcome-feedback'));
+      _setOutcomeFeedback(feedbackElement, richTextInstructions);
+
+      // Save feedback.
+      element(by.css('.protractor-test-save-outcome-feedback')).click();
+    },
+    // This saves the rule after the destination is selected.
+    // Note that the supplied 'destinationName' must be an existing state. If
+    // 'createState' is true, it will attempt to create a state named after the
+    // input 'destinationName'.
+    setDestination: function(destinationName, createState) {
+      // Begin editing destination.
+      element(by.css('.protractor-test-open-outcome-dest-editor')).click();
+
+      // Set destination contents.
+      var destElement = element(by.css(
+        '.protractor-test-edit-outcome-dest'));
+      _setOutcomeDest(destElement, destinationName, createState);
+
+      // Save destination.
+      element(by.css('.protractor-test-save-outcome-dest')).click();
+    },
+    // The current state name must be at the front of the list.
+    expectAvailableDestinationsToBe: function(stateNames) {
+      // Begin editing destination.
+      element(by.css('.protractor-test-open-outcome-dest-editor')).click();
+
+      var expectedOptionTexts = ['(try again)'].concat(stateNames.slice(1));
+
+      // Create new option always at the end of the list.
+      expectedOptionTexts.push(_OPTION_CREATE_NEW);
+
+      var destElement = element(by.css(
+        '.protractor-test-edit-outcome-dest'));
+      var destinationElement =
+        destElement.element(by.css('.protractor-test-dest-bubble'));
+      destinationElement.all(by.tagName('option')).map(function(optionElem) {
+        return optionElem.getText();
+      }).then(function(actualOptionTexts) {
+        expect(actualOptionTexts).toEqual(expectedOptionTexts);
+      });
+
+      // Cancel editing the destination.
+      element(by.css('.protractor-test-cancel-outcome-dest')).click();
+    },
+    addRule: function(interactionId, ruleName) {
+      // Additional parameters may be provided after ruleName.
+
+      // Add the rule
+      element(by.css('.protractor-test-add-answer')).click();
+
+      // Set the rule description.
+      var ruleElement = element(by.css('.protractor-test-rule-details'));
+      var args = [ruleElement, interactionId];
+      for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
       _selectRule.apply(null, args);
-    },
-    setFeedback: function(index, richTextInstructions) {
-      var feedbackEditor = forms.ListEditor(
-        elem.element(by.css('.protractor-test-feedback-bubble'))
-      ).editItem(index, 'RichText');
-      feedbackEditor.clear();
-      richTextInstructions(feedbackEditor);
-    },
-    addFeedback: function() {
-      forms.ListEditor(
-        elem.element(by.css('.protractor-test-feedback-bubble'))
-      ).addItem();
-    },
-    deleteFeedback: function(index) {
-      forms.ListEditor(
-        elem.element(by.css('.protractor-test-feedback-bubble'))
-      ).deleteItem(index);
-    },
-    // Enter 'END' for the end state.
-    // This saves the rule after the destination is selected.
-    setDestination: function(destinationName) {
-      var destinationElement =
-        elem.element(by.css('.protractor-test-dest-bubble'));
-      forms.AutocompleteDropdownEditor(destinationElement).
-        setValue(destinationName);
-      elem.element(by.css('.protractor-test-save-rule')).click();
-    },
-    expectAvailableDestinationsToBe: function(stateNames) {
-      forms.AutocompleteDropdownEditor(
-        elem.element(by.css('.protractor-test-dest-bubble'))
-      ).expectOptionsToBe(stateNames);
+
+      // Save the new rule.
+      element(by.css('.protractor-test-save-answer')).click();
     },
     delete: function() {
-      element(by.css('.protractor-test-delete-rule')).click();
-      browser.driver.switchTo().alert().accept();
+      headerElem.element(by.css('.protractor-test-delete-response')).click();
+      element(by.css('.protractor-test-confirm-delete-response')).click();
+    },
+    expectCannotSetFeedback: function() {
+      var feedbackEditorElem = element(by.css(
+        '.protractor-test-open-outcome-feedback-editor'));
+      expect(feedbackEditorElem.isPresent()).toBeFalsy();
+    },
+    expectCannotSetDestination: function() {
+      var destEditorElem = element(by.css(
+        '.protractor-test-open-outcome-dest-editor'));
+      expect(destEditorElem.isPresent()).toBeFalsy();
+    },
+    expectCannotAddRule: function() {
+      expect(headerElem.element(by.css(
+        '.protractor-test-add-answer')).isPresent()).toBeFalsy();
+    },
+    expectCannotDeleteRule: function(ruleNum) {
+      ruleElem = element.all(by.css(
+        '.protractor-test-delete-answer')).get(ruleNum);
+      expect(ruleElem.isPresent()).toBeFalsy();
+    },
+    expectCannotDeleteResponse: function() {
+      expect(headerElem.element(by.css(
+        '.protractor-test-delete-response')).isPresent()).toBeFalsy();
     }
   }
 };
 
-// STATE GRAPH
-
-var createState = function(newStateName) {
-  element(by.css('.protractor-test-add-state-input')).sendKeys(newStateName);
-  element(by.css('.protractor-test-add-state-submit')).click();
+var expectCannotAddResponse = function() {
+  expect(element(by.css(
+    '.protractor-test-open-add-response-modal')).isPresent()).toBeFalsy();
 };
+
+// STATE GRAPH
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
@@ -322,6 +526,7 @@ var moveToState = function(targetName) {
       if (listOfNames[i] === targetName) {
         element.all(by.css('.protractor-test-node')).get(i).click();
         matched = true;
+        general.waitForSystem();
       }
     }
     if (! matched) {
@@ -331,6 +536,7 @@ var moveToState = function(targetName) {
 };
 
 var deleteState = function(stateName) {
+  general.waitForSystem();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -356,7 +562,7 @@ var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
     return stateNode.element(by.css('.protractor-test-node-label')).getText();
   }).then(function(stateNames) {
-    expect(stateNames).toEqual(names);
+    expect(stateNames.sort()).toEqual(names.sort());
   });
 };
 
@@ -407,7 +613,7 @@ var expectAvailableFirstStatesToBe = function(names) {
         all(by.tagName('option')).map(function(elem) {
       return elem.getText();
     }).then(function(options) {
-      expect(options).toEqual(names);
+      expect(options.sort()).toEqual(names.sort());
     });
   });
 };
@@ -443,6 +649,12 @@ var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
   browser.driver.switchTo().alert().accept();
+  general.waitForSystem();
+};
+
+var expectCannotSaveChanges = function() {
+  expect(element(by.css(
+    '.protractor-test-save-changes')).isPresent()).toBeFalsy();
 };
 
 // HISTORY
@@ -451,6 +663,7 @@ var discardChanges = function() {
 var _runFromHistoryTab = function(callbackFunction) {
   element(by.css('.protractor-test-history-tab')).click();
   var result = callbackFunction();
+  general.waitForSystem();
   element(by.css('.protractor-test-main-tab')).click();
   return result;
 };
@@ -646,6 +859,8 @@ var revertToVersion = function(version) {
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+exports.progressInTutorial = progressInTutorial;
+exports.finishTutorial  = finishTutorial;
 
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;
@@ -659,11 +874,13 @@ exports.expectContentToMatch = expectContentToMatch;
 
 exports.setInteraction = setInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
+exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
 
-exports.addRule = addRule;
-exports.RuleEditor = RuleEditor;
+exports.addResponse = addResponse;
+exports.setDefaultOutcome = setDefaultOutcome;
+exports.ResponseEditor = ResponseEditor;
+exports.expectCannotAddResponse = expectCannotAddResponse;
 
-exports.createState = createState;
 exports.moveToState = moveToState;
 exports.deleteState = deleteState;
 exports.expectStateNamesToBe = expectStateNamesToBe;
@@ -678,6 +895,7 @@ exports.setFirstState = setFirstState;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
+exports.expectCannotSaveChanges = expectCannotSaveChanges;
 
 exports.expectGraphComparisonOf = expectGraphComparisonOf;
 exports.expectTextComparisonOf = expectTextComparisonOf;
