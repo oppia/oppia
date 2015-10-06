@@ -4,47 +4,56 @@
     schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
-<div ng-if="$parent.value.imagePath !== ''">
+<div ng-if="$parent.value.imagePath !== ''" ng-attr-style="cursor: <[getCursorStyle()]>;">
   <div>
     <svg class="oppia-image-with-regions-editor-svg"
-      ng-attr-width="<[imageWidth]>" 
-      ng-attr-height="<[imageHeight]>"
+      width="100%"
+      ng-attr-height="<[getImageHeight()]>"
       ng-mousedown="onSvgMouseDown($event)"
       ng-mousemove="onSvgMouseMove($event)"
       ng-mouseup="onSvgMouseUp($event)">
       <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
         x="0"
         y="0"
-        height="100%"
-        width="100%">
+        ng-attr-height="<[getImageHeight()]>"
+        ng-attr-width="<[getImageWidth()]>">
       </image>
-      <rect ng-if="userIsCurrentlyDragging"
+      <rect ng-if="userIsCurrentlyDrawing"
         ng-attr-x="<[rectX]>"
         ng-attr-y="<[rectY]>"
         ng-attr-width="<[rectWidth]>"
         ng-attr-height="<[rectHeight]>"
-        style="fill: blue; opacity: 0.3;">
+        ng-attr-style="<[getRegionStyle(null)]>">
       </rect>
-      <rect ng-repeat="labeledRegion in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[labeledRegion.region.regionArea[0][0] * imageWidth]>"
-        ng-attr-y="<[labeledRegion.region.regionArea[0][1] * imageHeight]>"
-        ng-attr-width="<[(labeledRegion.region.regionArea[1][0] - labeledRegion.region.regionArea[0][0]) * imageWidth]>"
-        ng-attr-height="<[(labeledRegion.region.regionArea[1][1] - labeledRegion.region.regionArea[0][1]) * imageHeight]>"
-        style="fill: blue; opacity: 0.3;">
+      <rect ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
+        ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth()]>"
+        ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight()]>"
+        ng-attr-width="<[(labeledRegion.region.area[1][0] - labeledRegion.region.area[0][0]) * getImageWidth()]>"
+        ng-attr-height="<[(labeledRegion.region.area[1][1] - labeledRegion.region.area[0][1]) * getImageHeight()]>"
+        ng-attr-style="<[getRegionStyle($index)]>"
+        ng-mouseover="onMouseoverRegion($index)"
+        ng-mouseout="onMouseoutRegion($index)"
+        ng-mousedown="onMousedownRegion($index)">
       </rect>
-      <text ng-repeat="region in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth + REGION_LABEL_OFFSET_X]>"
-        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight + REGION_LABEL_OFFSET_Y]>">
-        <[region.label]>
+      <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
+        ng-attr-style="<[REGION_LABEL_STYLE]>"
+        ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + REGION_LABEL_OFFSET_X]>"
+        ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + REGION_LABEL_OFFSET_Y]>">
+        <[labeledRegion.label]>
       </text>
     </svg>
-    <ul>
-      <li ng-repeat="region in $parent.$parent.value.imageRegions">
-        <input type="text" ng-model="regionLabelGetterSetter($index)" ng-model-options="{getterSetter: true}"></input>
-        <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
-      </li>
-    </ul>
+   
+  <button style="margin-top: 10px;" type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>
+      <div style="display: inline-block; float:right; margin-top:10px;" ng-if="selectedRegion !== null">
+        <input type="text" style="margin-left: 10px; height: 34px; width: 100px;"
+          ng-model="regionLabelGetterSetter(selectedRegion)" 
+          ng-model-options="{getterSetter: true}">
+        </input>
+        <button style="margin-top: -6px;" type="button" class="btn btn-danger btn-sm" ng-click="deleteRegion(selectedRegion)">Delete Region</button>
+      </div>  
+
   </div>
   <br><div style="color: red;"><[errorText]></div>
-  <br><button type="button" class="btn btn-default" ng-click="resetEditor()">Clear Image and Regions</button>
+  <br>
+  <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>

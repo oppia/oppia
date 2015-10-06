@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import os
 
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
 
@@ -28,15 +29,18 @@ class ImageHandlerTest(test_utils.GenericTestBase):
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     IMAGE_VIEW_URL_PREFIX = '/imagehandler'
 
-    def _initialize(self):
+    def setUp(self):
+        """Load a demo exploration and register self.EDITOR_EMAIL."""
+        super(ImageHandlerTest, self).setUp()
+
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        self.register_editor(self.EDITOR_EMAIL)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, '0')
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
     def test_image_upload_and_download(self):
         """Test image uploading and downloading."""
-
-        self._initialize()
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -63,8 +67,6 @@ class ImageHandlerTest(test_utils.GenericTestBase):
     def test_upload_empty_image(self):
         """Test upload of an empty image."""
 
-        self._initialize()
-
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -85,8 +87,6 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
     def test_upload_bad_image(self):
         """Test upload of a malformed image."""
-
-        self._initialize()
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -110,15 +110,12 @@ class ImageHandlerTest(test_utils.GenericTestBase):
     def test_get_invalid_image(self):
         """Test retrieval of invalid images."""
 
-        self._initialize()
-
         response = self.testapp.get(
             '%s/0/bad_image' % self.IMAGE_VIEW_URL_PREFIX, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_bad_filenames_are_detected(self):
         # TODO(sll): Add more tests here.
-        self._initialize()
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')

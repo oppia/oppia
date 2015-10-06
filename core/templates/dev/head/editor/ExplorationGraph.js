@@ -29,27 +29,12 @@ oppia.controller('ExplorationGraph', [
   $scope.getGraphData = graphDataService.getGraphData;
   $scope.isEditable = editabilityService.isEditable;
 
-  $scope.newStateName = '';
-  $scope.addState = function(newStateName) {
-    if (!explorationStatesService.isNewStateNameValid(newStateName, true)) {
-      $scope.newStateName = '';
-      return;
-    }
-    explorationStatesService.addState(newStateName, function() {
-      $scope.newStateName = '';
-      routerService.navigateToMainTab(newStateName);
-      focusService.setFocus('newStateNameSubmittedFromStateEditor');
-    });
-  };
-
   $scope.deleteState = function(deleteStateName) {
     explorationStatesService.deleteState(deleteStateName);
   };
 
   $scope.onClickStateInMinimap = function(stateName) {
-    if (stateName !== END_DEST) {
-      routerService.navigateToMainTab(stateName);
-    }
+    routerService.navigateToMainTab(stateName);
   };
 
   $scope.getActiveStateName = function() {
@@ -61,7 +46,7 @@ oppia.controller('ExplorationGraph', [
 
     $modal.open({
       templateUrl: 'modals/stateGraph',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {
         isEditable: function() {
           return $scope.isEditable;
@@ -77,23 +62,6 @@ oppia.controller('ExplorationGraph', [
           $scope.graphData = graphDataService.getGraphData();
           $scope.isEditable = isEditable;
 
-          $scope.isNewStateNameValid = function(newStateName) {
-            return explorationStatesService.isNewStateNameValid(newStateName, false);
-          }
-
-          $scope.newStateName = '';
-          $scope.addStateFromModal = function(newStateName) {
-            if (!explorationStatesService.isNewStateNameValid(newStateName, true)) {
-              $scope.newStateName = '';
-              return;
-            }
-            explorationStatesService.addState(newStateName, function() {
-              $scope.newStateName = '';
-              $scope.graphData = graphDataService.getGraphData();
-              focusService.setFocus('newStateNameSubmittedFromModal');
-            });
-          };
-
           $scope.deleteState = function(stateName) {
             $modalInstance.close({
               action: 'delete',
@@ -102,12 +70,10 @@ oppia.controller('ExplorationGraph', [
           };
 
           $scope.selectState = function(stateName) {
-            if (stateName !== END_DEST) {
-              $modalInstance.close({
-                action: 'navigate',
-                stateName: stateName
-              });
-            }
+            $modalInstance.close({
+              action: 'navigate',
+              stateName: stateName
+            });
           };
 
           $scope.cancel = function() {

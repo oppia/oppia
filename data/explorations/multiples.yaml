@@ -6,8 +6,9 @@ language_code: en
 objective: solve Problem 1 on the Project Euler site
 param_changes: []
 param_specs: {}
-schema_version: 3
-skill_tags: []
+schema_version: 7
+skin_customizations:
+  panels_contents: {}
 states:
   After First Question:
     content:
@@ -15,62 +16,79 @@ states:
       value: Yes, 23 is correct. There are four numbers below 10 that are multiples
         of 3 or 5. These numbers are 3, 5, 6, and 9, and if we add all of them, we
         get 23. Well done!
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Second Question
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: Continue
+      default_outcome:
+        dest: Second Question
+        feedback: []
+        param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      id: EndExploration
+      triggers: []
+    param_changes: []
   First Question:
     content:
     - type: text
       value: "<div><b>Question:</b>\_What is the sum of the multiples of 3 or 5 that\
         \ are less than 10?<br></div>"
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 23.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+    interaction:
+      answer_groups:
+      - outcome:
           dest: After First Question
           feedback: []
           param_changes: []
-        - definition:
-            inputs:
-              a: 22.0
-              b: 24.0
-            name: IsInclusivelyBetween
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: 23.0
+          rule_type: Equals
+      - outcome:
           dest: First Question
           feedback:
           - That seems slightly off. Please check your addition.
           - I think you might not have added everything up correctly. Could you double-check
             your work and try again?
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Numbers for first question
+        rule_specs:
+        - inputs:
+            a: 22.0
+            b: 24.0
+          rule_type: IsInclusivelyBetween
+      - outcome:
+          dest: First Question
           feedback:
-          - OK. To check our work, let's have a quick look at what we're adding up!
+          - 'Yes, 8 is the sum of 3 and 5 but this is not what we want in this problem.
+            We are talking ''multiples'' of 3 and 5 from 1 to 10. Think of the 3 ''times''
+            table: 3;6;9;12;.. and the 5 ''times'' table: 5;10,15,...<div>Your answer
+            would be correct if the range was from 1 to 5.</div>'
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+        rule_specs:
+        - inputs:
+            x: 8.0
+          rule_type: Equals
+      customization_args: {}
+      default_outcome:
+        dest: Numbers for first question
+        feedback:
+        - OK. To check our work, let's have a quick look at what we're adding up!
+        param_changes: []
+      id: NumericInput
+      triggers: []
+    param_changes: []
   Intro:
     content:
     - type: text
@@ -81,64 +99,47 @@ states:
         \ can tackle this directly, or we could also try to check that we understand\
         \ the problem by answering the question for a smaller case. Which of these\
         \ would you prefer?</div>"
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
       customization_args:
         choices:
           value:
           - Solve the problem directly
           - Start by trying a smaller case
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Second Question
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: First Question
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      default_outcome:
+        dest: First Question
+        feedback: []
+        param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
   Numbers for first question:
     content:
     - type: text
       value: "<b>Question:\_</b>List all the multiples of 3 or 5 below 10."
-    param_changes: []
-    widget:
-      customization_args:
-        element_type:
-          value: UnicodeString
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x:
-              - '10'
-            name: HasElementsIn
-            rule_type: atomic
-            subject: answer
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Numbers for first question
           feedback:
           - Hmm. The question asks for the numbers that are below 10. But 10 is not
             below 10...
           - Um, I don't think 10 is less than 10. Try again?
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - '0'
-            name: HasElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - '10'
+          rule_type: HasElementsIn
+      - outcome:
           dest: Numbers for first question
           feedback:
           - It does differ by country, but in this problem we use the traditional
@@ -147,74 +148,76 @@ states:
           - Note that in this problem, we consider multiples to be natural numbers,
             that is, integers that are greater than zero.
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - '3'
-              - '5'
-              - '6'
-              - '9'
-            name: Equals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - '0'
+          rule_type: HasElementsIn
+      - outcome:
           dest: First Question
           feedback:
           - That's right! Now that you know what the numbers are, let's return to
             the first question.
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - '5'
-            name: OmitsElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - '3'
+            - '5'
+            - '6'
+            - '9'
+          rule_type: Equals
+      - outcome:
           dest: Numbers for first question
           feedback:
           - I think you missed a multiple of 5. Remember that 1 times 5 is 5.
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - '3'
-              - '6'
-              - '9'
-            name: OmitsElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - '5'
+          rule_type: OmitsElementsIn
+      - outcome:
           dest: Numbers for first question
           feedback:
           - I think you've missed some multiples of 3? Have a check and make sure
             you've got all of them.
           param_changes: []
-        - definition:
-            inputs:
-              x:
-              - '1'
-              - '2'
-              - '4'
-              - '7'
-              - '8'
-            name: HasElementsIn
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x:
+            - '3'
+            - '6'
+            - '9'
+          rule_type: OmitsElementsIn
+      - outcome:
           dest: Numbers for first question
           feedback:
           - It looks like your list contains numbers that are not multiples of 3 or
             5. Remember that each of your numbers must be 3 times an integer, or 5
             times an integer.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Numbers for first question
-          feedback:
-          - Something about your list of numbers isn't quite right. Perhaps it contains
-            numbers that are less than 1, or more than 10?
-          - Remember, the question asked only for numbers less than 10. (Also, the
-            'multiples' here should be positive integers.)
-          param_changes: []
-      sticky: true
-      widget_id: SetInput
+        rule_specs:
+        - inputs:
+            x:
+            - '1'
+            - '2'
+            - '4'
+            - '7'
+            - '8'
+          rule_type: HasElementsIn
+      customization_args: {}
+      default_outcome:
+        dest: Numbers for first question
+        feedback:
+        - Something about your list of numbers isn't quite right. Perhaps it contains
+          numbers that are less than 1, or more than 10?
+        - Remember, the question asked only for numbers less than 10. (Also, the 'multiples'
+          here should be positive integers.)
+        param_changes: []
+      id: SetInput
+      triggers: []
+    param_changes: []
   Second Question:
     content:
     - type: text
@@ -223,32 +226,28 @@ states:
         \ is a big number. Would you prefer to give an answer directly, or would you\
         \ instead like to write a small program allowing the computer to do the computational\
         \ work for you?</div>"
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question Straight Answer
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
       customization_args:
         choices:
           value:
           - I want to submit an answer directly.
           - I want to write a simple program to compute the answer.
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 0
-            name: Equals
-            rule_type: atomic
-            subject: answer
-          dest: Second Question Straight Answer
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Second Question Coding
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: MultipleChoiceInput
+      default_outcome:
+        dest: Second Question Coding
+        feedback: []
+        param_changes: []
+      id: MultipleChoiceInput
+      triggers: []
+    param_changes: []
   Second Question Coding:
     content:
     - type: text
@@ -259,48 +258,36 @@ states:
         is the list [0, 1, 2, 3, 4, 5, 6]</li><li>x % 7 gives the remainder when x
         is divided by 7. So, for example, 1 % 7 = 1, and 20 % 7 = 6.</li><li>You can
         print the value of a variable x by typing 'print x'.</li></ul></div></div>
-    param_changes: []
-    widget:
-      customization_args:
-        language:
-          value: python
-        placeholder:
-          value: 'for num in range(1000):'
-        postCode:
-          value: ''
-        preCode:
-          value: ''
-      handlers:
-      - name: submit
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question Coding
+          feedback: []
+          param_changes: []
         rule_specs:
-        - definition:
-            inputs:
-              x: '233168'
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        - inputs: {}
+          rule_type: ResultsInError
+      - outcome:
           dest: Second Question Sample Answer
           feedback:
           - That is correct! Well done.
           param_changes: []
-        - definition:
-            inputs:
-              x: '234168'
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: '233168'
+          rule_type: OutputEquals
+      - outcome:
           dest: Second Question Coding
           feedback:
           - Careful with your definition of range() (or similar). You don't want to
             include 1000!<div><br></div><div>If you like, you can type something like
             'print range(5)' to find out what range(5) is.</div>
           param_changes: []
-        - definition:
-            inputs:
-              x: '266333'
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: '234168'
+          rule_type: OutputEquals
+      - outcome:
           dest: Second Question Coding
           feedback:
           - "It looks like you've counted some numbers twice. Notice that 15 is a\
@@ -311,141 +298,190 @@ states:
             \ if so, you'll be counting numbers like 15 twice. See if you can find\
             \ a way to only count them once.</div><div><br></div>"
           param_changes: []
-        - definition:
-            inputs:
-              x: '23'
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: '266333'
+          rule_type: OutputEquals
+      - outcome:
           dest: Second Question Coding
           feedback:
           - Yep, that's the correct answer for the case when we were looking at numbers
             that were less than 10. Can you get your program to print the right answer
             for numbers less than 1000?
           param_changes: []
-        - definition:
-            inputs:
-              x: '33165'
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: '23'
+          rule_type: OutputEquals
+      - outcome:
           dest: Second Question Coding
           feedback:
           - "That's quite small. I think you might only be counting numbers that are\
             \ multiples of <b>both</b>\_3 and 5. But, actually, we want numbers that\
             \ are multiples of <b>either</b>\_3 or 5..."
           param_changes: []
-        - definition:
-            inputs:
-              x: '499500'
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: '33165'
+          rule_type: OutputEquals
+      - outcome:
           dest: Second Question Coding
           feedback:
           - Ooh, that's really big. I think you might actually just be adding every
             single number less than 1000. Is that what your program is doing? Remember,
             we only care about numbers that are multiples of either 3 or 5...
           param_changes: []
-        - definition:
-            inputs:
-              x: ''
-            name: OutputEquals
-            rule_type: atomic
-            subject: answer
+        rule_specs:
+        - inputs:
+            x: '499500'
+          rule_type: OutputEquals
+      - outcome:
           dest: Second Question Coding
           feedback:
           - Sorry, it doesn't look like your program prints any output. Could you
             get it to print something? You can do this by using a statement like 'print
             x'.
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Second Question Coding
-          feedback:
-          - Unfortunately, that's not correct, but I'm not sure what went wrong. Why
-            don't you try replacing the number 1000 in your program with 10, and seeing
-            if that gives you 23, as before?
-          - Oops! That's not right. But we can do a sanity check. Why don't you try
-            replacing the number 1000 in your program with 10, and seeing if that
-            gives you 23, as before?
-          param_changes: []
-      sticky: true
-      widget_id: CodeRepl
+        rule_specs:
+        - inputs:
+            x: ''
+          rule_type: OutputEquals
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# In Python, the code
+
+            #
+
+            #     for letter in [''a'', ''b'']:
+
+            #         print letter
+
+            #
+
+            # prints:
+
+            #
+
+            #     a
+
+            #     b
+
+
+            for num in range(1000):'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Second Question Coding
+        feedback:
+        - Unfortunately, that's not correct, but I'm not sure what went wrong. Why
+          don't you try replacing the number 1000 in your program with 10, and seeing
+          if that gives you 23, as before?
+        - Oops! That's not right. But we can do a sanity check. Why don't you try
+          replacing the number 1000 in your program with 10, and seeing if that gives
+          you 23, as before?
+        param_changes: []
+      id: CodeRepl
+      triggers: []
+    param_changes: []
   Second Question Sample Answer:
     content:
     - type: text
       value: "In case you're interested, here is a sample answer:<div><br></div><div>\_\
-        \ \_ sum = 0</div><div>\_ \_ for x in range(1000):</div><div>\_ \_ \_ \_ if\
-        \ x % 3 == 0 or x % 5 == 0:</div><div>\_ \_ \_ \_ \_ \_ sum += x<br></div><div><br></div><div>\_\
+        \ \_ sum = 0</div><div>\_ \_ for num in range(1000):</div><div>\_ \_ \_ \_\
+        \ if num % 3 == 0 or num % 5 == 0:</div><div>\_ \_ \_ \_ \_ \_ sum += num<br></div><div><br></div><div>\_\
         \ \_ print sum</div><div><br></div><div><br></div><div>This code loops through\
         \ all the integers under 1000, and checks if each is a multiple of 3 or 5.\
         \ If either of these conditions holds, we add the integer to a running sum\
         \ and continue. (In fact, it also loops through 0, but since that doesn't\
         \ add anything to the sum, we still get the correct result.)</div>"
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups: []
       customization_args:
         buttonText:
           value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: Continue
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      id: Continue
+      triggers: []
+    param_changes: []
   Second Question Straight Answer:
     content:
     - type: text
       value: All right, go for it! What is the answer?
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: 233168.0
-            name: Equals
-            rule_type: atomic
-            subject: answer
+    interaction:
+      answer_groups:
+      - outcome:
           dest: Second Question Why
           feedback: []
           param_changes: []
-        - definition:
-            rule_type: default
-          dest: Second Question Coding
+        rule_specs:
+        - inputs:
+            x: 233168.0
+          rule_type: Equals
+      - outcome:
+          dest: Second Question Straight Answer
           feedback:
-          - Hm, that doesn't look correct. It's easy to make mistakes when adding
-            many numbers together, so sometimes it might be easier to let the computer
-            do it instead.<br>
+          - You probably figured that, since the answer for 10 is 23, the answer for
+            1000 is 23 times 100, which is 2300.<br><br>No, it's not so simple! Let's
+            replace 10 by 20. This logic suggests that the answer should then be 23
+            times 2, which is 46. But the relevant multiples are 3, 5, 6, 9, 10, 12,
+            15 and 18, which sum to 78.<br><br>Try again?<br>
+          - <span><span>You probably figured that, since the answer for 10 is 23,
+            the answer for 1000 is 23 times 100, which is 2300.<br><br>OK, let's replace
+            10 by 5 instead, rather than 1000. This means that the answer for 5 is
+            23 divided by 2, which is ... hmm, maybe there's something wrong with
+            the reasoning here. Try again?<br></span></span>
           param_changes: []
-      sticky: false
-      widget_id: NumericInput
+        rule_specs:
+        - inputs:
+            x: 2300.0
+          rule_type: Equals
+      - outcome:
+          dest: Second Question Straight Answer
+          feedback:
+          - Um... that does not make sense, does it? The answer for numbers less than
+            10 was 23. Surely the answer for numbers less than 1000 is greater than
+            that?<br>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 23.0
+          rule_type: IsLessThan
+      customization_args: {}
+      default_outcome:
+        dest: Second Question Coding
+        feedback:
+        - Hm, that doesn't look correct. It's easy to make mistakes when adding many
+          numbers together, so sometimes it might be easier to let the computer do
+          it instead.<br>
+        param_changes: []
+      id: NumericInput
+      triggers: []
+    param_changes: []
   Second Question Why:
     content:
     - type: text
       value: That is correct!<div><br></div><div>Can you explain how you got to this
         answer?</div>
-    param_changes: []
-    widget:
+    interaction:
+      answer_groups: []
       customization_args:
         placeholder:
           value: Type your answer here.
         rows:
           value: 5
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+states_schema_version: 4
+tags: []

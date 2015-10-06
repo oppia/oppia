@@ -35,13 +35,19 @@ class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None):
+            last_started_state_editor_tutorial=None,
+            profile_picture_data_url=None, user_bio='',
+            preferred_language_codes=None):
         self.user_id = user_id
         self.email = email
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
+        self.profile_picture_data_url = profile_picture_data_url
+        self.user_bio = user_bio
+        self.preferred_language_codes = (
+            preferred_language_codes if preferred_language_codes else [])
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
@@ -96,16 +102,27 @@ class UserSettings(object):
         elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
                 'Usernames can only have alphanumeric characters.')
-        elif 'admin' in username.lower().strip():
+        elif ('admin' in username.lower().strip() or
+              'oppia' in username.lower().strip() or
+              feconf.MIGRATION_BOT_USERNAME in username.lower().strip()):
             # Admin usernames are reserved for admins. Note that 'admin'
             # itself is already in use for the demo exploration.
-            raise utils.ValidationError('This username is already taken.')
+            raise utils.ValidationError('This username is not available.')
 
 
 def is_username_taken(username):
     """Checks if the given username is taken."""
     return user_models.UserSettingsModel.is_normalized_username_taken(
         UserSettings.normalize_username(username))
+
+
+def get_email_from_user_id(user_id):
+    """Gets the email from a given user_id.
+
+    Raises an Exception if the user is not found.
+    """
+    user_settings = get_user_settings(user_id)
+    return user_settings.email
 
 
 def get_email_from_username(username):
@@ -134,6 +151,19 @@ def get_user_id_from_username(username):
         return user_model.id
 
 
+def get_user_settings_from_username(username):
+    """Gets the user settings for a given username.
+
+    Returns None if the user is not found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_normalized_username(
+        UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
 def get_users_settings(user_ids):
     """Gets domain objects representing the settings for the given user_ids.
 
@@ -143,9 +173,11 @@ def get_users_settings(user_ids):
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
     for ind, model in enumerate(user_settings_models):
-        if user_ids[ind] == feconf.ADMIN_COMMITTER_ID:
+        if user_ids[ind] == feconf.SYSTEM_COMMITTER_ID:
             result.append(UserSettings(
-                'admin', email=feconf.ADMIN_EMAIL_ADDRESS, username='admin',
+                feconf.SYSTEM_COMMITTER_ID,
+                email=feconf.SYSTEM_EMAIL_ADDRESS,
+                username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow(),
                 last_started_state_editor_tutorial=None,
             ))
@@ -155,6 +187,9 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
+                profile_picture_data_url=model.profile_picture_data_url,
+                user_bio=model.user_bio,
+                preferred_language_codes=model.preferred_language_codes
             ))
         else:
             result.append(None)
@@ -180,7 +215,10 @@ def _save_user_settings(user_settings):
         normalized_username=user_settings.normalized_username,
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
-            user_settings.last_started_state_editor_tutorial)
+            user_settings.last_started_state_editor_tutorial),
+        profile_picture_data_url=user_settings.profile_picture_data_url,
+        user_bio=user_settings.user_bio,
+        preferred_language_codes=user_settings.preferred_language_codes,
     ).put()
 
 
@@ -195,7 +233,9 @@ def _create_user(user_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % user_id)
 
-    user_settings = UserSettings(user_id, email)
+    user_settings = UserSettings(
+        user_id, email,
+        preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     return user_settings
 
@@ -212,7 +252,10 @@ def get_or_create_user(user_id, email):
 
 
 def get_username(user_id):
-    return get_user_settings(user_id, strict=True).username
+    if user_id == feconf.MIGRATION_BOT_USER_ID:
+        return feconf.MIGRATION_BOT_USERNAME
+    else:
+        return get_user_settings(user_id, strict=True).username
 
 
 def get_usernames(user_ids):
@@ -241,6 +284,24 @@ def record_agreement_to_terms(user_id):
     _save_user_settings(user_settings)
 
 
+def update_profile_picture_data_url(user_id, profile_picture_data_url):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.profile_picture_data_url = profile_picture_data_url
+    _save_user_settings(user_settings)
+
+
+def update_user_bio(user_id, user_bio):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_preferred_language_codes(user_id, preferred_language_codes):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_language_codes = preferred_language_codes
+    _save_user_settings(user_settings)
+
+
 def get_human_readable_user_ids(user_ids):
     """Converts the given ids to usernames, or truncated email addresses.
 
@@ -253,7 +314,7 @@ def get_human_readable_user_ids(user_ids):
             logging.error('User id %s not known in list of user_ids %s' % (
                 user_ids[ind], user_ids))
             raise Exception('User not found.')
-        elif user_settings.user_id == feconf.ADMIN_COMMITTER_ID:
+        elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
             usernames.append('admin')
         elif user_settings.username:
             usernames.append(user_settings.username)
@@ -277,3 +338,33 @@ def record_user_started_state_editor_tutorial(user_id):
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
     _save_user_settings(user_settings)
+
+
+def update_email_preferences(user_id, can_receive_email_updates):
+    """Updates whether the user has chosen to receive email updates.
+
+    If no UserEmailPreferencesModel exists for this user, a new one will
+    be created.
+    """
+    email_preferences_model = user_models.UserEmailPreferencesModel.get(
+        user_id, strict=False)
+    if email_preferences_model is None:
+        email_preferences_model = user_models.UserEmailPreferencesModel(
+            id=user_id)
+
+    email_preferences_model.site_updates = can_receive_email_updates
+    email_preferences_model.put()
+
+
+def get_email_preferences(user_id):
+    """Returns a boolean representing whether the user has chosen to receive
+    email updates.
+    """
+    email_preferences_model = user_models.UserEmailPreferencesModel.get(
+        user_id, strict=False)
+    return {
+        'can_receive_email_updates': (
+            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.site_updates)
+    }

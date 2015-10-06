@@ -28,9 +28,6 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     """Test the state rule answer log domain object."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
-        'sid', 'NormalizedString')
-    SUBMIT_HANDLER = feconf.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -40,31 +37,28 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         state_name = exp.init_state_name
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {})
         self.assertEquals(answer_log.total_answer_count, 0)
         self.assertEquals(answer_log.get_top_answers(2), [])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer1')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 1})
         self.assertEquals(answer_log.total_answer_count, 1)
         self.assertEquals(answer_log.get_top_answers(1), [('answer1', 1)])
         self.assertEquals(answer_log.get_top_answers(2), [('answer1', 1)])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 3)
         self.assertEquals(
@@ -73,14 +67,12 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             answer_log.get_top_answers(2), [('answer1', 2), ('answer2', 1)])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer2')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 3})
         self.assertEquals(answer_log.total_answer_count, 5)
         self.assertEquals(
@@ -93,34 +85,26 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             'eid', 'title', 'category')
         exp_services.save_new_exploration('user_id', exp)
 
-        rule = exp_domain.RuleSpec.from_dict_and_obj_type({
-            'definition':  {
-                 'rule_type': 'atomic',
-                 'name': 'LessThan',
-                 'subject': 'answer',
-                 'inputs': {'x': 5}
-             },
-             'dest': 'dest',
-             'feedback': None,
-             'param_changes': []
-        }, 'Real')
+        rule = exp_domain.RuleSpec.from_dict({
+            'rule_type': 'LessThan',
+            'inputs': {'x': 5}
+        })
+        rule_str = rule.stringify_classified_rule()
 
         state_name = exp.init_state_name
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
-            'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER, rule,
-            'answer2')
+            'eid', 1, state_name, rule_str, 'answer2')
 
         default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(default_rule_answer_log.answers, {'answer1': 1})
         self.assertEquals(default_rule_answer_log.total_answer_count, 1)
 
         other_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, str(rule))
+            'eid', state_name, rule_str)
         self.assertEquals(other_rule_answer_log.answers, {'answer2': 1})
         self.assertEquals(other_rule_answer_log.total_answer_count, 1)
 
@@ -132,28 +116,25 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         state_name = exp.init_state_name
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {})
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, 'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 3)
 
         event_services.DefaultRuleAnswerResolutionEventHandler.record(
-            'eid', state_name, self.SUBMIT_HANDLER, ['answer1'])
+            'eid', state_name, ['answer1'])
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
+            'eid', state_name, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 1)

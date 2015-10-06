@@ -30,7 +30,6 @@ class ParamSpec(object):
     """Value object for an exploration parameter specification."""
     def __init__(self, obj_type):
         self.obj_type = obj_type
-        self.validate()
 
     def to_dict(self):
         return {
@@ -45,6 +44,16 @@ class ParamSpec(object):
         # Ensure that this object class exists.
         obj_services.Registry.get_object_class_by_type(self.obj_type)
 
+        # Ensure the obj_type is UnicodeString, since that is the only supported
+        # type of ParamSpec.
+        # TODO(bhenning): Expand parameter support in the editor to multiple
+        # types, then validate all changes and rule inputs to properly match the
+        # type of the parameter.
+        if self.obj_type != 'UnicodeString':
+            raise utils.ValidationError(
+                'Only \'UnicodeString\' is the supported object type for '
+                'parameters, not: %s' % self.obj_type)
+
 
 class ParamChange(object):
     """Value object for a parameter change."""
@@ -57,7 +66,6 @@ class ParamChange(object):
         self._name = name
         self._generator_id = generator_id
         self._customization_args = customization_args
-        self.validate()
 
     @property
     def name(self):

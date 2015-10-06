@@ -39,6 +39,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackThreadPermissionsTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
@@ -47,7 +48,6 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         # Get the CSRF token and create a single thread with a single message.
         # The corresponding user has already registered as an editor, and has a
         # username.
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
@@ -117,13 +117,12 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackThreadIntegrationTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
-
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
     def test_create_thread(self):
         self.login(self.EDITOR_EMAIL)
@@ -244,22 +243,22 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_no_username_shown_for_nonregistered_users(self):
+    def test_no_username_shown_for_logged_out_learners(self):
         NEW_EXP_ID = 'new_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             NEW_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.EDITOR_ID, exploration)
         rights_manager.publish_exploration(self.EDITOR_ID, NEW_EXP_ID)
 
-        self.login('test@example.com')
         response = self.testapp.get('/create/%s' % NEW_EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, NEW_EXP_ID),
+            '/explorehandler/give_feedback/%s' % NEW_EXP_ID,
             {
                 'state_name': None,
                 'subject': 'Test thread',
-                'text': 'Test thread text',
+                'feedback': 'Test thread text',
+                'include_author': False,
             }, csrf_token)
 
         response_dict = self.get_json(
@@ -271,8 +270,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             feconf.FEEDBACK_THREAD_URL_PREFIX, NEW_EXP_ID,
             threadlist[0]['thread_id']))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
-
-        self.logout()
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
         # Create a thread for others to post to.
@@ -305,7 +302,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         for num in range(NUM_USERS):
             username = _get_username(num)
             email = _get_email(num)
-            self.register_editor(email, username)
+            self.signup(email, username)
 
         # Each of these users posts a new message to the same thread.
         for num in range(NUM_USERS):

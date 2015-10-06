@@ -25,9 +25,11 @@ IMPORTANT NOTES:
 
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
     where [APP_NAME] is the name of your app as defined in app.yaml. This
-    folder should contain a folder called /images, which in turn should contain
-    three files: banner.png, favicon.ico and logo.png. These files will be used
-    for the splash page of the deployed app.
+    folder should contain a folder called /images, which in turn should
+    contain:
+    - one file: favicon.ico
+    - two folders: /splash and /sidebar, containing images used for the gallery
+        carousel and sidebar, respectively.
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -65,11 +67,12 @@ else:
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 RELEASE_DIR_NAME = '%s-deploy-%s' % (
-    APP_NAME, CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+    '-'.join('-'.join(APP_NAME.split('.')).split(':')),
+    CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.11', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.19', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
@@ -95,7 +98,7 @@ def preprocess_release():
     d.write(content)
 
     # Substitute image files for the splash page.
-    SPLASH_PAGE_FILES = ['banner.png', 'favicon.ico', 'logo.png']
+    SPLASH_PAGE_FILES = ['favicon.ico']
     DEPLOY_DATA_PATH = os.path.join(
         os.getcwd(), '..', 'deploy_data', APP_NAME)
 
@@ -115,6 +118,22 @@ def preprocess_release():
                 'Could not find destination path %s. Has the code been '
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
+
+    IMAGE_DIRS = ['splash', 'sidebar']
+    for dir_name in IMAGE_DIRS:
+        src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
+        dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
+
+        if not os.path.exists(src_dir):
+            raise Exception(
+                'Could not find source dir %s. Please check your deploy_data '
+                'folder.' % src_dir)
+        common.ensure_directory_exists(dst_dir)
+
+        for filename in os.listdir(src_dir):
+            src = os.path.join(src_dir, filename)
+            dst = os.path.join(dst_dir, filename)
+            shutil.copyfile(src, dst)
 
 
 # Check that the current directory is correct.

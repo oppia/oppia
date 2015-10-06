@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+var _RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
+
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
@@ -43,19 +45,52 @@ oppia.filter('camelCaseToHyphens', [function() {
 }]);
 
 // Filter that truncates long descriptors.
-// TODO(sll): Strip out HTML tags before truncating.
-oppia.filter('truncate', [function() {
+oppia.filter('truncate', ['$filter', function($filter) {
   return function(input, length, suffix) {
-    if (!input)
+    if (!input) {
       return '';
-    if (isNaN(length))
+    }
+    if (isNaN(length)) {
       length = 70;
-    if (suffix === undefined)
+    }
+    if (suffix === undefined) {
       suffix = '...';
-    if (!angular.isString(input))
+    }
+    if (!angular.isString(input)) {
       input = String(input);
-    return (input.length <= length ? input
-            : input.substring(0, length - suffix.length) + suffix);
+    }
+    input = $filter('convertToPlainText')(input);
+    return (
+      input.length <= length ? input : (
+        input.substring(0, length - suffix.length) + suffix));
+  };
+}]);
+
+oppia.filter('truncateAtFirstLine', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
+    // Normalize line endings then split using the normalized delimiter.
+    var lines = input.replace(pattern, '\n').split('\n');
+    var firstNonemptyLineIndex = -1;
+    var otherNonemptyLinesExist = false;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].length > 0) {
+        if (firstNonemptyLineIndex === -1) {
+          firstNonemptyLineIndex = i;
+        } else {
+          otherNonemptyLinesExist = true;
+          break;
+        }
+      }
+    }
+    var suffix = otherNonemptyLinesExist ? '...' : '';
+    return (
+      firstNonemptyLineIndex !== -1 ?
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -74,9 +109,9 @@ oppia.filter('replaceInputsWithEllipses', [function() {
   };
 }]);
 
-// Filter that truncates a string at the first {{...}}.
-oppia.filter('truncateAtFirstInput', [function() {
-  var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
+// Filter that truncates a string at the first '...'.
+oppia.filter('truncateAtFirstEllipsis', [function() {
+  var pattern = /\.\.\./g;
   return function(input) {
     if (!input) {
       return '';
@@ -86,43 +121,95 @@ oppia.filter('truncateAtFirstInput', [function() {
   };
 }]);
 
+oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
+  return function(input, characterCount) {
+    if (typeof input == 'string' || input instanceof String) {
+      input = $filter('normalizeWhitespace')(input);
+      if (input.length <= characterCount || characterCount < 3) {
+        // String fits within the criteria; no wrapping is necessary.
+        return input;
+      }
+
+      // Replace characters counting backwards from character count with an
+      // ellipsis, then trim the string.
+      return input.substr(0, characterCount - 3).trim() + '...';
+    } else {
+      return input;
+    }
+  };
+}]);
+
+// Filter that returns true iff an outcome has a self-loop and no feedback.
+oppia.filter('isOutcomeConfusing', [function() {
+  return function(outcome, currentStateName) {
+    return (
+      outcome.dest === currentStateName &&
+      !outcome.feedback.some(function(feedbackItem) {
+        return feedbackItem.trim().length > 0;
+      })
+    );
+  };
+}]);
+
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 // Note that this returns an HTML string to accommodate the case of multiple-choice
 // input and image-click input.
-oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
-  return function(input, choices) {
-    if (!input || !(input.description)) {
+oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  return function(rule, interactionId, choices) {
+    if (!rule) {
       return '';
     }
-    var description = input.description;
-    if (description == 'Default') {
-      return description;
+
+    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+      console.error('Cannot find interaction with id ' + interactionId);
+      return '';
     }
-    // TODO(sll): Generalize this to allow Boolean combinations of rules.
-    var inputs = input.definition.inputs;
 
-    var finalRule = description;
+    var description = INTERACTION_SPECS[interactionId].rule_descriptions[
+      rule.rule_type];
+    if (!description) {
+      console.error(
+        'Cannot find description for rule ' + rule.rule_type +
+        ' for interaction ' + interactionId);
+      return '';
+    }
 
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    var inputs = rule.inputs;
+    var finalDescription = description;
+
+    var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     var iter = 0;
     while (true) {
-      if (!description.match(pattern) || iter == 100) {
+      if (!description.match(PATTERN) || iter == 100) {
         break;
       }
       iter++;
 
-      var varName = description.match(pattern)[1];
-      var varType = description.match(pattern)[2];
+      var varName = description.match(PATTERN)[1];
+      var varType = description.match(PATTERN)[2];
       if (varType) {
         varType = varType.substring(1);
       }
 
-      var replacementText;
-      // Special case for MultipleChoiceInput and ImageClickInput
+      var replacementText = '[INVALID]';
+      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
       if (choices) {
-        for (var i = 0; i < choices.length; i++) {
-          if (choices[i].val === inputs[varName]) {
-            replacementText = '\'' + choices[i].label + '\'';
+        if (varType === 'SetOfHtmlString') {
+          replacementText = '[';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
+            }
+          }
+          replacementText += ']';
+        } else {
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
           }
         }
       // TODO(sll): Generalize this to use the inline string representation of
@@ -136,6 +223,18 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
           replacementText += inputs[varName][i].readableNoteName;
         }
         replacementText += ']';
+      } else if (varType === 'CoordTwoDim') {
+        var latitude = inputs[varName][0] || 0.0;
+        var longitude = inputs[varName][1] || 0.0;
+        replacementText = '(';
+        replacementText += (
+          inputs[varName][0] >= 0.0
+          ? latitude.toFixed(2) + '°N' : -latitude.toFixed(2) + '°S');
+        replacementText += ', ';
+        replacementText += (
+          inputs[varName][1] >= 0.0
+          ? longitude.toFixed(2) + '°E' : -longitude.toFixed(2) + '°W');
+        replacementText += ')';
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + inputs[varName] + '"';
       } else if (varType === 'Graph') {
@@ -144,10 +243,10 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
         replacementText = inputs[varName];
       }
 
-      description = description.replace(pattern, ' ');
-      finalRule = finalRule.replace(pattern, replacementText);
+      description = description.replace(PATTERN, ' ');
+      finalDescription = finalDescription.replace(PATTERN, replacementText);
     }
-    return 'the answer ' + finalRule;
+    return finalDescription;
   };
 }]);
 
@@ -167,14 +266,74 @@ oppia.filter('normalizeWhitespace', [function() {
   };
 }]);
 
-oppia.filter('convertRuleChoiceToPlainText', [function() {
+oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.trim();
-    if (strippedText.length === 0) {
-      return input;
-    } else {
+    strippedText = strippedText.replace('&nbsp;', ' ');
+
+    var trimmedText = strippedText.trim();
+    if (trimmedText.length === 0) {
       return strippedText;
+    } else {
+      return trimmedText;
     }
   };
 }]);
+
+oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
+  return function(answerGroup, interactionId, answerChoices, shortenRule) {
+    var summary = '';
+    var outcome = answerGroup.outcome;
+    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+
+    if (answerGroup.rule_specs) {
+      var firstRule = $filter('convertToPlainText')(
+        $filter('parameterizeRuleDescription')(
+          answerGroup.rule_specs[0], interactionId, answerChoices));
+      summary = 'Answer ' + firstRule;
+
+      if (hasFeedback && shortenRule) {
+        summary = $filter('wrapTextWithEllipsis')(
+          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+      }
+      summary = '[' + summary + '] ';
+    }
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(outcome.feedback[0]);
+    }
+    return summary;
+  };
+}]);
+
+oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
+  return function(
+      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+    if (!defaultOutcome) {
+      return '';
+    }
+
+    var summary = '';
+    var feedback = defaultOutcome.feedback;
+    var hasFeedback = feedback.length > 0 && feedback[0];
+
+    if (interactionId === 'Continue') {
+      summary = 'When the button is clicked';
+    } else if (answerGroupCount > 0) {
+      summary = 'All other answers';
+    } else {
+      summary = 'All answers';
+    }
+
+    if (hasFeedback && shortenRule) {
+      summary = $filter('wrapTextWithEllipsis')(
+        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+    }
+    summary = '[' + summary + '] ';
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
+    }
+    return summary;
+  }
+}])

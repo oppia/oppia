@@ -64,12 +64,6 @@ def assert_contains(needle, haystack):
         raise Exception('Expected to find term: %s\n%s', needle, haystack)
 
 
-def assert_does_not_contain(needle, haystack):
-    if needle in haystack:
-        raise Exception(
-            'Did not expect to find term: %s\n%s', needle, haystack)
-
-
 def assert_equals(expected, actual):
     if expected != actual:
         raise Exception('Expected equality of %s and %s.', expected, actual)
@@ -308,7 +302,7 @@ class ReaderViewLoadTest(object):
         url = '%s/explorehandler/transition/%s/%s' % (
             self.host, self.exp_id, urllib.quote(self.last_state_name))
         body = self._post_json(url, {
-            'answer': answer, 'handler': 'submit', 'params': self.last_params,
+            'answer': answer, 'params': self.last_params,
             'state_history': self.state_history,
         })
 

@@ -184,6 +184,7 @@ oppia.factory('changeListService', [
     'category': true,
     'objective': true,
     'language_code': true,
+    'tags': true,
     'param_specs': true,
     'param_changes': true,
     'default_skin_id': true,
@@ -193,8 +194,9 @@ oppia.factory('changeListService', [
   var ALLOWED_STATE_BACKEND_NAMES = {
     'widget_customization_args': true,
     'widget_id': true,
-    'widget_handlers': true,
-    'widget_sticky': true,
+    'answer_groups': true,
+    'default_outcome': true,
+    'confirmed_unclassified_answers': true,
     'state_name': true,
     'content': true,
     'param_changes': true
@@ -347,13 +349,13 @@ oppia.factory('explorationRightsService', [
       return this._clonedFrom;
     },
     isPrivate: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE;
+      return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
     },
     isPublic: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC;
+      return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
     },
     isPublicized: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED;
+      return this._status === GLOBALS.ACTIVITY_STATUS_PUBLICIZED;
     },
     isCloned: function() {
       return Boolean(this._clonedFrom);
@@ -532,6 +534,33 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+// A data service that stores tags for the exploration.
+oppia.factory('explorationTagsService', [
+    'explorationPropertyService',
+    function(explorationPropertyService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'tags';
+  child._normalize = function(value) {
+    for (var i = 0; i < value.length; i++) {
+      value[i] = value[i].trim().replace(/\s+/g, ' ');
+    }
+    // TODO(sll): Prevent duplicate tags from being added.
+    return value;
+  };
+  child._isValid = function(value) {
+    // Every tag should match the TAG_REGEX.
+    for (var i = 0; i < value.length; i++) {
+      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+      if (!value[i].match(tagRegex)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+  return child;
+}]);
+
 oppia.factory('explorationParamSpecsService', [
     'explorationPropertyService', function(explorationPropertyService) {
   var child = Object.create(explorationPropertyService);
@@ -541,6 +570,17 @@ oppia.factory('explorationParamSpecsService', [
   };
   return child;
 }]);
+
+oppia.factory('explorationParamChangesService', [
+    'explorationPropertyService', function(explorationPropertyService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'param_changes';
+  child._isValid = function(value) {
+    return true;
+  };
+  return child;
+}]);
+
 
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
@@ -554,7 +594,7 @@ oppia.factory('explorationStatesService', [
              newStateTemplateService) {
   var _states = null;
   return {
-    setStates: function(value) {
+    init: function(value) {
       _states = angular.copy(value);
     },
     getStates: function() {
@@ -600,7 +640,7 @@ oppia.factory('explorationStatesService', [
       warningsData.clear();
 
       var initStateName = explorationInitStateNameService.displayed;
-      if (deleteStateName === initStateName || deleteStateName === END_DEST) {
+      if (deleteStateName === initStateName) {
         return;
       }
       if (!_states[deleteStateName]) {
@@ -610,7 +650,7 @@ oppia.factory('explorationStatesService', [
 
       $modal.open({
         templateUrl: 'modals/deleteState',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           deleteStateName: function() {
             return deleteStateName;
@@ -634,12 +674,16 @@ oppia.factory('explorationStatesService', [
       }).result.then(function(deleteStateName) {
         delete _states[deleteStateName];
         for (var otherStateName in _states) {
-          var handlers = _states[otherStateName].interaction.handlers;
-          for (var i = 0; i < handlers.length; i++) {
-            for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-              if (handlers[i].rule_specs[j].dest === deleteStateName) {
-                handlers[i].rule_specs[j].dest = otherStateName;
-              }
+          var interaction = _states[otherStateName].interaction;
+          var groups = interaction.answer_groups;
+          for (var i = 0; i < groups.length; i++) {
+            if (groups[i].outcome.dest === deleteStateName) {
+              groups[i].outcome.dest = otherStateName;
+            }
+          }
+          if (interaction.default_outcome) {
+            if (interaction.default_outcome.dest === deleteStateName) {
+              interaction.default_outcome.dest = otherStateName;
             }
           }
         }
@@ -672,12 +716,16 @@ oppia.factory('explorationStatesService', [
       delete _states[oldStateName];
 
       for (var otherStateName in _states) {
-        var handlers = _states[otherStateName].interaction.handlers;
-        for (var i = 0; i < handlers.length; i++) {
-          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === oldStateName) {
-              handlers[i].rule_specs[j].dest = newStateName;
-            }
+        var interaction = _states[otherStateName].interaction;
+        var groups = interaction.answer_groups;
+        for (var i = 0; i < groups.length; i++) {
+          if (groups[i].outcome.dest === oldStateName) {
+            groups[i].outcome.dest = newStateName;
+          }
+        }
+        if (interaction.default_outcome) {
+          if (interaction.default_outcome.dest === oldStateName) {
+            interaction.default_outcome.dest = newStateName;
           }
         }
       }
@@ -803,14 +851,6 @@ oppia.factory('stateCustomizationArgsService', [
   return child;
 }]);
 
-// A data service that stores the current sticky status for the interaction.
-// TODO(sll): Add validation.
-oppia.factory('stateInteractionStickyService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.propertyName = 'widget_sticky';
-  return child;
-}]);
 
 // A service that returns the frontend representation of a newly-added state.
 oppia.factory('newStateTemplateService', [function() {
@@ -820,43 +860,49 @@ oppia.factory('newStateTemplateService', [function() {
     // NB: clients should ensure that the desired state name is valid.
     getNewStateTemplate: function(newStateName) {
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.interaction.handlers.forEach(function(handler) {
-        handler.rule_specs.forEach(function(ruleSpec) {
-          ruleSpec.dest = newStateName;
-        });
-      });
+      newStateTemplate.interaction.default_outcome.dest = newStateName;
       return newStateTemplate;
     }
   };
 }]);
 
 
-oppia.factory('computeGraphService', [function() {
+oppia.factory('computeGraphService', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
 
   var _computeGraphData = function(initStateId, states) {
     var nodes = {};
     var links = [];
+    var finalStateIds = [];
     for (var stateName in states) {
+      var interaction = states[stateName].interaction;
+      if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
+        finalStateIds.push(stateName);
+      }
+
       nodes[stateName] = stateName;
 
-      var handlers = states[stateName].interaction.handlers;
-      for (var h = 0; h < handlers.length; h++) {
-        var ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
+      if (interaction.id) {
+        var groups = interaction.answer_groups;
+        for (var h = 0; h < groups.length; h++) {
           links.push({
             source: stateName,
-            target: ruleSpecs[i].dest,
+            target: groups[h].outcome.dest,
+          });
+        }
+        if (interaction.default_outcome) {
+          links.push({
+            source: stateName,
+            target: interaction.default_outcome.dest,
           });
         }
       }
     }
-    nodes[END_DEST] = END_DEST;
 
     return {
       nodes: nodes,
       links: links,
       initStateId: initStateId,
-      finalStateId: END_DEST
+      finalStateIds: finalStateIds
     };
   };
 
@@ -936,20 +982,50 @@ oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', fun
 }]);
 
 
+oppia.constant('WARNING_TYPES', {
+  // These must be fixed before the exploration can be saved.
+  CRITICAL: 'critical',
+  // These must be fixed before publishing an exploration to the gallery.
+  ERROR: 'error'
+});
+
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
-    'graphDataService', 'explorationStatesService', 'explorationObjectiveService',
-    function(graphDataService, explorationStatesService, explorationObjectiveService) {
+    '$filter', 'graphDataService', 'explorationStatesService',
+    'expressionInterpolationService', 'explorationParamChangesService',
+    'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
+    'FUZZY_RULE_TYPE',
+    function(
+      $filter, graphDataService, explorationStatesService,
+      expressionInterpolationService, explorationParamChangesService,
+      explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES,
+      FUZZY_RULE_TYPE) {
   var _warningsList = [];
 
-  // Given an initial node id, a object with keys node ids, and values node
-  // names, and a list of edges (each of which is an object with keys 'source'
-  // and 'target', and values equal to the respective node names), returns a
-  // list of names of all nodes which are unreachable from the initial node.
-  var _getUnreachableNodeNames = function(initNodeId, nodes, edges) {
-    var queue = [initNodeId];
+  var _getStatesWithoutInteractionIds = function() {
+    var statesWithoutInteractionIds = [];
+
+    var states = explorationStatesService.getStates();
+    for (var stateName in states) {
+      if (!states[stateName].interaction.id) {
+        statesWithoutInteractionIds.push(stateName);
+      }
+    }
+
+    return statesWithoutInteractionIds;
+  };
+
+  // Given a list of initial node ids, a object with keys node ids, and values
+  // node names, and a list of edges (each of which is an object with keys
+  // 'source' and 'target', and values equal to the respective node names),
+  // returns a list of names of all nodes which are unreachable from the
+  // initial node.
+  var _getUnreachableNodeNames = function(initNodeIds, nodes, edges) {
+    var queue = initNodeIds;
     var seen = {};
-    seen[initNodeId] = true;
+    for (var i = 0; i < initNodeIds.length; i++) {
+      seen[initNodeIds[i]] = true;
+    }
     while (queue.length > 0) {
       var currNodeId = queue.shift();
       edges.forEach(function(edge) {
@@ -983,29 +1059,254 @@ oppia.factory('explorationWarningsService', [
     });
   };
 
-  // Returns a list of states which have rules that have no feedback and that
-  // point back to the same state.
-  var _getStatesWithInsufficientFeedback = function() {
-    var problematicStates = [];
-    var _states = explorationStatesService.getStates();
-    for (var stateName in _states) {
-      var handlers = _states[stateName].interaction.handlers;
-      var isProblematic = handlers.some(function(handler) {
-        return handler.rule_specs.some(function(ruleSpec) {
-          return (
-            ruleSpec.dest === stateName &&
-            !ruleSpec.feedback.some(function(feedbackItem) {
-              return feedbackItem.length > 0;
-            })
-          );
-        });
-      });
+  var PARAM_ACTION_GET = 'get';
+  var PARAM_ACTION_SET = 'set';
 
-      if (isProblematic) {
-        problematicStates.push(stateName);
+  var PARAM_SOURCE_ANSWER = 'answer';
+  var PARAM_SOURCE_CONTENT = 'content';
+  var PARAM_SOURCE_FEEDBACK = 'feedback';
+  var PARAM_SOURCE_PARAM_CHANGES = 'param_changes';
+
+  var _getMetadataFromParamChanges = function(paramChanges) {
+    var result = [];
+
+    for (var i = 0; i < paramChanges.length; i++) {
+      var pc = paramChanges[i];
+
+      if (pc.generator_id === 'Copier') {
+        if (!pc.customization_args.parse_with_jinja) {
+          result.push({
+            action: PARAM_ACTION_SET,
+            paramName: pc.name,
+            source: PARAM_SOURCE_PARAM_CHANGES,
+            sourceInd: i
+          });
+        } else {
+          var paramsReferenced = expressionInterpolationService.getParamsFromString(
+            pc.customization_args.value);
+          for (var j = 0; j < paramsReferenced.length; j++) {
+            result.push({
+              action: PARAM_ACTION_GET,
+              paramName: paramsReferenced[j],
+              source: PARAM_SOURCE_PARAM_CHANGES,
+              sourceInd: i
+            });
+          }
+
+          result.push({
+            action: PARAM_ACTION_SET,
+            paramName: pc.name,
+            source: PARAM_SOURCE_PARAM_CHANGES,
+            sourceInd: i
+          });
+        }
+      } else {
+        // RandomSelector. Elements in the list of possibilities are treated
+        // as raw unicode strings, not expressions.
+        result.push({
+          action: PARAM_ACTION_SET,
+          paramName: pc.name,
+          source: PARAM_SOURCE_PARAM_CHANGES,
+          sourceInd: i
+        });
       }
     }
-    return problematicStates;
+
+    return result;
+  };
+
+  // Returns a list of set/get actions for parameters in the given state, in the
+  // order that they occur.
+  // TODO(sll): Add trace data (so that it's easy to figure out in which rule
+  // an issue occurred, say).
+  var _getStateParamMetadata = function(state) {
+    // First, the state param changes are applied: we get their values
+    // and set the params.
+    var result = _getMetadataFromParamChanges(state.param_changes);
+
+    // Next, the content is evaluated.
+    expressionInterpolationService.getParamsFromString(
+        state.content[0].value).forEach(function(paramName) {
+      result.push({
+        action: PARAM_ACTION_GET,
+        paramName: paramName,
+        source: PARAM_SOURCE_CONTENT
+      });
+    });
+
+    // Next, the answer is received.
+    result.push({
+      action: PARAM_ACTION_SET,
+      paramName: 'answer',
+      source: PARAM_SOURCE_ANSWER
+    });
+
+    // Finally, the rule feedback strings are evaluated.
+    state.interaction.answer_groups.forEach(function(group) {
+      for (var k = 0; k < group.outcome.feedback.length; k++) {
+        expressionInterpolationService.getParamsFromString(
+            group.outcome.feedback[k]).forEach(function(paramName) {
+          result.push({
+            action: PARAM_ACTION_GET,
+            paramName: paramName,
+            source: PARAM_SOURCE_FEEDBACK,
+            sourceInd: k
+          });
+        });
+      }
+    });
+
+    return result;
+  };
+
+  // Returns one of null, PARAM_ACTION_SET, PARAM_ACTION_GET depending on
+  // whether this parameter is not used at all in this state, or
+  // whether its first occurrence is a 'set' or 'get'.
+  var _getParamStatus = function(stateParamMetadata, paramName) {
+    for (var i = 0; i < stateParamMetadata.length; i++) {
+      if (stateParamMetadata[i].paramName === paramName) {
+        return stateParamMetadata[i].action;
+      }
+    }
+    return null;
+  };
+
+  // Verify that all parameters referred to in a state are guaranteed to
+  // have been set beforehand.
+  var _verifyParameters = function(initNodeIds, nodes, edges) {
+    var _states = explorationStatesService.getStates();
+
+    // Determine all parameter names that are used within this exploration.
+    var allParamNames = [];
+    var explorationParamMetadata = _getMetadataFromParamChanges(
+      explorationParamChangesService.savedMemento);
+    var stateParamMetadatas = {};
+
+    explorationParamMetadata.forEach(function(explorationParamMetadataItem) {
+      if (allParamNames.indexOf(explorationParamMetadataItem.paramName) === -1) {
+        allParamNames.push(explorationParamMetadataItem.paramName);
+      }
+    });
+
+    for (var stateName in _states) {
+      stateParamMetadatas[stateName] = _getStateParamMetadata(_states[stateName]);
+      for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
+        var pName = stateParamMetadatas[stateName][i].paramName;
+        if (allParamNames.indexOf(pName) === -1) {
+          allParamNames.push(pName);
+        }
+      }
+    }
+
+    // For each parameter, see if it's possible to get from the start node
+    // to a node requiring this param, without passing through any nodes
+    // that sets this param. Each of these requires a BFS.
+    // TODO(sll): Ensure that there is enough trace information provided to make
+    // any errors clear.
+    var paramWarningsList = [];
+
+    for (var paramInd = 0; paramInd < allParamNames.length; paramInd++) {
+      var paramName = allParamNames[paramInd];
+      var error = null;
+
+      var paramStatusAtOutset = _getParamStatus(explorationParamMetadata, paramName);
+      if (paramStatusAtOutset === PARAM_ACTION_GET) {
+        paramWarningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Please ensure the value of parameter "' + paramName + '" is set ' +
+            'before it is referred to in the initial list of parameter changes.')
+        });
+        continue;
+      } else if (paramStatusAtOutset === PARAM_ACTION_SET) {
+        // This parameter will remain set for the entirety of the exploration.
+        continue;
+      }
+
+      var queue = [];
+      var seen = {};
+      for (var i = 0; i < initNodeIds.length; i++) {
+        seen[initNodeIds[i]] = true;
+        var paramStatus = _getParamStatus(
+          stateParamMetadatas[initNodeIds[i]], paramName);
+        if (paramStatus === PARAM_ACTION_GET) {
+          error = {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure the value of parameter "' + paramName +
+              '" is set before using it in "' + initNodeIds[i] + '".')
+          };
+          break;
+        } else if (!paramStatus) {
+          queue.push(initNodeIds[i]);
+        }
+      }
+
+      if (error) {
+        paramWarningsList.push(error);
+        continue;
+      }
+
+      while (queue.length > 0) {
+        var currNodeId = queue.shift();
+        for (var i = 0; i < edges.length; i++) {
+          var edge = edges[i];
+          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
+            seen[edge.target] = true;
+            paramStatus = _getParamStatus(stateParamMetadatas[edge.target], paramName);
+            if (paramStatus === PARAM_ACTION_GET) {
+              error = {
+                type: WARNING_TYPES.CRITICAL,
+                message: (
+                  'Please ensure the value of parameter "' + paramName +
+                  '" is set before using it in "' + edge.target + '".')
+              };
+              break;
+            } else if (!paramStatus) {
+              queue.push(edge.target);
+            }
+          }
+        };
+      }
+
+      if (error) {
+        paramWarningsList.push(error);
+      }
+    }
+
+    return paramWarningsList;
+  };
+
+  var _getAnswerGroupIndexesWithEmptyFuzzyRules = function(state) {
+    var indexes = [];
+    var answerGroups = state.interaction.answer_groups;
+    for (var i = 0; i < answerGroups.length; i++) {
+      var group = answerGroups[i];
+      if (group.rule_specs.length == 1 &&
+          group.rule_specs[0].rule_type == FUZZY_RULE_TYPE &&
+          group.rule_specs[0].inputs.training_data.length == 0) {
+        indexes.push(i);
+      }
+    }
+    return indexes;
+  };
+
+  var _getStatesAndAnswerGroupsWithEmptyFuzzyRules = function() {
+    var results = [];
+
+    var states = explorationStatesService.getStates();
+    for (var stateName in states) {
+      var groupIndexes = _getAnswerGroupIndexesWithEmptyFuzzyRules(
+        states[stateName]);
+      if (groupIndexes.length > 0) {
+        results.push({
+          'stateName': stateName,
+          'groupIndexes': groupIndexes
+        });
+      }
+    }
+
+    return results;
   };
 
   var _updateWarningsList = function() {
@@ -1013,35 +1314,98 @@ oppia.factory('explorationWarningsService', [
 
     graphDataService.recompute();
     var _graphData = graphDataService.getGraphData();
+
+    var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
+    if (statesWithoutInteractionIds.length) {
+      _warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Please add interactions for these cards: ' +
+          statesWithoutInteractionIds.join(', ') + '.')
+      });
+    }
+
     if (_graphData) {
       var unreachableStateNames = _getUnreachableNodeNames(
-        _graphData.initStateId, _graphData.nodes, _graphData.links);
+        [_graphData.initStateId], _graphData.nodes, _graphData.links);
+
       if (unreachableStateNames.length) {
-        _warningsList.push(
-          'The following state(s) are unreachable: ' +
-          unreachableStateNames.join(', ') + '.');
+        _warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'The following card(s) are unreachable: ' +
+            unreachableStateNames.join(', ') + '.')
+        });
       } else {
         // Only perform this check if all states are reachable.
         var deadEndStates = _getUnreachableNodeNames(
-          _graphData.finalStateId, _graphData.nodes,
+          _graphData.finalStateIds, _graphData.nodes,
           _getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
-          _warningsList.push(
-            'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
+          var deadEndStatesString = null;
+          if (deadEndStates.length === 1) {
+            deadEndStatesString = 'the following card: ' + deadEndStates[0];
+          } else {
+            deadEndStatesString = 'each of: ' + deadEndStates.join(', ');
+          }
+
+          _warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please make sure there\'s a way to complete ' +
+              'the exploration starting from ' +
+              deadEndStatesString + '.')
+          });
+        }
+      }
+
+      _warningsList = _warningsList.concat(_verifyParameters(
+        [_graphData.initStateId], _graphData.nodes, _graphData.links));
+    }
+
+    var _states = explorationStatesService.getStates();
+    for (var stateName in _states) {
+      var interaction = _states[stateName].interaction;
+      if (interaction.id) {
+        var validatorName = 'oppiaInteractive' + _states[stateName].interaction.id + 'Validator';
+        var interactionWarnings = $filter(validatorName)(
+          stateName, interaction.customization_args, interaction.answer_groups,
+          interaction.default_outcome);
+
+        for (var j = 0; j < interactionWarnings.length; j++) {
+          _warningsList.push({
+            type: interactionWarnings[j].type,
+            message: 'In \'' + stateName + '\', ' + interactionWarnings[j].message
+          });
         }
       }
     }
 
-    var statesWithInsufficientFeedback = _getStatesWithInsufficientFeedback();
-    if (statesWithInsufficientFeedback.length) {
-      _warningsList.push(
-        'The following states need more feedback: ' +
-        statesWithInsufficientFeedback.join(', ') + '.');
+    if (!explorationObjectiveService.displayed) {
+      _warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: 'Please specify an objective (in the Settings tab).'
+      });
     }
 
-    if (!explorationObjectiveService.displayed) {
-      _warningsList.push('Please specify an objective (in the Settings tab).');
-    }
+    var statesWithAnswerGroupsWithEmptyFuzzyRules = (
+      _getStatesAndAnswerGroupsWithEmptyFuzzyRules());
+    statesWithAnswerGroupsWithEmptyFuzzyRules.forEach(function(result) {
+      var warningMessage = 'In \'' + result.stateName + '\'';
+      if (result.groupIndexes.length != 1) {
+        warningMessage += ', the following answer groups have fuzzy rules ';
+        warningMessage += 'with no training data: ';
+      } else {
+        warningMessage += ', the following answer group has a fuzzy rule with ';
+        warningMessage += 'no training data: ';
+      }
+      warningMessage += result.groupIndexes.join(', ');
+
+      _warningsList.push({
+        type: WARNING_TYPES.ERROR,
+        message: warningMessage
+      })
+    });
   };
 
   return {
@@ -1049,10 +1413,15 @@ oppia.factory('explorationWarningsService', [
       return _warningsList.length;
     },
     getWarnings: function() {
-      return angular.copy(_warningsList);
+      return _warningsList;
     },
     updateWarnings: function() {
       _updateWarningsList();
+    },
+    hasCriticalWarnings: function() {
+      return _warningsList.some(function(warning) {
+        return warning.type === WARNING_TYPES.CRITICAL;
+      });
     }
   };
 }]);

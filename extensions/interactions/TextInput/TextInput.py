@@ -20,13 +20,14 @@ from extensions.interactions import base
 class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 
-    name = 'Text'
-    category = 'Basic Input'
+    name = 'Text Input'
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
+    is_trainable = True
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'NormalizedString'}]
+    answer_type = 'NormalizedString'
+    instructions = None
+    needs_summary = False
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
@@ -37,15 +38,14 @@ class TextInput(base.BaseInteraction):
     # parameter.
     _customization_arg_specs = [{
         'name': 'placeholder',
-        'description': 'The placeholder for the text input field.',
+        'description': 'Placeholder text (optional)',
         'schema': {
             'type': 'unicode',
         },
-        'default_value': 'Type your answer here.'
+        'default_value': ''
     }, {
         'name': 'rows',
-        'description': (
-            'How long the learner\'s answer is expected to be (in rows).'),
+        'description': 'Height (in rows)',
         'schema': {
             'type': 'int',
             'validators': [{

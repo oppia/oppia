@@ -220,11 +220,11 @@ describe('Compare versions service', function() {
             'type': 'text',
             'value': statesDetails[stateName].contentStr
           }],
-          'interaction': {'handlers': [{ 'rule_specs': []}]}
+          'interaction': {'answer_groups': []}
         };
-        newStateData.interaction.handlers[0].rule_specs =
+        newStateData.interaction.answer_groups =
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {
-            return {'dest': ruleDestName};
+            return {'outcome': {'dest': ruleDestName}};
           });
         statesData.states[stateName] = newStateData;
       }
@@ -1024,6 +1024,10 @@ describe('Compare versions service', function() {
         'A': {
           'contentStr': '',
           'ruleDests': ['A']
+        },
+        'END': {
+          'contentStr': '',
+          'ruleDests': ['END']
         }
       },
       {
@@ -1032,6 +1036,10 @@ describe('Compare versions service', function() {
           'ruleDests': ['B']
         },
         'B': {
+          'contentStr': '',
+          'ruleDests': ['END']
+        },
+        'END': {
           'contentStr': '',
           'ruleDests': ['END']
         }
@@ -1048,6 +1056,10 @@ describe('Compare versions service', function() {
         'C': {
           'contentStr': '',
           'ruleDests': ['A']
+        },
+        'END': {
+          'contentStr': '',
+          'ruleDests': ['END']
         }
       },
       {
@@ -1062,6 +1074,10 @@ describe('Compare versions service', function() {
         'D': {
           'contentStr': '',
           'ruleDests': ['A']
+        },
+        'END': {
+          'contentStr': '',
+          'ruleDests': ['END']
         }
       },
       {
@@ -1076,28 +1092,8 @@ describe('Compare versions service', function() {
         'D': {
           'contentStr': '',
           'ruleDests': ['A']
-        }
-      },
-      {
-        'A': {
-          'contentStr': '',
-          'ruleDests': ['B']
         },
-        'B': {
-          'contentStr': '',
-          'ruleDests': ['D', 'END']
-        },
-        'D': {
-          'contentStr': '',
-          'ruleDests': ['A']
-        }
-      },
-      {
-        'A': {
-          'contentStr': '',
-          'ruleDests': ['B']
-        },
-        'B': {
+        'END': {
           'contentStr': '',
           'ruleDests': ['END']
         }
@@ -1113,7 +1109,43 @@ describe('Compare versions service', function() {
         },
         'D': {
           'contentStr': '',
+          'ruleDests': ['A']
+        },
+        'END': {
+          'contentStr': '',
+          'ruleDests': ['END']
+        }
+      },
+      {
+        'A': {
+          'contentStr': '',
           'ruleDests': ['B']
+        },
+        'B': {
+          'contentStr': '',
+          'ruleDests': ['END']
+        },
+        'END': {
+          'contentStr': '',
+          'ruleDests': ['END']
+        }
+      },
+      {
+        'A': {
+          'contentStr': '',
+          'ruleDests': ['B']
+        },
+        'B': {
+          'contentStr': '',
+          'ruleDests': ['D', 'END']
+        },
+        'D': {
+          'contentStr': '',
+          'ruleDests': ['B']
+        },
+        'END': {
+          'contentStr': '',
+          'ruleDests': ['END']
         }
       }
     ];
@@ -1132,12 +1164,12 @@ describe('Compare versions service', function() {
       expect(linkData).toEqual([
         {
           'source': 1,
-          'target': 2,
+          'target': 3,
           'linkProperty': 'added'
         },
         {
-          'source': 2,
-          'target': 3,
+          'source': 3,
+          'target': 2,
           'linkProperty': 'added'
         }
       ]);
@@ -1242,7 +1274,7 @@ describe('Compare versions service', function() {
         },
         {
           'source': 2,
-          'target': 4,
+          'target': 3,
           'linkProperty': 'unchanged'
         }
       ]);

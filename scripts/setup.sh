@@ -61,10 +61,7 @@ export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
-
 mkdir -p $NODE_MODULE_DIR
-chown -R $ME $NODE_MODULE_DIR
-chmod -R 744 $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
 export NODE_PATH=$TOOLS_DIR/node-0.10.33
@@ -72,13 +69,30 @@ export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
-export NPM_CMD=$NODE_PATH/bin/npm
-export NPM_INSTALL="$NPM_CMD install"
-
-# Adjust path to support the default Chrome locations for Unix and Mac OS.
-if [ -f "/usr/bin/google-chrome" ]; then
-  export CHROME_BIN="/usr/bin/google-chrome"
+if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
+  # If the OS is Windows, node will be installed globally.
+  export NPM_CMD=npm
 else
-  export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  # Otherwise, npm will be installed locally, in NODE_PATH.
+  export NPM_CMD=$NODE_PATH/bin/npm
+  # Also, change ownership of $NODE_MODULE_DIR. (For Windows,
+  # chown does not seem to be available in git bash.)
+  chown -R $ME $NODE_MODULE_DIR
+  chmod -R 744 $NODE_MODULE_DIR
 fi
 
+export NPM_INSTALL="$NPM_CMD install"
+
+# Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
+if [[ $TRAVIS == 'true' ]]; then
+  export CHROME_BIN="chromium-browser"
+elif [ -f "/usr/bin/google-chrome" ]; then
+  # Unix.
+  export CHROME_BIN="/usr/bin/google-chrome"
+elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
+  # Windows.
+  export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+else
+  # Mac OS.
+  export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+fi

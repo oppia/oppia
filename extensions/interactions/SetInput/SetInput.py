@@ -20,13 +20,13 @@ from extensions.interactions import base
 class SetInput(base.BaseInteraction):
     """Interaction for input of an unordered set of strings."""
 
-    name = 'Set'
-    category = 'Basic Input'
+    name = 'Set Input'
     description = 'Allows learners to enter an unordered set of strings.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
+    display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'SetOfUnicodeString'}]
+    answer_type = 'SetOfUnicodeString'
+    instructions = None
+    needs_summary = False
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.

@@ -199,6 +199,17 @@ class CodeEvaluation(BaseObject):
     }
 
 
+class ListOfCodeEvaluation(BaseObject):
+    """Class for lists of CodeEvaluations."""
+
+    description = 'A list of code and its evaluation results.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CodeEvaluation.SCHEMA
+    }
+
+
 class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
@@ -210,6 +221,17 @@ class CoordTwoDim(BaseObject):
         'type': 'list',
         'len': 2,
         'items': Real.SCHEMA,
+    }
+
+
+class ListOfCoordTwoDim(BaseObject):
+    """Class for lists of CoordTwoDims."""
+
+    description = 'A list of 2D coordinates.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CoordTwoDim.SCHEMA
     }
 
 
@@ -253,6 +275,21 @@ class NormalizedString(BaseObject):
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'normalize_spaces'
+        }]
+    }
+
+
+class SetOfNormalizedString(BaseObject):
+    """Class for sets of NormalizedStrings."""
+
+    description = (
+        'A set (a list with unique elements) of whitespace-collapsed strings.')
+
+    SCHEMA = {
+        'type': 'list',
+        'items': NormalizedString.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }
 
@@ -452,7 +489,7 @@ class Graph(BaseObject):
             'schema': Int.SCHEMA
         }, {
             'name': 'weight',
-            'schema': Int.SCHEMA 
+            'schema': Int.SCHEMA
         }]
     }
     SCHEMA = {
@@ -480,7 +517,7 @@ class Graph(BaseObject):
             'schema': Boolean.SCHEMA
         }]
     }
-    
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
@@ -493,25 +530,26 @@ class Graph(BaseObject):
 
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-            
+
             if not raw['isLabeled']:
                 for vertex in raw['vertices']:
                     assert (vertex['label'] == '')
-            
+
             for edge in raw['edges']:
                 assert (edge['src'] != edge['dst'])
                 if not raw['isWeighted']:
                     assert (edge['weight'] == 1.0)
 
             if raw['isDirected']:
-                edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
+                edge_pairs = [
+                    (edge['src'], edge['dst']) for edge in raw['edges']]
             else:
                 edge_pairs = (
-                    [(edge['src'], edge['dst']) for edge in raw['edges']] + 
+                    [(edge['src'], edge['dst']) for edge in raw['edges']] +
                     [(edge['dst'], edge['src']) for edge in raw['edges']]
                 )
             assert len(set(edge_pairs)) == len(edge_pairs)
-            
+
         except Exception:
             raise TypeError('Cannot convert to graph %s' % raw)
 
@@ -532,11 +570,23 @@ class GraphProperty(BaseObject):
         ]
     }
 
+class ListOfGraph(BaseObject):
+    """Class for lists of Graphs."""
+
+    description = 'A list of graphs.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Graph.SCHEMA
+    }
+
 
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
-    
-    description = 'A rectangle normalized so that the coordinates are within the range [0,1].'
+
+    description = (
+        'A rectangle normalized so that the coordinates are within the range '
+        '[0,1].')
 
     SCHEMA = {
         'type': 'list',
@@ -547,15 +597,16 @@ class NormalizedRectangle2D(BaseObject):
             'items': Real.SCHEMA
         }
     }
-    
+
     @classmethod
     def normalize(cls, raw):
-        # Moves cur_value to the nearest available value in the range [min_value, max_value]
+        # Moves cur_value to the nearest available value in the range
+        # [min_value, max_value].
         def clamp(min_value, current_value, max_value):
             return min(max_value, max(min_value, current_value))
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-            
+
             raw[0][0] = clamp(0.0, raw[0][0], 1.0)
             raw[0][1] = clamp(0.0, raw[0][1], 1.0)
             raw[1][0] = clamp(0.0, raw[1][0], 1.0)
@@ -568,27 +619,28 @@ class NormalizedRectangle2D(BaseObject):
 
 
 class ImageRegion(BaseObject):
-    """Image Region class."""
+    """A region of an image, including its shape and coordinates."""
 
     description = 'A region of an image.'
-    
-    # Note: at the moment, only supports rectangular image regions
-    # Coordinates are [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]]
-    # origin is top-left, increasing x is to the right, increasing y is down
+
+    # Note: at the moment, only supports rectangular image regions.
+    # Coordinates are:
+    #   [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]].
+    # Origin is top-left, increasing x is to the right, increasing y is down.
     SCHEMA = {
         'type': 'dict',
         'properties': [{
             'name': 'regionType',
             'schema': UnicodeString.SCHEMA
         }, {
-            'name': 'regionArea',
+            'name': 'area',
             'schema': NormalizedRectangle2D.SCHEMA
         }]
     }
 
 
 class ImageWithRegions(BaseObject):
-    """Image With Regions class."""
+    """An image overlaid with labeled regions."""
 
     description = 'An image overlaid with regions.'
     edit_html_filename = 'image_with_regions_editor'
@@ -600,7 +652,7 @@ class ImageWithRegions(BaseObject):
             'name': 'imagePath',
             'schema': Filepath.SCHEMA
         }, {
-            'name': 'imageRegions',
+            'name': 'labeledRegions',
             'schema': {
                 'type': 'list',
                 'items': {
@@ -610,7 +662,7 @@ class ImageWithRegions(BaseObject):
                         'schema': UnicodeString.SCHEMA
                     }, {
                         'name': 'region',
-                        'schema': ImageRegion.SCHEMA 
+                        'schema': ImageRegion.SCHEMA
                     }]
                 }
             }
@@ -618,12 +670,41 @@ class ImageWithRegions(BaseObject):
     }
 
 
-class ListOfRegion(BaseObject):
-    """List of Region class."""
+class ClickOnImage(BaseObject):
+    """A click on an image and the clicked regions."""
 
-    description = "A list of regions by index."
+    description = "Position of a click and a list of regions clicked."
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'clickPosition',
+            'schema': {
+                'type': 'list',
+                'items': Real.SCHEMA,
+                'len': 2
+            }
+        }, {
+            'name': 'clickedRegions',
+            'schema': {
+                'type': 'list',
+                'items': UnicodeString.SCHEMA
+            }
+        }]
+    }
+
+
+class SetOfHtmlString(BaseObject):
+    """A Set of Html Strings"""
+
+    description = "A list of Html strings."
+    edit_html_filename = 'set_of_html_string_editor'
+    edit_js_filename = 'SetOfHtmlStringEditor'
 
     SCHEMA = {
         'type': 'list',
-        'items': UnicodeString.SCHEMA
+        'items': Html.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }]
     }

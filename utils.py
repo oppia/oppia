@@ -23,6 +23,7 @@ import json
 import os
 import random
 import re
+import string
 import StringIO
 import time
 import unicodedata
@@ -31,10 +32,7 @@ import urlparse
 import yaml
 import zipfile
 
-
-# Sentinel value for schema verification, indicating that a value can take any
-# type.
-ANY_TYPE = 1
+import feconf
 
 
 class InvalidInputException(Exception):
@@ -42,13 +40,15 @@ class InvalidInputException(Exception):
     pass
 
 
-class EntityIdNotFoundError(Exception):
-    """Error class for when an entity ID is not in the datastore."""
+class ValidationError(Exception):
+    """Error class for when a domain object fails validation."""
     pass
 
 
-class ValidationError(Exception):
-    """Error class for when a domain object fails validation."""
+class ExplorationConversionError(Exception):
+    """Error class for when an exploration fails to convert from a certain
+    version to a certain version.
+    """
     pass
 
 
@@ -228,36 +228,6 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def verify_dict_keys_and_types(adict, dict_schema):
-    """Checks the keys in adict, and that their values have the right types.
-
-    Args:
-      adict: the dictionary to test.
-      dict_schema: list of 2-element tuples. The first element of each
-        tuple is the key name and the second element is the value type.
-    """
-    for item in dict_schema:
-        if len(item) != 2:
-            raise Exception('Schema %s is invalid.' % dict_schema)
-        if not isinstance(item[0], str):
-            raise Exception('Schema key %s is not a string.' % item[0])
-        if item[1] != ANY_TYPE and not isinstance(item[1], type):
-            raise Exception('Schema value %s is not a valid type.' % item[1])
-
-    TOP_LEVEL_KEYS = [item[0] for item in dict_schema]
-    if sorted(TOP_LEVEL_KEYS) != sorted(adict.keys()):
-        raise ValidationError(
-            'Dict %s should conform to schema %s.' % (adict, dict_schema))
-
-    for item in dict_schema:
-        if item[1] == ANY_TYPE:
-            continue
-        if not isinstance(adict[item[0]], item[1]):
-            raise ValidationError(
-                'Value \'%s\' for key \'%s\' is not of type %s in:\n\n %s'
-                % (adict[item[0]], item[0], item[1], adict))
-
-
 def convert_png_to_data_url(filepath):
     """Converts the png file at filepath to a data URL.
 
@@ -332,11 +302,7 @@ def get_time_in_millisecs(datetime_obj):
 
 
 def get_current_time_in_millisecs():
-    """Returns time in milliseconds since the Epoch.
-
-    Args:
-      datetime_obj: An object of type datetime.datetime.
-    """
+    """Returns time in milliseconds since the Epoch."""
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
@@ -391,3 +357,43 @@ def vfs_normpath(path):
     if initial_slashes:
         path = slash * initial_slashes + path
     return path or dot
+
+
+def get_short_language_description(full_language_description):
+    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
+    the corresponding short description.
+    """
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
+
+
+def require_valid_name(name, name_type):
+    """Generic name validation.
+
+    Args:
+      name: the name to validate.
+      name_type: a human-readable string, like 'the exploration title' or
+        'a state name'. This will be shown in error messages.
+    """
+    # This check is needed because state names are used in URLs and as ids
+    # for statistics, so the name length should be bounded above.
+    if len(name) > 50 or len(name) < 1:
+        raise ValidationError(
+            'The length of %s should be between 1 and 50 '
+            'characters; received %s' % (name_type, name))
+
+    if name[0] in string.whitespace or name[-1] in string.whitespace:
+        raise ValidationError(
+            'Names should not start or end with whitespace.')
+
+    if re.search('\s\s+', name):
+        raise ValidationError(
+            'Adjacent whitespace in %s should be collapsed.' % name_type)
+
+    for c in feconf.INVALID_NAME_CHARS:
+        if c in name:
+            raise ValidationError(
+                'Invalid character %s in %s: %s' % (c, name_type, name))

@@ -22,53 +22,27 @@ var editor = require('./editor.js');
 var forms = require('./forms.js');
 
 var setLanguages = function(languages) {
-  forms.AutocompleteMultiDropdownEditor(
+  forms.MultiSelectEditor(
     element(by.css('.protractor-test-gallery-language-selector'))
   ).setValues(languages);
 };
 
 var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
-  forms.AutocompleteMultiDropdownEditor(
+  forms.MultiSelectEditor(
     element(by.css('.protractor-test-gallery-language-selector'))
   ).expectCurrentSelectionToBe(expectedLanguages);
 };
 
-// Here section is expected to be 'category'. The label can be any category.
-// Verifies the previous state of the checkbox, then clicks it.
-var _clickCheckbox = function(section, label, isPreviouslyTicked) {
-  element.all(by.css('.protractor-test-gallery-' + section)).
-      map(function(option) {
-    return option.getText().then(function(text) {
-      if (text === label) {
-        var checkbox =
-          option.element(by.css('.protractor-test-gallery-checkbox'));
-        if (isPreviouslyTicked) {
-          expect(checkbox.isSelected()).toBeTruthy();
-        } else {
-          expect(checkbox.isSelected()).toBeFalsy();
-        }
-        checkbox.click();
-        return true;
-      }
-      return false;
-    });
-  }).then(function(results) {
-    var foundCheckbox = false;
-    for (var i = 0; i < results.length; i++) {
-      foundCheckbox = foundCheckbox || results[i];
-    }
-    if (!foundCheckbox) {
-      throw Error('Checkbox ' + label + ' not found in section ' + section);
-    }
-  });
+var setCategories = function(categories) {
+  forms.MultiSelectEditor(
+    element(by.css('.protractor-test-gallery-category-selector'))
+  ).setValues(categories);
 };
 
-var tickCheckbox = function(section, label) {
-  _clickCheckbox(section, label, false);
-};
-
-var untickCheckbox = function(section, label) {
-  _clickCheckbox(section, label, true);
+var expectCurrentCategorySelectionToBe = function(expectedCategories) {
+  forms.MultiSelectEditor(
+    element(by.css('.protractor-test-gallery-category-selector'))
+  ).expectCurrentSelectionToBe(expectedCategories);
 };
 
 // Returns a promise of all explorations with the given name.
@@ -96,6 +70,9 @@ var expectExplorationToBeHidden = function(name) {
 
 var playExploration = function(name) {
   _getExplorationElements(name).then(function(elems) {
+    if (elems.length === 0) {
+      throw 'Could not find exploration tile with name ' + name;
+    }
     elems[0].element(by.css('.protractor-test-gallery-tile-title')).click();
   });
 };
@@ -116,8 +93,9 @@ var getExplorationObjective = function(name) {
 
 exports.setLanguages = setLanguages;
 exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
-exports.tickCheckbox = tickCheckbox;
-exports.untickCheckbox = untickCheckbox;
+exports.setCategories = setCategories;
+exports.expectCurrentCategorySelectionToBe = expectCurrentCategorySelectionToBe;
+
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;
 exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;

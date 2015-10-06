@@ -26,6 +26,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import rights_manager
+from core.domain import rule_domain
 from core.tests import test_utils
 import feconf
 
@@ -34,6 +35,20 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+
+    def setUp(self):
+        """Completes the sign-up process for self.EDITOR_EMAIL."""
+        super(BaseEditorControllerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        self.set_admins([self.ADMIN_EMAIL])
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
@@ -50,25 +65,27 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 class EditorTest(BaseEditorControllerTest):
 
+    def setUp(self):
+        super(EditorTest, self).setUp()
+        exp_services.load_demo('0')
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, '0')
+
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
 
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
+        self.assertIn('Welcome to Oppia!', response.body)
         self.assert_cannot_edit(response.body)
 
-        # Register and login as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
+        # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
-
-        # Check if exploration title was loaded.
-        self.assertIn('Welcome to Oppia!', response.body)
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
+        self.assertIn('Welcome to Oppia!', response.body)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
@@ -80,21 +97,18 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_new_state_template(self):
         """Test the validity of the NEW_STATE_TEMPLATE."""
-        exp_services.load_demo('0')
+
         exploration = exp_services.get_exploration_by_id('0')
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
-        new_state_dict = exploration.export_state_to_frontend_dict(
-            feconf.DEFAULT_INIT_STATE_NAME)
+        new_state_dict = exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].to_dict()
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
         CURRENT_VERSION = 1
 
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -141,17 +155,6 @@ class EditorTest(BaseEditorControllerTest):
             _get_payload('[Bad State Name]', CURRENT_VERSION))
         self.assertIn('Invalid character [', response_dict['error'])
 
-        # A request with a state name of feconf.END_DEST is invalid.
-        response_dict = _put_and_expect_400_error(
-            _get_payload(feconf.END_DEST, CURRENT_VERSION))
-        self.assertIn('Invalid state name', response_dict['error'])
-
-        # Even if feconf.END_DEST is mixed case, it is still invalid.
-        response_dict = _put_and_expect_400_error(
-            _get_payload('eNd', CURRENT_VERSION))
-        self.assertEqual('eNd'.lower(), feconf.END_DEST.lower())
-        self.assertIn('Invalid state name', response_dict['error'])
-
         # A name cannot have spaces at the front or back.
         response_dict = _put_and_expect_400_error(
             _get_payload('  aa', CURRENT_VERSION))
@@ -174,9 +177,6 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
     def test_resolved_answers_handler(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
         # In the reader perspective, submit the first multiple-choice answer,
         # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
         # TODO(sll): Use the ExplorationPlayer in reader_test for this.
@@ -186,17 +186,16 @@ class EditorTest(BaseEditorControllerTest):
             exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['exploration']['init_state_name']
-        exploration_dict = self.submit_answer('0', state_name, '0')
+        result_dict = self.submit_answer('0', state_name, '0')
 
-        state_name = exploration_dict['state_name']
+        state_name = result_dict['state_name']
         self.submit_answer('0', state_name, 'blah')
         for _ in range(2):
             self.submit_answer('0', state_name, 'blah2')
         for _ in range(3):
             self.submit_answer('0', state_name, 'blah3')
 
-        # Register and log in as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
+        # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get('/create/0')
@@ -205,8 +204,7 @@ class EditorTest(BaseEditorControllerTest):
 
         def _get_unresolved_answers():
             return stats_domain.StateRuleAnswerLog.get(
-                '0', state_name, feconf.SUBMIT_HANDLER_NAME,
-                exp_domain.DEFAULT_RULESPEC_STR
+                '0', state_name, exp_domain.DEFAULT_RULESPEC_STR
             ).answers
 
         self.assertEqual(
@@ -243,19 +241,158 @@ class EditorTest(BaseEditorControllerTest):
 
         self.logout()
 
+    def test_untrained_answers_handler(self):
+        with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
+            def _create_answer(value, count=1):
+                return {'value': value, 'count': count}
+            def _create_training_data(*arg):
+                return [_create_answer(value) for value in arg]
 
-class StatsIntegrationTest(BaseEditorControllerTest):
-    """Test statistics recording using the default exploration."""
+            # Load the fuzzy rules demo exploration.
+            exp_services.load_demo('16')
+            rights_manager.release_ownership_of_exploration(
+                feconf.SYSTEM_COMMITTER_ID, '16')
 
-    def test_state_stats_for_default_exploration(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+            self.assertEqual(
+                exploration_dict['exploration']['title'],
+                'Demonstrating fuzzy rules')
 
-        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0/1'
+            # This test uses the interaction which supports numeric input.
+            state_name = 'text'
 
-        # Check, from the editor perspective, that no stats have been recorded.
-        self.register_editor(self.EDITOR_EMAIL)
-        self.login(self.EDITOR_EMAIL)
+            self.assertIn(
+                state_name, exploration_dict['exploration']['states'])
+            self.assertEqual(
+                exploration_dict['exploration']['states'][state_name][
+                    'interaction']['id'], 'TextInput')
+
+            # Input happy since there is an explicit rule checking for that.
+            result_dict = self.submit_answer('16', state_name, 'happy')
+
+            # Input text not at all similar to happy (default outcome).
+            self.submit_answer('16', state_name, 'sad')
+
+            # Input cheerful: this is current training data and falls under the
+            # fuzzy rule.
+            self.submit_answer('16', state_name, 'cheerful')
+
+            # Input joyful: this is not training data but will be classified
+            # under the fuzzy rule.
+            self.submit_answer('16', state_name, 'joyful')
+
+            # Log in as an editor.
+            self.login(self.EDITOR_EMAIL)
+            response = self.testapp.get('/create/16')
+            csrf_token = self.get_csrf_token_from_response(response)
+            url = str('/createhandler/training_data/16/%s' % state_name)
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # Only two of the four submitted answers should be unhandled.
+            response_dict = self.get_json(url)
+            self.assertEqual(
+                response_dict['unhandled_answers'],
+                _create_training_data('joyful', 'sad'))
+
+            # If the confirmed unclassified answers is trained for one of the
+            # values, it should no longer show up in unhandled answers.
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        'new_value': ['sad']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(
+                response_dict['unhandled_answers'],
+                _create_training_data('joyful'))
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # If one of the values is added to the training data of a fuzzy
+            # rule, then it should not be returned as an unhandled answer.
+            state = exploration_dict['exploration']['states'][state_name]
+            answer_group = state['interaction']['answer_groups'][1]
+            rule_spec = answer_group['rule_specs'][0]
+            self.assertEqual(
+                rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
+            rule_spec['inputs']['training_data'].append('joyful')
+
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        'new_value': []
+                    }, {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                        'new_value': state['interaction']['answer_groups']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(
+                response_dict['unhandled_answers'],
+                _create_training_data('sad'))
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # If both are classified, then nothing should be returned
+            # unhandled.
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        'new_value': ['sad']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(response_dict['unhandled_answers'], [])
+
+            exploration_dict = self.get_json(
+                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+
+            # If one of the existing training data elements in the fuzzy rule
+            # is removed (5 in this case), but it is not backed up by an
+            # answer, it will not be returned as potential training data.
+            state = exploration_dict['exploration']['states'][state_name]
+            answer_group = state['interaction']['answer_groups'][1]
+            rule_spec = answer_group['rule_specs'][0]
+            del rule_spec['inputs']['training_data'][1]
+            self.put_json('/createhandler/data/16', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                        'new_value': state['interaction']['answer_groups']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+            response_dict = self.get_json(url)
+            self.assertEqual(response_dict['unhandled_answers'], [])
+
+            self.logout()
 
 
 class DownloadIntegrationTest(BaseEditorControllerTest):
@@ -266,67 +403,57 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
 - type: text
   value: ''
 interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
-  handlers:
-  - name: submit
-    rule_specs:
-    - definition:
-        rule_type: default
-      dest: State A
-      feedback: []
-      param_changes: []
+  default_outcome:
+    dest: State A
+    feedback: []
+    param_changes: []
+  fallbacks: []
   id: TextInput
-  sticky: false
 param_changes: []
 """),
         "State B": ("""content:
 - type: text
   value: ''
 interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
-  handlers:
-  - name: submit
-    rule_specs:
-    - definition:
-        rule_type: default
-      dest: State B
-      feedback: []
-      param_changes: []
+  default_outcome:
+    dest: State B
+    feedback: []
+    param_changes: []
+  fallbacks: []
   id: TextInput
-  sticky: false
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
 - type: text
-  value: Welcome to the Oppia editor!<br><br>Anything
-    you type here will be shown to the learner playing
-    your exploration.<br><br>If you need more help getting
-    started, check out the Help link in the navigation
-    bar.
+  value: ''
 interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
-  handlers:
-  - name: submit
-    rule_specs:
-    - definition:
-        rule_type: default
-      dest: %s
-      feedback: []
-      param_changes: []
+  default_outcome:
+    dest: %s
+    feedback: []
+    param_changes: []
+  fallbacks: []
   id: TextInput
-  sticky: false
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -336,38 +463,42 @@ param_changes: []
 - type: text
   value: ''
 interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
-  handlers:
-  - name: submit
-    rule_specs:
-    - definition:
-        rule_type: default
-      dest: State A
-      feedback: []
-      param_changes: []
+  default_outcome:
+    dest: State A
+    feedback: []
+    param_changes: []
+  fallbacks: []
   id: TextInput
-  sticky: false
 param_changes: []
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):
-
-        # Register and log in as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # Create a simple exploration
         EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'The title for ZIP download handler test!',
-            'This is just a test category')
+        self.save_new_valid_exploration(
+            EXP_ID, self.OWNER_ID,
+            title='The title for ZIP download handler test!',
+            category='This is just a test category',
+            objective='')
+
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        init_state = exploration.states[exploration.init_state_name]
+        init_interaction = init_state.interaction
+        init_interaction.default_outcome.dest = exploration.init_state_name
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
         exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
@@ -423,18 +554,21 @@ param_changes: []
 
     def test_state_download_handler_for_default_exploration(self):
 
-        # Register and log in as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # Create a simple exploration
         EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'The title for states download handler test!',
-            'This is just a test category')
+        self.save_new_valid_exploration(
+            EXP_ID, self.OWNER_ID,
+            title='The title for states download handler test!',
+            category='This is just a test category')
+
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
         exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
@@ -454,22 +588,6 @@ param_changes: []
 
 class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
-    def setUp(self):
-        """Creates dummy users."""
-        super(ExplorationDeletionRightsTest, self).setUp()
-
-        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        self.set_admins([self.ADMIN_EMAIL])
-
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
         UNPUBLISHED_EXP_ID = 'unpublished_eid'
@@ -477,7 +595,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             UNPUBLISHED_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
@@ -506,7 +624,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             PUBLISHED_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, PUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
@@ -545,10 +663,10 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
         self.EXP_ID = '0'
 
-        exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
 
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
         # In version 2, change the objective and the initial state content.
@@ -660,13 +778,15 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
     def test_user_banning(self):
         """Test that banned users are banned."""
-        EXP_ID = '0'
-        exp_services.delete_demo(EXP_ID)
-        exp_services.load_demo(EXP_ID)
 
-        # Register new editors Joe and Sandra.
-        self.register_editor('joe@example.com', username='joe')
-        self.register_editor('sandra@example.com', username='sandra')
+        EXP_ID = '0'
+        exp_services.load_demo(EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID)
+
+        # Sign-up new editors Joe and Sandra.
+        self.signup('joe@example.com', 'joe')
+        self.signup('sandra@example.com', 'sandra')
 
         # Joe logs in.
         self.login('joe@example.com')
@@ -679,7 +799,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
         # Ban joe.
         config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'banned_usernames', ['joe'])
+            feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
 
         # Test that Joe is banned. (He can still access the gallery.)
         response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)
@@ -708,38 +828,33 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     COLLABORATOR2_USERNAME = 'collab2'
     COLLABORATOR3_EMAIL = 'collaborator3@example.com'
     COLLABORATOR3_USERNAME = 'collab3'
-    VIEWER2_EMAIL = 'viewer2@example.com'
 
     def test_exploration_rights_handler(self):
         """Test exploration rights handler."""
 
         # Create several users
-        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
-        self.register_editor(
+        self.signup(
             self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
-        self.register_editor(
+        self.signup(
             self.COLLABORATOR2_EMAIL, username=self.COLLABORATOR2_USERNAME)
-        self.register_editor(
+        self.signup(
             self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        self.set_admins([self.ADMIN_EMAIL])
 
         # Owner creates exploration
         self.login(self.OWNER_EMAIL)
         EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title for rights handler test!',
-            'My category')
+        self.save_new_valid_exploration(
+            EXP_ID, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
@@ -792,6 +907,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,
@@ -829,6 +949,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 5'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 5',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,

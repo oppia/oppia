@@ -48,6 +48,10 @@ class SetOfUnicodeStringRule(rule_domain.Rule):
     subject_type = objects.SetOfUnicodeString
 
 
+class SetOfHtmlStringRule(rule_domain.Rule):
+    subject_type = objects.SetOfHtmlString
+
+
 class UnicodeStringRule(rule_domain.Rule):
     subject_type = objects.UnicodeString
 
@@ -64,5 +68,5 @@ class ImageWithRegionsRule(rule_domain.Rule):
     subject_type = objects.ImageWithRegions
 
 
-class ListOfRegionRule(rule_domain.Rule):
-    subject_type = objects.ListOfRegion
+class ClickOnImageRule(rule_domain.Rule):
+    subject_type = objects.ClickOnImage

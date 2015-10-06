@@ -16,6 +16,7 @@
 
 """Stores various configuration options and constants for Oppia."""
 
+import copy
 import os
 
 # Whether to unconditionally log info messages.
@@ -35,12 +36,13 @@ else:
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
+SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
+GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-OBJECTS_DIR = os.path.join('extensions', 'objects')
 SKINS_TEMPLATES_DIR = os.path.join('extensions', 'skins')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
 FRONTEND_TEMPLATES_DIR = os.path.join(
@@ -51,24 +53,43 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
-# The id and name for the final state of an exploration.
-END_DEST = 'END'
+# The current version of the exploration states blob schema. If any backward-
+# incompatible changes are made to the states blob schema in the data store,
+# this version number must be changed and the exploration migration job
+# executed.
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 6
 
-# The default number of items to show on a page in a paged view.
-DEFAULT_PAGE_SIZE = 50
+# The current version of the all collection blob schemas (such as the nodes
+# structure within the Collection domain object). If any backward-incompatible
+# changes are made to any of the blob schemas in the data store, this version
+# number must be changed.
+CURRENT_COLLECTION_SCHEMA_VERSION = 1
+
+# The default number of exploration tiles to load at a time in the gallery
+# page.
+GALLERY_PAGE_SIZE = 10
+
+# The default number of commits to show on a page in the exploration history
+# tab.
+COMMIT_LIST_PAGE_SIZE = 50
+
+# The default number of items to show on a page in the exploration feedback
+# tab.
+FEEDBACK_TAB_PAGE_SIZE = 20
 
 # Default name for the initial state of an exploration.
-DEFAULT_INIT_STATE_NAME = 'First State'
+DEFAULT_INIT_STATE_NAME = 'First Card'
 # The default content text for the initial state of an exploration.
-DEFAULT_INIT_STATE_CONTENT_STR = (
-    'Welcome to the Oppia editor!<br><br>'
-    'Anything you type here will be shown to the learner playing '
-    'your exploration.<br><br>'
-    'If you need more help getting started, check out the Help link '
-    'in the navigation bar.')
+DEFAULT_INIT_STATE_CONTENT_STR = ''
 
-# Name (and description) of the default rule.
-DEFAULT_RULE_NAME = 'Default'
+# The threshold the truth value of an evaluated answer group must equal or
+# exceed in order to be considered a better classification than the default
+# group.
+DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
+
+# Default valid parameter for instantiating Explorations when explicit
+# skin customizations aren't provided.
+DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -79,16 +100,10 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'gif': ['gif']
 }
 
-DEFAULT_EDITOR_PREREQUISITES_AGREEMENT = """
-I understand and agree that any contributions I make to this site will be
-licensed under CC-BY-SA v4.0, with a waiver of the attribution requirement. I
-will not contribute material to the site (including images and files that are
-part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
-"""
-
 # Static file url to path mapping
 PATH_MAP = {
     '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
+    '/extensions/gadgets': GADGETS_DIR,
     '/extensions/interactions': INTERACTIONS_DIR,
     '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
     '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
@@ -96,9 +111,6 @@ PATH_MAP = {
     '/lib/static': os.path.join('lib', 'static'),
     '/third_party/static': os.path.join('third_party', 'static'),
 }
-
-# Format string for displaying datetimes in the UI.
-HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M UTC'
 
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
@@ -109,22 +121,40 @@ for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = ')]}\'\n'
-# A regular expression for alphanumeric characters
+# A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+# A regular expression for tags.
+TAG_REGEX = r'^[a-z ]+$'
 
 # Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
+AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
 INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
     'pow', 'round', 'then']
 
+# These are here rather than in rating_services.py to avoid import
+# circularities with exp_services.
+# TODO (Jacob) Refactor exp_services to remove this problem.
+_EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+def get_empty_ratings():
+    return copy.deepcopy(_EMPTY_RATINGS)
+
 # Committer id for system actions.
-ADMIN_COMMITTER_ID = 'admin'
+SYSTEM_COMMITTER_ID = 'admin'
+SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
-# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
-# app before setting this to True. If ADMIN_EMAIL_ADDRESS is not that of an
-# app owner, email messages from this user cannot be sent.
+# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
+# correspond to owners of the app before setting this to True. If
+# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
+# address cannot be sent.
 CAN_SEND_EMAILS_TO_ADMIN = False
+# Ensure that SYSTEM_EMAIL_ADDRESS is valid and corresponds to an owner of the
+# app before setting this to True. Emails will be sent from
+# SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
+# email messages from this user cannot be sent.
+CAN_SEND_EMAILS_TO_USERS = False
+# Whether to send email updates to a user who has not specified a preference.
+DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
@@ -132,8 +162,12 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
-# Whether to include a page with the Oppia discussion forum.
-SHOW_FORUM_PAGE = True
+# Whether to include the forum, terms and privacy pages.
+SHOW_CUSTOM_PAGES = True
+
+# User id and username for exploration migration bot.
+MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
+MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -156,39 +190,48 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
-ALLOWED_INTERACTIONS = {
-    'CodeRepl': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'CodeRepl')
+
+# These categories and interactions are displayed in the order in which they
+# appear in the interaction selector.
+ALLOWED_INTERACTION_CATEGORIES = [{
+    'name': 'General',
+    'interaction_ids': [
+        'Continue',
+        'EndExploration',
+        'ImageClickInput',
+        'ItemSelectionInput',
+        'MultipleChoiceInput',
+        'TextInput'
+    ],
+}, {
+    'name': 'Math',
+    'interaction_ids': [
+        'GraphInput',
+        'LogicProof',
+        'NumericInput',
+        'SetInput',
+    ]
+}, {
+    'name': 'Programming',
+    'interaction_ids': ['CodeRepl'],
+}, {
+    'name': 'Music',
+    'interaction_ids': [
+        'MusicNotesInput'
+    ],
+}, {
+    'name': 'Geography',
+    'interaction_ids': [
+        'InteractiveMap'
+    ],
+}]
+
+ALLOWED_GADGETS = {
+    'AdviceBar': {
+        'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
     },
-    'Continue': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
-    },
-    'GraphInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
-    },
-    'ImageClickInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'ImageClickInput')
-    },
-    'InteractiveMap': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'InteractiveMap')
-    },
-    'LogicProof': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'LogicProof')
-    },
-    'MultipleChoiceInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'MultipleChoiceInput')
-    },
-    'MusicNotesInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'MusicNotesInput')
-    },
-    'NumericInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'NumericInput')
-    },
-    'SetInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'SetInput')
-    },
-    'TextInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'TextInput')
+    'ScoreBar': {
+        'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },
 }
 
@@ -205,7 +248,7 @@ DEMO_EXPLORATIONS = [
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('counting.yaml', 'Three Balls', 'Mathematics'),
+    ('three_balls', 'Three Balls', 'Mathematics'),
     ('cities.yaml', 'World Cities', 'Geography'),
     ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
     ('hola.yaml', u'¡Hola!', 'Languages'),
@@ -214,16 +257,26 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
-    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
+    ('test_interactions', 'Test of expressions and interactions', 'Test'),
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
+    ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
+    ('solar_system', 'The Solar System', 'Physics'),
+    ('about_oppia.yaml', 'About Oppia', 'Welcome'),
+    # TODO(anuzis): Replace about_oppia.yaml with this dev version when gadget
+    # visibility by state is functional. Currently an AdviceBar gadget that
+    # should only display on the Helsinki map state is visible during the
+    # entire exploration as a dev demo.
+    ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
+     'Welcome'),
+    ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
+]
+
+DEMO_COLLECTIONS = [
+    'welcome_to_collections.yaml'
 ]
 
 # TODO(sll): Add all other URLs here.
-CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
-CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
-EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
-EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
@@ -235,24 +288,24 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_LOGIN_REDIRECT_URL = '/gallery_login_redirect'
 LEARN_GALLERY_URL = '/learn'
-LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
-PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SIGNUP_URL = '/signup'
+SIGNUP_DATA_URL = '/signuphandler/data'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
-NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
 NAV_MODE_HOME = 'home'
+NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
+NAV_MODE_SIGNUP = 'signup'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -260,10 +313,19 @@ EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
 EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
-# The values for these two event types should be left as-is for backwards
+EVENT_TYPE_COLLECTION_CHANGE = 'collection_change'
+EVENT_TYPE_COLLECTION_STATUS_CHANGE = 'collection_status_change'
+EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
+EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
+# The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
+EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
+
+ACTIVITY_STATUS_PRIVATE = 'private'
+ACTIVITY_STATUS_PUBLIC = 'public'
+ACTIVITY_STATUS_PUBLICIZED = 'publicized'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
@@ -271,9 +333,13 @@ PLAY_TYPE_NORMAL = 'normal'
 
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
+COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
+
+# Unfinished feature.
+SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -281,10 +347,57 @@ OUTPUT_FORMAT_ZIP = 'zip'
 
 # Types of updates shown in the 'recent updates' table in the dashboard page.
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
+UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# The name for the default handler of an interaction.
-SUBMIT_HANDLER_NAME = 'submit'
+# Default color
+COLOR_TEAL = 'teal'
+# Social sciences
+COLOR_SALMON = 'salmon'
+# Art
+COLOR_SUNNYSIDE = 'sunnyside'
+# Mathematics and computing
+COLOR_SHARKFIN = 'sharkfin'
+# Science
+COLOR_GUNMETAL = 'gunmetal'
+DEFAULT_COLOR = COLOR_TEAL
+
+# List of supported default categories. For now, each category has
+# a specific color associated with it.
+CATEGORIES_TO_COLORS = {
+    'Architecture': COLOR_SUNNYSIDE,
+    'Art': COLOR_SUNNYSIDE,
+    'Biology': COLOR_GUNMETAL,
+    'Business': COLOR_SALMON,
+    'Chemistry': COLOR_GUNMETAL,
+    'Computing': COLOR_SHARKFIN,
+    'Economics': COLOR_SALMON,
+    'Education': COLOR_TEAL,
+    'Engineering': COLOR_GUNMETAL,
+    'Environment': COLOR_GUNMETAL,
+    'Geography': COLOR_SALMON,
+    'Government': COLOR_SALMON,
+    'Hobbies': COLOR_TEAL,
+    'Languages': COLOR_SUNNYSIDE,
+    'Law': COLOR_SALMON,
+    'Life Skills': COLOR_TEAL,
+    'Mathematics': COLOR_SHARKFIN,
+    'Medicine': COLOR_GUNMETAL,
+    'Music': COLOR_SUNNYSIDE,
+    'Philosophy': COLOR_SALMON,
+    'Physics': COLOR_GUNMETAL,
+    'Programming': COLOR_SHARKFIN,
+    'Psychology': COLOR_SALMON,
+    'Puzzles': COLOR_TEAL,
+    'Reading': COLOR_TEAL,
+    'Religion': COLOR_SALMON,
+    'Sport': COLOR_SUNNYSIDE,
+    'Statistics': COLOR_SHARKFIN,
+    'Welcome': COLOR_TEAL,
+}
+
+# A sorted list of default categories.
+DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -366,3 +479,7 @@ ALL_LANGUAGE_CODES = [{
 }, {
     'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
 }]
+
+# Defaults for topic similarities
+DEFAULT_TOPIC_SIMILARITY = 0.5
+SAME_TOPIC_SIMILARITY = 1.0

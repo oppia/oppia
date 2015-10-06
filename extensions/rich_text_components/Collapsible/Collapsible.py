@@ -25,6 +25,7 @@ class Collapsible(base.BaseRichTextComponent):
     description = 'A collapsible block of HTML.'
     frontend_name = 'collapsible'
     tooltip = 'Insert collapsible block'
+    is_complex = True
 
     _customization_arg_specs = [{
         'name': 'heading',
@@ -32,12 +33,15 @@ class Collapsible(base.BaseRichTextComponent):
         'schema': {
             'type': 'unicode',
         },
-        'default_value': 'More information...',
+        'default_value': 'Sample Header',
     }, {
         'name': 'content',
         'description': 'The content of the collapsible block',
         'schema': {
             'type': 'html',
+            'ui_config': {
+                'hide_complex_extensions': True,
+            }
         },
         'default_value': 'You have opened the collapsible block.'
     }]

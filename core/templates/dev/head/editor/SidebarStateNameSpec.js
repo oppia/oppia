@@ -36,20 +36,21 @@ describe('Sidebar state name controller', function() {
       fs = $injector.get('focusService');
       ess = $injector.get('explorationStatesService');
 
-      GLOBALS = {INVALID_NAME_CHARS: '#@&^%$'};
+      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
-      ess.setStates({
+      ess.init({
         'First State': {
           content: [{
             type: 'text',
             value: 'First State Content'
           }],
           interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              feedback: [],
+              param_changes: []
+            }
           },
           param_changes: []
         },
@@ -59,11 +60,12 @@ describe('Sidebar state name controller', function() {
             value: 'Second State Content'
           }],
           interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              feedback: [],
+              param_changes: []
+            }
           },
           param_changes: []
         },
@@ -73,11 +75,12 @@ describe('Sidebar state name controller', function() {
             value: 'This is some content.'
           }],
           interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              feedback: [],
+              param_changes: []
+            }
           },
           param_changes: [{
             name: 'comparison',
@@ -129,9 +132,6 @@ describe('Sidebar state name controller', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateNameEditor();
       expect(scope.saveStateName('#')).toBe(false);
-      expect(scope.saveStateName('END')).toBe(false);
-      expect(scope.saveStateName('enD')).toBe(false);
-      expect(scope.saveStateName('end')).toBe(false);
       expect(ecs.getActiveStateName()).toBe('Third State');
     });
 
@@ -152,6 +152,15 @@ describe('Sidebar state name controller', function() {
       scope.saveStateName('Fifth State');
       expect(scope.stateName).toEqual('Fifth State');
       expect(ecs.getActiveStateName()).toEqual('Fifth State');
+    });
+
+    it('should check that states can be named variations of \'END\'', function() {
+      ecs.setActiveStateName('First State');
+      scope.initStateNameEditor();
+
+      expect(scope.saveStateName('END')).toBe(true);
+      expect(scope.saveStateName('enD')).toBe(true);
+      expect(scope.saveStateName('end')).toBe(true);
     });
 
     it('should check that state name edits are independent', function() {

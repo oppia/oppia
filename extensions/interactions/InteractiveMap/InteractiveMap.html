@@ -18,7 +18,9 @@
 </script>
 
 <script type="text/ng-template" id="response/InteractiveMap">
-  <div ng-if="!stateSticky">
-    <img ng-src="<[staticMapUrl]>" style="margin: 3px auto; display: block;">
-  </div>
+  <img ng-src="<[staticMapUrl]>" style="margin: 3px auto; display: block;">
+</script>
+
+<script type="text/ng-template" id="shortResponse/InteractiveMap">
+  <span><[formattedCoords]></span>
 </script>

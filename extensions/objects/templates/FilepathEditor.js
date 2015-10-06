@@ -13,15 +13,15 @@
 // limitations under the License.
 
 
-// This directive is always editable. No 'save' button needs to be clicked.
+// This directive can only be used in the context of an exploration.
 
-oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, warningsData) {
-  // Editable filepath directive. This can only be used in the context of an
-  // exploration.
+oppia.directive('filepathEditor', [
+    '$compile', '$http', '$sce', 'warningsData', 'explorationContextService',
+    function($compile, $http, $sce, warningsData, explorationContextService) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'Filepath';
       };
       $compile(element.contents())(scope);
     },
@@ -36,20 +36,11 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
         $scope.imageUploaderIsActive = false;
       });
 
-      $scope.explorationId = $rootScope.explorationId;
+      $scope.explorationId = explorationContextService.getExplorationId();
 
-      $scope.hasExplorationId = function() {
-        if ($scope.explorationId === null || $scope.explorationId === undefined) {
-          return false;
-        }
-        return true;
+      $scope.validate = function(localValue) {
+        return localValue.label && localValue.label.length > 0;
       };
-
-      if (!$scope.explorationId) {
-        warningsData.addWarning(
-          'The file picker can only be used in the context of an exploration.');
-        return;
-      }
 
       $scope.$watch('localValue.label', function(newValue, oldValue) {
         if (newValue) {
@@ -62,25 +53,51 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       $scope.getPreviewUrl = function(filepath) {
         var encodedFilepath = window.encodeURIComponent(filepath);
         return $sce.trustAsResourceUrl(
-            '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+          '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+      };
+
+      $scope.resetImageUploader = function() {
+        $scope.currentFile = null;
+        $scope.currentFilename = null;
+        $scope.imagePreview = null;
       };
 
       $scope.openImageUploader = function() {
+        $scope.resetImageUploader();
+        $scope.uploadWarning = null;
         $scope.imageUploaderIsActive = true;
-
-        // Set the filename to match the name of the uploaded file.
-        document.getElementById('newImage').onchange = function(e) {
-          $scope.newImageFilename = e.target.value.split(/(\\|\/)/g).pop();
-          $scope.$apply();
-        };
       };
 
       $scope.closeImageUploader = function() {
         $scope.imageUploaderIsActive = false;
       };
 
-      $scope.uploadNewImage = function(filename) {
-        var file = document.getElementById('newImage').files[0];
+      $scope.onFileChanged = function(file, filename) {
+        if (!file || !file.size || !file.type.match('image.*')) {
+          $scope.uploadWarning = 'This file is not recognized as an image.';
+          $scope.resetImageUploader();
+          $scope.$apply();
+          return;
+        }
+
+        $scope.currentFile = file;
+        $scope.currentFilename = filename;
+        $scope.uploadWarning = null;
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          $scope.$apply(function() {
+            $scope.imagePreview = e.target.result;
+          });
+        };
+        reader.readAsDataURL(file);
+
+        $scope.$apply();
+      };
+
+      $scope.saveUploadedFile = function(file, filename) {
+        warningsData.clear();
+
         if (!file || !file.size) {
           warningsData.addWarning('Empty file detected.');
           return;
@@ -94,8 +111,6 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
           warningsData.addWarning('Filename must not be empty.');
           return;
         }
-
-        warningsData.clear();
 
         var form = new FormData();
         form.append('image', file);
@@ -116,8 +131,6 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
           dataType: 'text'
         }).done(function(data) {
           var inputElement = $('#newImage');
-          inputElement.wrap('<form>').closest('form').get(0).reset();
-          inputElement.unwrap();
           $scope.filepaths.push(data.filepath);
           $scope.closeImageUploader();
           $scope.localValue.label = data.filepath;
@@ -128,7 +141,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
           var transformedData = data.responseText.substring(5);
           var parsedResponse = JSON.parse(transformedData);
           warningsData.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
+            parsedResponse.error || 'Error communicating with server.');
           $scope.$apply();
         });
       };
@@ -140,4 +153,4 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       });
     }
   };
-});
+}]);

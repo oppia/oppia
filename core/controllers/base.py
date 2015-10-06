@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import base64
+import Cookie
 import datetime
 import hmac
 import json
@@ -26,11 +27,14 @@ import sys
 import time
 import traceback
 import urllib
+import urlparse
 
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import obj_services
 from core.domain import rights_manager
+from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -42,19 +46,94 @@ import utils
 import jinja2
 import webapp2
 
+from google.appengine.api import users
+
 
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
-    'oppia_csrf_secret', 'UnicodeString', 'Text used to encrypt CSRF tokens.',
-    DEFAULT_CSRF_SECRET)
-FULL_SITE_URL = config_domain.ConfigProperty(
-    'full_site_url', 'UnicodeString',
-    'The full site URL, without a trailing slash',
-    default_value='https://FULL.SITE/URL')
+    'oppia_csrf_secret', {'type': 'unicode'},
+    'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_head_tag_hook', 'UnicodeString',
+    'before_end_head_tag_hook', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
     'Code to insert just before the closing </head> tag in all pages.', '')
+BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
+    'before_end_body_tag_hook', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
+    'Code to insert just before the closing </body> tag in all pages.', '')
+
+OBJECT_EDITORS_JS = config_domain.ComputedProperty(
+    'object_editors_js', {'type': 'unicode'},
+    'JavaScript code for the object editors',
+    obj_services.get_all_object_editor_js_templates)
+
+SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
+    'sidebar_menu_additional_links', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'name',
+                'description': 'Text of the menu item',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'link',
+                'description': 'The link to open in a new tab',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'icon_filename',
+                'description': (
+                    'Filename of the menu icon (in /images/sidebar)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Additional links to show in the sidebar menu.',
+    default_value=[{
+        'name': 'Site Feedback',
+        'link': 'http://site/feedback/url',
+        'icon_filename': 'comment.png',
+    }])
+
+SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
+    'social_media_buttons', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'link',
+                'description': 'The link to open in a new tab',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'icon_filename',
+                'description': (
+                    'Filename of the social media icon (in /images/social)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Links and icon filenames for the social media buttons in the sidebar.',
+    default_value=[])
+
+DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
+    'disabled_explorations', {
+        'type': 'list',
+        'items': {
+            'type': 'unicode'
+        }
+    },
+    'IDs of explorations which should not be displayable in either the '
+    'learner or editor views',
+    [])
 
 
 def require_user(handler):
@@ -87,30 +166,58 @@ def require_moderator(handler):
     return test_is_moderator
 
 
-def require_registered_as_editor(handler):
-    """Decorator that checks if the user has registered as an editor."""
+def require_fully_signed_up(handler):
+    """Decorator that checks if the user is logged in and has completed the
+    signup process. If any of these checks fail, an UnauthorizedUserException
+    is raised.
+    """
+
     def test_registered_as_editor(self, **kwargs):
         """Check that the user has registered as an editor."""
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if self.username in config_domain.BANNED_USERNAMES.value:
+        if (not self.user_id
+                or self.username in config_domain.BANNED_USERNAMES.value
+                or not user_services.has_user_registered_as_editor(
+                    self.user_id)):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-
-        redirect_url = feconf.EDITOR_PREREQUISITES_URL
-
-        if not user_services.has_user_registered_as_editor(self.user_id):
-            redirect_url = utils.set_url_query_parameter(
-                redirect_url, 'return_url', self.request.uri)
-            self.redirect(redirect_url)
-            return
 
         return handler(self, **kwargs)
 
     return test_registered_as_editor
+
+
+def _clear_login_cookies(response_headers):
+    ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
+
+    # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
+    # for https:// . We just unset both below.
+    cookie = Cookie.SimpleCookie()
+    for cookie_name in ['ACSID', 'SACSID']:
+        cookie = Cookie.SimpleCookie()
+        cookie[cookie_name] = ''
+        cookie[cookie_name]['expires'] = (
+            datetime.datetime.utcnow() +
+            datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
+        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        response_headers.add_header(*cookie.output().split(': ', 1))
+
+
+class LogoutPage(webapp2.RequestHandler):
+
+    def get(self):
+        """Logs the user out, and returns them to a specified page or the home
+        page.
+        """
+        # The str conversion is needed, otherwise an InvalidResponseError
+        # asking for the 'Location' header value to be str instead of
+        # 'unicode' will result.
+        url_to_redirect_to = str(self.request.get('return_url') or '/')
+        _clear_login_cookies(self.response.headers)
+
+        if feconf.DEV_MODE:
+            self.redirect(users.create_logout_url(url_to_redirect_to))
+        else:
+            self.redirect(url_to_redirect_to)
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -126,6 +233,9 @@ class BaseHandler(webapp2.RequestHandler):
     # TODO(sll): A weakness of the current approach is that the source and
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
+    # Whether to redirect requests corresponding to a logged-in user who has
+    # not completed signup in to the signup page.
+    REDIRECT_UNFINISHED_SIGNUPS = True
 
     @webapp2.cached_property
     def jinja2_env(self):
@@ -143,19 +253,29 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
-
+        self.username = None
         self.user_has_started_state_editor_tutorial = False
+        self.partially_logged_in = False
+        self.values['profile_picture_data_url'] = None
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
-            self.username = user_settings.username
-
             self.values['user_email'] = user_settings.email
-            self.values['username'] = self.username
-            if user_settings.last_started_state_editor_tutorial:
-                self.user_has_started_state_editor_tutorial = True
+
+            if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
+                _clear_login_cookies(self.response.headers)
+                self.partially_logged_in = True
+                self.user_id = None
+            else:
+                self.username = user_settings.username
+                self.last_agreed_to_terms = user_settings.last_agreed_to_terms
+                self.values['username'] = self.username
+                self.values['profile_picture_data_url'] = (
+                    user_settings.profile_picture_data_url)
+                if user_settings.last_started_state_editor_tutorial:
+                    self.user_has_started_state_editor_tutorial = True
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
@@ -181,6 +301,12 @@ class BaseHandler(webapp2.RequestHandler):
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
             self.redirect('https://oppiatestserver.appspot.com', True)
+            return
+
+        # In DEV_MODE, clearing cookies does not log out the user, so we
+        # force-clear them by redirecting to the logout URL.
+        if feconf.DEV_MODE and self.partially_logged_in:
+            self.redirect(users.create_logout_url(self.request.uri))
             return
 
         if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
@@ -229,7 +355,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         self.response.content_type = 'application/javascript; charset=utf-8'
-        self.response.headers['Content-Disposition'] = 'attachment'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -245,31 +372,56 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_COUNT.inc()
 
     def render_template(
-            self, filename, values=None, iframe_restriction='DENY'):
+            self, filename, values=None, iframe_restriction='DENY',
+            redirect_url_on_logout=None):
         if values is None:
             values = self.values
 
+        scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
+
         values.update({
-            'DEV_MODE': feconf.DEV_MODE,
-            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
-            'EXPLORATION_STATUS_PRIVATE': (
-                rights_manager.EXPLORATION_STATUS_PRIVATE),
-            'EXPLORATION_STATUS_PUBLIC': (
-                rights_manager.EXPLORATION_STATUS_PUBLIC),
-            'EXPLORATION_STATUS_PUBLICIZED': (
-                rights_manager.EXPLORATION_STATUS_PUBLICIZED),
+            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'FULL_SITE_URL': FULL_SITE_URL.value,
-            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
-            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
+                BEFORE_END_BODY_TAG_HOOK.value),
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
+            'DEV_MODE': feconf.DEV_MODE,
+            'DOMAIN_URL': '%s://%s' % (scheme, netloc),
+            'ACTIVITY_STATUS_PRIVATE': (
+                rights_manager.ACTIVITY_STATUS_PRIVATE),
+            'ACTIVITY_STATUS_PUBLIC': (
+                rights_manager.ACTIVITY_STATUS_PUBLIC),
+            'ACTIVITY_STATUS_PUBLICIZED': (
+                rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
+            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
+            # TODO(sll): Consider including the obj_editor html directly as
+            # part of the base HTML template?
+            'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
+            'RTE_COMPONENT_SPECS': (
+                rte_component_registry.Registry.get_all_specs()),
+            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
+            'SIDEBAR_MENU_ADDITIONAL_LINKS': (
+                SIDEBAR_MENU_ADDITIONAL_LINKS.value),
+            'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
+            'user_is_logged_in': bool(self.username),
         })
 
+        if 'meta_name' not in values:
+            values['meta_name'] = 'Personalized Online Learning from Oppia'
+
+        if 'meta_description' not in values:
+            values['meta_description'] = (
+                'Oppia is a free, open-source learning platform. Join the '
+                'community to create or try an exploration today!')
+
+        if redirect_url_on_logout is None:
+            redirect_url_on_logout = self.request.uri
         if self.user_id:
-            redirect_url = self.request.uri
             values['logout_url'] = (
-                current_user_services.create_logout_url(redirect_url))
+                current_user_services.create_logout_url(
+                    redirect_url_on_logout))
         else:
             values['login_url'] = (
                 current_user_services.create_login_url(self.request.uri))
@@ -394,7 +546,7 @@ class CsrfTokenManager(object):
 
         # Initialize to random value.
         config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, CSRF_SECRET.name,
+            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod

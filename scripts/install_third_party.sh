@@ -29,7 +29,7 @@ if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
   echo "  If you are running this script on Windows, see the instructions"
   echo "  here regarding installation of node.js:"
   echo ""
-  echo "    https://code.google.com/p/oppia/wiki/WindowsGuidelines"
+  echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
   echo ""
   echo "  STATUS: Installation completed except for node.js and jsrepl. Exiting."
   echo ""

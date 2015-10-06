@@ -20,19 +20,19 @@ from extensions.interactions import base
 class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
-    name = 'Music Notes'
-    category = 'Custom'
+    name = 'Music Notes Input'
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'MusicPhrase'}]
+    answer_type = 'MusicPhrase'
+    instructions = 'Drag notes to the staff to form a sequence'
+    needs_summary = True
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
-        'description': 'The sequence of notes that the reader should guess.',
+        'description': 'Correct sequence of notes',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',
@@ -40,7 +40,7 @@ class MusicNotesInput(base.BaseInteraction):
         'default_value': [],
     }, {
         'name': 'initialSequence',
-        'description': 'The sequence of notes that start on the staff.',
+        'description': 'Starting notes on the staff',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',

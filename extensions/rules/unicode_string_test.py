@@ -19,39 +19,39 @@
 __author__ = 'Tarashish Mishra'
 
 import base64
-import unittest
+import test_utils
 
 from core.domain import fs_domain
 from extensions.rules import unicode_string
 
 
-class UnicodeStringRuleUnitTests(unittest.TestCase):
+class UnicodeStringRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on UnicodeString objects."""
 
     def test_equals_rule(self):
         rule = unicode_string.Equals('hello world')
 
-        self.assertTrue(rule.eval('hello world'))
-        self.assertTrue(rule.eval('Hello World'))
-        self.assertFalse(rule.eval('goodbye world'))
+        self.assertFuzzyTrue(rule.eval('hello world'))
+        self.assertFuzzyTrue(rule.eval('Hello World'))
+        self.assertFuzzyFalse(rule.eval('goodbye world'))
 
     def test_case_sensitive_equals_rule(self):
         rule = unicode_string.CaseSensitiveEquals('hello world')
 
-        self.assertTrue(rule.eval('hello world'))
-        self.assertFalse(rule.eval('Hello World'))
-        self.assertFalse(rule.eval('goodbye world'))
+        self.assertFuzzyTrue(rule.eval('hello world'))
+        self.assertFuzzyFalse(rule.eval('Hello World'))
+        self.assertFuzzyFalse(rule.eval('goodbye world'))
 
     def test_starts_with_rule(self):
-        self.assertTrue(unicode_string.StartsWith('he').eval('hello world'))
-        self.assertTrue(unicode_string.StartsWith('HE').eval('hello world'))
-        self.assertFalse(unicode_string.StartsWith('hello').eval('he'))
+        self.assertFuzzyTrue(unicode_string.StartsWith('he').eval('hello world'))
+        self.assertFuzzyTrue(unicode_string.StartsWith('HE').eval('hello world'))
+        self.assertFuzzyFalse(unicode_string.StartsWith('hello').eval('he'))
 
     def test_contains_rule(self):
-        self.assertTrue(unicode_string.Contains('he').eval('hello world'))
-        self.assertTrue(unicode_string.Contains('HE').eval('hello world'))
-        self.assertTrue(unicode_string.Contains('ll').eval('hello world'))
-        self.assertFalse(unicode_string.Contains('ol').eval('hello world'))
+        self.assertFuzzyTrue(unicode_string.Contains('he').eval('hello world'))
+        self.assertFuzzyTrue(unicode_string.Contains('HE').eval('hello world'))
+        self.assertFuzzyTrue(unicode_string.Contains('ll').eval('hello world'))
+        self.assertFuzzyFalse(unicode_string.Contains('ol').eval('hello world'))
 
     def test_matches_base64encoded_file_rule(self):
         TEST_DATA_DIR = 'extensions/rules/testdata'
@@ -64,4 +64,4 @@ class UnicodeStringRuleUnitTests(unittest.TestCase):
             encoded_content = base64.b64encode(fs.get(file_name))
             rule = unicode_string.MatchesBase64EncodedFile(
                 file_name).set_fs(fs)
-            self.assertTrue(rule.eval(encoded_content))
+            self.assertFuzzyTrue(rule.eval(encoded_content))

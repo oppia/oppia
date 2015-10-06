@@ -1,9 +1,13 @@
-<div ng-if="!hasExplorationId()">
-  Warning: The file picker does not work outside the context of an exploration.
-</div>
-<div ng-if="hasExplorationId()">
-  <div ng-show="!imageUploaderIsActive">
+<style>
+  .filepath-editor-image-upload-reset-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+</style>
 
+<div ng-model="localValue" ui-validate="'validate($value)'">
+  <div ng-show="!imageUploaderIsActive">
     <div ng-if="!filepathsLoaded">
       <span class="text-align: center; width: 50px;">
         Loading...
@@ -24,15 +28,36 @@
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
   </div>
 
-  <div ng-show="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
+  <div ng-if="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
     <div class="oppia-warning">
       Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
     </div>
-    <input type="file" id="newImage" class="protractor-test-file-upload">
+
     <br>
-    Choose a filename: <input type="text" ng-model="newImageFilename" class="protractor-test-file-name">
+
+    <div ng-if="!currentFile">
+      <image-uploader on-file-changed="onFileChanged">
+      </image-uploader>
+
+      <div ng-if="uploadWarning" style="color: red;">
+        <br>
+        <strong>Error:</strong> <[uploadWarning]>
+      </div>
+    </div>
+
+    <div ng-if="currentFile" style="position: relative;">
+      <button class="btn btn-default filepath-editor-image-upload-reset-button" ng-click="resetImageUploader()">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+
+      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;">
+    </div>
+
     <br>
-    <button type="button" class="btn btn-success" ng-click="uploadNewImage(newImageFilename)" ng-disabled="!newImageFilename">Save</button>
+    Choose a filename:
+    <input type="text" ng-model="currentFilename" class="protractor-test-file-name">
+
+    <button type="button" class="btn btn-success" ng-click="saveUploadedFile(currentFile, currentFilename)" ng-disabled="!currentFile || !currentFilename">Save</button>
     <button type="button" class="btn btn-default" ng-click="closeImageUploader()">Cancel</button>
   </div>
 </div>

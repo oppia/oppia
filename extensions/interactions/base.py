@@ -41,6 +41,7 @@ import os
 
 from core.domain import obj_services
 from core.domain import rule_domain
+from extensions import domain
 import feconf
 import jinja_utils
 import schema_utils
@@ -56,64 +57,45 @@ DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
-class AnswerHandler(object):
-    """Value object for an answer event stream (e.g. submit, click, drag)."""
-
-    def __init__(self, name, obj_type):
-        self.name = name
-        self.obj_type = obj_type
-        self.obj_class = obj_services.Registry.get_object_class_by_type(
-            obj_type)
-
-    @property
-    def rules(self):
-        return rule_domain.get_rules_for_obj_type(self.obj_type)
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'obj_type': self.obj_type,
-        }
-
-
-class CustomizationArgSpec(object):
-    """Value object for a customization arg specification."""
-
-    def __init__(self, name, description, schema, default_value):
-        self.name = name
-        self.description = description
-        self.schema = schema
-        self.default_value = default_value
-
-
 class BaseInteraction(object):
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should
     be get()-type methods.
+
+    Note that all interactions should also include a thumbnail image of size
+    178 x 146 pixels. This image will be shown in the interaction selector.
     """
 
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
-    # The category the interaction falls under in the repository. Overridden in
-    # subclasses.
-    category = ''
     # A description of the interaction. Overridden in subclasses.
     description = ''
-    # Describes how the interaction should be displayed (either within the
-    # conversation, or as a separate object).
+    # Describes how the interaction should be displayed -- either within the
+    # conversation ('inline'), or as a separate object ('supplemental'). In the
+    # latter case, the interaction instance is reused if two adjacent states
+    # have the same interaction id.
     display_mode = ''
+    # Whether this interaction should be considered terminal, i.e. it ends
+    # the exploration. Defaults to False.
+    is_terminal = False
+    # Whether this interaction supports training and fuzzy classification.
+    is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. Overridden in subclasses.
-    _handlers = []
+    # The type of answer (as a string) accepted by this interaction, e.g.
+    # 'CodeEvaluation'.
+    answer_type = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
+    # Instructions for using this interaction, to be shown to the learner. Only
+    # relevant for supplemental interactions.
+    instructions = None
+    # Whether the answer is long, and would benefit from being summarized.
+    needs_summary = False
 
     @property
     def id(self):
@@ -122,35 +104,25 @@ class BaseInteraction(object):
     @property
     def customization_arg_specs(self):
         return [
-            CustomizationArgSpec(**cas)
+            domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
-
-    @property
-    def handlers(self):
-        return [AnswerHandler(**ah) for ah in self._handlers]
 
     @property
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
 
-    def normalize_answer(self, answer, handler_name):
+    @property
+    def rules(self):
+        return rule_domain.get_rules_for_obj_type(self.answer_type)
+
+    def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""
-        for handler in self.handlers:
-            if handler.name == handler_name:
-                return handler.obj_class.normalize(answer)
+        if self.answer_type:
+            return obj_services.Registry.get_object_class_by_type(
+                self.answer_type).normalize(answer)
 
         raise Exception(
-            'Could not find handler in interaction %s with name %s' %
-            (self.name, handler_name))
-
-    def validate_customization_arg_values(self, customization_args):
-        """Validates customization arg values. The input is a dict whose
-        keys are the names of the customization args.
-        """
-        for ca_spec in self.customization_arg_specs:
-            schema_utils.normalize_against_schema(
-                customization_args[ca_spec.name]['value'],
-                ca_spec.schema)
+            'No answer type initialized for interaction %s' % self.name)
 
     @property
     def _stats_log_template(self):
@@ -177,6 +149,16 @@ class BaseInteraction(object):
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
+    @property
+    def validator_html(self):
+        """The HTML code containing validators for the interaction's
+        customization_args and submission handler.
+        """
+        return (
+            '<script>%s</script>\n' %
+            utils.get_file_contents(os.path.join(
+                feconf.INTERACTIONS_DIR, self.id, 'validator.js')))
+
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are
         provided.
@@ -184,45 +166,35 @@ class BaseInteraction(object):
         result = {
             'id': self.id,
             'name': self.name,
-            'category': self.category,
             'description': self.description,
             'display_mode': self.display_mode,
-            'customization_args': [{
+            'is_terminal': self.is_terminal,
+            'is_trainable': self.is_trainable,
+            'needs_summary': self.needs_summary,
+            'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
-            } for ca_spec in self.customization_arg_specs]
+            } for ca_spec in self.customization_arg_specs],
+            'instructions': self.instructions,
         }
 
-        # Add information about the handlers.
-        result['handler_specs'] = [h.to_dict() for h in self.handlers]
-        for idx, handler in enumerate(self.handlers):
-            result['handler_specs'][idx]['rules'] = dict((
-                rule_cls.description,
-                {'classifier': rule_cls.__name__}
-            ) for rule_cls in handler.rules)
+        # Add information about rule descriptions corresponding to the answer
+        # type for this interaction.
+        result['rule_descriptions'] = (
+            rule_domain.get_description_strings_for_obj_type(
+                self.answer_type))
 
         return result
 
-    def get_handler_by_name(self, handler_name):
-        """Get the handler for an interaction, given the handler's name."""
-        try:
-            return next(h for h in self.handlers if h.name == handler_name)
-        except StopIteration:
-            raise Exception(
-                'Could not find handler with name %s' % handler_name)
-
-    def get_rule_by_name(self, handler_name, rule_name):
-        """Gets a rule, given its name and ancestors."""
-        handler = self.get_handler_by_name(handler_name)
+    def get_rule_by_name(self, rule_name):
+        """Gets a rule given its name."""
         try:
             return next(
-                r for r in handler.rules if r.__name__ == rule_name)
+                r for r in self.rules if r.__name__ == rule_name)
         except StopIteration:
-            raise Exception(
-                'Could not find rule with name %s for handler %s'
-                % (rule_name, handler_name))
+            raise Exception('Could not find rule with name %s' % rule_name)
 
     def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a learner's response in the stats log.

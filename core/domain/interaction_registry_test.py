@@ -18,12 +18,9 @@
 
 __author__ = 'Sean Lip'
 
-import os
-
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
-import feconf
 
 
 class InteractionDependencyTests(test_utils.GenericTestBase):
@@ -49,24 +46,27 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 class InteractionRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the interaction registry."""
 
-    def test_allowed_interactions_and_counts(self):
-        """Do sanity checks on the ALLOWED_INTERACTIONS dict in feconf.py."""
+    def test_interaction_registry(self):
+        """Do some sanity checks on the interaction registry."""
         self.assertEqual(
             len(interaction_registry.Registry.get_all_interactions()),
-            len(feconf.ALLOWED_INTERACTIONS))
+            len(interaction_registry.Registry.get_all_interaction_ids()))
 
-        for (interaction_name, interaction_definition) in (
-                feconf.ALLOWED_INTERACTIONS.iteritems()):
-            contents = os.listdir(
-                os.path.join(os.getcwd(), interaction_definition['dir']))
-            self.assertIn('%s.py' % interaction_name, contents)
+    def test_get_all_specs(self):
+        """Test the get_all_specs() method."""
+        EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
-    def test_get_all_display_modes(self):
-        """Test the get_all_display_modes() method."""
-        num_interactions = len(feconf.ALLOWED_INTERACTIONS)
+        specs_dict = interaction_registry.Registry.get_all_specs()
+        self.assertEqual(
+            len(specs_dict.keys()),
+            len(interaction_registry.Registry.get_all_interaction_ids()))
 
-        display_modes_dict = (
-            interaction_registry.Registry.get_all_display_modes())
-        self.assertEqual(len(display_modes_dict.keys()), num_interactions)
-        for item in display_modes_dict.values():
-            self.assertIn(item, base.ALLOWED_DISPLAY_MODES)
+        terminal_interactions_count = 0
+        for item in specs_dict.values():
+            self.assertIn(item['display_mode'], base.ALLOWED_DISPLAY_MODES)
+            self.assertTrue(isinstance(item['is_terminal'], bool))
+            if item['is_terminal']:
+                terminal_interactions_count += 1
+
+        self.assertEqual(
+            terminal_interactions_count, EXPECTED_TERMINAL_INTERACTIONS_COUNT)

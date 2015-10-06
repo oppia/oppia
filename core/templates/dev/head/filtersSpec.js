@@ -22,17 +22,24 @@ describe('Testing filters', function() {
   var filterNames = [
     'spacesToUnderscores',
     'underscoresToCamelCase',
+    'camelCaseToHyphens',
     'truncate',
+    'truncateAtFirstLine',
     'round1',
     'replaceInputsWithEllipses',
-    'truncateAtFirstInput',
+    'truncateAtFirstEllipsis',
+    'wrapTextWithEllipsis',
+    'isOutcomeConfusing',
     'parameterizeRuleDescription',
-    'camelCaseToHyphens'
+    'normalizeWhitespace',
+    'convertToPlainText',
+    'summarizeAnswerGroup',
+    'summarizeDefaultOutcome',
   ];
 
   beforeEach(angular.mock.module('oppia'));
 
-  it('should have the relevant filters', inject(function($filter) {
+  it('should have all expected filters', inject(function($filter) {
     angular.forEach(filterNames, function(filterName) {
       expect($filter(filterName)).not.toEqual(null);
     });
@@ -47,7 +54,8 @@ describe('Testing filters', function() {
     expect(filter('  Test  App ')).toEqual('Test__App');
   }));
 
-  it('should convert underscores to camelCase properly', inject(function($filter) {
+  it('should convert underscores to camelCase properly',
+      inject(function($filter) {
     var filter = $filter('underscoresToCamelCase');
     expect(filter('Test')).toEqual('Test');
     expect(filter('test')).toEqual('test');
@@ -92,30 +100,84 @@ describe('Testing filters', function() {
     expect(filter('{{}}{{hello}}')).toEqual('{{}}...');
   }));
 
-  it('should truncate a string when it first sees a {{...}}', inject(function($filter) {
-    var filter = $filter('truncateAtFirstInput');
+  it('should truncate a string when it first sees a \'...\'',
+      inject(function($filter) {
+    var filter = $filter('truncateAtFirstEllipsis');
 
     expect(filter('')).toEqual('');
     expect(filter(null)).toEqual('');
     expect(filter(undefined)).toEqual('');
 
     expect(filter('hello')).toEqual('hello');
-    expect(filter('{{hello}}')).toEqual('');
-    expect(filter('say {{hello}} and {{goodbye}}')).toEqual('say ');
-    expect(filter('{{hello}} and {{goodbye}}')).toEqual('');
-    expect(filter('{{}}{{hello}}')).toEqual('{{}}');
+    expect(filter('...')).toEqual('');
+    expect(filter('say ... and ...')).toEqual('say ');
+    expect(filter('... and ...')).toEqual('');
+    expect(filter('{{}}...')).toEqual('{{}}');
+  }));
+
+  it('should wrap text with ellipses based on its length',
+      inject(function($filter) {
+    var filter = $filter('wrapTextWithEllipsis');
+
+    expect(filter('', 0)).toEqual('');
+    expect(filter(null, 0)).toEqual(null);
+    expect(filter(undefined, 0)).toEqual(undefined);
+
+    expect(filter('testing', 0)).toEqual('testing');
+    expect(filter('testing', 1)).toEqual('testing');
+    expect(filter('testing', 2)).toEqual('testing');
+    expect(filter('testing', 3)).toEqual('...');
+    expect(filter('testing', 4)).toEqual('t...');
+    expect(filter('testing', 7)).toEqual('testing');
+    expect(filter('Long sentence which goes on and on.', 80)).toEqual(
+      'Long sentence which goes on and on.');
+    expect(filter('Long sentence which goes on and on.', 20)).toEqual(
+      'Long sentence whi...');
+    expect(filter('Sentence     with     long     spacing.', 20)).toEqual(
+      'Sentence with lon...');
+    expect(filter('With space before ellipsis.', 21)).toEqual(
+      'With space before...');
   }));
 
   it('should correctly normalize whitespace', inject(function($filter) {
     var filter = $filter('normalizeWhitespace');
 
-    expect(filter('a')).toBe('a');
-    expect(filter('a  ')).toBe('a');
-    expect(filter('  a')).toBe('a');
-    expect(filter('  a  ')).toBe('a');
+    expect(filter('')).toEqual('');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
 
-    expect(filter('a  b ')).toBe('a b');
-    expect(filter('  a  b ')).toBe('a b');
-    expect(filter('  ab c ')).toBe('ab c');
+    expect(filter('a')).toEqual('a');
+    expect(filter('a  ')).toEqual('a');
+    expect(filter('  a')).toEqual('a');
+    expect(filter('  a  ')).toEqual('a');
+
+    expect(filter('a  b ')).toEqual('a b');
+    expect(filter('  a  b ')).toEqual('a b');
+    expect(filter('  ab c ')).toEqual('ab c');
+  }));
+
+  it('should truncate multi-line text to the first non-empty line',
+      inject(function($filter) {
+    var filter = $filter('truncateAtFirstLine');
+
+    expect(filter('')).toEqual('');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
+
+    expect(filter(' A   single line with spaces at either end. ')).toEqual(
+      ' A   single line with spaces at either end. ');
+    expect(filter('a\nb\nc')).toEqual('a...');
+    expect(filter('Removes newline at end\n')).toEqual(
+      'Removes newline at end');
+    expect(filter('\nRemoves newline at beginning.')).toEqual(
+      'Removes newline at beginning.');
+
+    expect(filter('\n')).toEqual('');
+    expect(filter('\n\n\n')).toEqual('');
+
+    // TODO(bhenning): There could be some merit in also testing cross-platform
+    // line endings (since the pattern in filter applies to them). Only one is
+    // tested here.
+    expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
   }));
 });

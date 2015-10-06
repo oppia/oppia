@@ -21,7 +21,7 @@ oppia.directive('nonnegativeIntEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+        return OBJECT_EDITOR_TEMPLATES_URL + 'NonnegativeInt';
       };
       $compile(element.contents())(scope);
     },
@@ -29,69 +29,16 @@ oppia.directive('nonnegativeIntEditor', function($compile, warningsData) {
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function ($scope, $attrs) {
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: newValue || 0};
-      }, true);
-
-      $scope.isNonnegativeInteger = function(value) {
-        return (!isNaN(parseInt(value,10)) &&
-                (parseFloat(value,10) == parseInt(value,10)) &&
-                (parseInt(value, 10) >= 0));
+      $scope.SCHEMA = {
+        'type': 'int',
+        'validators': [{
+            'id': 'is_at_least',
+            'min_value': 0
+        }]
       };
 
-      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-      if ($scope.alwaysEditable) {
-        $scope.isCorrection = false;
-        $scope.$watch('localValue.label', function(newValue, oldValue) {
-          if (newValue === null || !$scope.isNonnegativeInteger(newValue)) {
-            warningsData.clear();
-            warningsData.addWarning('Please enter a nonnegative integer.');
-            $scope.isCorrection = true;
-            if (angular.isNumber(newValue)) {
-              $scope.localValue = {label: Math.floor(newValue)};
-            } else {
-              $scope.localValue = {label: (oldValue || 0)};
-            }
-            return;
-          }
-          if (!$scope.isCorrection) {
-            warningsData.clear();
-          } else {
-            $scope.isCorrection = false;
-          }
-          $scope.$parent.value = newValue;
-        });
-      } else {
-        $scope.openEditor = function() {
-          $scope.active = true;
-        };
-
-        $scope.closeEditor = function() {
-          $scope.active = false;
-        };
-
-        $scope.replaceValue = function(newValue) {
-          if (newValue === null || !$scope.isNonnegativeInteger(newValue)) {
-            warningsData.addWarning('Please enter a nonnegative integer.');
-            return;
-          }
-          warningsData.clear();
-          $scope.localValue = {label: (newValue || 0)};
-          $scope.$parent.value = newValue;
-          $scope.closeEditor();
-        };
-
-        $scope.$on('externalSave', function() {
-          if ($scope.active) {
-            $scope.replaceValue($scope.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced value.
-            $scope.$apply();
-          }
-        });
-
-        $scope.closeEditor();
+      if (!$scope.$parent.value) {
+        $scope.$parent.value = 0;
       }
     }
   };

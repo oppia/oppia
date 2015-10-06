@@ -23,7 +23,8 @@ import inspect
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,feedback_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import feconf
 
@@ -75,12 +76,12 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
-                      handler_name, rule, answer):
+                      rule_spec_string, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
-            handler_name, rule, answer)
+            rule_spec_string, answer)
 
 
 class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
@@ -90,11 +91,11 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
 
     @classmethod
-    def _handle_event(cls, exploration_id, state_name, handler_name, answers):
+    def _handle_event(cls, exploration_id, state_name, answers):
         """Resolves a list of answers for the default rule of this state."""
         # TODO(sll): Escape these args?
         stats_models.resolve_answers(
-            exploration_id, state_name, handler_name,
+            exploration_id, state_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
 
@@ -125,6 +126,20 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
             params, play_type)
 
 
+class CompleteExplorationEventHandler(BaseEventHandler):
+    """Event handler for recording exploration completion events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_COMPLETE_EXPLORATION
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type):
+        stats_models.CompleteExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type)
+
+
 class StateHitEventHandler(BaseEventHandler):
     """Event handler for recording state hit events."""
 
@@ -140,13 +155,31 @@ class StateHitEventHandler(BaseEventHandler):
             params, play_type)
 
 
+class FeedbackThreadCreatedEventHandler(BaseEventHandler):
+    """Event handler for recording new feedback thread creation events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_NEW_THREAD_CREATED
+
+    @classmethod
+    def _handle_event(cls, exp_id):
+        pass
+
+
+class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
+    """Event handler for recording reopening feedback thread events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
+
+    @classmethod
+    def _handle_event(cls, exp_id, old_status, new_status):
+        pass
+
+
 class ExplorationContentChangeEventHandler(BaseEventHandler):
     """Event handler for receiving exploration change events. This event is
     triggered whenever changes to an exploration's contents or metadata (title,
-    blurb etc.) are persisted. This includes when a a new exploration is
-    created.
+    blurb etc.) are persisted. This includes when a new exploration is created.
     """
-
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
 
     @classmethod
@@ -159,8 +192,32 @@ class ExplorationStatusChangeEventHandler(BaseEventHandler):
     These events are triggered whenever an exploration is published,
     publicized, unpublished or unpublicized.
     """
-
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_STATUS_CHANGE
+
+    @classmethod
+    def _handle_event(cls, *args, **kwargs):
+        pass
+
+
+class CollectionContentChangeEventHandler(BaseEventHandler):
+    """Event handler for receiving collection change events. This event is
+    triggered whenever changes to an collection's contents or metadata (title,
+    category, etc.) are persisted. This includes when a new collection is
+    created.
+    """
+    EVENT_TYPE = feconf.EVENT_TYPE_COLLECTION_CHANGE
+
+    @classmethod
+    def _handle_event(cls, *args, **kwargs):
+        pass
+
+
+class CollectionStatusChangeEventHandler(BaseEventHandler):
+    """Event handler for receiving collection status change events.
+    These events are triggered whenever an collection is published,
+    publicized, unpublished or unpublicized.
+    """
+    EVENT_TYPE = feconf.EVENT_TYPE_COLLECTION_STATUS_CHANGE
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):

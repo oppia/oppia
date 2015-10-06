@@ -32,22 +32,22 @@ oppia.directive('snapshotsSkin', [function() {
           $scope.currentQuestion = initHtml;
           $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+          $scope.gadgetPanelsContents = oppiaPlayerService.getGadgetPanelsContents();
         });
       };
 
       $scope.initializePage();
 
-      $scope.submitAnswer = function(answer, handler) {
-        oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
+      $scope.submitAnswer = function(answer) {
+        oppiaPlayerService.submitAnswer(answer, function(
+            newStateName, refreshInteraction, feedbackHtml, questionHtml) {
           if (!newStateName) {
             $scope.currentQuestion = 'You have finished.';
             $scope.inputTemplate = '';
             return;
           }
 
-          if (!isSticky) {
-            // The previous interaction is not sticky and should be replaced.
+          if (refreshInteraction) {
             $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }

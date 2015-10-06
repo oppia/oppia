@@ -36,6 +36,13 @@ class Image(base.BaseRichTextComponent):
             'obj_type': 'Filepath',
         },
         'default_value': '',
+    }, {
+        'name': 'alt',
+        'description': 'Alternative text (for screen readers)',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
     }]
 
     icon_data_url = (

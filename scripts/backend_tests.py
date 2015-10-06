@@ -21,7 +21,6 @@ execute:
 """
 
 import argparse
-import copy
 import datetime
 import os
 import re
@@ -31,11 +30,10 @@ import time
 
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
-EXPECTED_TEST_COUNT = 399
-
+EXPECTED_TEST_COUNT = 580
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-3.6', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -133,7 +131,7 @@ class TestingTaskSpec(object):
 
         if self.generate_coverage_report:
             exc_list = [
-                'python', COVERAGE_PATH, '-xp', TEST_RUNNER_PATH,
+                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]

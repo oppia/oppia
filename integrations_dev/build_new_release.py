@@ -34,11 +34,14 @@ import datetime
 import os
 import re
 import shutil
+import tarfile
 
 INTEGRATION_NAME_GCB_OPPIA_TAG = 'gcb_oppia_tag'
+INTEGRATION_NAME_GOOGLE_SITES = 'google_sites'
 INTEGRATION_NAME_OPPIA_PLAYER = 'oppia_player'
 ALLOWED_INTEGRATION_NAMES = [
     INTEGRATION_NAME_GCB_OPPIA_TAG,
+    INTEGRATION_NAME_GOOGLE_SITES,
     INTEGRATION_NAME_OPPIA_PLAYER
 ]
 
@@ -84,6 +87,12 @@ TARGET_DIR = os.path.join(
     INTEGRATIONS_ROOT,
     '%s_%s_v%s' % (INTEGRATION_NAME, DATE_STR, VERSION_NUMBER))
 
+
+def _make_tarfile(output_filename, source_dir):
+    with tarfile.open(output_filename, 'w:gz') as tar:
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+
 print ''
 print 'Starting deployment process for %s' % SOURCE_DIR
 
@@ -126,9 +135,10 @@ try:
             'coursebuilder', 'modules', 'oppia_tag', 'resources'),
         INTEGRATION_NAME_OPPIA_PLAYER: '.',
     }
-    shutil.copy(
-        SCRIPT_FILEPATH,
-        os.path.join(TARGET_DIR, SCRIPT_LOCATIONS[INTEGRATION_NAME]))
+    if INTEGRATION_NAME in SCRIPT_LOCATIONS:
+        shutil.copy(
+            SCRIPT_FILEPATH,
+            os.path.join(TARGET_DIR, SCRIPT_LOCATIONS[INTEGRATION_NAME]))
 
     print ''
     print 'Done! Please check %s for the release candidate.' % TARGET_DIR

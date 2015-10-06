@@ -25,7 +25,8 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
-    'ui.sortable', 'infinite-scroll'
+    'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
+    'textAngular'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -211,7 +212,7 @@ oppia.factory('validatorsService', [
           if (showWarnings) {
             warningsData.addWarning(
              'Invalid input. Please use a non-empty description consisting ' +
-             'of alphanumeric characters, underscores, spaces and/or hyphens.'
+             'of alphanumeric characters, spaces and/or hyphens.'
             );
           }
           return false;
@@ -219,7 +220,7 @@ oppia.factory('validatorsService', [
       }
       return true;
     },
-    // NB: this does not check whether the state name already exists in the
+    // NB: this does not check whether the card name already exists in the
     // states dict.
     isValidStateName: function(input, showWarnings) {
       if (!this.isValidEntityName(input, showWarnings)) {
@@ -229,15 +230,7 @@ oppia.factory('validatorsService', [
       if (input.length > 50) {
         if (showWarnings) {
           warningsData.addWarning(
-            'State names should be at most 50 characters long.');
-        }
-        return false;
-      }
-
-      if (input.toUpperCase() === END_DEST) {
-        if (showWarnings) {
-          warningsData.addWarning(
-            'Please choose a state name that is not \'END\'.');
+            'Card names should be at most 50 characters long.');
         }
         return false;
       }
@@ -261,59 +254,22 @@ oppia.factory('validatorsService', [
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
 oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
+      if (_nextLabelToFocusOn) {
+        return;
+      }
+
+      _nextLabelToFocusOn = name;
       $timeout(function() {
-        $rootScope.$broadcast('focusOn', name);
+        $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
+        _nextLabelToFocusOn = null;
       });
-    }
-  };
-}]);
-
-// Service for caching RTE component definitions.
-oppia.factory('rteComponentRepositoryService', [
-    '$http', '$log', '$q', function($http, $log, $q) {
-  var _cachedRteComponentRepository = null;
-
-  return {
-    // Returns a promise, caching the results.
-    getRteComponentRepository: function() {
-      if (_cachedRteComponentRepository) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(_cachedRteComponentRepository));
-        return deferred.promise;
-      } else {
-        return $http.get('/rich_text_component_repository/data').then(function(response) {
-          _cachedRteComponentRepository = response.data.repository;
-          return angular.copy(_cachedRteComponentRepository);
-        });
-      }
-    }
-  };
-}]);
-
-oppia.factory('interactionRepositoryService', [
-    '$http', '$log', '$q', function($http, $log, $q) {
-  var _cachedInteractionRepository = null;
-
-  return {
-    // Returns a promise, caching the results.
-    getInteractionRepository: function() {
-      if (_cachedInteractionRepository) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(_cachedInteractionRepository));
-        return deferred.promise;
-      } else {
-        return $http.get('/interaction_repository/data').then(function(response) {
-          _cachedInteractionRepository = response.data.repository;
-          return angular.copy(_cachedInteractionRepository);
-        });
-      }
     },
-    // This is used in the ExplorationEditor in order to prevent a second
-    // RPC to the backend.
-    setInteractionRepository: function(interactionRepository) {
-      _cachedInteractionRepository = interactionRepository;
+    // Generates a random string (to be used as a focus label).
+    generateFocusLabel: function() {
+      return Math.random().toString(36).slice(2);
     }
   };
 }]);
@@ -330,6 +286,17 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    }
+  };
+}]);
+
+// Service for computing the window dimensions.
+oppia.factory('windowDimensionsService', ['$window', function($window) {
+  return {
+    getWidth: function() {
+      return (
+        $window.innerWidth || document.documentElement.clientWidth ||
+        document.body.clientWidth);
     }
   };
 }]);
@@ -370,6 +337,22 @@ oppia.factory('oppiaDebouncer', ['$log', function($log) {
         }
         return result;
       };
+    }
+  };
+}]);
+
+// Service for assembling extension tags (for gadgets and interactions).
+oppia.factory('extensionTagAssemblerService', [
+    '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  return {
+    formatCustomizationArgAttributesForElement: function(element, customizationArgSpecs) {
+      for (var caSpecName in customizationArgSpecs) {
+        var caSpecValue = customizationArgSpecs[caSpecName].value;
+        element.attr(
+          $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
+          oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+      }
+      return element;
     }
   };
 }]);

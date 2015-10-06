@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import ast
 import copy
 import datetime
+import json
 import logging
 import traceback
 import utils
@@ -31,6 +32,7 @@ from core.platform import models
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
+from google.appengine.api import app_identity
 from google.appengine.ext import ndb
 
 from mapreduce import base_handler
@@ -38,8 +40,9 @@ from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
 from mapreduce import model as mapreduce_model
-from mapreduce.lib.pipeline import pipeline
+from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
+from pipeline import pipeline
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
@@ -323,7 +326,7 @@ class BaseJobManager(object):
 class BaseDeferredJobManager(BaseJobManager):
 
     @classmethod
-    def _run(cls):
+    def _run(cls, additional_job_params):
         """Function that performs the main business logic of the job.
 
         Needs to be implemented by subclasses.
@@ -331,7 +334,7 @@ class BaseDeferredJobManager(BaseJobManager):
         raise NotImplementedError
 
     @classmethod
-    def _run_job(cls, job_id):
+    def _run_job(cls, job_id, additional_job_params):
         """Starts the job."""
         logging.info(
             'Job %s started at %s' %
@@ -339,7 +342,7 @@ class BaseDeferredJobManager(BaseJobManager):
         cls.register_start(job_id)
 
         try:
-            result = cls._run()
+            result = cls._run(additional_job_params)
         except Exception as e:
             logging.error(traceback.format_exc())
             logging.error(
@@ -359,8 +362,15 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, unused_additional_job_params):
-        taskqueue_services.defer(cls._run_job, job_id)
+    def _real_enqueue(cls, job_id, additional_job_params):
+        """Puts the job in the task queue.
+
+        Args:
+        - job_id: str, the id of the job.
+        - additional_job_params: dict of additional params to pass into the
+            job's _run() method.
+        """
+        taskqueue_services.defer(cls._run_job, job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -387,13 +397,12 @@ class StoreMapReduceResults(base_handler.PipelineBase):
         job_class = mapreduce_util.for_name(job_class_str)
 
         try:
-            iterator = input_readers.RecordsReader(output, 0)
+            iterator = input_readers.GoogleCloudStorageInputReader(
+                output, 0)
             results_list = []
-            for item in iterator:
-                # Map/reduce puts reducer output into blobstore files as a
-                # string obtained via "str(result)".  Use AST as a safe
-                # alternative to eval() to get the Python object back.
-                results_list.append(ast.literal_eval(item))
+            for item_reader in iterator:
+                for item in item_reader:
+                    results_list.append(json.loads(item))
             job_class.register_completion(job_id, results_list)
         except Exception as e:
             logging.error(traceback.format_exc())
@@ -403,6 +412,14 @@ class StoreMapReduceResults(base_handler.PipelineBase):
             job_class.register_failure(
                 job_id,
                 '%s\n%s' % (unicode(e), traceback.format_exc()))
+
+
+class GoogleCloudStorageConsistentJsonOutputWriter(
+        output_writers.GoogleCloudStorageConsistentOutputWriter):
+
+    def write(self, data):
+        super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
+            '%s\n' % json.dumps(data))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
@@ -454,12 +471,11 @@ class BaseMapReduceJobManager(BaseJobManager):
     def reduce(key, values):
         """Implements the reduce function.  Must be declared @staticmethod.
 
-        This function should yield whatever it likes; the recommended thing to
-        do is emit entities. All emitted outputs from all reducers will be
-        collected in an array and set into the output value for the job, so
-        don't pick anything huge. If you need something huge, persist it out
-        into the datastore instead and return a reference (and dereference it
-        later to load content as needed).
+        This function should yield a JSON string. All emitted outputs from all
+        reducers will be collected in an array and set into the output value
+        for the job, so don't pick anything huge. If you need something huge,
+        persist it out into the datastore instead and return a reference (and
+        dereference it later to load content as needed).
 
         Args:
           key: A key value as emitted from the map() function, above.
@@ -488,7 +504,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             'input_reader_spec': (
                 'core.jobs.MultipleDatastoreEntitiesInputReader'),
             'output_writer_spec': (
-                'mapreduce.output_writers.BlobstoreRecordsOutputWriter'),
+                'core.jobs.GoogleCloudStorageConsistentJsonOutputWriter'),
             'mapper_params': {
                 MAPPER_PARAM_KEY_ENTITY_KINDS: entity_class_names,
                 # Note that all parameters passed to the mapper need to be
@@ -497,6 +513,13 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # actual enqueue time.
                 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
                     utils.get_current_time_in_millisecs()),
+            },
+            'reducer_params': {
+                'output_writer': {
+                    'bucket_name': app_identity.get_default_gcs_bucket_name(),
+                    'content_type': 'text/plain',
+                    'naming_format': 'mrdata/$name/$id/output-$num',
+                }
             }
         }
 
@@ -806,7 +829,7 @@ class BaseContinuousComputationManager(object):
             cc_model.active_realtime_layer_index = (
                 1 - cc_model.active_realtime_layer_index)
             cc_model.put()
-        
+
         transaction_services.run_in_transaction(
             _switch_active_realtime_class_transactional)
 
@@ -880,7 +903,7 @@ class BaseContinuousComputationManager(object):
                 cc_model = job_models.ContinuousComputationModel(
                     id=cls.__name__)
 
-            if (cc_model.status_code != 
+            if (cc_model.status_code !=
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE):
                 raise Exception(
                     'Attempted to start computation %s, which is already '
@@ -917,7 +940,7 @@ class BaseContinuousComputationManager(object):
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             # If there is no job currently running, go to IDLE immediately.
             new_status_code = (
-                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if 
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if
                 do_unfinished_jobs_exist else
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code

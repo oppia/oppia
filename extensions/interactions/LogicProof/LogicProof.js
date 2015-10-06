@@ -19,8 +19,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/LogicProof',
-      controller: ['$scope', '$attrs', '$modal', function($scope, $attrs, $modal) {
-        $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj($attrs.questionWithValue);
+      controller: ['$scope', '$attrs', '$modal',
+          function($scope, $attrs, $modal) {
+        $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.questionWithValue);
 
         // This is the information about how to mark a question (e.g. the
         // permited line templates) that is stored in defaultData.js within
@@ -41,7 +43,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
         $scope.expressions.push($scope.questionData.results[0]);
         $scope.topTypes.push('boolean');
         $scope.typing = logicProofShared.assignTypesToExpressionArray(
-          $scope.expressions, $scope.topTypes, logicProofData.BASE_STUDENT_LANGUAGE,
+          $scope.expressions, $scope.topTypes,
+          logicProofData.BASE_STUDENT_LANGUAGE,
           ['variable', 'constant', 'prefix_function']
         );
         $scope.questionData.language.operators = $scope.typing[0].operators;
@@ -54,10 +57,13 @@ oppia.directive('oppiaInteractiveLogicProof', [
           $scope.questionData.language.operators);
         $scope.questionString = ($scope.assumptionsString === '') ?
             'Prove ' + $scope.targetString + '.':
-            'Assuming ' + $scope.assumptionsString + '; prove ' + $scope.targetString + '.';
+            'Assuming ' + (
+              $scope.assumptionsString + '; prove ' + $scope.targetString +
+              '.');
 
 
-        $scope.questionInstance = logicProofStudent.buildInstance($scope.questionData);
+        $scope.questionInstance = logicProofStudent.buildInstance(
+          $scope.questionData);
         $scope.haveErrorMessage = false;
 
         // NOTE: for information on integrating angular and code-mirror see
@@ -71,8 +77,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           editor.setOption('lineWrapping', true);
 
           // NOTE: this is necessary to avoid the textarea being greyed-out. See
-          // http://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked
-          // for discussion.
+          // http://stackoverflow.com/questions/8349571 for discussion.
           setTimeout(function() {
             editor.refresh();
           }, 500);
@@ -114,7 +119,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.mistakeMark.clear();
           }
           try {
-            logicProofStudent.validateProof($scope.proofString, $scope.questionInstance);
+            logicProofStudent.validateProof(
+              $scope.proofString, $scope.questionInstance);
             $scope.proofError = '';
           } catch(err) {
             $scope.proofError = $scope.displayMessage(err.message, err.line);
@@ -145,13 +151,14 @@ oppia.directive('oppiaInteractiveLogicProof', [
             [
               numberedLines.slice(0, errorLineNum).join('\n'),
               numberedLines[errorLineNum],
-              numberedLines.slice(errorLineNum + 1, numberedLines.length).join('\n')
+              numberedLines.slice(
+                errorLineNum + 1, numberedLines.length).join('\n')
             ];
         };
 
-        // NOTE: proof_num_lines, displayed_question and displayed_proof are only computed here
-        // because response.html needs them and does not have its own
-        // javascript.
+        // NOTE: proof_num_lines, displayed_question and displayed_proof are
+        // only computed here because response.html needs them and does not have
+        // its own javascript.
         $scope.submitProof = function() {
           var submission = {
             assumptions_string: $scope.assumptionsString,
@@ -178,16 +185,18 @@ oppia.directive('oppiaInteractiveLogicProof', [
           }
           if (submission.correct) {
             submission.displayed_message = '';
-            submission.displayed_proof = $scope.displayProof($scope.proofString);
+            submission.displayed_proof = $scope.displayProof(
+              $scope.proofString);
           }
-          $scope.$parent.$parent.submitAnswer(submission, 'submit');
+          $scope.$parent.$parent.submitAnswer(submission);
         };
 
         $scope.showHelp = function() {
           $modal.open({
             templateUrl: 'modals/logicProofHelp',
-            backdrop: 'static',
-            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+            backdrop: true,
+            controller: ['$scope', '$modalInstance',
+              function($scope, $modalInstance) {
                 $scope.close = function() {
                   $modalInstance.close();
                 };
@@ -200,13 +209,25 @@ oppia.directive('oppiaInteractiveLogicProof', [
   }
 ]);
 
-
 oppia.directive('oppiaResponseLogicProof', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/LogicProof',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseLogicProof', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/LogicProof',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
       }]

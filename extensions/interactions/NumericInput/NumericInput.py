@@ -20,13 +20,14 @@ from extensions.interactions import base
 class NumericInput(base.BaseInteraction):
     """Interaction for numeric input."""
 
-    name = 'Numeric'
-    category = 'Basic Input'
+    name = 'Number Input'
     description = (
         'Allows learners to enter integers and floating point numbers.')
     display_mode = base.DISPLAY_MODE_INLINE
+    is_trainable = False
     _dependency_ids = []
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Real'}]
+    answer_type = 'Real'
+    instructions = None
+    needs_summary = False
 
     _customization_arg_specs = []

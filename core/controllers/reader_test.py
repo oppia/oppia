@@ -34,14 +34,12 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ReaderPermissionsTest, self).setUp()
 
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.register_editor(self.EDITOR_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
-        exploration.states[exploration.init_state_name].interaction.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration(self.editor_id, exploration)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.EDITOR_ID, title=self.UNICODE_TEST_STRING,
+            category=self.UNICODE_TEST_STRING)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
@@ -50,7 +48,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
-        self.login('person@example.com')
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -58,14 +56,15 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
-        other_editor_email = 'another@example.com'
+        OTHER_EDITOR_EMAIL = 'another@example.com'
+        self.signup(OTHER_EDITOR_EMAIL, 'othereditorusername')
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
             'eid2', 'A title', 'A category')
         exp_services.save_new_exploration(
-            other_editor_email, other_exploration)
+            OTHER_EDITOR_EMAIL, other_exploration)
 
-        self.login(other_editor_email)
+        self.login(OTHER_EDITOR_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -80,6 +79,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_EMAIL])
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
@@ -88,12 +88,13 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_explorations_are_visible_to_anyone(self):
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
+
 
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
@@ -198,7 +199,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
     def test_give_feedback_handler(self):
         """Test giving feedback handler."""
-        viewer_email = 'viewer@example.com'
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration
         EXP_ID = '0'
@@ -206,7 +207,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Viewer opens exploration
-        self.login(viewer_email)
+        self.login(self.VIEWER_EMAIL)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
         state_name_1 = exploration_dict['exploration']['init_state_name']
@@ -221,8 +222,8 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         # Viewer submits answer '0'
-        exploration_dict = self.submit_answer(EXP_ID, state_name_1, '0')
-        state_name_2 = exploration_dict['state_name']
+        result_dict = self.submit_answer(EXP_ID, state_name_1, '0')
+        state_name_2 = result_dict['state_name']
 
         # Viewer gives 2nd feedback
         self.post_json(
@@ -249,13 +250,13 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
             'a': param_domain.ParamSpec('UnicodeString'),
             'b': param_domain.ParamSpec('UnicodeString'),
         }
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             {}, [independent_pc, dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
 
         # Jinja string evaluation fails gracefully on dependencies that do not
         # exist.
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             {}, [dependent_pc, independent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
 
@@ -272,13 +273,13 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
         }
 
         old_params = {}
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             old_params, [independent_pc, dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
         self.assertEqual(old_params, {})
 
         old_params = {'a': 'secondValue'}
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             old_params, [dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
         self.assertEqual(old_params, {'a': 'secondValue'})
@@ -286,7 +287,112 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
         # Jinja string evaluation fails gracefully on dependencies that do not
         # exist.
         old_params = {}
-        new_params = reader._get_updated_param_dict(
+        new_params = self.get_updated_param_dict(
             old_params, [dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'b': ''})
         self.assertEqual(old_params, {})
+
+
+class RatingsIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests of ratings recording and display."""
+
+    def setUp(self):
+        super(RatingsIntegrationTests, self).setUp()
+        self.EXP_ID = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+    def test_assign_and_read_ratings(self):
+        """Test the PUT and GET methods for ratings."""
+
+        self.signup('user@example.com', 'user')
+        self.login('user@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+
+        # User checks rating
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
+        self.assertEqual(ratings['user_rating'], None)
+        self.assertEqual(
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+
+        # User rates and checks rating
+        self.put_json(
+            '/explorehandler/rating/%s' % self.EXP_ID, {
+                'user_rating': 2
+            }, csrf_token
+        )
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
+        self.assertEqual(ratings['user_rating'], 2)
+        self.assertEqual(
+            ratings['overall_ratings'],
+            {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
+
+        # User re-rates and checks rating
+        self.login('user@example.com')
+        self.put_json(
+            '/explorehandler/rating/%s' % self.EXP_ID, {
+                'user_rating': 5
+            }, csrf_token
+        )
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
+        self.assertEqual(ratings['user_rating'], 5)
+        self.assertEqual(
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
+
+        self.logout()
+
+    def test_non_logged_in_users_cannot_rate(self):
+        """Check non logged-in users can view but not submit ratings."""
+
+        self.signup('user@example.com', 'user')
+        self.login('user@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        self.logout()
+
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
+        self.assertEqual(ratings['user_rating'], None)
+        self.assertEqual(
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+        self.put_json(
+            '/explorehandler/rating/%s' % self.EXP_ID, {
+                'user_rating': 1
+            }, csrf_token, expected_status_int=401, expect_errors=True
+        )
+
+    def test_ratings_by_different_users(self):
+        """Check that ratings by different users do not interfere."""
+
+        self.signup('a@example.com', 'a')
+        self.signup('b@example.com', 'b')
+
+        self.login('a@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        self.put_json(
+            '/explorehandler/rating/%s' % self.EXP_ID, {
+                'user_rating': 4
+            }, csrf_token
+        )
+        self.logout()
+
+        self.login('b@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % self.EXP_ID))
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
+        self.assertEqual(ratings['user_rating'], None)
+        self.put_json(
+            '/explorehandler/rating/%s' % self.EXP_ID, {
+                'user_rating': 4
+            }, csrf_token
+        )
+        ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
+        self.assertEqual(ratings['user_rating'], 4)
+        self.assertEqual(
+            ratings['overall_ratings'],
+            {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
+        self.logout()

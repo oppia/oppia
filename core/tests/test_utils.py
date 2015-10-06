@@ -17,19 +17,28 @@
 """Common utilities for test classes."""
 
 import contextlib
+import copy
+import datetime
 import os
 import re
 import unittest
 import webtest
 
 from core.controllers import reader
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rule_domain
+from core.domain import rights_manager
 from core.platform import models
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import jinja_utils
 import main
+import utils
 
 import inspect
 import json
@@ -58,7 +67,6 @@ class TestBase(unittest.TestCase):
 
     maxDiff = 2500
 
-    DEFAULT_USERNAME = 'defaultusername'
     # This is the value that gets returned by default when
     # app_identity.get_application_id() is called during tests.
     EXPECTED_TEST_APP_ID = 'testbed-test'
@@ -80,6 +88,27 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+    DEFAULT_END_STATE_NAME = 'End'
+
+    VERSION_0_STATES_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: {
+            'content': [{'type': 'text', 'value': ''}],
+            'param_changes': [],
+            'interaction': {
+                'customization_args': {},
+                'id': 'Continue',
+                'handlers': [{
+                    'name': 'submit',
+                    'rule_specs': [{
+                        'dest': 'END',
+                        'feedback': [],
+                        'param_changes': [],
+                        'definition': {'rule_type': 'default'}
+                    }]
+                }]
+            }
+        }
+    }
 
     def _get_unicode_test_string(self, suffix):
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
@@ -89,6 +118,19 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
+
+    def assertFuzzyTrue(self, value):
+        self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
+        self.assertTrue(isinstance(value, float))
+
+    def assertFuzzyFalse(self, value):
+        self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
+        self.assertTrue(isinstance(value, float))
+
+    def signup_superadmin_user(self):
+        """Signs up a superadmin user. Should be called at the end of setUp().
+        """
+        self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
 
     def log_line(self, line):
         """Print the line with a prefix that can be identified by the
@@ -198,17 +240,14 @@ class TestBase(unittest.TestCase):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
 
-    def register_editor(self, email, username=None):
-        """Register a user with the given username as an editor."""
-        if username is None:
-            username = self.DEFAULT_USERNAME
-
+    def signup(self, email, username):
+        """Complete the signup process for the user with the given username."""
         self.login(email)
 
-        response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-
-        response = self.testapp.post(feconf.EDITOR_PREREQUISITES_DATA_URL, {
+        response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
             'csrf_token': csrf_token,
             'payload': json.dumps({
                 'username': username,
@@ -223,7 +262,7 @@ class TestBase(unittest.TestCase):
         """Set the ADMIN_EMAILS property."""
         self._stash_current_user_env()
 
-        self.login('superadmin@example.com', is_super_admin=True)
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -240,7 +279,7 @@ class TestBase(unittest.TestCase):
         """Set the MODERATOR_EMAILS property."""
         self._stash_current_user_env()
 
-        self.login('superadmin@example.com', is_super_admin=True)
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -259,8 +298,8 @@ class TestBase(unittest.TestCase):
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
 
-    def save_new_default_exploration(self,
-            exploration_id, owner_id, title='A title'):
+    def save_new_default_exploration(
+            self, exploration_id, owner_id, title='A title'):
         """Saves a new default exploration written by owner_id.
 
         Returns the exploration domain object.
@@ -272,32 +311,169 @@ class TestBase(unittest.TestCase):
 
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective'):
+            category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE,
+            end_state_name=None):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category)
-        exploration.states[exploration.init_state_name].interaction.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
+            exploration_id, title, category, language_code=language_code)
+        exploration.states[exploration.init_state_name].update_interaction_id(
+            'TextInput')
         exploration.objective = objective
+
+        # If an end state name is provided, add terminal node with that name
+        if end_state_name is not None:
+            exploration.add_states([end_state_name])
+            end_state = exploration.states[end_state_name]
+            end_state.update_interaction_id('EndExploration')
+            end_state.interaction.default_outcome = None
+
+            # Link first state to ending state (to maintain validity)
+            init_state = exploration.states[exploration.init_state_name]
+            init_interaction = init_state.interaction
+            init_interaction.default_outcome.dest = end_state_name
+
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
+        """Saves a new default exploration with a default version 0 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title=title,
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            default_skin='conversation_v1',
+            skin_customizations={'panels_contents': {}},
+            states_schema_version=0,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'%s\'.' % title
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+
+    def save_new_default_collection(
+            self, collection_id, owner_id, title='A title',
+            category='A category', objective='An objective'):
+        """Saves a new default collection written by owner_id.
+
+        Returns the collection domain object.
+        """
+        collection = collection_domain.Collection.create_default_collection(
+            collection_id, title, category, objective)
+        collection_services.save_new_collection(owner_id, collection)
+        return collection
+
+    def save_new_valid_collection(
+            self, collection_id, owner_id, title='A title',
+            category='A category', objective='An objective',
+            exploration_id='an_exploration_id',
+            end_state_name=DEFAULT_END_STATE_NAME):
+        collection = collection_domain.Collection.create_default_collection(
+            collection_id, title, category, objective=objective)
+        collection.add_node(
+            self.save_new_valid_exploration(
+                exploration_id, owner_id, title, category, objective,
+                end_state_name=end_state_name).id)
+
+        collection_services.save_new_collection(owner_id, collection)
+        return collection
+
+    def get_updated_param_dict(
+            self, param_dict, param_changes, exp_param_specs):
+        """Updates a param dict using the given list of param_changes.
+
+        Note that the list of parameter changes is ordered. Parameter
+        changes later in the list may depend on parameter changes that have
+        been set earlier in the same list.
+        """
+        new_param_dict = copy.deepcopy(param_dict)
+        for pc in param_changes:
+            try:
+                obj_type = exp_param_specs[pc.name].obj_type
+            except:
+                raise Exception('Parameter %s not found' % pc.name)
+            new_param_dict[pc.name] = pc.get_normalized_value(
+                obj_type, new_param_dict)
+        return new_param_dict
+
     def submit_answer(
             self, exploration_id, state_name, answer,
-            params=None, handler_name=feconf.SUBMIT_HANDLER_NAME,
-            exploration_version=None):
+            params=None, exploration_version=None):
         """Submits an answer as an exploration player and returns the
-        corresponding dict.
+        corresponding dict. This function has strong parallels to code in
+        PlayerServices.js which has the non-test code to perform the same
+        functionality. This is replicated here so backend tests may utilize the
+        functionality of PlayerServices.js without being able to access it.
+
+        TODO(bhenning): Replicate this in an integration test to protect
+        against code skew here.
         """
         if params is None:
             params = {}
-        return reader.submit_answer_in_tests(
-            exploration_id, state_name, answer, params, handler_name,
-            exploration_version)
 
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+
+        # First, the answer must be classified.
+        classify_result = self.post_json(
+            '/explorehandler/classify/%s' % exploration_id, {
+                'old_state': exploration.states[state_name].to_dict(),
+                'params': params,
+                'answer': answer
+            }
+        )
+
+        # Next, ensure the submission is recorded.
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
+                'answer': answer,
+                'params': params,
+                'version': exploration.version,
+                'old_state_name': state_name,
+                'rule_spec_string': classify_result['rule_spec_string']
+            }
+        )
+
+        # Now the next state's data must be calculated.
+        outcome = classify_result['outcome']
+        new_state = exploration.states[outcome['dest']]
+        params['answer'] = answer
+        new_params = self.get_updated_param_dict(
+            params, new_state.param_changes, exploration.param_specs)
+
+        return {
+            'feedback_html': jinja_utils.parse_string(
+                utils.get_random_choice(outcome['feedback'])
+                if outcome['feedback'] else '', params),
+            'question_html': new_state.content[0].to_html(new_params),
+            'state_name': outcome['dest']
+        }
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -314,9 +490,9 @@ class TestBase(unittest.TestCase):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
-        means that you can only use them once after construction, otherwise, the
-        generator will immediately raise StopIteration, and contextlib will raise
-        a RuntimeError.
+        means that you can only use them once after construction, otherwise,
+        the generator will immediately raise StopIteration, and contextlib will
+        raise a RuntimeError.
         """
         original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
@@ -349,6 +525,7 @@ class AppEngineTestBase(TestBase):
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
+        self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_urlfetch_stub()
@@ -366,6 +543,8 @@ class AppEngineTestBase(TestBase):
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
+
+        self.signup_superadmin_user()
 
     def tearDown(self):
         self.logout()
@@ -394,7 +573,8 @@ class AppEngineTestBase(TestBase):
 
             https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
         """
-        queue_names = [queue_name] if queue_name else self._get_all_queue_names()
+        queue_names = (
+            [queue_name] if queue_name else self._get_all_queue_names())
 
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
         for q in queue_names:
@@ -432,16 +612,18 @@ else:
 
 class FunctionWrapper(object):
     """A utility for making function wrappers. Create a subclass and override
-       any or both of the pre_call_hook and post_call_hook methods. See these methods
-       for more info."""
+    any or both of the pre_call_hook and post_call_hook methods. See these
+    methods for more info.
+    """
 
     def __init__(self, f):
         """Creates a new FunctionWrapper instance.
 
         args:
-          - f: a callable, or data descriptor. If it's a descriptor, its __get__
-            should return a bound method. For example, f can be a function, a
-            method, a static or class method, but not a @property."""
+          - f: a callable, or data descriptor. If it's a descriptor, its
+            __get__ should return a bound method. For example, f can be a
+            function, a method, a static or class method, but not a @property.
+        """
         self._f = f
         self._instance = None
 
@@ -460,9 +642,9 @@ class FunctionWrapper(object):
         return result
 
     def __get__(self, instance, owner):
-        # We have to implement __get__ because otherwise, we don't have a chance
-        # to bind to the instance self._f was bound to. See the following SO answer:
-        # http://stackoverflow.com/a/22555978/675311
+        # We have to implement __get__ because otherwise, we don't have a
+        # chance to bind to the instance self._f was bound to. See the
+        # following SO answer: https://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 
@@ -475,12 +657,14 @@ class FunctionWrapper(object):
 
 class CallCounter(FunctionWrapper):
     """A function wrapper that keeps track of how often the function is called.
-       Note that the counter is incremented before each call, so it is also
-       increased when the function raises an exception."""
+    Note that the counter is incremented before each call, so it is also
+    increased when the function raises an exception.
+    """
 
     def __init__(self, f):
         """Counts the number of times the given function has been called.
-           See FunctionWrapper for arguments."""
+        See FunctionWrapper for arguments.
+        """
         super(CallCounter, self).__init__(f)
         self._times_called = 0
 
@@ -493,8 +677,9 @@ class CallCounter(FunctionWrapper):
 
 
 class FailingFunction(FunctionWrapper):
-    """A function wrapper that makes a function fail, raising a given exception.
-       It can be set to succeed after a given number of calls."""
+    """A function wrapper that makes a function fail, raising a given
+    exception. It can be set to succeed after a given number of calls.
+    """
 
     INFINITY = 'infinity'
 
@@ -504,16 +689,16 @@ class FailingFunction(FunctionWrapper):
         args:
           - f: see FunctionWrapper.
           - exception: the exception to be raised.
-          - num_tries_before_success: the number of times to raise an exception,
-            before a call succeeds. If this is 0, all calls will succeed, if it
-            is FailingFunction.INFINITY, all calls will fail.
+          - num_tries_before_success: the number of times to raise an
+            exception, before a call succeeds. If this is 0, all calls will
+            succeed, if it is FailingFunction.INFINITY, all calls will fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
-        self._always_fail = self._num_tries_before_success == FailingFunction.INFINITY
+        self._always_fail = (
+            self._num_tries_before_success == FailingFunction.INFINITY)
         self._times_called = 0
-
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
@@ -523,6 +708,7 @@ class FailingFunction(FunctionWrapper):
 
     def pre_call_hook(self, args):
         self._times_called += 1
-        call_should_fail = not self._num_tries_before_success < self._times_called
+        call_should_fail = (
+            self._num_tries_before_success >= self._times_called)
         if call_should_fail or self._always_fail:
             raise self._exception

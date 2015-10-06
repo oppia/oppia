@@ -25,16 +25,24 @@
 {%- endmacro %}
 
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Base">
+<html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
-    <noscript>
-      <meta http-equiv="refresh" content="1;url=/static/pages/noscript.txt">
-    </noscript>
-    <meta charset=utf-8>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
-    <link rel="apple-touch-icon" href="/images/logo.png">
-   <title>{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
+    <!-- The itemprops are for G+ sharing. -->
+    <meta itemprop="name" content="{{meta_name}}">
+    <meta itemprop="description" content="{{meta_description}}">
+    <!-- The og tags are for Facebook sharing. -->
+    <meta property="og:title" content="{{meta_name}}">
+    <meta property="og:site_name" content="Oppia">
+    <meta property="og:url" content="{{FULL_URL}}">
+    <meta property="og:description" content="{{meta_description}}">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
+
+    <link rel="apple-touch-icon" href="/images/logo/favicon.png">
+    <title itemprop="name">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
 
     {% block header_css %}
       {% include 'header_css_libs.html' %}
@@ -52,16 +60,20 @@
             null,
           {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
-        EXPLORATION_STATUS_PRIVATE: JSON.parse(
-          '{{EXPLORATION_STATUS_PRIVATE|js_string}}'),
-        EXPLORATION_STATUS_PUBLIC: JSON.parse(
-          '{{EXPLORATION_STATUS_PUBLIC|js_string}}'),
-        EXPLORATION_STATUS_PUBLICIZED: JSON.parse(
-          '{{EXPLORATION_STATUS_PUBLICIZED|js_string}}'),
+        ACTIVITY_STATUS_PRIVATE: JSON.parse(
+          '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
+        ACTIVITY_STATUS_PUBLIC: JSON.parse(
+          '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
+        ACTIVITY_STATUS_PUBLICIZED: JSON.parse(
+          '{{ACTIVITY_STATUS_PUBLICIZED|js_string}}'),
         ALL_LANGUAGE_CODES: JSON.parse(
           '{{ALL_LANGUAGE_CODES|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(
-          '{{DEFAULT_LANGUAGE_CODE|js_string}}')
+          '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
+        RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
+        /* A list of functions to be called when an exploration is completed. */
+        POST_COMPLETION_HOOKS: [],
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
 
       {% if additional_angular_modules %}
@@ -88,95 +100,120 @@
               <!-- Top navigation. -->
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
-                  <div>
-                    <div class="navbar-header protractor-test-navbar-header" ng-if="!screenIsLarge">
-                      <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
-                        <img src="/images/menu.png">
-                      </a>
-                      <a class="oppia-navbar-brand-name" href="/gallery">
-                        <img src="/images/logo/288x288_oppia_white.png" class="oppia-logo">
-                      </a>
-                    </div>
+                  <div class="navbar-header protractor-test-navbar-header pull-left">
+                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
+                      <img src="/images/general/menu.png">
+                    </a>
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery">
+                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
+                    </a>
+                    <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
+                    <a style="display: none;">
+                      <img src="/images/logo/288x128_logo_mint.png" itemprop="image">
+                    </a>
+                  </div>
 
-                    <div class="collapse navbar-collapse">
-                      {% if nav_mode in ['explore', 'create'] %}
-                        {% block navbar_breadcrumb %}
-                        {% endblock navbar_breadcrumb %}
-                      {% else %}
-                        <ul class="nav navbar-nav oppia-navbar-nav">
-                          {% if SHOW_FORUM_PAGE %}
-                            <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-                              <a href="/forum">Forum</a>
-                            </li>
-                          {% endif %}
-                          <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-                            <a href="/about">About</a>
-                          </li>
-                        </ul>
-                      {% endif %}
+                  {% if nav_mode != 'signup' %}
+                    <div class="navbar-header pull-right">
+                      <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+                        {% if username %}
+                          <li class="dropdown pull-right">
+                            <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                              <div class="oppia-navbar-profile-picture-container">
+                                {% if profile_picture_data_url %}
+                                  <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
+                                {% else %}
+                                  <img ng-if="profileDropdownIsActive" src="/images/general/user_mint_48px.png" class="oppia-navbar-profile-picture">
+                                  <img ng-if="!profileDropdownIsActive" src="/images/general/user_white_48px.png" class="oppia-navbar-profile-picture">
+                                {% endif %}
+                                <span class="caret" style="margin-top: 10px;"></span>
 
-                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
-                        {% if user_email %}
-                          <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown">
-                              {% if username %}
-                                {{username}}
-                              {% else %}
-                                {{user_email}}
-                              {% endif %}
+                                <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
+                                  <span class="oppia-navbar-dashboard-indicator-text">
+                                    <[numUnseenNotifications]>
+                                  </span>
+                                </div>
 
-                              {% if is_admin %}
-                                (Admin)
-                              {% elif is_moderator %}
-                                (Moderator)
-                              {% endif %}
-                              <span class="caret"></span>
+                                <div style="display: none;" class="oppia-user-email">
+                                  {{user_email}}
+                                </div>
+
+                                {% if is_admin or is_moderator %}
+                                  <div class="oppia-navbar-role-indicator">
+                                    {% if is_admin %}
+                                      <!-- "right: 4px;" is necessary here but not in moderator to prevent 'A' from appearing off-center because 'A' is slightly thinner than 'M' in this font -->
+                                      <span class="oppia-navbar-role-text" style="right: 4px;">A</span>
+                                    {% elif is_moderator %}
+                                      <span class="oppia-navbar-role-text">M</span>
+                                    {% endif %}
+                                  </div>
+                                {% endif %}
+                              </div>
                             </a>
-                            <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                            <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
-                                <a href="/dashboard">Dashboard</a>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
+                                  My Explorations
+                                </a>
                               </li>
+                              <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
+                                  Notifications
+                                  <span ng-if="numUnseenNotifications > 0">
+                                    (<[numUnseenNotifications]>)
+                                  </span>
+                                </a>
+                              </li>
+                              <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">Preferences</a>
+                              </li>
+
                               {% if is_moderator %}
                                 <li>
-                                  <a href="/moderator" target="_blank">
+                                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
                                     Moderator Page
                                   </a>
                                 </li>
                               {% endif %}
-
                               {% if is_super_admin %}
                                 <li>
-                                  <a href="/admin" target="_blank">
+                                  <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
                                     Admin Page
                                   </a>
                                 </li>
                               {% endif %}
-
                               <li>
-                                <a href="{{logout_url}}">Logout</a>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
                               </li>
                             </ul>
                           </li>
                         {% else %}
-                          <li>
-                            <a href="{{login_url}}" style="font-size: 0.8em; margin-right: -20px;" class="oppia-no-hover-change">
-                              Log in
+                          <li class="dropdown oppia-clickable-dropdown pull-right">
+                            <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
+                              Sign in
+                              <span class="caret"></span>
                             </a>
-                          </li>
-                          <li>
-                            <a href="{{login_url}}" style="font-size: 0.8em;" class="oppia-no-hover-change">
-                              <span class="oppia-signup-button">
-                                Sign up
-                              </span>
-                            </a>
+                            <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                              <li>
+                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
+                                  <img src="/images/signin/Red-signin-Long-base-44dp.png">
+                                </a>
+                              </li>
+                            </ul>
                           </li>
                         {% endif %}
                       </ul>
-
-                      {% block local_top_nav_options %}
-                      {% endblock %}
                     </div>
+                  {% endif %}
+
+                  <div class="collapse navbar-collapse ng-cloak">
+                    {% block navbar_breadcrumb %}
+                    {% endblock navbar_breadcrumb %}
+
+                    {% block local_top_nav_options %}
+                    {% endblock %}
                   </div>
+                </div>
                 </div>
               </nav>
 
@@ -188,20 +225,19 @@
 
             {% include 'side_nav.html' %}
 
-            {% if nav_mode in ['explore'] %}
-              <span class="oppia-cc-icon">
-                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
-                  <img alt="Creative Commons Licence" style="border-width: 0; height: 24px;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                </a><br />
-                <a href="/about#license" target="_blank" style="font-size: 9px;">Attribution Guide</a>
-              </span>
-            {% endif %}
-
           </div>
         </div>
       </div>
+
+    {% if DEV_MODE %}
+      <div class="oppia-dev-mode">
+        Development Mode
+      </div>
     {% endif %}
 
+    {% endif %}
+
+    {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
 
@@ -218,10 +254,13 @@
       {{ include_js_file('base.js') }}
       {{ include_js_file('/expressions/evaluator.js') }}
       {{ include_js_file('/expressions/parser.js') }}
+      {{ include_js_file('components/objectEditor.js') }}
+      {{ OBJECT_EDITORS_JS }}
     </script>
 
     {% block footer_js %}
     {% endblock footer_js %}
 
+    {{BEFORE_END_BODY_TAG_HOOK}}
   </body>
 </html>

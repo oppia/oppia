@@ -33,7 +33,7 @@ var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [
   // This error arises when a logout event takes place before a page has fully
   // loaded.
-  'http://localhost:4445/third_party/static/angularjs-1.3.0-rc.5/angular.js 11086:24'
+  'http://localhost:4445/third_party/static/angularjs-1.3.13/angular.js 11607:24'
 ];
 
 var checkForConsoleErrors = function(errorsToIgnore) {
@@ -67,7 +67,7 @@ var ADMIN_URL_SUFFIX = '/admin';
 var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
-var FIRST_STATE_DEFAULT_NAME = 'First State';
+var FIRST_STATE_DEFAULT_NAME = 'First Card';
 
 
 var _getExplorationId = function(currentUrlPrefix) {

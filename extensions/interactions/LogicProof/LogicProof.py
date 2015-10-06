@@ -23,17 +23,17 @@ class LogicProof(base.BaseInteraction):
     """Interaction for entering logic proofs."""
 
     name = 'Logic Proof'
-    category = 'Custom'
     description = (
         'Allows learners to write proofs for simple logical statements.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['logic_proof', 'codemirror']
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'CheckedProof'}]
+    answer_type = 'CheckedProof'
+    instructions = 'Construct a proof'
+    needs_summary = True
 
     _customization_arg_specs = [{
         'name': 'question',
-        'description': 'Question to ask.',
+        'description': 'Question to ask',
         'schema': {
             'type': 'custom',
             'obj_type': 'LogicQuestion',

@@ -23,8 +23,8 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'base_model', 'config', 'exploration', 'file', 'job', 'statistics', 'user',
-    'feedback')
+    'base_model', 'collection', 'config', 'email', 'exploration', 'feedback',
+    'file', 'job', 'recommendations', 'statistics', 'user')
 
 
 class _Platform(object):
@@ -40,29 +40,38 @@ class _Gae(_Platform):
         returned_models = []
         for name in model_names:
             if name == NAMES.base_model:
-                from core.storage.base_model import gae_models as base_model
-                returned_models.append(base_model)
+                from core.storage.base_model import gae_models as base_models
+                returned_models.append(base_models)
+            elif name == NAMES.collection:
+                from core.storage.collection import gae_models as collection_models
+                returned_models.append(collection_models)
             elif name == NAMES.config:
-                from core.storage.config import gae_models as config_model
-                returned_models.append(config_model)
+                from core.storage.config import gae_models as config_models
+                returned_models.append(config_models)
+            elif name == NAMES.email:
+                from core.storage.email import gae_models as email_models
+                returned_models.append(email_models)
             elif name == NAMES.exploration:
-                from core.storage.exploration import gae_models as exp_model
-                returned_models.append(exp_model)
-            elif name == NAMES.file:
-                from core.storage.file import gae_models as file_model
-                returned_models.append(file_model)
-            elif name == NAMES.job:
-                from core.storage.job import gae_models as job_model
-                returned_models.append(job_model)
-            elif name == NAMES.statistics:
-                from core.storage.statistics import gae_models as statistics_model
-                returned_models.append(statistics_model)
-            elif name == NAMES.user:
-                from core.storage.user import gae_models as user_model
-                returned_models.append(user_model)
+                from core.storage.exploration import gae_models as exp_models
+                returned_models.append(exp_models)
             elif name == NAMES.feedback:
-                from core.storage.feedback import gae_models as feedback_model
-                returned_models.append(feedback_model)
+                from core.storage.feedback import gae_models as feedback_models
+                returned_models.append(feedback_models)
+            elif name == NAMES.file:
+                from core.storage.file import gae_models as file_models
+                returned_models.append(file_models)
+            elif name == NAMES.job:
+                from core.storage.job import gae_models as job_models
+                returned_models.append(job_models)
+            elif name == NAMES.recommendations:
+                from core.storage.recommendations import gae_models as recommendations_models
+                returned_models.append(recommendations_models)
+            elif name == NAMES.statistics:
+                from core.storage.statistics import gae_models as statistics_models
+                returned_models.append(statistics_models)
+            elif name == NAMES.user:
+                from core.storage.user import gae_models as user_models
+                returned_models.append(user_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 

@@ -26,7 +26,6 @@ import zipfile
 import common
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
-STATIC_IMAGES_DIR = os.path.join('.', 'static', 'images')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
 
@@ -141,6 +140,20 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, target_root_name))
 
 
+# This is a temporary modified version of UI Bootstrap used for displaying
+# HTML in popovers. It should be replaced with UI Bootstrap when version
+# 0.13.0 is released. See https://github.com/angular-ui/bootstrap/issues/220
+# TODO(sll): Delete this snippet of code after v0.13.0 is released.
+UI_BOOTSTRAP_JBRUNI_URL = (
+    'https://raw.githubusercontent.com/jbruni/jbruni.github.io/master/javascripts')
+UI_BOOTSTRAP_JBRUNI_DST = os.path.join(
+    THIRD_PARTY_STATIC_DIR, 'ui-bootstrap-jbruni-0.13.0')
+UI_BOOTSTRAP_JBRUNI_FILES = ['ui-bootstrap-tpls-0.13.0-jbruni.min.js']
+
+download_files(
+    UI_BOOTSTRAP_JBRUNI_URL, UI_BOOTSTRAP_JBRUNI_DST, UI_BOOTSTRAP_JBRUNI_FILES)
+
+
 # Download all the standalone files.
 YUICOMPRESSOR_REV = '2.4.8'
 YUICOMPRESSOR_FILENAME = 'yuicompressor-%s' % YUICOMPRESSOR_REV
@@ -160,18 +173,37 @@ UI_BOOTSTRAP_FILES = [
     for suffix in ['js', 'min.js']]
 
 MATERIAL_DESIGN_ICONS_REV = '1.0.1'
+MATERIAL_DESIGN_ICONS_URL_PREFIX = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s' %
+    MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_ACTION_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/action/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICONS_TOGGLE_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/toggle/drawable-xxxhdpi'
-    % MATERIAL_DESIGN_ICONS_REV)
+    '%s/action/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
+MATERIAL_DESIGN_ICONS_COMMUNICATION_URL = (
+    '%s/communication/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
+MATERIAL_DESIGN_ICONS_CONTENT_URL = (
+    '%s/content/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
+MATERIAL_DESIGN_ICONS_FILE_URL = (
+    '%s/file/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
+MATERIAL_DESIGN_ICONS_NAVIGATION_URL = (
+    '%s/navigation/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
+MATERIAL_DESIGN_ICONS_SOCIAL_URL = (
+    '%s/social/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
-    STATIC_IMAGES_DIR, 'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICON_ACTION_FILES = ['ic_bookmark_outline_black_48dp.png']
-MATERIAL_DESIGN_ICON_TOGGLE_FILES = ['ic_star_outline_black_48dp.png']
+    THIRD_PARTY_STATIC_DIR,
+    'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
+MATERIAL_DESIGN_ICON_ACTION_FILES = [
+    'ic_info_black_48dp.png', 'ic_help_black_48dp.png',
+    'ic_home_black_48dp.png']
+MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
+MATERIAL_DESIGN_ICON_CONTENT_FILES = [
+    'ic_link_black_48dp.png', 'ic_save_black_48dp.png']
+MATERIAL_DESIGN_ICON_FILE_FILES = ['ic_cloud_upload_black_48dp.png']
+MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
+    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png',
+    'ic_close_black_48dp.png']
+MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png']
 
-# Note that Angular 1.3.0 requires a jQuery version that is >= 2.1.1.
+# Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'
 JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/%s' % JQUERY_REV
 JQUERY_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'jquery-%s' % JQUERY_REV)
@@ -184,7 +216,7 @@ JQUERYUI_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV)
 JQUERYUI_FILES = ['jquery-ui.min.js']
 
-ANGULAR_REV = '1.3.0-rc.5'
+ANGULAR_REV = '1.3.13'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
 ANGULAR_TEST_URL = 'https://code.angularjs.org/%s' % ANGULAR_REV
@@ -203,7 +235,7 @@ D3_FILES = ['d3.min.js']
 
 NG_INFINITE_SCROLL_REV = '1.0.0'
 NG_INFINITE_SCROLL_URL = (
-    'https://raw.github.com/BinaryMuse/ngInfiniteScroll/%s/build/' 
+    'https://raw.github.com/BinaryMuse/ngInfiniteScroll/%s/build/'
     % NG_INFINITE_SCROLL_REV)
 NG_INFINITE_SCROLL_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'nginfinitescroll-%s' % NG_INFINITE_SCROLL_REV)
@@ -217,19 +249,36 @@ download_files(ANGULAR_URL, ANGULAR_DST, ANGULAR_FILES)
 download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_ACTION_URL,
-    MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICONS_ACTION_URL, MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_ACTION_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_TOGGLE_URL,
-    MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_TOGGLE_FILES)
+    MATERIAL_DESIGN_ICONS_COMMUNICATION_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_COMMUNICATION_FILES)
 download_files(
-    NG_INFINITE_SCROLL_URL, 
-    NG_INFINITE_SCROLL_DST, 
-    NG_INFINITE_SCROLL_FILES)
+    MATERIAL_DESIGN_ICONS_CONTENT_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_CONTENT_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_FILE_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_FILE_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_NAVIGATION_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_NAVIGATION_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_SOCIAL_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_SOCIAL_FILES)
+download_files(
+    NG_INFINITE_SCROLL_URL, NG_INFINITE_SCROLL_DST, NG_INFINITE_SCROLL_FILES)
 
 # Download all the frontend library zip files.
+MD_ICONIC_FONT_REV = '2.1.2'
+MD_ICONIC_FONT_ROOT_NAME = (
+    'material-design-iconic-font-%s' % MD_ICONIC_FONT_REV)
+MD_ICONIC_FONT_ZIP_URL = (
+    'https://github.com/zavoloklom/material-design-iconic-font'
+    '/archive/%s.zip' % MD_ICONIC_FONT_REV)
+MD_ICONIC_FONT_ZIP_ROOT_NAME = MD_ICONIC_FONT_ROOT_NAME
+MD_ICONIC_FONT_TARGET_ROOT_NAME = 'md-iconic-font-%s' % MD_ICONIC_FONT_REV
+
 BOWER_MATERIAL_REV = '0.6.0-rc1'
 BOWER_MATERIAL_ROOT_NAME = 'bower-material-%s' % BOWER_MATERIAL_REV
 BOWER_MATERIAL_ZIP_URL = (
@@ -251,11 +300,19 @@ SELECT2_ZIP_URL = (
 SELECT2_ZIP_ROOT_NAME = 'select2-%s' % SELECT2_REV
 SELECT2_TARGET_ROOT_NAME = 'select2-%s' % SELECT2_REV
 
-JWYSIWYG_REV = '496497b0772067a0064b627c02893d989ccc7cc9'
-JWYSIWYG_ZIP_URL = (
-    'https://github.com/jwysiwyg/jwysiwyg/archive/%s.zip' % JWYSIWYG_REV)
-JWYSIWYG_ZIP_ROOT_NAME = 'jwysiwyg-%s' % JWYSIWYG_REV
-JWYSIWYG_TARGET_ROOT_NAME = 'jwysiwyg-496497'
+FONTAWESOME_REV = '4.4.0'
+FONTAWESOME_ZIP_URL = (
+    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' %
+    FONTAWESOME_REV)
+FONTAWESOME_ZIP_ROOT_NAME = 'Font-Awesome-%s' % FONTAWESOME_REV
+FONTAWESOME_TARGET_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
+
+TEXTANGULAR_REV = '1.3.7'
+TEXTANGULAR_ZIP_URL = (
+    'https://github.com/fraywing/textAngular/archive/v%s.zip' %
+    TEXTANGULAR_REV)
+TEXTANGULAR_ZIP_ROOT_NAME = 'textAngular-%s' % TEXTANGULAR_REV
+TEXTANGULAR_TARGET_ROOT_NAME = 'textAngular-%s' % TEXTANGULAR_REV
 
 JQUERYUI_FILENAME = 'jquery-ui-themes-%s' % JQUERYUI_REV
 JQUERYUI_THEMES_SRC = (
@@ -297,16 +354,16 @@ UI_SORTABLE_ZIP_URL = (
 UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
 UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
 
-INTRO_JS_REV = '1.0.0'
-INTRO_JS_ZIP_URL = (
-    'https://github.com/usablica/intro.js/archive/v%s.zip' % INTRO_JS_REV)
-INTRO_JS_ZIP_ROOT_NAME = 'intro.js-%s' % INTRO_JS_REV
-INTRO_JS_TARGET_ROOT_NAME = 'intro-js-%s' % INTRO_JS_REV
+NG_JOYRIDE_REV = '0.1.11'
+NG_JOYRIDE_ZIP_URL = (
+    'https://github.com/abhikmitra/ng-joyride/archive/%s.zip' % NG_JOYRIDE_REV)
+NG_JOYRIDE_ZIP_ROOT_NAME = 'ng-joyride-%s' % NG_JOYRIDE_REV
+NG_JOYRIDE_TARGET_ROOT_NAME = 'ng-joyride-%s' % NG_JOYRIDE_REV
 
-BOOTSTRAP_REV = '3.1.1'
+BOOTSTRAP_REV = '3.3.4'
 BOOTSTRAP_ROOT_NAME = 'bootstrap-%s-dist' % BOOTSTRAP_REV
 BOOTSTRAP_ZIP_URL = (
-    'https://github.com/twbs/bootstrap/releases/download/v3.1.1/%s.zip'
+    'https://github.com/twbs/bootstrap/releases/download/v3.3.4/%s.zip'
     % BOOTSTRAP_ROOT_NAME)
 BOOTSTRAP_ZIP_ROOT_NAME = BOOTSTRAP_ROOT_NAME
 BOOTSTRAP_TARGET_ROOT_NAME = 'bootstrap-%s' % BOOTSTRAP_REV
@@ -318,6 +375,15 @@ MATHJAX_ZIP_URL = (
 MATHJAX_ZIP_ROOT_NAME = MATHJAX_ROOT_NAME
 MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
 
+NG_IMG_CROP_REV = '0.3.2'
+NG_IMG_CROP_ZIP_URL = (
+    'https://github.com/alexk111/ngImgCrop/archive/v%s.zip' % NG_IMG_CROP_REV)
+NG_IMG_CROP_ZIP_ROOT_NAME = 'ngImgCrop-%s' % NG_IMG_CROP_REV
+NG_IMG_CROP_TARGET_ROOT_NAME = 'ng-img-crop-%s' % NG_IMG_CROP_REV
+
+download_and_unzip_files(
+    MD_ICONIC_FONT_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    MD_ICONIC_FONT_ZIP_ROOT_NAME, MD_ICONIC_FONT_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOWER_MATERIAL_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOWER_MATERIAL_ZIP_ROOT_NAME, BOWER_MATERIAL_TARGET_ROOT_NAME)
@@ -328,8 +394,11 @@ download_and_unzip_files(
     SELECT2_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     SELECT2_ZIP_ROOT_NAME, SELECT2_TARGET_ROOT_NAME)
 download_and_unzip_files(
-    JWYSIWYG_ZIP_URL, THIRD_PARTY_STATIC_DIR,
-    JWYSIWYG_ZIP_ROOT_NAME, JWYSIWYG_TARGET_ROOT_NAME)
+    FONTAWESOME_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    FONTAWESOME_ZIP_ROOT_NAME, FONTAWESOME_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    TEXTANGULAR_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    TEXTANGULAR_ZIP_ROOT_NAME, TEXTANGULAR_TARGET_ROOT_NAME)
 download_and_unzip_files(
     JQUERYUI_THEMES_SRC,
     os.path.join(THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV),
@@ -350,14 +419,17 @@ download_and_unzip_files(
     UI_SORTABLE_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_SORTABLE_ZIP_ROOT_NAME, UI_SORTABLE_TARGET_ROOT_NAME)
 download_and_unzip_files(
-    INTRO_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
-    INTRO_JS_ZIP_ROOT_NAME, INTRO_JS_TARGET_ROOT_NAME)
+    NG_JOYRIDE_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    NG_JOYRIDE_ZIP_ROOT_NAME, NG_JOYRIDE_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOOTSTRAP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOOTSTRAP_ZIP_ROOT_NAME, BOOTSTRAP_TARGET_ROOT_NAME)
 download_and_unzip_files(
     MATHJAX_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     MATHJAX_ZIP_ROOT_NAME, MATHJAX_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    NG_IMG_CROP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    NG_IMG_CROP_ZIP_ROOT_NAME, NG_IMG_CROP_TARGET_ROOT_NAME)
 # MathJax is too big. Remove many unneeded files by following these
 # instructions:
 #   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
@@ -399,7 +471,7 @@ download_and_unzip_files(
 
 # Download all the tar files.
 
-GAE_MAPREDUCE_REV = '1.9.0.0'
+GAE_MAPREDUCE_REV = '1.9.17.0'
 GAE_MAPREDUCE_ROOT_NAME = 'gae-mapreduce-%s' % GAE_MAPREDUCE_REV
 GAE_MAPREDUCE_TAR_URL = (
     'https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/'
@@ -407,16 +479,43 @@ GAE_MAPREDUCE_TAR_URL = (
 GAE_MAPREDUCE_TAR_ROOT_NAME = 'GoogleAppEngineMapReduce-%s' % GAE_MAPREDUCE_REV
 GAE_MAPREDUCE_TARGET_ROOT_NAME = GAE_MAPREDUCE_ROOT_NAME
 
-GAE_CLOUD_STORAGE_REV = '1.9.0.0'
+GAE_CLOUD_STORAGE_REV = '1.9.15.0'
 GAE_CLOUD_STORAGE_ROOT_NAME = 'gae-cloud-storage-%s' % GAE_CLOUD_STORAGE_REV
 GAE_CLOUD_STORAGE_TAR_URL = (
     'https://pypi.python.org/packages/source/G/'
     'GoogleAppEngineCloudStorageClient/'
     'GoogleAppEngineCloudStorageClient-%s.tar.gz' % GAE_CLOUD_STORAGE_REV)
 GAE_CLOUD_STORAGE_TAR_ROOT_NAME = (
-    'GoogleAppEngineCloudStorageClient-%s' % GAE_MAPREDUCE_REV)
+    'GoogleAppEngineCloudStorageClient-%s' % GAE_CLOUD_STORAGE_REV)
 GAE_CLOUD_STORAGE_TARGET_ROOT_NAME = GAE_CLOUD_STORAGE_ROOT_NAME
 
+GAE_PIPELINE_REV = '1.9.17.0'
+GAE_PIPELINE_ROOT_NAME = 'gae-pipeline-%s' % GAE_PIPELINE_REV
+GAE_PIPELINE_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/'
+    'GoogleAppEnginePipeline/GoogleAppEnginePipeline-%s.tar.gz'
+    '#md5=9fe87b281f4b0a7c110534df4e61b6ec' % GAE_PIPELINE_REV)
+GAE_PIPELINE_TAR_ROOT_NAME = (
+    'GoogleAppEnginePipeline-%s' % GAE_PIPELINE_REV)
+GAE_PIPELINE_TARGET_ROOT_NAME = GAE_PIPELINE_ROOT_NAME
+
+GRAPHY_REV = '1.0.0'
+GRAPHY_ROOT_NAME = 'graphy-%s' % GRAPHY_REV
+GRAPHY_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/'
+    'Graphy/Graphy-%s.tar.gz#md5=390b4f9194d81d0590abac90c8b717e0'
+    % GRAPHY_REV)
+GRAPHY_TAR_ROOT_NAME = 'Graphy-%s' % GRAPHY_REV
+GRAPHY_TARGET_ROOT_NAME = GRAPHY_ROOT_NAME
+
+SIMPLEJSON_REV = '3.7.1'
+SIMPLEJSON_ROOT_NAME = 'simplejson-%s' % SIMPLEJSON_REV
+SIMPLEJSON_TAR_URL = (
+    'https://pypi.python.org/packages/source/s/'
+    'simplejson/simplejson-%s.tar.gz#md5=c76c2d11b87e9fb501bd0b2b72091653'
+    % SIMPLEJSON_REV)
+SIMPLEJSON_TAR_ROOT_NAME = 'simplejson-%s' % SIMPLEJSON_REV
+SIMPLEJSON_TARGET_ROOT_NAME = SIMPLEJSON_ROOT_NAME
 
 download_and_untar_files(
     GAE_MAPREDUCE_TAR_URL, THIRD_PARTY_DIR,
@@ -424,6 +523,15 @@ download_and_untar_files(
 download_and_untar_files(
     GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
     GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
+download_and_untar_files(
+    GAE_PIPELINE_TAR_URL, THIRD_PARTY_DIR,
+    GAE_PIPELINE_TAR_ROOT_NAME, GAE_PIPELINE_TARGET_ROOT_NAME)
+download_and_untar_files(
+    GRAPHY_TAR_URL, THIRD_PARTY_DIR,
+    GRAPHY_TAR_ROOT_NAME, GRAPHY_TARGET_ROOT_NAME)
+download_and_untar_files(
+    SIMPLEJSON_TAR_URL, THIRD_PARTY_DIR,
+    SIMPLEJSON_TAR_ROOT_NAME, SIMPLEJSON_TARGET_ROOT_NAME)
 
 MIDI_JS_REV = '2ef687b47e5f478f1506b47238f3785d9ea8bd25'
 MIDI_JS_ZIP_URL = (

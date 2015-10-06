@@ -1,6 +1,353 @@
 This file contains a summary of changes to the Oppia code base. For a full changelog, please see
 
-    https://code.google.com/p/oppia/source/list
+    https://github.com/oppia/oppia/commits/master
+
+
+v2.0.0 (26 Sep 2015)
+--------------------
+Learner page:
+* Fully redesign the learner view in order to make only one state viewable at a time.
+* Make the feedback popover keyboard-accessible.
+* Add alt tags to the Oppia and user avatars.
+
+Gallery page:
+* Fix #716: allow ratings to have half-star granularity.
+* Fix a bug where the tick marks in the gallery dropdown menus were not aligned with the corresponding rows.
+
+Editor page:
+* Upgrade the rule system to support fuzzy rules.
+* Improve the wording of the tutorial and the default content card.
+* Make the number next to the 'Save Draft' button less prominent.
+* If a user does not have permissions to view an exploration, do not allow them to download it.
+* Fix #865: remove the 'Change Interaction' button from the interaction modal if an interaction is already selected.
+* Fix #762: prevent more than one modal from opening, even if the "Save Draft" button is clicked twice.
+* Fix #937: in the feedback tab, allow a status change (with no accompanying message) to count as a valid update to a feedback thread.
+* In the history tab, fix a display error for text in the 'revert version' modal.
+
+Sitewide frontend changes:
+* Fix links to point to github.com instead of code.google.com.
+* Fix a bug in which the profile dropdown would sometimes not show up on the top right.
+* Fix #917: make the error pages more friendly.
+
+Interactions:
+* Add a new ItemSelectionInput interaction.
+* Redesign the multiple-choice, numeric, text and continue button interactions.
+* Fix #788: in the ImageClickInput interaction, show a more descriptive representation of the learner's answer.
+* Fix #882: in the ImageClickInput interaction, enable labels to be specified.
+* Fix #919: make NumericInput interaction accept percentages.
+* Fix #953: in the TextInput interaction, change 'Number of rows' to 'Height (in rows)'.
+* Fix a typo in the editor warning message for multiple choice interactions with no default outcomes.
+
+Rich-text editor components:
+* Fix tooltips for RTE component insertion buttons.
+* Add an optional MP4 video RTE component.
+
+Security:
+* Specify the filename explicitly in the Content-Disposition header for JSON responses.
+
+Infrastructure:
+* Adjust backend tests to not use datetime.datetime.now(), since it gives different results in different locales.
+* Add a hook for inserting custom HTML before the end of the 'body' tag.
+* Broadcast parameter values to the messengerService for explorationCompleted and stateTransition events.
+* Speed up the recommendations job by making fewer calls to the datastore.
+* Update FontAwesome to version 4.4.0.
+* Add created_on and last_updated fields to reconstituted version snapshots.
+* Use the date when analytics were migrated away from StateCounter as the signal for which state to consider as the initial state for an exploration.
+
+
+v2.0.0.rc.4 (15 Jul 2015)
+-------------------------
+Editor walkthrough page:
+* Add a new walkthrough tutorial which teaches the standard functionality of the editor.
+
+Learner page:
+* Show tiles of recommended explorations for the user to play after they have finished an exploration.
+
+Editor page:
+* Introduce answer groups (called responses) which replace the current rules in the editor.
+* Change the process of creating a new state to use an in-line text field instead of a modal.
+* Change many of the editor headers and button texts to be more conversational and friendly.
+* Rename 'states' to 'cards'.
+* Remove the ability to add varied feedback (only one piece of feedback may be set for a response).
+* Automatically open the Add Response modal after selecting a new interaction type.
+* Change the confirmation of deleting a state to use a modal instead of a browser confirmation dialog.
+* Change the confirmation of deleting an answer group to use a modal instead of a browser confirmation dialog.
+* Change the confirmation of deleting an interaction to use a modal instead of a browser confirmation dialog.
+* Update the 'Add Response' (previously called 'Add Rule') modal to allow saving the rule and adding another without the user having to manually reopen the modal.
+* Increase the width of the editor cards by 140px.
+* Sanitize content in the Rich Text Editor whenever content changes, as long as the rich-text extension customization modal is not open.
+
+Infrastructure:
+* In the exploration backend, introduce an answer group structure which groups together multiple RuleSpecs with a single piece of feedback.
+* In the exploration backend, introduce a 'default outcome' structure to replace the concept of a default rule.
+* Introduce a recommendation system for recommending similar explorations to a user after they have completed an exploration.
+* Fix issue 839: prevent notifications showing up due to automatic migrations.
+* Update the gae-mapreduce library to use Cloud Storage instead of the Files API.
+* Add backend support for fallbacks/triggers, which allow Oppia to react to learner actions that are not just answer submissions.
+* Add an XBlock for embedding Oppia explorations in courses on the OpenEdX platform.
+
+Administration:
+* Add functionality to disable explorations.
+
+Scripts:
+* Update the run_integration_tests.sh script to have arguments for enabling/disabling sharding and setting the number of shards to run.
+
+Emails:
+* Make it possible to send emails to users when they sign up.
+
+Frontend testing:
+* Add frontend unit tests for interaction validators.
+
+Sitewide frontend changes:
+* Fix issue 855: display the correct profile pictures and usernames on profile pages.
+* Add functionality allowing users to set email preferences.
+
+
+v2.0.0.rc.3 (11 Jun 2015)
+-------------------------
+Sitewide frontend changes:
+* Add a new rich-text editor based on textAngular. Deprecate the previous jWysiwyg rich-text editor.
+* Update page titles to list the page name before the site name.
+* Add a link to the home page in the left sidebar.
+
+Splash/gallery page:
+* Change the width of the category input field in the exploration creation modal to 100%.
+* Fix a bug which caused recently-updated explorations to not show higher in the gallery.
+* Ensure that gallery rankings are never negative.
+
+Learner page:
+* Make cards have a width of 95%, so that they show up properly on small screens.
+
+Editor page:
+* Use icons for save/publish buttons in the exploration editor if the window width is small.
+* Rename the 'Add Interaction' button to 'Add Interaction / End Conversation'.
+* Fix a grammatical error in some rule warning messages.
+* Amend the "path to end state" error message to reflect the fact that there is no longer an explicit END state.
+* Increase the line spacing in the customization dialogs for both interactions and RTE extensions.
+* Arrange state names in the rule destination selector in the order that they appear in the state graph.
+* Reset float input fields when the rule containing them is changed.
+* Fix issue 764: do not show unhandled answers for the Continue interaction.
+* Fix preformatting text having inconsistent wrapping in the popup dialog for long unhandled answers.
+* In the editor settings tab, use a category dropdown similar to the modal in the gallery page.
+* In the history tab, use grids to display the commit history, and display the commit time in localized format.
+* Fix issue 789: in the feedback tab, clear the input field after a new message is submitted.
+
+'My Explorations' page:
+* Include published exploration that subsequently become community-owned.
+* Fix issue 724: add a realtime model for feedback analytics.
+
+Rich-text editor components:
+* Prevent recursive nesting of the 'collapsible' and 'tabs' RTE extensions.
+* Image: allow alt text to be specified.
+
+Interactions:
+* EndExploration: do not show a blank card in iframed mode (issue 804).
+* ImageClickInput: center the image and make it look clickable.
+* NumericInput: fix a bug where 0 was not accepted as an answer.
+* InteractiveMap: use a map (instead of latitude/longitude fields) to specify rule location.
+* SetInput: fix set input display not showing up in the rule editor, and add a warning for duplicates.
+
+Infrastructure:
+* Implement a generic exploration migration system.
+* In the exploration backend, remove the pseudo END state and add a placeholder field for state triggers.
+* Upgrade the version of the Google App Engine development SDK to v1.9.19.
+* Upgrade the version of ui-bootstrap to v0.13.0.
+* Amend the deployment script to support deployment to App Engine instances within a particular domain.
+* Add a storage model for completion events, and record completion events in this model instead of the one for MaybeLeave events. Add a migration job to migrate existing completion events from MaybeLeave to the new model.
+
+Analytics:
+* Fix some errors in the StatisticsAggregator computation.
+
+Integrations:
+* Fix issue 167: Add instructions and an XML file to support embedding of explorations in Google Sites pages.
+
+Demo explorations:
+* Update the schema versions for the demo explorations.
+
+Security:
+* Add a layer of HTML cleansing before loading an exploration.
+
+
+v2.0.0.rc.2 (24 Apr 2015)
+-------------------------
+Splash/gallery page:
+* Add a video to the interstitial section.
+* Fix reddish-looking placeholder text in the search input field.
+* Fix an error in search which caused unnecessary errors to be logged.
+* Fix an error where the search cursor was not being overwritten correctly after fetching results.
+
+Learner page:
+* Add the ability for logged-in users to submit ratings at the end of an exploration. The average rating will display in the gallery after at least 5 ratings have been submitted.
+* Adjust the loading time for cards to take the server RPC call into account, in order to reduce the effect of network latency on the end user.
+* Provide options for sharing explorations on Facebook and Twitter.
+* Change the feedback submission modal into a more lightweight popover.
+* Redesign the "embed exploration" modal to include instructions for iframing explorations in a container that does not support adding JavaScript or custom tags.
+* Show the same congratulatory text when the learner completes an exploration via a state with a terminal interaction (as opposed to the END state).
+
+Editor page:
+* Simplify the content + interaction flow: remove unnecessary default content for the initial state and use a redesigned modal for interaction selection.
+* Allow tags to be specified for an exploration.
+* In the exploration graph visualization, add links from states with a terminal interaction to the END state, and change the layout algorithm, colors, text positioning, and node heights.
+* Add checks for errors related to using parameters wrongly.
+* Add CSS transitions to numerous elements.
+* Prevent publishing an exploration to the gallery if it contains warnings or errors.
+* Update the list of warnings when the exploration objective is changed.
+* Fix a bug where the 'publish changes' button reverted to 'save draft' when an exploration was featured.
+* Remove the duplicate user response in the rule preview, since it's already in the header.
+* Show a string instead of a dropdown for rule parameter selectors with a single choice.
+* Add some space between the various segments that make up the rule description.
+* In non-edit mode, suppress the sort handles on the rules.
+* Use a more appropriate rule description for the 'Continue Button' interaction.
+* Make the currently-selected rule stand out more.
+* Allow pressing the 'enter' key in the 'add new state' modal to submit the form.
+
+Sitewide frontend changes:
+* Change the body font size to 1.6em.
+* Add social media chiclets to the sidebar.
+
+Other pages:
+* Updates page: rename this page to 'Notifications'.
+* My Explorations page: show total and unresolved feedback thread counts (issue 632).
+* Updates and Preferences pages: fix a bug where the header subtext was aligned too far too the left on narrow screens.
+* Signup page: show the user's email, and remove the "sign in" navbar tab.
+* About page: improve the text, move the 'contact' and 'license' sections upwards, and fix a missing link.
+* Participation Playbook page: simplify the structure..
+* Forum page: show the 'category' view instead, and make the forum taller and responsive to the page width.
+* Admin page: add admin customization options for the embedded forum URL, the videos for the splash and About pages, the sidebar icons, and the different sharing options to be shown in the learner view.
+
+Interactions
+* Shorten the descriptions for many interaction customization options.
+* EndConversation: add some space above the 'return to gallery' button.
+
+Analytics
+* Fix a bug in the logic for checking null versions in the stats aggregator MapReduce job.
+* Ensure that a leave event is recorded when any terminal state is hit (issue 703).
+
+Infrastructure and tests
+* Simplify the Windows installation process: do not run chown or chmod.
+* In development mode, show a 'Development Mode' indicator in the bottom right (issue 83).
+* Add functionality for running deferred jobs with parameters.
+* In the integration test script, clarify the messaging about screenshots.
+* Create a GLOBALS file to be included before all Karma tests.
+* Add an integration test for the tutorial in the exploration editor.
+
+Demo explorations
+* Add an image credit to the "Solar System" exploration.
+
+
+v2.0.0.rc.1 (5 Mar 2015)
+------------------------
+Frontend (general):
+* Add a sidebar to all pages as a primary navigation mechanism.
+* Restyle top navbar as an area for breadcrumbs and secondary navigation, and to be more responsive.
+* Revamp the general color scheme.
+* Use Material Design elements, e.g. cards.
+* Add avatars representing Oppia and the user.
+* Remove the footer, and make the licensing text less obtrusive.
+* Combine the Splash and Gallery pages into a single page.
+* Make it explicit that users are signing into Oppia with G+.
+* Use a user icon instead of username in the top-right corner.
+* Split the Dashboard page into two different pages: My Explorations and Updates.
+* Split the About page into two different pages: About and Participation Playbook.
+* Remove the noscript tag so that the G+ crawler can generate the correct snippet.
+* Allow clicking outside a modal to dismiss it.
+
+Splash/gallery page:
+* Add paged searching and infinite scrolling functionality.
+* Add a carousel.
+* Add thumbnail images to exploration cards in the gallery.
+* Add basic ranking functionality.
+
+Learner page:
+* Add an introductory card with the thumbnail image.
+* Show the 'edit' button in the navbar only for users who have exploration editing rights.
+* Add a feedback menu to the top right of each card in the learner view.
+* Add 'share on G+' functionality.
+* Make the scrolling behavior more gentle.
+* Set focus on the learner input field on its appearance, when appropriate.
+* Show the learner's answer immediately after they submit it.
+
+Editor page:
+* Update the tutorial.
+* Move the 'create new state' functionality into the rule destination dropdown.
+* Move the 'unresolved answers' section to the bottom of the page, below the rules.
+* Move state parameter changes to the right column.
+* Require the user to explicitly select an interaction for each state.
+* Hide the default rule if it has not yet been set.
+* Make the interaction selection menu into a two-tier dropdown.
+* Make the arrows in the state graph a bit thinner.
+* Change the colors of the graph nodes.
+* Add validation for rules and interaction customizations.
+* When the user changes the currently-active state, apply fading-out/fading-in to the state cards to make the transition less abrupt.
+
+About page:
+* Update the text.
+* Remove tabs, and add a menu on the right.
+
+Profile page:
+* Allow users to choose a preferred language for explorations shown in the gallery.
+* Allow users to upload a profile picture and to add a bio.
+
+Sign-in flow:
+* Redirect to sign-in flow if the user is logged in but has not chosen a username.
+* Allow users to leave the sign-in page midway through sign-in, logging them out if they do so.
+* Fix issue 136: logging out of Oppia no longer logs you out of all Google accounts.
+
+Admin page:
+* Remove unneeded config properties.
+* Add config properties for the splash page carousel and for additional links in the sidebar menu.
+* Add functionality for clearing the search index.
+
+Interactions:
+* Deprecate the 'reuse this interaction' setting in the editor. This is now determined by the individual widget's display mode ('inline' or 'supplemental').
+* Load interactions concurrently with the base page.
+* Rename 'interactive widgets' to 'interactions'.
+* Add new interactions: EndExploration, ImageClickInput.
+* CodeRepl: fix a bug where the error message was being overwritten; update UI to use Material Design.
+* Continue: update UI to use Material Design.
+* GraphInput: restrict the drawable region, and remove the large left margin in the response area.
+* InteractiveMap: use spherical distance formula for calculating map distances (issue 487).
+* InteractiveMap: fix display of rule descriptions.
+* LogicProof: add new excluded middle rule.
+* MusicNotesInput: rearrange buttons to make the interaction more intuitive.
+* NumericInput: update UI to use Material Design.
+* TextInput: update UI to use Material Design.
+
+RTE extensions:
+* Rename 'noninteractive widgets' to 'RTE extensions'.
+* Load RTE extensions concurrently with the base page.
+* Image: add drag-and-drop upload functionality.
+* Link: allow text to be specified that is different from the link URL.
+* Video: do not show related videos at the end.
+
+Forms:
+* Make the list, int and nonnegative-int editors use schema-based forms.
+* Restyle the 'list of strings editor', and hide the 'Add Element' button when the user is editing a field.
+* Improve error messages for float input.
+* Make the float editors display inline.
+* Fix issue 488: do not show a warning for float input when the input field is still in focus.
+
+Infrastructure:
+* Deprecate intro.js dependency.
+* Add new dependencies: material-design-icons, ngImgCrop, ng-joyride.
+* Upgrade angular version to 1.3.13 to fix a bug in ngAnimate.
+* Fix an error in the encoding of filenames when an exploration is downloaded as a zip file.
+* Use curl instead of wget, to make the installation process easier for Mac users.
+* Add a flag in the start.sh script to save existing contents of the datastore.
+* Fix broken installation of webtest.
+* Make paths to third-party python libraries work on Windows.
+* Limit backend test parallelization to a maximum batch size of 24.
+* Update the deployment script to include splash and sidebar folders.
+* Add an experimental_deploy script that does not run tests and should only be used for experimental purposes.
+
+Protractor tests:
+* Add protractor tests for the history tab.
+* Add a utility function for scrolling to elements on the page that are not currently in view.
+* Switch protractor utilities to use classes prefixed by 'protractor-test-', where possible.
+* Add functionality to display screenshots from failed tests.
+
+Demo explorations:
+* Add the following demo explorations: 'About Oppia', 'The Solar System' and 'Protractor Test'.
 
 
 v1.2.12 (13 Dec 2014)
