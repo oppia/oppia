@@ -18,7 +18,8 @@
 
 Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
-should therefore be independent of the specific storage models used."""
+should therefore be independent of the specific storage models used.
+"""
 
 __author__ = 'Sean Lip'
 
@@ -1116,7 +1117,7 @@ class Exploration(object):
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
-    def create_exploration_from_dict(
+    def from_dict(
             cls, exploration_dict,
             exploration_version=0, exploration_created_on=None,
             exploration_last_updated=None):
@@ -1208,37 +1209,8 @@ class Exploration(object):
         return exploration
 
     @classmethod
-    def _require_valid_name(cls, name, name_type):
-        """Generic name validation.
-
-        Args:
-          name: the name to validate.
-          name_type: a human-readable string, like 'the exploration title' or
-            'a state name'. This will be shown in error messages.
-        """
-        # This check is needed because state names are used in URLs and as ids
-        # for statistics, so the name length should be bounded above.
-        if len(name) > 50 or len(name) < 1:
-            raise utils.ValidationError(
-                'The length of %s should be between 1 and 50 '
-                'characters; received %s' % (name_type, name))
-
-        if name[0] in string.whitespace or name[-1] in string.whitespace:
-            raise utils.ValidationError(
-                'Names should not start or end with whitespace.')
-
-        if re.search('\s\s+', name):
-            raise utils.ValidationError(
-                'Adjacent whitespace in %s should be collapsed.' % name_type)
-
-        for c in feconf.INVALID_NAME_CHARS:
-            if c in name:
-                raise utils.ValidationError(
-                    'Invalid character %s in %s: %s' % (c, name_type, name))
-
-    @classmethod
     def _require_valid_state_name(cls, name):
-        cls._require_valid_name(name, 'a state name')
+        utils.require_valid_name(name, 'a state name')
 
     def validate(self, strict=False):
         """Validates the exploration before it is committed to storage.
@@ -1248,13 +1220,13 @@ class Exploration(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        self._require_valid_name(self.title, 'the exploration title')
+        utils.require_valid_name(self.title, 'the exploration title')
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        self._require_valid_name(self.category, 'the exploration category')
+        utils.require_valid_name(self.category, 'the exploration category')
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(
@@ -1878,8 +1850,8 @@ class Exploration(object):
     @classmethod
     def _convert_states_v5_dict_to_v6_dict(cls, states_dict):
         """Converts from version 5 to 6. Version 6 introduces a list of
-        confirmed unclassified answers. Those are answers which are confirmed to
-        be associated with the default outcome during classification.
+        confirmed unclassified answers. Those are answers which are confirmed
+        to be associated with the default outcome during classification.
         """
         for (state_name, sdict) in states_dict.iteritems():
             interaction = sdict['interaction']
@@ -1970,7 +1942,8 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 9
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 10
+    LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION = 9
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -2094,8 +2067,16 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def from_yaml(cls, exploration_id, title, category, yaml_content):
-        """Creates and returns exploration from a YAML text string."""
+    def _convert_v9_dict_to_v10_dict(cls, exploration_dict, title, category):
+        """Converts a v9 exploration dict into a v10 exploration dict."""
+        exploration_dict['schema_version'] = 10
+        exploration_dict['title'] = title
+        exploration_dict['category'] = category
+        return exploration_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(cls, yaml_content, title=None,
+            category=None):
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -2105,6 +2086,7 @@ class Exploration(object):
                 % e)
 
         exploration_schema_version = exploration_dict.get('schema_version')
+        initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
         if not (1 <= exploration_schema_version
@@ -2152,21 +2134,59 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 9
 
-        exploration_dict['id'] = exploration_id
-        exploration_dict['title'] = title
-        exploration_dict['category'] = category
+        if exploration_schema_version == 9:
+            exploration_dict = cls._convert_v9_dict_to_v10_dict(
+                exploration_dict, title, category)
+            exploration_schema_version = 10
 
-        return Exploration.create_exploration_from_dict(exploration_dict)
+        return (exploration_dict, initial_schema_version)
+
+    @classmethod
+    def from_yaml(cls, exploration_id, yaml_content):
+        """Creates and returns exploration from a YAML text string for YAML
+        schema versions 10 and later.
+        """
+        migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
+        exploration_dict = migration_result[0]
+        initital_schema_version = migration_result[1]
+
+        if (initital_schema_version <=
+                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+            raise Exception(
+                'Expecting a title and category to be provided for an '
+                'exploration encoded in the YAML version: %d' % (
+                    exploration_dict['schema_version']))
+
+        exploration_dict['id'] = exploration_id
+        return Exploration.from_dict(exploration_dict)
+
+    @classmethod
+    def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
+        """Creates and returns exploration from a YAML text string. This is
+        for importing explorations using YAML schema version 9 or earlier.
+        """
+        migration_result = cls._migrate_to_latest_yaml_version(
+            yaml_content, title, category)
+        exploration_dict = migration_result[0]
+        initital_schema_version = migration_result[1]
+
+        if (initital_schema_version >
+                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+            raise Exception(
+                'No title or category need to be provided for an exploration '
+                'encoded in the YAML version: %d' % (
+                    exploration_dict['schema_version']))
+
+        exploration_dict['id'] = exploration_id
+        return Exploration.from_dict(exploration_dict)
 
     def to_yaml(self):
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXPLORATION_SCHEMA_VERSION
 
-        # Remove elements from the exploration dictionary that should not be
-        # saved within the YAML representation.
+        # The ID is the only property which should not be stored within the
+        # YAML representation.
         del exp_dict['id']
-        del exp_dict['title']
-        del exp_dict['category']
 
         return utils.yaml_from_dict(exp_dict)
 

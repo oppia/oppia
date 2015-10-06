@@ -36,6 +36,7 @@ else:
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
+SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
@@ -57,6 +58,12 @@ DEFAULT_QUERY_LIMIT = 1000
 # this version number must be changed and the exploration migration job
 # executed.
 CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 6
+
+# The current version of the all collection blob schemas (such as the nodes
+# structure within the Collection domain object). If any backward-incompatible
+# changes are made to any of the blob schemas in the data store, this version
+# number must be changed.
+CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
@@ -264,6 +271,10 @@ DEMO_EXPLORATIONS = [
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
+DEMO_COLLECTIONS = [
+    'welcome_to_collections.yaml'
+]
+
 # TODO(sll): Add all other URLs here.
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
@@ -302,6 +313,8 @@ EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
 EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
+EVENT_TYPE_COLLECTION_CHANGE = 'collection_change'
+EVENT_TYPE_COLLECTION_STATUS_CHANGE = 'collection_status_change'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 # The values for these event types should be left as-is for backwards
@@ -310,12 +323,17 @@ EVENT_TYPE_START_EXPLORATION = 'start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
+ACTIVITY_STATUS_PRIVATE = 'private'
+ACTIVITY_STATUS_PUBLIC = 'public'
+ACTIVITY_STATUS_PUBLICIZED = 'publicized'
+
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
+COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
@@ -329,6 +347,7 @@ OUTPUT_FORMAT_ZIP = 'zip'
 
 # Types of updates shown in the 'recent updates' table in the dashboard page.
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
+UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # Default color

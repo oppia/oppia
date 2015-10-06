@@ -388,12 +388,12 @@ class BaseHandler(webapp2.RequestHandler):
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
-            'EXPLORATION_STATUS_PRIVATE': (
-                rights_manager.EXPLORATION_STATUS_PRIVATE),
-            'EXPLORATION_STATUS_PUBLIC': (
-                rights_manager.EXPLORATION_STATUS_PUBLIC),
-            'EXPLORATION_STATUS_PUBLICIZED': (
-                rights_manager.EXPLORATION_STATUS_PUBLICIZED),
+            'ACTIVITY_STATUS_PRIVATE': (
+                rights_manager.ACTIVITY_STATUS_PRIVATE),
+            'ACTIVITY_STATUS_PUBLIC': (
+                rights_manager.ACTIVITY_STATUS_PUBLIC),
+            'ACTIVITY_STATUS_PUBLICIZED': (
+                rights_manager.ACTIVITY_STATUS_PUBLICIZED),
             'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as

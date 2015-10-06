@@ -349,13 +349,13 @@ oppia.factory('explorationRightsService', [
       return this._clonedFrom;
     },
     isPrivate: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE;
+      return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
     },
     isPublic: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC;
+      return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
     },
     isPublicized: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED;
+      return this._status === GLOBALS.ACTIVITY_STATUS_PUBLICIZED;
     },
     isCloned: function() {
       return Boolean(this._clonedFrom);

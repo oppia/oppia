@@ -47,7 +47,7 @@ import utils
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-#Name for the exploration search index
+# Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
 
@@ -270,7 +270,8 @@ def get_new_exploration_id():
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user may edit an exploration by checking
-    the given domain object."""
+    the given domain object.
+    """
     return user_id is not None and (
         user_id in exp_summary.editor_ids
         or user_id in exp_summary.owner_ids
@@ -306,7 +307,8 @@ def get_exploration_titles_and_categories(exp_ids):
 
 def _get_exploration_summary_dicts_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
-    corresponding exploration summary domain objects, keyed by id."""
+    corresponding exploration summary domain objects, keyed by id.
+    """
     exploration_summaries = [
         get_exploration_summary_from_model(exp_summary_model)
         for exp_summary_model in exp_summary_models]
@@ -375,37 +377,18 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
 
 def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id."""
+    keyed by their id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
 
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
-    keyed by their id."""
+    keyed by their id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_all())
-
-
-def get_private_at_least_viewable_exploration_summaries(user_id):
-    """Returns a dict with all exploration summary domain objects that are
-    at least viewable by given user. The dict is keyed by exploration id."""
-    return _get_exploration_summary_dicts_from_models(
-        exp_models.ExpSummaryModel.get_private_at_least_viewable(
-            user_id=user_id))
-
-
-def get_at_least_editable_exploration_summaries(user_id):
-    """Returns a dict with all exploration summary domain objects that are
-    at least editable by given user. The dict is keyed by exploration id."""
-    return _get_exploration_summary_dicts_from_models(
-        exp_models.ExpSummaryModel.get_at_least_editable(
-            user_id=user_id))
-
-
-def count_explorations():
-    """Returns the total number of explorations."""
-    return exp_models.ExplorationModel.get_exploration_count()
 
 
 # Methods for exporting states and explorations to other formats.
@@ -525,9 +508,10 @@ def apply_change_list(exploration_id, change_list):
             elif (change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
-                # Eploration domain object automatically converts it to use the
-                # latest states schema version. As a result, simply resaving the
-                # exploration is sufficient to apply the states schema update.
+                # Exploration domain object automatically converts it to use
+                # the latest states schema version. As a result, simply
+                # resaving the exploration is sufficient to apply the states
+                # schema update.
                 continue
         return exploration
 
@@ -679,8 +663,7 @@ def get_summary_of_change_list(base_exploration, change_list):
     }
 
 
-def _save_exploration(
-        committer_id, exploration, commit_message, change_list):
+def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
     If successful, increments the version number of the incoming exploration
@@ -689,7 +672,7 @@ def _save_exploration(
     if change_list is None:
         change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -729,8 +712,7 @@ def _save_exploration(
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
 
-    exploration_model.commit(
-        committer_id, commit_message, change_list)
+    exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     index_explorations_given_ids([exploration.id])
@@ -885,7 +867,7 @@ def update_exploration_summary(exploration_id):
 
 
 def get_summary_of_exploration(exploration):
-    """Create ExplorationSummary domain object for a given Exploration
+    """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
@@ -912,9 +894,9 @@ def get_summary_of_exploration(exploration):
 
 
 def save_exploration_summary(exp_summary):
-    """Save exploration summary domain object as ExpSummaryModel
-    entity in datastore."""
-
+    """Save an exploration summary domain object as an ExpSummaryModel entity
+    in the datastore.
+    """
     exp_summary_model = exp_models.ExpSummaryModel(
         id=exp_summary.id,
         title=exp_summary.title,
@@ -966,7 +948,7 @@ def revert_exploration(
     exploration = get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -1009,7 +991,7 @@ def save_new_exploration_from_yaml_and_assets(
     if assets_list is None:
         assets_list = []
 
-    exploration = exp_domain.Exploration.from_yaml(
+    exploration = exp_domain.Exploration.from_untitled_yaml(
         exploration_id, title, category, yaml_content)
     commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -1065,9 +1047,6 @@ def load_demo(exploration_id):
         exploration_id, assets_list)
 
     rights_manager.publish_exploration(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
-    # Release ownership of all explorations.
-    rights_manager.release_ownership(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])
@@ -1126,14 +1105,14 @@ def get_next_page_of_all_non_private_commits(
 def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     doc = {}
-    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
         doc['is'] = 'featured'
     return doc
 
 
 def _should_index(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
-    return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
+    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
 def _get_search_rank(exp_id):
@@ -1154,7 +1133,7 @@ def _get_search_rank(exp_id):
     summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
+        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
     if summary.ratings:
@@ -1223,8 +1202,8 @@ def index_explorations_given_ids(exp_ids):
 
 def patch_exploration_search_document(exp_id, update):
     """Patches an exploration's current search document, with the values
-    from the 'update' dictionary."""
-
+    from the 'update' dictionary.
+    """
     doc = search_services.get_document_from_index(
         exp_id, SEARCH_INDEX_EXPLORATIONS)
     doc.update(update)
@@ -1233,7 +1212,7 @@ def patch_exploration_search_document(exp_id, update):
 
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(

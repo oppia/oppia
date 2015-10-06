@@ -259,9 +259,9 @@ describe('Exploration rights service', function() {
     beforeEach(inject(function($injector) {
       ers = $injector.get('explorationRightsService');
 
-      GLOBALS.EXPLORATION_STATUS_PRIVATE = 'private';
-      GLOBALS.EXPLORATION_STATUS_PUBLIC = 'public';
-      GLOBALS.EXPLORATION_STATUS_PUBLICIZED = 'publicized';
+      GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
+      GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';
+      GLOBALS.ACTIVITY_STATUS_PUBLICIZED = 'publicized';
     }));
 
     it('correctly initializes the service', function() {

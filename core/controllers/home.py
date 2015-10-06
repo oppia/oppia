@@ -129,7 +129,7 @@ class MyExplorationsHandler(base.BaseHandler):
 
         subscribed_summaries = (
             exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_activity_ids_subscribed_to(
+                subscription_services.get_exploration_ids_subscribed_to(
                     self.user_id)))
 
         def _get_intro_card_color(category):

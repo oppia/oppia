@@ -255,9 +255,9 @@ def get_item_similarity(
 
     similarity_score = 0
 
-    if (compared_exp_status == rights_manager.EXPLORATION_STATUS_PRIVATE):
+    if (compared_exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE):
         return 0
-    elif (compared_exp_status == rights_manager.EXPLORATION_STATUS_PUBLICIZED):
+    elif (compared_exp_status == rights_manager.ACTIVITY_STATUS_PUBLICIZED):
         similarity_score += 1
 
     similarity_score += get_topic_similarity(

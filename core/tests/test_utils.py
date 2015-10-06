@@ -25,6 +25,8 @@ import unittest
 import webtest
 
 from core.controllers import reader
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -86,6 +88,7 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+    DEFAULT_END_STATE_NAME = 'End'
 
     VERSION_0_STATES_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: {
@@ -295,8 +298,8 @@ class TestBase(unittest.TestCase):
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
 
-    def save_new_default_exploration(self,
-            exploration_id, owner_id, title='A title'):
+    def save_new_default_exploration(
+            self, exploration_id, owner_id, title='A title'):
         """Saves a new default exploration written by owner_id.
 
         Returns the exploration domain object.
@@ -309,13 +312,14 @@ class TestBase(unittest.TestCase):
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE,
             end_state_name=None):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category)
+            exploration_id, title, category, language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
         exploration.objective = objective
@@ -373,6 +377,33 @@ class TestBase(unittest.TestCase):
             'title': 'title',
             'category': 'category',
         }])
+
+    def save_new_default_collection(
+            self, collection_id, owner_id, title='A title',
+            category='A category', objective='An objective'):
+        """Saves a new default collection written by owner_id.
+
+        Returns the collection domain object.
+        """
+        collection = collection_domain.Collection.create_default_collection(
+            collection_id, title, category, objective)
+        collection_services.save_new_collection(owner_id, collection)
+        return collection
+
+    def save_new_valid_collection(
+            self, collection_id, owner_id, title='A title',
+            category='A category', objective='An objective',
+            exploration_id='an_exploration_id',
+            end_state_name=DEFAULT_END_STATE_NAME):
+        collection = collection_domain.Collection.create_default_collection(
+            collection_id, title, category, objective=objective)
+        collection.add_node(
+            self.save_new_valid_exploration(
+                exploration_id, owner_id, title, category, objective,
+                end_state_name=end_state_name).id)
+
+        collection_services.save_new_collection(owner_id, collection)
+        return collection
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
@@ -581,8 +612,9 @@ else:
 
 class FunctionWrapper(object):
     """A utility for making function wrappers. Create a subclass and override
-       any or both of the pre_call_hook and post_call_hook methods. See these
-       methods for more info."""
+    any or both of the pre_call_hook and post_call_hook methods. See these
+    methods for more info.
+    """
 
     def __init__(self, f):
         """Creates a new FunctionWrapper instance.
@@ -625,12 +657,14 @@ class FunctionWrapper(object):
 
 class CallCounter(FunctionWrapper):
     """A function wrapper that keeps track of how often the function is called.
-       Note that the counter is incremented before each call, so it is also
-       increased when the function raises an exception."""
+    Note that the counter is incremented before each call, so it is also
+    increased when the function raises an exception.
+    """
 
     def __init__(self, f):
         """Counts the number of times the given function has been called.
-           See FunctionWrapper for arguments."""
+        See FunctionWrapper for arguments.
+        """
         super(CallCounter, self).__init__(f)
         self._times_called = 0
 
