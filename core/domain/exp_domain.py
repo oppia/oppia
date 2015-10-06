@@ -205,7 +205,7 @@ class ExplorationChange(object):
         - 'delete_state' (with state_name)
         - 'edit_state_property' (with state_name, property_name, new_value and,
             optionally, old_value)
-        - 'add_gadget' (with gadget_dict and panel_name)
+        - 'add_gadget' (with gadget_dict and panel)
         - 'rename_gadget' (with old_gadget_name and new_gadget_name)
         - 'delete_gadget' (with gadget_name)
         - 'edit_gadget_property' (with gadget_name, property_name, new_value,
@@ -246,7 +246,7 @@ class ExplorationChange(object):
         elif self.cmd == CMD_ADD_GADGET:
             self.gadget_dict = change_dict['gadget_dict']
             self.gadget_name = change_dict['gadget_dict']['gadget_name']
-            self.panel_name = change_dict['panel_name']
+            self.panel = change_dict['panel']
         elif self.cmd == CMD_RENAME_GADGET:
             self.old_gadget_name = change_dict['old_gadget_name']
             self.new_gadget_name = change_dict['new_gadget_name']
@@ -764,6 +764,7 @@ class GadgetInstance(object):
         self.type = gadget_type
 
         # Author-facing unique name to distinguish instances in the Editor UI.
+        # Gadgets may use this name as a title in learner facing UI as well.
         self.name = gadget_name
 
         # List of State name strings where this Gadget is visible.
@@ -837,7 +838,7 @@ class GadgetInstance(object):
         if self.visible_in_states == []:
             raise utils.ValidationError(
                 '%s gadget not visible in any states.' % (
-                    self.gadget.name))
+                    self.name))
 
         # Validate state name visibility isn't repeated within each gadget.
         if len(self.visible_in_states) != len(set(self.visible_in_states)):
@@ -904,7 +905,7 @@ class SkinInstance(object):
         gadget panels for each panel specified in the skin.
         """
         self.skin_id = skin_id
-        # panel_contents_dict has gadget_panel_name strings as keys and
+        # panel_contents_dict has panel strings as keys and
         # lists of GadgetInstance instances as values.
         self.panel_contents_dict = {}
 
@@ -918,15 +919,15 @@ class SkinInstance(object):
 
         # Populate panel_contents_dict with default skin customizations
         # if they are not specified in skin_customizations.
-        for panel_name in default_skin_customizations['panels_contents']:
-            if panel_name not in skin_customizations['panels_contents']:
-                self.panel_contents_dict[panel_name] = []
+        for panel in default_skin_customizations['panels_contents']:
+            if panel not in skin_customizations['panels_contents']:
+                self.panel_contents_dict[panel] = []
             else:
-                self.panel_contents_dict[panel_name] = [GadgetInstance(
+                self.panel_contents_dict[panel] = [GadgetInstance(
                     gdict['gadget_type'], gdict['gadget_name'],
                     gdict['visible_in_states'], gdict['customization_args'])
                 for gdict in
-                skin_customizations['panels_contents'][panel_name]]
+                skin_customizations['panels_contents'][panel]]
 
     @property
     def skin(self):
@@ -938,7 +939,7 @@ class SkinInstance(object):
         """Generates default skin customizations when none are specified."""
         skin = skins_services.Registry.get_skin_by_id(skin_id)
         panels_contents = {
-            panel_name: [] for panel_name in skin.panels_properties
+            panel: [] for panel in skin.panels_properties
         }
         return {'panels_contents': panels_contents}
 
@@ -949,18 +950,18 @@ class SkinInstance(object):
         # A list to validate each gadget_instance.name is unique.
         gadget_instance_names = []
 
-        for panel_name, gadget_instances in (
+        for panel, gadget_instances in (
                 self.panel_contents_dict.iteritems()):
 
             # Validate existence of panels in the skin.
-            if not panel_name in self.skin.panels_properties:
+            if not panel in self.skin.panels_properties:
                 raise utils.ValidationError(
                     '%s panel not found in skin %s' % (
-                        panel_name, self.skin_id)
+                        panel, self.skin_id)
                 )
 
             # Validate gadgets fit each skin panel.
-            self.skin.validate_panel(panel_name, gadget_instances)
+            self.skin.validate_panel(panel, gadget_instances)
 
             # Validate gadget internal attributes.
             for gadget_instance in gadget_instances:
@@ -978,10 +979,10 @@ class SkinInstance(object):
             'skin_id': self.skin_id,
             'skin_customizations': {
                 'panels_contents': {
-                    panel_name: [
+                    panel: [
                         gadget_instance.to_dict() for gadget_instance
                         in instances_list]
-                    for panel_name, instances_list in
+                    for panel, instances_list in
                     self.panel_contents_dict.iteritems()
                 },
             }
@@ -1805,14 +1806,14 @@ class Exploration(object):
         del self.states[state_name]
 
     # Methods relating to gadgets.
-    def add_gadget(self, gadget_dict, panel_name):
+    def add_gadget(self, gadget_dict, panel):
         """Adds a gadget to the associated panel."""
         gadget_instance = GadgetInstance(
             gadget_dict['gadget_type'], gadget_dict['gadget_name'],
             gadget_dict['visible_in_states'],
             gadget_dict['customization_args'])
 
-        self.skin_instance.panel_contents_dict[panel_name].append(
+        self.skin_instance.panel_contents_dict[panel].append(
             gadget_instance)
 
     def rename_gadget(self, old_gadget_name, new_gadget_name):
@@ -1836,15 +1837,15 @@ class Exploration(object):
         if gadget_name not in self.get_all_gadget_names():
             raise ValueError('Gadget %s does not exist.' % gadget_name)
 
-        panel_name = self._get_panel_name_for_gadget(gadget_name)
+        panel = self._get_panel_for_gadget(gadget_name)
         gadget_index = None
         for index in range(len(
-                self.skin_instance.panel_contents_dict[panel_name])):
+                self.skin_instance.panel_contents_dict[panel])):
             if self.skin_instance.panel_contents_dict[
-                    panel_name][index].name == gadget_name:
+                    panel][index].name == gadget_name:
                 gadget_index = index
                 break
-        del self.skin_instance.panel_contents_dict[panel_name][gadget_index]
+        del self.skin_instance.panel_contents_dict[panel][gadget_index]
 
     def get_gadget_instance_by_name(self, gadget_name):
         """Returns the GadgetInstance with the given name."""
@@ -1864,13 +1865,13 @@ class Exploration(object):
                 gadget_names.add(gadget_instance.name)
         return sorted(gadget_names)
 
-    def _get_panel_name_for_gadget(self, gadget_name):
+    def _get_panel_for_gadget(self, gadget_name):
         """Returns the panel name for the given GadgetInstance."""
-        for panel_name, gadget_instances in (
+        for panel, gadget_instances in (
                 self.skin_instance.panel_contents_dict.iteritems()):
             for gadget_instance in gadget_instances:
                 if gadget_instance.name == gadget_name:
-                    return panel_name
+                    return panel
         raise ValueError('Gadget %s does not exist.' % gadget_name)
 
     def _update_gadget_visibilities_for_renamed_state(

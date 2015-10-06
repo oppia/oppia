@@ -32,8 +32,6 @@ oppia.directive('oppiaGadgetTestGadget', [
       restrict: 'E',
       templateUrl: 'gadget/TestGadget',
       controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
-        $scope.testGadgetTitle = oppiaHtmlEscaper.escapedJsonToObj(
-        	$attrs.titleWithValue);
         $scope.testGadgetAdviceResources = oppiaHtmlEscaper.escapedJsonToObj(
         	$attrs.adviceObjectsWithValue);
 

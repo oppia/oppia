@@ -28,13 +28,10 @@ oppia.directive('oppiaGadgetScoreBar', [
       templateUrl: 'gadget/ScoreBar',
       controller: ['$scope', '$attrs', function ($scope, $attrs) {
 
+        $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj($attrs.gadgetName);
         $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj($attrs.maxValueWithValue);
-        $scope.scoreBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj($attrs.paramNameWithValue);
 
-        // TODO(anuzis): Refactor to return a default value or show a static
-        // image in the Editor view where learnerParamsService does not yet
-        // have parameters initialized.
         $scope.getScoreValue = function() {
           return learnerParamsService.getValue($scope.scoreBarParamName);
         };

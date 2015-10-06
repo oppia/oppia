@@ -340,13 +340,12 @@ oppia.factory('changeListService', [
      * is correctly formed
      *
      * @param {object} gadgetData The dict containing new gadget information.
-     * @param {string} panelName The panel where the gadget is being added.
      */
-    addGadget: function(gadgetData, panelName) {
+    addGadget: function(gadgetData) {
       this._addChange({
         cmd: CMD_ADD_GADGET,
         gadget_dict: gadgetData,
-        panel_name: panelName
+        panel: gadgetData.panel
       });
     },
     /**
@@ -971,10 +970,10 @@ oppia.factory('stateCustomizationArgsService', [
 oppia.factory('explorationGadgetsService', [
     '$log', '$modal', '$filter', '$location', '$rootScope',
     'changeListService', 'editorContextService', 'warningsData',
-    'gadgetValidationService',
+    'gadgetValidationService', 'GADGET_SPECS',
     function($log, $modal, $filter, $location, $rootScope,
              changeListService, editorContextService, warningsData,
-             gadgetValidationService) {
+             gadgetValidationService, GADGET_SPECS) {
   // _gadgets is a JS object with gadget_instance.name strings as keys
   // and each gadget_instance's data as values.
   var _gadgets = null;
@@ -984,19 +983,19 @@ oppia.factory('explorationGadgetsService', [
   var _panels = null;
 
   var _getPanelNameFromGadgetName = function(gadgetName) {
-    for (var panelName in _panels) {
-      if (_panels[panelName].indexOf(gadgetName) != -1 ) {
-        return panelName;
+    for (var panel in _panels) {
+      if (_panels[panel].indexOf(gadgetName) != -1 ) {
+        return panel;
       }
     }
     $log.info(gadgetName + ' gadget does not exist in any panel.');
   };
 
   var _generateUniqueGadgetName = function(gadgetType) {
-    if (!_gadgets.hasOwnProperty(gadgetType)) {
-      return gadgetType;
+    var baseGadgetName = GADGET_SPECS[gadgetType].short_description;
+    if (!_gadgets.hasOwnProperty(baseGadgetName)) {
+      return baseGadgetName;
     } else {
-      var baseGadgetName = gadgetType;
       var uniqueInteger = 2;
       var generatedGadgetName = baseGadgetName + uniqueInteger;
       while (_gadgets.hasOwnProperty(generatedGadgetName)) {
@@ -1007,9 +1006,9 @@ oppia.factory('explorationGadgetsService', [
     }
   };
 
-  var _getAllGadgetsInstancesForPanel = function(panelName) {
+  var _getAllGadgetsInstancesForPanel = function(panel) {
     var panelGadgets = [];
-    var gadgetsInCurrentPanel = _panels[panelName];
+    var gadgetsInCurrentPanel = _panels[panel];
     for (var i = 0; i < gadgetsInCurrentPanel.length; i++) {
       panelGadgets.push(_gadgets[gadgetsInCurrentPanel[i]]);
     }
@@ -1021,8 +1020,8 @@ oppia.factory('explorationGadgetsService', [
    * values are lists of gadget instances representing the gadgets visible in
    * that state for the given panel.
    */
-  var _getGadgetsVisibilityMap = function(panelName) {
-    var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panelName);
+  var _getGadgetsVisibilityMap = function(panel) {
+    var gadgetInstanceList = _getAllGadgetsInstancesForPanel(panel);
     var visibilityMap = {};
     for (var i = 0; i < gadgetInstanceList.length; i++) {
       var gadgetInstance = angular.copy(gadgetInstanceList[i]);
@@ -1058,15 +1057,15 @@ oppia.factory('explorationGadgetsService', [
   var _initGadgetsAndPanelsData = function(panelsContents) {
     _panels = {};
     _gadgets = {};
-    for (var panelName in panelsContents) {
-      _panels[panelName] = [];
+    for (var panel in panelsContents) {
+      _panels[panel] = [];
       // Append the name of each gadget instance in the panel.
-      for (var i = 0; i < panelsContents[panelName].length; i++) {
-        _panels[panelName].push(
-          panelsContents[panelName][i].gadget_name
+      for (var i = 0; i < panelsContents[panel].length; i++) {
+        _panels[panel].push(
+          panelsContents[panel][i].gadget_name
         );
-        var gadgetName = panelsContents[panelName][i].gadget_name;
-        _gadgets[gadgetName] = angular.copy(panelsContents[panelName][i]);
+        var gadgetName = panelsContents[panel][i].gadget_name;
+        _gadgets[gadgetName] = angular.copy(panelsContents[panel][i]);
       }
     }
   };
@@ -1081,10 +1080,10 @@ oppia.factory('explorationGadgetsService', [
       }
       _initGadgetsAndPanelsData(skinCustomizationsData.panels_contents);
       var isValid = false;
-      for (var panelName in _panels) {
-        var visibilityMap = _getGadgetsVisibilityMap(panelName);
+      for (var panel in _panels) {
+        var visibilityMap = _getGadgetsVisibilityMap(panel);
         isValid = gadgetValidationService.validatePanel(
-          panelName, visibilityMap);
+          panel, visibilityMap);
         // validatePanel(...) should have added the warning to warningsData.
         if (!isValid) {
           return;
@@ -1098,13 +1097,13 @@ oppia.factory('explorationGadgetsService', [
      * Confirms if a panel can accept a new gadget considering its capacity
      * and the gadget's size requirements given its customization arguments.
      */
-    canAddGadgetTo: function(panelName, gadgetData) {
-      var visibilityMap = _getGadgetsVisibilityMap(panelName);
+    canAddGadgetToItsPanel: function(gadgetData) {
+      var visibilityMap = _getGadgetsVisibilityMap(gadgetData.panel);
       var canAdd = _isNewGadgetNameValid(gadgetData.gadget_name);
 
       if(canAdd) {
         canAdd = gadgetValidationService.canAddGadget(
-          panelName, gadgetData, visibilityMap);
+          gadgetData, visibilityMap);
       }
       return canAdd;
     },
@@ -1231,11 +1230,13 @@ oppia.factory('explorationGadgetsService', [
       currentGadgetData.visible_in_states = angular.copy(newVisibleInStates);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
     },
-    addGadget: function(gadgetData, panelName) {
+    addGadget: function(gadgetData) {
 
-      if(!_panels.hasOwnProperty(panelName)) {
+      // Defense-in-depth: This warning should never happen with panel names
+      // hard coded and validated on the backend.
+      if(!_panels.hasOwnProperty(gadgetData.panel)) {
         warningsData.addWarning(
-          'Attempted to add to a non-existent panel: ' + panelName);
+          'Attempted add to a non-existent panel: ' + gadgetData.panel);
         return;
       }
 
@@ -1244,9 +1245,9 @@ oppia.factory('explorationGadgetsService', [
         return;
       }
       _gadgets[gadgetData.gadget_name] = gadgetData;
-      _panels[panelName].push(gadgetData.gadget_name);
+      _panels[gadgetData.panel].push(gadgetData.gadget_name);
       $rootScope.$broadcast('gadgetsChangedOrInitialized');
-      changeListService.addGadget(gadgetData, panelName);
+      changeListService.addGadget(gadgetData);
     },
     /**
      * Function that opens a modal to confirm gadget delete.

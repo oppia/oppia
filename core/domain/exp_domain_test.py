@@ -114,8 +114,6 @@ skin_customizations:
             value:
               - adviceTitle: b
                 adviceHtml: <p>c</p>
-          title:
-            value: The Test Gadget!
         gadget_type: TestGadget
         gadget_name: ATestGadget
         visible_in_states:
@@ -200,9 +198,6 @@ TEST_GADGET_CUSTOMIZATION_ARGS = {
             'adviceTitle': 'b',
             'adviceHtml': '<p>c</p>'
         }]
-    },
-    'title': {
-        'value': 'The Test Gadget!'
     }
 }
 
@@ -1882,8 +1877,8 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
                 gadget_instance
             )
 
-            panel_name = exploration._get_panel_name_for_gadget('ANewName')
-            self.assertEqual(panel_name, 'bottom')
+            panel = exploration._get_panel_for_gadget('ANewName')
+            self.assertEqual(panel, 'bottom')
 
             exploration.delete_gadget('ANewName')
             exploration.delete_gadget('ATestGadget')
@@ -1979,9 +1974,6 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(test_gadget_instance.height, 50)
         self.assertEqual(test_gadget_instance.width, 60)
-        self.assertEqual(
-            test_gadget_instance.customization_args['title']['value'],
-            'The Test Gadget!')
         self.assertIn('New state', test_gadget_instance.visible_in_states)
 
     def test_gadget_instance_validation(self):
@@ -2065,10 +2057,6 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(test_gadget_as_instance.width, 60)
         self.assertEqual(test_gadget_as_instance.height, 50)
-        self.assertEqual(
-            test_gadget_as_instance.customization_args['title']['value'],
-            'The Test Gadget!'
-        )
 
 
 class GadgetVisibilityInStatesUnitTests(test_utils.GenericTestBase):

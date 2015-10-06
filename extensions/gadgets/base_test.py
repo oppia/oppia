@@ -101,24 +101,17 @@ class GadgetUnitTests(test_utils.GenericTestBase):
             gadget = gadget_registry.Registry.get_gadget_by_type(
                 TEST_GADGET_TYPE)
         self.assertEqual(gadget.type, TEST_GADGET_TYPE)
-        self.assertEqual(gadget.name, 'TestGadget')
+        self.assertEqual(gadget.short_description, 'Test Gadget')
 
         self.assertIn('id="gadget/TestGadget"', gadget.html_body)
 
         gadget_dict = gadget.to_dict()
         self.assertItemsEqual(gadget_dict.keys(), [
-            'type', 'name', 'height_px', 'width_px', 'description',
+            'type', 'short_description', 'height_px', 'width_px', 'panel', 'description',
             'customization_arg_specs',])
         self.assertEqual(gadget_dict['type'], TEST_GADGET_TYPE)
         self.assertEqual(gadget_dict['customization_arg_specs'], [
             {
-                'name': 'title',
-                'description': 'Optional title for the test gadget',
-                'schema': {
-                    'type': 'unicode',
-                },
-                'default_value': ''
-            }, {
                 'name': 'adviceObjects',
                 'description': 'Title and content for each tip.',
                 'schema': {
@@ -160,8 +153,8 @@ class GadgetUnitTests(test_utils.GenericTestBase):
         """Test that the default gadgets are valid."""
 
         _GADGET_CONFIG_SCHEMA = [
-            ('name', basestring), ('description', basestring),
-            ('height_px', int), ('width_px', int),
+            ('short_description', basestring), ('description', basestring),
+            ('height_px', int), ('width_px', int), ('panel', basestring),
             ('_customization_arg_specs', list)]
 
         for gadget_type in feconf.ALLOWED_GADGETS:
@@ -239,6 +232,9 @@ class GadgetUnitTests(test_utils.GenericTestBase):
             # values.
             self.assertGreater(gadget.height_px, 0)
             self.assertGreater(gadget.width_px, 0)
+
+            # Check that the gadget's uses a valid panel in the Reader view.
+            self.assertTrue(gadget.panel in feconf.ALLOWED_GADGET_PANELS)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.

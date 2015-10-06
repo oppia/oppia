@@ -3,7 +3,6 @@
 <script type="text/ng-template" id="gadget/TestGadget">
   <!-- TestGadget assists validation from gadgets.base_test. -->
   <div class="oppia-test-gadget-container">
-    <h2 class="oppia-test-gadget-title protractor-test-testgadget-title"><[testGadgetTitle]></h2>
     <div ng-repeat="resource in testGadgetAdviceResources track by $index">
       <div class="oppia-test-gadget-resource" ng-click="overlayAdviceModal($index)">
         <[resource.adviceTitle]>

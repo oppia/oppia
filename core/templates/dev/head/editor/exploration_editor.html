@@ -333,9 +333,6 @@
           <div class="col-lg-8 col-md-8 col-sm-8">
             <div>
               {% include 'editor/state_editor.html' %}
-              {% if SHOW_GADGETS_EDITOR %}
-                {% include 'editor/gadget_editor.html' %}
-              {% endif %}
             </div>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-4">
@@ -345,6 +342,9 @@
               </div>
               <div>
                 {% include 'editor/sidebar_state_parameter_changes.html' %}
+                {% if SHOW_GADGETS_EDITOR %}
+                  {% include 'editor/gadget_editor.html' %}
+                {% endif %}
               </div>
             </div>
           </div>
@@ -412,7 +412,6 @@
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/visualizations.html' %}
   {% include 'components/gadget_panel.html' %}
-  {% include 'editor/gadget_preview.html' %}
 
 {% endblock content %}
 
@@ -443,7 +442,6 @@
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/GadgetValidationService.js') }}
-    {{ include_js_file('editor/GadgetPreview.js') }}
     {{ include_js_file('editor/GadgetEditor.js') }}
     {{ include_js_file('editor/StateInteraction.js') }}
     {{ include_js_file('player/PlayerServices.js') }}

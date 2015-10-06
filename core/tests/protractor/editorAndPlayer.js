@@ -388,8 +388,8 @@ describe('Full exploration editor', function() {
 // NOTE: Gadgets are disabled by default. Enable when running gadget-specific
 // integration tests.
 xdescribe('Gadget editor', function() {
-  it('should allow adding a gadget that is visible in the editor preview ' +
-       'and player view.', function() {
+  it('should allow adding a gadget that is listed in the editor side panel ' +
+       ' and visible in the player view.', function() {
     users.createUser('gadgetuser1@example.com', 'gadgetuser1');
     users.login('gadgetuser1@example.com');
 
@@ -401,23 +401,19 @@ xdescribe('Gadget editor', function() {
     editor.setInteraction('EndExploration');
 
     // Setup a parameter for the ScoreBar to follow.
-    editor.addParameterChange('powerlevel', 3000);
+    editor.addParameterChange('coconuts', 3000);
 
     editor.addGadget(
-      'bottom', // panel
       'ScoreBar', // type
-      'PowerScoreBar', // name
-      'Power Level!!!', // title
+      'Coconut Surplus', // name
       '9000', // maxValue
-      'powerlevel' // parameter to follow
+      'coconuts' // parameter to follow
     );
 
-    editor.expectGadgetPreviewToMatch(
-      'ScoreBar',
-      'PowerScoreBar',
-      'Power Level!!!',
-      '9000',
-      'powerlevel'
+    editor.expectGadgetListNameToMatch(
+      'ScoreBar', // type
+      'Score Bar', // short_description
+      'Coconut Surplus' // name
     );
 
     editor.saveChanges();
@@ -425,10 +421,9 @@ xdescribe('Gadget editor', function() {
 
     player.expectGadgetToMatch(
       'ScoreBar',
-      'PowerScoreBar',
-      'Power Level!!!',
+      'Coconut Surplus',
       '9000',
-      'powerlevel'
+      'coconuts'
     );
 
     users.logout();
@@ -460,19 +455,17 @@ xdescribe('Gadget editor', function() {
     editor.moveToState('first');
 
     // Add a parameter for the ScoreBar to follow.
-    editor.addParameterChange('powerlevel', 3000);
+    editor.addParameterChange('coconuts', 3000);
 
     editor.addGadget(
-      'bottom', // panel
       'ScoreBar', // type
-      'PowerScoreBar', // name
-      'Power Level!!!', // title
+      'CoconutSurplus', // name
       '9000', // maxValue
-      'powerlevel' // parameter to follow
+      'coconuts' // parameter to follow
     );
 
     // Edit visibility
-    editor.openGadgetEditorModal('PowerScoreBar');
+    editor.openGadgetEditorModal('CoconutSurplus');
     editor.enableGadgetVisibilityForState('final card');
     editor.saveAndCloseGadgetEditorModal();
 
@@ -508,29 +501,25 @@ xdescribe('Gadget editor', function() {
     editor.setDefaultOutcome(null, 'second', true);
 
     // Add a parameter for the ScoreBar to follow.
-    editor.addParameterChange('powerlevel', 3000);
+    editor.addParameterChange('coconuts', 3000);
 
     editor.addGadget(
-      'bottom', // panel
       'ScoreBar', // type
-      'PowerScoreBar', // name
-      'Power Level!!!', // title
+      'CoconutSurplus', // name
       '9000', // maxValue
-      'powerlevel' // parameter to follow
+      'coconuts' // parameter to follow
     );
 
-    editor.renameGadget('PowerScoreBar', 'SuperPowerScoreBar');
+    editor.renameGadget('CoconutSurplus', 'SuperCoconuts');
 
-    editor.expectGadgetPreviewToMatch(
-      'ScoreBar',
-      'SuperPowerScoreBar',
-      'Power Level!!!',
-      '9000',
-      'powerlevel'
+    editor.expectGadgetListNameToMatch(
+      'ScoreBar', // type
+      'Score Bar', // short_description
+      'SuperCoconuts' // name
     );
 
-    editor.deleteGadget('SuperPowerScoreBar');
-    editor.expectGadgetWithNameDoesNotExist('SuperPowerScoreBar');
+    editor.deleteGadget('SuperCoconuts');
+    editor.expectGadgetWithNameDoesNotExist('SuperCoconuts');
 
   });
 

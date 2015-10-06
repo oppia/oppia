@@ -504,7 +504,7 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
             elif change.cmd == exp_domain.CMD_ADD_GADGET:
-                exploration.add_gadget(change.gadget_dict, change.panel_name)
+                exploration.add_gadget(change.gadget_dict, change.panel)
             elif change.cmd == exp_domain.CMD_RENAME_GADGET:
                 exploration.rename_gadget(
                     change.old_gadget_name, change.new_gadget_name)

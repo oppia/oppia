@@ -219,13 +219,13 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }]
 
 ALLOWED_GADGETS = {
-    'AdviceBar': {
-        'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
-    },
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },
 }
+
+# Gadgets subclasses must specify a valid panel option from this list.
+ALLOWED_GADGET_PANELS = ['bottom']
 
 # Demo explorations to load on startup. The id assigned to each exploration
 # is based on the index of the exploration in this list, so if you want to
@@ -310,7 +310,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 
-# Advanced feature in development.
+# Advanced feature.
 SHOW_GADGETS_EDITOR = False
 
 # Unlaunched feature.

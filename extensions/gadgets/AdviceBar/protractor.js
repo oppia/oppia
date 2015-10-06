@@ -27,14 +27,9 @@ var customizeGadget = function(elem, title) {
 	// TODO(anuzis): Implement.
 };
 
-var expectGadgetPreviewDetailsToMatch = function(elem, title) {
-	// TODO(anuzis): Implement.
-};
-
 var expectGadgetDetailsToMatch = function(elem, title) {
 	// TODO(anuzis): Implement.
 };
 
 exports.customizeGadget = customizeGadget;
-exports.expectGadgetPreviewDetailsToMatch = expectGadgetPreviewDetailsToMatch;
 exports.expectGadgetDetailsToMatch = expectGadgetDetailsToMatch;

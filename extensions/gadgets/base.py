@@ -34,14 +34,19 @@ class BaseGadget(object):
     be get()-type methods.
     """
 
-    # The human-readable name of the gadget. Overridden in subclasses.
-    name = ''
+    # The human-readable name of the gadget displayed in the editor.
+    # Overridden in subclasses.
+    short_description = ''
     # A description of the gadget. Overridden in subclasses.
     description = ''
     # Height of the gadget in pixels.
     height_px = 0
     # Width of the gadget in pixels.
     width_px = 0
+    # The panel in which this gadget shows up in the learner view. This must
+    # match the name of a stationary panel in the skin. Example: 'bottom'.
+    # In the future, this property may offer other options like 'draggable'.
+    panel = ''
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -95,9 +100,10 @@ class BaseGadget(object):
         """
         result = {
             'type': self.type,
-            'name': self.name,
+            'short_description': self.short_description,
             'height_px': self.height_px,
             'width_px': self.width_px,
+            'panel': self.panel,
             'description': self.description,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
