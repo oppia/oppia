@@ -124,7 +124,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
             'customization_arg_specs', 'is_trainable', 'is_terminal',
-            'rule_descriptions', 'instructions', 'needs_summary'])
+            'is_linear', 'rule_descriptions', 'instructions', 'needs_summary',
+            'default_outcome_heading'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -151,7 +152,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         _INTERACTION_CONFIG_SCHEMA = [
             ('name', basestring), ('display_mode', basestring),
             ('description', basestring), ('_customization_arg_specs', list),
-            ('is_terminal', bool)]
+            ('is_terminal', bool), ('needs_summary', bool)]
 
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -282,6 +283,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     isinstance(interaction.instructions, basestring))
                 self.assertIsNotNone(interaction.instructions)
 
+            # Check that the interactions with a default_outcome_heading
+            # property are exactly the ones that are linear.
+            self.assertTrue((
+                interaction.is_linear and not interaction.is_terminal and
+                isinstance(interaction.default_outcome_heading, basestring) and
+                interaction.default_outcome_heading
+            ) or (
+                not (interaction.is_linear and not interaction.is_terminal) and
+                interaction.default_outcome_heading is None
+            ))
+
     def test_trainable_interactions_have_fuzzy_rules(self):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -332,3 +344,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     len(all_rule_classes), 1,
                     'Expected trainable interaction to have more than just a '
                     'fuzzy rule: %s' % interaction_id)
+
+    def test_linear_interactions(self):
+        """Sanity-check for the number of linear interactions."""
+
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        count = 0
+        for interaction_id in all_interaction_ids:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            if interaction.is_linear:
+                count += 1
+
+        self.assertEqual(count, 2)

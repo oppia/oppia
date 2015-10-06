@@ -96,10 +96,20 @@ class BaseInteraction(object):
     instructions = None
     # Whether the answer is long, and would benefit from being summarized.
     needs_summary = False
+    # The heading for the 'default outcome' section in the editor. This should
+    # be None unless the interaction is linear and non-terminal.
+    default_outcome_heading = None
 
     @property
     def id(self):
         return self.__class__.__name__
+
+    @property
+    def is_linear(self):
+        """Returns a boolean indicating whether the interaction has only one
+         possible answer.
+         """
+        return self.answer_type == 'Null'
 
     @property
     def customization_arg_specs(self):
@@ -170,6 +180,7 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
+            'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
@@ -178,6 +189,7 @@ class BaseInteraction(object):
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
             'instructions': self.instructions,
+            'default_outcome_heading': self.default_outcome_heading,
         }
 
         # Add information about rule descriptions corresponding to the answer

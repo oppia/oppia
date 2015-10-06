@@ -32,9 +32,7 @@ describe('Testing filters', function() {
     'isOutcomeConfusing',
     'parameterizeRuleDescription',
     'normalizeWhitespace',
-    'convertToPlainText',
-    'summarizeAnswerGroup',
-    'summarizeDefaultOutcome',
+    'convertToPlainText'
   ];
 
   beforeEach(angular.mock.module('oppia'));
