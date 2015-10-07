@@ -88,7 +88,8 @@ class BaseInteraction(object):
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
     # The type of answer (as a string) accepted by this interaction, e.g.
-    # 'CodeEvaluation'. This is 'None' for linear and terminal interactions.
+    # 'CodeEvaluation'. This should be None for linear and terminal
+    # interactions.
     answer_type = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
