@@ -339,9 +339,9 @@ md-card.conversation-skin-supplemental-card {
 }
 
 .protractor-test-conversation-feedback.ng-enter {
+  opacity: 0;
   -webkit-transition: all .5s;
   transition: all .5s;
-  opacity: 0;
 }
 .protractor-test-conversation-feedback.ng-enter.ng-enter-active {
   opacity: 1;
