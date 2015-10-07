@@ -22,7 +22,7 @@ oppia.directive('threadTable', [function() {
     restrict: 'E',
     scope: {
       onClickRow: '=',
-      threads: '&'
+      getThreads: '&threads'
     },
     templateUrl: 'feedbackTab/threadTable',
     controller: [
