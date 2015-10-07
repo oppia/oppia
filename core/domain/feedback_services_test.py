@@ -19,7 +19,7 @@ __author__ = 'Sean Lip'
 from core.domain import feedback_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-import test_utils
+from core.tests import test_utils
 
 
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
@@ -64,4 +64,4 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             EXP_ID, 'a_state_name', None, 'a subject', 'some text')
         threadlist = feedback_services.get_threadlist(EXP_ID)
         thread_status = threadlist[0]['status']
-        self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)   
+        self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
