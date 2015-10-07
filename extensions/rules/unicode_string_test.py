@@ -19,9 +19,9 @@
 __author__ = 'Tarashish Mishra'
 
 import base64
-import test_utils
 
 from core.domain import fs_domain
+from core.tests import test_utils
 from extensions.rules import unicode_string
 
 

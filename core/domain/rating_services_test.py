@@ -23,7 +23,7 @@ import datetime
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rating_services
-import test_utils
+from core.tests import test_utils
 
 
 class RatingServicesTests(test_utils.GenericTestBase):

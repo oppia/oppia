@@ -20,8 +20,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
