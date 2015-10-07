@@ -80,22 +80,22 @@ class BaseSkin(object):
         return '<%s></%s>' % (cls.tag_name, cls.tag_name)
 
     @classmethod
-    def validate_panel(cls, panel_name, gadget_list):
+    def validate_panel(cls, panel, gadget_list):
         """Validates that a panel is able to contain a given set of gadgets.
 
         Args:
-        - panel_name: string. Unique name for a gadget panel in this skin.
+        - panel: string. Unique identifier for the gadget panel.
         - gadget_list: list of GadgetInstance instances."""
 
-        panel_properties_dict = cls.panels_properties[panel_name]
-        gadget_panel = GadgetPanelSpec(
-            panel_name, panel_properties_dict['width'],
+        panel_properties_dict = cls.panels_properties[panel]
+        panel_instance = GadgetPanelSpec(
+            panel, panel_properties_dict['width'],
             panel_properties_dict['height'],
             panel_properties_dict['stackable_axis'],
             panel_properties_dict['pixels_between_gadgets'],
             panel_properties_dict['max_gadgets'])
 
-        gadget_panel.validate(gadget_list)
+        panel_instance.validate(gadget_list)
 
 
 class GadgetPanelSpec(object):
@@ -242,20 +242,6 @@ class ConversationV1(BaseSkin):
     tag_name = 'conversation-skin'
 
     panels_properties = {
-        'left': {
-            'width': 100,
-            'height': 350,
-            'stackable_axis': BaseSkin._GADGET_PANEL_AXIS_VERTICAL,
-            'pixels_between_gadgets': 50,
-            'max_gadgets': 1
-        },
-        'right': {
-            'width': 160,
-            'height': 350,
-            'stackable_axis': BaseSkin._GADGET_PANEL_AXIS_VERTICAL,
-            'pixels_between_gadgets': 50,
-            'max_gadgets': 1
-        },
         'bottom': {
             'width': 350,
             'height': 100,

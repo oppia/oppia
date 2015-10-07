@@ -53,6 +53,9 @@ DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
+SITE_NAME = config_domain.ConfigProperty(
+    'site_name', {'type': 'unicode'}, 'The site name',
+    default_value='SITE_NAME')
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     'before_end_head_tag_hook', {
@@ -404,6 +407,7 @@ class BaseHandler(webapp2.RequestHandler):
             'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
             'SIDEBAR_MENU_ADDITIONAL_LINKS': (
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
+            'SITE_NAME': SITE_NAME.value,
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
             'user_is_logged_in': bool(self.username),
         })

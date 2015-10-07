@@ -1,12 +1,10 @@
 <link rel="stylesheet" type="text/css" href="/extensions/gadgets/AdviceBar/static/css/adviceBar.css">
 
 <script type="text/ng-template" id="gadget/AdviceBar">
- <!-- TODO(anuzis): Implement dynamic horizontal formatting. http://css.maxdesign.com.au/listutorial/horizontal_master.htm -->
   <div class="oppia-advice-bar-container">
-    <h2 class="oppia-advice-bar-title"><[adviceBarTitle]></h2>
+    <h2 class="oppia-advice-bar-title protractor-test-advicebar-title">Tips</h2>
     <div ng-repeat="resource in adviceBarResources track by $index">
-      <div class="oppia-advice-resource">
-        <div class="oppia-advice-resource-image" ng-click="overlayAdviceModal($index)"></div>
+      <div class="oppia-advice-resource" ng-click="overlayAdviceModal($index)">
         <[resource.adviceTitle]>
       </div>
     </div>

@@ -87,10 +87,6 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 # group.
 DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
-# Default valid parameter for instantiating Explorations when explicit
-# skin customizations aren't provided.
-DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
-
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # files.
@@ -123,6 +119,9 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+# A regular expression for alphanumeric words separated by single spaces.
+# Ex.: 'valid name', 'another valid name', 'invalid   name'.
+ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
@@ -227,13 +226,13 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }]
 
 ALLOWED_GADGETS = {
-    'AdviceBar': {
-        'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
-    },
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },
 }
+
+# Gadgets subclasses must specify a valid panel option from this list.
+ALLOWED_GADGET_PANELS = ['bottom']
 
 # Demo explorations to load on startup. The id assigned to each exploration
 # is based on the index of the exploration in this list, so if you want to
@@ -262,12 +261,6 @@ DEMO_EXPLORATIONS = [
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
-    # TODO(anuzis): Replace about_oppia.yaml with this dev version when gadget
-    # visibility by state is functional. Currently an AdviceBar gadget that
-    # should only display on the Helsinki map state is visible during the
-    # entire exploration as a dev demo.
-    ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
-     'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
@@ -334,6 +327,9 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+
+# Advanced feature.
+SHOW_GADGETS_EDITOR = False
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
