@@ -16,7 +16,7 @@
 
 __author__ = 'Jeremy Emerson'
 
-import test_utils
+from core.tests import test_utils
 import utils
 
 

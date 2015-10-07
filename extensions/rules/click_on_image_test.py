@@ -18,8 +18,8 @@
 
 __author__ = 'Zhan Xiong Chin'
 
+from core.tests import test_utils
 from extensions.rules import click_on_image
-import test_utils
 
 
 class ClickOnImageRuleUnitTests(test_utils.GenericTestBase):
