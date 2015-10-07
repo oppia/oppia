@@ -2238,11 +2238,11 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-info-card-bottom-row md-chips md-chip {
+  cursor: default;
   font-size: 12px;
   line-height: 1em;
   margin: 0;
   padding: 0;
-  cursor: default;
 }
 
 .oppia-info-card-bottom-row ul li {

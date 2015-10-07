@@ -87,7 +87,7 @@
             <[viewersCount | summarizeNonnegativeNumber]>
           </li>
           <li>
-            <span class="fa fa-clock-o fa-lg" tooltip="Last Updates" tooltip-placement="top"></span>
+            <span class="fa fa-clock-o fa-lg" tooltip="Last Updated" tooltip-placement="top"></span>
             <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
           </li>
           <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
@@ -100,11 +100,11 @@
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
             
-            <li ng-if='explorationContributorUsernames.length > 2' class="oppia-contributors-more-circle"
-              tooltip-append-to-body=true tooltip="<[explorationContributorUsernames.slice(2).join(',')]>"
+            <li ng-if="explorationContributorUsernames.length > 2" class="oppia-contributors-more-circle"
+              tooltip-append-to-body="true" tooltip="<[explorationContributorUsernames.slice(2).join(',')]>"
               tooltip-placement="top">+<[explorationContributorUsernames.length - 2]>
             </li>
-            <li ng-if='explorationContributorUsernames.length === 0'
+            <li ng-if="explorationContributorUsernames.length === 0"
                 tooltip="Community-editable" tooltip-placement="top">
               <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
             </li>
@@ -115,8 +115,8 @@
             <md-content layout="row">
               <div class="oppia-info-card-tag-icon"><span class="fa fa-tags fa-lg"></span></div>
               <md-chips layout-align="center center">
-                <md-chip ng-if='explorationTags.tagsInTooltip.length > 0' class="oppia-info-card-tooltip-more"
-                  tooltip-append-to-body=true tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
+                <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
+                  tooltip-append-to-body="true" tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
                   tooltip-placement="right">
                   <[explorationTags.tagsInTooltip.length]>+ more tags
                 </md-chip>

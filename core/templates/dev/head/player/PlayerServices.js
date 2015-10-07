@@ -788,7 +788,7 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
           var _tagsToBeShown =[];
           var _tagsInTooltip = [];
           for (var i = 0; i < arrayOfTags.length; i++) {
-            if((_tagsToBeShown.toString() + arrayOfTags[i]).length < 45) {
+            if ((_tagsToBeShown.toString() + arrayOfTags[i]).length < 45) {
               _tagsToBeShown.push(arrayOfTags[i]);
             } else {
               _tagsInTooltip.push(arrayOfTags[i]);
