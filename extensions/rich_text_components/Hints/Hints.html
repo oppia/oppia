@@ -11,6 +11,10 @@
       font-weight: normal;
       font-style: italic;
     }
+    .oppia-extension-hint {
+      border-bottom: 1px solid #eee;
+      border-top: 1px solid #eee;
+    }
     .oppia-extension-hint.ng-enter
     { 
         -webkit-transition: 100ms ease-out all;
@@ -21,6 +25,7 @@
         opacity: 1;
     }
   </style>
-  <span class="oppia-extension-hint-link" ng-class="{'disabled': currentHintIndex == numberOfHints}" ng-click="showNextHint()">Click here for a hint ({{ numberOfHints - currentHintIndex }})</span>
-  <div class="oppia-extension-hint" ng-repeat="visibleHint in visibleHints" ng-bind-html="visibleHint"></span>
+  <span class="oppia-extension-hint-link" ng-class="{'disabled': currentHintIndex == numberOfHints}" ng-click="showNextHint()">Click here for a hint (<[ numberOfHints - currentHintIndex ]>)</span>
+  <div class="oppia-extension-hint" ng-repeat="visibleHint in visibleHints track by $index" ng-bind-html="visibleHint">
+  </div>
 </script>
