@@ -338,9 +338,9 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
   }
 }]);
 
-// Filter that summarizes large number to nearly four significant figures and
-// one decimal place also appends metrix prefix(K for Thousands, M for Millions and B for Billions)
-// example 167656 becomes 167.7K.
+// Filter that summarizes a large number to a decimal followed by
+// the appropriate metric prefix (K, M or B). For example, 167656
+// becomes 167.7K.
 // Users of this filter should ensure that the input is a non-negative number.
 oppia.filter('summarizeNonnegativeNumber', [function() {
   return function (input) {

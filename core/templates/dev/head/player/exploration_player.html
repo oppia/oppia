@@ -78,28 +78,30 @@
         <p ng-if="!explorationDescription">No objective specified.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
-            <span class="fa fa-star fa-lg"></span>
-            <[explorationRatings]>
+            <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top"></span>
+            <span ng-if="explorationRatings === 0"><i>Unrated</i></span>
+            <span ng-if="explorationRatings !== 0"><[explorationRatings]></span>
           </li>
           <li>
-            <span class="fa fa-eye fa-lg"></span>
+            <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top"></span>
             <[viewersCount | summarizeNonnegativeNumber]>
           </li>
           <li>
-            <span class="fa fa-clock-o fa-lg"></span>
+            <span class="fa fa-clock-o fa-lg" tooltip="Last Updates" tooltip-placement="top"></span>
             <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
           </li>
           <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-            <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
+            <img tooltip="Contributors" tooltip-placement="top"
+              src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
             <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
               tooltip="<[ContributorUsername]>" tooltip-placement="top">
-              <img class="img-circle" ng-src="/images/general/user_mint_48px.png" alt="">
+              <img class="oppia-contributors-circle" ng-src="/images/general/user_mint_48px.png" alt="">
             </li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
             
             <li ng-if='explorationContributorUsernames.length > 2' class="oppia-contributors-more-circle"
-              tooltip-append-to-body=true tooltip="<[explorationContributorUsernames.slice(2).join()]>"
+              tooltip-append-to-body=true tooltip="<[explorationContributorUsernames.slice(2).join(',')]>"
               tooltip-placement="top">+<[explorationContributorUsernames.length - 2]>
             </li>
             <li ng-if='explorationContributorUsernames.length === 0'
@@ -113,13 +115,18 @@
             <md-content layout="row">
               <div class="oppia-info-card-tag-icon"><span class="fa fa-tags fa-lg"></span></div>
               <md-chips layout-align="center center">
-                  <md-chip ng-if='explorationTags.length > 2' class="oppia-info-card-tooltip-more"
-                    tooltip-append-to-body=true tooltip="<[explorationTags.slice(2).join()]>"
-                    tooltip-placement="right">
-                    <[explorationTags.length - 2]>+ more tags
-                  </md-chip>
-                  <md-chip><[explorationTags.slice(0,2).join()]></md-chip>
-                  <md-chip ng-if="explorationTags.length === 0">This exploration has no tags<md-chip>
+                <md-chip ng-if='explorationTags.tagsInTooltip.length > 0' class="oppia-info-card-tooltip-more"
+                  tooltip-append-to-body=true tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
+                  tooltip-placement="right">
+                  <[explorationTags.tagsInTooltip.length]>+ more tags
+                </md-chip>
+                <md-chip ng-if="explorationTags.tagsToBeShown.length > 0">
+                  <[explorationTags.tagsToBeShown.join(", ")]>
+                </md-chip>
+                <md-chip ng-if="explorationTags.tagsToBeShown.length === 0 &&
+                  explorationTags.tagsInTooltip.tagsToBeShown.length === 0">
+                  <span>This exploration has no tags</span>
+                <md-chip>
               </md-chips>
             </md-content>
           </div>
@@ -151,7 +158,7 @@
               {% endif %}
 
               <li>
-                <a href="" ng-click="showEmbedExplorationModal(explorationId)">
+                <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
                   <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
                 </a>
               </li>

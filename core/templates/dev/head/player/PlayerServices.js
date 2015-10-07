@@ -321,7 +321,8 @@ oppia.factory('oppiaPlayerService', [
       _explorationTags = data.tags;
       // TODO(sll): in the backend, compute the actual contributors
       // based on the list of commits to the exploration.
-      _explorationContributorUsernames = data.rights.owner_names.concat(data.rights.editor_names);
+      _explorationContributorUsernames = data.rights.owner_names.concat(
+        data.rights.editor_names);
     }).error(function () {
       warningsData.addWarning(
         data.error || 'There was an error loading the exploration information.');
@@ -782,7 +783,23 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
         };
         $scope.explorationRatings = ratingService.getUserRating() !== null ? 
                                     ratingService.getUserRating() : 0;
-        $scope.explorationTags = _informationCardData.explorationTags;
+
+        var _explorationTagsSummary = function(arrayOfTags) {
+          var _tagsToBeShown =[];
+          var _tagsInTooltip = [];
+          for (var i = 0; i < arrayOfTags.length; i++) {
+            if((_tagsToBeShown.toString() + arrayOfTags[i]).length < 45) {
+              _tagsToBeShown.push(arrayOfTags[i]);
+            } else {
+              _tagsInTooltip.push(arrayOfTags[i]);
+            }
+          };
+          return {
+            tagsToBeShown: _tagsToBeShown,
+            tagsInTooltip: _tagsInTooltip
+          };
+        };
+        $scope.explorationTags = _explorationTagsSummary(_informationCardData.explorationTags);
         $scope.explorationDescription = _informationCardData.explorationObjective;
         $scope.explorationContributorUsernames = _informationCardData.explorationContributorUsernames;
         $scope.explorationLastUpdatedMsec = _informationCardData.explorationLastUpdatedMsec;

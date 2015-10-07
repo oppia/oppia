@@ -197,13 +197,13 @@ describe('Testing filters', function() {
 
   }));
 
-  it('should capitalize first letter and truncate string ', inject(function($filter) {
+  it('should capitalize first letter and truncate string', inject(function($filter) {
     var filter = $filter('truncateAndCapitalize');
 
     expect(filter('remove New line', 4)).toEqual('Remo...');
-    // If maximum number of character are not specified
-    // return whole objective but first letter capitalize.
-    expect(filter('capitalize first letter and trancate')).toEqual('Capitalize first letter and trancate');
+    // If the maximum number of characters is not specified, return
+    // the whole objective with the first letter capitalized.
+    expect(filter('capitalize first letter and truncate')).toEqual('Capitalize first letter and truncate');
     expect(filter('a single sentence with more than twenty one characters', 21)).toEqual(
       'A single sentence wit...');
 
