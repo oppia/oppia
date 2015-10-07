@@ -1,10 +1,10 @@
-<md-card class="oppia-editor-card" ng-controller="ExplorationFeedback">
+<md-card class="oppia-editor-card" ng-controller="FeedbackTab">
   <div ng-if="!activeThread">
     <div ng-if="(threadData.threadList | filter:!has_suggestion).length > 0">
       <h2>Suggestions from Learners</h2>
-      <thread-summary-table threads="threadData.threadList | filter:'has_suggestion'"
-                            on-click-row="setActiveThread">
-      </thread-summary-table>
+      <thread-table threads="threadData.threadList | filter:'has_suggestion'"
+                    on-click-row="setActiveThread">
+      </thread-table>
       <hr>
     </div>
 
@@ -24,9 +24,9 @@
       <em>No feedback has been given for this exploration yet.</em>
     </div>
 
-    <thread-summary-table threads="threadData.threadList | filter:'!has_suggestion'"
-                          on-click-row="setActiveThread">
-    </thread-summary-table>
+    <thread-table threads="threadData.threadList | filter:'!has_suggestion'"
+                  on-click-row="setActiveThread">
+    </thread-table>
 
     {% if not user_email %}
       <em>To create a new feedback thread, please log in.</em>
@@ -153,31 +153,4 @@
     <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   </div>
-</script>
-
-<script type="text/ng-template" id="feedback/threadSummaryTable">
-  <table class="table">
-    <tr ng-if="threads().length > 0">
-      <th class="col-lg-1 col-md-1 col-sm-1">Status</th>
-      <th class="col-lg-6 col-md-6 col-sm-6">Subject</th>
-      <th class="col-lg-3 col-md-3 col-sm-3">Original author</th>
-      <th class="col-lg-2 col-md-2 col-sm-2">Last updated</th>
-    </tr>
-    <tr ng-repeat="thread in threads()|orderBy:'-last_updated'" ng-click="onClickRow(thread.thread_id)" class="oppia-feedback-tab-row">
-      <td class="col-lg-1 col-md-1 col-sm-1">
-        <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
-      </td>
-      <td class="col-lg-6 col-md-6 col-sm-6">
-        <div><[thread.subject]></div>
-      </td>
-      <td class="col-lg-3 col-md-3 col-sm-3">
-        <span ng-if="thread.original_author_username"><[thread.original_author_username]></span>
-      </td>
-      <td class="col-lg-2 col-md-2 col-sm-2">
-        <span><[getLocaleAbbreviatedDatetimeString(thread.last_updated)]></span>
-      </td>
-      <td class="col-lg-2 col-md-2 col-sm-2">
-      </td>
-    </tr>
-  </table>
 </script>
