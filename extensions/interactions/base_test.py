@@ -48,7 +48,7 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
     def test_rules_property(self):
         """Test that interaction.rules behaves as expected."""
         interaction = base.BaseInteraction()
-        interaction.answer_type = 'Null'
+        interaction.answer_type = None
         interaction.normalize_answer('15')
         self.assertEqual(interaction.rules, [])
 
@@ -265,9 +265,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
 
-            # Check that the obj_type corresponds to a valid object class.
-            obj_services.Registry.get_object_class_by_type(
-                interaction.answer_type)
+            if interaction.is_linear or interaction.is_terminal:
+                self.assertIsNone(interaction.answer_type)
+            else:
+                # Check that the answer_type corresponds to a valid object
+                # class.
+                obj_services.Registry.get_object_class_by_type(
+                    interaction.answer_type)
 
             self._validate_customization_arg_specs(
                 interaction._customization_arg_specs)
@@ -283,16 +287,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     isinstance(interaction.instructions, basestring))
                 self.assertIsNotNone(interaction.instructions)
 
-            # Check that the interactions with a default_outcome_heading
-            # property are exactly the ones that are linear.
-            self.assertTrue((
-                interaction.is_linear and not interaction.is_terminal and
-                isinstance(interaction.default_outcome_heading, basestring) and
-                interaction.default_outcome_heading
-            ) or (
-                not (interaction.is_linear and not interaction.is_terminal) and
-                interaction.default_outcome_heading is None
-            ))
+            # Check that terminal interactions are not linear.
+            if interaction.is_terminal:
+                self.assertFalse(interaction.is_linear)
+
+            # Check that only linear interactions have a
+            # default_outcome_heading property.
+            if interaction.is_linear:
+                self.assertTrue(
+                    isinstance(interaction.default_outcome_heading, basestring)
+                    and interaction.default_outcome_heading)
+            else:
+                self.assertIsNone(interaction.default_outcome_heading)
 
     def test_trainable_interactions_have_fuzzy_rules(self):
         all_interaction_ids = (
@@ -358,4 +364,4 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             if interaction.is_linear:
                 count += 1
 
-        self.assertEqual(count, 2)
+        self.assertEqual(count, 1)

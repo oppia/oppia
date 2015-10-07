@@ -79,6 +79,8 @@ class BaseInteraction(object):
     # Whether this interaction should be considered terminal, i.e. it ends
     # the exploration. Defaults to False.
     is_terminal = False
+    # Whether the interaction has only one possible answer.
+    is_linear = False
     # Whether this interaction supports training and fuzzy classification.
     is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
@@ -86,7 +88,7 @@ class BaseInteraction(object):
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
     # The type of answer (as a string) accepted by this interaction, e.g.
-    # 'CodeEvaluation'.
+    # 'CodeEvaluation'. This is 'None' for linear and terminal interactions.
     answer_type = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
@@ -105,13 +107,6 @@ class BaseInteraction(object):
         return self.__class__.__name__
 
     @property
-    def is_linear(self):
-        """Returns a boolean indicating whether the interaction has only one
-         possible answer.
-         """
-        return self.answer_type == 'Null'
-
-    @property
     def customization_arg_specs(self):
         return [
             domain.CustomizationArgSpec(**cas)
@@ -127,12 +122,11 @@ class BaseInteraction(object):
 
     def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""
-        if self.answer_type:
+        if self.answer_type is None:
+            return None
+        else:
             return obj_services.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
-
-        raise Exception(
-            'No answer type initialized for interaction %s' % self.name)
 
     @property
     def _stats_log_template(self):

@@ -35,7 +35,7 @@ oppia.controller('StateStatistics', [
     // Do not show unresolved answers if the interaction has only one possible
     // answer.
     $scope.unresolvedAnswers = (
-      data.interaction.id && !INTERACTION_SPECS[data.interaction.id].is_linear ?
+      (data.interaction.id && !INTERACTION_SPECS[data.interaction.id].is_linear) ?
       data.unresolved_answers : {});
     $scope.generateUnresolvedAnswersList();
 

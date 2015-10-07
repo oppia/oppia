@@ -338,9 +338,8 @@ oppia.controller('StateResponses', [
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
 
     // If the creator selects an interaction which has only one possible
-    // answer, automatically expand the default response (which is the 'handle
-    // button click' response). Otherwise, default to having no responses
-    // initially selected.
+    // answer, automatically expand the default response. Otherwise, default to
+    // having no responses initially selected.
     if ($scope.isCurrentInteractionLinear()) {
       responsesService.changeActiveAnswerGroupIndex(0);
     }
