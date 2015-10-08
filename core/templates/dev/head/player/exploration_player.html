@@ -79,7 +79,8 @@
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
             <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top"></span>
-            <span><[explorationRatings]></span>
+            <span ng-if="explorationRatings === 0">Unrated</span>
+            <span ng-if="explorationRatings !== 0"><[explorationRatings]></span>
           </li>
           <li>
             <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top"></span>
@@ -94,7 +95,7 @@
               src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
             <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
               tooltip="<[ContributorUsername]>" tooltip-placement="top">
-              <img class="oppia-contributors-circle" ng-src="/images/general/user_mint_48px.png" alt="">
+              <img class="oppia-contributors-circle" ng-src="/images/avatar/user_mint_48px.png" alt="">
             </li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
@@ -170,7 +171,7 @@
         </div>
       </div>
       <div ng-if="loadingInfoCardData" class="oppia-info-card-content">
-        <h3>Loading Data ....</h3>
+        <h3>Loading...</h3>
       </div>
       <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
         <img src="/third_party/static/material-design-icons-1.0.1/ic_close_white_48dp.png">
