@@ -38,7 +38,6 @@ SAMPLE_YAML_CONTENT = (
 """author_notes: ''
 blurb: ''
 category: Category
-default_skin: conversation_v1
 init_state_name: %s
 language_code: en
 objective: ''
@@ -161,7 +160,6 @@ SAMPLE_YAML_CONTENT_WITH_GADGETS = (
 """author_notes: ''
 blurb: ''
 category: Category
-default_skin: conversation_v1
 init_state_name: %s
 language_code: en
 objective: ''
@@ -1695,7 +1693,6 @@ tags: []
 """author_notes: ''
 blurb: ''
 category: Category
-default_skin: conversation_v1
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -1881,7 +1878,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_specs': {},
             'skin_customizations': (
                 exp_domain.SkinInstance._get_default_skin_customizations(
-                    exploration.default_skin)
+                    feconf.DEFAULT_SKIN_ID)
             ),
         })
 
@@ -2075,7 +2072,7 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
 
     def test_generation_of_get_default_skin_customizations(self):
         """Tests that default skin customizations are created properly."""
-        skin_instance = exp_domain.SkinInstance('conversation_v1', None)
+        skin_instance = exp_domain.SkinInstance(feconf.DEFAULT_SKIN_ID, None)
         self.assertEqual(
             skin_instance.panel_contents_dict,
             {'bottom': []}

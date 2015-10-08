@@ -361,7 +361,6 @@ class TestBase(unittest.TestCase):
             tags=[],
             blurb='',
             author_notes='',
-            default_skin='conversation_v1',
             skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,

@@ -577,7 +577,6 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 """author_notes: ''
 blurb: ''
 category: A category
-default_skin: conversation_v1
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -640,7 +639,6 @@ title: A title
 """author_notes: ''
 blurb: ''
 category: A category
-default_skin: conversation_v1
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -2573,7 +2571,6 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 """author_notes: ''
 blurb: ''
 category: category
-default_skin: conversation_v1
 init_state_name: %s
 language_code: en
 objective: Old objective

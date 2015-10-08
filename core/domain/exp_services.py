@@ -163,7 +163,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
-        exploration_model.default_skin, exploration_model.skin_customizations,
+        exploration_model.skin_customizations,
         versioned_exploration_states['states_schema_version'],
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
@@ -817,7 +817,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
-    exploration_model.default_skin = exploration.default_skin
     exploration_model.skin_customizations = (
         exploration.skin_instance.to_dict()['skin_customizations'])
 
@@ -857,7 +856,6 @@ def _create_exploration(
         tags=exploration.tags,
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
-        default_skin=exploration.default_skin,
         skin_customizations=exploration.skin_instance.to_dict(
             )['skin_customizations'],
         states_schema_version=exploration.states_schema_version,
