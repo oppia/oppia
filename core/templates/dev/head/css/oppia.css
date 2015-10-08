@@ -222,12 +222,12 @@ textarea {
 */
 .oppia-dev-mode {
   background-color: DarkSlateGray;
-  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
   bottom: 0;
   color: white;
-  padding: 5px;
+  padding: 4px 8px;
   position: fixed;
-  right: 0;
+  left: 0;
 }
 
 /*
@@ -834,8 +834,13 @@ md-card.oppia-gallery-tile {
 
 .oppia-cc-icon {
   bottom: 0;
+  opacity: 0.4;
   position: fixed;
   right: 25px;
+}
+
+.oppia-cc-icon:hover {
+  opacity: 0.7;
 }
 
 .oppia-wide-panel {
