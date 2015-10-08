@@ -127,12 +127,12 @@
                         {% if username %}
                           <li class="dropdown pull-right">
                             <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
-                              <div class="oppia-navbar-profile-picture-container">
+                              <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
                                 {% else %}
-                                  <img ng-if="profileDropdownIsActive" src="/images/general/user_mint_48px.png" class="oppia-navbar-profile-picture">
-                                  <img ng-if="!profileDropdownIsActive" src="/images/general/user_white_48px.png" class="oppia-navbar-profile-picture">
+                                  <img ng-if="profileDropdownIsActive" src="/images/avatar/user_mint_48px.png" class="oppia-navbar-profile-picture">
+                                  <img ng-if="!profileDropdownIsActive" src="/images/avatar/user_white_48px.png" class="oppia-navbar-profile-picture">
                                 {% endif %}
                                 <span class="caret" style="margin-top: 10px;"></span>
 

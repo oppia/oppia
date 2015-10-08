@@ -938,11 +938,11 @@ pre.oppia-pre-wrapped-text {
   width: 24px;
 }
 .oppia-pre-avatar-oppia::before {
-  background-image: url('/images/general/oppia_black_48px.png');
+  background-image: url('/images/avatar/oppia_black_48px.png');
   top: 2px;
 }
 .oppia-pre-avatar-user::before {
-  background-image: url('/images/general/user_mint_48px.png');
+  background-image: url('/images/avatar/user_mint_48px.png');
   top: 8px;
 }
 

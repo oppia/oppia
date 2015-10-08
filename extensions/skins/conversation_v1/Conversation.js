@@ -205,7 +205,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.PANEL_TUTOR = 'tutor';
       $scope.PANEL_INTERACTION = 'interaction';
 
-      $scope.profilePicture = '/images/general/user_blue_72px.png';
+      $scope.profilePicture = '/images/avatar/user_blue_72px.png';
       oppiaPlayerService.getUserProfileImage().then(function(result) {
         $scope.profilePicture = result;
       });
@@ -236,7 +236,7 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.getThumbnailSrc = function(panelName) {
         if (panelName === $scope.PANEL_TUTOR) {
-          return '/images/general/o_black_72px.png';
+          return oppiaPlayerService.getOppiaAvatarImageUrl();
         } else if (panelName === $scope.PANEL_INTERACTION) {
           return oppiaPlayerService.getInteractionThumbnailSrc(
             $scope.activeCard.stateName);
