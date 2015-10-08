@@ -191,7 +191,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'default_skin_id', 'init_state_name')
+        'init_state_name')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -1706,9 +1706,6 @@ class Exploration(object):
             param_domain.ParamChange.from_dict(param_change)
             for param_change in param_changes_list
         ]
-
-    def update_default_skin_id(self, default_skin_id):
-        self.default_skin = default_skin_id
 
     def update_init_state_name(self, init_state_name):
         if init_state_name not in self.states:

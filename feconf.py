@@ -164,6 +164,9 @@ DEFAULT_LANGUAGE_CODE = 'en'
 # Whether to include the forum, terms and privacy pages.
 SHOW_CUSTOM_PAGES = True
 
+# The id of the default skin.
+DEFAULT_SKIN_ID = 'conversation_v1'
+
 # User id and username for exploration migration bot.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
@@ -328,13 +331,8 @@ PLAY_TYPE_NORMAL = 'normal'
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
-# Advanced feature.
-SHOW_GADGETS_EDITOR = False
-
-# Unlaunched feature.
-SHOW_SKIN_CHOOSER = False
-
-# Unfinished feature.
+# Unfinished features.
+SHOW_GADGETS_EDITOR = True
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.

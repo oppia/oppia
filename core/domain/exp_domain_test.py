@@ -2081,12 +2081,6 @@ class SkinInstanceUnitTests(test_utils.GenericTestBase):
             {'bottom': []}
         )
 
-        skin_instance = exp_domain.SkinInstance('snapshots_v1', None)
-        self.assertEqual(
-            skin_instance.panel_contents_dict,
-            {'main': []}
-        )
-
     def test_conversion_of_skin_to_and_from_dict(self):
         """Tests conversion of SkinInstance to and from dict representations."""
         exploration = exp_domain.Exploration.from_yaml(

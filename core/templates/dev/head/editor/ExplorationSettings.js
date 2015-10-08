@@ -24,13 +24,13 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', 'explorationSkinIdService', 'CATEGORY_LIST', function(
+    'explorationWarningsService', 'CATEGORY_LIST', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService, explorationSkinIdService, CATEGORY_LIST) {
+      explorationWarningsService, CATEGORY_LIST) {
 
   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -42,7 +42,6 @@ oppia.controller('ExplorationSettings', [
   }
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
-  $scope.ALL_SKIN_IDS = Object.keys(GLOBALS.SKIN_SPECS);
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -63,7 +62,6 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationInitStateNameService = explorationInitStateNameService;
     $scope.explorationParamSpecsService = explorationParamSpecsService;
     $scope.explorationParamChangesService = explorationParamChangesService;
-    $scope.explorationSkinIdService = explorationSkinIdService;
 
     explorationData.getData().then(function(data) {
       $scope.refreshSettingsTab();
@@ -139,12 +137,6 @@ oppia.controller('ExplorationSettings', [
   $scope.saveExplorationParamChanges = function() {
     explorationParamChangesService.saveDisplayedValue();
     explorationWarningsService.updateWarnings();
-  };
-
-  $scope.saveExplorationSkinId = function() {
-    // TODO(sll): This should first change the panel specifications to match
-    // the new skin.
-    explorationSkinIdService.saveDisplayedValue();
   };
 
   /********************************************

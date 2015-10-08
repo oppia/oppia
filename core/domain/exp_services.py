@@ -522,8 +522,6 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(change.new_value)
-                elif change.property_name == 'default_skin_id':
-                    exploration.update_default_skin_id(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
             elif (change.cmd ==

@@ -28,22 +28,13 @@ class DefaultSkinsUnitTests(test_utils.GenericTestBase):
     def test_get_all_skin_ids(self):
         self.assertEqual(
             sorted(skins_services.Registry.get_all_skin_ids()),
-            ['conversation_v1', 'snapshots_v1'])
+            ['conversation_v1'])
 
-    def test_default_skins_are_present(self):
+    def test_default_skin_is_present(self):
         conversation_skin = skins_services.Registry.get_skin_templates([
             'conversation_v1'])
         self.assertIn('conversation.css', conversation_skin)
         self.assertIn('skins/Conversation', conversation_skin)
-
-        snapshots_skin = skins_services.Registry.get_skin_templates([
-            'snapshots_v1'])
-        self.assertIn('skins/Snapshots', snapshots_skin)
-
-        two_skins = skins_services.Registry.get_skin_templates([
-            'conversation_v1', 'snapshots_v1'])
-        self.assertIn('skins/Conversation', two_skins)
-        self.assertIn('skins/Snapshots', two_skins)
 
     def test_nonexistent_skins_raise_error(self):
         with self.assertRaises(Exception):

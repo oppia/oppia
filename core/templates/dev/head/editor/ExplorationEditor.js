@@ -22,17 +22,16 @@
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
 oppia.constant('GADGET_SPECS', window.GLOBALS ? GLOBALS.GADGET_SPECS : {});
-oppia.constant('SKIN_SPECS', window.GLOBALS ? GLOBALS.SKIN_SPECS: {});
+oppia.constant('PANEL_SPECS', window.GLOBALS ? GLOBALS.PANEL_SPECS: {});
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'explorationData', 'editorContextService', 'explorationTitleService',
   'explorationCategoryService', 'explorationGadgetsService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationSkinIdService',
-  'explorationInitStateNameService', 'explorationTagsService',
-  'editabilityService', 'explorationStatesService', 'routerService',
-  'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'explorationRightsService', 'explorationInitStateNameService',
+  'explorationTagsService', 'editabilityService', 'explorationStatesService',
+  'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   function(
@@ -40,10 +39,9 @@ oppia.controller('ExplorationEditor', [
     explorationData,  editorContextService, explorationTitleService,
     explorationCategoryService, explorationGadgetsService,
     explorationObjectiveService, explorationLanguageCodeService,
-    explorationRightsService, explorationSkinIdService,
-    explorationInitStateNameService, explorationTagsService,
-    editabilityService, explorationStatesService, routerService,
-    graphDataService,  stateEditorTutorialFirstTimeService,
+    explorationRightsService, explorationInitStateNameService,
+    explorationTagsService, editabilityService, explorationStatesService,
+    routerService, graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
     explorationWarningsService, $templateCache, explorationContextService) {
 
@@ -87,7 +85,6 @@ oppia.controller('ExplorationEditor', [
       explorationStatesService.init(data.states);
 
       explorationTitleService.init(data.title);
-      explorationSkinIdService.init(data.default_skin_id);
       explorationCategoryService.init(data.category);
       explorationGadgetsService.init(data.skin_customizations);
       explorationObjectiveService.init(data.objective);
@@ -98,7 +95,6 @@ oppia.controller('ExplorationEditor', [
       explorationParamChangesService.init(data.param_changes || []);
 
       $scope.explorationTitleService = explorationTitleService;
-      $scope.explorationSkinIdService = explorationSkinIdService;
       $scope.explorationCategoryService = explorationCategoryService;
       $scope.explorationGadgetsService = explorationGadgetsService;
       $scope.explorationObjectiveService = explorationObjectiveService;
@@ -585,7 +581,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'tags': 'Tags',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
-              'default_skin_id': 'Default skin',
               'init_state_name': 'First card'
             };
 
@@ -595,7 +590,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'title': true,
               'category': true,
               'objective': true,
-              'default_skin_id': true,
               'init_state_name': true
             };
 

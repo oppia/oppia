@@ -227,6 +227,8 @@ textarea {
   color: white;
   left: 0;
   padding: 4px 8px;
+  /* This allows clicks to 'pass through' the element. */
+  pointer-events: none;
   position: fixed;
 }
 
