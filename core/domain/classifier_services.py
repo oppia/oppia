@@ -22,15 +22,18 @@ import numpy
 
 class StringClassifier(object):
     """
-    A classifier for strings, originally created to classify student free-form
-    responses into different answer groups. Uses Latent Dirichlet Allocation
+    A classifier that uses supervised learning to match free-form text answers
+    to answer groups. The classifier trains on answers that exploration editors
+    have assigned to an answer group. Given a new answer, it predicts the
+    answer group using Latent Dirichlet Allocation
     (https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) with Gibbs
-    Sampling, and predicts normalized to a given threshold.
+    Sampling.
 
     Below is an example workflow for running a batch job that builds a new
     classifier and outputs it to a dictionary.
-        # a list where the first element is a doc string and the second
-        # element is a list of labels associated with the doc
+
+        # Examples are formatted as a list. Each element is a doc followed by a
+        # list of labels.
         examples = [
             ['i eat fish and vegetables', ['food']],
             ['fish are pets', ['pets']],
@@ -41,9 +44,10 @@ class StringClassifier(object):
         classifier_dict = string_classifier.to_dict()
         save_to_data_store(classifier_dict)
 
-    Below is an example workflow for predicting a label for a document with
-    an existing classifier.
-        # a list of doc strings to predict on
+    Below is an example workflow for using an existing classifier to predict a
+    document's label.
+
+        # A list of docs to classify.
         prediction_examples = [
             'i only eat fish and vegetables'
         ]
@@ -56,26 +60,27 @@ class StringClassifier(object):
         print label
 
     Below are some concepts used in this class.
-    doc - A student free form response. This is expected to be pre-normalized
-        prior to being passed into a StringClassifier.
-    word - A doc's tokens. Currently defined to be whitespace-delimited.
+    doc - A student free form response, represented as a string of arbitrary
+        non-whitespace characters (a "word") separated by single spaces.
+    word - A string of arbitrary non-whitespace characters.
     word id - A unique word. Each unique word has one word id that is used
-        to represent the word in the model.
+        to represent the word in the classifier model.
     word instance - An instance of a word id. Each word id can have multiple
-        instances that exist throughout the model.
+        instances corresponding to its occurrences in all docs.
     label - An answer group that the doc should correspond to. Labels should
         not begin with a '_' (underscore). If a doc is being added to train
         a model, labels are provided. If a doc is being added for prediction
         purposes, no labels are provided.
     label bit vector - A bit vector corresponding to a doc, indexed by label
-        id. A one in the vector represents a label exists in the doc, a zero
-        in the vector represents a label does not exist.
+        id. A one in the vector means the label id matches some word instance
+        in the doc; a zero in the vector means the label id does not match any
+        word instance in the doc.
 
     This class uses index notation with the format "_V_XY", where V is the
     element of an array, and X and Y are the indices used to measure V.
     https://en.wikipedia.org/wiki/Index_notation
 
-    Index notation variable mappings:
+    The following maps index notation letters to their meanings:
     b - boolean value for whether Y is set in X
     c - count of Y's in X
     p - position of a value V in X
@@ -90,19 +95,20 @@ class StringClassifier(object):
     _l_dp - lists of label ids, where each list represents what label
         is assigned to a word instance.
     _c_dl - lists of counts, where each list represents the number of
-        each label in a doc.
+        word instances assigned to each label in a doc.
     _c_lw - lists of counts, where each list represents the number of
-        each label for a given word id.
+        word instances assigned to each label for a given word id (aggregated
+        across all docs).
     _c_l - a list of counts, where each count is the number of times
-        a label was matched to a word instance.
+        a label was assigned (aggregated over all word instances in all docs).
 
     There are two internal learning rates, _DEFAULT_ALPHA and _DEFAULT_BETA.
     These are initialized to Wikipedia's recommendations. Do not change these
     unless you know what you're doing.
 
-    A default label _DEFAULT_LABEL is assigned to each doc. This label is
-    assigned to word instances that are not useful predictors of a doc's
-    label.
+    It is possible for a word instance in a doc to not have an explicit label
+    assigned to it. This is characterized by assigning _DEFAULT_LABEL to the
+    word instance.
     """
 
     _DEFAULT_ALPHA = 0.1
@@ -172,12 +178,11 @@ class StringClassifier(object):
         label_vector[self._label_to_id[self._DEFAULT_LABEL]] = 1
         return label_vector
 
-    def _update_counting_matrices(self, d, w, l, inc):
+    def _update_counting_matrices(self, d, w, l, val):
         """
         Updates counting matrices (ones that begin with _c) when a label
         is assigned and unassigned to a word.
         """
-        val = 1 if inc else -1
         self._c_dl[d, l] += val
         self._c_lw[l, w] += val
         self._c_l[l] += val
@@ -186,13 +191,13 @@ class StringClassifier(object):
         """
         Assign a label to a word in a doc.
         """
-        self._update_counting_matrices(d, w, l, True)
+        self._update_counting_matrices(d, w, l, 1)
 
     def _decrement_counting_matrices(self, d, w, l):
         """
         Unassign a label from a word in a doc.
         """
-        self._update_counting_matrices(d, w, l, False)
+        self._update_counting_matrices(d, w, l, -1)
 
     def _get_doc_ids(self, doc_ids):
         """
@@ -284,13 +289,17 @@ class StringClassifier(object):
         return probs_with_label_name
 
     def _get_prediction_report_for_doc(self, d):
-        """
-        Generates and returns a prediction report for a given doc.
-        The prediction report contains a document's predicted label,
-        the prediction confidence that exceeded the classifier's
-        prediction threshold, and the probability given to each label.
+        """Generates and returns a prediction report for a given doc.
 
-        Because "_default" is a special label that captures unspecial
+        The prediction report is a dict with the following keys:
+        - 'prediction_label': the document's predicted label
+        - 'prediction_confidence': the prediction confidence. This is
+        Prob(the doc should be assigned this label |
+        the doc is not assigned _DEFAULT_LABEL).
+        - 'all_predictions': a dict mapping each label to
+        Prob(the doc should be assigned to this label).
+
+        Because _DEFAULT_LABEL is a special label that captures unspecial
         tokens (how ironic), its probability is not a good predicting
         indicator. For the current normalization process, it has on
         average a higher probability than other labels. To combat this,
@@ -300,13 +309,11 @@ class StringClassifier(object):
         normalized probability for the two labels without the default
         label is 0.4 and 0.6, respectively.
 
-        The prediction threshold can be altered at the classifier level.
+        The prediction threshold is currently defined at the classifier level.
         A higher prediction threshold indicates that the predictor needs
         more confidence prior to making a prediction, otherwise it will
-        not predict (and return the default label). A lower prediction
-        threshold indicates that the preditor can predict with less
-        confidence. However, lower confidence predictions will be less
-        accurate, and more docs could be incorrectly classified.
+        predict _DEFAULT_LABEL. This will make non-default predictions more
+        accurate, but result in fewer of them.
         """
         prediction_label = self._DEFAULT_LABEL
         prediction_confidence = 0
