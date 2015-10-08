@@ -21,111 +21,212 @@ import numpy
 
 
 class StringClassifier(object):
-    """Handles math-y internals for classifying strings.
-    https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation"""
+    """
+    A classifier for strings, originally created to classify student free-form
+    responses into different answer groups. Uses Latent Dirichlet Allocation
+    (https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) with Gibbs
+    Sampling, and predicts normalized to a given threshold.
 
-    # Learning rates
+    Below is an example workflow for running a batch job that builds a new
+    classifier and outputs it to a dictionary.
+        # a list where the first element is a doc string and the second
+        # element is a list of labels associated with the doc
+        examples = [
+            ['i eat fish and vegetables', ['food']],
+            ['fish are pets', ['pets']],
+            ['my kitten eats fish', ['food', 'pets']]
+        ]
+        string_classifier = StringClassifier()
+        string_classifier.load_examples(examples)
+        classifier_dict = string_classifier.to_dict()
+        save_to_data_store(classifier_dict)
+
+    Below is an example workflow for predicting a label for a document with
+    an existing classifier.
+        # a list of doc strings to predict on
+        prediction_examples = [
+            'i only eat fish and vegetables'
+        ]
+        classifier_dict = load_from_data_store()
+        string_classifier = StringClassifier()
+        string_classifier.from_dict(classifier_dict)
+        doc_ids = string_classifier.add_examples_for_predicting(
+            prediction_examples)
+        label = string_classifier.predict_label_for_doc(doc_ids[0])
+        print label
+
+    Below are some concepts used in this class.
+    doc - A student free form response. This is expected to be pre-normalized
+        prior to being passed into a StringClassifier.
+    word - A doc's tokens. Currently defined to be whitespace-delimited.
+    word id - A unique word. Each unique word has one word id that is used
+        to represent the word in the model.
+    word instance - An instance of a word id. Each word id can have multiple
+        instances that exist throughout the model.
+    label - An answer group that the doc should correspond to. Labels should
+        not begin with a '_' (underscore). If a doc is being added to train
+        a model, labels are provided. If a doc is being added for prediction
+        purposes, no labels are provided.
+    label bit vector - A bit vector corresponding to a doc, indexed by label
+        id. A one in the vector represents a label exists in the doc, a zero
+        in the vector represents a label does not exist.
+
+    This class uses index notation with the format "_V_XY", where V is the
+    element of an array, and X and Y are the indices used to measure V.
+    https://en.wikipedia.org/wiki/Index_notation
+
+    Index notation variable mappings:
+    b - boolean value for whether Y is set in X
+    c - count of Y's in X
+    p - position of a value V in X
+    l - label id
+    w - word id
+    d - doc id
+
+    Internal model representation:
+    _w_dp - lists of word ids, where each list represents a doc
+    _b_dl - lists of booleans, where each boolean represents whether a
+        label is contained within a doc.
+    _l_dp - lists of label ids, where each list represents what label
+        is assigned to a word instance.
+    _c_dl - lists of counts, where each list represents the number of
+        each label in a doc.
+    _c_lw - lists of counts, where each list represents the number of
+        each label for a given word id.
+    _c_l - a list of counts, where each count is the number of times
+        a label was matched to a word instance.
+
+    There are two internal learning rates, _DEFAULT_ALPHA and _DEFAULT_BETA.
+    These are initialized to Wikipedia's recommendations. Do not change these
+    unless you know what you're doing.
+
+    A default label _DEFAULT_LABEL is assigned to each doc. This label is
+    assigned to word instances that are not useful predictors of a doc's
+    label.
+    """
+
     _DEFAULT_ALPHA = 0.1
     _DEFAULT_BETA = 0.001
 
-    # Default label
-    # Captures parts of docs that don't help with prediction
+    _DEFAULT_TRAINING_ITERATIONS = 25
+    _DEFAULT_PREDICTION_ITERATIONS = 5
+
+    _DEFAULT_PREDICTION_THRESHOLD = 0.5
+
     _DEFAULT_LABEL = '_default'
 
     def __init__(self):
         """
-        Hieroglyph decoder:
-        b - boolean
-        c - count
-        p - position
-        l - label (id)
-        w - word (id)
-        d - doc (id)
-
-        Internal (private) model representation:
-        _w_dp - word given doc and count
-            (list of word ids which represent a doc)
-        _b_dl - boolean given doc and label
-            (boolean of whether a doc has a label)
-        _l_dp - label given doc and count
-            (assigned label of each word instance in a doc)
-        _c_dl - count given doc and label
-            (count of each label per doc)
-        _c_lw - count given label and word
-            (count of labels per word)
-        _c_l - count given label
-            (count of each label type)
+        Initializes constants for the classifier. Setting a seed ensures
+        that results are deterministic. There is nothing special about the
+        value 4. These should not be changed unless you know what you're doing.
         """
-        # Ensure that results are deterministic
-        # There is nothing special about the value 4
         numpy.random.seed(seed=4)
 
         self._alpha = self._DEFAULT_ALPHA
         self._beta = self._DEFAULT_BETA
 
+        self._training_iterations = self._DEFAULT_TRAINING_ITERATIONS
+        self._prediction_iterations = self._DEFAULT_PREDICTION_ITERATIONS
+
+        self._prediction_threshold = self._DEFAULT_PREDICTION_THRESHOLD
+
     def _get_word_id(self, word):
-        """Returns a word's id if it exists, otherwise assigns
-        a new id to the word and returns it."""
+        """
+        Returns a word's id if it exists, otherwise assigns
+        a new id to the word and returns it.
+        """
         if word not in self._word_to_id:
             self._word_to_id[word] = self._num_words
             self._num_words += 1
         return self._word_to_id[word]
 
     def _get_label_id(self, label):
-        """Returns a label's id if it exists, otherwise assigns
-        a new id to the label and returns it."""
+        """
+        Returns a label's id if it exists, otherwise assigns
+        a new id to the label and returns it.
+        """
         if label not in self._label_to_id:
             self._label_to_id[label] = self._num_labels
             self._num_labels += 1
         return self._label_to_id[label]
 
-    def _get_record(self, d):
-        """Given a doc id, return the doc and labels."""
+    def _get_doc_with_label_vector(self, d):
+        """
+        Given a doc id, return the doc and its label bit vector.
+        """
         return self._w_dp[d], self._b_dl[d]
 
     def _get_label_vector(self, labels):
-        """Returns a vector specifying which labels
-        are specified in the training set."""
-        # When we see an empty label list, predicting on all labels
-        # is assumed (versus having to pass all the labels each prediction)
+        """
+        Given a list of labels, return the label bit vector.
+        An empty label list is an alias for all labels being set. This is
+        useful because otherwise when a new label is introduce to the model,
+        none of the input data needs to be altered.
+        """
         if len(labels) == 0:
             return numpy.ones(self._num_labels)
         label_vector = numpy.zeros(self._num_labels)
         for label in labels:
             label_vector[self._get_label_id(label)] = 1
-        # Always set default label
         label_vector[self._label_to_id[self._DEFAULT_LABEL]] = 1
         return label_vector
 
-    def _update_counting_matrices(self, d, w, l, inc=True):
-        """Update counting matrices given doc/word/label indices.
-        Either increments or decrements."""
+    def _update_counting_matrices(self, d, w, l, inc):
+        """
+        Updates counting matrices (ones that begin with _c) when a label
+        is assigned and unassigned to a word.
+        """
         val = 1 if inc else -1
         self._c_dl[d, l] += val
         self._c_lw[l, w] += val
         self._c_l[l] += val
 
+    def _increment_counting_matrices(self, d, w, l):
+        """
+        Assign a label to a word in a doc.
+        """
+        self._update_counting_matrices(d, w, l, True)
+
+    def _decrement_counting_matrices(self, d, w, l):
+        """
+        Unassign a label from a word in a doc.
+        """
+        self._update_counting_matrices(d, w, l, False)
+
     def _get_doc_ids(self, doc_ids):
+        """
+        Helper function for methods that iterate over doc ids.
+        If no doc ids are provided, then all doc ids are iterated over.
+        This simplifies logic closer to the client.
+        """
         if doc_ids is None:
             doc_ids = xrange(self._num_docs)
         return doc_ids
 
-    def _init_docs(self, doc_ids=None):
-        """Initialize data for given docs (defaults to all)."""
+    def _assign_initial_labels_to_word_instances(self, doc_ids=None):
+        """
+        Uniformly assigns labels to word instances in a new document. This
+        prevents the model from converging to a non-useful state when training.
+        """
         doc_ids = self._get_doc_ids(doc_ids)
 
         for d in doc_ids:
-            doc, labels = self._get_record(d)
-            l_c = [
+            doc, labels = self._get_doc_with_label_vector(d)
+            l_p = [
                 numpy.random.multinomial(1, labels / labels.sum()).argmax()
-                for i in xrange(len(doc))
+                for _ in xrange(len(doc))
             ]
-            self._l_dp.append(l_c)
-            for w, l in zip(doc, l_c):
-                self._update_counting_matrices(d, w, l)
+            self._l_dp.append(l_p)
+            for w, l in zip(doc, l_p):
+                self._increment_counting_matrices(d, w, l)
 
-    def _infer_docs(self, doc_ids):
-        """Runs iterative inference on given docs."""
+    def _run_gibbs_sampling(self, doc_ids):
+        """
+        Runs one iteration of Gibbs sampling on the provided docs.
+        The statez variable is used for debugging, and possibly convergence
+        testing in the future.
+        """
         doc_ids = self._get_doc_ids(doc_ids)
 
         statez = {
@@ -134,94 +235,215 @@ class StringClassifier(object):
         }
 
         for d in doc_ids:
-            doc, labels = self._get_record(d)
+            doc, labels = self._get_doc_with_label_vector(d)
             for p, w in enumerate(doc):
                 l = self._l_dp[d][p]
 
-                self._update_counting_matrices(d, w, l, False)
+                self._decrement_counting_matrices(d, w, l)
 
-                # Gibbs update of labels
                 coeff_a = 1.0 / (
                     self._c_dl[d].sum() + self._num_labels * self._alpha)
                 coeff_b = 1.0 / (
                     self._c_lw.sum(axis=1) + self._num_words * self._beta)
-                prob_l = (
+                label_probabilities = (
                     labels *
                     coeff_a * (self._c_dl[d] + self._alpha) *
                     coeff_b * (self._c_lw[:, w] + self._beta))
-                new_l = numpy.random.multinomial(
-                    1, prob_l / prob_l.sum()).argmax()
+                new_label = numpy.random.multinomial(
+                    1,
+                    label_probabilities / label_probabilities.sum()).argmax()
 
                 statez['computes'] += 1
-                if l != new_l:
+                if l != new_label:
                     statez['updates'] += 1
 
-                self._l_dp[d][p] = new_l
-                self._update_counting_matrices(d, w, new_l)
+                self._l_dp[d][p] = new_label
+                self._increment_counting_matrices(d, w, new_label)
 
         return statez
 
-    def _get_probability(self, d):
-        """Returns the probability of a doc having a label."""
-        probs_i = self._c_dl[d] + (self._b_dl[d] * self._alpha)
-        probs_i = probs_i / probs_i.sum(axis=0)[numpy.newaxis]
-        return probs_i
+    def _get_label_probabilities(self, d):
+        """
+        Returns a list of label probabilities for a given doc, indexed by
+        label id.
+        """
+        probs_with_label_id = self._c_dl[d] + (self._b_dl[d] * self._alpha)
+        probs_with_label_id = (probs_with_label_id /
+            probs_with_label_id.sum(axis=0)[numpy.newaxis])
+        return probs_with_label_id
 
-    def _get_probability_with_label(self, d):
-        """Returns a dict that maps human-readable labels to the probability
-        that the doc has the label."""
-        probs_i = self._get_probability(d)
-        probs_l = {}
-        for label, l in self._label_to_id.iteritems():
-            probs_l[label] = probs_i[l]
-        return probs_l
+    def _get_label_probabilities_with_label_names(self, d):
+        """
+        Returns a dictionary of label probabilities for a given doc, keyed by
+        label name.
+        """
+        probs_with_label_id = self._get_label_probabilities(d)
+        probs_with_label_name = {}
+        for label_name, l in self._label_to_id.iteritems():
+            probs_with_label_name[label_name] = probs_with_label_id[l]
+        return probs_with_label_name
 
-    def _predict(self, d, threshold=0.5):
-        """Calculates prediction data for a doc.
-        Returns a tuple of (predicted label, prediction score)."""
-        probs_l = self._get_probability_with_label(d)
-        default_prob = probs_l[self._DEFAULT_LABEL]
+    def _get_prediction_report_for_doc(self, d):
+        """
+        Generates and returns a prediction report for a given doc.
+        The prediction report contains a document's predicted label,
+        the prediction confidence that exceeded the classifier's
+        prediction threshold, and the probability given to each label.
+
+        Because "_default" is a special label that captures unspecial
+        tokens (how ironic), its probability is not a good predicting
+        indicator. For the current normalization process, it has on
+        average a higher probability than other labels. To combat this,
+        all other labels are normalized as if the default label did not
+        exist. For example, if we have two labels with probability 0.2
+        and 0.3 with the default label having probability 0.5, the
+        normalized probability for the two labels without the default
+        label is 0.4 and 0.6, respectively.
+
+        The prediction threshold can be altered at the classifier level.
+        A higher prediction threshold indicates that the predictor needs
+        more confidence prior to making a prediction, otherwise it will
+        not predict (and return the default label). A lower prediction
+        threshold indicates that the preditor can predict with less
+        confidence. However, lower confidence predictions will be less
+        accurate, and more docs could be incorrectly classified.
+        """
+        prediction_label = self._DEFAULT_LABEL
+        prediction_confidence = 0
+        probs_with_label_name =(
+            self._get_label_probabilities_with_label_names(d))
+        default_prob = probs_with_label_name[self._DEFAULT_LABEL]
         default_prob_comp = 1.0 - default_prob
-        for label in sorted(probs_l, key=probs_l.get, reverse=True):
-            prob_l = probs_l[label]
+
+        for label in sorted(probs_with_label_name,
+                key=probs_with_label_name.get, reverse=True):
+            prob_with_label_name = probs_with_label_name[label]
             if (label != self._DEFAULT_LABEL and
-                    prob_l / default_prob_comp > threshold):
-                return label, prob_l / default_prob_comp
-        return self._DEFAULT_LABEL, default_prob / default_prob_comp
+                    prob_with_label_name /
+                    default_prob_comp > self._prediction_threshold):
+                prediction_label = label
+                prediction_confidence = prob_with_label_name / default_prob_comp
+
+        return {
+            'prediction_label': prediction_label,
+            'prediction_confidence': prediction_confidence,
+            'all_predictions': prob_with_label_name
+        }
 
     def _validate_label(self, label):
-        """Checks that labels don't begin with underscore."""
+        """
+        Labels are defined to not begin with underscores. This is a generic
+        rule defined as loosely as possible to avoid a label having the same
+        name as the default label. If a label in the provided examples begins
+        with an underscore, an exception will be raised.
+        """
         if label[0] == '_':
             raise Exception('Label %s cannot begin with underscore.' % label)
 
     def _parse_examples(self, examples):
-        """Splits examples into docs (split on spaces) and labels.
-        Example format:
-        [
-            ['doc1', ['label1']],
-            ['doc2', ['label2']],
-            etc
-        ]
+        """
+        Unzips docs and label lists from examples and returns the two lists.
+        Docs are split on whitespace. Order is preserved.
         """
         docs = []
-        labels = []
+        labels_list = []
         for example in examples:
-            doc = example[0].split()
+            doc_string = example[0]
+            doc = doc_string.split()
             if len(doc) > 0:
+                labels = example[1]
                 docs.append(doc)
-                map(self._validate_label, example[1])
-                labels.append(example[1])
-        return docs, labels
+                map(self._validate_label, labels)
+                labels_list.append(labels)
+        return docs, labels_list
 
-    def _train_docs(self, iterations, doc_ids=None):
-        """Trains given docs (default all) for a number of iterations."""
+    def _iterate_gibbs_sampling(self, iterations, doc_ids=None):
+        """
+        Runs Gibbs sampling for iterations number of times on the provided
+        docs.
+        """
         doc_ids = self._get_doc_ids(doc_ids)
 
         for i in xrange(iterations):
-            statez = self._infer_docs(doc_ids)
+            statez = self._run_gibbs_sampling(doc_ids)
 
-    def load_examples(self, examples, iterations=25):
-        """Sets new examples. Overwrites existing ones."""
+    def _add_examples(self, examples, iterations):
+        """
+        Adds examples to the internal state of the classifier, assigns random
+        initial labels to only the added docs, and runs Gibbs sampling for
+        iterations number of iterations.
+        """
+        if len(examples) == 0:
+            return
+
+        docs, labels_list = self._parse_examples(examples)
+
+        last_num_labels = self._num_labels
+        last_num_docs = self._num_docs
+        last_num_words = self._num_words
+
+        # Increments _num_labels with any new labels
+        [map(self._get_label_id, labels) for labels in labels_list]
+        self._num_docs += len(docs)
+
+        self._b_dl = numpy.concatenate(
+            (self._b_dl, numpy.zeros(
+                (last_num_docs, self._num_labels - last_num_labels),
+                dtype=int)), axis=1)
+        self._b_dl = numpy.concatenate(
+            (self._b_dl, [
+                self._get_label_vector(labels) for labels in labels_list
+            ]), axis=0)
+        self._w_dp.extend([map(self._get_word_id, doc) for doc in docs])
+        self._c_dl = numpy.concatenate(
+            (self._c_dl, numpy.zeros(
+                (last_num_docs, self._num_labels - last_num_labels),
+                dtype=int)), axis=1)
+        self._c_dl = numpy.concatenate(
+            (self._c_dl, numpy.zeros(
+                (self._num_docs - last_num_docs, self._num_labels),
+                dtype=int)), axis=0)
+        self._c_lw = numpy.concatenate(
+            (self._c_lw, numpy.zeros(
+                (last_num_labels, self._num_words - last_num_words),
+                dtype=int)), axis=1)
+        self._c_lw = numpy.concatenate(
+            (self._c_lw, numpy.zeros(
+                (self._num_labels - last_num_labels, self._num_words),
+                dtype=int)), axis=0)
+        self._c_l = numpy.concatenate(
+            (self._c_l, numpy.zeros(
+                self._num_labels - last_num_labels, dtype=int)))
+
+        for d in xrange(last_num_docs, self._num_docs):
+            self._assign_initial_labels_to_word_instances([d])
+            self._iterate_gibbs_sampling(iterations, [d])
+
+        return xrange(last_num_docs, self._num_docs)
+
+    def add_examples_for_training(self, training_examples):
+        """
+        Adds examples to the classifier with _training_iterations number of
+        iterations.
+        """
+        return self._add_examples(training_examples, self._training_iterations)
+
+    def add_examples_for_predicting(self, prediction_examples):
+        """
+        Adds examples to the classifier with _prediction_iterations number of
+        iterations.
+        """
+        return self._add_examples(
+            zip(prediction_examples,
+                [[] for _ in xrange(len(prediction_examples))]),
+            self._prediction_iterations)
+
+    def load_examples(self, examples):
+        """
+        Sets the internal state of the classifier, assigns random initial
+        labels to the docs, and runs Gibbs sampling for _training_iterations
+        number of iterations.
+        """
         docs, labels_list = self._parse_examples(examples)
 
         label_set = set(
@@ -239,75 +461,35 @@ class StringClassifier(object):
         self._b_dl = numpy.array(
             map(self._get_label_vector, labels_list), dtype=int)
         self._w_dp = [map(self._get_word_id, doc) for doc in docs]
-        self._l_dp = []
         self._c_dl = numpy.zeros(
             (self._num_docs, self._num_labels), dtype=int)
         self._c_lw = numpy.zeros(
             (self._num_labels, self._num_words), dtype=int)
         self._c_l = numpy.zeros(self._num_labels, dtype=int)
+        self._l_dp = []
 
-        self._init_docs()
-        self._train_docs(iterations)
+        self._assign_initial_labels_to_word_instances()
+        self._iterate_gibbs_sampling(self._training_iterations)
 
-    def add_examples(self, examples, iterations=25):
-        """Adds examples. Old examples are preserved.
-        Recommend 5 iterations when adding for predicting purposes.
-        Returns the doc ids of examples added, in the same order."""
-        docs, labels_list = self._parse_examples(examples)
-
-        last_num_labels = self._num_labels
-        last_num_docs = self._num_docs
-        last_num_words = self._num_words
-
-        # Increments _num_labels with any new labels
-        [map(self._get_label_id, labels) for labels in labels_list]
-        self._num_docs += len(docs)
-
-        if len(examples) > 0:
-            self._b_dl = numpy.concatenate(
-                (self._b_dl, numpy.zeros(
-                    (last_num_docs, self._num_labels - last_num_labels),
-                    dtype=int)), axis=1)
-            self._b_dl = numpy.concatenate(
-                (self._b_dl, [
-                    self._get_label_vector(labels) for labels in labels_list
-                ]), axis=0)
-            self._w_dp.extend([map(self._get_word_id, doc) for doc in docs])
-            self._c_dl = numpy.concatenate(
-                (self._c_dl, numpy.zeros(
-                    (last_num_docs, self._num_labels - last_num_labels),
-                    dtype=int)), axis=1)
-            self._c_dl = numpy.concatenate(
-                (self._c_dl, numpy.zeros(
-                    (self._num_docs - last_num_docs, self._num_labels),
-                    dtype=int)), axis=0)
-            self._c_lw = numpy.concatenate(
-                (self._c_lw, numpy.zeros(
-                    (last_num_labels, self._num_words - last_num_words),
-                    dtype=int)), axis=1)
-            self._c_lw = numpy.concatenate(
-                (self._c_lw, numpy.zeros(
-                    (self._num_labels - last_num_labels, self._num_words),
-                    dtype=int)), axis=0)
-            self._c_l = numpy.concatenate(
-                (self._c_l, numpy.zeros(
-                    self._num_labels - last_num_labels, dtype=int)))
-
-        for d in xrange(last_num_docs, self._num_docs):
-            self._init_docs([d])
-            self._train_docs(iterations, [d])
-
-        return xrange(last_num_docs, self._num_docs)
-
-    def predict_label(self, d, threshold=0.5):
-        """Calculates predicted label for a doc."""
-        return self._predict(d, threshold)[0]
+    def predict_label_for_doc(self, d):
+        """
+        Returns the predicted label from a doc's prediction report.
+        """
+        return self._get_prediction_report_for_doc(d)['prediction_label']
 
     def to_dict(self):
-        """Converts a classifier into a dict model."""
+        """
+        Converts a classifier into a dict model.
+        """
         model = {}
         model['_alpha'] = copy.deepcopy(self._alpha)
         model['_beta'] = copy.deepcopy(self._beta)
+        model['_prediction_threshold'] = copy.deepcopy(
+            self._prediction_threshold)
+        model['_training_iterations'] = copy.deepcopy(
+            self._training_iterations)
+        model['_prediction_iterations'] = copy.deepcopy(
+            self._prediction_iterations)
         model['_num_labels'] = copy.deepcopy(self._num_labels)
         model['_num_docs'] = copy.deepcopy(self._num_docs)
         model['_num_words'] = copy.deepcopy(self._num_words)
@@ -322,9 +504,17 @@ class StringClassifier(object):
         return model
 
     def from_dict(self, model):
-        """Converts a dict model into a classifier."""
+        """
+        Converts a dict model into a classifier.
+        """
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
+        self._prediction_threshold = copy.deepcopy(
+            model['_prediction_threshold'])
+        self._training_iterations = copy.deepcopy(
+            model['_training_iterations'])
+        self._prediction_iterations = copy.deepcopy(
+            model['_prediction_iterations'])
         self._num_labels = copy.deepcopy(model['_num_labels'])
         self._num_docs = copy.deepcopy(model['_num_docs'])
         self._num_words = copy.deepcopy(model['_num_words'])

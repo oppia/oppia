@@ -15,8 +15,8 @@
 # limitations under the License.
 
 from core.domain import classifier_services
+from core.tests import test_utils
 
-import test_utils
 import utils
 
 import numpy
@@ -34,9 +34,9 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     ]
 
     _EXAMPLES_TEST = [
-        ['i only eat fish and vegetables', []],
-        ['pets are friends', []],
-        ['a b c d e f g h i j k l m n o p q r s t u v w x y z', []]
+        'i only eat fish and vegetables',
+        'pets are friends',
+        'a b c d e f g h i j k l m n o p q r s t u v w x y z'
     ]
 
     def setUp(self):
@@ -47,6 +47,12 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def _validate_instance(self, string_classifier):
         self.assertEquals('_alpha' in dir(self.string_classifier), True)
         self.assertEquals('_beta' in dir(self.string_classifier), True)
+        self.assertEquals('_prediction_threshold' in
+            dir(self.string_classifier), True)
+        self.assertEquals('_training_iterations' in
+            dir(self.string_classifier), True)
+        self.assertEquals('_prediction_iterations' in
+            dir(self.string_classifier), True)
 
         for d in xrange(self.string_classifier._num_docs):
             self.assertEquals(
@@ -97,14 +103,15 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self._validate_instance(self.string_classifier)
 
     def test_add_train_examples(self):
-        self.string_classifier.add_examples(self._NEW_EXAMPLES_TRAIN)
+        self.string_classifier.add_examples_for_training(
+            self._NEW_EXAMPLES_TRAIN)
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 3)
         self.assertEquals(self.string_classifier._num_words, 10)
         self._validate_instance(self.string_classifier)
 
     def test_add_test_examples(self):
-        self.string_classifier.add_examples(self._EXAMPLES_TEST)
+        self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 5)
         self.assertEquals(self.string_classifier._num_words, 34)
@@ -119,7 +126,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self._validate_instance(self.string_classifier)
 
     def test_empty_add(self):
-        self.string_classifier.add_examples([])
+        self.string_classifier.add_examples_for_training([])
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 2)
         self.assertEquals(self.string_classifier._num_words, 7)
@@ -137,7 +144,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             self.string_classifier._num_docs,
             len(self._EXAMPLES_TRAIN))
-        self.string_classifier.add_examples(self._EXAMPLES_TEST)
+        self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(
             self.string_classifier._num_docs,
             len(self._EXAMPLES_TRAIN) + len(self._EXAMPLES_TEST))
@@ -165,28 +172,30 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._num_labels, label_count + 2)
 
     def test_only_valid_labels_are_allowed(self):
-        self.string_classifier.add_examples([['example doc', ['good_label']]])
+        self.string_classifier.add_examples_for_training(
+            [['example doc', ['good_label']]])
         with self.assertRaises(Exception):
-            self.string_classifier.add_examples(
+            self.string_classifier.add_examples_for_training(
                 [['example doc', ['_bad_label']]])
 
     def test_reload_valid_state(self):
-        self.string_classifier.load_examples(self._EXAMPLES_TEST)
-        self.assertEquals(self.string_classifier._num_labels, 1)
+        self.string_classifier.load_examples(self._NEW_EXAMPLES_TRAIN)
+        self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(
             self.string_classifier._num_docs,
-            len(self._EXAMPLES_TEST))
-        self.assertEquals(self.string_classifier._num_words, 34)
+            len(self._NEW_EXAMPLES_TRAIN))
+        self.assertEquals(self.string_classifier._num_words, 4)
         self._validate_instance(self.string_classifier)
 
     def test_training(self):
-        doc_ids = self.string_classifier.add_examples(self._EXAMPLES_TEST)
-        predicted_label = self.string_classifier.predict_label(doc_ids[0])
+        doc_ids = self.string_classifier.add_examples_for_predicting(
+            self._EXAMPLES_TEST)
+        predicted_label = self.string_classifier.predict_label_for_doc(doc_ids[0])
         self.assertEquals(predicted_label, 'food')
-        predicted_label = self.string_classifier.predict_label(doc_ids[1])
+        predicted_label = self.string_classifier.predict_label_for_doc(doc_ids[1])
         self.assertEquals(predicted_label, 'pets')
-        predicted_label = self.string_classifier.predict_label(
-            doc_ids[2],
-            threshold=0.7)
+        # Testing a doc predicted with the default label
+        self.string_classifier._prediction_threshold = 0.7
+        predicted_label = self.string_classifier.predict_label_for_doc(doc_ids[2])
         self.assertEquals(predicted_label, '_default')
         self._validate_instance(self.string_classifier)
