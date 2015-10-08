@@ -130,7 +130,8 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if not rights_manager.Actor(self.user_id).can_edit(exploration_id):
+        if not rights_manager.Actor(self.user_id).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this exploration.',
                 self.user_id)
@@ -172,14 +173,15 @@ class ExplorationPage(EditorHandler):
             exploration_id, strict=False)
         if (exploration is None or
                 not rights_manager.Actor(self.user_id).can_view(
-                    exploration_id)):
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)):
             self.redirect('/')
             return
 
         can_edit = (
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(exploration_id))
+            rights_manager.Actor(self.user_id).can_edit(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         value_generators_js = VALUE_GENERATORS_JS.value
 
@@ -201,31 +203,40 @@ class ExplorationPage(EditorHandler):
             interaction_registry.Registry.get_validators_html(
                 interaction_ids))
 
-        gadget_ids = gadget_registry.Registry.get_all_gadget_ids()
+        gadget_types = gadget_registry.Registry.get_all_gadget_types()
         gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_ids))
+            gadget_registry.Registry.get_gadget_html(gadget_types))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
 
         self.values.update({
+            'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'SKIN_SPECS': skins_services.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
-                self.user_id).can_delete(exploration_id),
+                self.user_id).can_delete(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
-                self.user_id).can_modify_roles(exploration_id),
+                self.user_id).can_modify_roles(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publicize': rights_manager.Actor(
-                self.user_id).can_publicize(exploration_id),
-            'can_publish': rights_manager.Actor(self.user_id).can_publish(
-                exploration_id),
+                self.user_id).can_publicize(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+            'can_publish': rights_manager.Actor(
+                self.user_id).can_publish(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_release_ownership': rights_manager.Actor(
-                self.user_id).can_release_ownership(exploration_id),
+                self.user_id).can_release_ownership(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublicize': rights_manager.Actor(
-                self.user_id).can_unpublicize(exploration_id),
-            'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
-                exploration_id),
+                self.user_id).can_unpublicize(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+            'can_unpublish': rights_manager.Actor(
+                self.user_id).can_unpublish(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
@@ -241,12 +252,14 @@ class ExplorationPage(EditorHandler):
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
             # This is needed for the exploration preview.
             'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
+            'SHOW_GADGETS_EDITOR': feconf.SHOW_GADGETS_EDITOR,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
@@ -279,6 +292,7 @@ class ExplorationHandler(EditorHandler):
 
         editor_dict = {
             'category': exploration.category,
+            'default_skin_id': exploration.default_skin,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,
@@ -298,16 +312,12 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
         }
 
-        if feconf.SHOW_SKIN_CHOOSER:
-            editor_dict['all_skin_ids'] = (
-                skins_services.Registry.get_all_skin_ids())
-            editor_dict['default_skin_id'] = exploration.default_skin
-
         return editor_dict
 
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if not rights_manager.Actor(self.user_id).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=None)
@@ -366,7 +376,7 @@ class ExplorationHandler(EditorHandler):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         can_delete = rights_manager.Actor(self.user_id).can_delete(
-            exploration.id)
+            rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration.id)
         if not can_delete:
             raise self.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
@@ -402,8 +412,9 @@ class ExplorationRightsHandler(EditorHandler):
         viewable_if_private = self.payload.get('viewable_if_private')
 
         if new_member_username:
-            if not rights_manager.Actor(self.user_id).can_modify_roles(
-                    exploration_id):
+            if not rights_manager.Actor(
+                    self.user_id).can_modify_roles(
+                        rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add or change '
                     'roles.')
@@ -414,7 +425,7 @@ class ExplorationRightsHandler(EditorHandler):
                 raise Exception(
                     'Sorry, we could not find the specified user.')
 
-            rights_manager.assign_role(
+            rights_manager.assign_role_for_exploration(
                 self.user_id, exploration_id, new_member_id, new_member_role)
 
         elif is_public is not None:
@@ -455,10 +466,11 @@ class ExplorationRightsHandler(EditorHandler):
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 
-            rights_manager.release_ownership(self.user_id, exploration_id)
+            rights_manager.release_ownership_of_exploration(
+                self.user_id, exploration_id)
 
         elif viewable_if_private is not None:
-            rights_manager.set_private_viewability(
+            rights_manager.set_private_viewability_of_exploration(
                 self.user_id, exploration_id, viewable_if_private)
 
         else:
@@ -590,7 +602,8 @@ class ExplorationDownloadHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if not rights_manager.Actor(self.user_id).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
@@ -625,7 +638,8 @@ class StateDownloadHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if not rights_manager.Actor(self.user_id).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)

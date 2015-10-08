@@ -25,6 +25,18 @@ var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 var TIME_PADDING_MSEC = 250;
 var TIME_SCROLL_MSEC = 600;
 
+
+oppia.animation('.conversation-skin-responses-animate-slide', function() {
+  return {
+    enter: function(element, done) {
+      element.hide().slideDown()
+    },
+    leave: function(element, done) {
+      element.slideUp();
+    }
+  };
+});
+
 oppia.animation('.conversation-skin-animate-cards', function() {
   // This removes the newly-added class once the animation is finished.
   var animateCards = function(element, className, done) {

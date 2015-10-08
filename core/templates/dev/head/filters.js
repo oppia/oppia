@@ -75,14 +75,22 @@ oppia.filter('truncateAtFirstLine', [function() {
     var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
     // Normalize line endings then split using the normalized delimiter.
     var lines = input.replace(pattern, '\n').split('\n');
-    var nonemptyLineIndex = -1;
+    var firstNonemptyLineIndex = -1;
+    var otherNonemptyLinesExist = false;
     for (var i = 0; i < lines.length; i++) {
-      if (lines[i].length != 0) {
-        nonemptyLineIndex = i;
-        break;
+      if (lines[i].length > 0) {
+        if (firstNonemptyLineIndex === -1) {
+          firstNonemptyLineIndex = i;
+        } else {
+          otherNonemptyLinesExist = true;
+          break;
+        }
       }
     }
-    return (nonemptyLineIndex != -1 ? lines[nonemptyLineIndex] : '');
+    var suffix = otherNonemptyLinesExist ? '...' : '';
+    return (
+      firstNonemptyLineIndex !== -1 ?
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -271,61 +279,3 @@ oppia.filter('convertToPlainText', [function() {
     }
   };
 }]);
-
-oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
-  return function(answerGroup, interactionId, answerChoices, shortenRule) {
-    var summary = '';
-    var outcome = answerGroup.outcome;
-    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
-
-    if (answerGroup.rule_specs) {
-      var firstRule = $filter('convertToPlainText')(
-        $filter('parameterizeRuleDescription')(
-          answerGroup.rule_specs[0], interactionId, answerChoices));
-      summary = 'Answer ' + firstRule;
-
-      if (hasFeedback && shortenRule) {
-        summary = $filter('wrapTextWithEllipsis')(
-          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-      }
-      summary = '[' + summary + '] ';
-    }
-
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(outcome.feedback[0]);
-    }
-    return summary;
-  };
-}]);
-
-oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
-  return function(
-      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
-    if (!defaultOutcome) {
-      return '';
-    }
-
-    var summary = '';
-    var feedback = defaultOutcome.feedback;
-    var hasFeedback = feedback.length > 0 && feedback[0];
-
-    if (interactionId === 'Continue') {
-      summary = 'When the button is clicked';
-    } else if (answerGroupCount > 0) {
-      summary = 'All other answers';
-    } else {
-      summary = 'All answers';
-    }
-
-    if (hasFeedback && shortenRule) {
-      summary = $filter('wrapTextWithEllipsis')(
-        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-    }
-    summary = '[' + summary + '] ';
-
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
-    }
-    return summary;
-  }
-}])

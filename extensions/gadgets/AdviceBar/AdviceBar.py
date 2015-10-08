@@ -24,68 +24,64 @@ import utils
 class AdviceBar(base.BaseGadget):
     """Base gadget for providing an AdviceBar."""
 
-    name = 'AdviceBar'
+    short_description = 'Advice Bar'
     description = 'Allows learners to receive advice from predefined tips.'
+    height_px = 300
+    width_px = 100
+    # TODO(anuzis): AdviceBar doesn't fit any panels in the current Oppia
+    # view. It's listed as bottom here to temporarily pass validation, but
+    # is disabled in the feconf.py ALLOWED_GADGETS to prevent it from being
+    # displayed. We might remove the gadget entirely, but are preserving it
+    # temporarily in case it would be useful in a subsequent release with
+    # expanded gadget panel functionality.
+    panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [
         {
-            'name': 'title',
-            'description': 'Optional title for the advice bar (e.g. "Tips")',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }, {
             # AdviceBars hold 1 or more adviceObjects, which include a title
             # and text.
             'name': 'adviceObjects',
             'description': 'Title and content for each tip.',
             'schema': {
                 'type': 'list',
+                'validators': [{
+                    'id': 'has_length_at_least',
+                    'min_value': 1,
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': 3,
+                }],
                 'items': {
                     'type': 'dict',
                     'properties': [{
                         'name': 'adviceTitle',
-                        'description': 'Title for the tip.',
+                        'description': 'Tip title (visible on advice bar)',
                         'schema': {
                             'type': 'unicode',
+                            'validators': [{
+                                'id': 'is_nonempty',
+                            }]
                         },
                     }, {
                         'name': 'adviceHtml',
-                        'description': 'Advice shown on click. (HTML)',
+                        'description': 'Advice content (visible upon click)',
                         'schema': {
                             'type': 'html',
                         },
                     }]
                 }
             },
-            'default_value': []
-        }, {
-            'name': 'orientation',
-            'description': (
-                'Whether to extend tips horizontally or vertically.'),
-            'schema': {
-                'type': 'unicode',
-                'choices': ['horizontal', 'vertical']
-            },
-            'default_value': 'vertical'
+            'default_value': [{
+                'adviceTitle': 'Tip title',
+                'adviceHtml': ''
+            }]
         }
     ]
 
     # Maximum and minimum number of tips that an AdviceBar can hold.
     _MAX_TIP_COUNT = 3
     _MIN_TIP_COUNT = 1
-
-    # Constants for calculation of height and width.
-    _FIXED_AXIS_BASE_LENGTH = 100
-    _STACKABLE_AXIS_BASE_LENGTH = 150
-    _LENGTH_PER_ADVICE_RESOURCE = 100
-
-    # customization_args values that determine whether this AdviceBar should
-    # be extended along a horizontal or vertical axis.
-    _HORIZONTAL_AXIS = 'horizontal'
-    _VERTICAL_AXIS = 'vertical'
 
     def validate(self, customization_args):
         """Ensure AdviceBar retains reasonable config."""
@@ -100,41 +96,3 @@ class AdviceBar(base.BaseGadget):
                 'AdviceBar requires at least %d tips, found %s.' % (
                     self._MIN_TIP_COUNT,
                     tip_count))
-
-    def _stackable_length_for_instance(self, advice_bar_instance):
-        """Returns int representing the stackable axis length."""
-        return self._STACKABLE_AXIS_BASE_LENGTH + (
-            self._LENGTH_PER_ADVICE_RESOURCE * len(
-                advice_bar_instance.resource_count))
-
-    def get_width(self, customization_args):
-        """Returns int representing width in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        orientation = customization_args['orientation']['value']
-        if orientation == self._HORIZONTAL_AXIS:
-            return self._STACKABLE_AXIS_BASE_LENGTH + (
-                self._LENGTH_PER_ADVICE_RESOURCE * len(
-                    customization_args['adviceObjects']['value']))
-        elif orientation == self._VERTICAL_AXIS:
-            return self._FIXED_AXIS_BASE_LENGTH
-        else:
-            raise Exception('Unknown gadget orientation: %s' % orientation)
-
-    def get_height(self, customization_args):
-        """Returns int representing height in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        orientation = customization_args['orientation']['value']
-        if orientation == self._VERTICAL_AXIS:
-            return self._STACKABLE_AXIS_BASE_LENGTH + (
-                self._LENGTH_PER_ADVICE_RESOURCE * len(
-                    customization_args['adviceObjects']['value']))
-        elif orientation == self._HORIZONTAL_AXIS:
-            return self._FIXED_AXIS_BASE_LENGTH
-        else:
-            raise Exception('Unknown gadget orientation: %s' % orientation)

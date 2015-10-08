@@ -383,7 +383,7 @@
         <div class="form-group">
           <label for="defaultSkinId" class="col-lg-2 col-md-2 col-sm-2">Default skin</label>
           <div class="col-lg-4 col-md-4 col-sm-4">
-            <select class="form-control" ng-model="$parent.defaultSkinId" ng-options="skinId as skinId for skinId in allSkinIds">
+            <select class="form-control" ng-model="explorationSkinIdService.displayed" ng-options="skinId as skinId for skinId in ALL_SKIN_IDS" ng-change="saveExplorationSkinId()">
             </select>
           </div>
         </div>

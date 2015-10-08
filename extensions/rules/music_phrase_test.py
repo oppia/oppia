@@ -18,8 +18,8 @@
 
 __author__ = 'Michael Wagner'
 
+from core.tests import test_utils
 from extensions.rules import music_phrase
-import test_utils
 
 
 class MusicPhraseRuleUnitTests(test_utils.GenericTestBase):

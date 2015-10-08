@@ -188,6 +188,160 @@ describe('Change list service', function() {
       cls.undoLastChange();
       expect(cls.getChangeList()).toEqual([]);
     })
+
+    it('should correctly add a gadget', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.addState('newState1');
+      var gadgetDict = {
+        'gadget_type': 'TestGadget',
+        'gadget_name': 'TestGadget 1',
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>Tips</p>',
+              'adviceTitle': 'R-Tip'
+            }]
+          },
+          'title': {
+            'value': 'Tips'
+          }
+        },
+        'visible_in_states': ['newState1']
+      };
+      cls.addGadget(gadgetDict);
+      expect(cls.getChangeList()).toEqual([
+        {
+          cmd: 'add_state',
+          state_name: 'newState1'
+        }, {
+          cmd: 'add_gadget',
+          gadget_dict: {
+            'gadget_type': 'TestGadget',
+            'gadget_name': 'TestGadget 1',
+            'customization_args': {
+              'adviceObjects': {
+                'value': [{
+                  'adviceHtml': '<p>Tips</p>',
+                  'adviceTitle': 'R-Tip'
+                }]
+              },
+              'title': {
+                'value': 'Tips'
+              }
+            },
+            'visible_in_states': ['newState1']
+          },
+        }
+      ]);
+    });
+
+    it('should correctly rename a gadget', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.renameGadget('oldName', 'newName');
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'rename_gadget',
+        old_gadget_name: 'oldName',
+        new_gadget_name: 'newName'
+      }]);
+      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+    });
+
+    it('should correctly delete a gadget', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.deleteGadget('gadgetName');
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'delete_gadget',
+        gadget_name: 'gadgetName'
+      }]);
+      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+    });
+
+    it('should correctly edit gadget customization args', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      var oldCustomizationArgs = {
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>Html Data</p>',
+              'adviceTitle': 'advice tip name'
+            }]
+          },
+          'title': {
+            'value': 'main Title'
+          }
+        }
+      };
+      var newCustomizationArgs = {
+        'customization_args': {
+          'adviceObjects': {
+            'value': [{
+              'adviceHtml': '<p>New Html Data</p>',
+              'adviceTitle': 'New advice tip name'
+            }]
+          },
+          'title': {
+            'value': 'New main Title'
+          }
+        }
+      };
+      cls.editGadgetProperty(
+        'gadgetName',
+        'gadget_customization_args',
+        newCustomizationArgs,
+        oldCustomizationArgs
+      );
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'edit_gadget_property',
+        gadget_name: 'gadgetName',
+        property_name: 'gadget_customization_args',
+        new_value: {
+          'customization_args': {
+            'adviceObjects': {
+              'value': [{
+                'adviceHtml': '<p>New Html Data</p>',
+                'adviceTitle': 'New advice tip name'
+              }]
+            },
+            'title': {
+              'value': 'New main Title'
+            }
+          }
+        },
+        old_value: {
+          'customization_args': {
+            'adviceObjects': {
+              'value': [{
+                'adviceHtml': '<p>Html Data</p>',
+                'adviceTitle': 'advice tip name'
+              }]
+            },
+            'title': {
+              'value': 'main Title'
+            }
+          }
+        }
+      }]);
+    });
+
+
+    it('should correctly edit a gadget visibility property', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      var oldVisibilityProp = ['old_state_name'];
+      var newVisibilityProp = ['new state name'];
+      cls.editGadgetProperty(
+        'gadgetName',
+        'gadget_visibility',
+        newVisibilityProp,
+        oldVisibilityProp
+      );
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'edit_gadget_property',
+        gadget_name: 'gadgetName',
+        property_name: 'gadget_visibility',
+        new_value: ['new state name'],
+        old_value: ['old_state_name']
+      }]);
+    });
   });
 });
 
@@ -259,9 +413,9 @@ describe('Exploration rights service', function() {
     beforeEach(inject(function($injector) {
       ers = $injector.get('explorationRightsService');
 
-      GLOBALS.EXPLORATION_STATUS_PRIVATE = 'private';
-      GLOBALS.EXPLORATION_STATUS_PUBLIC = 'public';
-      GLOBALS.EXPLORATION_STATUS_PUBLICIZED = 'publicized';
+      GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
+      GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';
+      GLOBALS.ACTIVITY_STATUS_PUBLICIZED = 'publicized';
     }));
 
     it('correctly initializes the service', function() {
@@ -321,6 +475,241 @@ describe('Exploration rights service', function() {
   });
 });
 
+describe('Exploration gadgets service', function() {
+  beforeEach(module('oppia'));
+
+  describe('exploration gadgets service', function() {
+    var egs = null;
+    var mockWarningsData;
+    var GADGET_SPECS = {
+      'ScoreBar': {
+        'type': 'ScoreBar',
+        'width_px': 250,
+        'panel': 'bottom',
+        'customization_arg_specs': [{
+          'name': 'title',
+          'description': 'Optional title for the score bar (e.g. \'Score\')',
+          'schema': {
+            'type': 'unicode'
+          },
+          'default_value': 'Score'
+        }, {
+          'name': 'maxValue',
+          'description': 'Maximum value (bar fills as a % of this value)',
+          'schema': {
+            'type': 'int'
+          },
+          'default_value': 100
+        }, {
+          'name': 'paramName',
+          'description': 'The parameter name this score bar follows.',
+          'schema': {
+            'type': 'unicode'
+          },
+          'default_value': ''
+        }],
+        'height_px': 100,
+        'description': 'A visual score bar that can represent progress or success.',
+        'name': 'ScoreBar'
+      },
+      'TestGadget': {
+        'type': 'TestGadget',
+        'width_px': 100,
+        'panel': 'bottom',
+        'customization_arg_specs': [{
+          'name': 'title',
+          'description': 'Optional title for the advice bar (e.g. \'Tips\')',
+          'schema': {
+            'type': 'unicode'
+          },
+          'default_value': '',
+        }, {
+          'name': 'adviceObjects',
+          'description': 'Title and content for each tip.',
+          'schema': {
+            'type': 'list',
+            'validators': [{
+              'id': 'has_length_at_least',
+              'min_value': 1
+            }, {
+              'id': 'has_length_at_most',
+              'max_value': 3
+            }],
+            'items': {
+              'properties': [{
+                'name': 'adviceTitle',
+                'description': 'Tip title (visible on advice bar)',
+                'schema': {
+                  'type': 'unicode',
+                  'validators': [{
+                    'id': 'is_nonempty'
+                  }]
+                },
+              }, {
+                'name': 'adviceHtml',
+                'description': 'Advice content (visible upon click)',
+                'schema': {
+                  'type': 'html'
+                },
+              }],
+              'type': 'dict'
+            }
+          },
+          'default_value': [{
+            'adviceTitle': 'Tip title',
+            'adviceHtml': ''
+          }],
+        }],
+        'height_px': 300,
+        'description': 'Allows learners to receive advice from predefined tips.',
+        'name': 'TestGadget'
+      }
+    };
+    var skinCustomizationsData = {
+      'panels_contents': {
+        'bottom': [{
+          'gadget_name': 'TestGadget1',
+          'visible_in_states': [
+            'Example1',
+            'Example2'
+          ],
+          'customization_args': {
+            'title': {
+              'value': 'TIP1'
+            },
+            'adviceObjects': {
+              'value': [{
+                'adviceTitle': 'title1',
+                'adviceHtml': 'content1'
+              }]
+            }
+          },
+          'gadget_type': 'TestGadget'
+        }],
+      }
+    };
+    var gadgetData = {
+      gadget_type: 'TestGadget',
+      gadget_name: 'NewTestGadget',
+      panel: 'bottom',
+      customization_args: {
+        'title': {
+          'value': 'TIP3'
+        },
+        'adviceObjects': {
+          'value': [{
+            'adviceTitle': 'title3',
+            'adviceHtml': 'content3'
+          }]
+        }
+      },
+      visible_in_states: ['state1']
+    };
+
+    beforeEach(function() {
+      mockWarningsData = {
+        addWarning: function(warning) {}
+      };
+      module(function($provide) {
+        $provide.value('warningsData', mockWarningsData);
+        $provide.constant('GADGET_SPECS', GADGET_SPECS);
+      });
+      spyOn(mockWarningsData, 'addWarning');
+    });
+
+    beforeEach(inject(function($injector) {
+      egs = $injector.get('explorationGadgetsService');
+      esis = $injector.get('explorationSkinIdService');
+      esis.savedMemento = 'conversation_v1';
+      GLOBALS.SKIN_SPECS = {
+        'conversation_v1': {
+          'bottom': {
+            'stackable_axis': 'horizontal',
+            'pixels_between_gadgets': 80,
+            'max_gadgets': 1,
+            'width': 350,
+            'height': 100
+          }
+        }
+      };
+    }));
+
+    it('Update gadgets data when state is deleted', function() {
+      egs.init(skinCustomizationsData);
+      egs.handleStateDeletion('Example1');
+
+      expect(egs.getGadgets()['TestGadget1'].visible_in_states).toEqual(
+        ['Example2']
+      );
+    });
+
+    it('Update gadgets data when state is renamed', function() {
+      egs.init(skinCustomizationsData);
+      egs.handleStateRenaming('Example2', 'newStateName');
+
+      expect(egs.getGadgets()['TestGadget1'].visible_in_states).toEqual(
+        ['Example1', 'newStateName']
+      );
+    });
+
+    it('should detect invalid data passed for initialization', function() {
+      egs.init({'wrongObjectKey': 'value'});
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Gadget Initialization failed. Panel contents were not provided');
+    });
+
+    it('init on valid data', function() {
+      egs.init(skinCustomizationsData);
+      expect(egs.getPanels()).toEqual({
+        'bottom': ['TestGadget1'],
+      });
+    });
+
+    it('add a new gadget with valid data', function() {
+      egs.init(skinCustomizationsData);
+      egs.addGadget(gadgetData, 'bottom');
+      expect(egs.getPanels()).toEqual({
+        'bottom': ['TestGadget1', 'NewTestGadget']
+      });
+    });
+
+    it('should detect non existent panel when adding gadget', function() {
+      egs.init(skinCustomizationsData);
+      gadgetData.panel = 'unknown_panel';
+      egs.addGadget(gadgetData);
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Attempted add to a non-existent panel: unknown_panel');
+    });
+
+    it('should detect same gadget name before adding gadget', function() {
+      egs.init(skinCustomizationsData);
+      gadgetData.gadget_name = 'TestGadget1';
+      gadgetData.panel = 'bottom';
+      egs.addGadget(gadgetData);
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'A gadget with this name already exists.');
+    });
+
+    it('should detect unknown gadget name before updating gadget', function() {
+      egs.init(skinCustomizationsData);
+      egs.updateGadget('unknownGadgetName', {}, []);
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Attempted to update a non-existent gadget: unknownGadgetName');
+    });
+
+    it('should detect if gadget is not visible in any state.', function() {
+      egs.init(skinCustomizationsData);
+      egs.updateGadget('TestGadget1', gadgetData['TestGadget1'], []);
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'This gadget is not visible in any states.');
+    });
+
+    // TODO(vjoisar/sll): Add the test case when we delete the only state that
+    // contains the gadget.
+    // Also ensure right confirmation boxes show up in various cases.
+  });
+});
+
 describe('New state template service', function() {
   beforeEach(module('oppia'));
 
@@ -329,8 +718,8 @@ describe('New state template service', function() {
     var NEW_STATE_NAME = 'new state name';
 
     beforeEach(inject(function($injector) {
-      // TODO(sll): Make this match the dict in the backend so that there
-      // is a single source of truth.
+      // TODO(sll): Find a way to have this and the backend dict read from the
+      // same single source of truth.
       GLOBALS.NEW_STATE_TEMPLATE = {
         content: [{type: 'text', value: ''}],
         interaction: {

@@ -38,7 +38,7 @@ class Image(base.BaseRichTextComponent):
         'default_value': '',
     }, {
         'name': 'alt',
-        'description': 'Alt text (for screen readers)',
+        'description': 'Alternative text (for screen readers)',
         'schema': {
             'type': 'unicode',
         },

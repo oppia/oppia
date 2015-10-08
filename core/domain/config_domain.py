@@ -60,7 +60,6 @@ class ConfigProperty(object):
             raise Exception('Property with name %s already exists' % name)
 
         self._name = name
-        # TODO(sll): Validate the schema.
         self._schema = schema
         self._description = description
         self._default_value = schema_utils.normalize_against_schema(

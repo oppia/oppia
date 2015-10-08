@@ -17,7 +17,6 @@
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import email_manager
 from core.domain import user_services
 import feconf
@@ -154,7 +153,6 @@ class SignupPage(base.BaseHandler):
         self.values.update({
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
-            'SITE_NAME': pages.SITE_NAME.value,
         })
         self.render_template('profile/signup.html')
 

@@ -1,28 +1,24 @@
 .oppia-advice-bar-container {
-  width: 140px;
+  background: #fff;
   height: 100%;
-  padding: 50px 25px 0;
-  vertical-align: top;
-  text-align: center;
+  width: 140px;
 }
 
 .oppia-advice-bar-title {
-  margin-bottom: 25px;
+  background: #05a69a;
+  color: #fff;
   font-size: 28px;
+  margin: auto;
+  text-align: center;
 }
 
 .oppia-advice-resource {
-  margin-bottom: 15px;
-  word-wrap: break-word;
+  border-top: 1px solid #eee; 
+  color: #05a69a;
   cursor: pointer;
   font-size: 13px;
-  color: #36f;
-}
-
-.oppia-advice-resource-image {
-  background: url('../images/AdviceBarResourceIcon.png');
-  background-repeat: no-repeat;
-  width: 70px;
   height: 50px;
-  margin: auto;
+  padding-top: 10px;
+  text-align: center;
+  word-wrap: break-word;
 }

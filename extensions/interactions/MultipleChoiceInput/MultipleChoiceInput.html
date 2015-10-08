@@ -1,5 +1,6 @@
 <style>
   .multiple-choice-form-container {
+    margin-left: -15px;
     margin-top: -10px;
   }
 
@@ -57,12 +58,21 @@
     <form ng-submit="submitAnswer(answer)">
       <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
         <button class="multiple-choice-option" ng-click="submitAnswer($index)">
-          <div class="multiple-choice-radio-container">
-            <span class="multiple-choice-outer-radio-button">
-              <span class="multiple-choice-inner-radio-button"></span>
-            </span>
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                <div class="multiple-choice-radio-container">
+                  <span class="multiple-choice-outer-radio-button">
+                    <span class="multiple-choice-inner-radio-button"></span>
+                  </span>
+                </div>
+              </div>
+              <!-- With col-xs-11, the choice text gets pushed to the next line on small screens. So we use col-xs-10 instead. -->
+              <div class="col-lg-11 col-md-11 col-sm-11 col-xs-10">
+                <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
+              </div>
+            </div>
           </div>
-          <span angular-html-bind="choice"></span>
         </button>
       </div>
     </form>

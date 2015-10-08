@@ -140,7 +140,7 @@
                ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
 
         <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
-              style="font-size: 0.85em; left: 0; position: absolute;"
+              style="font-size: 0.85em; position: absolute;"
               tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
           <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
             Please enter a valid decimal number.
@@ -189,7 +189,7 @@
       <input type="text" ng-disabled="isDisabled()" class="form-control"
              ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
              ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
-             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"
+             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
              style="display: inline;">
     </span>
 
