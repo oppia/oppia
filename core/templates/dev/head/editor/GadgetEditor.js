@@ -93,11 +93,9 @@ oppia.controller('GadgetEditor', [
       },
       controller: [
         '$scope', '$modalInstance', 'explorationStatesService',
-        'explorationSkinIdService', 'explorationGadgetsService', 'gadgetDict',
-        'GADGET_SPECS',
+        'explorationGadgetsService', 'gadgetDict', 'GADGET_SPECS',
         function($scope, $modalInstance, explorationStatesService,
-          explorationSkinIdService, explorationGadgetsService, gadgetDict,
-          GADGET_SPECS) {
+          explorationGadgetsService, gadgetDict, GADGET_SPECS) {
 
         $scope.ALLOWED_GADGETS = GLOBALS.ALLOWED_GADGETS;
         $scope.GADGET_SPECS = GADGET_SPECS;

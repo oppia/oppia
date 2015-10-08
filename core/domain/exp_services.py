@@ -163,7 +163,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
-        exploration_model.default_skin, exploration_model.skin_customizations,
+        exploration_model.skin_customizations,
         versioned_exploration_states['states_schema_version'],
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
@@ -522,8 +522,6 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(change.new_value)
-                elif change.property_name == 'default_skin_id':
-                    exploration.update_default_skin_id(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
             elif (change.cmd ==
@@ -819,7 +817,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
-    exploration_model.default_skin = exploration.default_skin
     exploration_model.skin_customizations = (
         exploration.skin_instance.to_dict()['skin_customizations'])
 
@@ -859,7 +856,6 @@ def _create_exploration(
         tags=exploration.tags,
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
-        default_skin=exploration.default_skin,
         skin_customizations=exploration.skin_instance.to_dict(
             )['skin_customizations'],
         states_schema_version=exploration.states_schema_version,
