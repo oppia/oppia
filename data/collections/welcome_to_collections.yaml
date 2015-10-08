@@ -1,0 +1,27 @@
+category: Welcome
+nodes:
+- acquired_skills:
+  - Introduced to Oppia
+  exploration_id: '0'
+  prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: '2'
+  prerequisite_skills:
+  - Introduced to Oppia
+- acquired_skills: []
+  exploration_id: '4'
+  prerequisite_skills:
+  - Introduced to Oppia
+- acquired_skills:
+  - Learned Oppia
+  exploration_id: '14'
+  prerequisite_skills:
+  - Introduced to Oppia
+- acquired_skills:
+  - Learned Gadgets
+  exploration_id: '15'
+  prerequisite_skills:
+  - Learned Oppia
+objective: To introduce collections using demo explorations.
+schema_version: 1
+title: Welcome to Collections in Oppia!

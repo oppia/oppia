@@ -22,11 +22,15 @@
 
 oppia.directive('oppiaGadgetAdviceBar', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+
+    // Maximum and minimum number of tips that an AdviceBar can hold.
+    var _MAX_TIP_COUNT = 3;
+    var _MIN_TIP_COUNT = 1;
+
     return {
       restrict: 'E',
       templateUrl: 'gadget/AdviceBar',
       controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
-        $scope.adviceBarTitle = oppiaHtmlEscaper.escapedJsonToObj($attrs.titleWithValue);
         $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj($attrs.adviceObjectsWithValue);
 
         $scope.overlayAdviceModal = function(adviceResourceIndex) {

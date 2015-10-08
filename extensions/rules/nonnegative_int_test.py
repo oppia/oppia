@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 from extensions.rules import nonnegative_int
-import test_utils
 
 
 class NonnegativeIntUnitTests(test_utils.GenericTestBase):

@@ -27,6 +27,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
 from core.domain import recommendations_services
+from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
@@ -168,8 +169,9 @@ class AdminHandler(base.BaseHandler):
                 logging.info(
                     '[ADMIN] %s reloaded exploration %s' %
                     (self.user_id, exploration_id))
-                exp_services.delete_demo(unicode(exploration_id))
                 exp_services.load_demo(unicode(exploration_id))
+                rights_manager.release_ownership_of_exploration(
+                    feconf.SYSTEM_COMMITTER_ID, exploration_id)
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':

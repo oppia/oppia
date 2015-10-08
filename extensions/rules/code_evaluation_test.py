@@ -18,8 +18,8 @@
 
 __author__ = 'Koji Ashida'
 
+from core.tests import test_utils
 from extensions.rules import code_evaluation
-import test_utils
 
 
 class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):

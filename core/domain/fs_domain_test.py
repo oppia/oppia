@@ -19,8 +19,8 @@
 __author__ = 'Sean Lip'
 
 from core.domain import fs_domain
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):

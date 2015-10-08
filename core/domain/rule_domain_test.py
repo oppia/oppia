@@ -23,9 +23,9 @@ import os
 import pkgutil
 
 from core.domain import rule_domain
+from core.tests import test_utils
 from extensions.objects.models import objects
 import feconf
-import test_utils
 
 
 class FakeRule(rule_domain.Rule):

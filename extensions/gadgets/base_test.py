@@ -24,6 +24,7 @@ import string
 
 from core.domain import dependency_registry
 from core.domain import gadget_registry
+from core.domain import obj_services
 from core.tests import test_utils
 from extensions.gadgets import base
 import feconf
@@ -94,58 +95,75 @@ class GadgetUnitTests(test_utils.GenericTestBase):
     def test_gadget_properties(self):
         """Test the standard properties of gadgets."""
 
-        TEST_GADGET_ID = 'TestGadget'
+        TEST_GADGET_TYPE = 'TestGadget'
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            gadget = gadget_registry.Registry.get_gadget_by_id(
-                TEST_GADGET_ID)
-        self.assertEqual(gadget.id, TEST_GADGET_ID)
-        self.assertEqual(gadget.name, 'TestGadget')
+            gadget = gadget_registry.Registry.get_gadget_by_type(
+                TEST_GADGET_TYPE)
+        self.assertEqual(gadget.type, TEST_GADGET_TYPE)
+        self.assertEqual(gadget.short_description, 'Test Gadget')
 
         self.assertIn('id="gadget/TestGadget"', gadget.html_body)
 
         gadget_dict = gadget.to_dict()
         self.assertItemsEqual(gadget_dict.keys(), [
-            'id', 'name', 'description', 'customization_arg_specs',])
-        self.assertEqual(gadget_dict['id'], TEST_GADGET_ID)
+            'type', 'short_description', 'height_px', 'width_px', 'panel', 'description',
+            'customization_arg_specs',])
+        self.assertEqual(gadget_dict['type'], TEST_GADGET_TYPE)
         self.assertEqual(gadget_dict['customization_arg_specs'], [
             {
-                'name': 'title',
-                'description': 'A text title of the test gadget.',
+                'name': 'adviceObjects',
+                'description': 'Title and content for each tip.',
                 'schema': {
-                    'type': 'unicode',
+                    'type': 'list',
+                    'validators': [{
+                        'id': 'has_length_at_least',
+                        'min_value': 1,
+                    }, {
+                        'id': 'has_length_at_most',
+                        'max_value': 3,
+                    }],
+                    'items': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'adviceTitle',
+                            'description': 'Tip title',
+                            'schema': {
+                                'type': 'unicode',
+                                'validators': [{
+                                    'id': 'is_nonempty',
+                                }]
+                            },
+                        }, {
+                            'name': 'adviceHtml',
+                            'description': 'Advice content',
+                            'schema': {
+                                'type': 'html',
+                            },
+                        }]
+                    }
                 },
-                'default_value': ''
-            }, {
-                'name': 'floors',
-                'description': 'A test attribute that helps increase height.',
-                'schema': {
-                    'type': 'int',
-                },
-                'default_value': 1
-            }, {
-                'name': 'characters',
-                'description': 'A test attribute that helps increase width.',
-                'schema': {
-                    'type': 'int',
-                },
-                'default_value': 2
+                'default_value': [{
+                    'adviceTitle': 'Tip title',
+                    'adviceHtml': ''
+                }]
             }])
 
     def test_default_gadgets_are_valid(self):
         """Test that the default gadgets are valid."""
 
         _GADGET_CONFIG_SCHEMA = [
-            ('name', basestring), ('description', basestring),
+            ('short_description', basestring), ('description', basestring),
+            ('height_px', int), ('width_px', int), ('panel', basestring),
             ('_customization_arg_specs', list)]
 
-        for gadget_id in feconf.ALLOWED_GADGETS:
-            # Check that the gadget id is valid.
-            self.assertTrue(self._is_camel_cased(gadget_id))
+        for gadget_type in feconf.ALLOWED_GADGETS:
+            # Check that the gadget type is valid.
+            self.assertTrue(self._is_camel_cased(gadget_type))
 
             # Check that the gadget directory exists.
             gadget_dir = os.path.join(
-                feconf.GADGETS_DIR, gadget_id)
+                feconf.GADGETS_DIR, gadget_type)
             self.assertTrue(os.path.isdir(gadget_dir))
 
             # In this directory there should only be a config .py file, an
@@ -166,7 +184,7 @@ class GadgetUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    gadget_dir, '%sSpec.js' % gadget_id)))
+                    gadget_dir, '%sSpec.js' % gadget_type)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -183,10 +201,10 @@ class GadgetUnitTests(test_utils.GenericTestBase):
                 dir_contents
             )
 
-            py_file = os.path.join(gadget_dir, '%s.py' % gadget_id)
+            py_file = os.path.join(gadget_dir, '%s.py' % gadget_type)
             html_file = os.path.join(
-                gadget_dir, '%s.html' % gadget_id)
-            js_file = os.path.join(gadget_dir, '%s.js' % gadget_id)
+                gadget_dir, '%s.html' % gadget_type)
+            js_file = os.path.join(gadget_dir, '%s.js' % gadget_type)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -195,20 +213,28 @@ class GadgetUnitTests(test_utils.GenericTestBase):
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
             self.assertIn(
-                'oppiaGadget%s' % gadget_id, js_file_content)
+                'oppiaGadget%s' % gadget_type, js_file_content)
             self.assertIn(
                 '<script type="text/ng-template" id="gadget/%s"' %
-                    gadget_id,
+                    gadget_type,
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
-            gadget = gadget_registry.Registry.get_gadget_by_id(
-                gadget_id)
+            gadget = gadget_registry.Registry.get_gadget_by_type(
+                gadget_type)
 
-            # Check that the specified gadget id is the same as the class
+            # Check that the specified gadget type is the same as the class
             # name.
-            self.assertTrue(gadget_id, gadget.__class__.__name__)
+            self.assertTrue(gadget_type, gadget.__class__.__name__)
+
+            # Check that height and width have been overridden with positive
+            # values.
+            self.assertGreater(gadget.height_px, 0)
+            self.assertGreater(gadget.width_px, 0)
+
+            # Check that the gadget's uses a valid panel in the Reader view.
+            self.assertTrue(gadget.panel in feconf.ALLOWED_GADGET_PANELS)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
