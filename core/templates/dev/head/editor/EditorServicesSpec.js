@@ -619,17 +619,13 @@ describe('Exploration gadgets service', function() {
 
     beforeEach(inject(function($injector) {
       egs = $injector.get('explorationGadgetsService');
-      esis = $injector.get('explorationSkinIdService');
-      esis.savedMemento = 'conversation_v1';
-      GLOBALS.SKIN_SPECS = {
-        'conversation_v1': {
-          'bottom': {
-            'stackable_axis': 'horizontal',
-            'pixels_between_gadgets': 80,
-            'max_gadgets': 1,
-            'width': 350,
-            'height': 100
-          }
+      GLOBALS.PANEL_SPECS = {
+        'bottom': {
+          'stackable_axis': 'horizontal',
+          'pixels_between_gadgets': 80,
+          'max_gadgets': 1,
+          'width': 350,
+          'height': 100
         }
       };
     }));

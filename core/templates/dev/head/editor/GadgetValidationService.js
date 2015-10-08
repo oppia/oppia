@@ -19,17 +19,16 @@
  */
 oppia.factory('gadgetValidationService', [
     '$filter', 'warningsData', 'validatorsService', 'editorContextService',
-    'explorationSkinIdService', 'GADGET_SPECS',
+    'GADGET_SPECS',
     function($filter, warningsData, validatorsService, editorContextService,
-      explorationSkinIdService, GADGET_SPECS) {
+      GADGET_SPECS) {
   var AXIS_HORIZONTAL = 'horizontal';
   var AXIS_VERTICAL = 'vertical';
   var VALID_AXIS_OPTIONS = [AXIS_HORIZONTAL, AXIS_VERTICAL];
   var _MAX_GADGET_NAME_LENGTH = 50;
 
   var _getPanelSpecs = function(panel) {
-    return GLOBALS.SKIN_SPECS[
-      explorationSkinIdService.savedMemento][panel];
+    return GLOBALS.PANEL_SPECS[panel];
   };
 
   return {

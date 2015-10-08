@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -29,7 +28,6 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import gadget_registry
 from core.domain import interaction_registry
-from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -263,12 +261,11 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
-                    [exploration.default_skin])),
+                    [feconf.DEFAULT_SKIN_ID])),
             'skin_js_url': skins_services.Registry.get_skin_js_url(
-                exploration.default_skin),
+                feconf.DEFAULT_SKIN_ID),
             'skin_tag': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_tag(exploration.default_skin)
-            ),
+                skins_services.Registry.get_skin_tag(feconf.DEFAULT_SKIN_ID)),
         })
 
         if is_iframed:

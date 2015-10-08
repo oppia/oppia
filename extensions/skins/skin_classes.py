@@ -257,28 +257,3 @@ class ConversationV1(BaseSkin):
         'default_value': True,
         'obj_type': 'Boolean'
     }]
-
-
-class SnapshotsV1(BaseSkin):
-    skin_id = 'snapshots_v1'
-    skin_name = 'Snapshots'
-    description = 'A sequence of snapshots.'
-    js_path = 'Snapshots.js'
-    tag_name = 'snapshots-skin'
-
-    panels_properties = {
-        'main': {
-            'width': 800,
-            'height': 1000,
-            'stackable_axis': 'vertical',
-            'pixels_between_gadgets': 80,
-            'max_gadgets': 1
-        },
-    }
-
-    options = [{
-        'name': 'show_back_button',
-        'description': 'Whether to show the back button.',
-        'default_value': True,
-        'obj_type': 'Boolean'
-    }]

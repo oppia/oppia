@@ -213,7 +213,8 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'SKIN_SPECS': skins_services.Registry.get_all_specs(),
+            'PANEL_SPECS': skins_services.Registry.get_all_specs()[
+                feconf.DEFAULT_SKIN_ID],
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -260,7 +261,6 @@ class ExplorationPage(EditorHandler):
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_GADGETS_EDITOR': feconf.SHOW_GADGETS_EDITOR,
-            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,
@@ -292,7 +292,6 @@ class ExplorationHandler(EditorHandler):
 
         editor_dict = {
             'category': exploration.category,
-            'default_skin_id': exploration.default_skin,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'language_code': exploration.language_code,

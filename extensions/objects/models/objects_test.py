@@ -48,13 +48,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             with self.assertRaises(Exception):
                 cls.normalize(item)
 
-    def test_null_validation(self):
-        """Tests objects of type Null."""
-        mappings = [('', None), ('20', None), (None, None)]
-        invalid_values = []
-
-        self.check_normalization(objects.Null, mappings, invalid_values)
-
     def test_boolean_validation(self):
         """Tests objects of type Boolean."""
         mappings = [('', False), (False, False), (True, True), (None, False)]

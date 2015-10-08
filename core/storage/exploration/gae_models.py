@@ -59,19 +59,10 @@ class ExplorationModel(base_models.VersionedModel):
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
-    # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
-    # caused GAE to raise an error on fetching a specific version of the
-    # exploration model.
-    # TODO(sll): Fix this error and remove this property.
-    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
     blurb = ndb.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.
     author_notes = ndb.TextProperty(default='', indexed=False)
-    # The default HTML template to use for displaying the exploration to the
-    # reader. This is a filename in data/skins (without the .html suffix).
-    default_skin = ndb.StringProperty(default='conversation_v1')
-
     # Schema storing specifications of the contents of any gadget panels,
     # along with associated customizations for each gadget instance.
     skin_customizations = ndb.JsonProperty(required=True, indexed=False)
@@ -91,6 +82,15 @@ class ExplorationModel(base_models.VersionedModel):
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
+
+    # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
+    # caused GAE to raise an error on fetching a specific version of the
+    # exploration model.
+    # TODO(sll): Fix this error and remove this property.
+    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+    # DEPRECATED in v2.0.1. Do not use.
+    # TODO(sll): Remove this property from the model.
+    default_skin = ndb.StringProperty(default=feconf.DEFAULT_SKIN_ID)
 
     @classmethod
     def get_exploration_count(cls):

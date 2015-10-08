@@ -191,7 +191,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'default_skin_id', 'init_state_name')
+        'init_state_name')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -1204,9 +1204,9 @@ class Exploration(object):
     """Domain object for an Oppia exploration."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, blurb, author_notes, default_skin,
-                 skin_customizations, states_schema_version, init_state_name,
-                 states_dict, param_specs_dict, param_changes_list, version,
+                 language_code, tags, blurb, author_notes, skin_customizations,
+                 states_schema_version, init_state_name, states_dict,
+                 param_specs_dict, param_changes_list, version,
                  created_on=None, last_updated=None):
         self.id = exploration_id
         self.title = title
@@ -1216,11 +1216,11 @@ class Exploration(object):
         self.tags = tags
         self.blurb = blurb
         self.author_notes = author_notes
-        self.default_skin = default_skin
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
 
-        self.skin_instance = SkinInstance(default_skin, skin_customizations)
+        self.skin_instance = SkinInstance(
+            feconf.DEFAULT_SKIN_ID, skin_customizations)
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -1251,8 +1251,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', 'conversation_v1', None,
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            '', None, feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
@@ -1332,14 +1331,12 @@ class Exploration(object):
 
             exploration.states[state_name] = state
 
-        exploration.default_skin = exploration_dict['default_skin']
         exploration.param_changes = [
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
 
         exploration.skin_instance = SkinInstance(
-            exploration_dict['default_skin'],
-            exploration_dict['skin_customizations'])
+            feconf.DEFAULT_SKIN_ID, exploration_dict['skin_customizations'])
 
         exploration.version = exploration_version
         exploration.created_on = exploration_created_on
@@ -1419,17 +1416,6 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected author_notes to be a string, received %s' %
                 self.author_notes)
-
-        if not self.default_skin:
-            raise utils.ValidationError(
-                'Expected a default_skin to be specified.')
-        if not isinstance(self.default_skin, basestring):
-            raise utils.ValidationError(
-                'Expected default_skin to be a string, received %s (%s).'
-                % self.default_skin, type(self.default_skin))
-        if not self.default_skin in skins_services.Registry.get_all_skin_ids():
-            raise utils.ValidationError(
-                'Unrecognized skin id: %s' % self.default_skin)
 
         if not isinstance(self.states, dict):
             raise utils.ValidationError(
@@ -1706,9 +1692,6 @@ class Exploration(object):
             param_domain.ParamChange.from_dict(param_change)
             for param_change in param_changes_list
         ]
-
-    def update_default_skin_id(self, default_skin_id):
-        self.default_skin = default_skin_id
 
     def update_init_state_name(self, init_state_name):
         if init_state_name not in self.states:
@@ -2330,6 +2313,9 @@ class Exploration(object):
         exploration_dict['title'] = title
         exploration_dict['category'] = category
 
+        # Remove the 'default_skin' property.
+        del exploration_dict['default_skin']
+
         # Upgrade all gadget panel customizations to have exactly one empty
         # bottom panel. This is fine because, for previous schema versions,
         # gadgets functionality had not been released yet.
@@ -2465,7 +2451,6 @@ class Exploration(object):
             'category': self.category,
             'author_notes': self.author_notes,
             'blurb': self.blurb,
-            'default_skin': self.default_skin,
             'states_schema_version': self.states_schema_version,
             'init_state_name': self.init_state_name,
             'language_code': self.language_code,

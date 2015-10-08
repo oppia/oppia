@@ -32,9 +32,7 @@ describe('Testing filters', function() {
     'isOutcomeConfusing',
     'parameterizeRuleDescription',
     'normalizeWhitespace',
-    'convertToPlainText',
-    'summarizeAnswerGroup',
-    'summarizeDefaultOutcome',
+    'convertToPlainText'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -175,9 +173,41 @@ describe('Testing filters', function() {
     expect(filter('\n')).toEqual('');
     expect(filter('\n\n\n')).toEqual('');
 
-    // TODO(bhenning): There could be some merit in also testing cross-platform
-    // line endings (since the pattern in filter applies to them). Only one is
-    // tested here.
+    // Windows
     expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
+    expect(filter('Single line\u000D\u000AEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0D\x0AEOL')).toEqual('Single line...');
+    expect(filter('Single line\u000D\x0AEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0D\u000AEOL')).toEqual('Single line...');
+
+    // Mac
+    expect(filter('Single line\rEOL')).toEqual('Single line...');
+    expect(filter('Single line\u000DEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0DEOL')).toEqual('Single line...');
+
+    // Linux
+    expect(filter('Single line\nEOL')).toEqual('Single line...');
+    expect(filter('Single line\u000AEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0AEOL')).toEqual('Single line...');
+
+    // Vertical Tab
+    expect(filter('Vertical Tab\vEOL')).toEqual('Vertical Tab...');
+    expect(filter('Vertical Tab\u000BEOL')).toEqual('Vertical Tab...');
+    expect(filter('Vertical Tab\x0BEOL')).toEqual('Vertical Tab...');
+
+    // Form Feed
+    expect(filter('Form Feed\fEOL')).toEqual('Form Feed...');
+    expect(filter('Form Feed\u000CEOL')).toEqual('Form Feed...');
+    expect(filter('Form Feed\x0CEOL')).toEqual('Form Feed...');
+
+    // Next Line
+    expect(filter('Next Line\u0085EOL')).toEqual('Next Line...');
+    expect(filter('Next Line\x85EOL')).toEqual('Next Line...');
+
+    // Line Separator
+    expect(filter('Line Separator\u2028EOL')).toEqual('Line Separator...');
+
+    // Paragraph Separator
+    expect(filter('Paragraph Separator\u2029EOL')).toEqual('Paragraph Separator...');
   }));
 });

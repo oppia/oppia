@@ -222,12 +222,14 @@ textarea {
 */
 .oppia-dev-mode {
   background-color: DarkSlateGray;
-  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
   bottom: 0;
   color: white;
-  padding: 5px;
+  left: 0;
+  padding: 4px 8px;
+  /* This allows clicks to 'pass through' the element. */
+  pointer-events: none;
   position: fixed;
-  right: 0;
 }
 
 /*
@@ -834,8 +836,13 @@ md-card.oppia-gallery-tile {
 
 .oppia-cc-icon {
   bottom: 0;
+  opacity: 0.4;
   position: fixed;
   right: 25px;
+}
+
+.oppia-cc-icon:hover {
+  opacity: 0.7;
 }
 
 .oppia-wide-panel {
@@ -931,11 +938,11 @@ pre.oppia-pre-wrapped-text {
   width: 24px;
 }
 .oppia-pre-avatar-oppia::before {
-  background-image: url('/images/general/oppia_black_48px.png');
+  background-image: url('/images/avatar/oppia_black_48px.png');
   top: 2px;
 }
 .oppia-pre-avatar-user::before {
-  background-image: url('/images/general/user_mint_48px.png');
+  background-image: url('/images/avatar/user_mint_48px.png');
   top: 8px;
 }
 
