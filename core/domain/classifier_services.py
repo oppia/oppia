@@ -157,6 +157,17 @@ class StringClassifier(object):
             self._num_labels += 1
         return self._label_to_id[label]
 
+    def _get_label_name(self, l):
+        """
+        Returns a label's string name given its internal id.
+        If the id does not have a corresponding name, an exception is raised.
+        """
+        for label_name, label_id in self._label_to_id.iteritems():
+            if label_id == l:
+                return label_name
+
+        raise Exception('Label id %d does not exist.' % l)
+
     def _get_doc_with_label_vector(self, d):
         """
         Given a doc id, return the doc and its label bit vector.
@@ -277,17 +288,6 @@ class StringClassifier(object):
             probs_with_label_id.sum(axis=0)[numpy.newaxis])
         return probs_with_label_id
 
-    def _get_label_probabilities_with_label_names(self, d):
-        """
-        Returns a dictionary of label probabilities for a given doc, keyed by
-        label name.
-        """
-        probs_with_label_id = self._get_label_probabilities(d)
-        probs_with_label_name = {}
-        for label_name, l in self._label_to_id.iteritems():
-            probs_with_label_name[label_name] = probs_with_label_id[l]
-        return probs_with_label_name
-
     def _get_prediction_report_for_doc(self, d):
         """Generates and returns a prediction report for a given doc.
 
@@ -315,26 +315,25 @@ class StringClassifier(object):
         predict _DEFAULT_LABEL. This will make non-default predictions more
         accurate, but result in fewer of them.
         """
-        prediction_label = self._DEFAULT_LABEL
+        default_label_id = self._get_label_id(self._DEFAULT_LABEL)
+        prediction_label_id = default_label_id
         prediction_confidence = 0
-        probs_with_label_name =(
-            self._get_label_probabilities_with_label_names(d))
-        default_prob = probs_with_label_name[self._DEFAULT_LABEL]
+        probs_with_label_id = self._get_label_probabilities(d)
+        default_prob = probs_with_label_id[default_label_id]
         default_prob_comp = 1.0 - default_prob
 
-        for label in sorted(probs_with_label_name,
-                key=probs_with_label_name.get, reverse=True):
-            prob_with_label_name = probs_with_label_name[label]
-            if (label != self._DEFAULT_LABEL and
-                    prob_with_label_name /
-                    default_prob_comp > self._prediction_threshold):
-                prediction_label = label
-                prediction_confidence = prob_with_label_name / default_prob_comp
+        for l, prob in enumerate(probs_with_label_id):
+            if (l != default_label_id and
+                    prob / default_prob_comp > self._prediction_threshold):
+                prediction_label_id = l
+                prediction_confidence = prob / default_prob_comp
 
         return {
-            'prediction_label': prediction_label,
+            'prediction_label_id': prediction_label_id,
+            'prediction_label_name':
+                self._get_label_name(prediction_label_id),
             'prediction_confidence': prediction_confidence,
-            'all_predictions': prob_with_label_name
+            'all_predictions': probs_with_label_id
         }
 
     def _validate_label(self, label):
@@ -482,7 +481,7 @@ class StringClassifier(object):
         """
         Returns the predicted label from a doc's prediction report.
         """
-        return self._get_prediction_report_for_doc(d)['prediction_label']
+        return self._get_prediction_report_for_doc(d)['prediction_label_name']
 
     def to_dict(self):
         """

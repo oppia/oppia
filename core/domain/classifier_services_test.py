@@ -171,6 +171,13 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.string_classifier._get_label_id('_non_existent_label_2')
         self.assertEquals(self.string_classifier._num_labels, label_count + 2)
 
+    def test_get_label_name(self):
+        label_id = self.string_classifier._get_label_id('food')
+        label_name = self.string_classifier._get_label_name(label_id)
+        self.assertEquals(label_name, 'food')
+        with self.assertRaises(Exception):
+            label_id = self.string_classifier._get_label_name(-1)
+
     def test_only_valid_labels_are_allowed(self):
         self.string_classifier.add_examples_for_training(
             [['example doc', ['good_label']]])
