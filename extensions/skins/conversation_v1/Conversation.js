@@ -516,7 +516,7 @@ oppia.directive('conversationSkin', [function() {
 
       var scrollToTop = function() {
         $timeout(function() {
-          $("html, body").animate({ scrollTop: 0 }, 800, 'easeOutQuart');
+          $('html, body').animate({scrollTop: 0}, 800, 'easeOutQuart');
           return false;
         });
       };
