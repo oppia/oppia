@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the exploration feedback tab.
+ * @fileoverview Controller for the exploration editor feedback tab.
  *
  * @author kashida@google.com (Koji Ashida)
  */
@@ -109,7 +109,7 @@ oppia.controller('FeedbackTab', [
   };
 
   $scope.setActiveThread = function(threadId) {
-    threadDataService.loadMessagesFromBackend(threadId);
+    threadDataService.fetchMessages(threadId);
 
     for (var i = 0; i < $scope.threadData.threadList.length; i++) {
       if ($scope.threadData.threadList[i].thread_id === threadId) {
@@ -123,7 +123,7 @@ oppia.controller('FeedbackTab', [
 
   // Initial load of the thread list on page load.
   $scope.clearActiveThread();
-  threadDataService.reloadFromBackend(function() {
+  threadDataService.fetchThreads(function() {
     $timeout(function() {
       $rootScope.loadingMessage = '';
     }, 500);

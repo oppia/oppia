@@ -15,13 +15,15 @@
 /**
  * @fileoverview Service for getting thread data from the backend for the
  * feedback tab of the exploration editor.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('threadDataService', [
     '$http', 'explorationData', function($http, explorationData) {
-  var expId = explorationData.explorationId;
-  var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
-  var _THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
+  var _expId = explorationData.explorationId;
+  var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
+  var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
 
   // All the threads for this exploration. This is a list whose entries are
   // objects, each representing threads. The 'messages' key of this object
@@ -30,7 +32,7 @@ oppia.factory('threadDataService', [
     threadList: []
   };
 
-  var _reloadFromBackend = function(successCallback) {
+  var _fetchThreads = function(successCallback) {
     $http.get(_THREAD_LIST_HANDLER_URL).success(function(data) {
       _data.threadList = data.threads;
       if (successCallback) {
@@ -39,7 +41,7 @@ oppia.factory('threadDataService', [
     });
   };
 
-  var _loadMessagesFromBackend = function(threadId) {
+  var _fetchMessages = function(threadId) {
     $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
       for (var i = 0; i < _data.threadList.length; i++) {
         if (_data.threadList[i].thread_id === threadId) {
@@ -52,11 +54,11 @@ oppia.factory('threadDataService', [
 
   return {
     data: _data,
-    reloadFromBackend: function(successCallback) {
-      _reloadFromBackend(successCallback);
+    fetchThreads: function(successCallback) {
+      _fetchThreads(successCallback);
     },
-    loadMessagesFromBackend: function(threadId) {
-      _loadMessagesFromBackend(threadId);
+    fetchMessages: function(threadId) {
+      _fetchMessages(threadId);
     },
     createNewThread: function(newSubject, newText, successCallback) {
       $http.post(_THREAD_LIST_HANDLER_URL, {
@@ -64,7 +66,7 @@ oppia.factory('threadDataService', [
         subject: newSubject,
         text: newText
       }).success(function() {
-        _reloadFromBackend();
+        _fetchThreads();
         if (successCallback) {
           successCallback();
         }
@@ -95,7 +97,7 @@ oppia.factory('threadDataService', [
       };
 
       $http.post(url, payload).success(function(data) {
-        _loadMessagesFromBackend(threadId);
+        _fetchMessages(threadId);
 
         if (successCallback) {
           successCallback();
