@@ -313,6 +313,10 @@ oppia.factory('oppiaPlayerService', [
     var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
     var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
     var infoCardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
+    // This is a bit of a hack. We need to make sure all data are loaded 
+    // before displaying them in the information card.
+    // We employed chained handlers and keep track of promise of the last function.
+    var deferred = $q.defer();
 
     // This is needed to get exploration objective/goal, contributors
     // and exploration tags.
@@ -323,29 +327,35 @@ oppia.factory('oppiaPlayerService', [
       // based on the list of commits to the exploration.
       _explorationContributorUsernames = data.rights.owner_names.concat(
         data.rights.editor_names);
-    }).error(function () {
+    }).error(function() {
       warningsData.addWarning(
         data.error || 'There was an error loading the exploration information.');
-      });
+      })
+    .then(function() {
 
     // This is needed to get exploration snapshots.
     $http.get(infoCardSnapshotsUrl).success(function(response) {
       var data = response.snapshots;
       // Only get last published changes/get changes from the last snapshot.
       _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
-    }).error(function () {
+    }).error(function() {
       warningsData.addWarning(
         response.error || 'There was an error loading the exploration history');
       });
+    }).then(function() {
 
     // This is needed to get statistics of the exprolation.
     $http.get(infoCardStatisticsUrl).success(function(data) {
       // Only get number of viewers who started an exploration.
       _viewersCount = data.num_starts;
-    }).error(function () {
+      deferred.resolve(_viewersCount);
+    }).error(function() {
       warningsData.addWarning(
         data.error || 'There was an error loading the exploration statistics');
       });
+    });
+
+    return deferred.promise;
   };
 
   return {
@@ -583,6 +593,9 @@ oppia.factory('oppiaPlayerService', [
     },
     getOppiaAvatarImageUrl: function() {
       return '/images/avatar/oppia-avatar.png';
+    },
+    getInfoCardDataPromise: function() {
+      return _loadInitialInformationCardData();
     }
   };
 }]);
@@ -807,6 +820,10 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
         };
         $scope.viewersCount = _informationCardData.viewersCount;
+        $scope.loadingInfoCardData = true;
+        oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
+          $scope.loadingInfoCardData = false; 
+        });
         $scope.cancel = function() {
           $modalInstance.dismiss();
         };
