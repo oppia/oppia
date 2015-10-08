@@ -225,9 +225,9 @@ textarea {
   border-top-right-radius: 0.5em;
   bottom: 0;
   color: white;
+  left: 0;
   padding: 4px 8px;
   position: fixed;
-  left: 0;
 }
 
 /*
