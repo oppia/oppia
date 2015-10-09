@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the Oppia learner view."""
+"""Controllers for the Oppia exploration learner view."""
 
 __author__ = 'Sean Lip'
 
@@ -179,25 +179,11 @@ class ExplorationPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'player'
 
-    def _make_first_letter_uppercase(self, s):
-        """Converts the first letter of a string to its uppercase equivalent,
-        and returns the result.
-        """
-        # This guards against empty strings.
-        if s:
-            return s[0].upper() + s[1:]
-        else:
-            return s
-
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
         version = self.request.get('v')
-        if not version:
-            # The default value for a missing parameter seems to be ''.
-            version = None
-        else:
-            version = int(version)
+        version = int(version) if version else None
 
         try:
             exploration = exp_services.get_exploration_by_id(
@@ -256,7 +242,7 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_name': exploration.title,
             # Note that this overwrites the value in base.py.
-            'meta_description': self._make_first_letter_uppercase(
+            'meta_description': utils.make_first_letter_uppercase(
                 exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
@@ -289,20 +275,14 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        info_card_color = (
-            feconf.CATEGORIES_TO_COLORS[exploration.category] if
-            exploration.category in feconf.CATEGORIES_TO_COLORS else
-            feconf.DEFAULT_COLOR)
-
         self.values.update({
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'info_card_image_url': (
-                '/images/gallery/exploration_background_%s_large.png' %
-                info_card_color),
+            'info_card_image_url': utils.get_info_card_url_for_category(
+                exploration.category),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_random_string(24),
             'version': exploration.version,

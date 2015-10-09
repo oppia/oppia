@@ -2444,7 +2444,8 @@ class Exploration(object):
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
-        necessary information to represent the exploration."""
+        necessary information to represent the exploration.
+        """
         return copy.deepcopy({
             'id': self.id,
             'title': self.title,
@@ -2466,7 +2467,8 @@ class Exploration(object):
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the
-        learner view."""
+        learner view.
+        """
         return {
             'init_state_name': self.init_state_name,
             'param_changes': self.param_change_dicts,

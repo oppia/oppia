@@ -397,3 +397,23 @@ def require_valid_name(name, name_type):
         if c in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' % (c, name_type, name))
+
+
+def make_first_letter_uppercase(s):
+    """Converts the first letter of a string to its uppercase equivalent,
+    and returns the result.
+    """
+    # This guards against empty strings.
+    if s:
+        return s[0].upper() + s[1:]
+    else:
+        return s
+
+
+def get_info_card_url_for_category(category):
+    info_card_color = (
+        feconf.CATEGORIES_TO_COLORS[category] if
+        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
+    return (
+        '/images/gallery/exploration_background_%s_large.png' %
+        info_card_color)
