@@ -75,6 +75,7 @@ class StringClassifier(object):
         id. A one in the vector means the label id matches some word instance
         in the doc; a zero in the vector means the label id does not match any
         word instance in the doc.
+    example - A doc with a list of labels it should be matched to.
 
     This class uses index notation with the format "_V_XY", where V is the
     element of an array, and X and Y are the indices used to measure V.
@@ -185,7 +186,8 @@ class StringClassifier(object):
         useful because no old input data needs to be altered when a new label
         is introduced to the model."""
         if len(labels) == 0:
-            return numpy.ones(self._num_labels)
+            return self._label_set_to_vector([
+                label_to_id[0] for label_to_id in self._label_to_id.items()])
         return self._label_set_to_vector(labels)
 
     def _validate_training_label_list(self, label_list):
