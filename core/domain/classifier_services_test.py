@@ -187,13 +187,6 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             label_id = self.string_classifier._get_label_name(-1)
 
-    def test_empty_label_list_when_training(self):
-        self.string_classifier.add_examples_for_training(
-            [['example doc', ['label']]])
-        with self.assertRaises(Exception):
-            self.string_classifier.add_examples_for_training(
-                [['example doc', []]])
-
     def test_reload_valid_state(self):
         self.string_classifier.load_examples(self._NEW_EXAMPLES_TRAIN)
         self.assertEquals(self.string_classifier._num_labels, 3)

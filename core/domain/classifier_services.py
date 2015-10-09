@@ -172,35 +172,15 @@ class StringClassifier(object):
         """Given a doc id, return the doc and its label bit vector."""
         return self._w_dp[d], self._b_dl[d]
 
-    def _label_set_to_vector(self, labels):
+    def _get_label_vector(self, labels):
         """Generate and return a label bit vector given a list of labels that
-        are turned on for the vector."""
+        are turned on for the vector.
+        """
         label_vector = numpy.zeros(self._num_labels)
         for label in labels:
             label_vector[self._get_label_id(label)] = 1
         label_vector[self._label_to_id[self._DEFAULT_LABEL]] = 1
         return label_vector
-
-    def _get_label_vector(self, labels):
-        """Returns a label bit vector given a list of labels.
-
-        An empty label list is an alias for all labels being set. This is
-        useful because no old input data needs to be altered when a new label
-        is introduced to the model.
-        """
-        if len(labels) == 0:
-            return self._label_set_to_vector([
-                label_to_id[0] for label_to_id in self._label_to_id.items()])
-        return self._label_set_to_vector(labels)
-
-    def _validate_training_label_list(self, label_list):
-        """Checks that a label list is not empty. Used when examples are added
-        for training purposes. This is because empty label lists are treated as
-        a doc having all labels.
-        """
-        if len(label_list) == 0:
-            raise Exception(
-                'A document\'s labels cannot be empty when training.')
 
     def _update_counting_matrices(self, d, w, l, val):
         """Updates counting matrices (ones that begin with _c) when a label
@@ -409,16 +389,16 @@ class StringClassifier(object):
         """Adds examples to the classifier with _training_iterations number of
         iterations.
         """
-        for doc, label_list in training_examples:
-            self._validate_training_label_list(label_list)
         return self._add_examples(training_examples, self._training_iterations)
 
     def add_examples_for_predicting(self, prediction_examples):
         """Adds examples to the classifier with _prediction_iterations number
         of iterations.
         """
+        label_set = self._label_to_id.keys()
         return self._add_examples(
-            zip(prediction_examples, [[] for _ in prediction_examples]),
+            zip(prediction_examples, [copy.deepcopy(label_set) for _ in
+                prediction_examples]),
             self._prediction_iterations)
 
     def load_examples(self, examples):
