@@ -171,8 +171,8 @@
         </div>
       </div>
       <div ng-if="loadingInfoCardData" class="oppia-info-card-content">
-        <h3 ng-if="!failed">Loading...</h3>
-        <h3 ng-if="failed">Oops, something went wrong. Could not load data.</h3>
+        <h3 ng-if="!failedLoadingData">Loading...</h3>
+        <h3 ng-if="failedLoadingData">Oops, something went wrong. Could not load data.</h3>
       </div>
       <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
         <img src="/third_party/static/material-design-icons-1.0.1/ic_close_white_48dp.png">

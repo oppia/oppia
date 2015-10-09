@@ -354,8 +354,8 @@ oppia.factory('oppiaPlayerService', [
       $log.error('There was an error loading the exploration statistics');
     });
 
-    return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
-      deferredContributors.promise])
+   return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
+      deferredContributors.promise]);
   };
 
   return {
@@ -821,11 +821,11 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
         };
         $scope.viewersCount = _informationCardData.viewersCount;
         $scope.loadingInfoCardData = true;
-        $scope.failed;
+        $scope.failedLoadingData = false;
         oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
           $scope.loadingInfoCardData = false; 
         }, function() {
-          $scope.failed=true;
+          $scope.failedLoadingData = true;
         });
 
         $scope.cancel = function() {
