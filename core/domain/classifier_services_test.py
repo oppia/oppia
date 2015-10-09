@@ -132,23 +132,30 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._num_words, 7)
         self._validate_instance(self.string_classifier)
 
-    def test_model_save_load(self):
-        # Also tests deepcopy
-        # i.e. that editing the dictionary won't edit the model, and vice versa
+    def test_model_to_and_from_dict(self):
         self.assertEquals(
             self.string_classifier._num_docs,
             len(self._EXAMPLES_TRAIN))
+
+        # When the model is converted into a dictionary, check that updating
+        # the dictionary does not alter the model.
         model = self.string_classifier.to_dict()
         model['_num_docs'] = 9
         self.assertEquals(model['_num_docs'], 9)
         self.assertEquals(
             self.string_classifier._num_docs,
             len(self._EXAMPLES_TRAIN))
+
+        # When the model is updated, check that the dictionary remains
+        # unchanged.
         self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(
             self.string_classifier._num_docs,
             len(self._EXAMPLES_TRAIN) + len(self._EXAMPLES_TEST))
         self.assertEquals(model['_num_docs'], 9)
+
+        # When a dictionary is loaded into a model, check that the altered
+        # values are now consistent.
         self.string_classifier.from_dict(model)
         self.assertEquals(self.string_classifier._num_docs, 9)
         self.assertEquals(model['_num_docs'], 9)
@@ -178,12 +185,12 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             label_id = self.string_classifier._get_label_name(-1)
 
-    def test_only_valid_labels_are_allowed(self):
+    def test_empty_label_list_when_training(self):
         self.string_classifier.add_examples_for_training(
-            [['example doc', ['good_label']]])
+            [['example doc', ['label']]])
         with self.assertRaises(Exception):
             self.string_classifier.add_examples_for_training(
-                [['example doc', ['_bad_label']]])
+                [['example doc', []]])
 
     def test_reload_valid_state(self):
         self.string_classifier.load_examples(self._NEW_EXAMPLES_TRAIN)
@@ -193,6 +200,22 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
             len(self._NEW_EXAMPLES_TRAIN))
         self.assertEquals(self.string_classifier._num_words, 4)
         self._validate_instance(self.string_classifier)
+
+    def test_prediction_report(self):
+        def _mock_get_label_probabilities(d):
+            self.assertEquals(d, -1)
+            return [0.5, 0.3, 0.2]
+        def _mock_get_label_id(label):
+            return 0
+        def _mock_get_label_name(l):
+            return 'fake_label'
+        self.string_classifier._prediction_threshold = 0
+        self.string_classifier._get_label_probabilities = (
+            _mock_get_label_probabilities)
+        self.string_classifier._get_label_id = _mock_get_label_id
+        prediction_report = (
+            self.string_classifier._get_prediction_report_for_doc(-1))
+        self.assertEquals(prediction_report['prediction_label_id'], 1)
 
     def test_training(self):
         doc_ids = self.string_classifier.add_examples_for_predicting(

@@ -21,11 +21,11 @@ import numpy
 
 
 class StringClassifier(object):
-    """
-    A classifier that uses supervised learning to match free-form text answers
-    to answer groups. The classifier trains on answers that exploration editors
-    have assigned to an answer group. Given a new answer, it predicts the
-    answer group using Latent Dirichlet Allocation
+    """A classifier that uses supervised learning to match free-form text
+
+    answers to answer groups. The classifier trains on answers that exploration
+    editors have assigned to an answer group. Given a new answer, it predicts
+    the answer group using Latent Dirichlet Allocation
     (https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) with Gibbs
     Sampling.
 
@@ -67,10 +67,10 @@ class StringClassifier(object):
         to represent the word in the classifier model.
     word instance - An instance of a word id. Each word id can have multiple
         instances corresponding to its occurrences in all docs.
-    label - An answer group that the doc should correspond to. Labels should
-        not begin with a '_' (underscore). If a doc is being added to train
-        a model, labels are provided. If a doc is being added for prediction
-        purposes, no labels are provided.
+    label - An answer group that the doc should correspond to. If a doc is
+        being added to train a model, labels are provided. If a doc is being
+        added for prediction purposes, no labels are provided. If a doc does
+        not match any label, the doc should have only one label, '_default'.
     label bit vector - A bit vector corresponding to a doc, indexed by label
         id. A one in the vector means the label id matches some word instance
         in the doc; a zero in the vector means the label id does not match any
@@ -108,8 +108,7 @@ class StringClassifier(object):
 
     It is possible for a word instance in a doc to not have an explicit label
     assigned to it. This is characterized by assigning _DEFAULT_LABEL to the
-    word instance.
-    """
+    word instance."""
 
     _DEFAULT_ALPHA = 0.1
     _DEFAULT_BETA = 0.001
@@ -122,11 +121,11 @@ class StringClassifier(object):
     _DEFAULT_LABEL = '_default'
 
     def __init__(self):
-        """
-        Initializes constants for the classifier. Setting a seed ensures
+        """ Initializes constants for the classifier. Setting a seed ensures
+
         that results are deterministic. There is nothing special about the
-        value 4. These should not be changed unless you know what you're doing.
-        """
+        value 4. These should not be changed unless you know what you're
+        doing."""
         numpy.random.seed(seed=4)
 
         self._alpha = self._DEFAULT_ALPHA
@@ -138,30 +137,28 @@ class StringClassifier(object):
         self._prediction_threshold = self._DEFAULT_PREDICTION_THRESHOLD
 
     def _get_word_id(self, word):
-        """
-        Returns a word's id if it exists, otherwise assigns
-        a new id to the word and returns it.
-        """
+        """Returns a word's id if it exists, otherwise assigns
+
+        a new id to the word and returns it."""
         if word not in self._word_to_id:
             self._word_to_id[word] = self._num_words
             self._num_words += 1
         return self._word_to_id[word]
 
     def _get_label_id(self, label):
-        """
-        Returns a label's id if it exists, otherwise assigns
-        a new id to the label and returns it.
-        """
+        """Returns a label's id if it exists, otherwise assigns
+
+        a new id to the label and returns it."""
         if label not in self._label_to_id:
             self._label_to_id[label] = self._num_labels
             self._num_labels += 1
         return self._label_to_id[label]
 
     def _get_label_name(self, l):
-        """
-        Returns a label's string name given its internal id.
-        If the id does not have a corresponding name, an exception is raised.
-        """
+        """Returns a label's string name given its internal id.
+
+        If the id does not have a corresponding name, an exception is
+        raised."""
         for label_name, label_id in self._label_to_id.iteritems():
             if label_id == l:
                 return label_name
@@ -169,81 +166,64 @@ class StringClassifier(object):
         raise Exception('Label id %d does not exist.' % l)
 
     def _get_doc_with_label_vector(self, d):
-        """
-        Given a doc id, return the doc and its label bit vector.
-        """
+        """Given a doc id, return the doc and its label bit vector."""
         return self._w_dp[d], self._b_dl[d]
 
-    def _get_label_vector(self, labels):
-        """
-        Given a list of labels, return the label bit vector.
-        An empty label list is an alias for all labels being set. This is
-        useful because otherwise when a new label is introduce to the model,
-        none of the input data needs to be altered.
-        """
-        if len(labels) == 0:
-            return numpy.ones(self._num_labels)
+    def _label_set_to_vector(self, labels):
+        """Generate and return a label bit vector given a list of labels that
+        are turned on for the vector."""
         label_vector = numpy.zeros(self._num_labels)
         for label in labels:
             label_vector[self._get_label_id(label)] = 1
         label_vector[self._label_to_id[self._DEFAULT_LABEL]] = 1
         return label_vector
 
+    def _get_label_vector(self, labels):
+        """Returns a label bit vector given a list of labels.
+
+        An empty label list is an alias for all labels being set. This is
+        useful because no old input data needs to be altered when a new label
+        is introduced to the model."""
+        if len(labels) == 0:
+            return numpy.ones(self._num_labels)
+        return self._label_set_to_vector(labels)
+
+    def _validate_training_label_list(self, label_list):
+        """Checks that a label list is not empty. Used when examples are added
+
+        for training purposes. This is because empty label lists are treated as
+        a doc having all labels."""
+        if len(label_list) == 0:
+            raise Exception(
+                'A document\'s labels cannot be empty when training.')
+
     def _update_counting_matrices(self, d, w, l, val):
-        """
-        Updates counting matrices (ones that begin with _c) when a label
-        is assigned and unassigned to a word.
-        """
+        """Updates counting matrices (ones that begin with _c) when a label
+
+        is assigned and unassigned to a word."""
         self._c_dl[d, l] += val
         self._c_lw[l, w] += val
         self._c_l[l] += val
 
     def _increment_counting_matrices(self, d, w, l):
-        """
-        Assign a label to a word in a doc.
-        """
+        """Updates counting matrices when a label is assigned to a word
+
+        instancein a doc."""
         self._update_counting_matrices(d, w, l, 1)
 
     def _decrement_counting_matrices(self, d, w, l):
-        """
-        Unassign a label from a word in a doc.
-        """
+        """Updates counting matrices when a label is unassigned from a word
+
+        instance in a doc."""
         self._update_counting_matrices(d, w, l, -1)
 
-    def _get_doc_ids(self, doc_ids):
-        """
-        Helper function for methods that iterate over doc ids.
-        If no doc ids are provided, then all doc ids are iterated over.
-        This simplifies logic closer to the client.
-        """
+    def _run_gibbs_sampling(self, doc_ids):
+        """Runs one iteration of Gibbs sampling on the provided docs.
+
+        The statez variable is used for debugging, and possibly convergence
+        testing in the future."""
         if doc_ids is None:
             doc_ids = xrange(self._num_docs)
-        return doc_ids
-
-    def _assign_initial_labels_to_word_instances(self, doc_ids=None):
-        """
-        Uniformly assigns labels to word instances in a new document. This
-        prevents the model from converging to a non-useful state when training.
-        """
-        doc_ids = self._get_doc_ids(doc_ids)
-
-        for d in doc_ids:
-            doc, labels = self._get_doc_with_label_vector(d)
-            l_p = [
-                numpy.random.multinomial(1, labels / labels.sum()).argmax()
-                for _ in xrange(len(doc))
-            ]
-            self._l_dp.append(l_p)
-            for w, l in zip(doc, l_p):
-                self._increment_counting_matrices(d, w, l)
-
-    def _run_gibbs_sampling(self, doc_ids):
-        """
-        Runs one iteration of Gibbs sampling on the provided docs.
-        The statez variable is used for debugging, and possibly convergence
-        testing in the future.
-        """
-        doc_ids = self._get_doc_ids(doc_ids)
 
         statez = {
             'updates': 0,
@@ -279,20 +259,20 @@ class StringClassifier(object):
         return statez
 
     def _get_label_probabilities(self, d):
-        """
-        Returns a list of label probabilities for a given doc, indexed by
-        label id.
-        """
-        probs_with_label_id = self._c_dl[d] + (self._b_dl[d] * self._alpha)
-        probs_with_label_id = (probs_with_label_id /
-            probs_with_label_id.sum(axis=0)[numpy.newaxis])
-        return probs_with_label_id
+        """Returns a list of label probabilities for a given doc, indexed by
+
+        label id."""
+        label_probabilities = self._c_dl[d] + (self._b_dl[d] * self._alpha)
+        label_probabilities = (label_probabilities /
+            label_probabilities.sum(axis=0)[numpy.newaxis])
+        return label_probabilities
 
     def _get_prediction_report_for_doc(self, d):
         """Generates and returns a prediction report for a given doc.
 
         The prediction report is a dict with the following keys:
-        - 'prediction_label': the document's predicted label
+        - 'prediction_label_id': the document's predicted label id
+        - 'prediction_label_name': prediction_label_id's label name
         - 'prediction_confidence': the prediction confidence. This is
         Prob(the doc should be assigned this label |
         the doc is not assigned _DEFAULT_LABEL).
@@ -313,44 +293,33 @@ class StringClassifier(object):
         A higher prediction threshold indicates that the predictor needs
         more confidence prior to making a prediction, otherwise it will
         predict _DEFAULT_LABEL. This will make non-default predictions more
-        accurate, but result in fewer of them.
-        """
+        accurate, but result in fewer of them."""
         default_label_id = self._get_label_id(self._DEFAULT_LABEL)
         prediction_label_id = default_label_id
         prediction_confidence = 0
-        probs_with_label_id = self._get_label_probabilities(d)
-        default_prob = probs_with_label_id[default_label_id]
-        default_prob_comp = 1.0 - default_prob
+        label_probabilities = self._get_label_probabilities(d)
+        normalization_coeff = (1.0 /
+            (1.0 - label_probabilities[default_label_id]))
 
-        for l, prob in enumerate(probs_with_label_id):
+        for l, prob in enumerate(label_probabilities):
             if (l != default_label_id and
-                    prob / default_prob_comp > self._prediction_threshold):
+                    prob * normalization_coeff > self._prediction_threshold
+                    and prob * normalization_coeff > prediction_confidence):
                 prediction_label_id = l
-                prediction_confidence = prob / default_prob_comp
+                prediction_confidence = prob * normalization_coeff
 
         return {
             'prediction_label_id': prediction_label_id,
             'prediction_label_name':
                 self._get_label_name(prediction_label_id),
             'prediction_confidence': prediction_confidence,
-            'all_predictions': probs_with_label_id
+            'all_predictions': label_probabilities
         }
 
-    def _validate_label(self, label):
-        """
-        Labels are defined to not begin with underscores. This is a generic
-        rule defined as loosely as possible to avoid a label having the same
-        name as the default label. If a label in the provided examples begins
-        with an underscore, an exception will be raised.
-        """
-        if label[0] == '_':
-            raise Exception('Label %s cannot begin with underscore.' % label)
-
     def _parse_examples(self, examples):
-        """
-        Unzips docs and label lists from examples and returns the two lists.
-        Docs are split on whitespace. Order is preserved.
-        """
+        """Unzips docs and label lists from examples and returns the two lists.
+
+        Docs are split on whitespace. Order is preserved."""
         docs = []
         labels_list = []
         for example in examples:
@@ -359,26 +328,24 @@ class StringClassifier(object):
             if len(doc) > 0:
                 labels = example[1]
                 docs.append(doc)
-                map(self._validate_label, labels)
                 labels_list.append(labels)
         return docs, labels_list
 
     def _iterate_gibbs_sampling(self, iterations, doc_ids=None):
-        """
-        Runs Gibbs sampling for iterations number of times on the provided
-        docs.
-        """
-        doc_ids = self._get_doc_ids(doc_ids)
+        """Runs Gibbs sampling for "iterations" number of times on the provided
+
+        docs."""
+        if doc_ids is None:
+            doc_ids = xrange(self._num_docs)
 
         for i in xrange(iterations):
             statez = self._run_gibbs_sampling(doc_ids)
 
     def _add_examples(self, examples, iterations):
-        """
-        Adds examples to the internal state of the classifier, assigns random
-        initial labels to only the added docs, and runs Gibbs sampling for
-        iterations number of iterations.
-        """
+        """Adds examples to the internal state of the classifier, assigns
+
+        random initial labels to only the added docs, and runs Gibbs sampling
+        for iterations number of iterations."""
         if len(examples) == 0:
             return
 
@@ -422,34 +389,37 @@ class StringClassifier(object):
                 self._num_labels - last_num_labels, dtype=int)))
 
         for d in xrange(last_num_docs, self._num_docs):
-            self._assign_initial_labels_to_word_instances([d])
+            doc, _ = self._get_doc_with_label_vector(d)
+            l_p = numpy.random.random_integers(
+                0, self._num_labels - 1, size=len(doc)).tolist()
+            self._l_dp.append(l_p)
+            for w, l in zip(doc, l_p):
+                self._increment_counting_matrices(d, w, l)
             self._iterate_gibbs_sampling(iterations, [d])
 
         return xrange(last_num_docs, self._num_docs)
 
     def add_examples_for_training(self, training_examples):
-        """
-        Adds examples to the classifier with _training_iterations number of
-        iterations.
-        """
+        """Adds examples to the classifier with _training_iterations number of
+
+        iterations."""
+        for doc, label_list in training_examples:
+            self._validate_training_label_list(label_list)
         return self._add_examples(training_examples, self._training_iterations)
 
     def add_examples_for_predicting(self, prediction_examples):
-        """
-        Adds examples to the classifier with _prediction_iterations number of
-        iterations.
-        """
+        """Adds examples to the classifier with _prediction_iterations number
+
+        of iterations."""
         return self._add_examples(
-            zip(prediction_examples,
-                [[] for _ in xrange(len(prediction_examples))]),
+            zip(prediction_examples, [[] for _ in prediction_examples]),
             self._prediction_iterations)
 
     def load_examples(self, examples):
-        """
-        Sets the internal state of the classifier, assigns random initial
+        """Sets the internal state of the classifier, assigns random initial
+
         labels to the docs, and runs Gibbs sampling for _training_iterations
-        number of iterations.
-        """
+        number of iterations."""
         docs, labels_list = self._parse_examples(examples)
 
         label_set = set(
@@ -474,19 +444,21 @@ class StringClassifier(object):
         self._c_l = numpy.zeros(self._num_labels, dtype=int)
         self._l_dp = []
 
-        self._assign_initial_labels_to_word_instances()
+        for d in xrange(self._num_docs):
+            doc, _ = self._get_doc_with_label_vector(d)
+            l_p = numpy.random.random_integers(
+                0, self._num_labels - 1, size=len(doc)).tolist()
+            self._l_dp.append(l_p)
+            for w, l in zip(doc, l_p):
+                self._increment_counting_matrices(d, w, l)
         self._iterate_gibbs_sampling(self._training_iterations)
 
     def predict_label_for_doc(self, d):
-        """
-        Returns the predicted label from a doc's prediction report.
-        """
+        """Returns the predicted label from a doc's prediction report."""
         return self._get_prediction_report_for_doc(d)['prediction_label_name']
 
     def to_dict(self):
-        """
-        Converts a classifier into a dict model.
-        """
+        """Converts a classifier into a dict model."""
         model = {}
         model['_alpha'] = copy.deepcopy(self._alpha)
         model['_beta'] = copy.deepcopy(self._beta)
@@ -510,9 +482,7 @@ class StringClassifier(object):
         return model
 
     def from_dict(self, model):
-        """
-        Converts a dict model into a classifier.
-        """
+        """Converts a dict model into a classifier."""
         self._alpha = copy.deepcopy(model['_alpha'])
         self._beta = copy.deepcopy(model['_beta'])
         self._prediction_threshold = copy.deepcopy(
