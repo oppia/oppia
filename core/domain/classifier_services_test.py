@@ -47,11 +47,14 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def _validate_instance(self, string_classifier):
         self.assertEquals('_alpha' in dir(self.string_classifier), True)
         self.assertEquals('_beta' in dir(self.string_classifier), True)
-        self.assertEquals('_prediction_threshold' in
+        self.assertEquals(
+            '_prediction_threshold' in
             dir(self.string_classifier), True)
-        self.assertEquals('_training_iterations' in
+        self.assertEquals(
+            '_training_iterations' in
             dir(self.string_classifier), True)
-        self.assertEquals('_prediction_iterations' in
+        self.assertEquals(
+            '_prediction_iterations' in
             dir(self.string_classifier), True)
 
         for d in xrange(self.string_classifier._num_docs):
@@ -205,8 +208,10 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         def _mock_get_label_probabilities(d):
             self.assertEquals(d, -1)
             return [0.5, 0.3, 0.2]
+
         def _mock_get_label_id(label):
             return 0
+
         def _mock_get_label_name(l):
             return 'fake_label'
         self.string_classifier._prediction_threshold = 0
@@ -220,12 +225,15 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
     def test_training(self):
         doc_ids = self.string_classifier.add_examples_for_predicting(
             self._EXAMPLES_TEST)
-        predicted_label = self.string_classifier.predict_label_for_doc(doc_ids[0])
+        predicted_label = self.string_classifier.predict_label_for_doc(
+            doc_ids[0])
         self.assertEquals(predicted_label, 'food')
-        predicted_label = self.string_classifier.predict_label_for_doc(doc_ids[1])
+        predicted_label = self.string_classifier.predict_label_for_doc(
+            doc_ids[1])
         self.assertEquals(predicted_label, 'pets')
         # Testing a doc predicted with the default label
         self.string_classifier._prediction_threshold = 0.7
-        predicted_label = self.string_classifier.predict_label_for_doc(doc_ids[2])
+        predicted_label = self.string_classifier.predict_label_for_doc(
+            doc_ids[2])
         self.assertEquals(predicted_label, '_default')
         self._validate_instance(self.string_classifier)

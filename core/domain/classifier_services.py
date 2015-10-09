@@ -263,7 +263,8 @@ class StringClassifier(object):
 
         label id."""
         label_probabilities = self._c_dl[d] + (self._b_dl[d] * self._alpha)
-        label_probabilities = (label_probabilities /
+        label_probabilities = (
+            label_probabilities /
             label_probabilities.sum(axis=0)[numpy.newaxis])
         return label_probabilities
 
@@ -298,13 +299,13 @@ class StringClassifier(object):
         prediction_label_id = default_label_id
         prediction_confidence = 0
         label_probabilities = self._get_label_probabilities(d)
-        normalization_coeff = (1.0 /
-            (1.0 - label_probabilities[default_label_id]))
+        normalization_coeff = (
+            1.0 / (1.0 - label_probabilities[default_label_id]))
 
         for l, prob in enumerate(label_probabilities):
             if (l != default_label_id and
-                    prob * normalization_coeff > self._prediction_threshold
-                    and prob * normalization_coeff > prediction_confidence):
+                    prob * normalization_coeff > self._prediction_threshold and
+                    prob * normalization_coeff > prediction_confidence):
                 prediction_label_id = l
                 prediction_confidence = prob * normalization_coeff
 
