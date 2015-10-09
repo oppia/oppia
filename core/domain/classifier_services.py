@@ -22,7 +22,6 @@ import numpy
 
 class StringClassifier(object):
     """A classifier that uses supervised learning to match free-form text
-
     answers to answer groups. The classifier trains on answers that exploration
     editors have assigned to an answer group. Given a new answer, it predicts
     the answer group using Latent Dirichlet Allocation
@@ -109,7 +108,8 @@ class StringClassifier(object):
 
     It is possible for a word instance in a doc to not have an explicit label
     assigned to it. This is characterized by assigning _DEFAULT_LABEL to the
-    word instance."""
+    word instance.
+    """
 
     _DEFAULT_ALPHA = 0.1
     _DEFAULT_BETA = 0.001
@@ -122,11 +122,12 @@ class StringClassifier(object):
     _DEFAULT_LABEL = '_default'
 
     def __init__(self):
-        """ Initializes constants for the classifier. Setting a seed ensures
+        """Initializes constants for the classifier.
 
-        that results are deterministic. There is nothing special about the
-        value 4. These should not be changed unless you know what you're
-        doing."""
+        Setting a seed ensures that results are deterministic. There is nothing
+        special about the value 4. These should not be changed unless you know
+        what you're doing.
+        """
         numpy.random.seed(seed=4)
 
         self._alpha = self._DEFAULT_ALPHA
@@ -139,8 +140,8 @@ class StringClassifier(object):
 
     def _get_word_id(self, word):
         """Returns a word's id if it exists, otherwise assigns
-
-        a new id to the word and returns it."""
+        a new id to the word and returns it.
+        """
         if word not in self._word_to_id:
             self._word_to_id[word] = self._num_words
             self._num_words += 1
@@ -148,8 +149,8 @@ class StringClassifier(object):
 
     def _get_label_id(self, label):
         """Returns a label's id if it exists, otherwise assigns
-
-        a new id to the label and returns it."""
+        a new id to the label and returns it.
+        """
         if label not in self._label_to_id:
             self._label_to_id[label] = self._num_labels
             self._num_labels += 1
@@ -159,7 +160,8 @@ class StringClassifier(object):
         """Returns a label's string name given its internal id.
 
         If the id does not have a corresponding name, an exception is
-        raised."""
+        raised.
+        """
         for label_name, label_id in self._label_to_id.iteritems():
             if label_id == l:
                 return label_name
@@ -184,7 +186,8 @@ class StringClassifier(object):
 
         An empty label list is an alias for all labels being set. This is
         useful because no old input data needs to be altered when a new label
-        is introduced to the model."""
+        is introduced to the model.
+        """
         if len(labels) == 0:
             return self._label_set_to_vector([
                 label_to_id[0] for label_to_id in self._label_to_id.items()])
@@ -192,38 +195,39 @@ class StringClassifier(object):
 
     def _validate_training_label_list(self, label_list):
         """Checks that a label list is not empty. Used when examples are added
-
         for training purposes. This is because empty label lists are treated as
-        a doc having all labels."""
+        a doc having all labels.
+        """
         if len(label_list) == 0:
             raise Exception(
                 'A document\'s labels cannot be empty when training.')
 
     def _update_counting_matrices(self, d, w, l, val):
         """Updates counting matrices (ones that begin with _c) when a label
-
-        is assigned and unassigned to a word."""
+        is assigned and unassigned to a word.
+        """
         self._c_dl[d, l] += val
         self._c_lw[l, w] += val
         self._c_l[l] += val
 
     def _increment_counting_matrices(self, d, w, l):
         """Updates counting matrices when a label is assigned to a word
-
-        instancein a doc."""
+        instance in a doc.
+        """
         self._update_counting_matrices(d, w, l, 1)
 
     def _decrement_counting_matrices(self, d, w, l):
         """Updates counting matrices when a label is unassigned from a word
-
-        instance in a doc."""
+        instance in a doc.
+        """
         self._update_counting_matrices(d, w, l, -1)
 
     def _run_gibbs_sampling(self, doc_ids):
         """Runs one iteration of Gibbs sampling on the provided docs.
 
         The statez variable is used for debugging, and possibly convergence
-        testing in the future."""
+        testing in the future.
+        """
         if doc_ids is None:
             doc_ids = xrange(self._num_docs)
 
@@ -262,8 +266,8 @@ class StringClassifier(object):
 
     def _get_label_probabilities(self, d):
         """Returns a list of label probabilities for a given doc, indexed by
-
-        label id."""
+        label id.
+        """
         label_probabilities = self._c_dl[d] + (self._b_dl[d] * self._alpha)
         label_probabilities = (
             label_probabilities /
@@ -296,7 +300,8 @@ class StringClassifier(object):
         A higher prediction threshold indicates that the predictor needs
         more confidence prior to making a prediction, otherwise it will
         predict _DEFAULT_LABEL. This will make non-default predictions more
-        accurate, but result in fewer of them."""
+        accurate, but result in fewer of them.
+        """
         default_label_id = self._get_label_id(self._DEFAULT_LABEL)
         prediction_label_id = default_label_id
         prediction_confidence = 0
@@ -322,7 +327,8 @@ class StringClassifier(object):
     def _parse_examples(self, examples):
         """Unzips docs and label lists from examples and returns the two lists.
 
-        Docs are split on whitespace. Order is preserved."""
+        Docs are split on whitespace. Order is preserved.
+        """
         docs = []
         labels_list = []
         for example in examples:
@@ -334,21 +340,18 @@ class StringClassifier(object):
                 labels_list.append(labels)
         return docs, labels_list
 
-    def _iterate_gibbs_sampling(self, iterations, doc_ids=None):
+    def _iterate_gibbs_sampling(self, iterations, doc_ids):
         """Runs Gibbs sampling for "iterations" number of times on the provided
-
-        docs."""
-        if doc_ids is None:
-            doc_ids = xrange(self._num_docs)
-
+        docs.
+        """
         for i in xrange(iterations):
             statez = self._run_gibbs_sampling(doc_ids)
 
     def _add_examples(self, examples, iterations):
         """Adds examples to the internal state of the classifier, assigns
-
         random initial labels to only the added docs, and runs Gibbs sampling
-        for iterations number of iterations."""
+        for iterations number of iterations.
+        """
         if len(examples) == 0:
             return
 
@@ -404,25 +407,25 @@ class StringClassifier(object):
 
     def add_examples_for_training(self, training_examples):
         """Adds examples to the classifier with _training_iterations number of
-
-        iterations."""
+        iterations.
+        """
         for doc, label_list in training_examples:
             self._validate_training_label_list(label_list)
         return self._add_examples(training_examples, self._training_iterations)
 
     def add_examples_for_predicting(self, prediction_examples):
         """Adds examples to the classifier with _prediction_iterations number
-
-        of iterations."""
+        of iterations.
+        """
         return self._add_examples(
             zip(prediction_examples, [[] for _ in prediction_examples]),
             self._prediction_iterations)
 
     def load_examples(self, examples):
         """Sets the internal state of the classifier, assigns random initial
-
         labels to the docs, and runs Gibbs sampling for _training_iterations
-        number of iterations."""
+        number of iterations.
+        """
         docs, labels_list = self._parse_examples(examples)
 
         label_set = set(
@@ -454,7 +457,9 @@ class StringClassifier(object):
             self._l_dp.append(l_p)
             for w, l in zip(doc, l_p):
                 self._increment_counting_matrices(d, w, l)
-        self._iterate_gibbs_sampling(self._training_iterations)
+        self._iterate_gibbs_sampling(
+            self._training_iterations,
+            xrange(self._num_docs))
 
     def predict_label_for_doc(self, d):
         """Returns the predicted label from a doc's prediction report."""
