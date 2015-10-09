@@ -32,7 +32,11 @@ describe('Testing filters', function() {
     'isOutcomeConfusing',
     'parameterizeRuleDescription',
     'normalizeWhitespace',
-    'convertToPlainText'
+    'convertToPlainText',
+    'summarizeAnswerGroup',
+    'summarizeDefaultOutcome',
+    'summarizeNonnegativeNumber',
+    'truncateAndCapitalize',
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -209,5 +213,38 @@ describe('Testing filters', function() {
 
     // Paragraph Separator
     expect(filter('Paragraph Separator\u2029EOL')).toEqual('Paragraph Separator...');
+  }));
+
+  it('should summarize large number to maximum of four significant figures and append metrix prefix',
+       inject(function($filter) {
+    var filter = $filter('summarizeNonnegativeNumber');
+
+    expect(filter(100)).toEqual(100);
+    expect(filter(1720)).toEqual('1.7K');
+    expect(filter(2306200)).toEqual('2.3M');
+
+    expect(filter(12389654281)).toEqual('12.4B');
+    expect(filter(897978581123)).toEqual('898.0B');
+    expect(filter(476678)).toEqual('476.7K');
+
+  }));
+
+  it('should capitalize first letter and truncate string', inject(function($filter) {
+    var filter = $filter('truncateAndCapitalize');
+
+    expect(filter('remove New line', 4)).toEqual('Remo...');
+    // If the maximum number of characters is not specified, return
+    // the whole objective with the first letter capitalized.
+    expect(filter('capitalize first letter and truncate')).toEqual('Capitalize first letter and truncate');
+    expect(filter('a single sentence with more than twenty one characters', 21)).toEqual(
+      'A single sentence wit...');
+
+    expect(filter('a single sentence with more than twenty one characters and all will be shown')).toEqual(
+      'A single sentence with more than twenty one characters and all will be shown');
+    expect(filter('remove New line', 6)).toEqual('Remove...');
+    // If maximum characters is greater than objective length
+    // return whole objective.
+    expect(filter('please do not test empty string', 100)).toEqual('Please do not test empty string');
+
   }));
 });
