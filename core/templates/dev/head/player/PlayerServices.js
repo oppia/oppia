@@ -131,14 +131,14 @@ oppia.factory('answerClassificationService', [
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
+    '$http', '$rootScope', '$modal', '$filter', '$q', '$log','messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'answerClassificationService', 'stateTransitionService',
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
     function(
-      $http, $rootScope, $modal, $filter, $q, messengerService,
+      $http, $rootScope, $modal, $filter, $q, $log, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       answerClassificationService, stateTransitionService,
       extensionTagAssemblerService, INTERACTION_SPECS,
@@ -328,10 +328,10 @@ oppia.factory('oppiaPlayerService', [
       _explorationContributorUsernames = data.rights.owner_names.concat(
         data.rights.editor_names);
       deferredContributors.resolve(data);
-    }).error(function() {
-      warningsData.addWarning('Oops, something went wrong. Could not load data.');
-      $log.error(data.error);
-      });
+    }).error(function(data) {
+      deferredContributors.reject(data);
+      $log.error('There was an error loading the exploration information.');
+    });
 
     // This is needed to get exploration snapshots.
     $http.get(infoCardSnapshotsUrl).success(function(response) {
@@ -339,9 +339,9 @@ oppia.factory('oppiaPlayerService', [
       // Only get last published changes/get changes from the last snapshot.
       _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
       deferredSnapshots.resolve(data);
-    }).error(function() {
-      warningsData.addWarning('Oops, something went wrong. Could not load data.');
-      $log.error(response.error);
+    }).error(function(response) {
+      deferredSnapshots.reject(response);
+      $log.error('There was an error loading the exploration history');
     });
 
     // This is needed to get statistics of the exprolation.
@@ -349,11 +349,10 @@ oppia.factory('oppiaPlayerService', [
       // Only get number of viewers who started an exploration.
       _viewersCount = data.num_starts;
       deferredStatistics.resolve(_viewersCount);
-    }).error(function() {
-      warningsData.addWarning('Oops, something went wrong. Could not load data.');
-      $log.error(data.error);
-
-      });
+    }).error(function(data) {
+      deferredStatistics.reject(data);
+      $log.error('There was an error loading the exploration statistics');
+    });
 
     return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
       deferredContributors.promise])
@@ -576,7 +575,7 @@ oppia.factory('oppiaPlayerService', [
     // user is not logged in or has not uploaded a profile picture, or the
     // player is in preview mode.
     getUserProfileImage: function() {
-      var DEFAULT_PROFILE_IMAGE_PATH = '/images/general/user_blue_72px.png';
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
       var deferred = $q.defer();
       if (_isLoggedIn && !_editorPreviewMode) {
         $http.get('/preferenceshandler/profile_picture').success(function(data) {
@@ -593,7 +592,7 @@ oppia.factory('oppiaPlayerService', [
       return deferred.promise;
     },
     getOppiaAvatarImageUrl: function() {
-      return '/images/avatar/oppia-avatar.png';
+      return '/images/avatar/oppia_black_72px.png';
     },
     getInfoCardDataPromise: function() {
       return _loadInitialInformationCardData();
@@ -822,9 +821,13 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
         };
         $scope.viewersCount = _informationCardData.viewersCount;
         $scope.loadingInfoCardData = true;
+        $scope.failed;
         oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
           $scope.loadingInfoCardData = false; 
+        }, function() {
+          $scope.failed=true;
         });
+
         $scope.cancel = function() {
           $modalInstance.dismiss();
         };
