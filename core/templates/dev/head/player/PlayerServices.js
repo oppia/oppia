@@ -131,7 +131,7 @@ oppia.factory('answerClassificationService', [
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', '$filter', '$q', '$log','messengerService',
+    '$http', '$rootScope', '$modal', '$filter', '$q', '$log', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'answerClassificationService', 'stateTransitionService',
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
@@ -334,13 +334,13 @@ oppia.factory('oppiaPlayerService', [
     });
 
     // This is needed to get exploration snapshots.
-    $http.get(infoCardSnapshotsUrl).success(function(response) {
-      var data = response.snapshots;
+    $http.get(infoCardSnapshotsUrl).success(function(data) {
+      var data = data.snapshots;
       // Only get last published changes/get changes from the last snapshot.
       _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
       deferredSnapshots.resolve(data);
-    }).error(function(response) {
-      deferredSnapshots.reject(response);
+    }).error(function(data) {
+      deferredSnapshots.reject(data);
       $log.error('There was an error loading the exploration history');
     });
 
