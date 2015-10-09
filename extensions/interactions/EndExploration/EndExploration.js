@@ -38,6 +38,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
         $scope.invalidExpIds = [];
         $scope.recommendedExplorationIds = [];
         $scope.recommendedExplorationSummaries = [];
+        $scope.collectionId = GLOBALS.collectionId;
 
         var authorRecommendationsDeferred = $q.defer();
         var authorRecommendationsPromise = authorRecommendationsDeferred.promise;
@@ -73,9 +74,15 @@ oppia.directive('oppiaInteractiveEndExploration', [
         if (!$scope.isInEditorPreviewMode) {
           authorRecommendationsPromise.then(function() {
             var explorationId = explorationContextService.getExplorationId();
+            var collectionSuffix = '';
+            if ($scope.collectionId) {
+              collectionSuffix = '?collection_id=' + $scope.collectionId;
+            }
             $http({
               method: 'GET',
-              url: '/explorehandler/recommendations/' + explorationId
+              url: (
+                '/explorehandler/recommendations/' + explorationId +
+                collectionSuffix)
             }).success(function(data) {
               var allRecommendedExplorationIds = data.recommended_exp_ids;
               var systemRecommendedExplorationIds = [];

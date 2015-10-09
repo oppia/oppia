@@ -23,6 +23,8 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.platform import models
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 import feconf
 import utils
 
@@ -100,12 +102,28 @@ class CollectionDataHandler(base.BaseHandler):
             exp_summary = exp_summaries[ind]
             exp_titles_dict[exp_id] = exp_summary.title if exp_summary else ''
 
+        # TODO(bhenning): Users should not be recommended explorations they
+        # have completed outside the context of a collection.
+        next_exploration_ids = None
+        if self.user_id:
+            completed_exploration_ids = (
+                collection_services.get_completed_exploration_ids(
+                    self.user_id, collection_id))
+            next_exploration_ids = collection.get_next_exploration_ids(
+                completed_exploration_ids)
+        else:
+            # If the user is not logged in or they have not completed any of the
+            # explorations yet within the context of this collection, recommend the
+            # initial explorations.
+            next_exploration_ids = collection.init_exploration_ids
+
         self.values.update({
             'can_edit': (
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection.to_dict(),
             'exploration_titles': exp_titles_dict,
+            'next_exploration_ids': next_exploration_ids,
             'info_card_image_url': utils.get_info_card_url_for_category(
                 collection.category),
             'is_logged_in': bool(self.user_id),

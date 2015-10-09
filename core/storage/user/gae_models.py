@@ -144,3 +144,53 @@ class ExplorationUserDataModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
+
+
+class ExplorationInCollectionCompletionModel(base_models.BaseModel):
+    """Stores all explorations which have been completed within the context of
+    a collection.
+    """
+
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The collection id.
+    collection_id = ndb.StringProperty(required=True, indexed=True)
+    # Contains the list of explorations which have been completed within the
+    # context of the collection specified by the above ID.
+    context = ndb.JsonProperty(required=True, indexed=False, default={})
+
+    @classmethod
+    def _generate_id(cls, user_id, collection_id):
+        return '%s.%s' % (user_id, collection_id)
+
+    @classmethod
+    def create(cls, user_id, collection_id):
+        """Creates a new ExplorationInCollectionCompletionModel entry and
+        returns it.
+
+        Note: the client is responsible for actually saving this entity to the
+        datastore.
+        """
+        instance_id = cls._generate_id(user_id, collection_id)
+        return cls(
+            id=instance_id, user_id=user_id, collection_id=collection_id)
+
+    @classmethod
+    def get(cls, user_id, collection_id):
+        """Gets the ExplorationInCollectionCompletionModel for the given ids.
+        """
+        instance_id = cls._generate_id(user_id, collection_id)
+        return super(ExplorationInCollectionCompletionModel, cls).get(
+            instance_id, strict=False)
+
+    @classmethod
+    def get_or_create(cls, user_id, collection_id):
+        """Gets the ExplorationInCollectionCompletionModel for the given ids,
+        or creates a new entry with the given IDs if no such instance yet
+        exists within the data store.
+        """
+        instance_model = cls.get(user_id, collection_id)
+        if instance_model:
+            return instance_model
+        else:
+            return cls.create(user_id, collection_id)

@@ -46,13 +46,15 @@ oppia.factory('CollectionDataService', [
 
   // TODO(bhenning): Figure out what to do about versioning. Should the version
   // be specified when a collection is fetched?
-  var _fetchCollection = function(collectionId, successCallback, errorCallback) {
+  var _fetchCollection = function(
+      collectionId, successCallback, errorCallback) {
     var collectionDataUrl = urlInterpolationService.interpolateUrl(
       COLLECTION_DATA_URL, {'collection_id': collectionId});
 
     $http.get(collectionDataUrl).success(function(data) {
       var collection = _populateExplorationsInNodes(
         angular.copy(data.collection), data.exploration_titles);
+      collection.next_exploration_ids = data.next_exploration_ids;
       if (successCallback) {
         successCallback(collection);
       }

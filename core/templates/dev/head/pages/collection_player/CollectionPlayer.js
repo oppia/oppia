@@ -25,11 +25,33 @@ oppia.controller('CollectionPlayer', [
     '$scope', 'CollectionDataService', 'warningsData',
     function($scope, collectionDataService, warningsData) {
 
-  $scope.collection = {};
+  $scope.collection = null;
+  $scope.collectionId = GLOBALS.collectionId;
+
+  $scope.getCollectionNodeForExplorationId = function(explorationId) {
+    for (var i = 0; i < $scope.collection.nodes.length; i++) {
+      var collectionNode = $scope.collection.nodes[i];
+      if (collectionNode.exploration_id == explorationId) {
+        return collectionNode;
+      }
+    }
+    return undefined;
+  };
+
+  $scope.getSuggestedCollectionNodes = function() {
+    var nextExplorationIds = $scope.collection.next_exploration_ids;
+    var suggestedCollectionNodes = [];
+    for (var i = 0; i < nextExplorationIds.length; i++) {
+      var collectionNode = $scope.getCollectionNodeForExplorationId(
+        nextExplorationIds[i]);
+      suggestedCollectionNodes.push(collectionNode);
+    }
+    return suggestedCollectionNodes;
+  };
 
   // Load the collection the learner wants to view.
   collectionDataService.loadCollection(
-      GLOBALS.collectionId, function(collection) {
+      $scope.collectionId, function(collection) {
     $scope.collection = collection;
   }, function(error, collectionId) {
     // TODO(bhenning): Handle not being able to load the collection.

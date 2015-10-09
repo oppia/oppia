@@ -19,6 +19,8 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -185,6 +187,8 @@ class ExplorationPage(base.BaseHandler):
         version = self.request.get('v')
         version = int(version) if version else None
 
+        collection_id = self.request.get('collection_id')
+
         try:
             exploration = exp_services.get_exploration_by_id(
                 exploration_id, version=version)
@@ -233,6 +237,7 @@ class ExplorationPage(base.BaseHandler):
                 dependencies_html),
             'exploration_title': exploration.title,
             'exploration_version': version,
+            'collection_id': collection_id,
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'iframed': is_iframed,
             'interaction_templates': jinja2.utils.Markup(
@@ -426,6 +431,8 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             exploration_id,
             self.payload.get('version'),
             self.payload.get('state_name'),
+            self.payload.get('collection_id'),
+            self.user_id,
             self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
@@ -487,14 +494,29 @@ class RatingHandler(base.BaseHandler):
 
 
 class RecommendationsHandler(base.BaseHandler):
-    """Provides recommendations to be displayed at the end of explorations."""
+    """Provides recommendations to be displayed at the end of explorations.
+    Which explorations are provided depends on whether the exploration was
+    played within the context of a collection. If so, then the explorations
+    are suggested from the collection, if there are upcoming explorations for
+    the learner to complete.
+    """
 
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
-        self.values.update({
-            'recommended_exp_ids': (
+        collection_id = self.request.get('collection_id')
+
+        recommended_exp_ids = []
+        if self.user_id and collection_id:
+            recommended_exp_ids = (
+                collection_services.get_next_exploration_ids_to_complete_by_user(
+                    self.user_id, collection_id))
+        else:
+            recommended_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
                     exploration_id))
+
+        self.values.update({
+            'recommended_exp_ids': recommended_exp_ids
         })
         self.render_json(self.values)

@@ -26,14 +26,22 @@
 
 {% block content %}
   <div ng-controller="CollectionPlayer">
-    <span>Welcome to: <[collection.title]></span>
-    <br>
-    <span>This collection has <[collection.nodes.length]> explorations.</span>
-    <ul>
-      <li ng-repeat="collection_node in collection.nodes">
-        <a target="_blank" href="/explore/<[collection_node.exploration.id]>"><[collection_node.exploration.title]></a>
-      </li>
-    </ul>
+    <div ng-if="collection">
+      <span>Welcome to: <[collection.title]></span>
+      <br>
+      Begin by playing or continue where you left off:
+      <ul>
+        <li ng-repeat="collection_node in getSuggestedCollectionNodes()">
+          <a target="_blank" href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>"><[collection_node.exploration.title]></a>
+        </li>
+      </ul>
+      <span>This collection has <[collection.nodes.length]> explorations.</span>
+      <ul>
+        <li ng-repeat="collection_node in collection.nodes">
+          <a target="_blank" href="/explore/<[collection_node.exploration.id]>"><[collection_node.exploration.title]></a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   {% include 'attribution_guide.html' %}
