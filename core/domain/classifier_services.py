@@ -248,10 +248,11 @@ class StringClassifier(object):
         """Returns a list of label probabilities for a given doc, indexed by
         label id.
         """
-        label_probabilities = self._c_dl[d] + (self._b_dl[d] * self._alpha)
+        unnormalized_label_probabilities = (
+            self._c_dl[d] + (self._b_dl[d] * self._alpha))
         label_probabilities = (
-            label_probabilities /
-            label_probabilities.sum(axis=0)[numpy.newaxis])
+            unnormalized_label_probabilities /
+            unnormalized_label_probabilities.sum())
         return label_probabilities
 
     def _get_prediction_report_for_doc(self, d):
@@ -395,9 +396,9 @@ class StringClassifier(object):
         """Adds examples to the classifier with _prediction_iterations number
         of iterations.
         """
-        label_set = self._label_to_id.keys()
+        all_labels = self._label_to_id.keys()
         return self._add_examples(
-            zip(prediction_examples, [copy.deepcopy(label_set) for _ in
+            zip(prediction_examples, [copy.deepcopy(all_labels) for _ in
                 prediction_examples]),
             self._prediction_iterations)
 
