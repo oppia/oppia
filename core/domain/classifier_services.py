@@ -252,7 +252,7 @@ class StringClassifier(object):
             self._c_dl[d] + (self._b_dl[d] * self._alpha))
         label_probabilities = (
             unnormalized_label_probabilities /
-            unnormalized_label_probabilities.sum())
+            unnormalized_label_probabilities.sum())[0]
         return label_probabilities
 
     def _get_prediction_report_for_doc(self, d):
