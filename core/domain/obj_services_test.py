@@ -17,8 +17,8 @@
 __author__ = 'Sean Lip'
 
 from core.domain import obj_services
+from core.tests import test_utils
 from extensions.objects.models import objects
-import test_utils
 
 
 class ObjectRegistryUnitTests(test_utils.GenericTestBase):

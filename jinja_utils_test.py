@@ -16,8 +16,8 @@
 
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 import jinja_utils
-import test_utils
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):

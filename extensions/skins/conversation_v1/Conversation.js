@@ -25,6 +25,18 @@ var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 var TIME_PADDING_MSEC = 250;
 var TIME_SCROLL_MSEC = 600;
 
+
+oppia.animation('.conversation-skin-responses-animate-slide', function() {
+  return {
+    enter: function(element, done) {
+      element.hide().slideDown()
+    },
+    leave: function(element, done) {
+      element.slideUp();
+    }
+  };
+});
+
 oppia.animation('.conversation-skin-animate-cards', function() {
   // This removes the newly-added class once the animation is finished.
   var animateCards = function(element, className, done) {
@@ -191,9 +203,9 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.panels = [];
       $scope.PANEL_TUTOR = 'tutor';
-      $scope.PANEL_INTERACTION = 'interaction';
+      $scope.PANEL_SUPPLEMENTAL = 'supplemental';
 
-      $scope.profilePicture = '/images/general/user_blue_72px.png';
+      $scope.profilePicture = '/images/avatar/user_blue_72px.png';
       oppiaPlayerService.getUserProfileImage().then(function(result) {
         $scope.profilePicture = result;
       });
@@ -224,8 +236,8 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.getThumbnailSrc = function(panelName) {
         if (panelName === $scope.PANEL_TUTOR) {
-          return '/images/general/o_black_72px.png';
-        } else if (panelName === $scope.PANEL_INTERACTION) {
+          return oppiaPlayerService.getOppiaAvatarImageUrl();
+        } else if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           return oppiaPlayerService.getInteractionThumbnailSrc(
             $scope.activeCard.stateName);
         } else {
@@ -235,13 +247,17 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
+      $scope.isSupplementalCardNonempty = function() {
+        return !$scope.activeCard.interactionIsInline;
+      };
+
       var _recomputeAndResetPanels = function() {
         $scope.panels = [];
         if (!$scope.canWindowFitTwoCards()) {
           $scope.panels.push($scope.PANEL_TUTOR);
         }
-        if (!$scope.interactionIsInline) {
-          $scope.panels.push($scope.PANEL_INTERACTION);
+        if ($scope.isSupplementalCardNonempty()) {
+          $scope.panels.push($scope.PANEL_SUPPLEMENTAL);
         }
         $scope.resetVisiblePanel();
       };
@@ -258,7 +274,7 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.setVisiblePanel = function(panelName) {
         $scope.currentVisiblePanelName = panelName;
-        if (panelName === $scope.PANEL_INTERACTION) {
+        if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
         }
       };
@@ -276,8 +292,6 @@ oppia.directive('conversationSkin', [function() {
       var _navigateToCard = function(index) {
         $scope.activeCard = $scope.transcript[index];
         $scope.arePreviousResponsesShown = false;
-        $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(
-          $scope.activeCard.stateName);
 
         _recomputeAndResetPanels();
         if (_nextFocusLabel && index === $scope.transcript.length - 1) {
@@ -288,8 +302,6 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var _addNewCard = function(stateName, contentHtml, interactionHtml) {
-        var interactionIsInline = oppiaPlayerService.isInteractionInline(
-          stateName);
         var interactionInstructions = (
           oppiaPlayerService.getInteractionInstructions(stateName));
 
@@ -304,7 +316,8 @@ oppia.directive('conversationSkin', [function() {
           contentHtml: contentHtml,
           contentHtmlFocusLabel: focusService.generateFocusLabel(),
           interactionHtml: interactionHtml,
-          interactionIsInline: interactionIsInline,
+          interactionIsInline: oppiaPlayerService.isInteractionInline(
+            stateName),
           interactionIsDisabled: false,
           interactionInstructions: interactionInstructions,
           answerFeedbackPairs: []
@@ -342,7 +355,6 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.initializePage = function() {
         $scope.transcript = [];
-        $scope.interactionIsInline = false;
         $scope.waitingForOppiaFeedback = false;
         hasInteractedAtLeastOnce = false;
 
@@ -504,7 +516,8 @@ oppia.directive('conversationSkin', [function() {
 
       var scrollToTop = function() {
         $timeout(function() {
-          $(window).scrollTop(0);
+          $('html, body').animate({scrollTop: 0}, 800, 'easeOutQuart');
+          return false;
         });
       };
 

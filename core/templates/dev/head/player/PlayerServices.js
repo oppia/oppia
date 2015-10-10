@@ -131,14 +131,14 @@ oppia.factory('answerClassificationService', [
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
+    '$http', '$rootScope', '$modal', '$filter', '$q', '$log', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'answerClassificationService', 'stateTransitionService',
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
     function(
-      $http, $rootScope, $modal, $filter, $q, messengerService,
+      $http, $rootScope, $modal, $filter, $q, $log, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       answerClassificationService, stateTransitionService,
       extensionTagAssemblerService, INTERACTION_SPECS,
@@ -147,6 +147,11 @@ oppia.factory('oppiaPlayerService', [
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _infoCardImageUrl = null;
+  var _explorationObjective = null;
+  var _explorationTags = [];
+  var _explorationContributorUsernames = [];
+  var _explorationLastUpdatedMsec = null;
+  var _viewersCount = null;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
@@ -302,6 +307,57 @@ oppia.factory('oppiaPlayerService', [
     }
   };
 
+  var _loadInitialInformationCardData = function() {
+
+    // TODO(sll): move these three handlers into a separate exp_metadata.py controller.
+    var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
+    var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
+    var infoCardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
+
+    var deferredContributors = $q.defer();
+    var deferredStatistics = $q.defer();
+    var deferredSnapshots = $q.defer();
+
+    // This is needed to get exploration objective/goal, contributors
+    // and exploration tags.
+    $http.get(infoCardDataUrl).success(function(data) {
+      _explorationObjective = data.objective;
+      _explorationTags = data.tags;
+      // TODO(sll): in the backend, compute the actual contributors
+      // based on the list of commits to the exploration.
+      _explorationContributorUsernames = data.rights.owner_names.concat(
+        data.rights.editor_names);
+      deferredContributors.resolve(data);
+    }).error(function(data) {
+      deferredContributors.reject(data);
+      $log.error('There was an error loading the exploration information.');
+    });
+
+    // This is needed to get exploration snapshots.
+    $http.get(infoCardSnapshotsUrl).success(function(data) {
+      var data = data.snapshots;
+      // Only get last published changes/get changes from the last snapshot.
+      _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
+      deferredSnapshots.resolve(data);
+    }).error(function(data) {
+      deferredSnapshots.reject(data);
+      $log.error('There was an error loading the exploration history');
+    });
+
+    // This is needed to get statistics of the exprolation.
+    $http.get(infoCardStatisticsUrl).success(function(data) {
+      // Only get number of viewers who started an exploration.
+      _viewersCount = data.num_starts;
+      deferredStatistics.resolve(_viewersCount);
+    }).error(function(data) {
+      deferredStatistics.reject(data);
+      $log.error('There was an error loading the exploration statistics');
+    });
+
+   return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
+      deferredContributors.promise]);
+  };
+
   return {
     // This should only be used in editor preview mode.
     populateExploration: function(exploration) {
@@ -344,6 +400,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
+          _loadInitialInformationCardData();
           $rootScope.$broadcast('playerServiceInitialized');
           messengerService.sendMessage(
             messengerService.EXPLORATION_LOADED, null);
@@ -361,6 +418,18 @@ oppia.factory('oppiaPlayerService', [
     },
     getExplorationId: function() {
       return _explorationId;
+    },
+    getInformationCardData: function() {
+      var informationCardData = {
+        explorationTags: _explorationTags,
+        infoCardImageUrl: _infoCardImageUrl,
+        explorationObjective: _explorationObjective,
+        explorationLastUpdatedMsec: _explorationLastUpdatedMsec,
+        explorationContributorUsernames : _explorationContributorUsernames,
+        viewersCount: _viewersCount
+      };
+
+      return informationCardData;
     },
     getExplorationTitle: function() {
       return _exploration.title;
@@ -506,7 +575,7 @@ oppia.factory('oppiaPlayerService', [
     // user is not logged in or has not uploaded a profile picture, or the
     // player is in preview mode.
     getUserProfileImage: function() {
-      var DEFAULT_PROFILE_IMAGE_PATH = '/images/general/user_blue_72px.png';
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
       var deferred = $q.defer();
       if (_isLoggedIn && !_editorPreviewMode) {
         $http.get('/preferenceshandler/profile_picture').success(function(data) {
@@ -523,7 +592,10 @@ oppia.factory('oppiaPlayerService', [
       return deferred.promise;
     },
     getOppiaAvatarImageUrl: function() {
-      return '/images/avatar/oppia-avatar.png';
+      return '/images/avatar/oppia_black_72px.png';
+    },
+    getInfoCardDataPromise: function() {
+      return _loadInitialInformationCardData();
     }
   };
 }]);
@@ -560,7 +632,7 @@ oppia.factory('ratingService', [
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
-    function(
+    function (
       $scope, $http, $modal, oppiaHtmlEscaper,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -691,4 +763,79 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
       };
     }]
   };
+}]);
+
+oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $modal) {
+
+  $scope.showInformationCard = function () {
+
+    var modalInstance = $modal.open({
+      animation: true,
+      templateUrl: 'popover/informationCard',
+      windowClass: 'oppia-modal-information-card',
+      controller: [
+         '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService', 
+         'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService', 
+         'oppiaDatetimeFormatter',
+         function ($scope, $http, $modal, $modalInstance, oppiaPlayerService, 
+                   ratingService, oppiaHtmlEscaper, embedExplorationButtonService,
+                   oppiaDatetimeFormatter) {
+
+        var _informationCardData = oppiaPlayerService.getInformationCardData();
+        $scope.serverName = window.location.protocol + '//' + window.location.host;
+        $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+          GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+        $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
+
+        // TODO(Barnabas) refactor getExplorationId() and getExplorationTitle() 
+        // to return promises.
+        $scope.explorationId = oppiaPlayerService.getExplorationId();
+        $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
+        $scope.infoCardBackgroundImageCss = {
+          'background-image': 'url('+ _informationCardData.infoCardImageUrl + ')'
+        };
+        $scope.explorationRatings = ratingService.getUserRating() !== null ? 
+                                    ratingService.getUserRating() : 0;
+
+        var _explorationTagsSummary = function(arrayOfTags) {
+          var _tagsToBeShown =[];
+          var _tagsInTooltip = [];
+          for (var i = 0; i < arrayOfTags.length; i++) {
+            if ((_tagsToBeShown.toString() + arrayOfTags[i]).length < 45) {
+              _tagsToBeShown.push(arrayOfTags[i]);
+            } else {
+              _tagsInTooltip.push(arrayOfTags[i]);
+            }
+          };
+          return {
+            tagsToBeShown: _tagsToBeShown,
+            tagsInTooltip: _tagsInTooltip
+          };
+        };
+        $scope.explorationTags = _explorationTagsSummary(_informationCardData.explorationTags);
+        $scope.explorationDescription = _informationCardData.explorationObjective;
+        $scope.explorationContributorUsernames = _informationCardData.explorationContributorUsernames;
+        $scope.explorationLastUpdatedMsec = _informationCardData.explorationLastUpdatedMsec;
+        $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+        };
+        $scope.viewersCount = _informationCardData.viewersCount;
+        $scope.loadingInfoCardData = true;
+        $scope.failedLoadingData = false;
+        oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
+          $scope.loadingInfoCardData = false; 
+        }, function() {
+          $scope.failedLoadingData = true;
+        });
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss();
+        };
+        
+      }]
+    });
+
+    modalInstance.result.then(function () {}, function () {});
+  };
+
 }]);

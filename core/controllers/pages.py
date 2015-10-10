@@ -43,9 +43,6 @@ SITE_FORUM_URL = config_domain.ConfigProperty(
     'site_forum_url', {'type': 'unicode'},
     'The site forum URL (for links; the Forum page is configured separately)',
     default_value='https://site/forum/url')
-SITE_NAME = config_domain.ConfigProperty(
-    'site_name', {'type': 'unicode'}, 'The site name',
-    default_value='SITE_NAME')
 
 
 class AboutPage(base.BaseHandler):
