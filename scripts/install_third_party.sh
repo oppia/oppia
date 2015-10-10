@@ -62,11 +62,16 @@ fi
 
 # Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
 #
-#   http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+#   http://blog.npmjs.org/post/78085451721
 #
 $NPM_CMD config set ca ""
 
-# Download and install Skulpt.
+# Download and install Skulpt. Skulpt is built using a Python script included
+# within the Skulpt repository (skulpt.py). This script requires GitPython to
+# run, among other various tools. GitPython is installed temporarily and these
+# other tools are ignored when building Skulpt (see the sed statements below).
+# The Python script is used to avoid having to manually recreate the Skulpt
+# dist build process in install_third_party.py.
 
 # GitPython is needed by Skulpt's dist build function. Download a local copy to
 # avoid the user needing to install it.

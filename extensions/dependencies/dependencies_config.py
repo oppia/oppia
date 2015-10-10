@@ -26,5 +26,5 @@ DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
     'google_maps': ['ui.map'],
     'logic_proof': [],
     'midijs': [],
-    'skulp': [],
+    'skulpt': [],
 }
