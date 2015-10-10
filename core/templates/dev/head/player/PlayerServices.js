@@ -383,6 +383,10 @@ oppia.factory('oppiaPlayerService', [
      */
     init: function(successCallback) {
       answerIsBeingProcessed = false;
+      _cachedUpdates = null;
+      learnerParamsService.init({});
+      stateHistory = [];
+      _currentStateName = null;
 
       if (_editorPreviewMode) {
         if (_exploration) {
@@ -774,10 +778,10 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
       templateUrl: 'popover/informationCard',
       windowClass: 'oppia-modal-information-card',
       controller: [
-         '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService', 
-         'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService', 
+         '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService',
+         'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService',
          'oppiaDatetimeFormatter',
-         function ($scope, $http, $modal, $modalInstance, oppiaPlayerService, 
+         function ($scope, $http, $modal, $modalInstance, oppiaPlayerService,
                    ratingService, oppiaHtmlEscaper, embedExplorationButtonService,
                    oppiaDatetimeFormatter) {
 
@@ -787,14 +791,14 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
           GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
         $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
-        // TODO(Barnabas) refactor getExplorationId() and getExplorationTitle() 
+        // TODO(Barnabas) refactor getExplorationId() and getExplorationTitle()
         // to return promises.
         $scope.explorationId = oppiaPlayerService.getExplorationId();
         $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
         $scope.infoCardBackgroundImageCss = {
           'background-image': 'url('+ _informationCardData.infoCardImageUrl + ')'
         };
-        $scope.explorationRatings = ratingService.getUserRating() !== null ? 
+        $scope.explorationRatings = ratingService.getUserRating() !== null ?
                                     ratingService.getUserRating() : 0;
 
         var _explorationTagsSummary = function(arrayOfTags) {
@@ -823,7 +827,7 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
         $scope.loadingInfoCardData = true;
         $scope.failedLoadingData = false;
         oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
-          $scope.loadingInfoCardData = false; 
+          $scope.loadingInfoCardData = false;
         }, function() {
           $scope.failedLoadingData = true;
         });
@@ -831,7 +835,7 @@ oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $moda
         $scope.cancel = function() {
           $modalInstance.dismiss();
         };
-        
+
       }]
     });
 
