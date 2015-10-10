@@ -1099,8 +1099,18 @@ oppia.factory('explorationGadgetsService', [
     getGadgets: function() {
       return angular.copy(_gadgets);
     },
+    // Returns a JS object mapping panel names to lists of gadget names.
     getPanels: function() {
       return angular.copy(_panels);
+    },
+    getPanelsContents: function() {
+      var panelsContents = {};
+      for (var panel in _panels) {
+        panelsContents[panel] = _panels[panel].map(function(gadgetName) {
+          return angular.copy(_gadgets[gadgetName]);
+        });
+      }
+      return panelsContents;
     },
     /**
      * Function that returns list of gadget names only visible in the state name
