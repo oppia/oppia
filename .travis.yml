@@ -13,6 +13,14 @@ env:
   - BACKEND_TEST=true JS_TEST=false
   - BACKEND_TEST=false JS_TEST=true
 
+notifications:
+  email:
+    recipients:
+    - sean@seanlip.org
+    - henning.benmax@gmail.com
+    on_success: change
+    on_failure: change
+
 before_install:
 - pip install codecov
 - export CHROME_BIN=chromium-browser
