@@ -20,7 +20,7 @@ import datetime
 
 from core.platform import models
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-import test_utils
+from core.tests import test_utils
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):

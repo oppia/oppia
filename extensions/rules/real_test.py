@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 from extensions.rules import real
-import test_utils
 
 
 class RealRuleUnitTests(test_utils.GenericTestBase):

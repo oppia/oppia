@@ -192,7 +192,7 @@ MATERIAL_DESIGN_ICONS_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR,
     'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICON_ACTION_FILES = [
-    'ic_info_black_48dp.png', 'ic_help_black_48dp.png',
+    'ic_info_black_48dp.png', 'ic_info_white_48dp.png', 'ic_help_black_48dp.png',
     'ic_home_black_48dp.png']
 MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
 MATERIAL_DESIGN_ICON_CONTENT_FILES = [
@@ -200,8 +200,8 @@ MATERIAL_DESIGN_ICON_CONTENT_FILES = [
 MATERIAL_DESIGN_ICON_FILE_FILES = ['ic_cloud_upload_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
     'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png',
-    'ic_close_black_48dp.png']
-MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png']
+    'ic_close_black_48dp.png', 'ic_close_white_48dp.png']
+MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png', 'ic_share_black_48dp.png']
 
 # Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'
@@ -302,8 +302,7 @@ SELECT2_TARGET_ROOT_NAME = 'select2-%s' % SELECT2_REV
 
 FONTAWESOME_REV = '4.4.0'
 FONTAWESOME_ZIP_URL = (
-    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' %
-    FONTAWESOME_REV)
+    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' % FONTAWESOME_REV)
 FONTAWESOME_ZIP_ROOT_NAME = 'Font-Awesome-%s' % FONTAWESOME_REV
 FONTAWESOME_TARGET_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
 

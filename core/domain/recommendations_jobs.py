@@ -38,7 +38,8 @@ class ExplorationRecommendationsAggregator(
 
     This job does not have a realtime component. There will be a delay in
     propagating new updates to recommendations; the length of the delay
-    will be approximately the time it takes a batch job to run."""
+    will be approximately the time it takes a batch job to run.
+    """
     @classmethod
     def get_event_types_listened_to(cls):
         return []
@@ -59,8 +60,8 @@ class ExplorationRecommendationsAggregator(
 class ExplorationRecommendationsMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
     """Manager for a MapReduce job that computes a list of recommended
-    explorations to play after completing some exploration."""
-
+    explorations to play after completing some exploration.
+    """
     @classmethod
     def _get_continuous_computation_class(cls):
         return ExplorationRecommendationsAggregator
@@ -76,7 +77,7 @@ class ExplorationRecommendationsMRJobManager(
         from core.domain import rights_manager
 
         # Only process the exploration if it is not private
-        if item.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+        if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             return
 
         # Note: There is a threshold so that bad recommendations will be
