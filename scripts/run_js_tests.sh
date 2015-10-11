@@ -74,8 +74,6 @@ if [ ! -d "$NODE_MODULE_DIR/karma-ng-html2js-preprocessor" ]; then
   $NPM_INSTALL karma-ng-html2js-preprocessor@0.1.0
 fi
 
-if $TRAVIS; then $NPM_INSTALL codecov.io; fi
-
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
 echo ""
