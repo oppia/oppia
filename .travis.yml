@@ -40,3 +40,4 @@ script:
 
 after_success:
 - if [[ $BACKEND_TEST == 'true' ]]; then codecov; fi
+- if [[ $JS_TEST == 'true' ]]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi

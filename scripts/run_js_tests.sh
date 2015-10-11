@@ -65,7 +65,7 @@ fi
 echo Checking whether karma-coverage is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma-coverage" ]; then
   echo Installing karma-coverage
-  $NPM_INSTALL karma-coverage@0.2.4
+  $NPM_INSTALL karma-coverage@0.5.2
 fi
 
 echo Checking whether karma-ng-html2js-preprocessor is installed in $TOOLS_DIR
