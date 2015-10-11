@@ -380,6 +380,12 @@ NG_IMG_CROP_ZIP_URL = (
 NG_IMG_CROP_ZIP_ROOT_NAME = 'ngImgCrop-%s' % NG_IMG_CROP_REV
 NG_IMG_CROP_TARGET_ROOT_NAME = 'ng-img-crop-%s' % NG_IMG_CROP_REV
 
+NODE_JSCS_REV = '2.3.0'
+NODE_JSCS_ZIP_URL = (
+    'https://github.com/jscs-dev/node-jscs/archive/v%s.zip' %NODE_JSCS_REV)
+NODE_JSCS_ZIP_ROOT_NAME = 'node-jscs-%s' %NODE_JSCS_REV
+NODE_JSCS_TARGET_ROOT_NAME = 'node-jscs'
+
 download_and_unzip_files(
     MD_ICONIC_FONT_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     MD_ICONIC_FONT_ZIP_ROOT_NAME, MD_ICONIC_FONT_TARGET_ROOT_NAME)
@@ -429,6 +435,9 @@ download_and_unzip_files(
 download_and_unzip_files(
     NG_IMG_CROP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     NG_IMG_CROP_ZIP_ROOT_NAME, NG_IMG_CROP_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    NODE_JSCS_ZIP_URL, TOOLS_DIR,
+    NODE_JSCS_ZIP_ROOT_NAME, NODE_JSCS_TARGET_ROOT_NAME)
 # MathJax is too big. Remove many unneeded files by following these
 # instructions:
 #   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
