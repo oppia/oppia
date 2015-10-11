@@ -57,6 +57,8 @@ export COMMON_DIR=$OPPIA_DIR/..
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
 export NODE_MODULE_DIR=$COMMON_DIR/node_modules
+export NODE_JSCS=$TOOLS_DIR/node-jscs
+export NODE_JSCS_MODULE_DIR=$NODE_JSCS/node_modules
 export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
