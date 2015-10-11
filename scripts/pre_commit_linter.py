@@ -29,7 +29,7 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python scripts/pre_commit.py
+        python scripts/pre_commit_linter.py
  Note that the root folder MUST be named 'oppia'.
  """
 
@@ -90,7 +90,7 @@ def _is_javascript_file(filename):
         return False
 
 
-def check_repo(path_to_jscs, auto_fix=False):
+def _check_repo(path_to_jscs, auto_fix=False):
     """This function checks all changed files in the repo and
     choose only javascript files(those which ends with .js)
     to be linted and the output error is displayed in console
@@ -160,7 +160,7 @@ def check_repo(path_to_jscs, auto_fix=False):
         print "\tYour code are clean you can now commit"
         print "\tThanks"
 
-def _pre_commit():
+def _pre_commit_linter():
     """This function is used to check if this script is ran from
     root directory, node-jscs dependencies are installed
     and pass path to node-jscs bin folder
@@ -170,7 +170,7 @@ def _pre_commit():
     path_to_jscs = parent_dir + jscs_bin_dir
     if os.getcwd().endswith("oppia"):
         if os.path.exists(path_to_jscs):
-            check_repo(path_to_jscs)
+            _check_repo(path_to_jscs)
         else:
             print "Please run  start.sh first"
             print "to install node-jscs and its dependencies"
@@ -179,4 +179,4 @@ def _pre_commit():
 
 
 if __name__ == '__main__':
-    _pre_commit()
+    _pre_commit_linter()
