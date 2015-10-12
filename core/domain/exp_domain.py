@@ -2094,6 +2094,19 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v6_dict_to_v7_dict(cls, states_dict):
+        """Converts from version 6 to 7. Version 7 forces all CodeRepl
+        interactions to use Python.
+        """
+        for (state_name, sdict) in states_dict.iteritems():
+            interaction = sdict['interaction']
+            if interaction['id'] == 'CodeRepl':
+                interaction['customization_args']['language']['value'] = (
+                    'python')
+
+        return states_dict
+
+    @classmethod
     def update_states_v0_to_v1_from_model(cls, versioned_exploration_states):
         """Converts from states schema version 0 to 1 of the states blob
         contained in the versioned exploration states dict provided.
@@ -2168,6 +2181,19 @@ class Exploration(object):
         """
         versioned_exploration_states['states_schema_version'] = 6
         converted_states = cls._convert_states_v5_dict_to_v6_dict(
+            versioned_exploration_states['states'])
+        versioned_exploration_states['states'] = converted_states
+
+    @classmethod
+    def update_states_v6_to_v7_from_model(cls, versioned_exploration_states):
+        """Converts from states schema version 6 to 7 of the states blob
+        contained in the versioned exploration states dict provided.
+
+        Note that the versioned_exploration_states being passed in is modified
+        in-place.
+        """
+        versioned_exploration_states['states_schema_version'] = 7
+        converted_states = cls._convert_states_v6_dict_to_v7_dict(
             versioned_exploration_states['states'])
         versioned_exploration_states['states'] = converted_states
 
@@ -2296,7 +2322,7 @@ class Exploration(object):
         """Converts a v8 exploration dict into a v9 exploration dict."""
         exploration_dict['schema_version'] = 9
 
-        # Ensure this exploration is up-to-date with states schema v5.
+        # Ensure this exploration is up-to-date with states schema v6.
         exploration_dict['states'] = cls._convert_states_v5_dict_to_v6_dict(
             exploration_dict['states'])
 
@@ -2309,7 +2335,11 @@ class Exploration(object):
     @classmethod
     def _convert_v9_dict_to_v10_dict(cls, exploration_dict, title, category):
         """Converts a v9 exploration dict into a v10 exploration dict."""
+
         exploration_dict['schema_version'] = 10
+
+        # From v10 onwards, the title and schema version are stored in the YAML
+        # file.
         exploration_dict['title'] = title
         exploration_dict['category'] = category
 
@@ -2324,6 +2354,15 @@ class Exploration(object):
                 'bottom': [],
             }
         }
+
+        # Ensure this exploration is up-to-date with states schema v7.
+        exploration_dict['states'] = cls._convert_states_v6_dict_to_v7_dict(
+            exploration_dict['states'])
+
+        # Update the states schema version to reflect the above conversions to
+        # the states dict.
+        exploration_dict['states_schema_version'] = 7
+
         return exploration_dict
 
     @classmethod

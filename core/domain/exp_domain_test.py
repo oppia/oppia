@@ -1075,6 +1075,50 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generated_yaml_as_dict, sample_yaml_as_dict)
 
 
+class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
+    """Test presence of appropriate schema migration methods in the
+    Exploration domain object class.
+    """
+    def test_correct_states_schema_conversion_methods_exist(self):
+        """Test that the right states schema conversion methods exist."""
+        CURRENT_STATES_SCHEMA_VERSION = (
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        for i in range(CURRENT_STATES_SCHEMA_VERSION):
+            self.assertTrue(hasattr(
+                exp_domain.Exploration,
+                '_convert_states_v%s_dict_to_v%s_dict' % (i, i + 1)))
+            self.assertTrue(hasattr(
+                exp_domain.Exploration,
+                'update_states_v%s_to_v%s_from_model' % (i, i + 1)))
+
+        self.assertFalse(hasattr(
+            exp_domain.Exploration,
+            '_convert_states_v%s_dict_to_v%s_dict' % (
+                CURRENT_STATES_SCHEMA_VERSION,
+                CURRENT_STATES_SCHEMA_VERSION + 1)))
+        self.assertFalse(hasattr(
+            exp_domain.Exploration,
+            'update_states_v%s_to_v%s_from_model' % (
+                CURRENT_STATES_SCHEMA_VERSION,
+                CURRENT_STATES_SCHEMA_VERSION + 1)))
+
+    def test_correct_exploration_schema_conversion_methods_exist(self):
+        """Test that the right exploration schema conversion methods exist."""
+        CURRENT_EXPLORATION_SCHEMA_VERSION = (
+            exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION)
+
+        for i in range(1, CURRENT_EXPLORATION_SCHEMA_VERSION):
+            self.assertTrue(hasattr(
+                exp_domain.Exploration,
+                '_convert_v%s_dict_to_v%s_dict' % (i, i + 1)))
+
+        self.assertFalse(hasattr(
+            exp_domain.Exploration,
+            '_convert_states_v%s_dict_to_v%s_dict' % (
+                CURRENT_EXPLORATION_SCHEMA_VERSION,
+                CURRENT_EXPLORATION_SCHEMA_VERSION + 1)))
+
+
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
@@ -1764,7 +1808,7 @@ states:
       fallbacks: []
       id: TextInput
     param_changes: []
-states_schema_version: 6
+states_schema_version: 7
 tags: []
 title: Title
 """)
