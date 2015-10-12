@@ -137,7 +137,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   cp -r $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 fi
 
-echo Checking whether node-jscs dependencies is installed
+echo Checking whether node-jscs dependencies are installed
 if [ ! -d "$NODE_JSCS_MODULE_DIR" ]; then
   echo installing dependencies
   cd $TOOLS_DIR
