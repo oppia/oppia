@@ -326,6 +326,7 @@ class ExplorationHandler(EditorHandler):
         change_list = self.payload.get('change_list')
 
         try:
+            print 'shan' + user_services.get_human_readable_user_ids([self.user_id])[0]
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
         except utils.ValidationError as e:

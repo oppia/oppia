@@ -28,7 +28,7 @@ import feconf
 import utils
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
-EMPTY_TEXT = ''
+DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
 def get_threadlist(exploration_id):
@@ -46,7 +46,7 @@ def get_threadlist(exploration_id):
 
 def _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, 
-        has_suggestion=False):
+        has_suggestion):
     """Creates a thread and the first message in it.
 
     Note that `state_name` may be None.
@@ -63,8 +63,7 @@ def _create_models_for_thread_and_first_message(
     # made there as well
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
-    if has_suggestion:
-        thread.has_suggestion = True
+    thread.has_suggestion = has_suggestion
     thread.put()
     create_message(
         thread.id, original_author_id,
@@ -77,7 +76,7 @@ def create_thread(
     """Public API for creating threads."""
 
     _create_models_for_thread_and_first_message(
-        exploration_id, state_name, original_author_id, subject, text)
+        exploration_id, state_name, original_author_id, subject, text, False)
 
 
 def _get_message_dict(message_instance):
@@ -197,10 +196,11 @@ def create_suggestion(exploration_id, author_id, exploration_version,
 
     thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, author_id, 
-        DEFAULT_SUGGESTION_THREAD_SUBJECT, EMPTY_TEXT, True)
-    (feedback_models.SuggestionModel.create(
+        DEFAULT_SUGGESTION_THREAD_SUBJECT, 
+        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
+    feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
-        suggestion_content))
+        suggestion_content)
 
 
 def get_suggestion(exploration_id, thread_id):
@@ -208,7 +208,7 @@ def get_suggestion(exploration_id, thread_id):
         exploration_id, thread_id)
 
 
-def get_open_threads(exploration_id, suggestions):
+def get_open_threads(exploration_id, has_suggestion):
     """If suggestions is True, return a list of all open threads that have a
     suggestion, otherwise return a list of all open threads that do not have a 
     suggestion."""     
@@ -216,13 +216,13 @@ def get_open_threads(exploration_id, suggestions):
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     open_threads = []
     for thread in threads:
-        if (bool(thread.has_suggestion) == bool(suggestions) and 
-            thread.status == feedback_models.STATUS_CHOICES_OPEN):
+        if (thread.has_suggestion == has_suggestion and
+                thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
     return open_threads
 
 
-def get_closed_threads(exploration_id, suggestions):
+def get_closed_threads(exploration_id, has_suggestion):
     """If suggestions is True, return a list of all closed threads that have a
     suggestion, otherwise return a list of all closed threads that do not have a 
     suggestion."""     
@@ -230,8 +230,8 @@ def get_closed_threads(exploration_id, suggestions):
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     closed_threads = []
     for thread in threads:
-        if (bool(thread.has_suggestion) == bool(suggestions) and 
-            thread.status != feedback_models.STATUS_CHOICES_OPEN):
+        if (thread.has_suggestion == has_suggestion and 
+                thread.status != feedback_models.STATUS_CHOICES_OPEN):
             closed_threads.append(thread)
     return closed_threads
 
@@ -239,12 +239,9 @@ def get_closed_threads(exploration_id, suggestions):
 def get_all_suggestion_threads(exploration_id):
     """Return a list of all threads with suggestions."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
-    all_threads = []
-    for thread in threads:
-        if thread.has_suggestion:
-            all_threads.append(thread)
-    return all_threads
+    return [(thread)
+        for thread in feedback_models.FeedbackThreadModel
+            .get_thread_with_suggestions(exploration_id)]    
 
 	
 def _is_suggestion_valid(thread_id, exploration_id):
@@ -252,10 +249,14 @@ def _is_suggestion_valid(thread_id, exploration_id):
     invalid if the exploration version has updated since the suggestion was
     made."""
 
-    return (feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-        exploration_id, thread_id).exploration_version ==
-        exp_models.ExplorationModel.get(id=exploration_id).version)
-
+    states = exp_models.ExplorationModel.get(id=exploration_id).states
+    suggestion = (feedback_models.SuggestionModel
+        .get_by_exploration_and_thread_id(exploration_id, thread_id))
+    if (suggestion.state_name in states.keys() and
+           suggestion.state_content == states.get(suggestion.state_name)):
+        return True
+    return False
+    
 
 def accept_suggestion(editor_id, change_list, thread_id, exploration_id, 
                       message):
@@ -266,9 +267,10 @@ def accept_suggestion(editor_id, change_list, thread_id, exploration_id,
 
     if _is_suggestion_valid(thread_id, exploration_id):
         commit_message = ('Accepted suggestion by %s: %s' % (
-            editor_id, message)) 
+            editor_id, message))
+        username = user_services.get_human_readable_user_ids([editor_id])[0]
         exp_services.update_exploration(
-            editor_id, exploration_id, change_list, commit_message)
+            username, exploration_id, change_list, commit_message)
         thread = (feedback_models.FeedbackThreadModel.
             get_by_exp_and_thread_id(exploration_id, thread_id))
         thread.status = feedback_models.STATUS_CHOICES_FIXED

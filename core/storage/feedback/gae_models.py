@@ -66,7 +66,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
     # Specifies whether this thread has a related learner suggestion.
-    has_suggestion = ndb.BooleanProperty(indexed=False, default=False)
+    has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
@@ -118,6 +118,15 @@ class FeedbackThreadModel(base_models.BaseModel):
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).fetch(
                 feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_thread_with_suggestions(cls, exploration_id):
+        """Returns an array of threads that have suggestions, for the given
+        exploration."""
+
+        return cls.get_all().filter(
+            cls.exploration_id == exploration_id).filter(
+                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):

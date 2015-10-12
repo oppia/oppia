@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 import test_utils
@@ -79,22 +80,25 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     EXP_ID3 = 'exp_id3'
+    USERNAME = 'user123'
     THREADS = []
+    THREADS_WITH_SUGGESTIONS = []
     SUGGESTIONS = []
 
     def _generate_thread_id(self, exp_id):
         return self.THREAD_ID1
 
+    def _get_threads(self, exploration_id):
+        return self.THREADS
+
     def setUp(self):
         super(SuggestionServicesUnitTests, self).setUp()
         with self.swap(feedback_models.FeedbackThreadModel, 
                        'generate_new_thread_id', self._generate_thread_id):
-            (feedback_services.create_suggestion(
-                self.EXP_ID1, 'author_id', 3, 'state_name', {'old_content': {}}))
-        with self.swap(feedback_models.FeedbackThreadModel, 
-                       'generate_new_thread_id', self._generate_thread_id):
-            (feedback_services.create_suggestion(
-                self.EXP_ID2, 'author_id', 3, 'state_name', {'old_content': {}}))        
+            feedback_services.create_suggestion(
+                self.EXP_ID1, 'author_id', 3, 'state_name', {'old_content': {}})
+            feedback_services.create_suggestion(
+                self.EXP_ID2, 'author_id', 3, 'state_name', {'old_content': {}})       
         # Open thread with suggestion.
         thread1 = feedback_models.FeedbackThreadModel(
             id='.'.join([self.EXP_ID1, self.THREAD_ID1]),
@@ -126,7 +130,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID1,
             state_name='state_name',
             original_author_id='author_id',
-            subject='SUGGESTION',
+            subject='NO SUGGESTION',
             status=feedback_models.STATUS_CHOICES_IGNORED)
         # Open thread without suggestion.
         thread5 = feedback_models.FeedbackThreadModel(
@@ -134,30 +138,29 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID1,
             state_name='state_name',
             original_author_id='author_id',
-            subject='SUGGESTION',
+            subject='NO SUGGESTION',
             status=feedback_models.STATUS_CHOICES_OPEN)
         self.THREADS = [thread1, thread2, thread3, thread4, thread5]
+        self.THREADS_WITH_SUGGESTIONS = [thread1, thread2, thread3]
 
     def test_create_and_get_suggestion(self):
         with self.swap(feedback_models.FeedbackThreadModel, 
                        'generate_new_thread_id', self._generate_thread_id):
-            (feedback_services.
-                create_suggestion(self.EXP_ID3, 'author_id', 3,
-                                  'state_name', {'old_content': {}}))
-            suggestion = feedback_services.get_suggestion(
-                self.EXP_ID3, self.THREAD_ID1)
-            thread = feedback_models.FeedbackThreadModel.get(
-                '.'.join([self.EXP_ID3, self.THREAD_ID1]))
-            self.assertEqual(thread.status, 
-                             feedback_models.STATUS_CHOICES_OPEN)
-            self.assertEqual(suggestion.exploration_id, self.EXP_ID3)
-            self.assertEqual(suggestion.author_id, 'author_id')
-            self.assertEqual(suggestion.exploration_version, 3)
-            self.assertEqual(suggestion.state_name, 'state_name')
-            self.assertEqual(suggestion.state_content, {'old_content': {}})
+            feedback_services.create_suggestion(
+                self.EXP_ID3, 'author_id', 3, 'state_name', {'old_content': {}})
+        suggestion = feedback_services.get_suggestion(
+            self.EXP_ID3,self.THREAD_ID1)
+        thread = feedback_models.FeedbackThreadModel.get(
+            '.'.join([self.EXP_ID3, self.THREAD_ID1]))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
+        self.assertEqual(suggestion.exploration_id, self.EXP_ID3)
+        self.assertEqual(suggestion.author_id, 'author_id')
+        self.assertEqual(suggestion.exploration_version, 3)
+        self.assertEqual(suggestion.state_name, 'state_name')
+        self.assertEqual(suggestion.state_content, {'old_content': {}})
 
-    def _get_threads(self, exploration_id):
-        return self.THREADS
+    def _get_thread_with_suggestions(self, exploration_id):
+        return self.THREADS_WITH_SUGGESTIONS
 
     def test_get_open_threads_with_suggestions(self):
         with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
@@ -198,8 +201,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             threads[0].id, '.'.join([self.EXP_ID1, self.THREAD_ID4]))
 
     def test_get_all_suggestion_threads(self):
-        with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
-                       self._get_threads):
+        with self.swap(
+            feedback_models.FeedbackThreadModel, 'get_thread_with_suggestions',
+            self._get_thread_with_suggestions):
             threads = feedback_services.get_all_suggestion_threads(
                 self.EXP_ID1)
         self.assertEqual(len(threads), 3)
@@ -219,13 +223,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def _null_fn(self, user_id, exploration_id, change_list, commit_message):
         pass
 
+    def _get_username_(self, user_ids):
+        return [self.USERNAME]
+
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(feedback_services, '_is_suggestion_valid', 
                        self._return_true):
             with self.swap(exp_services, 'update_exploration', self._null_fn):
-                (feedback_services.accept_suggestion(
-                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1, 
-                    'message'))
+                with self.swap(user_services, 'get_human_readable_user_ids',
+                               self. _get_username_):
+                    feedback_services.accept_suggestion(
+                        'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1,
+                        'message')
             thread = feedback_models.FeedbackThreadModel.get(
                 '.'.join([self.EXP_ID1, self.THREAD_ID1]))
             self.assertEqual(thread.status, 
@@ -235,9 +244,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(feedback_services, '_is_suggestion_valid', 
                        self._return_false):
             with self.assertRaisesRegexp(Exception, 'Suggestion Invalid'):
-                (feedback_services.accept_suggestion(
+                feedback_services.accept_suggestion(
                     'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2, 
-                    'message'))
+                    'message')
             thread = feedback_models.FeedbackThreadModel.get(
                  '.'.join([self.EXP_ID2, self.THREAD_ID1]))
             self.assertEqual(thread.status,
