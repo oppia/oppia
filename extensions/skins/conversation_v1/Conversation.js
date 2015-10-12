@@ -248,7 +248,7 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.isSupplementalCardNonempty = function() {
-        return !$scope.activeCard.interactionIsInline;
+        return $scope.activeCard && !$scope.activeCard.interactionIsInline;
       };
 
       var _recomputeAndResetPanels = function() {
