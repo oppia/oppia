@@ -18,8 +18,7 @@
     <h3>List of Changes</h3>
     <div ng-repeat="versionNumber in snapshotOrderArray" class="row">
       <div class="col-sm-2 col-md-2 col-lg-2">
-        <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')" class='protractor-test-history-v1-selector'>
-        <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')" class='protractor-test-history-v2-selector'>
+        <input type="checkbox" name="compareVer1" ng-model="versionArr" ng-click="submitVersion($event, versionNumber)" class='protractor-test-history-v1-selector'>
         [<[versionNumber]>]
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2">
@@ -45,7 +44,11 @@
 
     <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
       <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+      <div class="version-count-prompt">
+        <[versionCountPrompt]>
+      </div>
     </div>
+
   </md-card>
 
   <md-card class="oppia-editor-card" ng-hide="hideHistoryGraph || !explorationVersionMetadata" style="position: relative;">
