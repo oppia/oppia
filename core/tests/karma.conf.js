@@ -77,7 +77,8 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
-      type: 'html',
+      reporters: [{type: 'html'}, {type: 'json'}],
+      subdir: '.',
       dir: '../karma_coverage_reports/'
     },
     autoWatch: true,
