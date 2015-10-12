@@ -21,7 +21,7 @@
 describe('state parameter changes controller', function() {
 
   describe('StateParameterChangesEditor', function() {
-    var scope, ctrl, ecs, cls, ess;
+    var scope, ctrl, ecs, spcs, es, epss, wd;
 
     beforeEach(function() {
       module('oppia');
@@ -31,80 +31,39 @@ describe('state parameter changes controller', function() {
 
       scope = $rootScope.$new();
       ecs = $injector.get('editorContextService');
-      cls = $injector.get('changeListService');
-      ess = $injector.get('explorationStatesService');
+      spcs = $injector.get('stateParamChangesService');
+      es = $injector.get('editabilityService');
+      epss = $injector.get('explorationParamSpecsService');
+      wd = $injector.get('warningsData');
 
-      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
+      GLOBALS.INVALID_PARAMETER_NAMES = ['forbiddenName'];
 
-      ess.init({
-        'First State': {
-          content: [{
-            type: 'text',
-            value: 'First State Content'
-          }],
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
+      epss.init({});
+      spcs.init('First State', [], {
+        content: [{
+          type: 'text',
+          value: 'First State Content'
+        }],
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [{
+            rule_specs: [{
+              dest: 'Second State'
             }]
-          },
-          param_changes: []
-        },
-        'Second State': {
-          content: [{
-            type: 'text',
-            value: 'Second State Content'
-          }],
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
-          },
-          param_changes: []
-        },
-        'Third State': {
-          content: [{
-            type: 'text',
-            value: 'This is some content.'
-          }],
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [{
-                dest: 'Second State'
-              }]
-            }]
-          },
-          param_changes: [{
-            name: 'comparison',
-            generator_id: 'Copier',
-            customization_args: {
-              value: 'something clever',
-              parse_with_jinja: false
-            }
           }]
-        }
-      });
+        },
+        param_changes: []
+      }, 'param_changes');
 
       ctrl = $controller('StateParamChangesEditor', {
         $scope: scope,
         editorContextService: ecs,
-        changeListService: cls,
-        explorationStatesService: ess
+        stateParamChangesService: spcs,
+        editabilityService: es,
+        explorationParamSpecsService: epss,
+        warningsData: wd
       });
     }));
-
-    it('should initialize the state name and related properties', function() {
-      ecs.setActiveStateName('Third State');
-      scope.initStateParamChangesEditor();
-      expect(scope.stateParamChanges[0].customization_args.value)
-        .toEqual('something clever');
-    });
 
     it('should save parameter edits correctly', function() {
       ecs.setActiveStateName('First State');
@@ -127,14 +86,45 @@ describe('state parameter changes controller', function() {
         }
       };
 
-      scope.saveStateParamChanges(changeOne, []);
-      expect(cls.getChangeList()[0].new_value.customization_args.value)
-        .toEqual('something else');
+      // Stub out the function that checks validity.
+      scope.areDisplayedParamChangesValid = function() {
+        return true;
+      };
 
-      scope.saveStateParamChanges(changeTwo, changeOne);
-      expect(cls.getChangeList()[1].new_value.customization_args.value).toEqual(
-        'And now for something completely different'
-      );
+      spcs.displayed = [changeOne, changeTwo];
+      scope.saveStateParamChanges();
+      expect(spcs.savedMemento[0].customization_args.value)
+        .toEqual('something else');
+      expect(spcs.savedMemento[1].customization_args.value)
+        .toEqual('And now for something completely different');
+
+      spcs.displayed = [changeTwo, changeOne];
+      scope.saveStateParamChanges();
+      expect(spcs.savedMemento[0].customization_args.value)
+        .toEqual('And now for something completely different');
+      expect(spcs.savedMemento[1].customization_args.value)
+        .toEqual('something else');
+    });
+
+    it('should update exploration parameter specs correctly when edits are saved', function() {
+      ecs.setActiveStateName('First State');
+
+      var changeOne = {
+        name: 'comparison',
+        generator_id: 'Copier',
+        customization_args: {
+          value: 'something else',
+          parse_with_jinja: false
+        }
+      };
+
+      spcs.displayed = [changeOne];
+      scope.saveStateParamChanges();
+      expect(epss.savedMemento).toEqual({
+        comparison: {
+          obj_type: 'UnicodeString'
+        }
+      });
     });
   });
 });

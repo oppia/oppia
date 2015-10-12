@@ -341,7 +341,6 @@
                 {% include 'editor/exploration_graph.html' %}
               </div>
               <div>
-                {% include 'editor/sidebar_state_parameter_changes.html' %}
                 {% if SHOW_GADGETS_EDITOR %}
                   {% include 'editor/gadget_editor.html' %}
                 {% endif %}
@@ -397,10 +396,6 @@
     </defs>
   </svg>
 
-  <script type="text/ng-template" id="inline/param_change_editor">
-    {% include 'components/param_change_editor.html' %}
-  </script>
-
   <script type="text/ng-template" id="inline/rule_editor">
     {% include 'components/rule_editor.html' %}
   </script>
@@ -446,7 +441,6 @@
     {{ include_js_file('editor/StateInteraction.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
-    {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
     {{ include_js_file('components/answerGroupEditor.js') }}
 

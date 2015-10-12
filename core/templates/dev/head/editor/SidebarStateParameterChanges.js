@@ -20,30 +20,196 @@
  */
 
 oppia.controller('StateParamChangesEditor', [
-    '$scope', 'editorContextService', 'changeListService', 'explorationStatesService',
-    function($scope, editorContextService, changeListService, explorationStatesService) {
+    '$scope', 'editorContextService', 'stateParamChangesService',
+    'editabilityService', 'explorationParamSpecsService', 'warningsData',
+    function(
+      $scope, editorContextService, stateParamChangesService,
+      editabilityService, explorationParamSpecsService, warningsData) {
 
-  $scope.$on('refreshStateEditor', function() {
-    $scope.initStateParamChangesEditor();
+  $scope.stateParamChangesService = stateParamChangesService;
+  $scope.editabilityService = editabilityService;
+  $scope.isStateParamChangesEditorOpen = false;
+
+  $scope.warningText = '';
+
+  var _INVALID_PARAMETER_NAMES = GLOBALS.INVALID_PARAMETER_NAMES;
+
+  $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    $scope.stateParamChangesMemento = null;
+
+    var stateName = editorContextService.getActiveStateName();
+    stateParamChangesService.init(
+      stateName, stateData.param_changes, stateData, 'param_changes');
   });
 
-  $scope.initStateParamChangesEditor = function() {
-    $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = explorationStatesService.getState($scope.stateName);
-    $scope.stateParamChanges = stateData.param_changes || [];
+  $scope.PREAMBLE_TEXT = {
+    'Copier': 'to',
+    'RandomSelector': 'to one of'
   };
 
-  $scope.saveStateParamChanges = function(newValue, oldValue) {
-    if (!angular.equals(newValue, oldValue)) {
-      changeListService.editStateProperty(
-        editorContextService.getActiveStateName(), 'param_changes',
-        newValue, oldValue);
+  var _DEFAULT_PARAM_SPEC = {
+    obj_type: 'UnicodeString'
+  };
 
-      var _stateData = explorationStatesService.getState(
-        editorContextService.getActiveStateName());
-      _stateData.param_changes = angular.copy(newValue);
-      explorationStatesService.setState(
-        editorContextService.getActiveStateName(), _stateData);
+  // The name of this parameter change needs to be filled in.
+  var _DEFAULT_PARAM_CHANGE = {
+    name: '',
+    customization_args: {
+      value: '5',
+      parse_with_jinja: true
+    },
+    generator_id: 'Copier'
+  };
+
+  var _generateParamNameChoices = function() {
+    return Object.keys(
+      explorationParamSpecsService.savedMemento
+    ).sort().map(function(paramName) {
+      return {
+        id: paramName,
+        text: paramName
+      }
+    });
+  };
+
+  // This is a local variable that is used by the select2 dropdowns for
+  // choosing parameter names. It may not accurately reflect the content of
+  // explorationParamSpecsService, since it's possible that temporary parameter
+  // names may be added and then deleted within the course of a single
+  // "parameter changes" edit.
+  $scope.paramNameChoices = [];
+
+  $scope.addParamChange = function() {
+    var newParamChange = angular.copy(_DEFAULT_PARAM_CHANGE);
+    var allParamNames = $scope.paramNameChoices;
+    newParamChange.name = allParamNames.length > 0 ? allParamNames[0] : 'x';
+
+    // Add the new param name to $scope.paramNameChoices, if necessary, so
+    // that it shows up in the dropdown.
+    if (!$scope.paramNameChoices.hasOwnProperty(newParamChange.name)) {
+      explorationParamSpecsService.displayed[newParamChange.name] = angular.copy(
+        _DEFAULT_PARAM_SPEC);
+      $scope.paramNameChoices = _generateParamNameChoices();
+    };
+
+    stateParamChangesService.displayed.push(newParamChange);
+  };
+
+  $scope.openStateParamChangesEditor = function() {
+    $scope.isStateParamChangesEditorOpen = true;
+    $scope.paramNameChoices = _generateParamNameChoices();
+  };
+
+  $scope.HUMAN_READABLE_ARGS_RENDERERS = {
+    'Copier': function(customization_args) {
+      return 'to ' + customization_args.value;
+    },
+    'RandomSelector': function(customization_args) {
+      var result = 'to one of [';
+      for (var i = 0; i < customization_args.list_of_values.length; i++) {
+        if (i !== 0) {
+          result += ', ';
+        }
+        result += String(customization_args.list_of_values[i]);
+      }
+      result += '] at random';
+      return result;
     }
+  };
+
+  $scope.areDisplayedParamChangesValid = function() {
+    paramChanges = stateParamChangesService.displayed;
+
+    for (var i = 0; i < paramChanges.length; i++) {
+      var paramName = paramChanges[i].name;
+      if (paramName === '') {
+        $scope.warningText = 'Please pick a non-empty parameter name.';
+        return false;
+      }
+
+      if (_INVALID_PARAMETER_NAMES.indexOf(paramName) !== -1) {
+        $scope.warningText = 'The parameter name \'' + paramName + '\' is reserved.';
+        return false;
+      }
+
+      var _ALPHA_CHARS_REGEX = /^[A-Za-z]+$/;
+      if (!_ALPHA_CHARS_REGEX.test(paramName)) {
+        $scope.warningText = 'Parameter names should use only alphabetic characters.';
+        return false;
+      }
+
+      if (!$scope.PREAMBLE_TEXT.hasOwnProperty(paramChanges[i].generator_id)) {
+        $scope.warningText = 'Each parameter should have a generator id.';
+        return false;
+      }
+
+      if (paramChanges[i].generator_id === 'RandomSelector' &&
+          paramChanges[i].customization_args.list_of_values.length === 0) {
+        $scope.warningText = 'Each parameter should have at least one possible value.';
+        return false;
+      }
+    }
+
+    $scope.warningText = '';
+    return true;
+  };
+
+  $scope.saveStateParamChanges = function() {
+    // Validate displayed value.
+    if (!$scope.areDisplayedParamChangesValid()) {
+      warningsData.addWarning('Invalid parameter changes.');
+      return;
+    }
+
+    // Update paramSpecs manually with newly-added param names.
+    explorationParamSpecsService.restoreFromMemento();
+    for (var i = 0; i < stateParamChangesService.displayed.length; i++) {
+      var paramName = stateParamChangesService.displayed[i].name;
+      if (!explorationParamSpecsService.displayed.hasOwnProperty(name)) {
+        explorationParamSpecsService.displayed[paramName] = angular.copy(
+          _DEFAULT_PARAM_SPEC);
+      }
+    }
+
+    explorationParamSpecsService.saveDisplayedValue();
+    stateParamChangesService.saveDisplayedValue();
+    $scope.isStateParamChangesEditorOpen = false;
+  };
+
+  $scope.swapParamChanges = function(index1, index2) {
+    if (index1 < 0 || index1 >= stateParamChangesService.displayed.length ||
+        index2 < 0 || index2 >= stateParamChangesService.displayed.length) {
+      warningsData.addWarning(
+        'Cannot swap parameter changes at positions ' + index1 +
+        ' and ' + index2 + ': index out of range');
+    }
+
+    if (index1 === index2) {
+      return;
+    }
+
+    var tmp = angular.copy(stateParamChangesService.displayed[index1]);
+    stateParamChangesService.displayed[index1] = (
+      stateParamChangesService.displayed[index2]);
+    stateParamChangesService.displayed[index2] = tmp;
+
+    // TODO(sll): Need to refresh select2 dialog boxes 'from the outside'.
+  };
+
+  $scope.deleteParamChange = function(index) {
+    if (index < 0 || index >= stateParamChangesService.displayed.length) {
+      warningsData.addWarning(
+        'Cannot delete parameter change at position ' + index +
+        ': index out of range');
+    }
+
+    stateParamChangesService.displayed.splice(index, 1);
+
+    // TODO(sll): Need to refresh select2 dialog boxes 'from the outside'.
+  };
+
+  $scope.cancelEdit = function() {
+    stateParamChangesService.restoreFromMemento();
+    $scope.isStateParamChangesEditorOpen = false;
   };
 }]);
