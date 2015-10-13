@@ -1076,7 +1076,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
-    """Test presence of appropriate schema migration methods in the
+    """Tests the presence of appropriate schema migration methods in the
     Exploration domain object class.
     """
     def test_correct_states_schema_conversion_methods_exist(self):
@@ -1106,7 +1106,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(hasattr(
             exp_domain.Exploration,
-            '_convert_states_v%s_dict_to_v%s_dict' % (
+            '_convert_v%s_dict_to_v%s_dict' % (
                 CURRENT_EXPLORATION_SCHEMA_VERSION,
                 CURRENT_EXPLORATION_SCHEMA_VERSION + 1)))
 
