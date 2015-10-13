@@ -86,41 +86,11 @@ def _migrate_states_schema(versioned_exploration_states):
             'state schemas at present.' %
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-    # Check for conversion to v1.
-    if exploration_states_schema_version == 0:
-        exp_domain.Exploration.update_states_v0_to_v1_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 1
-
-    # Check for conversion to v2.
-    if exploration_states_schema_version == 1:
-        exp_domain.Exploration.update_states_v1_to_v2_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 2
-
-    # Check for conversion to v3.
-    if exploration_states_schema_version == 2:
-        exp_domain.Exploration.update_states_v2_to_v3_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 3
-
-    # Check for conversion to v4.
-    if exploration_states_schema_version == 3:
-        exp_domain.Exploration.update_states_v3_to_v4_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 4
-
-    # Check for conversion to v5.
-    if exploration_states_schema_version == 4:
-        exp_domain.Exploration.update_states_v4_to_v5_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 5
-
-    # Check for conversion to v6.
-    if exploration_states_schema_version == 5:
-        exp_domain.Exploration.update_states_v5_to_v6_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 6
+    while (exploration_states_schema_version <
+           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+        exp_domain.Exploration.update_states_from_model(
+            versioned_exploration_states, exploration_states_schema_version)
+        exploration_states_schema_version += 1
 
 
 # Repository GET methods.

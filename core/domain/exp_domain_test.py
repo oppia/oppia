@@ -1087,18 +1087,10 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_states_v%s_dict_to_v%s_dict' % (i, i + 1)))
-            self.assertTrue(hasattr(
-                exp_domain.Exploration,
-                'update_states_v%s_to_v%s_from_model' % (i, i + 1)))
 
         self.assertFalse(hasattr(
             exp_domain.Exploration,
             '_convert_states_v%s_dict_to_v%s_dict' % (
-                CURRENT_STATES_SCHEMA_VERSION,
-                CURRENT_STATES_SCHEMA_VERSION + 1)))
-        self.assertFalse(hasattr(
-            exp_domain.Exploration,
-            'update_states_v%s_to_v%s_from_model' % (
                 CURRENT_STATES_SCHEMA_VERSION,
                 CURRENT_STATES_SCHEMA_VERSION + 1)))
 

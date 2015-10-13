@@ -2107,95 +2107,22 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def update_states_v0_to_v1_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 0 to 1 of the states blob
-        contained in the versioned exploration states dict provided.
+    def update_states_from_model(
+            cls, versioned_exploration_states, current_states_schema_version):
+        """Converts the states blob contained in the given
+        versioned_exploration_states dict from current_states_schema_version to
+        current_states_schema_version + 1.
 
         Note that the versioned_exploration_states being passed in is modified
         in-place.
         """
-        versioned_exploration_states['states_schema_version'] = 1
-        converted_states = cls._convert_states_v0_dict_to_v1_dict(
+        versioned_exploration_states['states_schema_version'] = (
+            current_states_schema_version + 1)
+
+        conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
+            current_states_schema_version, current_states_schema_version + 1))
+        versioned_exploration_states['states'] = conversion_fn(
             versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
-
-    @classmethod
-    def update_states_v1_to_v2_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 1 to 2 of the states blob
-        contained in the versioned exploration states dict provided.
-
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-        """
-        versioned_exploration_states['states_schema_version'] = 2
-        converted_states = cls._convert_states_v1_dict_to_v2_dict(
-            versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
-
-    @classmethod
-    def update_states_v2_to_v3_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 2 to 3 of the states blob
-        contained in the versioned exploration states dict provided.
-
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-        """
-        versioned_exploration_states['states_schema_version'] = 3
-        converted_states = cls._convert_states_v2_dict_to_v3_dict(
-            versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
-
-    @classmethod
-    def update_states_v3_to_v4_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 3 to 4 of the states blob
-        contained in the versioned exploration states dict provided.
-
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-        """
-        versioned_exploration_states['states_schema_version'] = 4
-        converted_states = cls._convert_states_v3_dict_to_v4_dict(
-            versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
-
-    @classmethod
-    def update_states_v4_to_v5_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 4 to 5 of the states blob
-        contained in the versioned exploration states dict provided.
-
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-        """
-        versioned_exploration_states['states_schema_version'] = 5
-        converted_states = cls._convert_states_v4_dict_to_v5_dict(
-            versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
-
-    @classmethod
-    def update_states_v5_to_v6_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 5 to 6 of the states blob
-        contained in the versioned exploration states dict provided.
-
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-        """
-        versioned_exploration_states['states_schema_version'] = 6
-        converted_states = cls._convert_states_v5_dict_to_v6_dict(
-            versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
-
-    @classmethod
-    def update_states_v6_to_v7_from_model(cls, versioned_exploration_states):
-        """Converts from states schema version 6 to 7 of the states blob
-        contained in the versioned exploration states dict provided.
-
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-        """
-        versioned_exploration_states['states_schema_version'] = 7
-        converted_states = cls._convert_states_v6_dict_to_v7_dict(
-            versioned_exploration_states['states'])
-        versioned_exploration_states['states'] = converted_states
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
