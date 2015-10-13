@@ -67,28 +67,13 @@ fi
 $NPM_CMD config set ca ""
 
 # Download and install Skulpt. Skulpt is built using a Python script included
-# within the Skulpt repository (skulpt.py). This script requires GitPython to
-# run, among other various tools. GitPython is installed temporarily and these
-# other tools are ignored when building Skulpt (see the sed statements below).
-# The Python script is used to avoid having to manually recreate the Skulpt
-# dist build process in install_third_party.py.
-
-# GitPython is needed by Skulpt's dist build function. Download a local copy to
-# avoid the user needing to install it.
-echo Checking whether GitPython is installed in third_party
-if [ ! -d "$TOOLS_DIR/gitpython" ]; then
-  echo Downloading GitPython
-  cd $TOOLS_DIR
-  rm -rf gitpython
-  git clone https://github.com/gitpython-developers/GitPython ./gitpython/
-  cd gitpython
-
-  # Use a specific GitPython release.
-  git checkout 0.3.6
-  git submodule update --init --recursive
-fi
-
-export PYTHONPATH="$PYTHONPATH:$TOOLS_DIR/gitpython"
+# within the Skulpt repository (skulpt.py). This script normally requires
+# GitPython, however the patches to it below (with the sed operations) lead to
+# it no longer being required. The Python script is used to avoid having to
+# manually recreate the Skulpt dist build process in install_third_party.py.
+# Note that skulpt.py will issue a warning saying its dist command will not
+# work properly without GitPython, but it does actually work due to the
+# patches.
 
 echo Checking whether Skulpt is installed in third_party
 if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt" ]; then
@@ -101,7 +86,6 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt" ]; then
 
     # Use a specific Skulpt release.
     git checkout 0.10.0
-    git submodule update --init --recursive
 
     # Add a temporary backup file so that this script works on both Linux and
     # Mac.
