@@ -93,8 +93,10 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
-oppia.factory('checkIfMobileDevice', [function() {
-  return typeof window.orientation !== 'undefined';
+//Returns true if the user is on a mobile device.
+//See here: http://stackoverflow.com/a/14301832/5020618
+oppia.factory('deviceInfoService', [$window, function($window) {
+  return typeof $window.orientation !== 'undefined';
 }]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
