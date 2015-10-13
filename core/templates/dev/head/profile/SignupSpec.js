@@ -31,7 +31,7 @@ describe('Signup controller', function() {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({
         username: 'myUsername',
-        has_agreed_to_terms: false
+        has_agreed_to_latest_terms: false
       });
       rootScope = $rootScope;
 

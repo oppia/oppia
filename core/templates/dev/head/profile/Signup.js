@@ -31,7 +31,7 @@ oppia.controller('Signup', [
     $rootScope.loadingMessage = '';
     $scope.username = data.username;
     $scope.registeredBefore = data.has_registered_before;
-    $scope.agreedToTerms = data.has_agreed_to_terms;
+    $scope.agreedToTerms = data.has_agreed_to_latest_terms;
     $scope.hasUsername = Boolean($scope.username);
     focusService.setFocus('usernameInputField');
   });

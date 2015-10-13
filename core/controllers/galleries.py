@@ -85,9 +85,9 @@ class GalleryPage(base.BaseHandler):
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_CREATE_MODE_URL)),
-            'has_user_registered_as_editor': bool(
+            'has_fully_registered': bool(
                 self.user_id and
-                user_services.has_user_registered_as_editor(self.user_id)),
+                user_services.has_fully_registered(self.user_id)),
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': [{
