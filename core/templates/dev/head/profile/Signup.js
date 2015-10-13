@@ -30,7 +30,8 @@ oppia.controller('Signup', [
   $http.get(_SIGNUP_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.username = data.username;
-    $scope.agreedToTerms = data.has_agreed_to_terms;
+    $scope.hasEverRegistered = data.has_ever_registered;
+    $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
     $scope.hasUsername = Boolean($scope.username);
     focusService.setFocus('usernameInputField');
   });
@@ -40,7 +41,7 @@ oppia.controller('Signup', [
 
   $scope.isFormValid = function() {
     return (
-      $scope.agreedToTerms &&
+      $scope.hasAgreedToLatestTerms &&
       ($scope.hasUsername || !$scope.getWarningText($scope.username))
     );
   };
@@ -101,7 +102,8 @@ oppia.controller('Signup', [
     $scope.emailPreferencesWarningText = '';
   };
 
-  $scope.submitPrerequisitesForm = function(agreedToTerms, username, canReceiveEmailUpdates) {
+  $scope.submitPrerequisitesForm = function(
+      agreedToTerms, username, canReceiveEmailUpdates) {
     if (!agreedToTerms) {
       warningsData.addWarning(
         'In order to edit explorations on this site, you will need to ' +

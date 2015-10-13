@@ -206,6 +206,7 @@ oppia.factory('oppiaPlayerService', [
 
       // Broadcast information about the state transition to listeners.
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+        explorationVersion: version,
         oldStateName: _currentStateName,
         jsonAnswer: JSON.stringify(answer),
         newStateName: newStateName,
@@ -216,10 +217,10 @@ oppia.factory('oppiaPlayerService', [
       // event, and inform the parent page that a completion has happened.
       if (INTERACTION_SPECS[
             _exploration.states[newStateName].interaction.id].is_terminal) {
-        messengerService.sendMessage(
-          messengerService.EXPLORATION_COMPLETED, {
-            paramValues: learnerParamsService.getAllParams()
-          });
+        messengerService.sendMessage(messengerService.EXPLORATION_COMPLETED, {
+          explorationVersion: version,
+          paramValues: learnerParamsService.getAllParams()
+        });
 
         var completeExplorationUrl = (
           '/explorehandler/exploration_complete_event/' + _explorationId);
@@ -406,8 +407,9 @@ oppia.factory('oppiaPlayerService', [
           _loadInitialState(successCallback);
           _loadInitialInformationCardData();
           $rootScope.$broadcast('playerServiceInitialized');
-          messengerService.sendMessage(
-            messengerService.EXPLORATION_LOADED, null);
+          messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
+            explorationVersion: version
+          });
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
