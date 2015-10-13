@@ -16,8 +16,8 @@
   <div ng-controller="SearchBar">
     <div class="pull-right oppia-navbar-button-container">
       <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
-      {% if not user_email %}
-        <!-- User must log in. -->
+      {% if not has_fully_registered %}
+        <!-- User must complete the registration process. -->
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            href="{{gallery_login_redirect_url}}">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
@@ -168,7 +168,7 @@
             <br><br>
             <div style="display: inline-block;">
             <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-              {% if not user_email %}
+              {% if not has_fully_registered %}
                 <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
               {% else %}
                 <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
@@ -215,7 +215,7 @@
                         <span ng-if="exploration.objective" class="hidden-xs">
                           <span style="font-weight: bold;">&middot;</span>
                           <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
-                            <[getFormattedObjective(exploration.objective)]>
+                            <[exploration.objective | truncateAndCapitalize: 120]>
                           </span>
                         </span>
                       </div>

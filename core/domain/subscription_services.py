@@ -45,11 +45,11 @@ def subscribe_to_thread(user_id, feedback_thread_id):
         subscriptions_model.put()
 
 
-def subscribe_to_activity(user_id, activity_id):
-    """Subscribes a user to an activity (and, therefore, indirectly to all
-    feedback threads for that activity).
+def subscribe_to_exploration(user_id, exploration_id):
+    """Subscribes a user to an exploration (and, therefore, indirectly to all
+    feedback threads for that exploration).
 
-    Callers of this function should ensure that the user_id and activity_id
+    Callers of this function should ensure that the user_id and exploration_id
     are valid.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -57,14 +57,14 @@ def subscribe_to_activity(user_id, activity_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if (activity_id not in
-            subscriptions_model.activity_ids):
-        subscriptions_model.activity_ids.append(activity_id)
+    if exploration_id not in subscriptions_model.activity_ids:
+        subscriptions_model.activity_ids.append(exploration_id)
         subscriptions_model.put()
 
 
-def get_activity_ids_subscribed_to(user_id):
-    """Returns a list with all subscriptions' ids of given user.
+def get_exploration_ids_subscribed_to(user_id):
+    """Returns a list with ids of all explorations that the given user
+    subscribes to.
 
     Callers of this function should ensure that the user_id is valid.
     """
@@ -72,6 +72,35 @@ def get_activity_ids_subscribed_to(user_id):
         user_id, strict=False)
     return (
         subscriptions_model.activity_ids
+        if subscriptions_model else [])
+
+
+def subscribe_to_collection(user_id, collection_id):
+    """Subscribes a user to a collection.
+
+    Callers of this function should ensure that the user_id and collection_id
+    are valid.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+    if not subscriptions_model:
+        subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
+
+    if collection_id not in subscriptions_model.collection_ids:
+        subscriptions_model.collection_ids.append(collection_id)
+        subscriptions_model.put()
+
+
+def get_collection_ids_subscribed_to(user_id):
+    """Returns a list with ids of all collections that the given user
+    subscribes to.
+
+    Callers of this function should ensure that the user_id is valid.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+    return (
+        subscriptions_model.collection_ids
         if subscriptions_model else [])
 
 
