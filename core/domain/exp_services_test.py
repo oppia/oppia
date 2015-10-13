@@ -2303,7 +2303,7 @@ tags: []
 
 
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
-    """Test learner suggestion action functions in feedback_services."""
+    """Test learner suggestion action functions in exp_services."""
 
     THREAD_ID1 = '1111'
     EXP_ID1 = 'exp_id1'
