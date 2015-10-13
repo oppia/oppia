@@ -69,8 +69,8 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
 
 
-class SuggestionServicesUnitTests(test_utils.GenericTestBase):
-    """Test learner suggestion functions in feedback_services."""
+class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
+    """Test learner suggestion query functions in feedback_services."""
 
     THREAD_ID1 = '1111'
     THREAD_ID2 = '2222'
@@ -92,13 +92,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         return self.THREADS
 
     def setUp(self):
-        super(SuggestionServicesUnitTests, self).setUp()
-        with self.swap(feedback_models.FeedbackThreadModel, 
-                       'generate_new_thread_id', self._generate_thread_id):
-            feedback_services.create_suggestion(
-                self.EXP_ID1, 'author_id', 3, 'state_name', {'old_content': {}})
-            feedback_services.create_suggestion(
-                self.EXP_ID2, 'author_id', 3, 'state_name', {'old_content': {}})       
+        super(SuggestionQueriesUnitTests, self).setUp()
         # Open thread with suggestion.
         thread1 = feedback_models.FeedbackThreadModel(
             id='.'.join([self.EXP_ID1, self.THREAD_ID1]),
@@ -213,49 +207,3 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             threads[1].id, '.'.join([self.EXP_ID1, self.THREAD_ID2]))
         self.assertEqual(
             threads[2].id, '.'.join([self.EXP_ID1, self.THREAD_ID3]))
- 
-    def _return_true(self, thread_id, exploration_id):
-        return True
-    
-    def _return_false(self, thread_id, exploration_id):
-        return False
-
-    def _null_fn(self, user_id, exploration_id, change_list, commit_message):
-        pass
-
-    def _get_username_(self, user_ids):
-        return [self.USERNAME]
-
-    def test_accept_suggestion_valid_suggestion(self):
-        with self.swap(feedback_services, '_is_suggestion_valid', 
-                       self._return_true):
-            with self.swap(exp_services, 'update_exploration', self._null_fn):
-                with self.swap(user_services, 'get_human_readable_user_ids',
-                               self. _get_username_):
-                    feedback_services.accept_suggestion(
-                        'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1,
-                        'message')
-            thread = feedback_models.FeedbackThreadModel.get(
-                '.'.join([self.EXP_ID1, self.THREAD_ID1]))
-            self.assertEqual(thread.status, 
-                             feedback_models.STATUS_CHOICES_FIXED)
-
-    def test_accept_suggestion_invalid_suggestion(self):
-        with self.swap(feedback_services, '_is_suggestion_valid', 
-                       self._return_false):
-            with self.assertRaisesRegexp(Exception, 'Suggestion Invalid'):
-                feedback_services.accept_suggestion(
-                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2, 
-                    'message')
-            thread = feedback_models.FeedbackThreadModel.get(
-                 '.'.join([self.EXP_ID2, self.THREAD_ID1]))
-            self.assertEqual(thread.status,
-                             feedback_models.STATUS_CHOICES_OPEN)
-
-    def test_reject_suggestion(self):
-        feedback_services.reject_suggestion(self.THREAD_ID1, self.EXP_ID2)
-        thread = feedback_models.FeedbackThreadModel.get(
-            '.'.join([self.EXP_ID2, self.THREAD_ID1]))
-        self.assertEqual(thread.status, 
-                         feedback_models.STATUS_CHOICES_IGNORED)
-
