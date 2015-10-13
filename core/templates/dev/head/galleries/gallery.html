@@ -16,7 +16,7 @@
   <div ng-controller="SearchBar">
     <div class="pull-right oppia-navbar-button-container">
       <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
-      {% if not user_email %}
+      {% if not has_user_registered_as_editor %}
         <!-- User must log in. -->
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            href="{{gallery_login_redirect_url}}">

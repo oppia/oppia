@@ -224,7 +224,9 @@ def _save_user_settings(user_settings):
 
 def has_user_registered_as_editor(user_id):
     user_settings = get_user_settings(user_id, strict=True)
-    return user_settings.username and user_settings.last_agreed_to_terms
+    return user_settings.username and user_settings.last_agreed_to_terms and (
+        user_settings.last_agreed_to_terms >=
+        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
 def _create_user(user_id, email):

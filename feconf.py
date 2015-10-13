@@ -17,6 +17,7 @@
 """Stores various configuration options and constants for Oppia."""
 
 import copy
+import datetime
 import os
 
 # Whether to unconditionally log info messages.
@@ -154,6 +155,9 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 CAN_SEND_EMAILS_TO_USERS = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
+
+# When the site terms were last updated, in UTC.
+REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 12, 0, 0, 0)
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
