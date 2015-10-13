@@ -167,7 +167,9 @@ SHOW_CUSTOM_PAGES = True
 # The id of the default skin.
 DEFAULT_SKIN_ID = 'conversation_v1'
 
-# User id and username for exploration migration bot.
+# User id and username for exploration migration bot. Commits made by this bot
+# are not reflected in the exploration summary models (for the gallery and
+# last-updated timestamps), but are recorded in the exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
