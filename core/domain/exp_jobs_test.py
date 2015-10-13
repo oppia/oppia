@@ -221,12 +221,15 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             # check job output
             self.assertEqual(actual_job_output.keys(),
                              expected_job_output.keys())
+
+            # Note: 'exploration_model_last_updated' is not expected to be the
+            # same, because it is now read from the version model representing
+            # the exploration's history snapshot, and not the ExplorationModel.
             simple_props = ['id', 'title', 'category', 'objective',
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
                             'editor_ids', 'viewer_ids', 'version',
-                            'exploration_model_created_on',
-                            'exploration_model_last_updated']
+                            'exploration_model_created_on']
             for exp_id in actual_job_output:
                 for prop in simple_props:
                     self.assertEqual(
