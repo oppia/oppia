@@ -222,6 +222,11 @@ def _save_user_settings(user_settings):
     ).put()
 
 
+def has_ever_registered(user_id):
+    user_settings = get_user_settings(user_id, strict=True)
+    return bool(user_settings.username and user_settings.last_agreed_to_terms)
+
+
 def has_fully_registered(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     return user_settings.username and user_settings.last_agreed_to_terms and (

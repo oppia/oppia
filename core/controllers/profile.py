@@ -171,7 +171,7 @@ class SignupHandler(base.BaseHandler):
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=
                 feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),
-            'has_registered_before': bool(
+            'has_ever_registered': bool(
                 user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,
         })
@@ -184,7 +184,7 @@ class SignupHandler(base.BaseHandler):
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
 
-        has_ever_registered = bool(user_services.get_username(self.user_id))
+        has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered = user_services.has_fully_registered(self.user_id)
 
         if has_fully_registered:

@@ -36,7 +36,7 @@
     <md-card class="oppia-page-card">
       <h2 class="oppia-signup-page-title">Complete Your Registration</h2>
 
-      <form ng-submit="submitPrerequisitesForm(agreedToTerms, username, canReceiveEmailUpdates)">
+      <form ng-submit="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)">
         <div ng-show="!hasUsername" role="form" class="form-horizontal">
           <div class="form-group">
             <label for="username" class="col-lg-3 col-md-3 col-sm-3">Username</label>
@@ -79,12 +79,12 @@
           <hr>
         </div>
 
-        <div class="oppia-long-text" ng-if="registeredBefore">
+        <div class="oppia-long-text" ng-if="hasEverRegistered">
           <p>
             <em>Please note that we've recently updated our Terms of Use.</em>
           </p>
         </div>
-        <div class="oppia-long-text" ng-if="!registeredBefore">
+        <div class="oppia-long-text" ng-if="!hasEverRegistered">
           <p>
             {{SITE_NAME}} is an open commons of learning resources. All
             material on it is freely reusable and shareable.
@@ -107,7 +107,8 @@
 
         <div class="checkbox oppia-long-text">
           <label>
-            <input type="checkbox" ng-model="agreedToTerms" class="protractor-test-agree-to-terms-checkbox">
+            <input type="checkbox" ng-model="hasAgreedToLatestTerms"
+                   class="protractor-test-agree-to-terms-checkbox">
             By checking the box to the left of this text, you acknowledge,
             agree, and accept to be bound by the Oppia Terms of Use, found <a href="/terms" target="_blank">here</a>.
           </label>
@@ -115,7 +116,7 @@
 
         <br>
 
-        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms || submissionInProcess">Submit and start contributing</button>
+        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !hasAgreedToLatestTerms || submissionInProcess">Submit and start contributing</button>
       </form>
     </md-card>
   </div>

@@ -64,7 +64,7 @@ describe('Signup controller', function() {
     it('should get data correctly from the server', function() {
       $httpBackend.flush();
       expect(scope.username).toBe('myUsername');
-      expect(scope.agreedToTerms).toBe(false);
+      expect(scope.hasAgreedToLatestTerms).toBe(false);
     });
 
     it('should show a loading message until the data is retrieved', function() {
