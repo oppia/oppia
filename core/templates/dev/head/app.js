@@ -93,6 +93,10 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
+oppia.factory('checkIfMobileDevice', [function() {
+  return typeof window.orientation !== 'undefined';
+}]);
+
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
