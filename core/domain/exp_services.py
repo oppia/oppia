@@ -28,6 +28,7 @@ import copy
 import datetime
 import logging
 import os
+import pprint
 import StringIO
 import zipfile
 
@@ -536,7 +537,8 @@ def apply_change_list(exploration_id, change_list):
     except Exception as e:
         logging.error(
             '%s %s %s %s' % (
-                e.__class__.__name__, e, exploration_id, change_list)
+                e.__class__.__name__, e, exploration_id,
+                pprint.pprint(change_list))
         )
         raise
 

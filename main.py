@@ -154,6 +154,8 @@ urls = [
         r'/contact', pages.AboutPage, 'redirect_to_about_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
+    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
+    get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),

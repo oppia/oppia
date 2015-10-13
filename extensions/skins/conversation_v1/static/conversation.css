@@ -42,8 +42,13 @@ html, body {
   margin: 0 auto;
   position: fixed;
   right: 0;
-  top: 56px;
   z-index: 100;
+}
+.conversation-skin-progress-dots-not-iframed {
+  top: 56px;
+}
+.conversation-skin-progress-dots-iframed {
+  top: 6px;
 }
 
 .conversation-skin-initial-oppia-avatar,
@@ -73,6 +78,16 @@ html, body {
 .conversation-skin-responses-dropdown-icon {
   font-size: 10px;
   margin-bottom: -4px;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: 0.2s;
+}
+.conversation-skin-responses-dropdown-icon-rotated {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 .conversation-skin-responses-dropdown-container {
   border-bottom: 1px solid #ccc;
@@ -131,6 +146,8 @@ md-card.conversation-skin-tutor-card {
 .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
   left: -56px;
+  /* This is needed to prevent overlapping of avatars. */
+  margin-top: 10px;
   top: -7px;
 }
 
@@ -141,6 +158,8 @@ md-card.conversation-skin-tutor-card {
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
   margin-bottom: 30px;
+  /* This is needed to align content in-line with avatars. */
+  padding-top: 10px;
   position: relative;
 }
 
@@ -263,7 +282,7 @@ md-card.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-card-switcher {
-  background: #05a69a;
+  background: #009688;
   bottom: 0;
   height: 50px;
   position: fixed;
@@ -327,10 +346,10 @@ md-card.conversation-skin-supplemental-card {
     width: 100%;
   }
 
-  /* 
+  /*
     This is needed to position avatars inside the card for small screen devices/
     when card is 100% wide
-  */ 
+  */
   .conversation-skin-initial-oppia-avatar,
   .conversation-skin-oppia-avatar,
   .conversation-skin-user-avatar {

@@ -296,8 +296,8 @@ oppia.controller('StateResponses', [
     function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, warningsData, responsesService, routerService,
-      explorationContextService, trainingDataService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS) {
+      explorationContextService, trainingDataService,
+      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
   $scope.editorContextService = editorContextService;
 
   var _initializeTrainingData = function() {

@@ -119,9 +119,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         'explorationStatesService', 'routerService', 'validatorsService',
         'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
         'FUZZY_RULE_TYPE', function(
-          $scope, $timeout, editorContextService, explorationStatesService,
-          routerService, validatorsService, responsesService,
-          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
+          $scope, $timeout, editorContextService,
+          explorationStatesService, routerService, validatorsService,
+          responsesService, stateInteractionIdService, INTERACTION_SPECS,
+          FUZZY_RULE_TYPE) {
       $scope.currentInteractionId = stateInteractionIdService.savedMemento;
       $scope.editRuleForm = {};
 
@@ -155,18 +156,28 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           var _answerChoices = responsesService.getAnswerChoices();
 
           if (_answerChoices) {
-            // This rule is for a multiple-choice or image-click interaction.
+            // This rule is for a multiple-choice, image-click, or item selection interaction.
             // TODO(sll): Remove the need for this special case.
             if (_answerChoices.length > 0) {
-              $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
-                return {
-                  val: choice.label,
-                  id: choice.val
-                };
-              });
-              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
-              if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
-                $scope.rule.inputs[finalInputArray[i + 1]] = $scope.ruleDescriptionChoices[0].id;
+              if (finalInputArray[2] === 'SetOfHtmlString') {
+                $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+                  return {
+                    val: choice.label,
+                    id: choice.label
+                  };
+                });
+                result.push({'type': 'checkboxes', 'varName': finalInputArray[i + 1]});
+              } else {
+                $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+                  return {
+                    val: choice.label,
+                    id: choice.val
+                  };
+                });
+                result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+                if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
+                  $scope.rule.inputs[finalInputArray[i + 1]] = $scope.ruleDescriptionChoices[0].id;
+                }
               }
             } else {
               $scope.ruleDescriptionChoices = [];
@@ -216,9 +227,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
           }
 
-          if (_answerChoices) {
+          if (varType === 'SetOfHtmlString') {
+            $scope.rule.inputs[varName] = [];
+          } else if (_answerChoices) {
             $scope.rule.inputs[varName] = angular.copy(_answerChoices[0].val);
-          } else if (varType == "Graph") {
+          } else if (varType == 'Graph') {
             $scope.rule.inputs[varName] = {
               'vertices': [],
               'edges': [],
@@ -226,8 +239,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               'isWeighted': false,
               'isLabeled': false
             };
-          } else if (varType == 'Set') {
-            $scope.rule.inputs[varName] = [];
           } else {
             $scope.rule.inputs[varName] = '';
           }
