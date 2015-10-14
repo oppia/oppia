@@ -76,11 +76,12 @@ $NPM_CMD config set ca ""
 # patches.
 
 echo Checking whether Skulpt is installed in third_party
-if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt" ]; then
-  if [ ! -d "$TOOLS_DIR/skulpt/dist" ]; then
+if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
+  if [ ! -d "$TOOLS_DIR/skulpt-0.10.0" ]; then
     echo Downloading Skulpt
     cd $TOOLS_DIR
-    rm -rf skulpt
+    mkdir skulpt-0.10.0
+    cd skulpt-0.10.0
     git clone https://github.com/skulpt/skulpt
     cd skulpt
 
@@ -96,16 +97,16 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt" ]; then
     # The Skulpt setup function needs to be tweaked. It fails without certain
     # third party commands. These are only used for unit tests and generating
     # documentation and are not necessary when building Skulpt.
-    sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt/skulpt.py |\
+    sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
     sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
-    mv $TMP_FILE $TOOLS_DIR/skulpt/skulpt.py
-    python $TOOLS_DIR/skulpt/skulpt.py dist
+    mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
+    python $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
   fi
 
   # Move the build directory to the static resources folder.
-  mkdir -p $THIRD_PARTY_DIR/static/skulpt
-  cp -r $TOOLS_DIR/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt
+  mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
+  cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
