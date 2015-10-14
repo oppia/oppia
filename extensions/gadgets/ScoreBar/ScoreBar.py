@@ -23,46 +23,27 @@ from extensions.gadgets import base
 class ScoreBar(base.BaseGadget):
     """Gadget for providing a ScoreBar."""
 
-    name = 'ScoreBar'
+    short_description = 'Score Bar'
     description = 'A visual score bar that can represent progress or success.'
+    height_px = 100
+    width_px = 250
+    panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [
-        {
-            'name': 'title',
-            'description': 'Optional title for the score bar (e.g. "Score")',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': 'Score'
-        }, {
-            'name': 'maxValue',
-            'description': 'Maximum value (bar fills as a % of this value)',
-            'schema': {
-                'type': 'int',
-            },
-            'default_value': 100
-        }, {
-            # TODO(anuzis): Validate that the paramName corresponds to a valid
-            # parameter name in the exploration.
-            'name': 'paramName',
-            'description': 'The parameter name this score bar follows.',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }
-    ]
-
-    # Constants for height and width.
-    # Static placeholders for now.
-    _HEIGHT = 100
-    _WIDTH = 250
-
-    def get_width(self, customization_args):
-        """Returns integer representing width in pixels."""
-        return self._WIDTH
-
-    def get_height(self, customization_args):
-        """Returns integer representing height in pixels."""
-        return self._HEIGHT
+    {
+        'name': 'maxValue',
+        'description': 'Maximum value (the bar fills up to this value)',
+        'schema': {
+            'type': 'int',
+        },
+        'default_value': 100
+    }, {
+        'name': 'paramName',
+        'description': 'Which parameter should this score bar follow?',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'ParameterName',
+        },
+        'default_value': ''
+    }]

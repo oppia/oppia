@@ -21,7 +21,7 @@ from core.domain import feedback_services
 from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-import test_utils
+from core.tests import test_utils
 
 
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
@@ -196,7 +196,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_suggestion_threads(self):
         with self.swap(
-            feedback_models.FeedbackThreadModel, 'get_thread_with_suggestions',
+            feedback_models.FeedbackThreadModel, 'get_threads_with_suggestions',
             self._get_thread_with_suggestions):
             threads = feedback_services.get_all_suggestion_threads(
                 self.EXP_ID1)

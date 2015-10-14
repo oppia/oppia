@@ -32,7 +32,6 @@ class EndExploration(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     is_terminal = True
     _dependency_ids = []
-    answer_type = 'Null'
     instructions = None
     needs_summary = False
 
