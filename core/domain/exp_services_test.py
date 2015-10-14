@@ -2309,6 +2309,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     USERNAME = 'user123'
+    COMMIT_MESSAGE = 'commit message'
 
     def _generate_thread_id(self, exp_id):
         return self.THREAD_ID1
@@ -2320,7 +2321,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         return False
 
     def _null_fn(self, user_id, exploration_id, change_list, commit_message):
-        pass
+        self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
+            self.USERNAME, self.COMMIT_MESSAGE))
 
     def _get_username_(self, user_ids):
         return [self.USERNAME]
@@ -2342,7 +2344,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                                self. _get_username_):
                     exp_services.accept_suggestion(
                         'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1,
-                        'message')
+                        self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             '.'.join([self.EXP_ID1, self.THREAD_ID1]))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
@@ -2353,7 +2355,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(Exception, 'Suggestion Invalid'):
                 exp_services.accept_suggestion(
                     'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2,
-                    'message')
+                    self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             '.'.join([self.EXP_ID2, self.THREAD_ID1]))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)

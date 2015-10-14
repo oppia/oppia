@@ -95,6 +95,6 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
     def test_get_by_exploration_and_thread_id_no_suggestion(self):
         actual_suggestion = (feedback_models.SuggestionModel
-            .get_by_exploration_and_thread_id('exp_id9', 'thread_id1'))
+            .get_by_exploration_and_thread_id('invalid_exp_id', 'thread_id1'))
 
-        self.assertEqual(actual_suggestion, None)
+        self.assertIsNone(actual_suggestion)

@@ -209,9 +209,9 @@ def get_suggestion(exploration_id, thread_id):
 
 
 def get_open_threads(exploration_id, has_suggestion):
-    """If suggestions is True, return a list of all open threads that have a
+    """If has_suggestion is True, return a list of all open threads that have a
     suggestion, otherwise return a list of all open threads that do not have a 
-    suggestion."""     
+    suggestion.""" 
 
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     open_threads = []
@@ -223,9 +223,9 @@ def get_open_threads(exploration_id, has_suggestion):
 
 
 def get_closed_threads(exploration_id, has_suggestion):
-    """If suggestions is True, return a list of all closed threads that have a
-    suggestion, otherwise return a list of all closed threads that do not have a 
-    suggestion."""     
+    """If has_suggestion is True, return a list of all closed threads that have
+    a suggestion, otherwise return a list of all closed threads that do not have
+    a suggestion."""
 
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     closed_threads = []
@@ -239,6 +239,6 @@ def get_closed_threads(exploration_id, has_suggestion):
 def get_all_suggestion_threads(exploration_id):
     """Return a list of all threads with suggestions."""
 
-    return [(thread)
+    return [thread
         for thread in feedback_models.FeedbackThreadModel
-            .get_thread_with_suggestions(exploration_id)]    
+            .get_threads_with_suggestions(exploration_id)] 

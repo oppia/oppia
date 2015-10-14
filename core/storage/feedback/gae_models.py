@@ -120,7 +120,7 @@ class FeedbackThreadModel(base_models.BaseModel):
                 feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_thread_with_suggestions(cls, exploration_id):
+    def get_threads_with_suggestions(cls, exploration_id):
         """Returns an array of threads that have suggestions, for the given
         exploration."""
 

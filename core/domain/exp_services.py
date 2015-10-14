@@ -32,12 +32,12 @@ import pprint
 import StringIO
 import zipfile
 
-from core.domain import feedback_services
 from core.domain import event_services
-from core.domain import user_services
+from core.domain import feedback_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -1277,29 +1277,28 @@ def search_explorations(query, limit, sort=None, cursor=None):
          
 def _is_suggestion_valid(thread_id, exploration_id): 
     """Check if the suggestion is still valid. A suggestion is considered 
-    invalid if the exploration version has updated since the suggestion was 
-    made.""" 
+    invalid if the content or name of the state that the suggestion was made
+    for has changed since.""" 
  
-    states = exp_models.ExplorationModel.get(id=exploration_id).states 
+    states = get_exploration_by_id(exploration_id).states
     suggestion = (feedback_models.SuggestionModel 
         .get_by_exploration_and_thread_id(exploration_id, thread_id)) 
-    if (suggestion.state_name in states.keys() and 
-           suggestion.state_content == states.get(suggestion.state_name)): 
-        return True 
-    return False        
-
+    return (
+        suggestion.state_name in states and
+        suggestion.state_content == states[suggestion.state_name])
 
 def accept_suggestion(editor_id, change_list, thread_id, exploration_id, 
-                      message):
+                      commit_message):
     """If the suggestion is valid, accepts it by updating the exploration.
-    Raises an exception if the exploration is not valid."""
+    Raises an exception if the suggestion is not valid."""
 
     if _is_suggestion_valid(thread_id, exploration_id):
-        commit_message = ('Accepted suggestion by %s: %s' % ( 
-            editor_id, message))
-        username = user_services.get_human_readable_user_ids([editor_id])[0]
+        editor_username = user_services.get_human_readable_user_ids(
+            [editor_id])[0]
+        full_commit_message = ('Accepted suggestion by %s: %s' % ( 
+            editor_username, commit_message))
         update_exploration(
-            username, exploration_id, change_list, commit_message)
+            editor_id, exploration_id, change_list, full_commit_message)
         thread = (feedback_models.FeedbackThreadModel.
             get_by_exp_and_thread_id(exploration_id, thread_id))
         thread.status = feedback_models.STATUS_CHOICES_FIXED
@@ -1314,3 +1313,4 @@ def reject_suggestion(thread_id, exploration_id):
     thread = (feedback_models.FeedbackThreadModel.
         get_by_exp_and_thread_id(exploration_id, thread_id))
     thread.status = feedback_models.STATUS_CHOICES_IGNORED
+    thread.put()
