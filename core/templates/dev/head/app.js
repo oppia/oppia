@@ -96,7 +96,11 @@ oppia.config(['$provide', function($provide) {
 //Returns true if the user is on a mobile device.
 //See here: http://stackoverflow.com/a/14301832/5020618
 oppia.factory('deviceInfoService', ['$window', function($window) {
-  return typeof $window.orientation !== 'undefined';
+  return {
+    isMobileDevice: function() {
+      return typeof $window.orientation !== 'undefined';
+    }
+  }
 }]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
@@ -275,10 +279,8 @@ oppia.factory('focusService', ['$rootScope', '$timeout', 'deviceInfoService',
       });
     },
     setFocusIfOnDesktop: function(newFocusLabel) {
-      if (deviceInfoService) {
-        return null;
-      } else {
-        return this.setFocus(newFocusLabel);
+      if (!deviceInfoService.isMobileDevice()) {
+        this.setFocus(newFocusLabel);
       }
     },
     // Generates a random string (to be used as a focus label).
