@@ -228,6 +228,9 @@ def has_ever_registered(user_id):
 
 
 def has_fully_registered(user_id):
+    if user_id is None:
+        return False
+
     user_settings = get_user_settings(user_id, strict=True)
     return user_settings.username and user_settings.last_agreed_to_terms and (
         user_settings.last_agreed_to_terms >=
