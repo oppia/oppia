@@ -89,7 +89,7 @@
 
 {% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
   <md-card style="margin: 20px 0px; padding: 0px;" ng-if="isCurrentInteractionTrainable()">
-    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
         + Teach Oppia
       </button>
@@ -99,7 +99,7 @@
 {% else %}
   <md-card style="margin: 0px; padding: 0px;">
 {% endif %}
-    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && (getCurrentInteractionId() !== 'Continue')" class="oppia-add-rule-button-container">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()" class="oppia-add-rule-button-container">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Oppia Response
       </button>

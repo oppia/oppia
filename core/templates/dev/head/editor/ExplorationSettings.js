@@ -139,14 +139,6 @@ oppia.controller('ExplorationSettings', [
     explorationWarningsService.updateWarnings();
   };
 
-  // TODO(sll): Remove this, once we get rid of the skins functionality.
-  $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
-    if (oldValue !== undefined && !angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty(
-        'default_skin_id', newValue, oldValue);
-    }
-  });
-
   /********************************************
   * Methods for rights management.
   ********************************************/

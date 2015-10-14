@@ -31,14 +31,12 @@ oppia.controller('StateStatistics', [
   $scope.unresolvedAnswersList = [];
   $scope.isInteractionTrainable = false;
 
-  var INTERACTIONS_WITHOUT_UNRESOLVED_ANSWERS = ['Continue'];
-
   $scope.initStateStatistics = function(data) {
-    // Do not show unresolved answers if the interaction is of type 'Continue'.
+    // Do not show unresolved answers if the interaction has only one possible
+    // answer.
     $scope.unresolvedAnswers = (
-      INTERACTIONS_WITHOUT_UNRESOLVED_ANSWERS.indexOf(
-        data.interaction.id) !== -1 ?
-      {} : data.unresolved_answers);
+      (data.interaction.id && !INTERACTION_SPECS[data.interaction.id].is_linear) ?
+      data.unresolved_answers : {});
     $scope.generateUnresolvedAnswersList();
 
     $scope.isInteractionTrainable = (

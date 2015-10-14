@@ -20,8 +20,8 @@ from core.domain import config_services
 from core.domain import email_manager
 from core.platform import models
 (email_models,) = models.Registry.import_models([models.NAMES.email])
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class EmailRightsTest(test_utils.GenericTestBase):

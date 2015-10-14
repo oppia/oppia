@@ -59,7 +59,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
         self._run_batch_job_once_and_verify_output(
             exp_specs,
-            default_status=rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
 
     def test_all_exps_public(self):
         """Test summary batch job if all explorations are public
@@ -79,26 +79,26 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
         self._run_batch_job_once_and_verify_output(
             exp_specs,
-            default_status=rights_manager.EXPLORATION_STATUS_PUBLIC)
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
 
     def test_exps_some_publicized(self):
         """Test summary batch job if some explorations are publicized."""
 
         exp_specs = [
             {'category': 'Category A',
-             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
              'title': 'Title 1'},
             {'category': 'Category B',
-             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
              'title': 'Title 2'},
             {'category': 'Category C',
-             'status': rights_manager.EXPLORATION_STATUS_PRIVATE,
+             'status': rights_manager.ACTIVITY_STATUS_PRIVATE,
              'title': 'Title 3'},
             {'category': 'Category A',
-             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
              'title': 'Title 4'},
             {'category': 'Category C',
-             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
              'title': 'Title 5'}]
 
         self._run_batch_job_once_and_verify_output(exp_specs)
@@ -107,7 +107,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self, exp_specs,
             default_title='A title',
             default_category='A category',
-            default_status=rights_manager.EXPLORATION_STATUS_PUBLICIZED):
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED):
         """Run batch job for creating exploration summaries once and verify its
         output. exp_specs is a list of dicts with exploration specifications.
         Allowed keys are category, status, title. If a key is not specified,
@@ -154,10 +154,10 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
                 # publish or publicize exploration
-                if spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
+                if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
                     rights_manager.publish_exploration(self.ADMIN_ID, exp_id)
                 elif (spec['status'] ==
-                        rights_manager.EXPLORATION_STATUS_PUBLICIZED):
+                        rights_manager.ACTIVITY_STATUS_PUBLICIZED):
                     rights_manager.publish_exploration(self.ADMIN_ID, exp_id)
                     rights_manager.publicize_exploration(self.ADMIN_ID, exp_id)
 
@@ -221,12 +221,15 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             # check job output
             self.assertEqual(actual_job_output.keys(),
                              expected_job_output.keys())
+
+            # Note: 'exploration_model_last_updated' is not expected to be the
+            # same, because it is now read from the version model representing
+            # the exploration's history snapshot, and not the ExplorationModel.
             simple_props = ['id', 'title', 'category', 'objective',
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
                             'editor_ids', 'viewer_ids', 'version',
-                            'exploration_model_created_on',
-                            'exploration_model_last_updated']
+                            'exploration_model_created_on']
             for exp_id in actual_job_output:
                 for prop in simple_props:
                     self.assertEqual(
