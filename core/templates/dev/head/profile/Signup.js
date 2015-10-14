@@ -60,6 +60,9 @@ oppia.controller('Signup', [
   };
 
   $scope.onUsernameInputFormBlur = function(username) {
+    if ($scope.hasUsername) {
+      return;
+    }
     warningsData.clear();
     $scope.blurredAtLeastOnce = true;
     $scope.updateWarningText(username);
@@ -123,7 +126,7 @@ oppia.controller('Signup', [
       requestParams.username = username;
     }
 
-    if (GLOBALS.CAN_SEND_EMAILS_TO_USERS) {
+    if (GLOBALS.CAN_SEND_EMAILS_TO_USERS && !$scope.hasUsername) {
       if (canReceiveEmailUpdates === null) {
         $scope.emailPreferencesWarningText = 'This field is required.';
         return;
