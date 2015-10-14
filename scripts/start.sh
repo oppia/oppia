@@ -43,7 +43,6 @@ source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 set -- "${remaining_params[@]}"
 
-
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   echo Installing Google App Engine
@@ -105,18 +104,6 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-#Check for python 2.7, returns a string of "True" or "False"
-IS_PY_27=`python -c 'import sys; pyVer = (".".join(map(str,sys.version_info[0:2])));print float(pyVer)==2.7'`
-if [ $IS_PY_27 = "True" ]; then
-  PYTHON_CMD='python'
-elif hash python2.7 2>/dev/null; then
-  PYTHON_CMD='python2.7'
-else
-  echo "Could not find Python version 2.7."
-  echo "Please ensure you have Python 2.7 installed and in your path."
-  echo "Exiting."
-  exit 1
-fi
 $PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
 
 echo Done!
