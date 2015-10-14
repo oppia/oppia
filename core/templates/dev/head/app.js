@@ -100,7 +100,7 @@ oppia.factory('deviceInfoService', ['$window', function($window) {
     isMobileDevice: function() {
       return typeof $window.orientation !== 'undefined';
     }
-  }
+  };
 }]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
