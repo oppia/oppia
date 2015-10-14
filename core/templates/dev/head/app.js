@@ -259,13 +259,11 @@ oppia.factory('validatorsService', [
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
-oppia.factory('focusService', ['deviceInfoService', '$rootScope', '$timeout', function(deviceInfoService, $rootScope, $timeout) {
+oppia.factory('focusService', ['$rootScope', '$timeout', 'deviceInfoService', 
+  function($rootScope, $timeout, deviceInfoService) {
   var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
-      if (deviceInfoService) {
-        return null;
-      }
       if (_nextLabelToFocusOn) {
         return;
       }
@@ -275,6 +273,13 @@ oppia.factory('focusService', ['deviceInfoService', '$rootScope', '$timeout', fu
         $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
         _nextLabelToFocusOn = null;
       });
+    },
+    setFocusIfOnDesktop: function(newFocusLabel) {
+      if (deviceInfoService) {
+        return null;
+      } else {
+        return this.setFocus(newFocusLabel);
+      }
     },
     // Generates a random string (to be used as a focus label).
     generateFocusLabel: function() {
