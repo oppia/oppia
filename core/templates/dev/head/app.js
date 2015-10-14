@@ -95,7 +95,7 @@ oppia.config(['$provide', function($provide) {
 
 //Returns true if the user is on a mobile device.
 //See here: http://stackoverflow.com/a/14301832/5020618
-oppia.factory('deviceInfoService', [$window, function($window) {
+oppia.factory('deviceInfoService', ['$window', function($window) {
   return typeof $window.orientation !== 'undefined';
 }]);
 
@@ -259,10 +259,13 @@ oppia.factory('validatorsService', [
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
-oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+oppia.factory('focusService', ['deviceInfoService', '$rootScope', '$timeout', function(deviceInfoService, $rootScope, $timeout) {
   var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
+      if (deviceInfoService) {
+        return null;
+      }
       if (_nextLabelToFocusOn) {
         return;
       }
