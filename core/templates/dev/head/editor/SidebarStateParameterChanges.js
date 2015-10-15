@@ -192,8 +192,6 @@ oppia.controller('StateParamChangesEditor', [
     stateParamChangesService.displayed[index1] = (
       stateParamChangesService.displayed[index2]);
     stateParamChangesService.displayed[index2] = tmp;
-
-    // TODO(sll): Need to refresh select2 dialog boxes 'from the outside'.
   };
 
   $scope.deleteParamChange = function(index) {
@@ -204,8 +202,6 @@ oppia.controller('StateParamChangesEditor', [
     }
 
     stateParamChangesService.displayed.splice(index, 1);
-
-    // TODO(sll): Need to refresh select2 dialog boxes 'from the outside'.
   };
 
   $scope.cancelEdit = function() {
