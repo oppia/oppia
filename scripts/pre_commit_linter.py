@@ -40,39 +40,18 @@ import sys
 import subprocess
 
 
-def _current_changed():
-    """This function looks for all files changed but not
-    yet staged.
-    Returns:
-        list of files changed but not staged files
-    """
-    changed_files = os.popen("git diff --name-only")
-    return changed_files
-
-def _current_staged():
-    """This function looks for all files that are changed
-    and staged but not yet commited.
-    Returns:
-        list of staged files but not commited
-    """
-    staged_files = os.popen("git diff --cached --name-only --diff-filter=ACM")
-    return staged_files
-
-
 def _get_list_of_current_changed():
     """This function combines all changed files staged
     and not staged
     Returns:
         a list of files about to be commited. """
+    changed_and_staged_files = subprocess.check_output(['git', 'diff', '--name-only'])
+    changed_and_staged_files += subprocess.check_output(['git', 'diff', '--cached', 
+                                    '--name-only', '--diff-filter=ACM'])
     files = []
-    if _current_changed():
-        for js_file in _current_changed().read().splitlines():
-            files.append(js_file)
-
-    if _current_staged():
-        for js_file in _current_staged().read().splitlines():
-            if js_file not in files:
-                files.append(js_file)
+    if changed_and_staged_files:
+        for changed_and_staged_file in changed_and_staged_files.splitlines():
+            files.append(changed_and_staged_file)
     return files
 
 
@@ -132,18 +111,11 @@ def _check_repo(path_to_jscs, auto_fix=False):
             javascript_file, i, len(javascript_files))
         print ""
         try:
-            if auto_fix:
-                proc = subprocess.Popen(
-                    [path_to_jscs, "-x", javascript_file],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
-                out, _ = proc.communicate()
-            else:
-                proc = subprocess.Popen(
-                    [path_to_jscs, javascript_file],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
-                out, _ = proc.communicate()
+            proc = subprocess.Popen(
+                [path_to_jscs, javascript_file],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            out, _ = proc.communicate()
             errors.append(out)
             print out
         except OSError:
@@ -165,10 +137,9 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass path to node-jscs bin folder
     """
-    jscs_bin_dir = "/oppia_tools/node-jscs/bin/jscs"
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    path_to_jscs = parent_dir + jscs_bin_dir
-    if os.getcwd().endswith("oppia"):
+    path_to_jscs = os.path.join(parent_dir,'node_modules','jscs','bin','jscs')
+    if os.getcwd().endswith('oppia'):
         if os.path.exists(path_to_jscs):
             _check_repo(path_to_jscs)
         else:

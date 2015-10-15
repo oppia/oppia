@@ -1,6 +1,6 @@
 {
     "preset": "google",
-    "fileExtensions": [".js", "jscs"],
+    "fileExtensions": [".js"],
 
     "requireSemicolons": true,
     "requireParenthesesAroundIIFE": true,
@@ -35,7 +35,6 @@
     },
 
     "excludeFiles": [
-        "test/data/**",
-        "patterns/*"
+        "third_party/**"
     ]
 }
