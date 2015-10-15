@@ -46,7 +46,7 @@ def _get_list_of_current_changed():
     Returns:
         a list of files about to be commited. """
     changed_and_staged_files = subprocess.check_output(['git', 'diff', '--name-only'])
-    changed_and_staged_files += subprocess.check_output(['git', 'diff', '--cached', 
+    changed_and_staged_files += subprocess.check_output(['git', 'diff', '--cached',
                                     '--name-only', '--diff-filter=ACM'])
     files = []
     if changed_and_staged_files:
@@ -69,7 +69,7 @@ def _is_javascript_file(filename):
         return False
 
 
-def _check_repo(path_to_jscs, auto_fix=False):
+def _check_repo(path_to_jscs):
     """This function checks all changed files in the repo and
     choose only javascript files(those which ends with .js)
     to be linted and the output error is displayed in console
