@@ -355,21 +355,22 @@ var expectGadgetWithNameDoesNotExist = function(gadgetType, gadgetName) {
 
 // This function adds a parameter change, creating the parameter if necessary.
 var addParameterChange = function(paramName, paramValue) {
+  element(by.css('.protractor-test-state-edit-param-changes')).click();
   element(by.css('.protractor-test-add-param-button')).click();
 
-  forms.AutocompleteDropdownEditor(
-    element(by.css('.protractor-test-param-changes-editor'))
-  ).setValue(paramName);
+  var editorRowElem = element.all(by.css(
+    '.protractor-test-param-changes-list')).last();
+
+  forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
   /* Setting parameter value is difficult via css since the associated
   input is a sub-component of the third party select2 library. We isolate
   it as the third input in the current parameter changes UI. */
-  element(by.css('.protractor-test-param-changes-editor')).all(
-    by.tagName('input')).then(function(items) {
-      items[2].sendKeys(paramValue);
-    });
+  editorRowElem.all(by.tagName('input')).then(function(items) {
+    items[2].sendKeys(paramValue);
+  });
 
-  element(by.css('.protractor-test-save-param-change-button')).click();
+  element(by.css('.protractor-test-save-param-changes-button')).click();
 
   general.waitForSystem(500);
 }
