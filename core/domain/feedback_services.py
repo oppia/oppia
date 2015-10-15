@@ -239,6 +239,7 @@ def get_closed_threads(exploration_id, has_suggestion):
 def get_all_suggestion_threads(exploration_id):
     """Return a list of all threads with suggestions."""
 
-    return [thread
-        for thread in feedback_models.FeedbackThreadModel
-            .get_threads_with_suggestions(exploration_id)] 
+    return [
+        thread for thread in 
+        feedback_models.FeedbackThreadModel.get_threads_with_suggestions(
+            exploration_id)] 

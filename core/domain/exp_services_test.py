@@ -2864,7 +2864,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     def _return_false(self, thread_id, exploration_id):
         return False
 
-    def _null_fn(self, user_id, exploration_id, change_list, commit_message):
+    def _check_commit_message(
+        self, user_id, exploration_id, change_list, commit_message):
         self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
             self.USERNAME, self.COMMIT_MESSAGE))
 
@@ -2883,7 +2884,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid', 
                        self._return_true):
-            with self.swap(exp_services, 'update_exploration', self._null_fn):
+            with self.swap(exp_services, 'update_exploration',
+                           self._check_commit_message):
                 with self.swap(user_services, 'get_human_readable_user_ids',
                                self. _get_username_):
                     exp_services.accept_suggestion(
