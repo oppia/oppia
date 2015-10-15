@@ -295,9 +295,9 @@ oppia.directive('conversationSkin', [function() {
 
         _recomputeAndResetPanels();
         if (_nextFocusLabel && index === $scope.transcript.length - 1) {
-          focusService.setFocus(_nextFocusLabel);
+          focusService.setFocusIfOnDesktop(_nextFocusLabel);
         } else {
-          focusService.setFocus($scope.activeCard.contentHtmlFocusLabel);
+          focusService.setFocusIfOnDesktop($scope.activeCard.contentHtmlFocusLabel);
         }
       };
 
@@ -372,7 +372,7 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
-          focusService.setFocus(_nextFocusLabel);
+          focusService.setFocusIfOnDesktop(_nextFocusLabel);
 
           $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
             stateName);
@@ -420,7 +420,7 @@ oppia.directive('conversationSkin', [function() {
                 oppiaPlayerService.getInteractionHtml(newStateName, _nextFocusLabel) +
                 oppiaPlayerService.getRandomSuffix());
             }
-            focusService.setFocus(_nextFocusLabel);
+            focusService.setFocusIfOnDesktop(_nextFocusLabel);
             scrollToBottom();
           } else {
             // There is a new card. Disable the current interaction -- then, if
@@ -447,7 +447,7 @@ oppia.directive('conversationSkin', [function() {
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
               $scope.waitingForContinueButtonClick = true;
               _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
-              focusService.setFocus(_nextFocusLabel);
+              focusService.setFocusIfOnDesktop(_nextFocusLabel);
               scrollToBottom();
             } else {
               // Note that feedbackHtml is an empty string if no feedback has
@@ -487,7 +487,7 @@ oppia.directive('conversationSkin', [function() {
         }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
         $timeout(function() {
-          focusService.setFocus(_nextFocusLabel);
+          focusService.setFocusIfOnDesktop(_nextFocusLabel);
           scrollToTop();
         }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC);
 

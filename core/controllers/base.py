@@ -409,7 +409,8 @@ class BaseHandler(webapp2.RequestHandler):
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_NAME': SITE_NAME.value,
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
-            'user_is_logged_in': bool(self.username),
+            'user_is_logged_in': user_services.has_fully_registered(
+                self.user_id),
         })
 
         if 'meta_name' not in values:
