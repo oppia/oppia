@@ -101,46 +101,47 @@ else
   export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 fi
 
-# Check the version of Python. If its version does not start with 2.7, then
-# try and see whether the 'python2.7' command exists.
-# Borrowed from bhenning's solution for checking python version
-# http://stackoverflow.com/questions/592620
-test_python_version(){
+# This function takes a command for python as its only input
+# It checks this inpuut for a specific version of python and returns false
+# if it does not match the expected prefix.  
+function test_python_version() {
   EXPECTED_PYTHON_VERSION_PREFIX="2.7"
   PYTHON_VERSION=$($1 --version 2>&1)
   if [[ $PYTHON_VERSION =~ Python[[:space:]](.+) ]]; then
     PYTHON_VERSION=${BASH_REMATCH[1]}
   else
     echo "Unrecognizable Python command output: ${PYTHON_VERSION}"
+    # Return a false condition if output of tested command is unrecognizable. 
+    return 0
   fi
   if [[ "${PYTHON_VERSION}" = "${EXPECTED_PYTHON_VERSION_PREFIX}*" ]]; then
-    #false
+    # The value '1' indicates a true return value, 
+    # indicating the version of the input Python command is the expected Python version.
     return 1
   else 
-    #true
     return 0
   fi
 }
 
-#Setting default Python command. Assumes it is already in $PATH
+# First, check the default Python command (which should be found within the user's $PATH).
 PYTHON_CMD="python"
-#Check "python" and "python2.7" for version 2.7
+# Test whether the 'python' or 'python2.7' commands exist and finally fails when
+# no suitable python version 2.7 can be found.
 if ! test_python_version $PYTHON_CMD; then
   echo "Unable to find 'python'. Trying python2.7 instead..."
   PYTHON_CMD="python2.7"
   if ! test_python_version $PYTHON_CMD; then
     echo "Could not find a suitable Python environment. Exiting."
-    #If OS is Windows, print helpful error message about adding Python to path
+    # If OS is Windows, print helpful error message about adding Python to path
     if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
         echo "It looks like you are using Windows. If you have Python installed,"
         echo "make sure it is in your PATH and that PYTHONPATH is set."
         echo "If you have two versions of Python (ie, Python 2.7 and 3), specify 2.7 before other versions of Python when setting the PATH."
         echo "Here are some helpful articles:"
-        echo "https://docs.python.org/2/using/windows.html"
+        echo "http://docs.python-guide.org/en/latest/starting/install/win/"
         echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
-        exit 1
     fi
-    #Exit when python2.7 fails and !(Windows).
+    # Exit when no suitable Python environment can be found.
     exit 1
   fi
 fi
