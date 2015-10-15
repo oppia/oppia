@@ -23,7 +23,7 @@ class CodeRepl(base.BaseInteraction):
     name = 'Code Editor'
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    _dependency_ids = ['jsrepl', 'codemirror']
+    _dependency_ids = ['skulpt', 'codemirror']
     _handlers = [{
         'name': 'submit', 'obj_type': 'CodeEvaluation'}]
 
