@@ -36,8 +36,8 @@ IMPORTANT NOTES:
 __author__ = "Barnabas Makonda(barnabasmakonda@gmail.com)"
 
 import os
-import sys
 import subprocess
+import sys
 
 
 def _get_list_of_current_changed():
