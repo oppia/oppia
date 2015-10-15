@@ -26,14 +26,15 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
-(exp_models,) = models.Registry.import_models([
-    models.NAMES.exploration
+(base_models, exp_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.feedback
 ])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -2843,3 +2844,71 @@ title: Old Title
         # The converted exploration should be up-to-date and properly
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+
+
+class SuggestionActionUnitTests(test_utils.GenericTestBase):
+    """Test learner suggestion action functions in exp_services."""
+
+    THREAD_ID1 = '1111'
+    EXP_ID1 = 'exp_id1'
+    EXP_ID2 = 'exp_id2'
+    USERNAME = 'user123'
+    COMMIT_MESSAGE = 'commit message'
+
+    def _generate_thread_id(self, exp_id):
+        return self.THREAD_ID1
+
+    def _return_true(self, thread_id, exploration_id):
+        return True
+        
+    def _return_false(self, thread_id, exploration_id):
+        return False
+
+    def _check_commit_message(
+        self, user_id, exploration_id, change_list, commit_message):
+        self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
+            self.USERNAME, self.COMMIT_MESSAGE))
+
+    def _get_username_(self, user_ids):
+        return [self.USERNAME]
+
+    def setUp(self):
+        super(SuggestionActionUnitTests, self).setUp()
+        with self.swap(feedback_models.FeedbackThreadModel, 
+                       'generate_new_thread_id', self._generate_thread_id):
+            feedback_services.create_suggestion(
+                self.EXP_ID1, 'author_id', 3, 'state_name', {'old_content': {}})
+            feedback_services.create_suggestion(
+                self.EXP_ID2, 'author_id', 3, 'state_name', {'old_content': {}})           
+
+    def test_accept_suggestion_valid_suggestion(self):
+        with self.swap(exp_services, '_is_suggestion_valid', 
+                       self._return_true):
+            with self.swap(exp_services, 'update_exploration',
+                           self._check_commit_message):
+                with self.swap(user_services, 'get_human_readable_user_ids',
+                               self. _get_username_):
+                    exp_services.accept_suggestion(
+                        'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1,
+                        self.COMMIT_MESSAGE)
+        thread = feedback_models.FeedbackThreadModel.get(
+            '.'.join([self.EXP_ID1, self.THREAD_ID1]))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
+
+    def test_accept_suggestion_invalid_suggestion(self):
+        with self.swap(exp_services, '_is_suggestion_valid',
+                       self._return_false):
+            with self.assertRaisesRegexp(Exception, 'Suggestion Invalid'):
+                exp_services.accept_suggestion(
+                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2,
+                    self.COMMIT_MESSAGE)
+        thread = feedback_models.FeedbackThreadModel.get(
+            '.'.join([self.EXP_ID2, self.THREAD_ID1]))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
+
+    def test_reject_suggestion(self):
+        exp_services.reject_suggestion(self.THREAD_ID1, self.EXP_ID2)
+        thread = feedback_models.FeedbackThreadModel.get(
+            '.'.join([self.EXP_ID2, self.THREAD_ID1]))
+        self.assertEqual(thread.status,
+                         feedback_models.STATUS_CHOICES_IGNORED)

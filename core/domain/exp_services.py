@@ -34,14 +34,17 @@ import zipfile
 
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.feedback])
 import utils
 
 # This takes additional 'title' and 'category' parameters.
@@ -1343,3 +1346,44 @@ def search_explorations(query, limit, sort=None, cursor=None):
     """
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
+
+         
+def _is_suggestion_valid(thread_id, exploration_id): 
+    """Check if the suggestion is still valid. A suggestion is considered 
+    invalid if the content or name of the state that the suggestion was made
+    for has changed since.""" 
+ 
+    states = get_exploration_by_id(exploration_id).states
+    suggestion = (feedback_models.SuggestionModel 
+        .get_by_exploration_and_thread_id(exploration_id, thread_id)) 
+    return (
+        suggestion.state_name in states and
+        suggestion.state_content == states[suggestion.state_name])
+
+def accept_suggestion(editor_id, change_list, thread_id, exploration_id, 
+                      commit_message):
+    """If the suggestion is valid, accepts it by updating the exploration.
+    Raises an exception if the suggestion is not valid."""
+
+    if _is_suggestion_valid(thread_id, exploration_id):
+        editor_username = user_services.get_human_readable_user_ids(
+            [editor_id])[0]
+        full_commit_message = ('Accepted suggestion by %s: %s' % ( 
+            editor_username, commit_message))
+        update_exploration(
+            editor_id, exploration_id, change_list, full_commit_message)
+        thread = (feedback_models.FeedbackThreadModel.
+            get_by_exp_and_thread_id(exploration_id, thread_id))
+        thread.status = feedback_models.STATUS_CHOICES_FIXED
+        thread.put()
+    else:
+        raise Exception('Suggestion Invalid')
+
+
+def reject_suggestion(thread_id, exploration_id):
+    """Set the state of a suggetion to REJECTED."""
+
+    thread = (feedback_models.FeedbackThreadModel.
+        get_by_exp_and_thread_id(exploration_id, thread_id))
+    thread.status = feedback_models.STATUS_CHOICES_IGNORED
+    thread.put()

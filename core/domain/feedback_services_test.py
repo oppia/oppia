@@ -16,7 +16,9 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 from core.tests import test_utils
@@ -65,3 +67,143 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         threadlist = feedback_services.get_threadlist(EXP_ID)
         thread_status = threadlist[0]['status']
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
+
+
+class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
+    """Test learner suggestion query functions in feedback_services."""
+
+    THREAD_ID1 = '1111'
+    THREAD_ID2 = '2222'
+    THREAD_ID3 = '3333'
+    THREAD_ID4 = '4444'
+    THREAD_ID5 = '5555'
+    EXP_ID1 = 'exp_id1'
+    EXP_ID2 = 'exp_id2'
+    EXP_ID3 = 'exp_id3'
+    USERNAME = 'user123'
+    THREADS = []
+    THREADS_WITH_SUGGESTIONS = []
+    SUGGESTIONS = []
+
+    def _generate_thread_id(self, exp_id):
+        return self.THREAD_ID1
+
+    def _get_threads(self, exploration_id):
+        return self.THREADS
+
+    def setUp(self):
+        super(SuggestionQueriesUnitTests, self).setUp()
+        # Open thread with suggestion.
+        thread1 = feedback_models.FeedbackThreadModel(
+            id='.'.join([self.EXP_ID1, self.THREAD_ID1]),
+            exploration_id=self.EXP_ID1,
+            state_name='state_name',
+            original_author_id='author_id',
+            subject='SUGGESTION',
+            has_suggestion=True) 
+        # Closed threads with suggestion.
+        thread2 = feedback_models.FeedbackThreadModel(
+            id='.'.join([self.EXP_ID1, self.THREAD_ID2]),
+            exploration_id=self.EXP_ID1,
+            state_name='state_name',
+            original_author_id='author_id',
+            subject='SUGGESTION',
+            status=feedback_models.STATUS_CHOICES_FIXED,
+            has_suggestion=True)
+        thread3 = feedback_models.FeedbackThreadModel(
+            id='.'.join([self.EXP_ID1, self.THREAD_ID3]),
+            exploration_id=self.EXP_ID1,
+            state_name='state_name',
+            original_author_id='author_id',
+            subject='SUGGESTION',
+            status=feedback_models.STATUS_CHOICES_IGNORED,
+            has_suggestion=True)
+        # Closed thread without suggestion.
+        thread4 = feedback_models.FeedbackThreadModel(
+            id='.'.join([self.EXP_ID1, self.THREAD_ID4]),
+            exploration_id=self.EXP_ID1,
+            state_name='state_name',
+            original_author_id='author_id',
+            subject='NO SUGGESTION',
+            status=feedback_models.STATUS_CHOICES_IGNORED)
+        # Open thread without suggestion.
+        thread5 = feedback_models.FeedbackThreadModel(
+            id='.'.join([self.EXP_ID1, self.THREAD_ID5]),
+            exploration_id=self.EXP_ID1,
+            state_name='state_name',
+            original_author_id='author_id',
+            subject='NO SUGGESTION',
+            status=feedback_models.STATUS_CHOICES_OPEN)
+        self.THREADS = [thread1, thread2, thread3, thread4, thread5]
+        self.THREADS_WITH_SUGGESTIONS = [thread1, thread2, thread3]
+
+    def test_create_and_get_suggestion(self):
+        with self.swap(feedback_models.FeedbackThreadModel, 
+                       'generate_new_thread_id', self._generate_thread_id):
+            feedback_services.create_suggestion(
+                self.EXP_ID3, 'author_id', 3, 'state_name', {'old_content': {}})
+        suggestion = feedback_services.get_suggestion(
+            self.EXP_ID3,self.THREAD_ID1)
+        thread = feedback_models.FeedbackThreadModel.get(
+            '.'.join([self.EXP_ID3, self.THREAD_ID1]))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
+        self.assertEqual(suggestion.exploration_id, self.EXP_ID3)
+        self.assertEqual(suggestion.author_id, 'author_id')
+        self.assertEqual(suggestion.exploration_version, 3)
+        self.assertEqual(suggestion.state_name, 'state_name')
+        self.assertEqual(suggestion.state_content, {'old_content': {}})
+
+    def _get_thread_with_suggestions(self, exploration_id):
+        return self.THREADS_WITH_SUGGESTIONS
+
+    def test_get_open_threads_with_suggestions(self):
+        with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
+                       self._get_threads):
+            threads = feedback_services.get_open_threads(
+                self.EXP_ID1, True)
+        self.assertEqual(len(threads), 1)
+        self.assertEqual(
+            threads[0].id, '.'.join([self.EXP_ID1, self.THREAD_ID1]))
+
+    def test_get_open_threads_without_suggestions(self):
+        with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
+                       self._get_threads):
+            threads = feedback_services.get_open_threads(
+                self.EXP_ID1, False)
+        self.assertEqual(len(threads), 1)
+        self.assertEqual(
+            threads[0].id, '.'.join([self.EXP_ID1, self.THREAD_ID5]))
+
+    def test_get_closed_threads_with_suggestions(self):
+        with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
+                       self._get_threads):
+            threads = feedback_services.get_closed_threads(
+                self.EXP_ID1, True)
+        self.assertEqual(len(threads), 2)
+        self.assertEqual(
+            threads[0].id, '.'.join([self.EXP_ID1, self.THREAD_ID2]))
+        self.assertEqual(
+            threads[1].id, '.'.join([self.EXP_ID1, self.THREAD_ID3]))
+
+    def test_get_closed_threads_without_suggestions(self):
+        with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
+                       self._get_threads):
+            threads = feedback_services.get_closed_threads(
+                self.EXP_ID1, False)
+        self.assertEqual(len(threads), 1)
+        self.assertEqual(
+            threads[0].id, '.'.join([self.EXP_ID1, self.THREAD_ID4]))
+
+    def test_get_all_suggestion_threads(self):
+        with self.swap(
+            feedback_models.FeedbackThreadModel, 'get_threads_with_suggestions',
+            self._get_thread_with_suggestions):
+            threads = feedback_services.get_all_suggestion_threads(
+                self.EXP_ID1)
+        self.assertEqual(len(threads), 3)
+        self.assertEqual(
+            threads[0].id, '.'.join([self.EXP_ID1, self.THREAD_ID1]))
+        self.assertEqual(
+            threads[1].id, '.'.join([self.EXP_ID1, self.THREAD_ID2]))
+        self.assertEqual(
+            threads[2].id, '.'.join([self.EXP_ID1, self.THREAD_ID3]))

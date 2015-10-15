@@ -22,9 +22,13 @@ from core.domain import feedback_jobs
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.exploration])
 import feconf
 import utils
+
+DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
+DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
 def get_threadlist(exploration_id):
@@ -40,8 +44,9 @@ def get_threadlist(exploration_id):
     } for t in feedback_models.FeedbackThreadModel.get_threads(exploration_id)]
 
 
-def create_thread(
-        exploration_id, state_name, original_author_id, subject, text):
+def _create_models_for_thread_and_first_message(
+        exploration_id, state_name, original_author_id, subject, text, 
+        has_suggestion):
     """Creates a thread and the first message in it.
 
     Note that `state_name` may be None.
@@ -58,10 +63,20 @@ def create_thread(
     # made there as well
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
+    thread.has_suggestion = has_suggestion
     thread.put()
     create_message(
         thread.id, original_author_id,
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
+    return thread_id
+
+
+def create_thread(
+        exploration_id, state_name, original_author_id, subject, text):
+    """Public API for creating threads."""
+
+    _create_models_for_thread_and_first_message(
+        exploration_id, state_name, original_author_id, subject, text, False)
 
 
 def _get_message_dict(message_instance):
@@ -172,3 +187,59 @@ def get_thread_analytics(exploration_id):
     """
     return feedback_jobs.FeedbackAnalyticsAggregator.get_thread_analytics(
         exploration_id)
+
+
+def create_suggestion(exploration_id, author_id, exploration_version,
+                      state_name, suggestion_content):
+    """Creates a new SuggestionModel object and the corresponding
+    FeedbackThreadModel object."""
+
+    thread_id = _create_models_for_thread_and_first_message(
+        exploration_id, state_name, author_id, 
+        DEFAULT_SUGGESTION_THREAD_SUBJECT, 
+        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
+    feedback_models.SuggestionModel.create(
+        exploration_id, thread_id, author_id, exploration_version, state_name,
+        suggestion_content)
+
+
+def get_suggestion(exploration_id, thread_id):
+    return feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+        exploration_id, thread_id)
+
+
+def get_open_threads(exploration_id, has_suggestion):
+    """If has_suggestion is True, return a list of all open threads that have a
+    suggestion, otherwise return a list of all open threads that do not have a 
+    suggestion.""" 
+
+    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    open_threads = []
+    for thread in threads:
+        if (thread.has_suggestion == has_suggestion and
+                thread.status == feedback_models.STATUS_CHOICES_OPEN):
+            open_threads.append(thread)
+    return open_threads
+
+
+def get_closed_threads(exploration_id, has_suggestion):
+    """If has_suggestion is True, return a list of all closed threads that have
+    a suggestion, otherwise return a list of all closed threads that do not have
+    a suggestion."""
+
+    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    closed_threads = []
+    for thread in threads:
+        if (thread.has_suggestion == has_suggestion and 
+                thread.status != feedback_models.STATUS_CHOICES_OPEN):
+            closed_threads.append(thread)
+    return closed_threads
+
+
+def get_all_suggestion_threads(exploration_id):
+    """Return a list of all threads with suggestions."""
+
+    return [
+        thread for thread in 
+        feedback_models.FeedbackThreadModel.get_threads_with_suggestions(
+            exploration_id)] 

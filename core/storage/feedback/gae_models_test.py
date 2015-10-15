@@ -37,9 +37,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                                                {'old_content': {}})
         feedback_models.SuggestionModel.create('exp_id1', 'thread_id2',
                                                'author_id', 1, 'state_name',
-                                               {'old_content': {}},
-                                               feedback_models.
-                                                   SUGGESTION_STATUS_ACCEPTED)
+                                               {'old_content': {}})
         feedback_models.SuggestionModel.create('exp_id2', 'thread_id2',
                                                'author_id', 1, 'state_name',
                                                {'old_content': {}})
@@ -61,18 +59,14 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         feedback_models.SuggestionModel.create('exp_id3', 'thread_id2',
                                                'author_id', 1, 'state_name',
                                                {'old_content': {}})
-        suggestions = feedback_models.SuggestionModel.get_by_exp_id_and_status(
-            'exp_id3')
-        suggestion = suggestions[0]
+        suggestion = (feedback_models.SuggestionModel
+            .get_by_exploration_and_thread_id('exp_id3', 'thread_id2'))
 
-        self.assertEqual(len(suggestions), 1) 
         self.assertEqual(suggestion.exploration_id, 'exp_id3')
         self.assertEqual(suggestion.author_id, 'author_id')
         self.assertEqual(suggestion.exploration_version, 1)
         self.assertEqual(suggestion.state_name, 'state_name')
         self.assertEqual(suggestion.state_content, {'old_content': {}})
-        self.assertEqual(suggestion.status, 
-                         feedback_models.SUGGESTION_STATUS_NEW)
 
     def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
         with self.assertRaisesRegexp(Exception, 'There is already a feedback '
@@ -83,48 +77,24 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                                                    'state_name', 
                                                    {'old_content': {}})
 
-    def test_get_by_exp_id_and_status_status_set(self):
-        expected_suggestions = [feedback_models.SuggestionModel(
-            id='exp_id1.thread_id2',
-            author_id='author_id',
-            exploration_id='exp_id1',
-            exploration_version=1,
-            state_name='state_name',
-            state_content={'old_content': {}},
-            status='accepted')]
-        actual_suggestions = (
-            feedback_models.SuggestionModel.get_by_exp_id_and_status(
-                'exp_id1', status=feedback_models.SUGGESTION_STATUS_ACCEPTED))
-        
-        self.assertEqual(
-            self._get_suggestion_models_for_test(expected_suggestions),
-            self._get_suggestion_models_for_test(actual_suggestions))
-
-    def test_get_by_exp_id_and_status_status_not_set(self):
-        expected_suggestions = [feedback_models.SuggestionModel(
+    def test_get_by_exploration_and_thread_id_suggestion_present(self):
+        actual_suggestion = [(feedback_models.SuggestionModel
+            .get_by_exploration_and_thread_id('exp_id1', 'thread_id1'))]
+        expected_suggestion = [feedback_models.SuggestionModel(
             id='exp_id1.thread_id1',
             author_id='author_id',
             exploration_id='exp_id1',
             exploration_version=1,
             state_name='state_name',
-            state_content={'old_content': {}},
-            status='new'), feedback_models.SuggestionModel(
-            id='exp_id1.thread_id2',
-            author_id='author_id',
-            exploration_id='exp_id1',
-            exploration_version=1,
-            state_name='state_name',
-            state_content={'old_content': {}},
-            status='accepted')]
-        actual_suggestions = (feedback_models.SuggestionModel
-            .get_by_exp_id_and_status('exp_id1'))
+            state_content={'old_content': {}})]
 
+        self.assertEqual(len(self._get_suggestion_models_for_test(actual_suggestion)), 1)
         self.assertEqual(
-            self._get_suggestion_models_for_test(expected_suggestions),
-            self._get_suggestion_models_for_test(actual_suggestions))
+            self._get_suggestion_models_for_test(expected_suggestion),
+            self._get_suggestion_models_for_test(actual_suggestion))
 
-    def test_get_by_exp_id_and_status_empty_list(self):
-        actual_suggestions = (feedback_models.SuggestionModel
-            .get_by_exp_id_and_status('exp_id3'))
+    def test_get_by_exploration_and_thread_id_no_suggestion(self):
+        actual_suggestion = (feedback_models.SuggestionModel
+            .get_by_exploration_and_thread_id('invalid_exp_id', 'thread_id1'))
 
-        self.assertEqual([], actual_suggestions)
+        self.assertIsNone(actual_suggestion)
