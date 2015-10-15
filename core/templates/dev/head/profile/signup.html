@@ -36,7 +36,7 @@
     <md-card class="oppia-page-card">
       <h2 class="oppia-signup-page-title" translate>I18N_SIGNUP_COMPLETE_REGISTRATION</h2>
 
-      <form ng-submit="submitPrerequisitesForm(agreedToTerms, username, canReceiveEmailUpdates)">
+      <form ng-submit="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)">
         <div ng-show="!hasUsername" role="form" class="form-horizontal">
           <div class="form-group">
             <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate>I18N_SIGNUP_USERNAME</label>
@@ -77,27 +77,48 @@
               </div>
             </div>
           </div>
+          <hr>
+        </div>
+
+        <div class="oppia-long-text" ng-if="hasEverRegistered">
+          <p>
+            <em>Please note that we've recently updated our Terms of Use.</em>
+          </p>
+        </div>
+        <div class="oppia-long-text" ng-if="!hasEverRegistered">
+          <p style="font-size: 1em;" translate translate-value-sitename="{{SITE_NAME}}">
+            I18N_SIGNUP_SITE_DESCRIPTION
+          </p>
+        </div>
+
+        <div>
+          <strong>Creative Commons License</strong>
+          <br>
+          Please note that, by agreeing to our Terms of Use, you agree that
+          any content or contributions you make on our Site are and will
+          be licensed under CC-BY-SA v.4.0, with a waiver of the
+          attribution (BY) requirement. Please review our
+          <a href="/terms">Terms of Use</a> for more information about the
+          license grant. For more information about CC-BY-SA, click
+          <a ng-click="showLicenseExplanationModal()">here</a>.
         </div>
 
         <hr>
 
-        <p style="font-size: 1em;" translate translate-value-sitename="{{SITE_NAME}}">
-          I18N_SIGNUP_SITE_DESCRIPTION
-        </p>
-
-        <div class="checkbox">
+        <div class="checkbox oppia-long-text">
           <label>
-            <input type="checkbox" ng-model="agreedToTerms" class="protractor-test-agree-to-terms-checkbox">
-            <span translate translate-values="{sitename: '{{SITE_NAME}}', licenselink: '<a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/&quot; target=&quot;_blank&quot;>CC-BY-SA v4.0</a>'}">
-              I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION
+            <input type="checkbox" ng-model="hasAgreedToLatestTerms"
+                   class="protractor-test-agree-to-terms-checkbox">
+            <span>
+              By checking the box to the left of this text, you acknowledge, agree, and accept to be bound by the Oppia Terms of Use, found <a href="/terms" target="_blank">here</a>.
+              <!-- TODO(sll): Change this to I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION. -->
             </span>
-            <a ng-click="showLicenseExplanationModal()" translate>I18N_SIGNUP_WHY_LICENSE_PARENTHESIS</a>
           </label>
         </div>
 
         <br>
 
-        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !agreedToTerms || submissionInProcess" translate>
+        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !hasAgreedToLatestTerms || submissionInProcess" translate>
           I18N_SIGNUP_BUTTON_SUBMIT
         </button>
       </form>
@@ -109,7 +130,7 @@
       <h3 translate>I18N_SIGNUP_WHY_LICENSE</h3>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body oppia-long-text">
       <p style="line-height: 1.5;" translate translate-value-sitename="{{SITE_NAME}}">
         I18N_SIGNUP_SITE_OBJECTIVE
       </p>

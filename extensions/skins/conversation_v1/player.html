@@ -37,14 +37,14 @@
         side-by-side.
       -->
       <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
-               ng-class="{'conversation-skin-left-card': !activeCard.interactionIsInline && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': !activeCard.interactionIsInline && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+               ng-class="{'conversation-skin-left-card': isSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isSupplementalCardNonempty() && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
-          <span class="sr-only">Leave feedback on this card</span>
           <button class="conversation-skin-tutor-card-feedback-toggle"
                   popover-placement="<[getFeedbackPopoverPlacement()]>"
                   popover-template="popover/feedback" popover-trigger="click"
                   tooltip="Feedback" tooltip-placement="bottom"
                   state-name="<[activeCard.stateName]>">
+            <span class="sr-only">Leave feedback on this card</span>
             <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
           </button>
         </div>
@@ -112,9 +112,11 @@
                        angular-html-bind="activeCard.interactionHtml">
                   </div>
                 </div>
-                <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_INTERACTION)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
-                  (<[activeCard.interactionInstructions]>)
-                  <i class="zmdi zmdi-arrow-right"></i>
+                <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
+                  <button style="background: inherit; border: none;">
+                    (<[activeCard.interactionInstructions]>)
+                    <i class="zmdi zmdi-arrow-right"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -122,8 +124,8 @@
         </div>
       </md-card>
 
-      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': !activeCard.interactionIsInline && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_INTERACTION)}" ng-if="!activeCard.interactionIsInline && activeCard.interactionHtml">
-        <md-card ng-show="isPanelVisible(PANEL_INTERACTION)"
+      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': isSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}" ng-if="isSupplementalCardNonempty() && activeCard.interactionHtml">
+        <md-card ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
                  class="conversation-skin-supplemental-card">
           <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
           </div>
@@ -135,8 +137,9 @@
     </div>
   </div>
 
+  <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom" class="conversation-skin-bottom-gadget-panel"></oppia-gadget-panel>
+
   <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1" class="conversation-skin-final-ratings">
-    <oppia-gadget-panel panel-contents="gadgetPanelsContents.main" class="conversation-skin-main-gadget-panel"></oppia-gadget-panel>
 
     <div style="color: #eee; margin-bottom: 20px;">
       Learned something new? How would you rate this exploration?
@@ -186,7 +189,7 @@
         <div class="conversation-skin-feedback-dot-three"></div>
       </div>
       <div ng-if="feedback() !== null" angular-html-bind="feedback()"
-           class="protractor-test-conversation-feedback"></div>
+           class="protractor-test-conversation-feedback conversation-skin-oppia-feedback-item"></div>
     </div>
   </div>
 </script>
@@ -273,7 +276,8 @@
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
         ng-click="decrementCurrentDotIndex()">
-      <span class=" glyphicon glyphicon-arrow-left">
+      <span class="sr-only">Back</span>
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">
       </span>
     </li>
     <li ng-repeat="dot in dots track by $index"
@@ -294,7 +298,8 @@
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
         ng-click="incrementCurrentDotIndex()">
-      <span class=" glyphicon glyphicon-arrow-right">
+      <span class="sr-only">Forward</span>
+      <span class=" glyphicon glyphicon-arrow-right" aria-hidden="true">
       </span>
     </li>
   </ul>

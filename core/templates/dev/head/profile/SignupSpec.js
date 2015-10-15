@@ -32,7 +32,7 @@ describe('Signup controller', function() {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({
         username: 'myUsername',
-        has_agreed_to_terms: false
+        has_agreed_to_latest_terms: false
       });
       rootScope = $rootScope;
 
@@ -64,7 +64,7 @@ describe('Signup controller', function() {
     it('should get data correctly from the server', function() {
       $httpBackend.flush();
       expect(scope.username).toBe('myUsername');
-      expect(scope.agreedToTerms).toBe(false);
+      expect(scope.hasAgreedToLatestTerms).toBe(false);
     });
 
     it('should show a loading message until the data is retrieved', function() {

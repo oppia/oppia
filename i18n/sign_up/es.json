@@ -13,7 +13,7 @@
   "I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "El usuario seleccionado no está disponible.",
   "I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS": "Para poder editar las exploraciones de este sitio, debes aceptar los términos del mismo.",
   "I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Lo sentimos, este usuario ya está siendo utilizado.",
-  "I18N_SIGNUP_SITE_DESCRIPTION": "El sitio <[sitename]> es una base común de recursos para el aprendizaje, y todo el material en él puede ser libremente reutilizado y compartido.",
+  "I18N_SIGNUP_SITE_DESCRIPTION": "<[sitename]> es una base común de recursos para el aprendizaje, y todo el material en él puede ser libremente reutilizado y compartido.",
   "I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "Acepto que toda contribución que realice a <[sitename]> se encuentra bajo la licencia <[licenselink]>, con la renuncia del requerimiento de atribución. Además, acepto que todas las imágenes y archivos que suba al sitio estarán también bajo una licencia compatible con estos términos.",
   "I18N_SIGNUP_WHY_LICENSE_PARENTHESIS": "(¿Por qué CC-BY-SA?)",
   "I18N_SIGNUP_BUTTON_SUBMIT": "Enviar y comenzar a contribuir",

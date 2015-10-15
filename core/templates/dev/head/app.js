@@ -93,6 +93,16 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
+//Returns true if the user is on a mobile device.
+//See here: http://stackoverflow.com/a/14301832/5020618
+oppia.factory('deviceInfoService', ['$window', function($window) {
+  return {
+    isMobileDevice: function() {
+      return typeof $window.orientation !== 'undefined';
+    }
+  };
+}]);
+
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
@@ -253,7 +263,8 @@ oppia.factory('validatorsService', [
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
-oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+oppia.factory('focusService', ['$rootScope', '$timeout', 'deviceInfoService', 
+  function($rootScope, $timeout, deviceInfoService) {
   var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
@@ -266,6 +277,11 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
         $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
         _nextLabelToFocusOn = null;
       });
+    },
+    setFocusIfOnDesktop: function(newFocusLabel) {
+      if (!deviceInfoService.isMobileDevice()) {
+        this.setFocus(newFocusLabel);
+      }
     },
     // Generates a random string (to be used as a focus label).
     generateFocusLabel: function() {

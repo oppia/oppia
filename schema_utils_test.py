@@ -56,7 +56,7 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
-    'SanitizedUrl', 'Graph', 'ImageWithRegions']
+    'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not

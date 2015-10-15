@@ -153,14 +153,6 @@ oppia.controller('Gallery', [
     pic.src = '/images/splash/' + $scope.CAROUSEL_SLIDES[i].image_filename;
   }
 
-  $scope.getFormattedObjective = function(objective) {
-    objective = objective.trim();
-    if (objective.length > 120) {
-      objective = objective.substring(0, 120) + '...';
-    }
-    return objective.charAt(0).toUpperCase() + objective.slice(1);
-  };
-
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };

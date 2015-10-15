@@ -385,6 +385,146 @@ describe('Full exploration editor', function() {
   });
 });
 
+// NOTE: Gadgets are disabled by default. Enable when running gadget-specific
+// integration tests.
+xdescribe('Gadget editor', function() {
+  it('should allow adding a gadget that is listed in the editor side panel ' +
+       ' and visible in the player view.', function() {
+    users.createUser('gadgetuser1@example.com', 'gadgetuser1');
+    users.login('gadgetuser1@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test.'));
+    editor.setInteraction('EndExploration');
+
+    // Setup a parameter for the ScoreBar to follow.
+    editor.addParameterChange('coconuts', 3000);
+
+    editor.addGadget(
+      'ScoreBar', // type
+      'Coconut Surplus', // name
+      '9000', // maxValue
+      'coconuts' // parameter to follow
+    );
+
+    editor.expectGadgetListNameToMatch(
+      'ScoreBar', // type
+      'Score Bar', // short_description
+      'Coconut Surplus' // name
+    );
+
+    editor.saveChanges();
+    general.moveToPlayer();
+
+    player.expectGadgetToMatch(
+      'ScoreBar',
+      'Coconut Surplus',
+      '9000',
+      'coconuts'
+    );
+
+    users.logout();
+  });
+
+  it('should allow configuration of visibility settings, and properly ' +
+      'render as visible or invisible as expected per state.' , function() {
+    users.createUser('gadgetuser2@example.com', 'gadgetuser2');
+    users.login('gadgetuser2@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget visibility integration test card 1.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'second', true);
+
+    // Setup the second state
+    editor.moveToState('second');
+    editor.setContent(forms.toRichText('gadget visibility integration test card 2.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'final card', true);
+
+    // Setup a terminating state
+    editor.moveToState('final card');
+    editor.setContent(forms.toRichText('gadget visibility final card'));
+    editor.setInteraction('EndExploration');
+    editor.moveToState('first');
+
+    // Add a parameter for the ScoreBar to follow.
+    editor.addParameterChange('coconuts', 3000);
+
+    editor.addGadget(
+      'ScoreBar', // type
+      'CoconutSurplus', // name
+      '9000', // maxValue
+      'coconuts' // parameter to follow
+    );
+
+    // Edit visibility
+    editor.openGadgetEditorModal('CoconutSurplus');
+    editor.enableGadgetVisibilityForState('final card');
+    editor.saveAndCloseGadgetEditorModal();
+
+    editor.saveChanges();
+    general.moveToPlayer();
+
+    player.expectVisibleGadget('ScoreBar');
+    player.submitAnswer('Continue', null);
+    general.waitForSystem(2000);
+
+    player.expectInvisibleGadget('ScoreBar');
+    player.submitAnswer('Continue', null);
+    general.waitForSystem(2000);
+
+    player.expectVisibleGadget('ScoreBar');
+    users.logout();
+
+  });
+
+  // This test inspects within the editor view since gadget names only exist
+  // to help authors differentiate between gadgets, and are not visible in the
+  // player view.
+  it('should allow renaming and deleting gadgets', function() {
+    users.createUser('gadgetuser3@example.com', 'gadgetuser3');
+    users.login('gadgetuser3@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test card 1.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'second', true);
+
+    // Add a parameter for the ScoreBar to follow.
+    editor.addParameterChange('coconuts', 3000);
+
+    editor.addGadget(
+      'ScoreBar', // type
+      'CoconutSurplus', // name
+      '9000', // maxValue
+      'coconuts' // parameter to follow
+    );
+
+    editor.renameGadget('CoconutSurplus', 'SuperCoconuts');
+
+    editor.expectGadgetListNameToMatch(
+      'ScoreBar', // type
+      'Score Bar', // short_description
+      'SuperCoconuts' // name
+    );
+
+    editor.deleteGadget('SuperCoconuts');
+    editor.expectGadgetWithNameDoesNotExist('SuperCoconuts');
+
+  });
+
+});
+
 describe('rich-text components', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');

@@ -13,7 +13,7 @@
   "I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "This user name is not available.",
   "I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS": "In order to edit explorations on this site, you will need to agree to the site terms.",
   "I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Sorry, this username is already taken.",
-  "I18N_SIGNUP_SITE_DESCRIPTION": "The <[sitename]> site is an open commons of learning resources, and all material on it is freely reusable and shareable.",
+  "I18N_SIGNUP_SITE_DESCRIPTION": "<[sitename]> is an open commons of learning resources. All material on it is freely reusable and shareable.",
   "I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "I agree that any contributions I make to <[sitename]> are licensed under <[licenselink]>, with a waiver of the attribution (BY) requirement. I further agree that any images and files I upload to the site will also have licensing compatible with these terms.",
   "I18N_SIGNUP_WHY_LICENSE_PARENTHESIS": "(Why CC-BY-SA?)",
   "I18N_SIGNUP_BUTTON_SUBMIT": "Submit and start contributing",
