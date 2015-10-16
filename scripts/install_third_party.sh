@@ -114,6 +114,5 @@ fi
 echo Checking whether node-jscs dependencies are installed
 if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
   echo installing node-jscs
-  cd $COMMON_DIR
   $NPM_INSTALL jscs@2.3.0
 fi

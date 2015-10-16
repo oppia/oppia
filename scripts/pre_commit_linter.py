@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Pre-commit script for oppia
-This script checks Javascript coding style using jscs node module
-It returns and fix errors
+"""Pre-commit script for Oppia.
+
+This script uses the JSCS node module to lint JavaScript code
+It returns errors
 
 IMPORTANT NOTES:
 
@@ -30,123 +31,123 @@ IMPORTANT NOTES:
 2.  This script should be run from the oppia root folder:
 
         python scripts/pre_commit_linter.py
+
  Note that the root folder MUST be named 'oppia'.
  """
 
 __author__ = "Barnabas Makonda(barnabasmakonda@gmail.com)"
 
+import argparse
 import os
 import subprocess
 import sys
+import time
 
 
-def _get_list_of_current_changed():
-    """This function combines all changed files staged
-    and not staged
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--fix',
+    help='optional; if specified, autofix errors and display which can not be fixed')
+
+
+def _get_changed_filenames():
+    """Returns a list of modified files (both staged and unstaged)
     Returns:
         a list of files about to be commited. """
-    changed_and_staged_files = subprocess.check_output(['git', 'diff', '--name-only'])
-    changed_and_staged_files += subprocess.check_output(['git', 'diff', '--cached',
-                                    '--name-only', '--diff-filter=ACM'])
-    files = []
-    if changed_and_staged_files:
-        for changed_and_staged_file in changed_and_staged_files.splitlines():
-            files.append(changed_and_staged_file)
-    return files
+    unstaged_files = subprocess.check_output([
+        'git', 'diff', '--name-only']).splitlines()
+    staged_files  = subprocess.check_output([
+        'git', 'diff', '--cached', '--name-only', 
+        '--diff-filter=ACM']).splitlines()
+    return unstaged_files + staged_files
 
 
 def _is_javascript_file(filename):
-    """Check if the input file looks like a javascript
+    """Check if the input filename represents a JavaScript file.
+
     Args:
-        filename(String): Name of the files to be checked
-            if is javascript or not
+    - filename: str. The name of the file to be checked.
+
     Returns:
-        bool: True if the filename ends in ".js" and false otherwise.
+      bool: True if the filename ends in ".js", and false otherwise.
     """
-    if filename.endswith('.js'):
-        return True
-    else:
-        return False
+    return filename.endswith('.js')
 
 
-def _check_repo(path_to_jscs):
-    """This function checks all changed files in the repo and
-    choose only javascript files(those which ends with .js)
-    to be linted and the output error is displayed in console
+def _lint_js_files(jscs_path):
+    """Prints a list of lint errors in changed JavaScript files.
+
     Args:
-        path_to_jscs(String): path to the jscs bin direcory
-        auto_fix(Optional[bool]): if true node-jscs auto fix all
-           errors that it can and return remaining errors.
-    Raises:
-        valueError:if file was staged and then deleted
-    Returns:
-        errors: A list of errors obtained
+    - jscs_path: path to the JSCS binary
     """
-    # List of checked files and their results
+    start_time = time.time()
+    parsed_args = _PARSER.parse_args()
+
+    # List of checked files
     javascript_files = []
     # List of errors
     errors = []
 
-
+    changed_filenames = _get_changed_filenames()
     # Find all javascript files
-    for filename in _get_list_of_current_changed():
-        try:
-            if _is_javascript_file(filename):
-                javascript_files.append(str(filename))
-        except IOError:
-            print 'File not found (probably deleted): {}\t\tSKIPPED'.format(
-                filename)
+    for filename in changed_filenames:
+        changed_js_filenames = filter(
+                    _is_javascript_file, changed_filenames)
 
     # Do nothing if  no Javascript files changed
-    if len(javascript_files) == 0:
+    if len(changed_js_filenames) == 0:
         print "No Javascript file to check"
         sys.exit(0)
 
-    # lint javascript files
-    i = 1
-    for javascript_file in javascript_files:
+    num_js_files = len(changed_js_filenames)
 
-        # Start  linting
-        print "Running jscs linting on {} (file {}/{})..\t".format(
-            javascript_file, i, len(javascript_files))
-        print ""
+    for ind, filename in enumerate(changed_js_filenames):
+        print 'Linting %s (file %d/%d)...\t' % (filename, ind + 1, num_js_files)
         try:
-            proc = subprocess.Popen(
-                [path_to_jscs, javascript_file],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            out, _ = proc.communicate()
-            errors.append(out)
-            print out
-        except OSError:
-            print "\nAn error occurred. Is node-jscs installed?"
+            if parsed_args.fix:
+                proc = subprocess.Popen(
+                    [jscs_path, '-x', filename],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
+                linter_stdout, linter_stderr = proc.communicate()
+                errors.append(linter_stdout)
+            else:
+                proc = subprocess.Popen(
+                    [jscs_path, filename],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
+                linter_stdout, linter_stderr = proc.communicate()
+                errors.append(linter_stdout)
+            print linter_stdout
+        except OSError as e:
+            print e
             sys.exit(1)
 
-        # Bump parsed files
-        i += 1
+    # This removes empty string added incase no errors
+    errors = filter(None, errors)
     if len(errors) > 0:
-        print "\tWe are striving to make Oppia codebase clean"
-        print "\tPlease fix above errors before commiting your changes"
-        print "\tThanks."
+        print 'FAILED %s JavaScript files: %s failures' % (num_js_files, len(errors))
     else:
-        print "\tYour code are clean you can now commit"
-        print "\tThanks"
+        print 'SUCCESS %s JavaScript files linted (%.1f secs)' % (num_js_files,
+                time.time() - start_time)
+
 
 def _pre_commit_linter():
     """This function is used to check if this script is ran from
     root directory, node-jscs dependencies are installed
-    and pass path to node-jscs bin folder
+    and pass JSCS binary path
     """
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    path_to_jscs = os.path.join(parent_dir,'node_modules','jscs','bin','jscs')
+    jscs_path = os.path.join(parent_dir, 'node_modules',
+            'jscs', 'bin', 'jscs')
     if os.getcwd().endswith('oppia'):
-        if os.path.exists(path_to_jscs):
-            _check_repo(path_to_jscs)
+        if os.path.exists(jscs_path):
+            _lint_js_files(jscs_path)
         else:
-            print "Please run  start.sh first"
-            print "to install node-jscs and its dependencies"
+            print 'Please run  start.sh first'
+            print 'to install node-jscs and its dependencies'
     else:
-        print "Please run me from Oppia root directory"
+        print 'Please run me from Oppia root directory'
 
 
 if __name__ == '__main__':

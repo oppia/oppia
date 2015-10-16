@@ -1,3 +1,6 @@
+// For information on what these options mean, please refer to:
+//   http://jscs.info/rules
+
 {
     "preset": "google",
     "fileExtensions": [".js"],

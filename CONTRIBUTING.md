@@ -50,9 +50,11 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made. 
   * You can refer to relevant issues in the commit message by writing, e.g., "#105".
   * For consistency, please conform to the [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides. In addition, code should be formatted consistently with other code around it. Where these two guidelines differ, prefer the latter.
-  * To simplify javascript code formating:
-    * If you are using [Sublime Text]() as text Editor of your choice install [SublimeLinter-jscs](https://packagecontrol.io/packages/SublimeLinter-jscs) by following instruction [here](https://github.com/SublimeLinter/SublimeLinter-jscs).There is ```.jscsrc``` in the root directory that contains customized rules do not delete the file or change any rule 
-    * Before any commit remember to run ```python scripts/pre_commit_linter.py``` and ensure all style check pass. This will also be useful if you do not use Sublime text editor or by any means you can not install ```SublimeLinter-jscs```.
+  * In general, code should be formatted consistently with other code around it; we use Google's Python and JavaScript style guides as a reference. Prior to each commit, please run
+    ```
+      python scripts/pre_commit_linter.py
+    ```
+  which checks the styling of your JavaScript code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions.](https://github.com/SublimeLinter/SublimeLinter-jscs).
   * Please ensure that the code you write is well-tested.
   * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
 
