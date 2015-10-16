@@ -18,9 +18,11 @@
 
 __author__ = 'Zhan Xiong Chin'
 
-from extensions.rules import graph
-import test_utils
 import random
+
+from core.tests import test_utils
+from extensions.rules import graph
+
 
 def _emptyGraph():
     return {

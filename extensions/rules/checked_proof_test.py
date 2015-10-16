@@ -18,8 +18,8 @@
 
 __author__ = 'Jacob Davis'
 
+from core.tests import test_utils
 from extensions.rules import checked_proof
-import test_utils
 
 
 class CheckedProofRuleUnitTests(test_utils.GenericTestBase):

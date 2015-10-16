@@ -19,29 +19,29 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// TODO(sll): Move all hardcoded strings to the top of the file.
-
 // The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
 oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
+oppia.constant('GADGET_SPECS', window.GLOBALS ? GLOBALS.GADGET_SPECS : {});
+oppia.constant('PANEL_SPECS', window.GLOBALS ? GLOBALS.PANEL_SPECS: {});
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'explorationData', 'editorContextService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService',
-  'explorationLanguageCodeService', 'explorationRightsService',
-  'explorationInitStateNameService', 'explorationTagsService', 'editabilityService',
-  'explorationStatesService', 'routerService',
-  'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'explorationCategoryService', 'explorationGadgetsService',
+  'explorationObjectiveService', 'explorationLanguageCodeService',
+  'explorationRightsService', 'explorationInitStateNameService',
+  'explorationTagsService', 'editabilityService', 'explorationStatesService',
+  'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
-    explorationCategoryService, explorationObjectiveService,
-    explorationLanguageCodeService, explorationRightsService,
-    explorationInitStateNameService, explorationTagsService, editabilityService,
-    explorationStatesService, routerService,
-    graphDataService,  stateEditorTutorialFirstTimeService,
+    explorationCategoryService, explorationGadgetsService,
+    explorationObjectiveService, explorationLanguageCodeService,
+    explorationRightsService, explorationInitStateNameService,
+    explorationTagsService, editabilityService, explorationStatesService,
+    routerService, graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
     explorationWarningsService, $templateCache, explorationContextService) {
 
@@ -86,6 +86,7 @@ oppia.controller('ExplorationEditor', [
 
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
+      explorationGadgetsService.init(data.skin_customizations);
       explorationObjectiveService.init(data.objective);
       explorationLanguageCodeService.init(data.language_code);
       explorationInitStateNameService.init(data.init_state_name);
@@ -95,14 +96,13 @@ oppia.controller('ExplorationEditor', [
 
       $scope.explorationTitleService = explorationTitleService;
       $scope.explorationCategoryService = explorationCategoryService;
+      $scope.explorationGadgetsService = explorationGadgetsService;
       $scope.explorationObjectiveService = explorationObjectiveService;
       $scope.explorationRightsService = explorationRightsService;
       $scope.explorationInitStateNameService = explorationInitStateNameService;
 
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
-      $scope.defaultSkinId = data.default_skin_id;
-      $scope.allSkinIds = data.all_skin_ids;
 
       $scope.currentUser = data.user;
       $scope.currentVersion = data.version;
@@ -186,10 +186,10 @@ oppia.controller('ExplorationEditor', [
     selector: _ID_TUTORIAL_STATE_CONTENT,
     heading: 'Content',
     text: (
-      'An Oppia exploration is a one-on-one conversation that is divided ' +
-      'into several \'cards\'. A card consists of Oppia asking a question, and the ' +
-      'learner responding.<br><br>' +
-      'This is where you can tell Oppia what to say to the learner at the beginning.'),
+      'An Oppia exploration is a conversation between a tutor and a ' +
+      'learner that is divided into several \'cards\'.<br><br>' +
+      'The first part of a card is the <b>content</b>. Here, you can set ' +
+      'the scene and ask the learner a question.'),
     placement: 'right'
   }, {
     type: 'function',
@@ -453,6 +453,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     }
   };
 
+  // This flag is used to ensure only one save exploration modal can be open at
+  // any one time.
+  var _modalIsOpen = false;
+
   $scope.saveChanges = function() {
     routerService.savePendingChanges();
 
@@ -473,14 +477,22 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       var changedStates = data.summary.changed_states;
       var addedStates = data.summary.added_states;
       var deletedStates = data.summary.deleted_states;
+      var gadgetPropertyChanges = data.summary.gadget_property_changes;
+      var changedGadgets = data.summary.changed_gadgets;
+      var addedGadgets = data.summary.added_gadgets;
+      var deletedGadgets = data.summary.deleted_gadgets;
       var warningMessage = data.warning_message;
 
       var changesExist = (
         !$.isEmptyObject(explorationPropertyChanges) ||
         !$.isEmptyObject(statePropertyChanges) ||
+        !$.isEmptyObject(gadgetPropertyChanges) ||
         changedStates.length > 0 ||
+        changedGadgets.length > 0 ||
         addedStates.length > 0 ||
-        deletedStates.length > 0);
+        addedGadgets.length > 0 ||
+        deletedStates.length > 0 ||
+        deletedGadgets.length > 0);
 
       if (!changesExist) {
         warningsData.addWarning('Your changes cancel each other out, ' +
@@ -496,6 +508,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       }
 
       warningsData.clear();
+
+      // If the modal is open, do not open another one.
+      if (_modalIsOpen) {
+        return;
+      }
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
@@ -516,6 +533,18 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           deletedStates: function() {
             return deletedStates;
           },
+          gadgetPropertyChanges: function() {
+            return gadgetPropertyChanges;
+          },
+          changedGadgets: function() {
+            return changedGadgets;
+          },
+          addedGadgets: function() {
+            return addedGadgets;
+          },
+          deletedGadgets: function() {
+            return deletedGadgets;
+          },
           isExplorationPrivate: function() {
             return explorationRightsService.isPrivate();
           }
@@ -523,15 +552,21 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         controller: [
           '$scope', '$modalInstance', 'explorationPropertyChanges',
           'statePropertyChanges', 'changedStates', 'addedStates',
-          'deletedStates', 'isExplorationPrivate',
+          'deletedStates', 'gadgetPropertyChanges', 'changedGadgets',
+          'addedGadgets', 'deletedGadgets', 'isExplorationPrivate',
           function($scope, $modalInstance, explorationPropertyChanges,
                    statePropertyChanges, changedStates, addedStates,
-                   deletedStates, isExplorationPrivate) {
+                   deletedStates, gadgetPropertyChanges, changedGadgets,
+                   addedGadgets, deletedGadgets, isExplorationPrivate) {
             $scope.explorationPropertyChanges = explorationPropertyChanges;
             $scope.statePropertyChanges = statePropertyChanges;
             $scope.changedStates = changedStates;
             $scope.addedStates = addedStates;
             $scope.deletedStates = deletedStates;
+            $scope.gadgetPropertyChanges = gadgetPropertyChanges;
+            $scope.changedGadgets = changedGadgets;
+            $scope.addedGadgets = addedGadgets;
+            $scope.deletedGadgets = deletedGadgets;
             $scope.isExplorationPrivate = isExplorationPrivate;
 
             // For reasons of backwards compatibility, the following keys
@@ -546,7 +581,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'tags': 'Tags',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
-              'default_skin_id': 'Default skin',
               'init_state_name': 'First card'
             };
 
@@ -556,7 +590,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'title': true,
               'category': true,
               'objective': true,
-              'default_skin_id': true,
               'init_state_name': true
             };
 
@@ -573,6 +606,14 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               'confirmed_unclassified_answers': 'Confirmed unclassified answers'
             }
 
+            // For reasons of backwards compatibility, the following keys
+            // should not be changed.
+            $scope.GADGET_BACKEND_NAMES_TO_HUMAN_NAMES = {
+              'name': 'Gadget name',
+              'gadget_visibility': 'Gadget visibility between states',
+              'gadget_customization_args': 'Gadget customizations'
+            }
+
             // An ordered list of state properties that determines the order in which
             // to show them in the save confirmation modal.
             // For reasons of backwards compatibility, the following keys
@@ -587,6 +628,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.explorationPropertyChanges);
             $scope.stateChangesExist = !$.isEmptyObject(
               $scope.statePropertyChanges);
+            $scope.gadgetChangesExist = !$.isEmptyObject(
+              $scope.gadgetPropertyChanges);
 
             $scope._getLongFormPropertyChange = function(humanReadableName, changeInfo) {
               return (
@@ -614,8 +657,23 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               }
             };
 
+            $scope.formatGadgetPropertyChange = function(
+                propertyName, changeInfo) {
+              if (propertyName == 'name') {
+                return $scope._getLongFormPropertyChange(
+                  $scope.GADGET_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
+                  changeInfo);
+              } else {
+                return $scope.GADGET_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
+              }
+            };
+
             $scope.formatStateList = function(stateList) {
               return stateList.join('; ');
+            };
+
+            $scope.formatGadgetList = function(gadgetList) {
+              return gadgetList.join('; ');
             };
 
             $scope.save = function(commitMessage) {
@@ -629,6 +687,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         ]
       });
 
+      // Modal is Opened
+      _modalIsOpen = true;
+
       modalInstance.opened.then(function(data) {
         // The $timeout seems to be needed in order to give the modal time to
         // render.
@@ -639,6 +700,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
       modalInstance.result.then(function(commitMessage) {
         $scope.isSaveInProgress = true;
+        _modalIsOpen = false;
 
         var changeList = changeListService.getChangeList();
         explorationData.save(changeList, commitMessage, function() {
@@ -650,6 +712,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         }, function() {
           $scope.isSaveInProgress = false;
         });
+      }, function() {
+        _modalIsOpen = false;
       });
     });
   };

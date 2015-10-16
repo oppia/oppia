@@ -79,6 +79,8 @@ class BaseInteraction(object):
     # Whether this interaction should be considered terminal, i.e. it ends
     # the exploration. Defaults to False.
     is_terminal = False
+    # Whether the interaction has only one possible answer.
+    is_linear = False
     # Whether this interaction supports training and fuzzy classification.
     is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
@@ -86,11 +88,20 @@ class BaseInteraction(object):
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
     _dependency_ids = []
     # The type of answer (as a string) accepted by this interaction, e.g.
-    # 'CodeEvaluation'.
+    # 'CodeEvaluation'. This should be None for linear and terminal
+    # interactions.
     answer_type = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
+    # Instructions for using this interaction, to be shown to the learner. Only
+    # relevant for supplemental interactions.
+    instructions = None
+    # Whether the answer is long, and would benefit from being summarized.
+    needs_summary = False
+    # The heading for the 'default outcome' section in the editor. This should
+    # be None unless the interaction is linear and non-terminal.
+    default_outcome_heading = None
 
     @property
     def id(self):
@@ -112,12 +123,11 @@ class BaseInteraction(object):
 
     def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""
-        if self.answer_type:
+        if self.answer_type is None:
+            return None
+        else:
             return obj_services.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
-
-        raise Exception(
-            'No answer type initialized for interaction %s' % self.name)
 
     @property
     def _stats_log_template(self):
@@ -165,12 +175,16 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
+            'is_linear': self.is_linear,
+            'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
+            'instructions': self.instructions,
+            'default_outcome_heading': self.default_outcome_heading,
         }
 
         # Add information about rule descriptions corresponding to the answer

@@ -65,9 +65,14 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 class EditorTest(BaseEditorControllerTest):
 
+    def setUp(self):
+        super(EditorTest, self).setUp()
+        exp_services.load_demo('0')
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, '0')
+
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
-        exp_services.load_demo('0')
 
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
@@ -92,7 +97,7 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_new_state_template(self):
         """Test the validity of the NEW_STATE_TEMPLATE."""
-        exp_services.load_demo('0')
+
         exploration = exp_services.get_exploration_by_id('0')
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
@@ -102,7 +107,6 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""
-        exp_services.load_demo('0')
         CURRENT_VERSION = 1
 
         self.login(self.EDITOR_EMAIL)
@@ -173,8 +177,6 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
     def test_resolved_answers_handler(self):
-        exp_services.load_demo('0')
-
         # In the reader perspective, submit the first multiple-choice answer,
         # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
         # TODO(sll): Use the ExplorationPlayer in reader_test for this.
@@ -247,10 +249,12 @@ class EditorTest(BaseEditorControllerTest):
                 return [_create_answer(value) for value in arg]
 
             # Load the fuzzy rules demo exploration.
-            exp_services.load_demo('16')
+            exp_services.load_demo('15')
+            rights_manager.release_ownership_of_exploration(
+                feconf.SYSTEM_COMMITTER_ID, '15')
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
             self.assertEqual(
                 exploration_dict['exploration']['title'],
                 'Demonstrating fuzzy rules')
@@ -265,27 +269,27 @@ class EditorTest(BaseEditorControllerTest):
                     'interaction']['id'], 'TextInput')
 
             # Input happy since there is an explicit rule checking for that.
-            result_dict = self.submit_answer('16', state_name, 'happy')
+            result_dict = self.submit_answer('15', state_name, 'happy')
 
             # Input text not at all similar to happy (default outcome).
-            self.submit_answer('16', state_name, 'sad')
+            self.submit_answer('15', state_name, 'sad')
 
             # Input cheerful: this is current training data and falls under the
             # fuzzy rule.
-            self.submit_answer('16', state_name, 'cheerful')
+            self.submit_answer('15', state_name, 'cheerful')
 
             # Input joyful: this is not training data but will be classified
             # under the fuzzy rule.
-            self.submit_answer('16', state_name, 'joyful')
+            self.submit_answer('15', state_name, 'joyful')
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/create/16')
+            response = self.testapp.get('/create/15')
             csrf_token = self.get_csrf_token_from_response(response)
-            url = str('/createhandler/training_data/16/%s' % state_name)
+            url = str('/createhandler/training_data/15/%s' % state_name)
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # Only two of the four submitted answers should be unhandled.
             response_dict = self.get_json(url)
@@ -295,7 +299,7 @@ class EditorTest(BaseEditorControllerTest):
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -312,7 +316,7 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('joyful'))
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # If one of the values is added to the training data of a fuzzy
             # rule, then it should not be returned as an unhandled answer.
@@ -323,7 +327,7 @@ class EditorTest(BaseEditorControllerTest):
                 rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
             rule_spec['inputs']['training_data'].append('joyful')
 
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -346,11 +350,11 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('sad'))
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # If both are classified, then nothing should be returned
             # unhandled.
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -365,7 +369,7 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(response_dict['unhandled_answers'], [])
 
             exploration_dict = self.get_json(
-                '%s/16' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
 
             # If one of the existing training data elements in the fuzzy rule
             # is removed (5 in this case), but it is not backed up by an
@@ -374,7 +378,7 @@ class EditorTest(BaseEditorControllerTest):
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             del rule_spec['inputs']['training_data'][1]
-            self.put_json('/createhandler/data/16', {
+            self.put_json('/createhandler/data/15', {
                     'change_list': [{
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': state_name,
@@ -476,7 +480,6 @@ param_changes: []
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):
-
         self.login(self.EDITOR_EMAIL)
         self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -592,7 +595,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             UNPUBLISHED_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
@@ -621,7 +624,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             PUBLISHED_EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, PUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
@@ -661,6 +664,8 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         self.EXP_ID = '0'
 
         exp_services.load_demo(self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
 
@@ -773,8 +778,11 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
     def test_user_banning(self):
         """Test that banned users are banned."""
+
         EXP_ID = '0'
         exp_services.load_demo(EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            feconf.SYSTEM_COMMITTER_ID, EXP_ID)
 
         # Sign-up new editors Joe and Sandra.
         self.signup('joe@example.com', 'joe')

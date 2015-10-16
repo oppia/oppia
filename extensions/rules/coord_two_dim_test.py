@@ -20,8 +20,8 @@ __author__ = 'Sean Lip'
 
 import math
 
+from core.tests import test_utils
 from extensions.rules import coord_two_dim
-import test_utils
 
 QUARTER_CIRCUMFERENCE = 0.5 * math.pi * coord_two_dim.RADIUS_OF_EARTH
 HALF_CIRCUMFERENCE = 2 * QUARTER_CIRCUMFERENCE

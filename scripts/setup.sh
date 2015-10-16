@@ -34,16 +34,16 @@ then
   return 1
 fi
 
-# TODO: Consider using getopts command.
+# TODO(sll): Consider using getopts command.
 declare -a remaining_params
 for arg in "$@"; do
-  if [ "$arg" == "--nojsrepl" ]; then
-    NO_JSREPL=true
+  if [ "$arg" == "--nojsrepl" ] || [ "$arg" == "--noskulpt" ]; then
+    NO_SKULPT=true
   else
     remaining_params+=($arg)
   fi
 done
-export NO_JSREPL
+export NO_SKULPT
 export remaining_params
 
 EXPECTED_PWD='oppia'
@@ -53,7 +53,11 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
 fi
 
 export OPPIA_DIR=`pwd`
-export COMMON_DIR=$OPPIA_DIR/..
+# Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
+# is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
+# may use it in a situation where relative paths won't work as expected (such
+# as $PYTHONPATH).
+export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
 export NODE_MODULE_DIR=$COMMON_DIR/node_modules
@@ -84,7 +88,9 @@ fi
 export NPM_INSTALL="$NPM_CMD install"
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ -f "/usr/bin/google-chrome" ]; then
+if [[ $TRAVIS == 'true' ]]; then
+  export CHROME_BIN="chromium-browser"
+elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then

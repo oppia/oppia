@@ -131,14 +131,14 @@ oppia.factory('answerClassificationService', [
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
+    '$http', '$rootScope', '$modal', '$filter', '$q', '$log', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'answerClassificationService', 'stateTransitionService',
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
     function(
-      $http, $rootScope, $modal, $filter, $q, messengerService,
+      $http, $rootScope, $modal, $filter, $q, $log, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       answerClassificationService, stateTransitionService,
       extensionTagAssemblerService, INTERACTION_SPECS,
@@ -146,13 +146,18 @@ oppia.factory('oppiaPlayerService', [
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService) {
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-  var _introCardImageUrl = null;
+  var _infoCardImageUrl = null;
+  var _explorationObjective = null;
+  var _explorationTags = [];
+  var _explorationContributorUsernames = [];
+  var _explorationLastUpdatedMsec = null;
+  var _viewersCount = null;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
     '/explorehandler/init/' + _explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
-  var _isLoggedIn = false;
+  var _isLoggedIn = GLOBALS.userIsLoggedIn;
   var _exploration = null;
 
   learnerParamsService.init({});
@@ -162,17 +167,23 @@ oppia.factory('oppiaPlayerService', [
   var _viewerHasEditingRights = false;
 
   var _updateStatus = function(newParams, newStateName) {
-    // TODO(sll): Do this more incrementally.
     learnerParamsService.init(newParams);
+
     _currentStateName = newStateName;
     stateHistory.push(_currentStateName);
   };
 
-  var stopwatch = stopwatchProviderService.getInstance();
+  var _stopwatch = stopwatchProviderService.getInstance();
 
+  // When this is not null, it is an object with keys 'newParams' and
+  // 'newStateName'.
+  var _cachedUpdates = null;
+
+  // If delayParamUpdates is true, the parameters will need to be updated
+  // manually by calling applyCachedParamUpdates().
   var _onStateTransitionProcessed = function(
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
-      successCallback) {
+      successCallback, delayParamUpdates) {
     var oldStateName = _currentStateName;
     var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
 
@@ -185,58 +196,66 @@ oppia.factory('oppiaPlayerService', [
       // Record the state hit to the event handler.
       var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
 
-      if (newStateName) {
-        $http.post(stateHitEventHandlerUrl, {
-          new_state_name: newStateName,
-          exploration_version: version,
-          session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-          old_params: learnerParamsService.getAllParams()
-        });
-      }
+      $http.post(stateHitEventHandlerUrl, {
+        new_state_name: newStateName,
+        exploration_version: version,
+        session_id: sessionId,
+        client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
+        old_params: learnerParamsService.getAllParams()
+      });
+
+      // Broadcast information about the state transition to listeners.
+      messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+        explorationVersion: version,
+        oldStateName: _currentStateName,
+        jsonAnswer: JSON.stringify(answer),
+        newStateName: newStateName,
+        paramValues: learnerParamsService.getAllParams()
+      });
 
       // If the new state contains a terminal interaction, record a completion
-      // event.
-      if (!newStateName ||
-          INTERACTION_SPECS[
+      // event, and inform the parent page that a completion has happened.
+      if (INTERACTION_SPECS[
             _exploration.states[newStateName].interaction.id].is_terminal) {
+        messengerService.sendMessage(messengerService.EXPLORATION_COMPLETED, {
+          explorationVersion: version,
+          paramValues: learnerParamsService.getAllParams()
+        });
+
         var completeExplorationUrl = (
           '/explorehandler/exploration_complete_event/' + _explorationId);
         $http.post(completeExplorationUrl, {
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
           params: learnerParamsService.getAllParams(),
           session_id: sessionId,
           state_name: newStateName,
           version: version
         });
       }
-
-      // Broadcast the state hit to the parent page.
-      messengerService.sendMessage(messengerService.STATE_TRANSITION, {
-        oldStateName: _currentStateName,
-        jsonAnswer: JSON.stringify(answer),
-        newStateName: newStateName ? newStateName : 'END'
-      });
     }
 
-    _updateStatus(newParams, newStateName);
-    stopwatch.resetStopwatch();
+    if (!delayParamUpdates) {
+      _updateStatus(newParams, newStateName);
+    } else {
+      _cachedUpdates = {
+        newParams: angular.copy(newParams),
+        newStateName: angular.copy(newStateName)
+      };
+    }
+
+    _stopwatch.resetStopwatch();
 
     var newStateData = _exploration.states[newStateName];
-    var newInteractionId = newStateData.interaction.id;
-
     $rootScope.$broadcast('playerStateChange');
-
     successCallback(
-      newStateName, refreshInteraction, newFeedbackHtml,
-      newQuestionHtml, newInteractionId);
+      newStateName, refreshInteraction, newFeedbackHtml, newQuestionHtml);
   };
 
   var _registerMaybeLeaveEvent = function(stateName) {
     var maybeLeaveExplorationUrl = (
       '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
     $http.post(maybeLeaveExplorationUrl, {
-      client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+      client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
       params: learnerParamsService.getAllParams(),
       session_id: sessionId,
       state_name: stateName,
@@ -245,10 +264,10 @@ oppia.factory('oppiaPlayerService', [
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
-    stopwatch.resetStopwatch();
+    _stopwatch.resetStopwatch();
     _updateStatus(newParams, initStateName);
     $rootScope.$broadcast('playerStateChange');
-    callback(initStateName, initHtml, _viewerHasEditingRights, _introCardImageUrl);
+    callback(initStateName, initHtml);
   };
 
   // This should only be called when _exploration is non-null.
@@ -289,6 +308,57 @@ oppia.factory('oppiaPlayerService', [
     }
   };
 
+  var _loadInitialInformationCardData = function() {
+
+    // TODO(sll): move these three handlers into a separate exp_metadata.py controller.
+    var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
+    var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
+    var infoCardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
+
+    var deferredContributors = $q.defer();
+    var deferredStatistics = $q.defer();
+    var deferredSnapshots = $q.defer();
+
+    // This is needed to get exploration objective/goal, contributors
+    // and exploration tags.
+    $http.get(infoCardDataUrl).success(function(data) {
+      _explorationObjective = data.objective;
+      _explorationTags = data.tags;
+      // TODO(sll): in the backend, compute the actual contributors
+      // based on the list of commits to the exploration.
+      _explorationContributorUsernames = data.rights.owner_names.concat(
+        data.rights.editor_names);
+      deferredContributors.resolve(data);
+    }).error(function(data) {
+      deferredContributors.reject(data);
+      $log.error('There was an error loading the exploration information.');
+    });
+
+    // This is needed to get exploration snapshots.
+    $http.get(infoCardSnapshotsUrl).success(function(data) {
+      var data = data.snapshots;
+      // Only get last published changes/get changes from the last snapshot.
+      _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
+      deferredSnapshots.resolve(data);
+    }).error(function(data) {
+      deferredSnapshots.reject(data);
+      $log.error('There was an error loading the exploration history');
+    });
+
+    // This is needed to get statistics of the exprolation.
+    $http.get(infoCardStatisticsUrl).success(function(data) {
+      // Only get number of viewers who started an exploration.
+      _viewersCount = data.num_starts;
+      deferredStatistics.resolve(_viewersCount);
+    }).error(function(data) {
+      deferredStatistics.reject(data);
+      $log.error('There was an error loading the exploration statistics');
+    });
+
+   return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
+      deferredContributors.promise]);
+  };
+
   return {
     // This should only be used in editor preview mode.
     populateExploration: function(exploration) {
@@ -302,7 +372,7 @@ oppia.factory('oppiaPlayerService', [
      * Initializes an exploration, passing the data for the first state to
      * successCallback.
      *
-     * In editor preview mode, populateExploration() should be called before
+     * In editor preview mode, populateExploration() must be called before
      * calling init().
      *
      * @param {function} successCallback The function to execute after the initial
@@ -314,10 +384,14 @@ oppia.factory('oppiaPlayerService', [
      */
     init: function(successCallback) {
       answerIsBeingProcessed = false;
+      _cachedUpdates = null;
+      learnerParamsService.init({});
+      stateHistory = [];
+      _currentStateName = null;
 
       if (_editorPreviewMode) {
         if (_exploration) {
-          _introCardImageUrl = (
+          _infoCardImageUrl = (
             '/images/gallery/exploration_background_' +
             (GLOBALS.CATEGORIES_TO_COLORS[_exploration.category] || 'teal') +
             '_large.png');
@@ -326,21 +400,42 @@ oppia.factory('oppiaPlayerService', [
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
-          _introCardImageUrl = data.intro_card_image_url;
+          _infoCardImageUrl = data.info_card_image_url;
           version = data.version,
-          _isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
+          _loadInitialInformationCardData();
           $rootScope.$broadcast('playerServiceInitialized');
+          messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
+            explorationVersion: version
+          });
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
         });
       }
     },
+    applyCachedParamUpdates: function() {
+      if (_cachedUpdates !== null) {
+        _updateStatus(_cachedUpdates.newParams, _cachedUpdates.newStateName);
+        _cachedUpdates = null;
+      }
+    },
     getExplorationId: function() {
       return _explorationId;
+    },
+    getInformationCardData: function() {
+      var informationCardData = {
+        explorationTags: _explorationTags,
+        infoCardImageUrl: _infoCardImageUrl,
+        explorationObjective: _explorationObjective,
+        explorationLastUpdatedMsec: _explorationLastUpdatedMsec,
+        explorationContributorUsernames : _explorationContributorUsernames,
+        viewersCount: _viewersCount
+      };
+
+      return informationCardData;
     },
     getExplorationTitle: function() {
       return _exploration.title;
@@ -357,10 +452,33 @@ oppia.factory('oppiaPlayerService', [
     getGadgetPanelsContents: function() {
       return angular.copy(_exploration.skin_customizations.panels_contents);
     },
+    getInteractionThumbnailSrc: function(stateName) {
+      // TODO(sll): unify this with the 'choose interaction' modal in
+      // state_editor_interaction.html.
+      var interactionId = _exploration.states[stateName].interaction.id;
+      if (!interactionId) {
+        return '';
+      } else {
+        return (
+          '/extensions/interactions/' + interactionId + '/static/' +
+          interactionId + '.png');
+      }
+    },
+    getInteractionInstructions: function(stateName) {
+      var interactionId = _exploration.states[stateName].interaction.id;
+      if (!interactionId) {
+        return '';
+      } else {
+        return INTERACTION_SPECS[interactionId].instructions;
+      }
+    },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
+      // Note that we treat a null interaction as an inline one, so that the
+      // error message associated with it is displayed in the most compact way
+      // possible in the learner view.
       return (
-        interactionId &&
+        !interactionId ||
         INTERACTION_SPECS[interactionId].display_mode ===
           INTERACTION_DISPLAY_MODE_INLINE);
     },
@@ -394,7 +512,21 @@ oppia.factory('oppiaPlayerService', [
       return oppiaExplorationHtmlFormatterService.getAnswerHtml(
         answer, currentInteraction.id, currentInteraction.customization_args);
     },
-    submitAnswer: function(answer, successCallback) {
+    getShortAnswerAsHtml: function(answer) {
+      // Returns a HTML string representing a short summary of the answer, or
+      // null if the answer does not have to be summarized.
+      var currentInteraction = _exploration.states[
+        _currentStateName].interaction;
+
+      if (!currentInteraction.id ||
+          !INTERACTION_SPECS[currentInteraction.id].needs_summary) {
+        return null;
+      } else {
+        return oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+          answer, currentInteraction.id, currentInteraction.customization_args);
+      }
+    },
+    submitAnswer: function(answer, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -424,9 +556,7 @@ oppia.factory('oppiaPlayerService', [
         // Compute the data for the next state. This may be null if there are
         // malformed expressions.
         var nextStateData = stateTransitionService.getNextStateData(
-          outcome,
-          _exploration.states[newStateName],
-          answer);
+          outcome, _exploration.states[newStateName], answer);
 
         if (nextStateData) {
           nextStateData['state_name'] = newStateName;
@@ -434,7 +564,7 @@ oppia.factory('oppiaPlayerService', [
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
             nextStateData.question_html, nextStateData.feedback_html,
-            answer, successCallback);
+            answer, successCallback, delayParamUpdates);
         } else {
           answerIsBeingProcessed = false;
           warningsData.addWarning('Expression parsing error.');
@@ -451,7 +581,7 @@ oppia.factory('oppiaPlayerService', [
     // user is not logged in or has not uploaded a profile picture, or the
     // player is in preview mode.
     getUserProfileImage: function() {
-      var DEFAULT_PROFILE_IMAGE_PATH = '/images/general/user_mint_48px.png';
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
       var deferred = $q.defer();
       if (_isLoggedIn && !_editorPreviewMode) {
         $http.get('/preferenceshandler/profile_picture').success(function(data) {
@@ -466,6 +596,12 @@ oppia.factory('oppiaPlayerService', [
         deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
       }
       return deferred.promise;
+    },
+    getOppiaAvatarImageUrl: function() {
+      return '/images/avatar/oppia_black_72px.png';
+    },
+    getInfoCardDataPromise: function() {
+      return _loadInitialInformationCardData();
     }
   };
 }]);
@@ -502,7 +638,7 @@ oppia.factory('ratingService', [
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
-    function(
+    function (
       $scope, $http, $modal, oppiaHtmlEscaper,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -633,4 +769,79 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
       };
     }]
   };
+}]);
+
+oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $modal) {
+
+  $scope.showInformationCard = function () {
+
+    var modalInstance = $modal.open({
+      animation: true,
+      templateUrl: 'popover/informationCard',
+      windowClass: 'oppia-modal-information-card',
+      controller: [
+         '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService',
+         'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService',
+         'oppiaDatetimeFormatter',
+         function ($scope, $http, $modal, $modalInstance, oppiaPlayerService,
+                   ratingService, oppiaHtmlEscaper, embedExplorationButtonService,
+                   oppiaDatetimeFormatter) {
+
+        var _informationCardData = oppiaPlayerService.getInformationCardData();
+        $scope.serverName = window.location.protocol + '//' + window.location.host;
+        $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+          GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+        $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
+
+        // TODO(Barnabas) refactor getExplorationId() and getExplorationTitle()
+        // to return promises.
+        $scope.explorationId = oppiaPlayerService.getExplorationId();
+        $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
+        $scope.infoCardBackgroundImageCss = {
+          'background-image': 'url('+ _informationCardData.infoCardImageUrl + ')'
+        };
+        $scope.explorationRatings = ratingService.getUserRating() !== null ?
+                                    ratingService.getUserRating() : 0;
+
+        var _explorationTagsSummary = function(arrayOfTags) {
+          var _tagsToBeShown =[];
+          var _tagsInTooltip = [];
+          for (var i = 0; i < arrayOfTags.length; i++) {
+            if ((_tagsToBeShown.toString() + arrayOfTags[i]).length < 45) {
+              _tagsToBeShown.push(arrayOfTags[i]);
+            } else {
+              _tagsInTooltip.push(arrayOfTags[i]);
+            }
+          };
+          return {
+            tagsToBeShown: _tagsToBeShown,
+            tagsInTooltip: _tagsInTooltip
+          };
+        };
+        $scope.explorationTags = _explorationTagsSummary(_informationCardData.explorationTags);
+        $scope.explorationDescription = _informationCardData.explorationObjective;
+        $scope.explorationContributorUsernames = _informationCardData.explorationContributorUsernames;
+        $scope.explorationLastUpdatedMsec = _informationCardData.explorationLastUpdatedMsec;
+        $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+        };
+        $scope.viewersCount = _informationCardData.viewersCount;
+        $scope.loadingInfoCardData = true;
+        $scope.failedLoadingData = false;
+        oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
+          $scope.loadingInfoCardData = false;
+        }, function() {
+          $scope.failedLoadingData = true;
+        });
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss();
+        };
+
+      }]
+    });
+
+    modalInstance.result.then(function () {}, function () {});
+  };
+
 }]);

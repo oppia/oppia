@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -29,7 +28,6 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import gadget_registry
 from core.domain import interaction_registry
-from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -88,7 +86,8 @@ def require_playable(handler):
             return
 
         """Checks if the user for the current session is logged in."""
-        if rights_manager.Actor(self.user_id).can_play(exploration_id):
+        if rights_manager.Actor(self.user_id).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -208,13 +207,14 @@ class ExplorationPage(base.BaseHandler):
 
         version = exploration.version
 
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if not rights_manager.Actor(self.user_id).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         is_iframed = (self.request.get('iframed') == 'true')
 
         # TODO(sll): Cache these computations.
-        gadget_ids = exploration.get_gadget_ids()
+        gadget_types = exploration.get_gadget_types()
         interaction_ids = exploration.get_interaction_ids()
         dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -224,7 +224,7 @@ class ExplorationPage(base.BaseHandler):
                 dependency_ids))
 
         gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_ids))
+            gadget_registry.Registry.get_gadget_html(gadget_types))
 
         interaction_templates = (
             rte_component_registry.Registry.get_html_for_all_components() +
@@ -240,7 +240,8 @@ class ExplorationPage(base.BaseHandler):
             'can_edit': (
                 bool(self.username) and
                 self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)
+                rights_manager.Actor(self.user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)
             ),
             'dependencies_html': jinja2.utils.Markup(
                 dependencies_html),
@@ -260,12 +261,11 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
-                    [exploration.default_skin])),
+                    [feconf.DEFAULT_SKIN_ID])),
             'skin_js_url': skins_services.Registry.get_skin_js_url(
-                exploration.default_skin),
+                feconf.DEFAULT_SKIN_ID),
             'skin_tag': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_tag(exploration.default_skin)
-            ),
+                skins_services.Registry.get_skin_tag(feconf.DEFAULT_SKIN_ID)),
         })
 
         if is_iframed:
@@ -289,7 +289,7 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        intro_card_color = (
+        info_card_color = (
             feconf.CATEGORIES_TO_COLORS[exploration.category] if
             exploration.category in feconf.CATEGORIES_TO_COLORS else
             feconf.DEFAULT_COLOR)
@@ -297,11 +297,12 @@ class ExplorationHandler(base.BaseHandler):
         self.values.update({
             'can_edit': (
                 self.user_id and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)),
+                rights_manager.Actor(self.user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'intro_card_image_url': (
+            'info_card_image_url': (
                 '/images/gallery/exploration_background_%s_large.png' %
-                intro_card_color),
+                info_card_color),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_random_string(24),
             'version': exploration.version,
@@ -486,9 +487,11 @@ class RatingHandler(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'overall_ratings':
-                rating_services.get_overall_ratings(exploration_id),
-            'user_rating': rating_services.get_user_specific_rating(
-                self.user_id, exploration_id) if self.user_id else None
+                rating_services.get_overall_ratings_for_exploration(
+                    exploration_id),
+            'user_rating': (
+                rating_services.get_user_specific_rating_for_exploration(
+                    self.user_id, exploration_id) if self.user_id else None)
         })
         self.render_json(self.values)
 
@@ -498,7 +501,7 @@ class RatingHandler(base.BaseHandler):
         exploration.
         """
         user_rating = self.payload.get('user_rating')
-        rating_services.assign_rating(
+        rating_services.assign_rating_to_exploration(
             self.user_id, exploration_id, user_rating)
         self.render_json({})
 

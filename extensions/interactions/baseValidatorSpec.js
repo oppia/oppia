@@ -587,6 +587,119 @@ describe('Interaction validator', function() {
     });
   });
 
+  describe('oppiaInteractiveItemSelectionInputValidator', function() {
+    var validator, customizationArguments;
+
+    beforeEach(function() {
+      validator = filter('oppiaInteractiveItemSelectionInputValidator');
+      customizationArguments = {
+        'choices': {
+          'value': ['Selection 1', 'Selection 2', 'Selection 3']
+        },
+        'maxAllowableSelectionCount': {
+          'value': 2
+        },
+        'minAllowableSelectionCount': {
+          'value': 1
+        },
+      };
+      goodAnswerGroups = [
+        createAnswerGroup(goodOutcomeDest, [{
+          'rule_type': 'Equals',
+          'inputs': {
+            'x': ['Selection 1', 'Selection 2']
+          }
+        }])
+      ];
+    });
+
+    it('should be able to perform basic validation', function() {
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+    });
+
+    it('should expect a choices customization argument', function() {
+      expect(function() {
+        validator(currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      }).toThrow('Expected customization arguments to have property: choices');
+    });
+
+    it('should expect the minAllowableSelectionCount to be less than or equal to ' +
+        'maxAllowableSelectionCount', function() {
+      customizationArguments.minAllowableSelectionCount.value = 3;
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure that the max allowed count is not less than the min count.'
+      }]);
+    });
+
+    it('should expect maxAllowableSelectionCount to be less than the total number of selections',
+        function() {
+      customizationArguments.maxAllowableSelectionCount.value = 3;
+
+      // Remove the last choice.
+      customizationArguments.choices.value.splice(2, 1);
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure that you have enough choices to reach the max count.'
+      }]);
+    });
+
+    it('should expect minAllowableSelectionCount to be less than the total number of selections',
+        function() {
+      // Remove the last choice.
+      customizationArguments.choices.value.splice(2, 1);
+
+      customizationArguments.minAllowableSelectionCount.value = 3;
+      customizationArguments.maxAllowableSelectionCount.value = 3;
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure that you have enough choices to reach the min count.'
+      }]);
+    });
+
+    it('should expect all choices to be nonempty', function() {
+      // Set the first choice to empty.
+      customizationArguments.choices.value[0] = '';
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure the choices are nonempty.'
+      }]);
+    });
+
+    it('should expect all choices to be unique', function() {
+      // Repeat the last choice.
+      customizationArguments.choices.value.push('Selection 3');
+
+      var warnings = validator(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        'type': WARNING_TYPES.CRITICAL,
+        'message': 'please ensure the choices are unique.'
+      }]);
+    });
+
+  });
+
   describe('oppiaInteractiveLogicProofValidator', function() {
     var validator;
 

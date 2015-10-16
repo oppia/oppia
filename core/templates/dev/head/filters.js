@@ -75,14 +75,22 @@ oppia.filter('truncateAtFirstLine', [function() {
     var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
     // Normalize line endings then split using the normalized delimiter.
     var lines = input.replace(pattern, '\n').split('\n');
-    var nonemptyLineIndex = -1;
+    var firstNonemptyLineIndex = -1;
+    var otherNonemptyLinesExist = false;
     for (var i = 0; i < lines.length; i++) {
-      if (lines[i].length != 0) {
-        nonemptyLineIndex = i;
-        break;
+      if (lines[i].length > 0) {
+        if (firstNonemptyLineIndex === -1) {
+          firstNonemptyLineIndex = i;
+        } else {
+          otherNonemptyLinesExist = true;
+          break;
+        }
       }
     }
-    return (nonemptyLineIndex != -1 ? lines[nonemptyLineIndex] : '');
+    var suffix = otherNonemptyLinesExist ? '...' : '';
+    return (
+      firstNonemptyLineIndex !== -1 ?
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -184,11 +192,24 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput and ImageClickInput
+      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
       if (choices) {
-        for (var i = 0; i < choices.length; i++) {
-          if (choices[i].val === inputs[varName]) {
-            replacementText = '\'' + choices[i].label + '\'';
+        if (varType === 'SetOfHtmlString') {
+          replacementText = '[';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
+            }
+          }
+          replacementText += ']';
+        } else {
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
           }
         }
       // TODO(sll): Generalize this to use the inline string representation of
@@ -315,4 +336,41 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
     }
     return summary;
   }
-}])
+}]);
+
+// Filter that summarizes a large number to a decimal followed by
+// the appropriate metric prefix (K, M or B). For example, 167656
+// becomes 167.7K.
+// Users of this filter should ensure that the input is a non-negative number.
+oppia.filter('summarizeNonnegativeNumber', [function() {
+  return function (input) {
+    input = Number(input)
+    // Nine Zeroes for Billions
+    return input >= 1.0e+9
+    // Example 146008788788 becomes 146.0B
+    ? (input / 1.0e+9).toFixed(1) + 'B'
+
+    // Six Zeroes for Millions
+    : input >= 1.0e+6
+    // Example 146008788 becomes 146.0M
+    ? (input / 1.0e+6).toFixed(1) + 'M'
+
+    // Three Zeroes for Thousands
+    : input >= 1.0e+3
+    // Example 146008 becomes 146.0K
+    ? (input / 1.0e+3).toFixed(1) + 'K'
+    // For small number it should return number as it is
+    // Example 12 becomes 12
+    : input;
+  };
+}]);
+
+oppia.filter('truncateAndCapitalize', [function() {
+  return function(input, maxNumberOfCharacters) {
+    input = input.trim();
+    if(input.length > maxNumberOfCharacters) {
+      input = input.substring(0, maxNumberOfCharacters) + '...';
+    }
+    return input.charAt(0).toUpperCase() + input.slice(1);
+  }
+}]);

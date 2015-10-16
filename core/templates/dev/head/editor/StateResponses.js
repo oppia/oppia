@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for responses corresponding to a state's
- * interaction and answer groups.
+ * @fileoverview Controllers, services and filters for responses corresponding
+ * to a state's interaction and answer groups.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -296,8 +296,8 @@ oppia.controller('StateResponses', [
     function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, warningsData, responsesService, routerService,
-      explorationContextService, trainingDataService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS) {
+      explorationContextService, trainingDataService,
+      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
   $scope.editorContextService = editorContextService;
 
   var _initializeTrainingData = function() {
@@ -326,15 +326,21 @@ oppia.controller('StateResponses', [
     return outcome && outcome.dest == PLACEHOLDER_OUTCOME_DEST;
   };
 
+  // This returns false if the current interaction ID is null.
+  $scope.isCurrentInteractionLinear = function() {
+    var interactionId = $scope.getCurrentInteractionId();
+    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+  };
+
   $scope.$on('initializeAnswerGroups', function(evt, data) {
     responsesService.init(data);
     $scope.answerGroups = responsesService.getAnswerGroups();
     $scope.defaultOutcome = responsesService.getDefaultOutcome();
 
-    // If the creator selects the 'Continue' interaction, automatically expand
-    // the default response (which is the 'handle button click' response).
-    // Otherwise, default to having no responses initially selected.
-    if ($scope.getCurrentInteractionId() === 'Continue') {
+    // If the creator selects an interaction which has only one possible
+    // answer, automatically expand the default response. Otherwise, default to
+    // having no responses initially selected.
+    if ($scope.isCurrentInteractionLinear()) {
       responsesService.changeActiveAnswerGroupIndex(0);
     }
 
@@ -359,10 +365,11 @@ oppia.controller('StateResponses', [
         responsesService.getActiveAnswerGroupIndex());
     });
 
-    // Prompt the user to create a new response if it is not a 'Continue' or
+    // Prompt the user to create a new response if it is not a linear or
     // non-terminal interaction and if an actual interaction is specified
     // (versus one being deleted).
-    if (newInteractionId && newInteractionId !== 'Continue' &&
+    if (newInteractionId &&
+        !INTERACTION_SPECS[newInteractionId].is_linear &&
         !INTERACTION_SPECS[newInteractionId].is_terminal) {
       // Open the training interface if the interaction is trainable, otherwise
       // open the answer group modal.
@@ -638,3 +645,65 @@ oppia.controller('StateResponses', [
     routerService.navigateToMainTab(stateName);
   };
 }]);
+
+
+oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
+  return function(answerGroup, interactionId, answerChoices, shortenRule) {
+    var summary = '';
+    var outcome = answerGroup.outcome;
+    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+
+    if (answerGroup.rule_specs) {
+      var firstRule = $filter('convertToPlainText')(
+        $filter('parameterizeRuleDescription')(
+          answerGroup.rule_specs[0], interactionId, answerChoices));
+      summary = 'Answer ' + firstRule;
+
+      if (hasFeedback && shortenRule) {
+        summary = $filter('wrapTextWithEllipsis')(
+          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+      }
+      summary = '[' + summary + '] ';
+    }
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(outcome.feedback[0]);
+    }
+    return summary;
+  };
+}]);
+
+
+oppia.filter('summarizeDefaultOutcome', [
+    '$filter', 'INTERACTION_SPECS',
+    function($filter, INTERACTION_SPECS) {
+  return function(
+      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+    if (!defaultOutcome) {
+      return '';
+    }
+
+    var summary = '';
+    var feedback = defaultOutcome.feedback;
+    var hasFeedback = feedback.length > 0 && feedback[0];
+
+    if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+      summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
+    } else if (answerGroupCount > 0) {
+      summary = 'All other answers';
+    } else {
+      summary = 'All answers';
+    }
+
+    if (hasFeedback && shortenRule) {
+      summary = $filter('wrapTextWithEllipsis')(
+        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+    }
+    summary = '[' + summary + '] ';
+
+    if (hasFeedback) {
+      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
+    }
+    return summary;
+  }
+}])

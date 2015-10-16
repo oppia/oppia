@@ -28,6 +28,7 @@ import copy
 import datetime
 import logging
 import os
+import pprint
 import StringIO
 import zipfile
 
@@ -46,8 +47,12 @@ import utils
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-#Name for the exploration search index
+# Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
+
+# Constants used to initialize EntityChangeListSummarizer
+_BASE_ENTITY_STATE = 'state'
+_BASE_ENTITY_GADGET = 'gadget'
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -81,41 +86,11 @@ def _migrate_states_schema(versioned_exploration_states):
             'state schemas at present.' %
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-    # Check for conversion to v1.
-    if exploration_states_schema_version == 0:
-        exp_domain.Exploration.update_states_v0_to_v1_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 1
-
-    # Check for conversion to v2.
-    if exploration_states_schema_version == 1:
-        exp_domain.Exploration.update_states_v1_to_v2_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 2
-
-    # Check for conversion to v3.
-    if exploration_states_schema_version == 2:
-        exp_domain.Exploration.update_states_v2_to_v3_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 3
-
-    # Check for conversion to v4.
-    if exploration_states_schema_version == 3:
-        exp_domain.Exploration.update_states_v3_to_v4_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 4
-
-    # Check for conversion to v5.
-    if exploration_states_schema_version == 4:
-        exp_domain.Exploration.update_states_v4_to_v5_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 5
-
-    # Check for conversion to v6.
-    if exploration_states_schema_version == 5:
-        exp_domain.Exploration.update_states_v5_to_v6_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 6
+    while (exploration_states_schema_version <
+           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+        exp_domain.Exploration.update_states_from_model(
+            versioned_exploration_states, exploration_states_schema_version)
+        exploration_states_schema_version += 1
 
 
 # Repository GET methods.
@@ -158,7 +133,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
         exploration_model.blurb, exploration_model.author_notes,
-        exploration_model.default_skin, exploration_model.skin_customizations,
+        exploration_model.skin_customizations,
         versioned_exploration_states['states_schema_version'],
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
@@ -269,7 +244,8 @@ def get_new_exploration_id():
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user may edit an exploration by checking
-    the given domain object."""
+    the given domain object.
+    """
     return user_id is not None and (
         user_id in exp_summary.editor_ids
         or user_id in exp_summary.owner_ids
@@ -305,7 +281,8 @@ def get_exploration_titles_and_categories(exp_ids):
 
 def _get_exploration_summary_dicts_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
-    corresponding exploration summary domain objects, keyed by id."""
+    corresponding exploration summary domain objects, keyed by id.
+    """
     exploration_summaries = [
         get_exploration_summary_from_model(exp_summary_model)
         for exp_summary_model in exp_summary_models]
@@ -374,37 +351,18 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
 
 def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id."""
+    keyed by their id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
 
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
-    keyed by their id."""
+    keyed by their id.
+    """
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_all())
-
-
-def get_private_at_least_viewable_exploration_summaries(user_id):
-    """Returns a dict with all exploration summary domain objects that are
-    at least viewable by given user. The dict is keyed by exploration id."""
-    return _get_exploration_summary_dicts_from_models(
-        exp_models.ExpSummaryModel.get_private_at_least_viewable(
-            user_id=user_id))
-
-
-def get_at_least_editable_exploration_summaries(user_id):
-    """Returns a dict with all exploration summary domain objects that are
-    at least editable by given user. The dict is keyed by exploration id."""
-    return _get_exploration_summary_dicts_from_models(
-        exp_models.ExpSummaryModel.get_at_least_editable(
-            user_id=user_id))
-
-
-def count_explorations():
-    """Returns the total number of explorations."""
-    return exp_models.ExplorationModel.get_exploration_count()
 
 
 # Methods for exporting states and explorations to other formats.
@@ -498,6 +456,23 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
+            elif change.cmd == exp_domain.CMD_ADD_GADGET:
+                exploration.add_gadget(change.gadget_dict, change.panel)
+            elif change.cmd == exp_domain.CMD_RENAME_GADGET:
+                exploration.rename_gadget(
+                    change.old_gadget_name, change.new_gadget_name)
+            elif change.cmd == exp_domain.CMD_DELETE_GADGET:
+                exploration.delete_gadget(change.gadget_name)
+            elif change.cmd == exp_domain.CMD_EDIT_GADGET_PROPERTY:
+                gadget_instance = exploration.get_gadget_instance_by_name(
+                    change.gadget_name)
+                if (change.property_name ==
+                        exp_domain.GADGET_PROPERTY_VISIBILITY):
+                    gadget_instance.update_visible_in_states(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.GADGET_PROPERTY_CUST_ARGS):
+                    gadget_instance.update_customization_args(
+                        change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -517,25 +492,188 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(change.new_value)
-                elif change.property_name == 'default_skin_id':
-                    exploration.update_default_skin_id(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
             elif (change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
-                # Eploration domain object automatically converts it to use the
-                # latest states schema version. As a result, simply resaving the
-                # exploration is sufficient to apply the states schema update.
+                # Exploration domain object automatically converts it to use
+                # the latest states schema version. As a result, simply
+                # resaving the exploration is sufficient to apply the states
+                # schema update.
                 continue
         return exploration
 
     except Exception as e:
         logging.error(
             '%s %s %s %s' % (
-                e.__class__.__name__, e, exploration_id, change_list)
+                e.__class__.__name__, e, exploration_id,
+                pprint.pprint(change_list))
         )
         raise
+
+
+class EntityChangeListSummarizer(object):
+    """Summarizes additions, deletions, and general changes against a given
+    entity type.
+    """
+
+    def __init__(self, entity_type):
+        """
+        Args:
+        - entity_type: string. Type of the base entity (e.g. 'state')
+        """
+        self.entity_type = entity_type
+
+        # A list of added entity names.
+        self.added_entities = []
+
+        # A list of deleted entity names.
+        self.deleted_entities = []
+
+        # A list of entity names. This indicates that the entity has changed
+        # but we do not know what the changes are. This can happen for
+        # complicated operations like removing an entity and later adding a
+        # new entity with the same name as the removed one.
+        self.changed_entities = []
+
+        # A dict, where each key is an entity's name, and the corresponding
+        # values are dicts; the keys of these dicts represent properties of
+        # the entity, and the corresponding values are dicts with keys
+        # old_value and new_value. If an entity's 'name' property is changed,
+        # this is listed as a property name change under the old entity name
+        # in the outer dict.
+        self.property_changes = {}
+
+    @property
+    def add_entity_cmd(self):
+        return 'add_%s' % self.entity_type
+
+    @property
+    def rename_entity_cmd(self):
+        return 'rename_%s' % self.entity_type
+
+    @property
+    def delete_entity_cmd(self):
+        return 'delete_%s' % self.entity_type
+
+    @property
+    def edit_entity_property_cmd(self):
+        return 'edit_%s_property' % self.entity_type
+
+    @property
+    def entity_name(self):
+        return '%s_name' % self.entity_type
+
+    @property
+    def new_entity_name(self):
+        return 'new_%s_name' % self.entity_type
+
+    @property
+    def old_entity_name(self):
+        return 'old_%s_name' % self.entity_type
+
+    def process_changes(self, original_entity_names, changes):
+        """Processes the changes, making results available in each of the
+        initialized data structures of the EntityChangeListSummarizer.
+
+        Args:
+        - original_entity_names: a list of strings representing the names of
+          the individual entities before any of the changes in the change list
+          have been made.
+        - changes: list of ExplorationChange instances.
+        """
+        # TODO(sll): Make this method do the same thing as the corresponding
+        # code in the frontend's editor history tab -- or, better still, get
+        # rid of it entirely and use the frontend code to generate change
+        # summaries directly.
+
+        # original_names is a dict whose keys are the current state names, and
+        # whose values are the names of these states before any changes were
+        # applied. It is used to keep track of identities of states throughout
+        # the sequence of changes.
+        original_names = {name: name for name in original_entity_names}
+
+        for change in changes:
+            if change.cmd == self.add_entity_cmd:
+                entity_name = getattr(change, self.entity_name)
+                if entity_name in self.changed_entities:
+                    continue
+                elif entity_name in self.deleted_entities:
+                    self.changed_entities.append(entity_name)
+                    # TODO(sll): This logic doesn't make sense for the
+                    # following sequence of events: (a) an existing
+                    # non-default entity is deleted, (b) a new default entity
+                    # with the same name is created. Rewrite this method to
+                    # take that case into account (or, better still, delete it
+                    # altogether and use the frontend history diff
+                    # functionality instead).
+                    if entity_name in self.property_changes:
+                        del self.property_changes[entity_name]
+                    self.deleted_entities.remove(entity_name)
+                else:
+                    self.added_entities.append(entity_name)
+                    original_names[entity_name] = entity_name
+            elif change.cmd == self.rename_entity_cmd:
+                new_entity_name = getattr(change, self.new_entity_name)
+                old_entity_name = getattr(change, self.old_entity_name)
+                orig_name = original_names[old_entity_name]
+                original_names[new_entity_name] = orig_name
+                del original_names[old_entity_name]
+
+                if orig_name in self.changed_entities:
+                    continue
+
+                if orig_name not in self.property_changes:
+                    self.property_changes[orig_name] = {}
+                if 'name' not in self.property_changes[orig_name]:
+                    self.property_changes[orig_name]['name'] = {
+                        'old_value': old_entity_name
+                    }
+                self.property_changes[orig_name]['name']['new_value'] = (
+                    new_entity_name)
+            elif change.cmd == self.delete_entity_cmd:
+                entity_name = getattr(change, self.entity_name)
+                orig_name = original_names[entity_name]
+                del original_names[entity_name]
+
+                if orig_name in self.changed_entities:
+                    continue
+                elif orig_name in self.added_entities:
+                    self.added_entities.remove(orig_name)
+                else:
+                    self.deleted_entities.append(orig_name)
+            elif change.cmd == self.edit_entity_property_cmd:
+                entity_name = getattr(change, self.entity_name)
+                orig_name = original_names[entity_name]
+                if orig_name in self.changed_entities:
+                    continue
+
+                property_name = change.property_name
+
+                if orig_name not in self.property_changes:
+                    self.property_changes[orig_name] = {}
+                if property_name not in self.property_changes[orig_name]:
+                    self.property_changes[orig_name][property_name] = {
+                        'old_value': change.old_value
+                    }
+                self.property_changes[orig_name][property_name][
+                    'new_value'] = change.new_value
+
+        unchanged_names = []
+        for name in self.property_changes:
+            unchanged_properties = []
+            changes = self.property_changes[name]
+            for property_name in changes:
+                if (changes[property_name]['old_value'] ==
+                        changes[property_name]['new_value']):
+                    unchanged_properties.append(property_name)
+            for property_name in unchanged_properties:
+                del changes[property_name]
+            if len(changes) == 0:
+                unchanged_names.append(name)
+        for name in unchanged_names:
+            del self.property_changes[name]
 
 
 def get_summary_of_change_list(base_exploration, change_list):
@@ -545,25 +683,16 @@ def get_summary_of_change_list(base_exploration, change_list):
     object.
 
     Returns:
-      a dict with five keys:
-        exploration_property_changes: a dict, where each key is a property_name
-          of the exploration, and the corresponding values are dicts with keys
-          old_value and new_value.
-        state_property_changes: a dict, where each key is a state name, and the
-          corresponding values are dicts; the keys of these dicts represent
-          properties of the state, and the corresponding values are dicts with
-          keys old_value and new_value. If a state name is changed, this is
-          listed as a property name change under the old state name in the
-          outer dict.
-        changed_states: a list of state names. This indicates that the state
-          has changed but we do not know what the changes are. This can happen
-          for complicated operations like removing a state and later adding a
-          new state with the same name as the removed state.
-        added_states: a list of added state names.
-        deleted_states: a list of deleted state names.
+      a dict with nine keys:
+        - exploration_property_changes: a dict, where each key is a
+          property_name of the exploration, and the corresponding values are
+          dicts with keys old_value and new_value.
+        - 4 'state' and 'gadget' change lists per data structures defined
+          in EntityChangeListSummarizer
     """
-    # TODO(sll): This really needs tests, especially the diff logic. Probably
-    # worth comparing with the actual changed exploration.
+
+    # TODO(anuzis): need to capture changes in gadget positioning
+    # between and within panels when we expand support for these actions.
 
     # Ensure that the original exploration does not get altered.
     exploration = copy.deepcopy(base_exploration)
@@ -572,66 +701,22 @@ def get_summary_of_change_list(base_exploration, change_list):
         exp_domain.ExplorationChange(change_dict)
         for change_dict in change_list]
 
+    # State changes
+    state_change_summarizer = EntityChangeListSummarizer(
+        _BASE_ENTITY_STATE)
+    state_change_summarizer.process_changes(
+        exploration.states.keys(), changes)
+
+    # Gadget changes
+    gadget_change_summarizer = EntityChangeListSummarizer(
+        _BASE_ENTITY_GADGET)
+    gadget_change_summarizer.process_changes(
+        exploration.get_all_gadget_names(), changes)
+
+    # Exploration changes
     exploration_property_changes = {}
-    state_property_changes = {}
-    changed_states = []
-    added_states = []
-    deleted_states = []
-
-    original_state_names = {
-        state_name: state_name for state_name in exploration.states.keys()
-    }
-
     for change in changes:
-        if change.cmd == exp_domain.CMD_ADD_STATE:
-            if change.state_name in changed_states:
-                continue
-            elif change.state_name in deleted_states:
-                changed_states.append(change.state_name)
-                del state_property_changes[change.state_name]
-                deleted_states.remove(change.state_name)
-            else:
-                added_states.append(change.state_name)
-                original_state_names[change.state_name] = change.state_name
-        elif change.cmd == exp_domain.CMD_RENAME_STATE:
-            orig_state_name = original_state_names[change.old_state_name]
-            original_state_names[change.new_state_name] = orig_state_name
-
-            if orig_state_name in changed_states:
-                continue
-
-            if orig_state_name not in state_property_changes:
-                state_property_changes[orig_state_name] = {}
-            if 'name' not in state_property_changes[orig_state_name]:
-                state_property_changes[orig_state_name]['name'] = {
-                    'old_value': change.old_state_name
-                }
-            state_property_changes[orig_state_name]['name']['new_value'] = (
-                change.new_state_name)
-        elif change.cmd == exp_domain.CMD_DELETE_STATE:
-            orig_state_name = original_state_names[change.state_name]
-            if orig_state_name in changed_states:
-                continue
-            elif orig_state_name in added_states:
-                added_states.remove(orig_state_name)
-            else:
-                deleted_states.append(orig_state_name)
-        elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-            orig_state_name = original_state_names[change.state_name]
-            if orig_state_name in changed_states:
-                continue
-
-            property_name = change.property_name
-
-            if orig_state_name not in state_property_changes:
-                state_property_changes[orig_state_name] = {}
-            if property_name not in state_property_changes[orig_state_name]:
-                state_property_changes[orig_state_name][property_name] = {
-                    'old_value': change.old_value
-                }
-            state_property_changes[orig_state_name][property_name][
-                'new_value'] = change.new_value
-        elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+        if change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
             property_name = change.property_name
 
             if property_name not in exploration_property_changes:
@@ -652,33 +737,20 @@ def get_summary_of_change_list(base_exploration, change_list):
     for property_name in unchanged_exploration_properties:
         del exploration_property_changes[property_name]
 
-    unchanged_state_names = []
-    for state_name in state_property_changes:
-        unchanged_state_properties = []
-        changes = state_property_changes[state_name]
-        for property_name in changes:
-            if (changes[property_name]['old_value'] ==
-                    changes[property_name]['new_value']):
-                unchanged_state_properties.append(property_name)
-        for property_name in unchanged_state_properties:
-            del changes[property_name]
-
-        if len(changes) == 0:
-            unchanged_state_names.append(state_name)
-    for state_name in unchanged_state_names:
-        del state_property_changes[state_name]
-
     return {
         'exploration_property_changes': exploration_property_changes,
-        'state_property_changes': state_property_changes,
-        'changed_states': changed_states,
-        'added_states': added_states,
-        'deleted_states': deleted_states,
+        'state_property_changes': state_change_summarizer.property_changes,
+        'changed_states': state_change_summarizer.changed_entities,
+        'added_states': state_change_summarizer.added_entities,
+        'deleted_states': state_change_summarizer.deleted_entities,
+        'gadget_property_changes': gadget_change_summarizer.property_changes,
+        'changed_gadgets': gadget_change_summarizer.changed_entities,
+        'added_gadgets': gadget_change_summarizer.added_entities,
+        'deleted_gadgets': gadget_change_summarizer.deleted_entities
     }
 
 
-def _save_exploration(
-        committer_id, exploration, commit_message, change_list):
+def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
     If successful, increments the version number of the incoming exploration
@@ -687,7 +759,7 @@ def _save_exploration(
     if change_list is None:
         change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -715,7 +787,6 @@ def _save_exploration(
     exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
-    exploration_model.default_skin = exploration.default_skin
     exploration_model.skin_customizations = (
         exploration.skin_instance.to_dict()['skin_customizations'])
 
@@ -727,8 +798,7 @@ def _save_exploration(
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
 
-    exploration_model.commit(
-        committer_id, commit_message, change_list)
+    exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     index_explorations_given_ids([exploration.id])
@@ -756,7 +826,6 @@ def _create_exploration(
         tags=exploration.tags,
         blurb=exploration.blurb,
         author_notes=exploration.author_notes,
-        default_skin=exploration.default_skin,
         skin_customizations=exploration.skin_instance.to_dict(
             )['skin_customizations'],
         states_schema_version=exploration.states_schema_version,
@@ -840,6 +909,22 @@ def get_exploration_snapshots_metadata(exploration_id):
         exploration_id, version_nums)
 
 
+def _get_last_updated_by_human_ms(exp_id):
+    """Return the last time, in milliseconds, when the given exploration was
+    updated by a human.
+    """
+    # Iterate backwards through the exploration history metadata until we find
+    # the most recent snapshot that was committed by a human.
+    last_human_update_ms = 0
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    for snapshot_metadata in reversed(snapshots_metadata):
+        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
+            last_human_update_ms = snapshot_metadata['created_on_ms']
+            break
+
+    return last_human_update_ms
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
@@ -864,26 +949,26 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
-    # update summary of changed exploration
+    # Update summary of changed exploration.
     update_exploration_summary(exploration.id)
 
 
 def create_exploration_summary(exploration_id):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = get_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     save_exploration_summary(exp_summary)
 
 
 def update_exploration_summary(exploration_id):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = get_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     save_exploration_summary(exp_summary)
 
 
-def get_summary_of_exploration(exploration):
-    """Create ExplorationSummary domain object for a given Exploration
+def compute_summary_of_exploration(exploration):
+    """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
@@ -894,7 +979,8 @@ def get_summary_of_exploration(exploration):
     else:
         ratings = feconf.get_empty_ratings()
 
-    exploration_model_last_updated = exploration.last_updated
+    exploration_model_last_updated = datetime.datetime.fromtimestamp(
+        _get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
 
     exp_summary = exp_domain.ExplorationSummary(
@@ -910,9 +996,9 @@ def get_summary_of_exploration(exploration):
 
 
 def save_exploration_summary(exp_summary):
-    """Save exploration summary domain object as ExpSummaryModel
-    entity in datastore."""
-
+    """Save an exploration summary domain object as an ExpSummaryModel entity
+    in the datastore.
+    """
     exp_summary_model = exp_models.ExpSummaryModel(
         id=exp_summary.id,
         title=exp_summary.title,
@@ -920,7 +1006,7 @@ def save_exploration_summary(exp_summary):
         objective=exp_summary.objective,
         language_code=exp_summary.language_code,
         tags=exp_summary.tags,
-        ratings = exp_summary.ratings,
+        ratings=exp_summary.ratings,
         status=exp_summary.status,
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
@@ -964,7 +1050,7 @@ def revert_exploration(
     exploration = get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -1007,7 +1093,7 @@ def save_new_exploration_from_yaml_and_assets(
     if assets_list is None:
         assets_list = []
 
-    exploration = exp_domain.Exploration.from_yaml(
+    exploration = exp_domain.Exploration.from_untitled_yaml(
         exploration_id, title, category, yaml_content)
     commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -1042,10 +1128,9 @@ def delete_demo(exploration_id):
 def load_demo(exploration_id):
     """Loads a demo exploration.
 
-    The resulting exploration will have version 2 (one for its initial
-    creation and one for its subsequent modification.)
+    The resulting exploration will have two commits in its history (one for its
+    initial creation and one for its subsequent modification.)
     """
-    # TODO(sll): Speed this method up. It is too slow.
     delete_demo(exploration_id)
 
     if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):
@@ -1064,9 +1149,6 @@ def load_demo(exploration_id):
         exploration_id, assets_list)
 
     rights_manager.publish_exploration(
-        feconf.SYSTEM_COMMITTER_ID, exploration_id)
-    # Release ownership of all explorations.
-    rights_manager.release_ownership(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])
@@ -1125,14 +1207,14 @@ def get_next_page_of_all_non_private_commits(
 def _exp_rights_to_search_dict(rights):
     # Allow searches like "is:featured".
     doc = {}
-    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
         doc['is'] = 'featured'
     return doc
 
 
 def _should_index(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
-    return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
+    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
 def _get_search_rank(exp_id):
@@ -1153,7 +1235,7 @@ def _get_search_rank(exp_id):
     summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED
+        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
     if summary.ratings:
@@ -1163,14 +1245,7 @@ def _get_search_rank(exp_id):
                 summary.ratings[rating_value] *
                 RATING_WEIGHTINGS[rating_value])
 
-    # Iterate backwards through the exploration history metadata until we find
-    # the most recent snapshot that was committed by a human.
-    last_human_update_ms = 0
-    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
-    for snapshot_metadata in reversed(snapshots_metadata):
-        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
-            last_human_update_ms = snapshot_metadata['created_on_ms']
-            break
+    last_human_update_ms = _get_last_updated_by_human_ms(exp_id)
 
     _TIME_NOW_MS = utils.get_current_time_in_millisecs()
     _MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
@@ -1222,8 +1297,8 @@ def index_explorations_given_ids(exp_ids):
 
 def patch_exploration_search_document(exp_id, update):
     """Patches an exploration's current search document, with the values
-    from the 'update' dictionary."""
-
+    from the 'update' dictionary.
+    """
     doc = search_services.get_document_from_index(
         exp_id, SEARCH_INDEX_EXPLORATIONS)
     doc.update(update)
@@ -1232,7 +1307,7 @@ def patch_exploration_search_document(exp_id, update):
 
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(

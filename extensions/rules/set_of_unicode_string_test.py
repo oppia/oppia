@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 import extensions.rules.set_of_unicode_string as set_rules
-import test_utils
 
 
 class SetOfUnicodeStringRuleUnitTests(test_utils.GenericTestBase):

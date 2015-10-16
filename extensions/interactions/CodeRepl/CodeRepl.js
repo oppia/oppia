@@ -62,49 +62,41 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           editor.on('change', function(instance, change) {
             $scope.code = editor.getValue();
           });
+
+          $scope.hasLoaded = true;
         };
 
-
-        // Set up the jsrepl instance with callbacks set.
-        var jsrepl = new JSREPL({
+        // Configure Skulpt.
+        Sk.configure({
           output: function(out) {
-            // For successful evaluation, this is called before 'result', so
-            // just keep the output string here.
-            $scope.output = out;
+            // This output function is called continuously throughout the
+            // runtime of the script.
+            $scope.output += out;
           },
-          result: function(res) {
-            $scope.sendResponse(res, '');
+          timeoutMsg: function() {
+            $scope.sendResponse('', 'timeout');
           },
-          error: function(err) {
-            if ($scope.output) {
-              // Part of the error message can be in the output string.
-              err += $scope.output;
-              $scope.output = '';
-            }
-            $scope.sendResponse('', err);
-          },
-          timeout: {
-            time: 10000,
-            callback: function() {
-              $scope.sendResponse('', 'timeout');
-            },
-          },
-        });
-
-        jsrepl.loadLanguage($scope.language, function() {
-          $scope.hasLoaded = true;
-          $scope.$apply();
+          execLimit: 10000,
         });
 
         $scope.runCode = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
 
-          // Running the code. This triggers one of the callbacks set to jsrepl
-          // which then calls sendResponse with the result.
           var fullCode = (
             $scope.preCode + '\n' + codeInput + '\n' + $scope.postCode);
-          jsrepl.eval(fullCode);
+
+          // Evaluate the program asynchronously using Skulpt.
+          Sk.misceval.asyncToPromise(function() {
+            Sk.importMainWithBody('<stdin>', false, fullCode, true);
+          }).then(function(res) {
+            // Finished evaluating.
+            $scope.sendResponse('', '');
+          }, function(err) {
+            if (!(err instanceof Sk.builtin.TimeLimitError)) {
+              $scope.sendResponse('', String(err));
+            }
+          });
         };
 
         $scope.sendResponse = function(evaluation, err) {
@@ -128,8 +120,13 @@ oppia.directive('oppiaResponseCodeRepl', [
       restrict: 'E',
       scope: {},
       templateUrl: 'response/CodeRepl',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+
+        if ($scope.answer.error) {
+          $scope.errorFocusLabel = focusService.generateFocusLabel();
+          focusService.setFocus($scope.errorFocusLabel);
+        }
       }]
     };
   }
