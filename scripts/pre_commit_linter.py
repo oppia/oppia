@@ -17,7 +17,7 @@
 """Pre-commit script for Oppia.
 
 This script uses the JSCS node module to lint JavaScript code
-It returns errors
+It returns and autofix errors
 
 IMPORTANT NOTES:
 
@@ -47,13 +47,15 @@ import time
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--fix',
-    help='optional; if specified, autofix errors and display which can not be fixed')
+    help='optional; if specified, autofix and display errors which can not be fixed',
+    action='store_true')
 
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
     Returns:
-        a list of files about to be commited. """
+        a list of files about to be commited.
+    """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only']).splitlines()
     staged_files  = subprocess.check_output([
@@ -82,19 +84,16 @@ def _lint_js_files(jscs_path):
     """
     start_time = time.time()
     parsed_args = _PARSER.parse_args()
-
-    # List of checked files
-    javascript_files = []
-    # List of errors
+    # List of errors.
     errors = []
-
     changed_filenames = _get_changed_filenames()
-    # Find all javascript files
+
+    # Find all javascript files.
     for filename in changed_filenames:
         changed_js_filenames = filter(
                     _is_javascript_file, changed_filenames)
 
-    # Do nothing if  no Javascript files changed
+    # Do nothing if  no Javascript files changed.
     if len(changed_js_filenames) == 0:
         print "No Javascript file to check"
         sys.exit(0)
@@ -102,7 +101,8 @@ def _lint_js_files(jscs_path):
     num_js_files = len(changed_js_filenames)
 
     for ind, filename in enumerate(changed_js_filenames):
-        print 'Linting %s (file %d/%d)...\t' % (filename, ind + 1, num_js_files)
+        print 'Linting %s (file %d/%d)...\t' % (filename, ind + 1,
+                num_js_files)
         try:
             if parsed_args.fix:
                 proc = subprocess.Popen(
@@ -123,10 +123,11 @@ def _lint_js_files(jscs_path):
             print e
             sys.exit(1)
 
-    # This removes empty string added incase no errors
+    # This removes empty string added incase no errors.
     errors = filter(None, errors)
     if len(errors) > 0:
-        print 'FAILED %s JavaScript files: %s failures' % (num_js_files, len(errors))
+        print 'FAILED %s JavaScript files: %s failures' % (num_js_files,
+            len(errors))
     else:
         print 'SUCCESS %s JavaScript files linted (%.1f secs)' % (num_js_files,
                 time.time() - start_time)
