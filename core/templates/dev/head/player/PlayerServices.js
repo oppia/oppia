@@ -159,6 +159,7 @@ oppia.factory('oppiaPlayerService', [
   var sessionId = null;
   var _isLoggedIn = GLOBALS.userIsLoggedIn;
   var _exploration = null;
+  var _collection_id = GLOBALS.collectionId;
 
   learnerParamsService.init({});
   var stateHistory = [];
@@ -228,7 +229,8 @@ oppia.factory('oppiaPlayerService', [
           params: learnerParamsService.getAllParams(),
           session_id: sessionId,
           state_name: newStateName,
-          version: version
+          version: version,
+          collection_id: _collection_id,
         });
       }
     }

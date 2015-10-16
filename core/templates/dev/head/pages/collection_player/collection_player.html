@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  {{ collection_title }}
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+  {% if collection_id %}
+    <script type="text/javascript">
+      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    </script>
+  {% endif %}
+
+  {{dependencies_html}}
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span class="protractor-test-collection-header" itemprop="description">{{collection_title}}</span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div ng-controller="CollectionPlayer">
+    <div ng-if="collection">
+      <span>Welcome to: <[collection.title]></span>
+      <br>
+      Begin by playing or continue where you left off:
+      <ul>
+        <li ng-repeat="collection_node in getSuggestedCollectionNodes()">
+          <a target="_blank" href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>"><[collection_node.exploration.title]></a>
+        </li>
+      </ul>
+      <span>This collection has <[collection.nodes.length]> explorations.</span>
+      <ul>
+        <li ng-repeat="collection_node in collection.nodes">
+          <a target="_blank" href="/explore/<[collection_node.exploration.id]>"><[collection_node.exploration.title]></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  {% include 'attribution_guide.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/collection_player/CollectionPlayer.js') }}
+    {{ include_js_file('pages/collection_player/CollectionDataService.js') }}
+    {{ include_js_file('common/services/UrlInterpolationService.js') }}
+  </script>
+{% endblock footer_js %}

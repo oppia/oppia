@@ -12,6 +12,7 @@
       GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
       GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
+      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
     </script>
   {% endif %}
 
@@ -22,7 +23,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCard">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
+      <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
       <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon">

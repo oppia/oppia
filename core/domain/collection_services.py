@@ -33,7 +33,8 @@ from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
-(collection_models,) = models.Registry.import_models([models.NAMES.collection])
+(collection_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 import feconf
@@ -251,6 +252,40 @@ def get_collection_titles_and_categories(collection_ids):
                 'category': collection.category,
             }
     return result
+
+
+def get_completed_exploration_ids(user_id, collection_id):
+    """Returns a list of explorations the user has completed within the context
+    of the provided collection. Returns an empty list if the user has not yet
+    completed any explorations within the collection.
+    """
+    completion_model = user_models.ExplorationInCollectionCompletionModel.get(
+        user_id, collection_id)
+    if completion_model:
+        return completion_model.context['exploration_ids']
+    return []
+
+
+def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
+    """Returns a list of exploration IDs in the specified collection that the
+    given user has not yet attempted and has the prerequisite skills to play.
+
+    Returns the collection's initial explorations if the user has yet to
+    complete any explorations within the collection. Returns an empty list if
+    the user has completed all of the explorations within the collection.
+
+    See collection_domain.Collection.get_next_exploration_ids for more
+    information.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+
+    collection = get_collection_by_id(collection_id)
+    if completed_exploration_ids:
+        return collection.get_next_exploration_ids(completed_exploration_ids)
+    else:
+        # The user has yet to complete any explorations inside the collection.
+        return collection.init_exploration_ids
 
 
 def _get_collection_summary_dicts_from_models(collection_summary_models):
