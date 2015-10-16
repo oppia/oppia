@@ -412,6 +412,7 @@
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/visualizations.html' %}
   {% include 'components/gadget_panel.html' %}
+  {% include 'components/profile_link.html' %}
 
 {% endblock content %}
 
@@ -449,6 +450,7 @@
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
     {{ include_js_file('components/answerGroupEditor.js') }}
+    {{ include_js_file('components/profileLink.js') }}
 
     {% for skin_js_url in skin_js_urls %}
       {{ include_skins_js_file(skin_js_url) }}
