@@ -60,6 +60,7 @@
 
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/ratings.html' %}
+  {% include 'components/profile_link.html' %}
 
   <script type="text/ng-template" id="popover/feedback">
     <feedback-popup></feedback-popup>
@@ -95,7 +96,9 @@
               src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
             <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
               tooltip="<[ContributorUsername]>" tooltip-placement="top">
-              <img class="oppia-contributors-circle" ng-src="/images/avatar/user_mint_48px.png" alt="">
+              <profile-link-image linked-name="<[ContributorUsername]>">
+                <img class="oppia-contributors-circle" ng-src="/images/avatar/user_mint_48px.png" alt="">
+              </profile-link-image>
             </li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
@@ -221,6 +224,7 @@
     {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
+    {{ include_js_file('components/profileLink.js')}}
     {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>

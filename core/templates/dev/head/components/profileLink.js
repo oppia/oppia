@@ -11,7 +11,9 @@ oppia.directive('profileLinkText', [function() {
 oppia.directive('profileLinkImage', [function() { 
   return {
     restrict: 'E',
+    transclude: true,
     scope: {
+      linkedName: '@',
       linkedImage: '@'
     },
     templateUrl: 'components/profileLinkImage',
