@@ -106,7 +106,8 @@ fi
 # if it does not match the expected prefix.  
 function test_python_version() {
   EXPECTED_PYTHON_VERSION_PREFIX="2.7"
-  PYTHON_VERSION=$($1 --version 2>&1)
+  echo "Testing python command $PYTHON_CMD ..."
+  PYTHON_VERSION=$($1 --version 2>&1) 
   if [[ $PYTHON_VERSION =~ Python[[:space:]](.+) ]]; then
     PYTHON_VERSION=${BASH_REMATCH[1]}
   else
