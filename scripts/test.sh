@@ -90,6 +90,10 @@ for arg in "$@"; do
   fi
 done
 
+echo $PYTHON_CMD
+perms=$(ls -la)
+echo "$perms"
+
 $PYTHON_CMD scripts/backend_tests.py $@
 
 for arg in "$@"; do
