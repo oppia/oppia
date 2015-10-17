@@ -108,8 +108,8 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }
 
     $http.post($scope.adminHandlerUrl, {
-        action: 'save_config_properties',
-        new_config_property_values: newConfigPropertyValues
+      action: 'save_config_properties',
+      new_config_property_values: newConfigPropertyValues
     }).success(function(data) {
       $scope.message = 'Data saved successfully.';
     }).error(function(errorResponse) {
@@ -202,8 +202,8 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $scope.message = 'Starting new job...';
 
     $http.post($scope.adminHandlerUrl, {
-        action: 'start_new_job',
-        job_type: jobType
+      action: 'start_new_job',
+      job_type: jobType
     }).success(function(data) {
       $scope.message = 'Job started successfully.';
       window.location.reload();
@@ -216,9 +216,9 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $scope.message = 'Cancelling job...';
 
     $http.post($scope.adminHandlerUrl, {
-        action: 'cancel_job',
-        job_id: jobId,
-        job_type: jobType
+      action: 'cancel_job',
+      job_id: jobId,
+      job_type: jobType
     }).success(function(data) {
       $scope.message = 'Abort signal sent to job.';
       window.location.reload();
