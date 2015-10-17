@@ -177,13 +177,13 @@ class Rule(object):
             subject: the thing to be evaluated.
 
         Returns:
-            bool: the result of the evaluation.
+            float: the result of the evaluation (between 0.0 and 1.0).
         """
         return self._evaluate(self.subject_type.normalize(subject))
 
 
 def evaluate_rule(rule_spec, answer_type, context_params, answer, fs):
-    """Evaluates a rule spec using context_params. Returns a boolean."""
+    """Evaluates a rule spec. Returns a float between 0.0 and 1.0."""
     all_rule_classes = get_rules_for_obj_type(answer_type)
     rule = next(r for r in all_rule_classes
                 if r.__name__ == rule_spec.rule_type)

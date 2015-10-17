@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import html_cleaner
-import test_utils
+from core.tests import test_utils
 
 
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):

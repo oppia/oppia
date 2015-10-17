@@ -17,12 +17,8 @@
 __author__ = 'Sean Lip'
 
 from core.platform import models
-(base_models,) = models.Registry.import_models([
-    models.NAMES.base_model])
-import feconf
-import test_utils
-
-import unittest
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+from core.tests import test_utils
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
@@ -81,7 +77,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
-        for item in range(100):
+        for _ in range(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 

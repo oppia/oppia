@@ -336,4 +336,41 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
     }
     return summary;
   }
-}])
+}]);
+
+// Filter that summarizes a large number to a decimal followed by
+// the appropriate metric prefix (K, M or B). For example, 167656
+// becomes 167.7K.
+// Users of this filter should ensure that the input is a non-negative number.
+oppia.filter('summarizeNonnegativeNumber', [function() {
+  return function (input) {
+    input = Number(input)
+    // Nine Zeroes for Billions
+    return input >= 1.0e+9
+    // Example 146008788788 becomes 146.0B
+    ? (input / 1.0e+9).toFixed(1) + 'B'
+
+    // Six Zeroes for Millions
+    : input >= 1.0e+6
+    // Example 146008788 becomes 146.0M
+    ? (input / 1.0e+6).toFixed(1) + 'M'
+
+    // Three Zeroes for Thousands
+    : input >= 1.0e+3
+    // Example 146008 becomes 146.0K
+    ? (input / 1.0e+3).toFixed(1) + 'K'
+    // For small number it should return number as it is
+    // Example 12 becomes 12
+    : input;
+  };
+}]);
+
+oppia.filter('truncateAndCapitalize', [function() {
+  return function(input, maxNumberOfCharacters) {
+    input = input.trim();
+    if(input.length > maxNumberOfCharacters) {
+      input = input.substring(0, maxNumberOfCharacters) + '...';
+    }
+    return input.charAt(0).toUpperCase() + input.slice(1);
+  }
+}]);

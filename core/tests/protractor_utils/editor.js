@@ -22,6 +22,7 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
+var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 // constants
@@ -226,6 +227,153 @@ var expectCannotDeleteInteraction = function() {
   expect(element(by.css(
     '.protractor-test-delete-interaction')).isPresent()).toBeFalsy();
 };
+
+// GADGETS
+
+// Additional arguments may be sent to this function, and they will be
+// passed on to the relevant gadget editor.
+var addGadget = function(gadgetType, gadgetName) {
+
+  // Bring up the gadget insertion modal.
+  element(
+    by.css('.protractor-test-add-gadget-button'))
+    .click();
+
+  general.waitForSystem(2000);
+
+  // Select the desired gadgetType from the modal.
+  element(
+    by.css('.protractor-test-' + gadgetType + '-gadget-selection-modal'))
+    .click();
+
+  var gadgetNameInput = element(by.css('.protractor-test-gadget-name-input'));
+  gadgetNameInput.clear().then(function() {
+    gadgetNameInput.sendKeys(gadgetName);
+  });
+
+  // Locate the customization section and apply any customizations.
+  var elem = element(by.css('.protractor-test-gadget-customization-editor'));
+  var customizationArgs = [elem];
+
+  if (arguments.length > 2) {
+    for (var i = 2; i < arguments.length; i++) {
+      customizationArgs.push(arguments[i]);
+    }
+    gadgets.getGadget(gadgetType).customizeGadget.apply(
+      null, customizationArgs);
+  }
+
+  element(by.css('.protractor-test-save-gadget-button')).click();
+
+  // Wait for the customization modal to close.
+  general.waitForSystem(2000);
+
+};
+
+// Callers should ensure that a gadget with currentName exists.
+var renameGadget = function(currentName, newName) {
+  openGadgetEditorModal(currentName);
+  element(by.css('.protractor-test-open-gadget-name-editor'))
+    .click();
+  var gadgetNameInput = element(
+    by.css('.protractor-test-gadget-rename-text-input'));
+  gadgetNameInput.clear().then(function() {
+    gadgetNameInput.sendKeys(newName);
+  });
+  element(
+    by.css('.protractor-test-gadget-rename-confirmation-button')).click();
+  saveAndCloseGadgetEditorModal();
+};
+
+// Callers should ensure that a gadget with gadgetName exists.
+var deleteGadget = function(gadgetName) {
+  element(by.css('.protractor-test-delete-' + gadgetName + '-gadget-icon'))
+    .click();
+  general.waitForSystem(2000); // wait for modal popup.
+  element(by.css('.protractor-test-delete-gadget-button')).click();
+};
+
+var openGadgetEditorModal = function(gadgetName) {
+  element(by.css('.protractor-test-edit-' + gadgetName + '-gadget')).click();
+};
+
+var saveAndCloseGadgetEditorModal = function() {
+  element(by.css('.protractor-test-save-gadget-button')).click();
+};
+
+// Enables visibility for a given state.
+// openGadgetEditorModal must be called before this method.
+// Note: cssContainingText must be used as state names can contain spaces.
+var enableGadgetVisibilityForState = function(stateName) {
+  element(by.cssContainingText(
+    '.protractor-test-state-visibility-checkbox-label',
+    stateName)).all(by.css('.protractor-test-gadget-visibility-checkbox'))
+    .then(function(items) {
+      items[0].isSelected().then(function(selected) {
+        if (!selected) {
+          items[0].click();
+        }
+      })
+    })
+};
+
+// Disables visibility for a given state.
+// openGadgetEditorModal must be called before this method.
+var disableGadgetVisibilityForState = function(stateName) {
+  element(by.cssContainingText(
+    '.protractor-test-state-visibility-checkbox-label',
+    stateName)).all(by.css('.protractor-test-gadget-visibility-checkbox'))
+    .then(function(items) {
+      items[0].isSelected().then(function(selected) {
+        if (selected) {
+          items[0].click();
+        }
+      })
+    })
+};
+
+// Verifies a gadget's short description and name show up as expected
+// in the gadgets sidebar.
+var expectGadgetListNameToMatch = function(
+    gadgetType, gadgetShortDescription, gadgetName) {
+  var expectedListName;
+  if (gadgetShortDescription == gadgetName) {
+    expectedListName = gadgetName;
+  } else {
+    expectedListName = gadgetShortDescription + ' (' + gadgetName + ')';
+  }
+  expect(element(by.css('.protractor-test-' + gadgetType + '-list-item'))
+    .getText()).toBe(expectedListName);
+};
+
+var expectGadgetWithNameDoesNotExist = function(gadgetType, gadgetName) {
+  expect(element.all(by.css('.protractor-test-' + gadgetType + '-list-item'))
+    .count()).toBe(0);
+};
+
+// PARAMETERS
+
+// This function adds a parameter change, creating the parameter if necessary.
+var addParameterChange = function(paramName, paramValue) {
+  element(by.css('.protractor-test-add-param-button')).click();
+
+  forms.AutocompleteDropdownEditor(
+    element(by.css('.protractor-test-param-changes-editor'))
+  ).setValue(paramName);
+
+  /* Setting parameter value is difficult via css since the associated
+  input is a sub-component of the third party select2 library. We isolate
+  it as the third input in the current parameter changes UI. */
+  element(by.css('.protractor-test-param-changes-editor')).all(
+    by.tagName('input')).then(function(items) {
+      items[2].sendKeys(paramValue);
+    });
+
+  element(by.css('.protractor-test-save-param-change-button')).click();
+
+  general.waitForSystem(500);
+}
+
 
 // RULES
 
@@ -558,8 +706,6 @@ var deleteState = function(stateName) {
   });
 };
 
-// For problems with this function see issue 732.
-// TODO (jacob) fix issue 732.
 var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
     return stateNode.element(by.css('.protractor-test-node-label')).getText();
@@ -877,6 +1023,21 @@ exports.expectContentToMatch = expectContentToMatch;
 exports.setInteraction = setInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
+
+exports.addGadget = addGadget;
+exports.renameGadget = renameGadget;
+exports.deleteGadget = deleteGadget;
+
+exports.expectGadgetListNameToMatch = expectGadgetListNameToMatch;
+exports.expectGadgetWithNameDoesNotExist = expectGadgetWithNameDoesNotExist;
+
+exports.openGadgetEditorModal = openGadgetEditorModal;
+exports.saveAndCloseGadgetEditorModal = saveAndCloseGadgetEditorModal;
+
+exports.enableGadgetVisibilityForState = enableGadgetVisibilityForState;
+exports.disableGadgetVisibilityForState = disableGadgetVisibilityForState;
+
+exports.addParameterChange = addParameterChange;
 
 exports.addResponse = addResponse;
 exports.setDefaultOutcome = setDefaultOutcome;

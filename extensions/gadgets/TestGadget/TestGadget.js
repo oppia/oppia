@@ -13,15 +13,66 @@
 // limitations under the License.
 
 /**
- * Directive for the TestGadget gadget.
+ * Directive for the TestGadget gadget. This gadget is a simplified
+ * abstraction of the AdviceBar gadget for testing purposes.
  *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by 'With',
+ * followed by the name of the arg.
  */
+
 oppia.directive('oppiaGadgetTestGadget', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+
+    // Maximum and minimum number of tips that an TestGadget can hold.
+    var _MAX_TIP_COUNT = 3;
+    var _MIN_TIP_COUNT = 1;
+
     return {
       restrict: 'E',
-      scope: {},
       templateUrl: 'gadget/TestGadget',
+      controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
+        $scope.testGadgetAdviceResources = oppiaHtmlEscaper.escapedJsonToObj(
+        	$attrs.adviceObjectsWithValue);
+
+        $scope.validate = function() {
+          var tipCount = $scope.testGadgetAdviceResources.length;
+          if (tipCount > _MAX_TIP_COUNT) {
+            var validationError = 'TestGadget is limited to ' +
+              _MAX_TIP_COUNT + ' tip' + (_MAX_TIP_COUNT>1 ? 's' : '') + '.';
+            return validationError;
+          } else if (tipCount < _MIN_TIP_COUNT) {
+            var validationError = 'TestGadget needs at least ' +
+              _MIN_TIP_COUNT + ' tip' + (_MIN_TIP_COUNT>1 ? 's' : '') + '.';
+            return validationError;
+          } else {
+            return '';
+          }
+        };
+
+        $scope.overlayAdviceModal = function(adviceResourceIndex) {
+          $modal.open({
+            templateUrl: '../extensions/gadgets/TestGadget/static/html/test_gadget_overlay.html',
+            controller: 'TestGadgetAdviceModalCtrl',
+            backdrop: true,
+            resolve: {
+              adviceTitle: function() {
+                return $scope.testGadgetAdviceResources[adviceResourceIndex].adviceTitle;
+              },
+              adviceHtml: function() {
+                return $scope.testGadgetAdviceResources[adviceResourceIndex].adviceHtml;
+              }
+            },
+          })
+        };
+      }],
     }
   }
 ]);
+
+oppia.controller('TestGadgetAdviceModalCtrl',
+  ['$scope', 'adviceTitle', 'adviceHtml',
+  function ($scope, adviceTitle, adviceHtml) {
+    $scope.adviceTitle = adviceTitle;
+    $scope.adviceHtml = adviceHtml;
+}]);
