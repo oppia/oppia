@@ -17,6 +17,7 @@
 """Pre-commit script for Oppia.
 
 This script uses the JSCS node module to lint JavaScript code.
+
 It prints a list of lint errors to the terminal. 
 If the --autofix flag is passed, it will also attempt to automatically fix these errors.
 
@@ -50,7 +51,7 @@ _PARSER.add_argument(
     '--autofix',
     help=(
         'optional; if specified, automatically fix errors where possible, and '
-        'olny display errors which cannot be fixed'),
+        'only display errors which cannot be fixed'),
     action='store_true')
 
 
