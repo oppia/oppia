@@ -80,7 +80,7 @@ def _is_javascript_file(filename):
     return filename.endswith('.js')
 
 
-def _lint_js_files(node_path, jscs_path, autofix):
+def _lint_js_files(node_path, jscs_path, autofix, config_jscsrc):
     """Prints a list of lint errors in changed JavaScript files.
 
     Args:
@@ -100,7 +100,7 @@ def _lint_js_files(node_path, jscs_path, autofix):
 
     start_time = time.time()
 
-    jscs_cmd_args = [node_path, jscs_path]
+    jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
     if autofix:
         jscs_cmd_args.append('-x')
 
@@ -138,6 +138,8 @@ def _pre_commit_linter():
     autofix = bool(parsed_args.autofix)
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
+    config_jscsrc ='--config=' + jscsrc_path
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-0.10.33', 'bin', 'node')
     jscs_path = os.path.join(
@@ -145,7 +147,7 @@ def _pre_commit_linter():
 
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
-            _lint_js_files(node_path, jscs_path, autofix)
+            _lint_js_files(node_path, jscs_path, autofix, config_jscsrc)
         else:
             print ''
             print 'ERROR    Please run start.sh first to install node-jscs '
