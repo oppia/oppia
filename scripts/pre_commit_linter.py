@@ -139,7 +139,7 @@ def _pre_commit_linter():
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
-    config_jscsrc ='--config=' + jscsrc_path
+    config_jscsrc = '--config=%s' % jscsrc_path
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-0.10.33', 'bin', 'node')
     jscs_path = os.path.join(
