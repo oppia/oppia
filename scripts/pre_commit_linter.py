@@ -46,7 +46,7 @@ import time
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--fix',
+    '--autofix',
     help='optional; if specified, autofix and display errors which can not be fixed',
     action='store_true')
 
@@ -76,61 +76,56 @@ def _is_javascript_file(filename):
     return filename.endswith('.js')
 
 
-def _lint_js_files(jscs_path):
+def _lint_js_files(jscs_path, autofix = None):
     """Prints a list of lint errors in changed JavaScript files.
 
     Args:
-    - jscs_path: path to the JSCS binary
+    - jscs_path: path to the JSCS binary.
+    - autofix: (Optional[str]): Argument to autofix errors. Defaults to None. 
     """
     start_time = time.time()
-    parsed_args = _PARSER.parse_args()
     # List of errors.
     errors = []
     changed_filenames = _get_changed_filenames()
 
     # Find all javascript files.
-    for filename in changed_filenames:
-        changed_js_filenames = filter(
-                    _is_javascript_file, changed_filenames)
+    changed_js_filenames = filter(
+        _is_javascript_file, changed_filenames)
 
     # Do nothing if  no Javascript files changed.
     if len(changed_js_filenames) == 0:
-        print "No Javascript file to check"
+        print 'No Javascript file to check'
         sys.exit(0)
 
     num_js_files = len(changed_js_filenames)
 
     for ind, filename in enumerate(changed_js_filenames):
-        print 'Linting %s (file %d/%d)...\t' % (filename, ind + 1,
-                num_js_files)
+        print 'Linting %s (file %d/%d)...\t' % (
+            filename, ind + 1, num_js_files)
+
+        proc_args = (
+            [jscs_path, '-x', filename] if autofix
+            else [jscs_path, filename])
         try:
-            if parsed_args.fix:
-                proc = subprocess.Popen(
-                    [jscs_path, '-x', filename],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
-                linter_stdout, linter_stderr = proc.communicate()
-                errors.append(linter_stdout)
-            else:
-                proc = subprocess.Popen(
-                    [jscs_path, filename],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
-                linter_stdout, linter_stderr = proc.communicate()
-                errors.append(linter_stdout)
+            proc = subprocess.Popen(
+                proc_args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            linter_stdout, linter_stderr = proc.communicate()
+            errors.append(linter_stdout)
             print linter_stdout
         except OSError as e:
             print e
             sys.exit(1)
 
-    # This removes empty string added incase no errors.
+    # This removes empty string added in case no errors.
     errors = filter(None, errors)
     if len(errors) > 0:
-        print 'FAILED %s JavaScript files: %s failures' % (num_js_files,
-            len(errors))
+        print 'FAILED %s JavaScript files: %s failures' % (
+            num_js_files, len(errors))
     else:
-        print 'SUCCESS %s JavaScript files linted (%.1f secs)' % (num_js_files,
-                time.time() - start_time)
+        print 'SUCCESS %s JavaScript files linted (%.1f secs)' % (
+            num_js_files, time.time() - start_time)
 
 
 def _pre_commit_linter():
@@ -138,14 +133,15 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass JSCS binary path
     """
+    parsed_args = _PARSER.parse_args()
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    jscs_path = os.path.join(parent_dir, 'node_modules',
-            'jscs', 'bin', 'jscs')
+    jscs_path = os.path.join(
+            parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
-            _lint_js_files(jscs_path)
+            _lint_js_files(jscs_path, parsed_args.autofix)
         else:
-            print 'Please run  start.sh first'
+            print 'Please run start.sh first'
             print 'to install node-jscs and its dependencies'
     else:
         print 'Please run me from Oppia root directory'

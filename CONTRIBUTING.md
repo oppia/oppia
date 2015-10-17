@@ -54,7 +54,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
     ```
       python scripts/pre_commit_linter.py
     ```
-  which checks the styling of your JavaScript code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions.](https://github.com/SublimeLinter/SublimeLinter-jscs).
+  which checks the styling of your JavaScript code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions](https://github.com/SublimeLinter/SublimeLinter-jscs).
   * Please ensure that the code you write is well-tested.
   * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
 
