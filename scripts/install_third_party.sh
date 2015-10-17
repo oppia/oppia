@@ -110,3 +110,9 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
+
+echo Checking whether node-jscs dependencies are installed
+if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
+  echo installing node-jscs
+  $NPM_INSTALL jscs@2.3.0
+fi
