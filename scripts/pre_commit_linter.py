@@ -16,8 +16,9 @@
 
 """Pre-commit script for Oppia.
 
-This script uses the JSCS node module to lint JavaScript code
-It returns and autofix errors
+This script uses the JSCS node module to lint JavaScript code.
+It prints a list of lint errors to the terminal. 
+If the --autofix flag is passed, it will also attempt to automatically fix these errors.
 
 IMPORTANT NOTES:
 
@@ -47,14 +48,17 @@ import time
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--autofix',
-    help='optional; if specified, autofix and display errors which can not be fixed',
+    help=(
+        'optional; if specified, automatically fix errors where possible, and '
+        'olny display errors which cannot be fixed'),
     action='store_true')
 
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
+
     Returns:
-        a list of files about to be commited.
+        a list of filenames of modified files
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only']).splitlines()
@@ -76,16 +80,16 @@ def _is_javascript_file(filename):
     return filename.endswith('.js')
 
 
-def _lint_js_files(jscs_path, autofix = None):
+def _lint_js_files(jscs_path, autofix):
     """Prints a list of lint errors in changed JavaScript files.
 
     Args:
     - jscs_path: path to the JSCS binary.
-    - autofix: (Optional[str]): Argument to autofix errors. Defaults to None. 
+    - autofix: bool. Whether to automatically fix errors. 
     """
     start_time = time.time()
     # List of errors.
-    errors = []
+    num_of_file_with_errors = 0
     changed_filenames = _get_changed_filenames()
 
     # Find all javascript files.
@@ -112,20 +116,17 @@ def _lint_js_files(jscs_path, autofix = None):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
             linter_stdout, linter_stderr = proc.communicate()
-            errors.append(linter_stdout)
-            print linter_stdout
+            if linter_stdout:
+                num_of_file_with_errors += 1
+                print linter_stdout
         except OSError as e:
             print e
             sys.exit(1)
 
-    # This removes empty string added in case no errors.
-    errors = filter(None, errors)
-    if len(errors) > 0:
-        print 'FAILED %s JavaScript files: %s failures' % (
-            num_js_files, len(errors))
-    else:
-        print 'SUCCESS %s JavaScript files linted (%.1f secs)' % (
-            num_js_files, time.time() - start_time)
+    print 'FAILED %s JavaScript files' %(num_of_file_with_errors)
+    print 'SUCCESS %s JavaScript files linted (%.1f secs)' % (
+            num_js_files - num_of_file_with_errors,
+            time.time() - start_time)
 
 
 def _pre_commit_linter():
@@ -134,12 +135,13 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
+    autofix = True if parsed_args.autofix else False
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     jscs_path = os.path.join(
             parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
-            _lint_js_files(jscs_path, parsed_args.autofix)
+            _lint_js_files(jscs_path, autofix)
         else:
             print 'Please run start.sh first'
             print 'to install node-jscs and its dependencies'
