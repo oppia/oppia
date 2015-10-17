@@ -54,7 +54,6 @@ oppia.controller('ExplorationHistory', [
     }
   });
 
-  // VP - push selected versions to array
   $scope.submitVersion = function($event, versionNumber) {
     var checkbox = $event.target;
     var id = $scope.versionArr.indexOf(versionNumber);
@@ -64,8 +63,6 @@ oppia.controller('ExplorationHistory', [
     if (!checkbox.checked && id !== -1) {
       $scope.versionArr.splice(id, 1);
     }
-    console.log('versionArr:[' + $scope.versionArr + ']');
-
     
     if($scope.versionArr.length == 2) {
       $scope.versionCountPrompt = "";
