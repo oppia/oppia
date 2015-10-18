@@ -24,13 +24,15 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', 'CATEGORY_LIST', function(
+    'explorationWarningsService', 'CATEGORY_LIST',
+    'explorationEditorAdvancedFeaturesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService, CATEGORY_LIST) {
+      explorationWarningsService, CATEGORY_LIST,
+      explorationEditorAdvancedFeaturesService) {
 
   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -138,6 +140,19 @@ oppia.controller('ExplorationSettings', [
     explorationParamChangesService.saveDisplayedValue();
     explorationWarningsService.updateWarnings();
   };
+
+  /********************************************
+  * Methods for enabling advanced features.
+  ********************************************/
+  $scope.areParametersEnabled = (
+    explorationEditorAdvancedFeaturesService.areParametersEnabled);
+  $scope.areGadgetsEnabled = (
+    explorationEditorAdvancedFeaturesService.areGadgetsEnabled);
+
+  $scope.enableParameters = (
+    explorationEditorAdvancedFeaturesService.enableParameters);
+  $scope.enableGadgets = (
+    explorationEditorAdvancedFeaturesService.enableGadgets);
 
   /********************************************
   * Methods for rights management.

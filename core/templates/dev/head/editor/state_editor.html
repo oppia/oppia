@@ -9,7 +9,7 @@
         {% include 'editor/sidebar_state_name.html' %}
       </div>
 
-      <div>
+      <div ng-if="areParametersEnabled()">
         {% include 'editor/sidebar_state_parameter_changes.html' %}
       </div>
 

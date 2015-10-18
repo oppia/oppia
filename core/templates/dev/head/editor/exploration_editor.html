@@ -340,10 +340,8 @@
               <div>
                 {% include 'editor/exploration_graph.html' %}
               </div>
-              <div>
-                {% if SHOW_GADGETS_EDITOR %}
-                  {% include 'editor/gadget_editor.html' %}
-                {% endif %}
+              <div ng-if="areGadgetsEnabled()">
+                {% include 'editor/gadget_editor.html' %}
               </div>
             </div>
           </div>
@@ -416,6 +414,7 @@
   <script>
     {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('editor/EditorServices.js') }}
+    {{ include_js_file('editor/ExplorationEditorAdvancedFeaturesService.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}

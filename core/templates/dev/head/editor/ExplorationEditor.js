@@ -34,6 +34,7 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
+  'explorationEditorAdvancedFeaturesService',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -43,10 +44,14 @@ oppia.controller('ExplorationEditor', [
     explorationTagsService, editabilityService, explorationStatesService,
     routerService, graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
-    explorationWarningsService, $templateCache, explorationContextService) {
+    explorationWarningsService, $templateCache, explorationContextService,
+    explorationEditorAdvancedFeaturesService) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
+
+  $scope.areGadgetsEnabled = (
+    explorationEditorAdvancedFeaturesService.areGadgetsEnabled);
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
@@ -106,6 +111,24 @@ oppia.controller('ExplorationEditor', [
 
       $scope.currentUser = data.user;
       $scope.currentVersion = data.version;
+
+      if (data.param_changes.length > 0) {
+        explorationEditorAdvancedFeaturesService.enableParameters();
+      } else {
+        for (var state in data.states) {
+          if (data.states[state].param_changes.length > 0) {
+            explorationEditorAdvancedFeaturesService.enableParameters();
+            break;
+          }
+        }
+      }
+
+      for (var panel in data.skin_customizations.panels_contents) {
+        if (data.skin_customizations.panels_contents[panel].length > 0) {
+          explorationEditorAdvancedFeaturesService.enableGadgets();
+          break;
+        }
+      }
 
       explorationRightsService.init(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,

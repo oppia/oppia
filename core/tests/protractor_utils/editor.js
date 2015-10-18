@@ -367,6 +367,7 @@ var addParameterChange = function(paramName, paramValue) {
   input is a sub-component of the third party select2 library. We isolate
   it as the third input in the current parameter changes UI. */
   editorRowElem.all(by.tagName('input')).then(function(items) {
+    items[2].clear();
     items[2].sendKeys(paramValue);
   });
 
@@ -774,6 +775,18 @@ var setFirstState = function(stateName) {
   });
 };
 
+var enableParameters = function() {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-enable-parameters')).click();
+  });
+};
+
+var enableGadgets = function() {
+  runFromSettingsTab(function() {
+    element(by.css('.protractor-test-enable-gadgets')).click();
+  });
+};
+
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
@@ -1056,6 +1069,8 @@ exports.setObjective = setObjective;
 exports.setLanguage = setLanguage;
 exports.expectAvailableFirstStatesToBe = expectAvailableFirstStatesToBe;
 exports.setFirstState = setFirstState;
+exports.enableParameters = enableParameters;
+exports.enableGadgets = enableGadgets;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
