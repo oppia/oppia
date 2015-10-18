@@ -17,7 +17,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import value_generators_domain
-import test_utils
+from core.tests import test_utils
 
 
 class ValueGeneratorsUnitTests(test_utils.GenericTestBase):

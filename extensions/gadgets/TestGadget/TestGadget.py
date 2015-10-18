@@ -22,68 +22,71 @@ import utils
 
 
 class TestGadget(base.BaseGadget):
-    """Base gadget for testing and validation."""
+    """TestGadget is a simplified AdviceBar for testing purposes."""
 
-    name = 'TestGadget'
-    description = 'Tests base gadget validation internals.'
+    short_description = 'Test Gadget'
+    description = 'Tests functionality allowing supplementary predefined tips.'
+    height_px = 50
+    width_px = 60
+    panel = 'bottom'
     _dependency_ids = []
 
     _customization_arg_specs = [
         {
-            'name': 'title',
-            'description': 'A text title of the test gadget.',
+            # TestGadget holds 1 or more adviceObjects, which include a title
+            # and text.
+            'name': 'adviceObjects',
+            'description': 'Title and content for each tip.',
             'schema': {
-                'type': 'unicode',
+                'type': 'list',
+                'validators': [{
+                    'id': 'has_length_at_least',
+                    'min_value': 1,
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': 3,
+                }],
+                'items': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'adviceTitle',
+                        'description': 'Tip title',
+                        'schema': {
+                            'type': 'unicode',
+                            'validators': [{
+                                'id': 'is_nonempty',
+                            }]
+                        },
+                    }, {
+                        'name': 'adviceHtml',
+                        'description': 'Advice content',
+                        'schema': {
+                            'type': 'html',
+                        },
+                    }]
+                }
             },
-            'default_value': ''
-        }, {
-            'name': 'floors',
-            'description': 'A test attribute that helps increase height.',
-            'schema': {
-                'type': 'int',
-            },
-            'default_value': 1
-        }, {
-            'name': 'characters',
-            'description': 'A test attribute that helps increase width.',
-            'schema': {
-                'type': 'int',
-            },
-            'default_value': 2
+            'default_value': [{
+                'adviceTitle': 'Tip title',
+                'adviceHtml': ''
+            }]
         }
     ]
 
-    # This TestGadget tests having a dynamic height and width based on the
-    # number of 'floors' and 'characters' it has in its customization args.
-    # These attributes don't represent anything beyond their role in
-    # calculating the gadget's dimentions.
-    _MAX_FLOORS = 3
-    _PIXEL_HEIGHT_PER_FLOOR = 50
-    _PIXEL_WIDTH_PER_CHARACTER = 30
+    # Maximum and minimum number of tips that the TestGadget can hold.
+    _MAX_TIP_COUNT = 3
+    _MIN_TIP_COUNT = 1
 
     def validate(self, customization_args):
-        """Ensure TestGadget validates a proper config."""
-        floors = customization_args['floors']['value']
-        if floors > self._MAX_FLOORS:
+        """Ensure TestGadget retains reasonable config."""
+        tip_count = len(customization_args['adviceObjects']['value'])
+        if tip_count > self._MAX_TIP_COUNT:
             raise utils.ValidationError(
-                'TestGadgets are limited to %d floors, found %d.' % (
-                    self._MAX_FLOORS,
-                    floors))
-
-    def get_width(self, customization_args):
-        """Returns int representing width in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        characters = customization_args['characters']['value']
-        return characters * self._PIXEL_WIDTH_PER_CHARACTER
-
-    def get_height(self, customization_args):
-        """Returns int representing height in pixels.
-
-        Args:
-        - customization_args: list of CustomizationArgSpec instances.
-        """
-        floors = customization_args['floors']['value']
-        return floors * self._PIXEL_HEIGHT_PER_FLOOR
+                'TestGadget is limited to %d tips, found %d.' % (
+                    self._MAX_TIP_COUNT,
+                    tip_count))
+        elif tip_count < self._MIN_TIP_COUNT:
+            raise utils.ValidationError(
+                'TestGadget requires at least %d tips, found %s.' % (
+                    self._MIN_TIP_COUNT,
+                    tip_count))

@@ -17,6 +17,7 @@
 """Stores various configuration options and constants for Oppia."""
 
 import copy
+import datetime
 import os
 
 # Whether to unconditionally log info messages.
@@ -36,6 +37,7 @@ else:
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
+SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
@@ -56,7 +58,13 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 6
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
+
+# The current version of the all collection blob schemas (such as the nodes
+# structure within the Collection domain object). If any backward-incompatible
+# changes are made to any of the blob schemas in the data store, this version
+# number must be changed.
+CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
@@ -79,10 +87,6 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 # exceed in order to be considered a better classification than the default
 # group.
 DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
-
-# Default valid parameter for instantiating Explorations when explicit
-# skin customizations aren't provided.
-DEFAULT_SKIN_CUSTOMIZATIONS = {'panels_contents': {}}
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -116,6 +120,9 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+# A regular expression for alphanumeric words separated by single spaces.
+# Ex.: 'valid name', 'another valid name', 'invalid   name'.
+ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
@@ -149,16 +156,24 @@ CAN_SEND_EMAILS_TO_USERS = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 
+# When the site terms were last updated, in UTC.
+REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 12, 0, 0, 0)
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
-# Whether to include a page with the Oppia discussion forum.
-SHOW_FORUM_PAGE = True
+# Whether to include the forum, terms and privacy pages.
+SHOW_CUSTOM_PAGES = True
 
-# User id and username for exploration migration bot.
+# The id of the default skin.
+DEFAULT_SKIN_ID = 'conversation_v1'
+
+# User id and username for exploration migration bot. Commits made by this bot
+# are not reflected in the exploration summary models (for the gallery and
+# last-updated timestamps), but are recorded in the exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
@@ -192,6 +207,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'Continue',
         'EndExploration',
         'ImageClickInput',
+        'ItemSelectionInput',
         'MultipleChoiceInput',
         'TextInput'
     ],
@@ -219,13 +235,13 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }]
 
 ALLOWED_GADGETS = {
-    'AdviceBar': {
-        'dir': os.path.join(GADGETS_DIR, 'AdviceBar')
-    },
     'ScoreBar': {
         'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
     },
 }
+
+# Gadgets subclasses must specify a valid panel option from this list.
+ALLOWED_GADGET_PANELS = ['bottom']
 
 # Demo explorations to load on startup. The id assigned to each exploration
 # is based on the index of the exploration in this list, so if you want to
@@ -254,13 +270,11 @@ DEMO_EXPLORATIONS = [
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
-    # TODO(anuzis): Replace about_oppia.yaml with this dev version when gadget
-    # visibility by state is functional. Currently an AdviceBar gadget that
-    # should only display on the Helsinki map state is visible during the
-    # entire exploration as a dev demo.
-    ('about_oppia_w_gadgets.yaml', 'Welcome with Gadgets! (DEV ONLY)',
-     'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
+]
+
+DEMO_COLLECTIONS = [
+    'welcome_to_collections.yaml'
 ]
 
 # TODO(sll): Add all other URLs here.
@@ -301,6 +315,8 @@ EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
 EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
+EVENT_TYPE_COLLECTION_CHANGE = 'collection_change'
+EVENT_TYPE_COLLECTION_STATUS_CHANGE = 'collection_status_change'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 # The values for these event types should be left as-is for backwards
@@ -309,17 +325,20 @@ EVENT_TYPE_START_EXPLORATION = 'start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
+ACTIVITY_STATUS_PRIVATE = 'private'
+ACTIVITY_STATUS_PUBLIC = 'public'
+ACTIVITY_STATUS_PUBLICIZED = 'publicized'
+
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
+COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
-# Unlaunched feature.
-SHOW_SKIN_CHOOSER = False
-
-# Unfinished feature.
+# Unfinished features.
+SHOW_GADGETS_EDITOR = False
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.
@@ -328,6 +347,7 @@ OUTPUT_FORMAT_ZIP = 'zip'
 
 # Types of updates shown in the 'recent updates' table in the dashboard page.
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
+UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # Default color

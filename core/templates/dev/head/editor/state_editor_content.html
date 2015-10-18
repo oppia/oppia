@@ -5,16 +5,18 @@
     <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit Card Content">
     </span>
     <div class="oppia-state-content-display protractor-test-state-edit-content oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
-      <span ng-show="content[0].value == ''" class="oppia-placeholder">
+      <span ng-show="content[0].value == '' && isCurrentStateInitialState()" class="oppia-placeholder">
         This is the first card of your exploration. Use this space to introduce your topic and engage the learner, then ask them a question.
+      </span>
+      <span ng-show="content[0].value == '' && !isCurrentStateInitialState()" class="oppia-placeholder">
+        You can speak to the learner here, then ask them a question.
       </span>
       <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
     </div>
   </div>
 </div>
 
-<!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
-<div ng-if="contentMemento !== null" class="oppia-state-item-editor-div protractor-test-state-content-editor">
+<div ng-if="contentMemento !== null" class="protractor-test-state-content-editor">
   <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
   </schema-based-editor>
   <div style="margin-top: 2px;">

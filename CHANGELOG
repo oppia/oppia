@@ -3,6 +3,58 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.0.0 (26 Sep 2015)
+--------------------
+Learner page:
+* Fully redesign the learner view in order to make only one state viewable at a time.
+* Make the feedback popover keyboard-accessible.
+* Add alt tags to the Oppia and user avatars.
+
+Gallery page:
+* Fix #716: allow ratings to have half-star granularity.
+* Fix a bug where the tick marks in the gallery dropdown menus were not aligned with the corresponding rows.
+
+Editor page:
+* Upgrade the rule system to support fuzzy rules.
+* Improve the wording of the tutorial and the default content card.
+* Make the number next to the 'Save Draft' button less prominent.
+* If a user does not have permissions to view an exploration, do not allow them to download it.
+* Fix #865: remove the 'Change Interaction' button from the interaction modal if an interaction is already selected.
+* Fix #762: prevent more than one modal from opening, even if the "Save Draft" button is clicked twice.
+* Fix #937: in the feedback tab, allow a status change (with no accompanying message) to count as a valid update to a feedback thread.
+* In the history tab, fix a display error for text in the 'revert version' modal.
+
+Sitewide frontend changes:
+* Fix links to point to github.com instead of code.google.com.
+* Fix a bug in which the profile dropdown would sometimes not show up on the top right.
+* Fix #917: make the error pages more friendly.
+
+Interactions:
+* Add a new ItemSelectionInput interaction.
+* Redesign the multiple-choice, numeric, text and continue button interactions.
+* Fix #788: in the ImageClickInput interaction, show a more descriptive representation of the learner's answer.
+* Fix #882: in the ImageClickInput interaction, enable labels to be specified.
+* Fix #919: make NumericInput interaction accept percentages.
+* Fix #953: in the TextInput interaction, change 'Number of rows' to 'Height (in rows)'.
+* Fix a typo in the editor warning message for multiple choice interactions with no default outcomes.
+
+Rich-text editor components:
+* Fix tooltips for RTE component insertion buttons.
+* Add an optional MP4 video RTE component.
+
+Security:
+* Specify the filename explicitly in the Content-Disposition header for JSON responses.
+
+Infrastructure:
+* Adjust backend tests to not use datetime.datetime.now(), since it gives different results in different locales.
+* Add a hook for inserting custom HTML before the end of the 'body' tag.
+* Broadcast parameter values to the messengerService for explorationCompleted and stateTransition events.
+* Speed up the recommendations job by making fewer calls to the datastore.
+* Update FontAwesome to version 4.4.0.
+* Add created_on and last_updated fields to reconstituted version snapshots.
+* Use the date when analytics were migrated away from StateCounter as the signal for which state to consider as the initial state for an exploration.
+
+
 v2.0.0.rc.4 (15 Jul 2015)
 -------------------------
 Editor walkthrough page:
@@ -84,7 +136,7 @@ Editor page:
 * Include published exploration that subsequently become community-owned.
 * Fix issue 724: add a realtime model for feedback analytics.
 
-Rich-text editor extensions:
+Rich-text editor components:
 * Prevent recursive nesting of the 'collapsible' and 'tabs' RTE extensions.
 * Image: allow alt text to be specified.
 

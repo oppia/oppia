@@ -30,17 +30,17 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl']),
-            ['jsrepl', 'codemirror'])
+            ['skulpt', 'codemirror'])
 
         self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl', 'CodeRepl', 'CodeRepl']),
-            ['jsrepl', 'codemirror'])
+            ['skulpt', 'codemirror'])
 
         self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl', 'LogicProof']),
-            ['jsrepl', 'codemirror', 'logic_proof'])
+            ['skulpt', 'codemirror', 'logic_proof'])
 
 
 class InteractionRegistryUnitTests(test_utils.GenericTestBase):

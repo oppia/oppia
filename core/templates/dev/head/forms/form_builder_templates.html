@@ -133,27 +133,27 @@
   <span ng-model="localValue" ui-validate="'validate($value)'">
     <span ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <md-input-group class="long oppia-blue-on-focus md-default-theme" style="display: inline; position: relative;">
-          <input style="display: inline; height: 25px; width: 250px;" type="text" name="floatValue" ng-model="$parent.localValue"
-                 require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
-                 focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
-                 ng-blur="onBlur()" ng-focus="onFocus()">
+        <input type="text" ng-model="$parent.localValue" class="form-control"
+               name="floatValue" placeholder="Type a number" ng-disabled="isDisabled()"
+               require-is-float apply-validation="validators()"
+               focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
+               ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
 
-          <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce" style="font-size: 0.9em; left: 0; position: absolute; top: 25px;" tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
-            <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
-              Please enter a valid decimal number.
-            </span>
-            <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
-                  class="oppia-form-error" aria-live="assertive">
-              Please enter a number that is at least <[getMinValue()]>.
-            </span>
-            <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
-                  class="oppia-form-error" aria-live="assertive">
-              Please enter a number that is at most <[getMaxValue()]>.
-            </span>
+        <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
+              style="font-size: 0.85em; position: absolute;"
+              tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
+          <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
+            Please enter a valid decimal number.
           </span>
-
-        </md-input-group>
+          <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
+                class="oppia-form-error" aria-live="assertive">
+            Please enter a number that is at least <[getMinValue()]>.
+          </span>
+          <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
+                class="oppia-form-error" aria-live="assertive">
+            Please enter a number that is at most <[getMaxValue()]>.
+          </span>
+        </span>
       </span>
 
       <span ng-if="allowExpressions()">
@@ -185,13 +185,13 @@
               ng-focus="onInputFocus()">
     </textarea>
 
-    <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
-      <input type="text" ng-disabled="isDisabled()"
+    <span ng-if="!getCodingMode() && !getRows()">
+      <input type="text" ng-disabled="isDisabled()" class="form-control"
              ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
              ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
-             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"
-             style="padding-top: 20px; margin-top: -30px;">
-    </md-input-group>
+             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
+             style="display: inline;">
+    </span>
 
     <!-- Note that we do not yet support ng-blur for the code editor. -->
     <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">

@@ -23,12 +23,12 @@ oppia.controller('ExplorationPreview', [
     'explorationStatesService', 'explorationInitStateNameService',
     'explorationParamSpecsService', 'explorationTitleService',
     'explorationCategoryService', 'explorationParamChangesService',
-    'oppiaPlayerService',
+    'explorationGadgetsService', 'oppiaPlayerService',
     function($scope, learnerParamsService, explorationData,
              explorationStatesService, explorationInitStateNameService,
              explorationParamSpecsService, explorationTitleService,
              explorationCategoryService, explorationParamChangesService,
-             oppiaPlayerService) {
+             explorationGadgetsService, oppiaPlayerService) {
   $scope.isExplorationPopulated = false;
   explorationData.getData().then(function(data) {
     oppiaPlayerService.populateExploration({
@@ -38,9 +38,9 @@ oppia.controller('ExplorationPreview', [
       param_specs: explorationParamSpecsService.savedMemento,
       states: explorationStatesService.getStates(),
       title: explorationTitleService.savedMemento,
-      // TODO(sll): Change this to use a service once an editor for
-      // gadgets/panels is implemented.
-      skin_customizations: data.skin_customizations
+      skin_customizations: {
+        panels_contents: explorationGadgetsService.getPanelsContents()
+      }
     });
     $scope.isExplorationPopulated = true;
   });

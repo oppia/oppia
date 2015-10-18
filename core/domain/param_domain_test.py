@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import param_domain
-import test_utils
+from core.tests import test_utils
 import utils
 
 

@@ -94,7 +94,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
-            if exp_rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
                 exploration.validate()
             else:
                 exploration.validate(strict=True)
@@ -160,11 +160,11 @@ class SearchRankerMRJobManager(
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
-    versions. This job will load all existing explorations from NDB and
-    immediately store them back into NDB. The loading process of an exploration
-    in exp_services automatically performs schema updating. This job persists
-    that conversion work, keeping explorations up-to-date and enhancing the
-    load time of new explorations.
+    versions. This job will load all existing explorations from the data store
+    and immediately store them back into the data store. The loading process of
+    an exploration in exp_services automatically performs schema updating. This
+    job persists that conversion work, keeping explorations up-to-date and
+    improving the load time of new explorations.
     """
 
     @classmethod
@@ -207,6 +207,35 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that produces a list of (exploration, state) pairs, grouped by the
+    interaction they use.
+
+    This job is for demonstration purposes. It is not enabled by default in the
+    jobs registry.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        for state_name, state in exploration.states.iteritems():
+            exp_and_state_key = '%s %s' % (item.id, state_name)
+            yield (state.interaction.id, exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):

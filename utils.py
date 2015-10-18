@@ -23,6 +23,7 @@ import json
 import os
 import random
 import re
+import string
 import StringIO
 import time
 import unicodedata
@@ -30,6 +31,8 @@ import urllib
 import urlparse
 import yaml
 import zipfile
+
+import feconf
 
 
 class InvalidInputException(Exception):
@@ -365,3 +368,32 @@ def get_short_language_description(full_language_description):
     else:
         ind = full_language_description.find(' (')
         return full_language_description[:ind]
+
+
+def require_valid_name(name, name_type):
+    """Generic name validation.
+
+    Args:
+      name: the name to validate.
+      name_type: a human-readable string, like 'the exploration title' or
+        'a state name'. This will be shown in error messages.
+    """
+    # This check is needed because state names are used in URLs and as ids
+    # for statistics, so the name length should be bounded above.
+    if len(name) > 50 or len(name) < 1:
+        raise ValidationError(
+            'The length of %s should be between 1 and 50 '
+            'characters; received %s' % (name_type, name))
+
+    if name[0] in string.whitespace or name[-1] in string.whitespace:
+        raise ValidationError(
+            'Names should not start or end with whitespace.')
+
+    if re.search('\s\s+', name):
+        raise ValidationError(
+            'Adjacent whitespace in %s should be collapsed.' % name_type)
+
+    for c in feconf.INVALID_NAME_CHARS:
+        if c in name:
+            raise ValidationError(
+                'Invalid character %s in %s: %s' % (c, name_type, name))

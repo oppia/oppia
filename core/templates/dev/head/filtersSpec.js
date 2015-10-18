@@ -35,6 +35,8 @@ describe('Testing filters', function() {
     'convertToPlainText',
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
+    'summarizeNonnegativeNumber',
+    'truncateAndCapitalize',
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -166,7 +168,7 @@ describe('Testing filters', function() {
 
     expect(filter(' A   single line with spaces at either end. ')).toEqual(
       ' A   single line with spaces at either end. ');
-    expect(filter('Single line\nMultiple lines\nStuff')).toEqual('Single line');
+    expect(filter('a\nb\nc')).toEqual('a...');
     expect(filter('Removes newline at end\n')).toEqual(
       'Removes newline at end');
     expect(filter('\nRemoves newline at beginning.')).toEqual(
@@ -175,9 +177,74 @@ describe('Testing filters', function() {
     expect(filter('\n')).toEqual('');
     expect(filter('\n\n\n')).toEqual('');
 
-    // TODO(bhenning): There could be some merit in also testing cross-platform
-    // line endings (since the pattern in filter applies to them). Only one is
-    // tested here.
-    expect(filter('Single line\r\nWindows EOL')).toEqual('Single line');
+    // Windows
+    expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
+    expect(filter('Single line\u000D\u000AEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0D\x0AEOL')).toEqual('Single line...');
+    expect(filter('Single line\u000D\x0AEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0D\u000AEOL')).toEqual('Single line...');
+
+    // Mac
+    expect(filter('Single line\rEOL')).toEqual('Single line...');
+    expect(filter('Single line\u000DEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0DEOL')).toEqual('Single line...');
+
+    // Linux
+    expect(filter('Single line\nEOL')).toEqual('Single line...');
+    expect(filter('Single line\u000AEOL')).toEqual('Single line...');
+    expect(filter('Single line\x0AEOL')).toEqual('Single line...');
+
+    // Vertical Tab
+    expect(filter('Vertical Tab\vEOL')).toEqual('Vertical Tab...');
+    expect(filter('Vertical Tab\u000BEOL')).toEqual('Vertical Tab...');
+    expect(filter('Vertical Tab\x0BEOL')).toEqual('Vertical Tab...');
+
+    // Form Feed
+    expect(filter('Form Feed\fEOL')).toEqual('Form Feed...');
+    expect(filter('Form Feed\u000CEOL')).toEqual('Form Feed...');
+    expect(filter('Form Feed\x0CEOL')).toEqual('Form Feed...');
+
+    // Next Line
+    expect(filter('Next Line\u0085EOL')).toEqual('Next Line...');
+    expect(filter('Next Line\x85EOL')).toEqual('Next Line...');
+
+    // Line Separator
+    expect(filter('Line Separator\u2028EOL')).toEqual('Line Separator...');
+
+    // Paragraph Separator
+    expect(filter('Paragraph Separator\u2029EOL')).toEqual('Paragraph Separator...');
+  }));
+
+  it('should summarize large number to maximum of four significant figures and append metrix prefix',
+       inject(function($filter) {
+    var filter = $filter('summarizeNonnegativeNumber');
+
+    expect(filter(100)).toEqual(100);
+    expect(filter(1720)).toEqual('1.7K');
+    expect(filter(2306200)).toEqual('2.3M');
+
+    expect(filter(12389654281)).toEqual('12.4B');
+    expect(filter(897978581123)).toEqual('898.0B');
+    expect(filter(476678)).toEqual('476.7K');
+
+  }));
+
+  it('should capitalize first letter and truncate string', inject(function($filter) {
+    var filter = $filter('truncateAndCapitalize');
+
+    expect(filter('remove New line', 4)).toEqual('Remo...');
+    // If the maximum number of characters is not specified, return
+    // the whole objective with the first letter capitalized.
+    expect(filter('capitalize first letter and truncate')).toEqual('Capitalize first letter and truncate');
+    expect(filter('a single sentence with more than twenty one characters', 21)).toEqual(
+      'A single sentence wit...');
+
+    expect(filter('a single sentence with more than twenty one characters and all will be shown')).toEqual(
+      'A single sentence with more than twenty one characters and all will be shown');
+    expect(filter('remove New line', 6)).toEqual('Remove...');
+    // If maximum characters is greater than objective length
+    // return whole objective.
+    expect(filter('please do not test empty string', 100)).toEqual('Please do not test empty string');
+
   }));
 });

@@ -717,9 +717,7 @@ oppia.config(['$provide', function($provide) {
 
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
-        tooltiptext: (
-          componentDefn.name.charAt(0).toUpperCase() +
-          componentDefn.name.slice(1)),
+        tooltiptext: componentDefn.tooltip,
         onElementSelect: {
           element: 'img',
           filter: function(elt) {

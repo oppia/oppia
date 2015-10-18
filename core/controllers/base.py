@@ -53,6 +53,9 @@ DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
+SITE_NAME = config_domain.ConfigProperty(
+    'site_name', {'type': 'unicode'}, 'The site name',
+    default_value='SITE_NAME')
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     'before_end_head_tag_hook', {
@@ -176,8 +179,7 @@ def require_fully_signed_up(handler):
         """Check that the user has registered as an editor."""
         if (not self.user_id
                 or self.username in config_domain.BANNED_USERNAMES.value
-                or not user_services.has_user_registered_as_editor(
-                    self.user_id)):
+                or not user_services.has_fully_registered(self.user_id)):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
 
@@ -234,7 +236,8 @@ class BaseHandler(webapp2.RequestHandler):
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
     # Whether to redirect requests corresponding to a logged-in user who has
-    # not completed signup in to the signup page.
+    # not completed signup in to the signup page. This ensures that logged-in
+    # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
     @webapp2.cached_property
@@ -264,13 +267,13 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id, email)
             self.values['user_email'] = user_settings.email
 
-            if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
+            if (self.REDIRECT_UNFINISHED_SIGNUPS and not
+                    user_services.has_fully_registered(self.user_id)):
                 _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
                 self.user_id = None
             else:
                 self.username = user_settings.username
-                self.last_agreed_to_terms = user_settings.last_agreed_to_terms
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -355,7 +358,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         self.response.content_type = 'application/javascript; charset=utf-8'
-        self.response.headers['Content-Disposition'] = 'attachment'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -387,12 +391,12 @@ class BaseHandler(webapp2.RequestHandler):
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
-            'EXPLORATION_STATUS_PRIVATE': (
-                rights_manager.EXPLORATION_STATUS_PRIVATE),
-            'EXPLORATION_STATUS_PUBLIC': (
-                rights_manager.EXPLORATION_STATUS_PUBLIC),
-            'EXPLORATION_STATUS_PUBLICIZED': (
-                rights_manager.EXPLORATION_STATUS_PUBLICIZED),
+            'ACTIVITY_STATUS_PRIVATE': (
+                rights_manager.ACTIVITY_STATUS_PRIVATE),
+            'ACTIVITY_STATUS_PUBLIC': (
+                rights_manager.ACTIVITY_STATUS_PUBLIC),
+            'ACTIVITY_STATUS_PUBLICIZED': (
+                rights_manager.ACTIVITY_STATUS_PUBLICIZED),
             'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
@@ -400,9 +404,10 @@ class BaseHandler(webapp2.RequestHandler):
             'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
+            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
             'SIDEBAR_MENU_ADDITIONAL_LINKS': (
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
+            'SITE_NAME': SITE_NAME.value,
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
             'user_is_logged_in': bool(self.username),
         })
