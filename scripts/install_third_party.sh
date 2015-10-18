@@ -19,6 +19,9 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
+echo "Python command: $PYTHON_CMD"
+perms=$(ls -la)
+echo "$perms"
 $PYTHON_CMD scripts/install_third_party.py
 
 # Check if the OS supports node.js installation; if not, return to the calling

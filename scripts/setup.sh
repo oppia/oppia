@@ -101,8 +101,8 @@ else
   export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 fi
 
-# This function takes a command for python as its only input
-# It checks this inpuut for a specific version of python and returns false
+# This function takes a command for python as its only input.
+# It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.  
 function test_python_version() {
   EXPECTED_PYTHON_VERSION_PREFIX="2.7"
@@ -133,7 +133,7 @@ if ! test_python_version $PYTHON_CMD; then
   PYTHON_CMD="python2.7"
   if ! test_python_version $PYTHON_CMD; then
     echo "Could not find a suitable Python environment. Exiting."
-    # If OS is Windows, print helpful error message about adding Python to path
+    # If OS is Windows, print helpful error message about adding Python to path.
     if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
         echo "It looks like you are using Windows. If you have Python installed,"
         echo "make sure it is in your PATH and that PYTHONPATH is set."
