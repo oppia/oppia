@@ -146,3 +146,4 @@ if ! test_python_version $PYTHON_CMD; then
     exit 1
   fi
 fi
+export PYTHON_CMD
