@@ -1,14 +1,15 @@
 <script type="text/ng-template" id="components/profileLinkText">
-	 <a ng-if="!(username === 'admin') && !(username === 'OppiaMigrationBot')" ng-href="/profile/<[username]>">
-      <[username]>
-    </a>
-	 <span ng-if="username === 'admin' || username === 'OppiaMigrationBot'">
-      <[username]>
-    </span>
+  <a ng-if="isUsernameLinkable(username)" ng-href="/profile/<[username]>">
+    <[username]>
+  </a>
+  <span ng-if="!isUsernameLinkable(username)">
+    <[username]>
+  </span>
 </script>
 
 <script type="text/ng-template" id="components/profileLinkImage">
-    <a ng-href="/profile/<[username]>">
-      <img ng-src="<[profilePicture]>" class="<[classes]>" alt="<[alt]>"/>
-    </a>
+  <a ng-if="isUsernameLinkable(username)" ng-href="/profile/<[username]>">
+    <img ng-src="<[profilePicture]>" class="<[classes]>" alt="<[alt]>"/>
+  </a>
+  <img ng-if="!isUsernameLinkable(username)" ng-src="<[profilePicture]>" class="<[classes]>" alt="<[alt]>"/>
 </script>

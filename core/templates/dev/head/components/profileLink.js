@@ -26,6 +26,11 @@ oppia.directive('profileLinkText', [function() {
       username: '@'
     },
     templateUrl: 'components/profileLinkText',
+    controller: ['$scope', function($scope) {
+      $scope.isUsernameLinkable = function(username){
+        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
+      };
+    }]
   };
 }]);
 
@@ -39,6 +44,10 @@ oppia.directive('profileLinkImage', [function() {
     },
     templateUrl: 'components/profileLinkImage',
     controller: ['$scope', '$http', '$q', function($scope, $http, $q) {
+      $scope.isUsernameLinkable = function(username){
+        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
+      };
+
       $scope.profileImageURL = '/preferenceshandler/profile_picture_by_username/' + $scope.username;
       var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
       $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
