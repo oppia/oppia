@@ -128,14 +128,12 @@
                           <li class="dropdown pull-right">
                             <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
-                                <profile-link-image linked-name="{{username}}">
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
                                 {% else %}
                                   <img ng-if="profileDropdownIsActive" src="/images/avatar/user_mint_48px.png" class="oppia-navbar-profile-picture">
                                   <img ng-if="!profileDropdownIsActive" src="/images/avatar/user_white_48px.png" class="oppia-navbar-profile-picture">
                                 {% endif %}
-                                </profile-link-image>
                                 <span class="caret" style="margin-top: 10px;"></span>
 
                                 <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
@@ -250,7 +248,6 @@
     {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
-    {% include 'components/profile_link.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -266,7 +263,6 @@
       {{ include_js_file('/expressions/evaluator.js') }}
       {{ include_js_file('/expressions/parser.js') }}
       {{ include_js_file('components/objectEditor.js') }}
-      {{ include_js_file('components/profileLink.js') }}
       {{ OBJECT_EDITORS_JS }}
     </script>
 

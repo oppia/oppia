@@ -1,8 +1,18 @@
 <script type="text/ng-template" id="components/profileLinkText">
-	<a ng-if="!(linkedName === 'admin') && !(linkedName === 'OppiaMigrationBot')" ng-href="/profile/<[linkedName]>"><[linkedName]></a>
-	<span ng-if="linkedName === 'admin' || linkedName === 'OppiaMigrationBot'"><[linkedName]></span>
+  <div>
+	 <a ng-if="!(linkedName === 'admin') && !(linkedName === 'OppiaMigrationBot')" ng-href="/profile/<[linkedName]>">
+      <[linkedName]>
+    </a>
+	 <span ng-if="linkedName === 'admin' || linkedName === 'OppiaMigrationBot'">
+      <[linkedName]>
+    </span>
+	</div>
 </script>
 
 <script type="text/ng-template" id="components/profileLinkImage">
-	<a ng-href="/profile/<[linkedName]>"><ng-transclude></ng-transclude></a>
+	<div>
+    <a ng-href="/profile/<[linkedName]>">
+      <img ng-src="<[linkedProfilePicture]>" class="<[classes]>" alt="<[alt]>"/>
+    </a>
+  </div>
 </script>
