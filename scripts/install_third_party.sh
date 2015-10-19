@@ -19,7 +19,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-python scripts/install_third_party.py
+$PYTHON_CMD scripts/install_third_party.py
 
 # Check if the OS supports node.js installation; if not, return to the calling
 # script.
@@ -100,7 +100,7 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
     sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
-    python $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
+    $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
