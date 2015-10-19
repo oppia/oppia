@@ -23,7 +23,7 @@ oppia.directive('profileLinkText', [function() {
   return {
     restrict: 'E',
     scope: {
-      linkedName: '@'
+      username: '@'
     },
     templateUrl: 'components/profileLinkText',
   };
@@ -33,15 +33,15 @@ oppia.directive('profileLinkImage', [function() {
   return {
     restrict: 'E',
     scope: {
-      linkedName: '@',
+      username: '@',
       classes: '@',
       alt: '@'
     },
     templateUrl: 'components/profileLinkImage',
     controller: ['$scope', '$http', '$q', function($scope, $http, $q) {
-      $scope.profileImageURL = '/preferenceshandler/profile_picture_by_username/' + $scope.linkedName;
+      $scope.profileImageURL = '/preferenceshandler/profile_picture_by_username/' + $scope.username;
       var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
-      $scope.linkedProfilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+      $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
       // Returns a promise for the user profile picture, or the default image if
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
@@ -58,7 +58,7 @@ oppia.directive('profileLinkImage', [function() {
         return deferred.promise;
       }
       getUserProfileImage($scope.profileImageURL).then(function(result) {
-        $scope.linkedProfilePicture = result;
+        $scope.profilePicture = result;
       });
     }]
   };
