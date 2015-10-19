@@ -98,11 +98,49 @@ for arg in "$@"; do
   fi
 done
 
+PYTHON_CMD="python"
+
+# Check if Python exists.
+# http://stackoverflow.com/questions/592620
+if ! command -v $PYTHON_CMD >/dev/null 2>&1; then
+  echo "You must have Python 2.7 in order to run Oppia."
+fi
+
+# Get the version of Python.
+PYTHON_VERSION=$(python --version 2>&1)
+EXPECTED_PYTHON_VERSION_PREFIX="2.7"
+if [[ $PYTHON_VERSION =~ Python[[:space:]](.+) ]]; then
+  PYTHON_VERSION=${BASH_REMATCH[1]}
+else
+  echo "Unrecognizable Python command output: ${PYTHON_VERSION}"
+fi
+
+# Check the version of Python. If its version does not start with 2.7, then
+# try and see whether the 'python2.7' command exists.
+if [[ $PYTHON_VERSION != "${EXPECTED_PYTHON_VERSION_PREFIX}*" ]]; then
+  PYTHON_CMD="python2.7"
+  if ! command -v $PYTHON_CMD >/dev/null 2>&1; then
+    # TODO(bhenning): Implement a flag to allow the user to pass in a custom
+    # path to Python 2.7 if the script cannot locate it.
+    echo "Expected at least Python ${EXPECTED_PYTHON_VERSION_PREFIX}; you have Python ${PYTHON_VERSION}"
+  fi
+fi
+
+# TODO(bhenning): Per discussions with Sean on Windows, it both 'python2.7' and
+# 'python3.x' do not work as valid commands. Instead, only 'python' will work
+# and whether 2.7 or 3.x is selected is based on whichever's bin folder appears
+# first in the user's PATH variable. In order to fix this, the script should
+# detect if it is running on Windows and, if it cannot find Python or the
+# version of Python needed for Oppia, then it should emit a custom error message
+# for Windows users explaining to them where to go to install Python 2.7 and how
+# to make sure it is earlier than 3.x in their PATH in order to properly run
+# Oppia.
+
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
 echo Starting GAE development server
 # To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
-python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
+$PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
 echo Done!
