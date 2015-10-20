@@ -21,7 +21,7 @@
 describe('state parameter changes controller', function() {
 
   describe('StateParameterChangesEditor', function() {
-    var scope, ctrl, ecs, spcs, es, epss, wd;
+    var scope, ctrl, ecs, spcs, es, epss, wd, ess;
 
     beforeEach(function() {
       module('oppia');
@@ -35,10 +35,28 @@ describe('state parameter changes controller', function() {
       es = $injector.get('editabilityService');
       epss = $injector.get('explorationParamSpecsService');
       wd = $injector.get('warningsData');
+      ess = $injector.get('explorationStatesService');
 
       GLOBALS.INVALID_PARAMETER_NAMES = ['forbiddenName'];
 
       epss.init({});
+      ess.init({
+        'First State': {
+          content: [{
+            type: 'text',
+            value: 'First State Content'
+          }],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              rule_specs: [{
+                dest: 'Second State'
+              }]
+            }]
+          },
+          param_changes: []
+        }
+      });
       spcs.init('First State', [], {
         content: [{
           type: 'text',
@@ -61,7 +79,8 @@ describe('state parameter changes controller', function() {
         stateParamChangesService: spcs,
         editabilityService: es,
         explorationParamSpecsService: epss,
-        warningsData: wd
+        warningsData: wd,
+        explorationStatesService: ess
       });
     }));
 

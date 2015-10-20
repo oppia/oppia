@@ -22,9 +22,11 @@
 oppia.controller('StateParamChangesEditor', [
     '$scope', 'editorContextService', 'stateParamChangesService',
     'editabilityService', 'explorationParamSpecsService', 'warningsData',
+    'explorationStatesService',
     function(
       $scope, editorContextService, stateParamChangesService,
-      editabilityService, explorationParamSpecsService, warningsData) {
+      editabilityService, explorationParamSpecsService, warningsData,
+      explorationStatesService) {
 
   $scope.stateParamChangesService = stateParamChangesService;
   $scope.editabilityService = editabilityService;
@@ -35,11 +37,9 @@ oppia.controller('StateParamChangesEditor', [
   var _INVALID_PARAMETER_NAMES = GLOBALS.INVALID_PARAMETER_NAMES;
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.stateParamChangesMemento = null;
-
-    var stateName = editorContextService.getActiveStateName();
     stateParamChangesService.init(
-      stateName, stateData.param_changes, stateData, 'param_changes');
+      editorContextService.getActiveStateName(),
+      stateData.param_changes, stateData, 'param_changes');
   });
 
   $scope.PREAMBLE_TEXT = {
@@ -174,6 +174,7 @@ oppia.controller('StateParamChangesEditor', [
     explorationParamSpecsService.saveDisplayedValue();
     stateParamChangesService.saveDisplayedValue();
     $scope.isStateParamChangesEditorOpen = false;
+    _updateStatesDict();
   };
 
   $scope.swapParamChanges = function(index1, index2) {
@@ -192,6 +193,7 @@ oppia.controller('StateParamChangesEditor', [
     stateParamChangesService.displayed[index1] = (
       stateParamChangesService.displayed[index2]);
     stateParamChangesService.displayed[index2] = tmp;
+    _updateStatesDict();
   };
 
   $scope.deleteParamChange = function(index) {
@@ -202,10 +204,19 @@ oppia.controller('StateParamChangesEditor', [
     }
 
     stateParamChangesService.displayed.splice(index, 1);
+    _updateStatesDict();
   };
 
   $scope.cancelEdit = function() {
     stateParamChangesService.restoreFromMemento();
     $scope.isStateParamChangesEditorOpen = false;
+  };
+
+  var _updateStatesDict = function() {
+    var activeStateName = editorContextService.getActiveStateName();
+    var _stateDict = explorationStatesService.getState(activeStateName);
+    _stateDict.param_changes = angular.copy(
+      stateParamChangesService.savedMemento);
+    explorationStatesService.setState(activeStateName, _stateDict);
   };
 }]);
