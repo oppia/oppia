@@ -17,7 +17,7 @@
  *               the exploration editor.
  */
 
-oppia.factory('explorationEditorAdvancedFeaturesService', [function() {
+oppia.factory('explorationAdvancedFeaturesService', [function() {
   var _settings = {
     areParametersEnabled: false,
     areGadgetsEnabled: false
@@ -35,6 +35,25 @@ oppia.factory('explorationEditorAdvancedFeaturesService', [function() {
     },
     enableParameters: function() {
       _settings.areParametersEnabled = true;
+    },
+    init: function(explorationData) {
+      if (explorationData.param_changes.length > 0) {
+        this.enableParameters();
+      } else {
+        for (var state in explorationData.states) {
+          if (explorationData.states[state].param_changes.length > 0) {
+            this.enableParameters();
+            break;
+          }
+        }
+      }
+
+      for (var panel in explorationData.skin_customizations.panels_contents) {
+        if (explorationData.skin_customizations.panels_contents[panel].length > 0) {
+          this.enableGadgets();
+          break;
+        }
+      }
     }
   };
 }]);

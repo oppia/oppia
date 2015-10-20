@@ -22,19 +22,19 @@ oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
   'editabilityService', 'explorationStatesService', 'stateInteractionIdService',
   'INTERACTION_SPECS', 'explorationInitStateNameService',
-  'explorationEditorAdvancedFeaturesService',
+  'explorationAdvancedFeaturesService',
   function(
     $scope, $rootScope, editorContextService, changeListService,
     editabilityService, explorationStatesService, stateInteractionIdService,
     INTERACTION_SPECS, explorationInitStateNameService,
-    explorationEditorAdvancedFeaturesService) {
+    explorationAdvancedFeaturesService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html'
   };
 
   $scope.areParametersEnabled = (
-    explorationEditorAdvancedFeaturesService.areParametersEnabled);
+    explorationAdvancedFeaturesService.areParametersEnabled);
 
   $scope.isCurrentStateTerminal = false;
   $scope.isInteractionIdSet = false;
