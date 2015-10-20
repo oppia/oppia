@@ -340,7 +340,7 @@
               <div>
                 {% include 'editor/exploration_graph.html' %}
               </div>
-              <div ng-if="areGadgetsEnabled()">
+              <div ng-show="areGadgetsEnabled()">
                 {% include 'editor/gadget_editor.html' %}
               </div>
             </div>
