@@ -78,7 +78,15 @@
     "requireCapitalizedComments": true,
     "requireCapitalizedConstructors": true,
     "requireCommaBeforeLineBreak": true,
-    "requireCurlyBraces": true,
+    "requireCurlyBraces": [
+        "if",
+        "else",
+        "for",
+        "while",
+        "do",
+        "try",
+        "catch"
+    ],
     "requireDotNotation": {
         "allExcept": ["keywords"]
     },
