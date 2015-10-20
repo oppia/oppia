@@ -16,7 +16,7 @@
  * @fileoverview Directives for creating text and image links to a user's 
  * profile page.
  *
- * @author raine@stanford.edu (raine Hoover)
+ * @author raine@stanford.edu (Raine Hoover)
  */
 
 oppia.directive('profileLinkText', [function() {
@@ -27,7 +27,7 @@ oppia.directive('profileLinkText', [function() {
     },
     templateUrl: 'components/profileLinkText',
     controller: ['$scope', function($scope) {
-      $scope.isUsernameLinkable = function(username){
+      $scope.isUsernameLinkable = function(username) {
         return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
       };
     }]
@@ -39,24 +39,23 @@ oppia.directive('profileLinkImage', [function() {
     restrict: 'E',
     scope: {
       username: '@',
-      classes: '@',
-      alt: '@'
     },
     templateUrl: 'components/profileLinkImage',
     controller: ['$scope', '$http', '$q', function($scope, $http, $q) {
-      $scope.isUsernameLinkable = function(username){
+      $scope.isUsernameLinkable = function(username) {
         return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
       };
 
-      $scope.profileImageURL = '/preferenceshandler/profile_picture_by_username/' + $scope.username;
+      $scope.profileImageUrl = '/preferenceshandler/profile_picture_by_username/' + $scope.username;
       var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
       $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+
       // Returns a promise for the user profile picture, or the default image if
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
-      function getUserProfileImage(profileImageURL) {
+      var getUserProfileImage = function(profileImageUrl) {
         var deferred = $q.defer();
-        $http.get(profileImageURL).success(function(data) {
+        $http.get(profileImageUrl).success(function(data) {
           var profilePictureDataUrl = data.profile_picture_data_url;
           if (profilePictureDataUrl) {
             deferred.resolve(profilePictureDataUrl);
@@ -65,8 +64,8 @@ oppia.directive('profileLinkImage', [function() {
           }
         });
         return deferred.promise;
-      }
-      getUserProfileImage($scope.profileImageURL).then(function(result) {
+      };
+      getUserProfileImage($scope.profileImageUrl).then(function(result) {
         $scope.profilePicture = result;
       });
     }]

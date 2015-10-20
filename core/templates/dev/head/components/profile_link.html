@@ -9,7 +9,7 @@
 
 <script type="text/ng-template" id="components/profileLinkImage">
   <a ng-if="isUsernameLinkable(username)" ng-href="/profile/<[username]>">
-    <img ng-src="<[profilePicture]>" class="<[classes]>" alt="<[alt]>"/>
+    <img ng-src="<[profilePicture]>" alt=""/>
   </a>
   <img ng-if="!isUsernameLinkable(username)" ng-src="<[profilePicture]>" class="<[classes]>" alt="<[alt]>"/>
 </script>
