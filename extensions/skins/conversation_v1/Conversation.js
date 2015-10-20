@@ -206,281 +206,285 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.profilePicture = '/images/avatar/user_blue_72px.png';
           oppiaPlayerService.getUserProfileImage().then(function(result) {
-        $scope.profilePicture = result;
-      });
+            $scope.profilePicture = result;
+          });
 
           // If the exploration is iframed, send data to its parent about its
           // height so that the parent can be resized as necessary.
           $scope.lastRequestedHeight = 0;
           $scope.lastRequestedScroll = false;
           $scope.adjustPageHeight = function(scroll, callback) {
-        $timeout(function() {
-          var newHeight = document.body.scrollHeight;
-          if (Math.abs($scope.lastRequestedHeight - newHeight) > 50.5 ||
-              (scroll && !$scope.lastRequestedScroll)) {
-            // Sometimes setting iframe height to the exact content height still
-            // produces scrollbar, so adding 50 extra px.
-            newHeight += 50;
-            messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
-              {
-                height: newHeight,
-                scroll: scroll
-              });
-            $scope.lastRequestedHeight = newHeight;
-            $scope.lastRequestedScroll = scroll;
-          }
+            $timeout(function() {
+              var newHeight = document.body.scrollHeight;
+              if (Math.abs($scope.lastRequestedHeight - newHeight) > 50.5 ||
+                  (scroll && !$scope.lastRequestedScroll)) {
+                // Sometimes setting iframe height to the exact content height
+                // still produces scrollbar, so adding 50 extra px.
+                newHeight += 50;
+                messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
+                  {
+                    height: newHeight,
+                    scroll: scroll
+                  });
+                $scope.lastRequestedHeight = newHeight;
+                $scope.lastRequestedScroll = scroll;
+              }
 
-          if (callback) {
-            callback();
-          }
-        }, 100);
-      };
+              if (callback) {
+                callback();
+              }
+            }, 100);
+          };
 
           $scope.getThumbnailSrc = function(panelName) {
-        if (panelName === $scope.PANEL_TUTOR) {
-          return oppiaPlayerService.getOppiaAvatarImageUrl();
-        } else if (panelName === $scope.PANEL_SUPPLEMENTAL) {
-          return oppiaPlayerService.getInteractionThumbnailSrc(
-            $scope.activeCard.stateName);
-        } else {
-          throw Error(
-            'Found a panel not corresponding to a tutor or interaction: ' +
-            panelName);
-        }
-      };
+            if (panelName === $scope.PANEL_TUTOR) {
+              return oppiaPlayerService.getOppiaAvatarImageUrl();
+            } else if (panelName === $scope.PANEL_SUPPLEMENTAL) {
+              return oppiaPlayerService.getInteractionThumbnailSrc(
+                $scope.activeCard.stateName);
+            } else {
+              throw Error(
+                'Found a panel not corresponding to a tutor or interaction: ' +
+                panelName);
+            }
+          };
 
           $scope.isSupplementalCardNonempty = function() {
-        return $scope.activeCard && !$scope.activeCard.interactionIsInline;
-      };
+            return $scope.activeCard && !$scope.activeCard.interactionIsInline;
+          };
 
           var recomputeAndResetPanels = function() {
-        $scope.panels = [];
-        if (!$scope.canWindowFitTwoCards()) {
-          $scope.panels.push($scope.PANEL_TUTOR);
-        }
-        if ($scope.isSupplementalCardNonempty()) {
-          $scope.panels.push($scope.PANEL_SUPPLEMENTAL);
-        }
-        $scope.resetVisiblePanel();
-      };
+            $scope.panels = [];
+            if (!$scope.canWindowFitTwoCards()) {
+              $scope.panels.push($scope.PANEL_TUTOR);
+            }
+            if ($scope.isSupplementalCardNonempty()) {
+              $scope.panels.push($scope.PANEL_SUPPLEMENTAL);
+            }
+            $scope.resetVisiblePanel();
+          };
 
           $scope.currentVisiblePanelName = null;
 
           $scope.isPanelVisible = function(panelName) {
-        if (panelName === $scope.PANEL_TUTOR &&
-            $scope.canWindowFitTwoCards()) {
-          return true;
-        } else {
-          return panelName == $scope.currentVisiblePanelName;
-        }
-      };
+            if (panelName === $scope.PANEL_TUTOR &&
+                $scope.canWindowFitTwoCards()) {
+              return true;
+            } else {
+              return panelName == $scope.currentVisiblePanelName;
+            }
+          };
 
           $scope.setVisiblePanel = function(panelName) {
-        $scope.currentVisiblePanelName = panelName;
-        if (panelName === $scope.PANEL_SUPPLEMENTAL) {
-          $scope.$broadcast('showInteraction');
-        }
-      };
+            $scope.currentVisiblePanelName = panelName;
+            if (panelName === $scope.PANEL_SUPPLEMENTAL) {
+              $scope.$broadcast('showInteraction');
+            }
+          };
 
           $scope.resetVisiblePanel = function() {
-        if ($scope.panels.length === 0) {
-          $scope.currentVisiblePanelName = null;
-        } else {
-          $scope.currentVisiblePanelName = $scope.panels[0];
-        }
-      };
+            if ($scope.panels.length === 0) {
+              $scope.currentVisiblePanelName = null;
+            } else {
+              $scope.currentVisiblePanelName = $scope.panels[0];
+            }
+          };
 
           // Changes the currently-active card, and resets the 'show previous
           // responses' setting.
           var navigateToCard = function(index) {
-        $scope.activeCard = $scope.transcript[index];
-        $scope.arePreviousResponsesShown = false;
+            $scope.activeCard = $scope.transcript[index];
+            $scope.arePreviousResponsesShown = false;
 
-        recomputeAndResetPanels();
-        if (nextFocusLabel && index === $scope.transcript.length - 1) {
-          focusService.setFocusIfOnDesktop(nextFocusLabel);
-        } else {
-          focusService.setFocusIfOnDesktop(
-            $scope.activeCard.contentHtmlFocusLabel);
-        }
-      };
+            recomputeAndResetPanels();
+            if (nextFocusLabel && index === $scope.transcript.length - 1) {
+              focusService.setFocusIfOnDesktop(nextFocusLabel);
+            } else {
+              focusService.setFocusIfOnDesktop(
+                $scope.activeCard.contentHtmlFocusLabel);
+            }
+          };
 
           var addNewCard = function(stateName, contentHtml, interactionHtml) {
-        var interactionInstructions = (
-          oppiaPlayerService.getInteractionInstructions(stateName));
+            var interactionInstructions = (
+              oppiaPlayerService.getInteractionInstructions(stateName));
 
-        var oldStateName = null;
-        if ($scope.transcript.length >= 1) {
-          oldStateName = $scope.transcript[
-            $scope.transcript.length - 1].stateName;
-        }
+            var oldStateName = null;
+            if ($scope.transcript.length >= 1) {
+              oldStateName = $scope.transcript[
+                $scope.transcript.length - 1].stateName;
+            }
 
-        oppiaPlayerService.applyCachedParamUpdates();
-        $scope.transcript.push({
-          answerFeedbackPairs: [],
-          contentHtml: contentHtml,
-          contentHtmlFocusLabel: focusService.generateFocusLabel(),
-          interactionHtml: interactionHtml,
-          interactionInstructions: interactionInstructions,
-          interactionIsDisabled: false,
-          interactionIsInline: oppiaPlayerService.isInteractionInline(
-            stateName),
-          stateName: stateName
+            oppiaPlayerService.applyCachedParamUpdates();
+            $scope.transcript.push({
+              answerFeedbackPairs: [],
+              contentHtml: contentHtml,
+              contentHtmlFocusLabel: focusService.generateFocusLabel(),
+              interactionHtml: interactionHtml,
+              interactionInstructions: interactionInstructions,
+              interactionIsDisabled: false,
+              interactionIsInline: oppiaPlayerService.isInteractionInline(
+                stateName),
+              stateName: stateName
 
-        });
+            });
 
-        $scope.numProgressDots++;
+            $scope.numProgressDots++;
 
-        if ($scope.canWindowFitTwoCards() &&
-            oldStateName &&
-            oppiaPlayerService.isInteractionInline(oldStateName) &&
-            !oppiaPlayerService.isInteractionInline(stateName)) {
-          $scope.isAnimatingToTwoCards = true;
-          $timeout(function() {
-            $scope.isAnimatingToTwoCards = false;
-            $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
-          }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC +
-             TIME_PADDING_MSEC);
-        } else if (
-            $scope.canWindowFitTwoCards() &&
-            oldStateName &&
-            !oppiaPlayerService.isInteractionInline(oldStateName) &&
-            oppiaPlayerService.isInteractionInline(stateName)) {
-          $scope.isAnimatingToOneCard = true;
-          $timeout(function() {
-            $scope.isAnimatingToOneCard = false;
-            $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
-          }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC +
-             TIME_PADDING_MSEC);
-        } else {
-          $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
-        }
-      };
+            if ($scope.canWindowFitTwoCards() &&
+                oldStateName &&
+                oppiaPlayerService.isInteractionInline(oldStateName) &&
+                !oppiaPlayerService.isInteractionInline(stateName)) {
+              $scope.isAnimatingToTwoCards = true;
+              $timeout(function() {
+                $scope.isAnimatingToTwoCards = false;
+                $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
+              }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC +
+                 TIME_PADDING_MSEC);
+            } else if (
+                $scope.canWindowFitTwoCards() &&
+                oldStateName &&
+                !oppiaPlayerService.isInteractionInline(oldStateName) &&
+                oppiaPlayerService.isInteractionInline(stateName)) {
+              $scope.isAnimatingToOneCard = true;
+              $timeout(function() {
+                $scope.isAnimatingToOneCard = false;
+                $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
+              }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC +
+                 TIME_PADDING_MSEC);
+            } else {
+              $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
+            }
+          };
 
           $scope.toggleShowPreviousResponses = function() {
-        $scope.arePreviousResponsesShown = !$scope.arePreviousResponsesShown;
-      };
+            $scope.arePreviousResponsesShown =
+              !$scope.arePreviousResponsesShown;
+          };
 
           $scope.initializePage = function() {
-        $scope.transcript = [];
-        $scope.waitingForOppiaFeedback = false;
-        hasInteractedAtLeastOnce = false;
+            $scope.transcript = [];
+            $scope.waitingForOppiaFeedback = false;
+            hasInteractedAtLeastOnce = false;
 
-        oppiaPlayerService.init(function(stateName, initHtml) {
-          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
-          nextFocusLabel = focusService.generateFocusLabel();
-          $scope.gadgetPanelsContents = (
-            oppiaPlayerService.getGadgetPanelsContents());
+            oppiaPlayerService.init(function(stateName, initHtml) {
+              $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+              nextFocusLabel = focusService.generateFocusLabel();
+              $scope.gadgetPanelsContents = (
+                oppiaPlayerService.getGadgetPanelsContents());
 
-          addNewCard(
-            stateName,
-            initHtml,
-            oppiaPlayerService.getInteractionHtml(stateName, nextFocusLabel));
-          $rootScope.loadingMessage = '';
+              addNewCard(
+                stateName,
+                initHtml,
+                oppiaPlayerService.getInteractionHtml(
+                  stateName, nextFocusLabel));
+              $rootScope.loadingMessage = '';
 
-          $scope.adjustPageHeight(false, null);
-          $window.scrollTo(0, 0);
-          focusService.setFocusIfOnDesktop(nextFocusLabel);
+              $scope.adjustPageHeight(false, null);
+              $window.scrollTo(0, 0);
+              focusService.setFocusIfOnDesktop(nextFocusLabel);
 
-          $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-            stateName);
-        });
-      };
+              $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
+                stateName);
+            });
+          };
 
           $scope.submitAnswer = function(answer) {
-        // For some reason, answers are getting submitted twice when the submit
-        // button is clicked. This guards against that.
-        if (answerIsBeingProcessed) {
-          return;
-        }
+            // For some reason, answers are getting submitted twice when
+            // the submit button is clicked. This guards against that.
+            if (answerIsBeingProcessed) {
+              return;
+            }
 
-        $timeout(function() {
-          recomputeAndResetPanels();
-        }, TIME_PADDING_MSEC);
+            $timeout(function() {
+              recomputeAndResetPanels();
+            }, TIME_PADDING_MSEC);
 
-        answerIsBeingProcessed = true;
-        hasInteractedAtLeastOnce = true;
-        $scope.waitingForOppiaFeedback = true;
+            answerIsBeingProcessed = true;
+            hasInteractedAtLeastOnce = true;
+            $scope.waitingForOppiaFeedback = true;
 
-        var oldStateName = (
-          $scope.transcript[$scope.transcript.length - 1].stateName);
-        $scope.transcript[$scope.transcript.length - 1]
-          .answerFeedbackPairs.push({
-            learnerAnswer: oppiaPlayerService.getAnswerAsHtml(answer),
-            oppiaFeedback: null,
-            shortLearnerAnswer: oppiaPlayerService.getShortAnswerAsHtml(answer)
-          });
+            var oldStateName = (
+              $scope.transcript[$scope.transcript.length - 1].stateName);
+            $scope.transcript[$scope.transcript.length - 1]
+              .answerFeedbackPairs.push({
+                learnerAnswer: oppiaPlayerService.getAnswerAsHtml(answer),
+                oppiaFeedback: null,
+                shortLearnerAnswer: oppiaPlayerService.getShortAnswerAsHtml(
+                                    answer)
+              });
 
-        oppiaPlayerService.submitAnswer(answer, function(
-            newStateName, refreshInteraction, feedbackHtml, contentHtml) {
-          $scope.waitingForOppiaFeedback = false;
-          var pairs = (
-            $scope.transcript[
-              $scope.transcript.length - 1].answerFeedbackPairs);
-          var lastAnswerFeedbackPair = pairs[pairs.length - 1];
+            oppiaPlayerService.submitAnswer(answer, function(
+                newStateName, refreshInteraction, feedbackHtml, contentHtml) {
+              $scope.waitingForOppiaFeedback = false;
+              var pairs = (
+                $scope.transcript[$scope.transcript.length - 1]
+                  .answerFeedbackPairs);
+              var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
-          if (oldStateName === newStateName) {
-            // Stay on the same card.
-            lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
-            if (refreshInteraction) {
-              // Replace the previous interaction (even though it might be of
-              // the same type).
-              nextFocusLabel = focusService.generateFocusLabel();
-              $scope.transcript[
-                $scope.transcript.length - 1].interactionHtml = (
+              if (oldStateName === newStateName) {
+                // Stay on the same card.
+                lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
+                if (refreshInteraction) {
+                  // Replace the previous interaction (even though
+                  // it might be of the same type).
+                  nextFocusLabel = focusService.generateFocusLabel();
+                  $scope.transcript[
+                    $scope.transcript.length - 1].interactionHtml = (
+                      oppiaPlayerService.getInteractionHtml(
+                        newStateName, nextFocusLabel) +
+                      oppiaPlayerService.getRandomSuffix());
+                }
+                focusService.setFocusIfOnDesktop(nextFocusLabel);
+                scrollToBottom();
+              } else {
+                // There is a new card. Disable the current interaction -- then,
+                // if there is no feedback, move on immediately.
+                // Otherwise, give the learner a chance to read the feedback,
+                // and display a 'Continue' button.
+                $scope.transcript[
+                  $scope.transcript.length - 1].interactionIsDisabled = true;
+
+                nextFocusLabel = focusService.generateFocusLabel();
+
+                // These are used to compute the dimensions for the next card.
+                $scope.upcomingStateName = newStateName;
+                $scope.upcomingContentHtml = (
+                  contentHtml + oppiaPlayerService.getRandomSuffix());
+                var isNextInteractionInline =
+                    oppiaPlayerService.isInteractionInline(newStateName);
+                $scope.upcomingInlineInteractionHtml = (
+                  isNextInteractionInline ?
                   oppiaPlayerService.getInteractionHtml(
-                    newStateName, nextFocusLabel) +
-                  oppiaPlayerService.getRandomSuffix());
-            }
-            focusService.setFocusIfOnDesktop(nextFocusLabel);
-            scrollToBottom();
-          } else {
-            // There is a new card. Disable the current interaction -- then, if
-            // there is no feedback, move on immediately. Otherwise, give the
-            // learner a chance to read the feedback, and display a 'Continue'
-            // button.
-            $scope.transcript[
-              $scope.transcript.length - 1].interactionIsDisabled = true;
+                    newStateName, nextFocusLabel
+                  ) + oppiaPlayerService.getRandomSuffix() : '');
 
-            nextFocusLabel = focusService.generateFocusLabel();
-
-            // These are used to compute the dimensions for the next card.
-            $scope.upcomingStateName = newStateName;
-            $scope.upcomingContentHtml = (
-              contentHtml + oppiaPlayerService.getRandomSuffix());
-            var isNextInteractionInline =
-                oppiaPlayerService.isInteractionInline(newStateName);
-            $scope.upcomingInlineInteractionHtml = (
-              isNextInteractionInline ?
-              oppiaPlayerService.getInteractionHtml(
-                newStateName, nextFocusLabel
-              ) + oppiaPlayerService.getRandomSuffix() : '');
-
-            if (feedbackHtml) {
-              lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
-              $scope.waitingForContinueButtonClick = true;
-              nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
-              focusService.setFocusIfOnDesktop(nextFocusLabel);
-              scrollToBottom();
-            } else {
-              // Note that feedbackHtml is an empty string if no feedback has
-              // been specified. This causes the answer-feedback pair to change
-              // abruptly, so we make the change only after the animation has
-              // completed.
-              $scope.showPendingCard(
-                newStateName,
-                contentHtml + oppiaPlayerService.getRandomSuffix(),
-                function() {
+                if (feedbackHtml) {
                   lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
-                });
-            }
-          }
+                  $scope.waitingForContinueButtonClick = true;
+                  nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
+                  focusService.setFocusIfOnDesktop(nextFocusLabel);
+                  scrollToBottom();
+                } else {
+                  // Note that feedbackHtml is an empty string
+                  // if no feedback has been specified. This causes
+                  // the answer-feedback pair to change abruptly,
+                  // so we make the change only after the animation has
+                  // completed.
+                  $scope.showPendingCard(
+                    newStateName,
+                    contentHtml + oppiaPlayerService.getRandomSuffix(),
+                    function() {
+                      lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
+                    });
+                }
+              }
 
-          $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-            newStateName);
-          answerIsBeingProcessed = false;
-        }, true);
-      };
+              $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
+                newStateName);
+              answerIsBeingProcessed = false;
+            }, true);
+          };
 
           $scope.startCardChangeAnimation = false;
           $scope.showPendingCard = function(
@@ -489,130 +493,133 @@ oppia.directive('conversationSkin', [function() {
             $scope.startCardChangeAnimation = true;
 
             $timeout(function() {
-          addNewCard(
-            newStateName,
-            newContentHtml,
-            oppiaPlayerService.getInteractionHtml(
-              newStateName, nextFocusLabel) +
-              oppiaPlayerService.getRandomSuffix());
+              addNewCard(
+                newStateName,
+                newContentHtml,
+                oppiaPlayerService.getInteractionHtml(
+                  newStateName, nextFocusLabel) +
+                  oppiaPlayerService.getRandomSuffix());
 
-          $scope.upcomingStateName = null;
-          $scope.upcomingContentHtml = null;
-          $scope.upcomingInlineInteractionHtml = null;
-        }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
-
-            $timeout(function() {
-          focusService.setFocusIfOnDesktop(nextFocusLabel);
-          scrollToTop();
-        }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
-          0.5 * TIME_FADEIN_MSEC);
+              $scope.upcomingStateName = null;
+              $scope.upcomingContentHtml = null;
+              $scope.upcomingInlineInteractionHtml = null;
+            }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
             $timeout(function() {
-          $scope.startCardChangeAnimation = false;
-          if (successCallback) {
-            successCallback();
-          }
-        }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
-            TIME_FADEIN_MSEC + TIME_PADDING_MSEC);
+              focusService.setFocusIfOnDesktop(nextFocusLabel);
+              scrollToTop();
+            }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
+              0.5 * TIME_FADEIN_MSEC);
+
+            $timeout(function() {
+              $scope.startCardChangeAnimation = false;
+              if (successCallback) {
+                successCallback();
+              }
+            }, TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
+                TIME_FADEIN_MSEC + TIME_PADDING_MSEC);
           };
 
           var scrollToBottom = function() {
-        $timeout(function() {
-          var tutorCard = $('.conversation-skin-tutor-card-active');
-          var tutorCardBottom = tutorCard.offset().top +
-              tutorCard.outerHeight();
-          if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
-            $('html, body').animate({
-              scrollTop: tutorCardBottom - $(window).height() + 12
-            }, {
-              duration: TIME_SCROLL_MSEC,
-              easing: 'easeOutQuad'
-            });
-          }
-        }, 100);
-      };
+            $timeout(function() {
+              var tutorCard = $('.conversation-skin-tutor-card-active');
+              var tutorCardBottom = tutorCard.offset().top +
+                  tutorCard.outerHeight();
+              if ($(window).scrollTop() + $(window).height() <
+                 tutorCardBottom) {
+                $('html, body').animate({
+                  scrollTop: tutorCardBottom - $(window).height() + 12
+                }, {
+                  duration: TIME_SCROLL_MSEC,
+                  easing: 'easeOutQuad'
+                });
+              }
+            }, 100);
+          };
 
           var scrollToTop = function() {
-        $timeout(function() {
-          $('html, body').animate({
-            scrollTop: 0
-          }, 800, 'easeOutQuart');
-          return false;
-        });
-      };
+            $timeout(function() {
+              $('html, body').animate({
+                scrollTop: 0
+              }, 800, 'easeOutQuart');
+              return false;
+            });
+          };
 
           $scope.submitUserRating = function(ratingValue) {
-        ratingService.submitUserRating(ratingValue);
-      };
+            ratingService.submitUserRating(ratingValue);
+          };
           $scope.$on('ratingUpdated', function() {
-        $scope.userRating = ratingService.getUserRating();
-      });
+            $scope.userRating = ratingService.getUserRating();
+          });
 
           $scope.$watch('currentProgressDotIndex', function(newValue) {
-        if (newValue !== null) {
-          navigateToCard(newValue);
-        }
-      });
+            if (newValue !== null) {
+              navigateToCard(newValue);
+            }
+          });
 
           $scope.getFeedbackPopoverPlacement = function() {
-        return (
-          $(window).width() < FEEDBACK_POPOVER_THRESHOLD_PX ?
-            'left' : 'bottom');
-      };
+            return (
+              $(window).width() < FEEDBACK_POPOVER_THRESHOLD_PX ?
+                'left' : 'bottom');
+          };
 
           $window.addEventListener('beforeunload', function(e) {
-        if (hasInteractedAtLeastOnce && !$scope.explorationCompleted &&
-            !$scope.isInPreviewMode) {
-          oppiaPlayerService.registerMaybeLeaveEvent();
-          var confirmationMessage = (
-            'If you navigate away from this page, your progress on the ' +
-            'exploration will be lost.');
-          (e || $window.event).returnValue = confirmationMessage;
-          return confirmationMessage;
-        }
-      });
+            if (hasInteractedAtLeastOnce && !$scope.explorationCompleted &&
+                !$scope.isInPreviewMode) {
+              oppiaPlayerService.registerMaybeLeaveEvent();
+              var confirmationMessage = (
+                'If you navigate away from this page, your progress on the ' +
+                'exploration will be lost.');
+              (e || $window.event).returnValue = confirmationMessage;
+              return confirmationMessage;
+            }
+          });
 
           $scope.windowWidth = windowDimensionsService.getWidth();
           $window.onresize = function() {
-        $scope.adjustPageHeight(false, null);
-        $scope.windowWidth = windowDimensionsService.getWidth();
-        recomputeAndResetPanels();
-      };
+            $scope.adjustPageHeight(false, null);
+            $scope.windowWidth = windowDimensionsService.getWidth();
+            recomputeAndResetPanels();
+          };
 
           $window.addEventListener('scroll', function() {
-        fadeDotsOnScroll();
-        fixSupplementOnScroll();
-      });
+            fadeDotsOnScroll();
+            fixSupplementOnScroll();
+          });
 
           var fadeDotsOnScroll = function() {
-        var progressDots = $('.conversation-skin-progress-dots');
-        var progressDotsTop = progressDots.height();
-        var newOpacity = Math.max(
-          (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
-        progressDots.css({
-          opacity: newOpacity
-        });
-      };
+            var progressDots = $('.conversation-skin-progress-dots');
+            var progressDotsTop = progressDots.height();
+            var newOpacity = Math.max(
+                (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
+            progressDots.css({
+              opacity: newOpacity
+            });
+          };
 
           var fixSupplementOnScroll = function() {
-        var supplementCard = $('md-card.conversation-skin-supplemental-card');
-        var topMargin = $('.navbar-container').height() - 20;
-        if ($(window).scrollTop() > topMargin) {
-          supplementCard.addClass('conversation-skin-supplemental-card-fixed');
-        } else {
-          supplementCard.removeClass(
-            'conversation-skin-supplemental-card-fixed');
-        }
-      };
+            var supplementCard = $(
+                'md-card.conversation-skin-supplemental-card');
+            var topMargin = $('.navbar-container').height() - 20;
+            if ($(window).scrollTop() > topMargin) {
+              supplementCard.addClass(
+                  'conversation-skin-supplemental-card-fixed');
+            } else {
+              supplementCard.removeClass(
+                'conversation-skin-supplemental-card-fixed');
+            }
+          };
 
           $scope.canWindowFitTwoCards = function() {
-        return $scope.windowWidth >= $scope.TWO_CARD_THRESHOLD_PX;
-      };
+            return $scope.windowWidth >= $scope.TWO_CARD_THRESHOLD_PX;
+          };
 
           $scope.initializePage();
           ratingService.init(function(userRating) {
-        $scope.userRating = userRating;
-      });
+            $scope.userRating = userRating;
+          });
         }]
   };
 }]);
@@ -678,7 +685,8 @@ oppia.directive('progressDots', [function() {
       $scope.decrementCurrentDotIndex = function() {
         if ($scope.currentDotIndex > 0) {
           if ($scope.currentDotIndex === $scope.leftmostVisibleDotIndex) {
-            $scope.leftmostVisibleDotIndex = $scope.leftmostVisibleDotIndex - 1;
+            $scope.leftmostVisibleDotIndex =
+              $scope.leftmostVisibleDotIndex - 1;
             $scope.rightmostVisibleDotIndex =
               $scope.rightmostVisibleDotIndex - 1;
           }
@@ -691,7 +699,8 @@ oppia.directive('progressDots', [function() {
           if ($scope.currentDotIndex === $scope.rightmostVisibleDotIndex) {
             $scope.rightmostVisibleDotIndex =
               $scope.rightmostVisibleDotIndex + 1;
-            $scope.leftmostVisibleDotIndex = $scope.leftmostVisibleDotIndex + 1;
+            $scope.leftmostVisibleDotIndex =
+              $scope.leftmostVisibleDotIndex + 1;
           }
           $scope.changeActiveDot($scope.currentDotIndex + 1);
         }
