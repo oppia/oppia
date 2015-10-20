@@ -103,23 +103,22 @@ fi
 
 # This function takes a command for python as its only input.
 # It checks this input for a specific version of python and returns false
-# if it does not match the expected prefix.  
+# if it does not match the expected prefix.
 function test_python_version() {
   EXPECTED_PYTHON_VERSION_PREFIX="2.7"
-  echo "Testing python command $PYTHON_CMD ..."
-  PYTHON_VERSION=$($1 --version 2>&1) 
+  PYTHON_VERSION=$($1 --version 2>&1)
   if [[ $PYTHON_VERSION =~ Python[[:space:]](.+) ]]; then
     PYTHON_VERSION=${BASH_REMATCH[1]}
   else
     echo "Unrecognizable Python command output: ${PYTHON_VERSION}"
-    # Return a false condition if output of tested command is unrecognizable. 
+    # Return a false condition if output of tested command is unrecognizable.
     return 0
   fi
   if [[ "${PYTHON_VERSION}" = "${EXPECTED_PYTHON_VERSION_PREFIX}*" ]]; then
-    # The value '1' indicates a true return value, 
+    # The value '1' indicates a true return value,
     # indicating the version of the input Python command is the expected Python version.
     return 1
-  else 
+  else
     return 0
   fi
 }

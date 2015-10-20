@@ -94,8 +94,11 @@ def _lint_js_files(node_path, jscs_path, autofix, config_jscsrc):
 
     num_files_with_errors = 0
 
+    print '----------------------------------------'
+
     if not changed_js_filenames:
-        print 'There are no JavaScript files in this commit to lint. Exiting.'
+        print 'There are no JavaScript files to lint in this commit. Exiting.'
+        print '----------------------------------------'
         sys.exit(0)
 
     start_time = time.time()
@@ -105,8 +108,8 @@ def _lint_js_files(node_path, jscs_path, autofix, config_jscsrc):
         jscs_cmd_args.append('-x')
 
     for ind, filename in enumerate(changed_js_filenames):
-        print '\nLinting %s (file %d/%d)...\n' % (
-            filename, ind + 1, num_js_files)
+        print 'Linting file %d/%d: %s ...' % (
+            ind + 1, num_js_files, filename)
 
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -121,6 +124,8 @@ def _lint_js_files(node_path, jscs_path, autofix, config_jscsrc):
         if linter_stdout:
             num_files_with_errors += 1
             print linter_stdout
+
+    print '----------------------------------------'
 
     if num_files_with_errors:
         print 'FAILED    %s JavaScript files' % num_files_with_errors
@@ -147,6 +152,8 @@ def _pre_commit_linter():
 
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
+            print ''
+            print 'Starting linter...'
             _lint_js_files(node_path, jscs_path, autofix, config_jscsrc)
         else:
             print ''
