@@ -1,0 +1,43 @@
+// For information on what these options mean, please refer to:
+//   http://jscs.info/rules
+
+{
+    "preset": "google",
+    "fileExtensions": [".js"],
+
+    "requireSemicolons": true,
+    "requireParenthesesAroundIIFE": true,
+    "maximumLineLength": 80,
+    "validateLineBreaks": "LF",
+    "validateIndentation": 2, 
+    "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
+    "requireSpaceAfterLineComment": { 
+        "allExcept": ["#", "="] 
+    },
+    "requireSpaceAfterComma": true,
+    "requireCapitalizedComments": true,
+
+    "disallowSpacesInsideObjectBrackets": null,
+    "disallowImplicitTypeConversion": ["string"],
+    "disallowSpacesInCallExpression": true,
+    "disallowSpaceBeforeSemicolon": true,
+    "disallowMixedSpacesAndTabs": true,
+    "disallowSpacesInsideBrackets": {
+        "allExcept": [ "[", "]", "{", "}" ]
+    },
+
+    "jsDoc": {
+        "checkAnnotations": "jsdoc3",
+        "checkParamNames": true,
+        "requireParamTypes": true,
+        "checkRedundantParams": true,
+        "checkReturnTypes": true,
+        "checkRedundantReturns": true,
+        "requireReturnTypes": true,
+        "checkRedundantAccess": true
+    },
+
+    "excludeFiles": [
+        "third_party/**"
+    ]
+}
