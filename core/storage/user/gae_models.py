@@ -21,8 +21,9 @@ __author__ = 'Stephanie Federwisch'
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
-
+import utils
 from google.appengine.ext import ndb
+
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -30,9 +31,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-    # Email address of the user.
+    # Email address of the user
     email = ndb.StringProperty(required=True, indexed=True)
-
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.

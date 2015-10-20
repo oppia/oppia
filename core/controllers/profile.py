@@ -58,7 +58,8 @@ class ViewProfilePage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'user_username': username,
             'user_bio': user_settings.user_bio,
-            'user_pic_data_url': user_settings.profile_picture_data_url
+            'user_pic_data_url': user_settings.profile_picture_data_url,
+            'user_start_date': utils.get_time_in_millisecs(user_settings.created_on)
         })
         self.render_template('profile/profile.html')
 
