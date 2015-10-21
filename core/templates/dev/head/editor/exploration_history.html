@@ -18,7 +18,7 @@
     <h3>List of Changes</h3>
     <div ng-repeat="versionNumber in snapshotOrderArray" class="row">
       <div class="col-sm-2 col-md-2 col-lg-2">
-        <input type="checkbox" name="compareVer1" ng-model="versionArr" ng-click="submitVersion($event, versionNumber)" class='protractor-test-history-v1-selector'>
+        <input type="checkbox" name="compareVer" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" class='protractor-test-history-v1-selector'>
         [<[versionNumber]>]
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2">
@@ -43,7 +43,7 @@
     <br>
 
     <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
-      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="compareSelectedVersions()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
       <div class="version-count-prompt">
         <[versionCountPrompt]>
       </div>

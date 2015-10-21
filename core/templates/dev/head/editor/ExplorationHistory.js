@@ -54,32 +54,42 @@ oppia.controller('ExplorationHistory', [
     }
   });
 
-  $scope.submitVersion = function($event, versionNumber) {
+  // Compares the two selected versions and displays the comparison results.
+  $scope.compareSelectedVersions = function() {
+    if($scope.selectedVersionsArray.length === 2) {
+      console.log('comparing selected versions');
+      $scope.changeCompareVersion();
+      $scope.showHistoryGraph();
+    }
+  };
+  // Changes the checkbox selection and provides an appropriate user prompt.
+  $scope.changeSelectedVersions = function($event, versionNumber) {
     var checkbox = $event.target;
-    var id = $scope.versionArr.indexOf(versionNumber);
+    var id = $scope.selectedVersionsArray.indexOf(versionNumber);
     if (checkbox.checked && id === -1) {
-      $scope.versionArr.push(versionNumber);
+      $scope.selectedVersionsArray.push(versionNumber);
     }
     if (!checkbox.checked && id !== -1) {
-      $scope.versionArr.splice(id, 1);
+      $scope.selectedVersionsArray.splice(id, 1);
     }
     
-    if($scope.versionArr.length == 2) {
+    if ($scope.selectedVersionsArray.length === 2) {
       $scope.versionCountPrompt = "";
-      $scope.changeCompareVersion(versionNumber);
+      // Disable checkboxes
     }
-    else {
+    else if (!$scope.disableCompare) {
+
       $scope.hideHistoryGraph = true;
       $scope.hideCompareVersionsButton = false;
 
-      if($scope.versionArr.length == 0)
+      if ($scope.selectedVersionsArray.length === 0) {
         $scope.versionCountPrompt = "Please select any two.";
-      else if($scope.versionArr.length == 1)
+      }
+      else if ($scope.selectedVersionsArray.length === 1) {
         $scope.versionCountPrompt = "Please select one more.";
-      else 
-        $scope.versionCountPrompt = "Please select exactly two.";      
+      }
     }
-  }
+  };
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
     $rootScope.loadingMessage = 'Loading';
@@ -97,10 +107,16 @@ oppia.controller('ExplorationHistory', [
        */
       $scope.compareVersions = {};
       $scope.compareVersionMetadata = {};
-      $scope.versionArr = []; 
+      
+      // Contains the IDs of the versions selected for comparison. Should contain a maximum of two elements.
+      $scope.selectedVersionsArray = []; 
 
       $scope.hideHistoryGraph = true;
-      $scope.hideCompareVersionsButton = false;
+
+      // Disable all comparisons if there are less than two revisions in total.
+      $scope.disableCompare = (currentVersion<2) ? true : false;
+
+      $scope.hideCompareVersionsButton = $scope.disableCompare;
 
       $scope.versionCountPrompt = "Please select any 2.";  
 
@@ -123,8 +139,9 @@ oppia.controller('ExplorationHistory', [
           $scope.snapshotOrderArray.push(explorationSnapshots[i].version_number);
         }
 
-        $rootScope.loadingMessage = '';
-      });
+        $rootScope.loadingMessage = ''; 
+      }); 
+
     });
   };
 
@@ -150,11 +167,11 @@ oppia.controller('ExplorationHistory', [
 
   // Function to set compared version metadata, download YAML and generate
   // diff graph and legend when selection is changed
-  $scope.changeCompareVersion = function(versionNumber) {
+  $scope.changeCompareVersion = function() {
     $scope.diffGraphData = null;
 
-    var earlierComparedVersion = Math.min($scope.versionArr[0], $scope.versionArr[1]);
-    var laterComparedVersion = Math.max($scope.versionArr[0], $scope.versionArr[1]);
+    var earlierComparedVersion = Math.min($scope.selectedVersionsArray[0], $scope.selectedVersionsArray[1]);
+    var laterComparedVersion = Math.max($scope.selectedVersionsArray[0], $scope.selectedVersionsArray[1]);
 
     $scope.compareVersionMetadata.earlierVersion =
       $scope.explorationVersionMetadata[earlierComparedVersion];
@@ -278,9 +295,15 @@ oppia.controller('ExplorationHistory', [
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
     return (
-      $scope.compareVersions && $scope.versionArr.length == 2);
+      $scope.compareVersions && ($scope.selectedVersionsArray.length === 2));
   };
 
+  $scope.isCheckboxDisabled = function(versionNumber) {
+    if ($scope.selectedVersionsArray.length === 2) {
+      return !($scope.selectedVersionsArray.indexOf(versionNumber) > -1);
+    }
+    return false;
+  };
   // Downloads the zip file for an exploration.
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     // Note that this opens (and then immediately closes) a new tab. If we do
