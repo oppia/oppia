@@ -69,13 +69,14 @@ oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 // Global utility methods.
 oppia.controller('Base', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-    'warningsData', 'activeInputData',
+    'warningsData', 'activeInputData', 'LABEL_FOR_CLEARING_FOCUS',
     function($scope, $http, $rootScope, $window, $timeout, $document, $log,
-             warningsData, activeInputData) {
+             warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
+  $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
