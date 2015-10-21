@@ -676,17 +676,17 @@ oppia.directive('progressDots', [function() {
   };
 }]);
 
-oppia.directive('tooltipEvents', ['$timeout', function($timeout) {
+oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   return {
     restrict: 'A',
     scope: true,
     controller: ['$scope', 'deviceInfoService', function(
       $scope, deviceInfoService) {
       $scope.opened = false;
-      $scope.deviceHasTouchEvent = deviceInfoService.hasTouchEvents();
+      $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
     }],
     link: function(scope, element) {
-      if (scope.deviceHasTouchEvent) {
+      if (scope.deviceHasTouchEvents) {
         element.on('touchstart', function() {
           scope.opened = true;
           scope.$apply();
