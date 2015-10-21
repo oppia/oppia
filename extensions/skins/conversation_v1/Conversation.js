@@ -24,7 +24,7 @@ var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 var TIME_PADDING_MSEC = 250;
 var TIME_SCROLL_MSEC = 600;
-
+var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
@@ -672,7 +672,46 @@ oppia.directive('progressDots', [function() {
           $scope.changeActiveDot($scope.currentDotIndex + 1);
         }
       };
-
     }]
+  };
+}]);
+
+oppia.directive('tooltipEvents', ['$timeout', function($timeout) {
+  return {
+    restrict: 'A',
+    scope: true,
+    controller: ['$scope', '$window', function($scope, $window) {
+      $scope.opened = false;
+      $scope.deviceHasTouchEvent = false;
+      // This  is used to check if device has touch events
+      //  registered to it.
+      if ('ontouchstart' in $window) {
+        $scope.deviceHasTouchEvent = true;
+      }
+    }],
+    link: function(scope, iElement) {
+      if (scope.deviceHasTouchEvent) {
+        iElement.on('touchstart', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+        iElement.on('touchend', function() {
+          // Set time delay before tooltip close
+          $timeout(function() {
+            scope.opened = false;
+          }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
+        });
+      } else {
+        iElement.on('mouseenter', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+
+        iElement.on('mouseleave', function() {
+          scope.opened = false;
+          scope.$apply();
+        });
+      };
+    }
   };
 }]);
