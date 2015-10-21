@@ -19,24 +19,24 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-python scripts/install_third_party.py
+$PYTHON_CMD scripts/install_third_party.py
 
-# Check if the OS supports node.js and jsrepl installation; if not, return
-# to the calling script.
+# Check if the OS supports node.js installation; if not, return to the calling
+# script.
 if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
   echo ""
-  echo "  WARNING: Unsupported OS for installation of node.js and jsrepl."
+  echo "  WARNING: Unsupported OS for installation of node.js."
   echo "  If you are running this script on Windows, see the instructions"
   echo "  here regarding installation of node.js:"
   echo ""
   echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
   echo ""
-  echo "  STATUS: Installation completed except for node.js and jsrepl. Exiting."
+  echo "  STATUS: Installation completed except for node.js. Exiting."
   echo ""
   exit 0
 fi
 
-# If the OS supports it, download and install node.js and jsrepl.
+# If the OS supports it, download and install node.js.
 echo Checking if node.js is installed in $TOOLS_DIR
 if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
@@ -62,77 +62,57 @@ fi
 
 # Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
 #
-#   http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+#   http://blog.npmjs.org/post/78085451721
 #
 $NPM_CMD config set ca ""
 
-echo Checking whether jsrepl is installed in third_party
-if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
-  echo Installing CoffeeScript
-  $NPM_INSTALL coffee-script@1.2.0 ||
-  {
-    echo ""
-    echo "  [oppia-message]"
-    echo ""
-    echo "  Instructions:"
-    echo "    If the script fails here, please try running these commands (you"
-    echo "    may need to use sudo):"
-    echo ""
-    echo "      chown -R $ME ~/.npm"
-    echo "      rm -rf ~/tmp"
-    echo ""
-    echo "    Then run the script again."
-    echo ""
-    echo "  What is happening:"
-    echo "    npm, a package manager that Oppia uses to install some of its"
-    echo "    dependencies, is putting things into the ~/tmp and ~/.npm"
-    echo "    folders, and then encounters issues with permissions."
-    echo ""
-    echo "  More information:"
-    echo "    http://stackoverflow.com/questions/16151018/npm-throws-error-without-sudo"
-    echo "    https://github.com/isaacs/npm/issues/3664"
-    echo "    https://github.com/isaacs/npm/issues/2952"
-    echo ""
+# Download and install Skulpt. Skulpt is built using a Python script included
+# within the Skulpt repository (skulpt.py). This script normally requires
+# GitPython, however the patches to it below (with the sed operations) lead to
+# it no longer being required. The Python script is used to avoid having to
+# manually recreate the Skulpt dist build process in install_third_party.py.
+# Note that skulpt.py will issue a warning saying its dist command will not
+# work properly without GitPython, but it does actually work due to the
+# patches.
 
-    exit 1
-  }
-
-  echo Installing uglify
-  $NPM_INSTALL uglify-js
-
-  if [ ! -d "$TOOLS_DIR/jsrepl/build" ]; then
-    echo Downloading jsrepl
+echo Checking whether Skulpt is installed in third_party
+if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
+  if [ ! -d "$TOOLS_DIR/skulpt-0.10.0" ]; then
+    echo Downloading Skulpt
     cd $TOOLS_DIR
-    rm -rf jsrepl
-    git clone https://github.com/replit/jsrepl.git
-    cd jsrepl
-    # Use a specific version of the JSRepl repository.
-    git checkout 13f89c2cab0ee9163e0077102478958a14afb781
+    mkdir skulpt-0.10.0
+    cd skulpt-0.10.0
+    git clone https://github.com/skulpt/skulpt
+    cd skulpt
 
-    git submodule update --init --recursive
+    # Use a specific Skulpt release.
+    git checkout 0.10.0
 
-    # Add a temporary backup file so that this script works on both Linux and Mac.
+    # Add a temporary backup file so that this script works on both Linux and
+    # Mac.
     TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
 
-    echo Compiling jsrepl
-    # Sed fixes some issues:
-    # - Reducing jvm memory requirement from 4G to 1G.
-    # - This version of node uses fs.existsSync.
-    # - CoffeeScript is having trouble with octal representation.
-    # - Use our installed version of uglifyjs.
-    sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
-    sed -e 's/path\.existsSync/fs\.existsSync/' |\
-    sed -e 's/0o755/493/' |\
-    sed -e 's,uglifyjs,'$NODE_MODULE_DIR'/.bin/uglifyjs,' > $TMP_FILE
-    mv $TMP_FILE Cakefile
-    export NODE_PATH=$NODE_MODULE_DIR
-    $NODE_MODULE_DIR/.bin/cake bake
+    echo Compiling Skulpt
+
+    # The Skulpt setup function needs to be tweaked. It fails without certain
+    # third party commands. These are only used for unit tests and generating
+    # documentation and are not necessary when building Skulpt.
+    sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
+    sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
+    mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
+    $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
   fi
 
   # Move the build directory to the static resources folder.
-  mkdir -p $THIRD_PARTY_DIR/static/jsrepl
-  cp -r $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
+  mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
+  cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
+fi
+
+echo Checking whether node-jscs dependencies are installed
+if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
+  echo installing node-jscs
+  $NPM_INSTALL jscs@2.3.0
 fi

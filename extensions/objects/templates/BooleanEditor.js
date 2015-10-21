@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // The value for this editor is always editable.
 
-oppia.directive('booleanEditor', function($compile, warningsData) {
+oppia.directive('booleanEditor', ['$compile', function($compile) {
   return {
-    link: function(scope, element, attrs) {
+    controller: function($scope) {
+      // Reset the component each time the value changes (e.g. if this is part
+      // of an editable list).
+      $scope.$watch('$parent.value', function(newValue) {
+        $scope.localValue = {
+          label: newValue || false
+        };
+      }, true);
+
+      $scope.$watch('localValue.label', function(newValue) {
+        $scope.$parent.value = newValue;
+      });
+    },
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_TEMPLATES_URL + 'Boolean';
       };
@@ -25,17 +37,6 @@ oppia.directive('booleanEditor', function($compile, warningsData) {
     },
     restrict: 'E',
     scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: newValue || false};
-      }, true);
-
-      $scope.$watch('localValue.label', function(newValue, oldValue) {
-        $scope.$parent.value = newValue;
-      });
-    }
+    template: '<span ng-include="getTemplateUrl()"></span>'
   };
-});
+}]);

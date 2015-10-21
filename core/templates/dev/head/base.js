@@ -69,9 +69,9 @@ oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 // Global utility methods.
 oppia.controller('Base', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-    'warningsData', 'activeInputData', 'messengerService',
+    'warningsData', 'activeInputData',
     function($scope, $http, $rootScope, $window, $timeout, $document, $log,
-             warningsData, activeInputData, messengerService) {
+             warningsData, activeInputData) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
