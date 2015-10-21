@@ -279,6 +279,18 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
+      $scope.readSelectedTextAloud = function() {
+        var defaultMessage = "Clicking this button will read highlighted text aloud";
+        var selectedText =  $window.getSelection();
+        if (selectedText == "") {
+          var readText = new SpeechSynthesisUtterance(defaultMessage);
+        } else {
+          var readText = new SpeechSynthesisUtterance(selectedText);
+        };
+        readText.lang = 'en-US';
+        $window.speechSynthesis.speak(readText);
+      };
+
       $scope.resetVisiblePanel = function() {
         if ($scope.panels.length === 0) {
           $scope.currentVisiblePanelName = null;
