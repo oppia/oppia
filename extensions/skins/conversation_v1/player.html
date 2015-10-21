@@ -38,7 +38,7 @@
       -->
       <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
                ng-class="{'conversation-skin-left-card': isSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isSupplementalCardNonempty() && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
-        <div class="conversation-skin-tutor-card-read-text-aloud-container" ng-if="activeCard.stateName && !isInPreviewMode">
+        <div class="conversation-skin-tutor-card-read-text-aloud-container" ng-if="activeCard.stateName && !isInPreviewMode && isSpeechSynthesisEnabled()">
           <button class="conversation-skin-tutor-card-read-text-aloud"
                   tooltip="Click to read highlighted text aloud" tooltip-placement="bottom" 
                   state-name="<[activeCard.stateName]>" ng-click="readSelectedTextAloud()">

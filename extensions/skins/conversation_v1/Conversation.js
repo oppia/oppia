@@ -247,6 +247,10 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
+      $scope.isSpeechSynthesisEnabled = function() {
+        return 'speechSynthesis' in window;
+      };
+
       $scope.isSupplementalCardNonempty = function() {
         return $scope.activeCard && !$scope.activeCard.interactionIsInline;
       };
