@@ -191,7 +191,8 @@ def get_users_settings(user_ids):
                     model.last_started_state_editor_tutorial),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
-                preferred_language_codes=model.preferred_language_codes
+                preferred_language_codes=model.preferred_language_codes,
+                created_on=model.created_on
             ))
         else:
             result.append(None)
@@ -244,7 +245,6 @@ def _create_user(user_id, email):
     )
     _save_user_settings(user_settings)
 
-    created_on = get_user_settings(user_id).created_on
 
 
     return user_settings
