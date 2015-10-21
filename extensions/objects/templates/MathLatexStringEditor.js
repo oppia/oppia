@@ -21,7 +21,7 @@ oppia.directive('mathLatexStringEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'MathLatexString';
+        return '/object_editor_template/MathLatexString';
       };
       $compile(element.contents())(scope);
     },

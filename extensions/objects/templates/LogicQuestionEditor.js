@@ -21,7 +21,7 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'LogicQuestion';
+        return '/object_editor_template/LogicQuestion';
       };
       $compile(element.contents())(scope);
     },

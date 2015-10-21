@@ -23,7 +23,7 @@ oppia.directive('imageWithRegionsEditor', [
     return {
       link: function(scope, element, attrs) {
         scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_TEMPLATES_URL + 'ImageWithRegions';
+          return '/object_editor_template/ImageWithRegions';
         };
         $compile(element.contents())(scope);
       },

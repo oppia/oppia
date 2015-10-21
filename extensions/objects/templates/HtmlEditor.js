@@ -23,7 +23,7 @@ oppia.directive('htmlEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Html';
+        return '/object_editor_template/Html';
       };
       $compile(element.contents())(scope);
     },

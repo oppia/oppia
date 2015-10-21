@@ -31,7 +31,7 @@ oppia.directive('booleanEditor', ['$compile', function($compile) {
     },
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Boolean';
+        return '/object_editor_template/Boolean';
       };
       $compile(element.contents())(scope);
     },

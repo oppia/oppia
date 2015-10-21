@@ -21,7 +21,7 @@ oppia.directive('logicErrorCategoryEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'LogicErrorCategory';
+        return '/object_editor_template/LogicErrorCategory';
       };
       $compile(element.contents())(scope);
     },

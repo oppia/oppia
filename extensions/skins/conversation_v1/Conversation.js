@@ -18,12 +18,12 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// Note: This file should be assumed to be in an IIFE, and the constants below
+// should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;
 var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
-var TIME_PADDING_MSEC = 250;
-var TIME_SCROLL_MSEC = 600;
 
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
@@ -178,6 +178,8 @@ oppia.directive('conversationSkin', [function() {
       // The minimum width, in pixels, needed to be able to show the feedback
       // popover on the bottom of its click target.
       var FEEDBACK_POPOVER_THRESHOLD_PX = 700;
+      var TIME_PADDING_MSEC = 250;
+      var TIME_SCROLL_MSEC = 600;
 
       var hasInteractedAtLeastOnce = false;
       var _answerIsBeingProcessed = false;

@@ -94,7 +94,7 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
     },
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'CoordTwoDim';
+        return '/object_editor_template/CoordTwoDim';
       };
       $compile(element.contents())(scope);
     },

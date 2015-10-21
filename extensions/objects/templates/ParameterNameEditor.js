@@ -20,7 +20,7 @@ oppia.directive('parameterNameEditor', function($compile, warningsData) {
   return {
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'ParameterName';
+        return '/object_editor_template/ParameterName';
       };
       $compile(element.contents())(scope);
     },

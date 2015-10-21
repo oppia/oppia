@@ -19,7 +19,7 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'MusicPhrase';
+        return '/object_editor_template/MusicPhrase';
       };
       $compile(element.contents())(scope);
     },

@@ -19,7 +19,7 @@ oppia.directive('normalizedStringEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'NormalizedString';
+        return '/object_editor_template/NormalizedString';
       };
       $compile(element.contents())(scope);
     },

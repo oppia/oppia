@@ -21,7 +21,7 @@ oppia.directive('nonnegativeIntEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'NonnegativeInt';
+        return '/object_editor_template/NonnegativeInt';
       };
       $compile(element.contents())(scope);
     },
