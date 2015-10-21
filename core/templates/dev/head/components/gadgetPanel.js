@@ -22,7 +22,7 @@ oppia.directive('oppiaGadgetPanel', function() {
   return {
     restrict: 'E',
     scope: {
-      panelContents: '&',
+      panelContents: '&'
     },
     templateUrl: 'components/gadgetPanel'
   };
@@ -32,31 +32,35 @@ oppia.directive('oppiaGadget', function() {
   return {
     restrict: 'E',
     scope: {
-      gadgetType: '&',
-      gadgetName: '&',
       gadgetCustomizationArgs: '&',
+      gadgetName: '&',
+      gadgetType: '&',
       showInStates: '&'
     },
     templateUrl: 'components/gadget',
     controller: [
-        '$scope', '$filter', 'oppiaHtmlEscaper', 'oppiaPlayerService',
-        'extensionTagAssemblerService',
-        function($scope, $filter, oppiaHtmlEscaper, oppiaPlayerService,
+      '$scope', '$filter', 'oppiaHtmlEscaper', 'oppiaPlayerService',
+      'extensionTagAssemblerService',
+      function(
+          $scope, $filter, oppiaHtmlEscaper, oppiaPlayerService,
           extensionTagAssemblerService) {
+        var el = $(
+          '<oppia-gadget-' +
+          $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
+        el = extensionTagAssemblerService.formatCustomizationArgAttrs(
+          el, $scope.gadgetCustomizationArgs());
+        el.attr(
+          'gadget-name',
+          oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
+        $scope.gadgetHtml = ($('<div>').append(el)).html();
 
-      var el = $(
-        '<oppia-gadget-' + $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
-      el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
-        el, $scope.gadgetCustomizationArgs());
-      el.attr('gadget-name',
-        oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
-      $scope.gadgetHtml = ($('<div>').append(el)).html();
-
-      $scope.$watch(function() {
-        return oppiaPlayerService.getCurrentStateName();
-      }, function(currentStateName) {
-        $scope.isVisible = $scope.showInStates().indexOf(currentStateName) !== -1;
-      });
-    }]
+        $scope.$watch(function() {
+          return oppiaPlayerService.getCurrentStateName();
+        }, function(currentStateName) {
+          $scope.isVisible = $scope.showInStates().indexOf(
+            currentStateName) !== -1;
+        });
+      }
+    ]
   };
 });

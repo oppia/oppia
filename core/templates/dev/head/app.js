@@ -263,7 +263,7 @@ oppia.factory('validatorsService', [
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
-oppia.factory('focusService', ['$rootScope', '$timeout', 'deviceInfoService', 
+oppia.factory('focusService', ['$rootScope', '$timeout', 'deviceInfoService',
   function($rootScope, $timeout, deviceInfoService) {
   var _nextLabelToFocusOn = null;
   return {
@@ -361,7 +361,7 @@ oppia.factory('oppiaDebouncer', ['$log', function($log) {
 oppia.factory('extensionTagAssemblerService', [
     '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
   return {
-    formatCustomizationArgAttributesForElement: function(element, customizationArgSpecs) {
+    formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
       for (var caSpecName in customizationArgSpecs) {
         var caSpecValue = customizationArgSpecs[caSpecName].value;
         element.attr(
