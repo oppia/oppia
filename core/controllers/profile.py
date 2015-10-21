@@ -146,8 +146,7 @@ class SignupPage(base.BaseHandler):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
 
-        user_settings = user_services.get_user_settings(self.user_id)
-        if user_settings.last_agreed_to_terms and user_settings.username:
+        if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
 
@@ -169,7 +168,12 @@ class SignupHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
-            'has_agreed_to_terms': bool(user_settings.last_agreed_to_terms),
+            'has_agreed_to_latest_terms': (
+                user_settings.last_agreed_to_terms and
+                user_settings.last_agreed_to_terms >=
+                feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),
+            'has_ever_registered': bool(
+                user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,
         })
 
@@ -181,10 +185,10 @@ class SignupHandler(base.BaseHandler):
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
 
-        has_previously_registered = (
-            user_services.has_user_registered_as_editor(self.user_id))
+        has_ever_registered = user_services.has_ever_registered(self.user_id)
+        has_fully_registered = user_services.has_fully_registered(self.user_id)
 
-        if has_previously_registered:
+        if has_fully_registered:
             self.render_json({})
             return
 
@@ -207,7 +211,7 @@ class SignupHandler(base.BaseHandler):
 
         # Note that an email is only sent when the user registers for the first
         # time.
-        if feconf.CAN_SEND_EMAILS_TO_USERS:
+        if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         self.render_json({})

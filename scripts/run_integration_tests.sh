@@ -130,7 +130,7 @@ trap cleanup EXIT
 # Start a selenium process.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start )&
 # Start a demo server.
-(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes .)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done

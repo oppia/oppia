@@ -69,6 +69,9 @@ def _migrate_collection_to_latest_schema(versioned_collection):
 
     # This is where conversion functions will be placed once updates to the
     # collection schemas happen.
+    # TODO(sll): Ensure that there is a test similar to
+    # exp_domain_test.SchemaMigrationMethodsUnitTests to ensure that the
+    # appropriate migration functions are declared.
 
 
 # Repository GET methods.

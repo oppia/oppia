@@ -225,12 +225,26 @@ def _save_user_settings(user_settings):
     ).put()
 
 
+<<<<<<< HEAD
 
 
 
 def has_user_registered_as_editor(user_id):
+=======
+def has_ever_registered(user_id):
+>>>>>>> a9808e47a1c3885c216e5eb7ed5b51d9c60ecbe9
     user_settings = get_user_settings(user_id, strict=True)
-    return user_settings.username and user_settings.last_agreed_to_terms
+    return bool(user_settings.username and user_settings.last_agreed_to_terms)
+
+
+def has_fully_registered(user_id):
+    if user_id is None:
+        return False
+
+    user_settings = get_user_settings(user_id, strict=True)
+    return user_settings.username and user_settings.last_agreed_to_terms and (
+        user_settings.last_agreed_to_terms >=
+        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
 def _create_user(user_id, email):
