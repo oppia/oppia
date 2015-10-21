@@ -403,8 +403,9 @@
   </script>
 
   {% include 'components/exploration_embed_button.html' %}
-  {% include 'components/visualizations.html' %}
   {% include 'components/gadget_panel.html' %}
+  {% include 'components/param_changes_editor.html' %}
+  {% include 'components/visualizations.html' %}
 
 {% endblock content %}
 
@@ -418,6 +419,7 @@
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}
+    {{ include_js_file('components/paramChangesEditor.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ value_generators_js }}
@@ -430,7 +432,7 @@
     {{ include_js_file('editor/HistoryServices.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/SidebarStateName.js') }}
-    {{ include_js_file('editor/SidebarStateParameterChanges.js') }}
+    {{ include_js_file('editor/StateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateResponses.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}

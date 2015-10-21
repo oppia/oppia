@@ -977,7 +977,7 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0 15px 10px;
 }
 
-.oppia-state-content-display, .oppia-state-param-changes-display {
+.oppia-state-content-display, .oppia-param-changes-display {
   padding: 4px;
   text-align: left;
   max-width: 585px;

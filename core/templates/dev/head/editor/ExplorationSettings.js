@@ -136,8 +136,7 @@ oppia.controller('ExplorationSettings', [
     $rootScope.$broadcast('refreshGraph');
   };
 
-  $scope.saveExplorationParamChanges = function() {
-    explorationParamChangesService.saveDisplayedValue();
+  $scope.postSaveParamChangesHook = function() {
     explorationWarningsService.updateWarnings();
   };
 

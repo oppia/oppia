@@ -1,0 +1,94 @@
+<script type="text/ng-template" id="editor/paramChanges">
+  <!--
+    We do not track by $index here, because if we do, then the select2 dropdown
+    will not update when elements are swapped or deleted.
+  -->
+  <div ng-if="isParamChangesEditorOpen && editabilityService.isEditableOutsideTutorialMode()"
+       ng-model="paramChangesService.displayed">
+    <table class="table">
+      <tr ng-repeat="paramChange in paramChangesService.displayed"
+          class="protractor-test-param-changes-list">
+        <td>
+          <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
+                  ng-show="$index != 0" ng-click="swapParamChanges($index, $index - 1)">
+            <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
+          </button>
+          <span ng-hide="$index != 0" class="oppia-grayed">
+            <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
+          </span>
+
+          <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
+                  ng-show="!$last" ng-click="swapParamChanges($index, $index + 1)">
+            <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
+          </button>
+          <span ng-hide="!$last" class="oppia-grayed">
+            <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
+          </span>
+        </td>
+
+        <td>
+          Change
+          <select2-dropdown item="paramChange.name" choices="paramNameChoices"
+                            placeholder="Param name" new-choice-regex="^[A-Za-z]+$"
+                            width="153px">
+          </select2-dropdown>
+
+          <select class="form-control" ng-model="paramChange.generator_id"
+                  ng-options="key as PREAMBLE_TEXT[key] for (key, value) in PREAMBLE_TEXT"
+                  style="width: 110px; display: inline;" required>
+          </select>
+
+          <value-generator-editor generator-id="paramChange.generator_id"
+                                  customization-args="paramChange.customization_args"
+                                  obj-type="'UnicodeString'">
+          </value-generator-editor>
+        </td>
+        <td>
+          <button type="button" class="btn btn-default btn-xs oppia-small-delete-button"
+                  ng-click="deleteParamChange($index)">
+            <span class="glyphicon glyphicon-remove" title="Delete parameter change"></span>
+          </button>
+        </td>
+      </tr>
+    </table>
+
+    <div>
+      <button type="button" class="btn btn-default btn-xs protractor-test-add-param-button"
+              ng-click="addParamChange()">
+        Add parameter change
+      </button>
+    </div>
+
+    <div ng-if="warningText" class="oppia-serious-warning-text"
+         style="margin-top: 20px; margin-bottom: 20px;">
+      <span class="glyphicon glyphicon-warning-sign"></span>
+      <[warningText]>
+    </div>
+
+    <button type="button"
+            class="btn btn-success oppia-save-state-item-button pull-right protractor-test-save-param-changes-button"
+            ng-click="saveParamChanges()"
+            ng-disabled="!areDisplayedParamChangesValid()">Save Changes</button>
+    <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
+    <div style="clear: both;"></div>
+  </div>
+
+  <div ng-if="!isParamChangesEditorOpen" ng-click="openParamChangesEditor()"
+       ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+    <span ng-if="editabilityService.isEditable()"
+          class="glyphicon glyphicon-pencil oppia-editor-edit-icon"
+          title="Edit Card Parameter Changes">
+    </span>
+    <div class="oppia-param-changes-display oppia-transition-200"
+         ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}"
+         title="Card Parameter Changes" style="opacity: 0.7;">
+      <span ng-if="paramChangesService.savedMemento.length === 0">
+        <em>No parameter changes.</em>
+      </span>
+      <div ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
+        <[$index + 1]>. Change <span class="label label-info"><[paramChange.name]></span>
+         <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generator_id](paramChange.customization_args)]>
+      </div>
+    </div>
+  </div>
+</script>

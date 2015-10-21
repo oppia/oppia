@@ -137,8 +137,8 @@
   </md-card>
 
   <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+    <h3>Advanced Features</h3>
     <div class="row">
-      <h3>Advanced Features</h3>
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
@@ -393,11 +393,10 @@
   </md-card>
 
   <md-card class="oppia-editor-card" ng-if="areParametersEnabled()">
-    <h3>Parameters</h3>
+    <h3>Parameters used in this exploration</h3>
 
     <div class="row">
-      <div class="col-lg-6 col-md-6 col-sm-6">
-        <h5>Parameters used in this exploration</h5>
+      <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
           <em>No parameters used.</em>
         </div>
@@ -407,17 +406,18 @@
           </li>
         </ol>
       </div>
+    </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6">
-        <h5>
-          Parameters initialized at start of exploration
-          <span class="glyphicon glyphicon-info-sign" tooltip="These changes are applied before the learner begins the exploration." tooltip-placement="right" style="font-size: 12px; padding-left: 18px;"></span>
-        </h5>
+    <h3>
+      Initial parameter changes
+      <span class="glyphicon glyphicon-info-sign" tooltip="These changes are applied before the learner begins the exploration." tooltip-placement="right" style="font-size: 12px; padding-left: 18px;"></span>
+    </h3>
 
-        <param-change-editor param-changes="explorationParamChangesService.displayed"
-                             save-param-changes="saveExplorationParamChanges"
-                             is-editable="editabilityService.isEditable()">
-        </param-change-editor>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <param-changes-editor param-changes-service="explorationParamChangesService"
+                              post-save-hook="postSaveParamChangesHook">
+        </param-changes-editor>
       </div>
     </div>
   </md-card>
