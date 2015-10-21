@@ -8,7 +8,7 @@
     <table class="table">
       <tr ng-repeat="paramChange in paramChangesService.displayed"
           class="protractor-test-param-changes-list">
-        <td>
+        <td style="width: 55px;">
           <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
                   ng-show="$index != 0" ng-click="swapParamChanges($index, $index - 1)">
             <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
@@ -43,10 +43,10 @@
                                   obj-type="'UnicodeString'">
           </value-generator-editor>
         </td>
-        <td>
-          <button type="button" class="btn btn-default btn-xs oppia-small-delete-button"
+        <td style="position: relative;">
+          <button type="button" class="btn btn-default btn-xs oppia-delete-param-change-button"
                   ng-click="deleteParamChange($index)">
-            <span class="glyphicon glyphicon-remove" title="Delete parameter change"></span>
+            <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" title="Delete parameter change">
           </button>
         </td>
       </tr>

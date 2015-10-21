@@ -1149,6 +1149,7 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
+.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
