@@ -680,34 +680,30 @@ oppia.directive('tooltipEvents', ['$timeout', function($timeout) {
   return {
     restrict: 'A',
     scope: true,
-    controller: ['$scope', '$window', function($scope, $window) {
+    controller: ['$scope', 'deviceInfoService', function(
+      $scope, deviceInfoService) {
       $scope.opened = false;
-      $scope.deviceHasTouchEvent = false;
-      // This  is used to check if device has touch events
-      //  registered to it.
-      if ('ontouchstart' in $window) {
-        $scope.deviceHasTouchEvent = true;
-      }
+      $scope.deviceHasTouchEvent = deviceInfoService.hasTouchEvents();
     }],
-    link: function(scope, iElement) {
+    link: function(scope, element) {
       if (scope.deviceHasTouchEvent) {
-        iElement.on('touchstart', function() {
+        element.on('touchstart', function() {
           scope.opened = true;
           scope.$apply();
         });
-        iElement.on('touchend', function() {
+        element.on('touchend', function() {
           // Set time delay before tooltip close
           $timeout(function() {
             scope.opened = false;
           }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
         });
       } else {
-        iElement.on('mouseenter', function() {
+        element.on('mouseenter', function() {
           scope.opened = true;
           scope.$apply();
         });
 
-        iElement.on('mouseleave', function() {
+        element.on('mouseleave', function() {
           scope.opened = false;
           scope.$apply();
         });
