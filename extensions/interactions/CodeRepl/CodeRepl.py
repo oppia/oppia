@@ -24,20 +24,20 @@ class CodeRepl(base.BaseInteraction):
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable = True
-    _dependency_ids = ['jsrepl', 'codemirror']
+    _dependency_ids = ['skulpt', 'codemirror']
     answer_type = 'CodeEvaluation'
     instructions = 'Type code in the editor'
     needs_summary = True
 
-    # Language options 'lua' and 'scheme' have been removed for possible
-    # later re-release.
+    # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
+    # 'ruby' have been removed for possible later re-release.
     _customization_arg_specs = [{
         'name': 'language',
         'description': 'Programming language',
         'schema': {
             'type': 'unicode',
             'choices': [
-                'coffeescript', 'javascript', 'python', 'ruby',
+                'python',
             ]
         },
         'default_value': 'python'

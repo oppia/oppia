@@ -100,6 +100,14 @@ var NormalizedStringEditor = function(elem) {
   };
 };
 
+var ParameterNameEditor = function(elem) {
+  return {
+    setValue: function(text) {
+      elem.element(by.cssContainingText('option', text)).click();
+    }
+  }
+}
+
 var SanitizedUrlEditor = function(elem) {
   return {
     setValue: function(text) {
@@ -126,6 +134,7 @@ var OBJECT_EDITORS = {
   'MathLatexString': MathLatexStringEditor,
   'NonnegativeInt': NonnegativeIntEditor,
   'NormalizedString': NormalizedStringEditor,
+  'ParameterName': ParameterNameEditor,
   'SanitizedUrl': SanitizedUrlEditor,
   'UnicodeString': UnicodeStringEditor
 };
@@ -137,6 +146,7 @@ exports.IntEditor = IntEditor;
 exports.MathLatexStringEditor = MathLatexStringEditor;
 exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
+exports.ParameterNameEditor = ParameterNameEditor;
 exports.SanitizedUrlEditor = SanitizedUrlEditor;
 exports.UnicodeStringEditor = UnicodeStringEditor;
 

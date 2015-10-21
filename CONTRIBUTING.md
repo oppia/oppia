@@ -6,7 +6,7 @@ Thanks for your interest in contributing code to the Oppia project! This page ex
 
 ## Setting things up
 
-  1. Clone the Oppia repo to your computer by following the installation instructions in the [README](README.md).
+  1. Create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
   2. Update your GitHub notification settings:
     * Go to your settings page (click the Settings option under the profile menu in the top right), then go to 'Notification center' and ensure that everything's as you want it.
     * Go to the [Oppia repo](https://github.com/oppia/oppia), and click 'Watch' at the top right. Ensure that you're not 'ignoring' the repo, so that you'll be notified when someone replies to a conversation you're part of.
@@ -50,6 +50,11 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made. 
   * You can refer to relevant issues in the commit message by writing, e.g., "#105".
   * For consistency, please conform to the [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides. In addition, code should be formatted consistently with other code around it. Where these two guidelines differ, prefer the latter.
+  * In general, code should be formatted consistently with other code around it; we use Google's Python and JavaScript style guides as a reference. Prior to each commit, please run
+    ```
+      python scripts/pre_commit_linter.py
+    ```
+  which checks the styling of your JavaScript code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions](https://github.com/SublimeLinter/SublimeLinter-jscs).
   * Please ensure that the code you write is well-tested.
   * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
 

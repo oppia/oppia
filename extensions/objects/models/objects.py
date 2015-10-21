@@ -81,17 +81,6 @@ class BaseObject(object):
             '%s.html' % cls.edit_html_filename))
 
 
-class Null(BaseObject):
-    """Class for a null object."""
-
-    description = 'A null object.'
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        return None
-
-
 class Boolean(BaseObject):
     """Class for booleans."""
 
@@ -677,6 +666,21 @@ class ClickOnImage(BaseObject):
                 'items': UnicodeString.SCHEMA
             }
         }]
+    }
+
+
+class ParameterName(BaseObject):
+    """Parameter name class.
+
+    Validation for this class is done only in the frontend.
+    """
+
+    description = 'A string representing a parameter name.'
+    edit_html_filename = 'parameter_name_editor'
+    edit_js_filename = 'ParameterNameEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
     }
 
 

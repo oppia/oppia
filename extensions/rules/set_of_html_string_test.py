@@ -18,8 +18,8 @@
 
 __author__ = 'Kevin Lee'
 
+from core.tests import test_utils
 from extensions.rules import set_of_html_string
-import test_utils
 
 
 class SetOfHtmlStringUnitTests(test_utils.GenericTestBase):

@@ -43,9 +43,6 @@ SITE_FORUM_URL = config_domain.ConfigProperty(
     'site_forum_url', {'type': 'unicode'},
     'The site forum URL (for links; the Forum page is configured separately)',
     default_value='https://site/forum/url')
-SITE_NAME = config_domain.ConfigProperty(
-    'site_name', {'type': 'unicode'}, 'The site name',
-    default_value='SITE_NAME')
 
 
 class AboutPage(base.BaseHandler):
@@ -74,14 +71,6 @@ class ParticipatePage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_PARTICIPATE,
         })
         self.render_template('pages/participate.html')
-
-
-class EditorTutorialPage(base.BaseHandler):
-    """Page with a full editor tutorial."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('pages/editor_tutorial.html')
 
 
 class ForumPage(base.BaseHandler):

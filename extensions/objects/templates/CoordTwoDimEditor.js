@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
   return {
-    link: function(scope, element, attrs) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'CoordTwoDim';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope, $timeout) {
       $scope.schemaLatitude = {
         type: 'float',
@@ -63,7 +53,8 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
       };
 
       $scope.$watch('$parent.value', function(newValue, oldValue) {
-        if ($scope.$parent.value === '') {  // A new rule
+        // A new rule has just been created.
+        if ($scope.$parent.value === '') {
           $scope.$parent.value = [0.0, 0.0];
         }
 
@@ -72,12 +63,13 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
         }
       });
 
-      if ($scope.$parent.value === '') {  // A new rule
+      // A new rule has just been created.
+      if ($scope.$parent.value === '') {
         $scope.$parent.value = [0.0, 0.0];
       }
 
       // This is required in order to avoid the following bug:
-      //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
+      //   http://stackoverflow.com/q/18769287
       $timeout(function() {
         updateMarker($scope.$parent.value[0], $scope.$parent.value[1]);
         if ($scope.map) {
@@ -90,8 +82,8 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
           $scope.$parent.value[0],
           $scope.$parent.value[1]
         ),
-        zoom: 0,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        zoom: 0
       };
 
       $scope.registerClick = function($event, $params) {
@@ -99,6 +91,15 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
         updateMarker(latLng.lat(), latLng.lng());
         $scope.$parent.value = [latLng.lat(), latLng.lng()];
       };
-    }
+    },
+    link: function(scope, element) {
+      scope.getTemplateUrl = function() {
+        return OBJECT_EDITOR_TEMPLATES_URL + 'CoordTwoDim';
+      };
+      $compile(element.contents())(scope);
+    },
+    restrict: 'E',
+    scope: true,
+    template: '<span ng-include="getTemplateUrl()"></span>'
   };
 }]);

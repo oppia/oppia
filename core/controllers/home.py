@@ -35,7 +35,7 @@ class NotificationsDashboardPage(base.BaseHandler):
         if self.username in config_domain.BANNED_USERNAMES.value:
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        elif user_services.has_user_registered_as_editor(self.user_id):
+        elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
@@ -108,7 +108,7 @@ class MyExplorationsPage(base.BaseHandler):
         if self.username in config_domain.BANNED_USERNAMES.value:
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        elif user_services.has_user_registered_as_editor(self.user_id):
+        elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
@@ -129,7 +129,7 @@ class MyExplorationsHandler(base.BaseHandler):
 
         subscribed_summaries = (
             exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_activity_ids_subscribed_to(
+                subscription_services.get_exploration_ids_subscribed_to(
                     self.user_id)))
 
         def _get_intro_card_color(category):

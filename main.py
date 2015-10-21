@@ -31,7 +31,6 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
-from core.controllers import services
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
@@ -143,8 +142,6 @@ urls = [
         'my_explorations_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
-    get_redirect_route(
-        r'/editor_tutorial', pages.EditorTutorialPage, 'editor_tutorial_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(
@@ -332,9 +329,6 @@ urls = [
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,
         'notifications_handler'),
-
-    get_redirect_route(
-        r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
 
     get_redirect_route(
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
