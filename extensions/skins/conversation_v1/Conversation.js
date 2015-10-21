@@ -280,9 +280,9 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.readSelectedTextAloud = function() {
-        var defaultMessage = "Clicking this button will read highlighted text aloud";
+        var defaultMessage = 'Clicking this button will read highlighted text aloud';
         var selectedText =  $window.getSelection();
-        if (selectedText == "") {
+        if (selectedText == '') {
           var readText = new SpeechSynthesisUtterance(defaultMessage);
         } else {
           var readText = new SpeechSynthesisUtterance(selectedText);
