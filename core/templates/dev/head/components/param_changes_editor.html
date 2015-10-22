@@ -5,52 +5,39 @@
   -->
   <div ng-if="isParamChangesEditorOpen && editabilityService.isEditableOutsideTutorialMode()"
        ng-model="paramChangesService.displayed">
-    <table class="table">
-      <tr ng-repeat="paramChange in paramChangesService.displayed"
-          class="protractor-test-param-changes-list">
-        <td style="width: 55px;">
-          <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
-                  ng-show="$index != 0" ng-click="swapParamChanges($index, $index - 1)">
-            <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
-          </button>
-          <span ng-hide="$index != 0" class="oppia-grayed">
-            <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
-          </span>
+    <div ng-repeat="paramChange in paramChangesService.displayed"
+         class="oppia-param-editor-row protractor-test-param-changes-list">
+      <span class="oppia-param-arrow-buttons-container">
+        <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
+                ng-disabled="$index == 0" ng-click="swapParamChanges($index, $index - 1)">
+          <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
+        </button>
+        <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
+                ng-disabled="$last" ng-click="swapParamChanges($index, $index + 1)">
+          <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
+        </button>
+      </span>
+      <span>
+        Change
+        <select2-dropdown item="paramChange.name" choices="paramNameChoices"
+                          placeholder="Param name" new-choice-regex="^[A-Za-z]+$"
+                          width="153px">
+        </select2-dropdown>
 
-          <button type="button" class="btn btn-default btn-xs oppia-param-arrow-button"
-                  ng-show="!$last" ng-click="swapParamChanges($index, $index + 1)">
-            <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
-          </button>
-          <span ng-hide="!$last" class="oppia-grayed">
-            <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
-          </span>
-        </td>
-
-        <td>
-          Change
-          <select2-dropdown item="paramChange.name" choices="paramNameChoices"
-                            placeholder="Param name" new-choice-regex="^[A-Za-z]+$"
-                            width="153px">
-          </select2-dropdown>
-
-          <select class="form-control" ng-model="paramChange.generator_id"
-                  ng-options="key as PREAMBLE_TEXT[key] for (key, value) in PREAMBLE_TEXT"
-                  style="width: 110px; display: inline;" required>
-          </select>
-
-          <value-generator-editor generator-id="paramChange.generator_id"
-                                  customization-args="paramChange.customization_args"
-                                  obj-type="'UnicodeString'">
-          </value-generator-editor>
-        </td>
-        <td style="position: relative;">
-          <button type="button" class="btn btn-default btn-xs oppia-delete-param-change-button"
-                  ng-click="deleteParamChange($index)">
-            <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" title="Delete parameter change">
-          </button>
-        </td>
-      </tr>
-    </table>
+        <select class="form-control" ng-model="paramChange.generator_id"
+                ng-options="key as PREAMBLE_TEXT[key] for (key, value) in PREAMBLE_TEXT"
+                style="width: 110px; display: inline;" required>
+        </select>
+        <value-generator-editor generator-id="paramChange.generator_id"
+                                customization-args="paramChange.customization_args"
+                                obj-type="'UnicodeString'">
+        </value-generator-editor>
+      </span>
+      <button type="button" class="oppia-delete-param-change-button oppia-transition-200"
+              ng-click="deleteParamChange($index)">
+        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" title="Delete parameter change">
+      </button>
+    </div>
 
     <div>
       <button type="button" class="btn btn-default btn-xs protractor-test-add-param-button"
@@ -85,7 +72,7 @@
       <span ng-if="paramChangesService.savedMemento.length === 0">
         <em>No parameter changes.</em>
       </span>
-      <div ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
+      <div class="oppia-param-display-row" ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
         <[$index + 1]>. Change <span class="label label-info"><[paramChange.name]></span>
          <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generator_id](paramChange.customization_args)]>
       </div>
