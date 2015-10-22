@@ -99,6 +99,9 @@ oppia.factory('deviceInfoService', ['$window', function($window) {
   return {
     isMobileDevice: function() {
       return typeof $window.orientation !== 'undefined';
+    },
+    hasTouchEvents: function() {
+      return 'ontouchstart' in $window;
     }
   };
 }]);
