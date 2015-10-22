@@ -22,7 +22,8 @@ oppia.directive('oppiaGadgetPanel', function() {
   return {
     restrict: 'E',
     scope: {
-      panelContents: '&'
+      panelContents: '&',
+      currentStateName: '&'
     },
     templateUrl: 'components/gadgetPanel'
   };
@@ -34,16 +35,13 @@ oppia.directive('oppiaGadget', function() {
     scope: {
       gadgetCustomizationArgs: '&',
       gadgetName: '&',
-      gadgetType: '&',
-      showInStates: '&'
+      gadgetType: '&'
     },
     templateUrl: 'components/gadget',
     controller: [
-      '$scope', '$filter', 'oppiaHtmlEscaper', 'oppiaPlayerService',
-      'extensionTagAssemblerService',
+      '$scope', '$filter', 'oppiaHtmlEscaper', 'extensionTagAssemblerService',
       function(
-          $scope, $filter, oppiaHtmlEscaper, oppiaPlayerService,
-          extensionTagAssemblerService) {
+          $scope, $filter, oppiaHtmlEscaper, extensionTagAssemblerService) {
         var el = $(
           '<oppia-gadget-' +
           $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
@@ -52,14 +50,8 @@ oppia.directive('oppiaGadget', function() {
         el.attr(
           'gadget-name',
           oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
-        $scope.gadgetHtml = ($('<div>').append(el)).html();
 
-        $scope.$watch(function() {
-          return oppiaPlayerService.getCurrentStateName();
-        }, function(currentStateName) {
-          $scope.isVisible = $scope.showInStates().indexOf(
-            currentStateName) !== -1;
-        });
+        $scope.gadgetHtml = ($('<div>').append(el)).html();
       }
     ]
   };
