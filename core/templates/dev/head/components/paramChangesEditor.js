@@ -100,6 +100,10 @@ oppia.directive('paramChangesEditor', [function() {
 
         $scope.isParamChangesEditorOpen = true;
         $scope.paramNameChoices = _generateParamNameChoices();
+
+        if ($scope.paramChangesService.displayed.length === 0) {
+          $scope.addParamChange();
+        }
       };
 
       $scope.HUMAN_READABLE_ARGS_RENDERERS = {
