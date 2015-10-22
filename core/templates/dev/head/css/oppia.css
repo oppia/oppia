@@ -68,6 +68,13 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
 /* Bootstrap overrides and additions. */
 html {
   /*
@@ -300,6 +307,7 @@ textarea {
 .oppia-sidebar-menu-icon {
   height: 22px;
   margin: 0 16px 3px 6px;
+  vertical-align: middle;
   width: 22px;
 }
 

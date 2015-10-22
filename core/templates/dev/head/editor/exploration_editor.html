@@ -143,8 +143,8 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
-               class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish to Gallery">
+          <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+             alt="Publish to Gallery">&#xE2C3;</i>
           <span class="hidden-sm hidden-xs">Publish to Gallery</span>
         </button>
       </div>
@@ -156,13 +156,13 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_save_black_48dp.png"
-                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Save Draft">
+              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+             alt="Save Draft">&#xE161;</i>
               <span class="hidden-sm hidden-xs">Save Draft</span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
-                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish Changes">
+              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+             alt="Publish Changes">&#xE2C3;</i>
               <span class="hidden-sm hidden-xs">Publish Changes</span>
             </span>
             <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>

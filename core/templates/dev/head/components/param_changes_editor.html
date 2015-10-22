@@ -34,8 +34,8 @@
         </value-generator-editor>
       </span>
       <button type="button" class="oppia-delete-param-change-button oppia-transition-200"
-              ng-click="deleteParamChange($index)">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" title="Delete parameter change">
+              ng-click="deleteParamChange($index)" title="Delete parameter change">
+        <i class="material-icons md-18" ng-if="editabilityService.isEditable()">&#xE5CD;</i>
       </button>
     </div>
 
