@@ -1345,6 +1345,10 @@ oppia-parameter {
   position: relative;
 }
 
+.oppia-param-display-row {
+  margin-bottom: 4px;
+}
+
 .oppia-param-arrow-buttons-container {
   left: -40px;
   position: absolute;
@@ -1359,10 +1363,6 @@ oppia-parameter {
 .oppia-param-arrow-button:disabled {
   color: #999;
 }
-
-/*.oppia-param-input-area  {
-  display: inline-block;
-}*/
 
 .oppia-tutorial-tooltip {
   min-width: 400px !important;

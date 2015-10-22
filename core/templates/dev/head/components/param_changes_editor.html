@@ -72,7 +72,7 @@
       <span ng-if="paramChangesService.savedMemento.length === 0">
         <em>No parameter changes.</em>
       </span>
-      <div ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
+      <div class="oppia-param-display-row" ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
         <[$index + 1]>. Change <span class="label label-info"><[paramChange.name]></span>
          <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generator_id](paramChange.customization_args)]>
       </div>
