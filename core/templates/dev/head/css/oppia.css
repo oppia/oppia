@@ -977,7 +977,7 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0 15px 10px;
 }
 
-.oppia-state-content-display {
+.oppia-state-content-display, .oppia-param-changes-display {
   padding: 4px;
   text-align: left;
   max-width: 585px;
@@ -1149,6 +1149,7 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
+.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
@@ -2187,7 +2188,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-size: cover;
   height: 300px;
   padding: 20px;
-  position: relative; 
+  position: relative;
 }
 
 .oppia-info-card-content {
@@ -2200,7 +2201,7 @@ md-card.preview-conversation-skin-supplemental-card {
   line-height: 1;
   padding: 12px 0 24px 0;
   position: relative;
-  word-spacing: 0; 
+  word-spacing: 0;
 }
 
 .oppia-info-card-content .card-metrics {
@@ -2236,7 +2237,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-color: black;
   height: 20px;
   padding-top: 3px;
-  text-align: center; 
+  text-align: center;
   width: 20px;
 }
 

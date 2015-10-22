@@ -34,6 +34,7 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
+  'explorationAdvancedFeaturesService',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -43,10 +44,14 @@ oppia.controller('ExplorationEditor', [
     explorationTagsService, editabilityService, explorationStatesService,
     routerService, graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationParamChangesService,
-    explorationWarningsService, $templateCache, explorationContextService) {
+    explorationWarningsService, $templateCache, explorationContextService,
+    explorationAdvancedFeaturesService) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
+
+  $scope.areGadgetsEnabled = (
+    explorationAdvancedFeaturesService.areGadgetsEnabled);
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
@@ -107,6 +112,7 @@ oppia.controller('ExplorationEditor', [
       $scope.currentUser = data.user;
       $scope.currentVersion = data.version;
 
+      explorationAdvancedFeaturesService.init(data);
       explorationRightsService.init(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from, data.rights.community_owned,

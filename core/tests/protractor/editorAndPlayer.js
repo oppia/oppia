@@ -385,15 +385,16 @@ describe('Full exploration editor', function() {
   });
 });
 
-// NOTE: Gadgets are disabled by default. Enable when running gadget-specific
-// integration tests.
-xdescribe('Gadget editor', function() {
+describe('Gadget editor', function() {
   it('should allow adding a gadget that is listed in the editor side panel ' +
-       ' and visible in the player view.', function() {
+       'and visible in the player view.', function() {
     users.createUser('gadgetuser1@example.com', 'gadgetuser1');
     users.login('gadgetuser1@example.com');
 
     workflow.createExploration('sums', 'maths');
+
+    editor.enableParameters();
+    editor.enableGadgets();
 
     // Setup the first state.
     editor.setStateName('first');
@@ -454,6 +455,9 @@ xdescribe('Gadget editor', function() {
     editor.setInteraction('EndExploration');
     editor.moveToState('first');
 
+    editor.enableParameters();
+    editor.enableGadgets();
+
     // Add a parameter for the ScoreBar to follow.
     editor.addParameterChange('coconuts', 3000);
 
@@ -499,6 +503,9 @@ xdescribe('Gadget editor', function() {
     editor.setContent(forms.toRichText('gadget integration test card 1.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'second', true);
+
+    editor.enableParameters();
+    editor.enableGadgets();
 
     // Add a parameter for the ScoreBar to follow.
     editor.addParameterChange('coconuts', 3000);
