@@ -25,7 +25,7 @@ from jinja2 import meta
 import json
 
 
-_OPPIA_ROOT_FILEPATH = 'app.js'
+_OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
 
 class JinjaConfig(object):
@@ -68,7 +68,7 @@ def get_jinja_env(dir_path):
         """Include a raw JS file in the template without evaluating it."""
         assert filepath.endswith('.js')
         raw_file_contents = loader.get_source(env, filepath)[0]
-        if filepath == _OPPIA_ROOT_FILEPATH:
+        if filepath == _OPPIA_MODULE_DEFINITION_FILE:
             return jinja2.Markup(raw_file_contents)
         else:
             # Wrap the file in an immediately-invoked function expression

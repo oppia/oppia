@@ -13,6 +13,9 @@
 // limitations under the License.
 
 
+// TODO(sll): Remove this directive (as well as the whole of the value
+// generators framework).
+
 oppia.directive('copier', function($compile) {
   return {
     link: function(scope, element, attrs) {

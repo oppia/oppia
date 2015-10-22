@@ -17,11 +17,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('logicQuestionEditor', function($compile, warningsData) {
+oppia.directive('logicQuestionEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return '/object_editor_template/LogicQuestion';
+        return OBJECT_EDITOR_URL_PREFIX + 'LogicQuestion';
       };
       $compile(element.contents())(scope);
     },
@@ -87,4 +89,4 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       };
     }
   };
-});
+}]);

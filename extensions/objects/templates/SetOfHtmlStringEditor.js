@@ -16,11 +16,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('setOfHtmlStringEditor', function($compile, warningsData) {
+oppia.directive('setOfHtmlStringEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return '/object_editor_template/SetOfHtmlString';
+        return OBJECT_EDITOR_URL_PREFIX + 'SetOfHtmlString';
       };
       $compile(element.contents())(scope);
     },
@@ -54,4 +56,4 @@ oppia.directive('setOfHtmlStringEditor', function($compile, warningsData) {
       };
     }
   };
-});
+}]);

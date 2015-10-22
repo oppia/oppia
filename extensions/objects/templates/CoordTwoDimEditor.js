@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
+oppia.directive('coordTwoDimEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     controller: function($scope, $timeout) {
       $scope.schemaLatitude = {
@@ -94,7 +96,7 @@ oppia.directive('coordTwoDimEditor', ['$compile', function($compile) {
     },
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return '/object_editor_template/CoordTwoDim';
+        return OBJECT_EDITOR_URL_PREFIX + 'CoordTwoDim';
       };
       $compile(element.contents())(scope);
     },

@@ -17,11 +17,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('setOfUnicodeStringEditor', function($compile, warningsData) {
+oppia.directive('setOfUnicodeStringEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return '/object_editor_template/SetOfUnicodeString';
+        return OBJECT_EDITOR_URL_PREFIX + 'SetOfUnicodeString';
       };
       $compile(element.contents())(scope);
     },
@@ -44,4 +46,4 @@ oppia.directive('setOfUnicodeStringEditor', function($compile, warningsData) {
       }
     }
   };
-});
+}]);

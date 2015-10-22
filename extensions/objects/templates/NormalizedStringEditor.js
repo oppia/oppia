@@ -15,11 +15,13 @@
 
 // This is a copy of the UnicodeStringEditor.
 
-oppia.directive('normalizedStringEditor', function($compile, warningsData) {
+oppia.directive('normalizedStringEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return '/object_editor_template/NormalizedString';
+        return OBJECT_EDITOR_URL_PREFIX + 'NormalizedString';
       };
       $compile(element.contents())(scope);
     },
@@ -74,4 +76,4 @@ oppia.directive('normalizedStringEditor', function($compile, warningsData) {
       }
     }
   };
-});
+}]);
