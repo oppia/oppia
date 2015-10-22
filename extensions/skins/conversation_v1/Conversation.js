@@ -247,6 +247,10 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
+      $scope.isSpeechSynthesisEnabled = function() {
+        return 'speechSynthesis' in window;
+      };
+
       $scope.isSupplementalCardNonempty = function() {
         return $scope.activeCard && !$scope.activeCard.interactionIsInline;
       };
@@ -277,6 +281,18 @@ oppia.directive('conversationSkin', [function() {
         if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
         }
+      };
+
+      $scope.readSelectedTextAloud = function() {
+        var defaultMessage = 'Clicking this button will read highlighted text aloud';
+        var selectedText =  $window.getSelection();
+        if (selectedText == '') {
+          var readText = new SpeechSynthesisUtterance(defaultMessage);
+        } else {
+          var readText = new SpeechSynthesisUtterance(selectedText);
+        };
+        readText.lang = 'en-US';
+        $window.speechSynthesis.speak(readText);
       };
 
       $scope.resetVisiblePanel = function() {
