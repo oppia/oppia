@@ -68,6 +68,13 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
 /* Bootstrap overrides and additions. */
 html {
   /*
@@ -300,6 +307,7 @@ textarea {
 .oppia-sidebar-menu-icon {
   height: 22px;
   margin: 0 16px 3px 6px;
+  vertical-align: middle;
   width: 22px;
 }
 
@@ -977,7 +985,7 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0 15px 10px;
 }
 
-.oppia-state-content-display {
+.oppia-state-content-display, .oppia-param-changes-display {
   padding: 4px;
   text-align: left;
   max-width: 585px;
@@ -1149,18 +1157,26 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
+.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
   border: 0;
   color: #000;
   cursor: pointer;
-  height: 20px;
+  height: 30px;
   opacity: 0.5;
   position: absolute;
+  width: 30px;
+}
+.oppia-delete-interaction-button,
+.oppia-close-popover-button {
   right: 8px;
   top: 8px;
-  width: 30px;
+}
+.oppia-delete-param-change-button {
+  right: 0;
+  top: 0;
 }
 .oppia-delete-response-button,
 .oppia-delete-rule-button {
@@ -1171,12 +1187,15 @@ pre.oppia-pre-wrapped-text {
   top: 8px;
   width: 20px;
 }
+.oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover,
 .oppia-delete-response-button:hover,
 .oppia-delete-rule-button:hover {
   opacity: 1;
 }
+
+
 
 .oppia-graph-resize-button {
   border: 0;
@@ -1330,10 +1349,27 @@ oppia-parameter {
   white-space: nowrap;
 }
 
+.oppia-param-editor-row {
+  position: relative;
+}
+
+.oppia-param-display-row {
+  margin-bottom: 4px;
+}
+
+.oppia-param-arrow-buttons-container {
+  left: -40px;
+  position: absolute;
+  top: 5px;
+}
+
 .oppia-param-arrow-button {
   border: 0;
   font-size: 14px;
   padding: 0;
+}
+.oppia-param-arrow-button:disabled {
+  color: #999;
 }
 
 .oppia-tutorial-tooltip {
@@ -2187,7 +2223,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-size: cover;
   height: 300px;
   padding: 20px;
-  position: relative; 
+  position: relative;
 }
 
 .oppia-info-card-content {
@@ -2200,7 +2236,7 @@ md-card.preview-conversation-skin-supplemental-card {
   line-height: 1;
   padding: 12px 0 24px 0;
   position: relative;
-  word-spacing: 0; 
+  word-spacing: 0;
 }
 
 .oppia-info-card-content .card-metrics {
@@ -2236,7 +2272,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-color: black;
   height: 20px;
   padding-top: 3px;
-  text-align: center; 
+  text-align: center;
   width: 20px;
 }
 

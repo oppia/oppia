@@ -932,6 +932,15 @@ oppia.factory('statePropertyService', [
   };
 }]);
 
+// A data service that stores the current list of state parameter changes.
+// TODO(sll): Add validation.
+oppia.factory('stateParamChangesService', [
+    'statePropertyService', function(statePropertyService) {
+  var child = Object.create(statePropertyService);
+  child.propertyName = 'param_changes';
+  return child;
+}]);
+
 // A data service that stores the current interaction id.
 // TODO(sll): Add validation.
 oppia.factory('stateInteractionIdService', [

@@ -25,7 +25,6 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     enter: function(element, done) {
@@ -674,7 +673,44 @@ oppia.directive('progressDots', [function() {
           $scope.changeActiveDot($scope.currentDotIndex + 1);
         }
       };
-
     }]
+  };
+}]);
+
+oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
+  return {
+    restrict: 'A',
+    scope: true,
+    controller: ['$scope', 'deviceInfoService', function(
+      $scope, deviceInfoService) {
+      $scope.opened = false;
+      $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
+    }],
+    link: function(scope, element) {
+      var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
+
+      if (scope.deviceHasTouchEvents) {
+        element.on('touchstart', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+        element.on('touchend', function() {
+          // Set time delay before tooltip close
+          $timeout(function() {
+            scope.opened = false;
+          }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
+        });
+      } else {
+        element.on('mouseenter', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+
+        element.on('mouseleave', function() {
+          scope.opened = false;
+          scope.$apply();
+        });
+      };
+    }
   };
 }]);

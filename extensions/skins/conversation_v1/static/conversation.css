@@ -263,7 +263,6 @@ md-card.conversation-skin-supplemental-card {
   position: absolute;
   right: 0;
   width: 600px;
-  z-index: 1;
 }
 
 .conversation-skin-right-card-container md-card.conversation-skin-supplemental-card-fixed {

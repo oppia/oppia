@@ -26,7 +26,7 @@ oppia.directive('copier', function($compile) {
     },
     restrict: 'E',
     scope: true,
-    template: '<div ng-include="getTemplateUrl()"></div>',
+    template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope, $attrs) {
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
         $scope.initArgs = $scope.$parent.initArgs;

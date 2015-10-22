@@ -25,7 +25,7 @@
       <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
-      <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon">
+      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -33,7 +33,7 @@
 {% block local_top_nav_options %}
   <div ng-controller="LearnerLocalNav">
     <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
-      <li popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+      <li popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
         <a href="" tooltip="Feedback" tooltip-placement="bottom">
           <span class="glyphicon glyphicon-comment"></span>
         </a>
@@ -91,15 +91,14 @@
             <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
           </li>
           <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-            <img tooltip="Contributors" tooltip-placement="top"
-              src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
+            <i class="material-icons" tooltip="Contributors" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
             <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
               tooltip="<[ContributorUsername]>" tooltip-placement="top">
               <img class="oppia-contributors-circle" ng-src="/images/avatar/user_mint_48px.png" alt="">
             </li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
-            
+
             <li ng-if="explorationContributorUsernames.length > 2" class="oppia-contributors-more-circle"
               tooltip-append-to-body="true" tooltip="<[explorationContributorUsernames.slice(2).join(',')]>"
               tooltip-placement="top">+<[explorationContributorUsernames.length - 2]>
@@ -163,7 +162,7 @@
 
               <li>
                 <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
-                  <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
+                  <i class="material-icons md-18" style="color: black;">&#xE157;</i>
                 </a>
               </li>
             </ul>
@@ -175,7 +174,7 @@
         <h3 ng-if="failedLoadingData">Oops, something went wrong. Could not load data.</h3>
       </div>
       <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_white_48dp.png">
+        <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
       </button>
     </md-card>
   </script>
@@ -184,7 +183,7 @@
     <div style="min-width: 250px;">
       <div ng-show="!feedbackSubmitted">
         <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png">
+          <i class="material-icons md-18">&#xE5CD;</i>
         </button>
         <br>
 

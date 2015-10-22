@@ -55,7 +55,7 @@ exports.config = {
   //
   // Spec patterns are relative to the location of this config.
   specs: [
-    'protractor/*.js'
+    'protractor/**/*.js'
   ],
 
   // Patterns to exclude.
@@ -166,7 +166,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 600000
+    defaultTimeoutInterval: 900000
   },
 
   // ----- Options to be passed to mocha -----

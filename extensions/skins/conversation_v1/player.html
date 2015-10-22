@@ -41,7 +41,7 @@
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
           <button class="conversation-skin-tutor-card-feedback-toggle"
                   popover-placement="<[getFeedbackPopoverPlacement()]>"
-                  popover-template="popover/feedback" popover-trigger="click"
+                  popover-template="'popover/feedback'" popover-trigger="click"
                   tooltip="Feedback" tooltip-placement="bottom"
                   state-name="<[activeCard.stateName]>">
             <span class="sr-only">Leave feedback on this card</span>
@@ -115,7 +115,7 @@
                 <div ng-if="!activeCard.interactionIsInline" ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)" ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}" style="opacity: 0.8;">
                   <button style="background: inherit; border: none;">
                     (<[activeCard.interactionInstructions]>)
-                    <i class="zmdi zmdi-arrow-right"></i>
+                    <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
                   </button>
                 </div>
               </div>
@@ -137,14 +137,17 @@
     </div>
   </div>
 
-  <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom" class="conversation-skin-bottom-gadget-panel"></oppia-gadget-panel>
+  <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"
+                      class="conversation-skin-bottom-gadget-panel"
+                      current-state-name="activeCard.stateName">
+  </oppia-gadget-panel>
 
   <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1" class="conversation-skin-final-ratings">
 
     <div style="color: #eee; margin-bottom: 20px;">
       Learned something new? How would you rate this exploration?
     </div>
-    <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+    <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px; color: #fff;">
       </rating-from-value>
     </div>
@@ -168,7 +171,7 @@
   <div class="conversation-skin-learner-answer-container">
     <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
     <div ng-if="shortAnswer()">
-      <div popover-placement="bottom" popover-template="popover/answer" popover-trigger="click" style="cursor: pointer;">
+      <div popover-placement="bottom" popover-template="'popover/answer'" popover-trigger="click" style="cursor: pointer;">
         <div class="conversation-skin-learner-answer" angular-html-bind="shortAnswer()">
         </div>
       </div>
@@ -283,7 +286,8 @@
     <li ng-repeat="dot in dots track by $index"
         class="oppia-animate-progress-dot"
         ng-show="$index >= leftmostVisibleDotIndex && $index <= rightmostVisibleDotIndex"
-        tooltip="Card #<[$index +1]>" tooltip-placement="bottom">
+        tooltip="Card #<[$index +1]>" tooltip-placement="bottom"
+        tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip>
       <span class="oppia-progress-dot oppia-progress-dot-active"
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
       </span>
