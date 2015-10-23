@@ -10,6 +10,12 @@
     <script type="text/javascript">
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
     </script>
+    
+    <style>
+      html, body {
+        background-color: #eee;
+      }
+    </style>
   {% endif %}
 
   {{dependencies_html}}
@@ -26,21 +32,34 @@
 
 {% block content %}
   <div ng-controller="CollectionPlayer">
-    <div ng-if="collection">
-      <span>Welcome to: <[collection.title]></span>
-      <br>
-      Begin by playing or continue where you left off:
-      <ul>
-        <li ng-repeat="collection_node in getSuggestedCollectionNodes()">
-          <a target="_blank" href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>"><[collection_node.exploration.title]></a>
-        </li>
-      </ul>
-      <span>This collection has <[collection.nodes.length]> explorations.</span>
-      <ul>
-        <li ng-repeat="collection_node in collection.nodes">
-          <a target="_blank" href="/explore/<[collection_node.exploration.id]>"><[collection_node.exploration.title]></a>
-        </li>
-      </ul>
+    <div ng-if="collection" class="oppia-collection-player-tiles-area">
+      <div class="oppia-collection-player-tiles-container">
+        <div ng-if="!hasFinishedCollection()" class="oppia-collection-player-tiles-header">
+          <span>Begin by playing or continue where you left off:</span>
+        </div>
+        <div ng-if="hasFinishedCollection()" class="oppia-collection-player-tiles-header">
+          <span>You have finished the collection! Feel free to replay any explorations in this collection.</span>
+        </div>
+
+        <div ng-repeat="collection_node in getSuggestedCollectionNodes()">
+          <md-card layout="row" class="oppia-collection-player-tile protractor-test-collection-player-tile">
+            <a href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>" class="oppia-collection-player-tile-container-link" style="text-decoration: none;">
+              <div class="oppia-collection-player-tile-contents">
+                <span class="oppia-collection-player-tile-image-container"
+                      style="position: absolute;">
+                  <img class="oppia-collection-player-tile-image" ng-src="/images/gallery/exploration_background_teal_small.png">
+                </span>
+
+                <div class="oppia-collection-player-tile-details">
+                  <span class="oppia-collection-player-tile-title protractor-test-gallery-tile-title">
+                    <[collection_node.exploration.title]>
+                  </span>
+                </div>
+              </div>
+            </a>
+          </md-card>
+        </div>
+      </div>
     </div>
   </div>
 

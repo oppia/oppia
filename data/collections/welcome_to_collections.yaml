@@ -5,7 +5,7 @@ nodes:
   exploration_id: '0'
   prerequisite_skills: []
 - acquired_skills: []
-  exploration_id: '2'
+  exploration_id: '13'
   prerequisite_skills:
   - Introduced to Oppia
 - acquired_skills: []

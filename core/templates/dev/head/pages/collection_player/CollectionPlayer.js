@@ -38,7 +38,17 @@ oppia.controller('CollectionPlayer', [
     return undefined;
   };
 
+  $scope.hasFinishedCollection = function() {
+    return $scope.collection.next_exploration_ids.length == 0;
+  };
+
   $scope.getSuggestedCollectionNodes = function() {
+    // If the collection has been finished, show all explorations so users may
+    // replay any of their choice.
+    if ($scope.hasFinishedCollection()) {
+      return $scope.collection.nodes;
+    }
+
     var nextExplorationIds = $scope.collection.next_exploration_ids;
     var suggestedCollectionNodes = [];
     for (var i = 0; i < nextExplorationIds.length; i++) {
