@@ -39,7 +39,7 @@
             <div><[t.summary]></div>
           </td>
           <td class="col-lg-3 col-md-3 col-sm-3">
-            <span ng-if="t.original_author_username"><profile-link-text username="<[t.original_author_username]>"></profile-link-text></span>
+            <span ng-if="t.original_author_username"><profile-link-text username="t.original_author_username"></profile-link-text></span>
           </td>
           <td class="col-lg-2 col-md-2 col-sm-2">
             <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
@@ -92,7 +92,7 @@
                         #<[m.message_id]>
                       </span>
                       <span ng-if="m.author_username">
-                        by <strong><profile-link-text username="<[m.author_username]>"></profile-link-text></strong>
+                        by <strong><profile-link-text username="m.author_username"></profile-link-text></strong>
                       </span>
                       <span ng-if="!m.author_username">
                         (anonymously submitted)
