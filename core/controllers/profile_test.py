@@ -111,6 +111,7 @@ class SignupTest(test_utils.GenericTestBase):
 
         self.logout()
 
+
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
     def test_username_check(self):
