@@ -237,5 +237,5 @@ class ProfileLinkTests(test_utils.GenericTestBase):
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
         self.assertEqual(
-                response_dict['profile_picture_data_url_for_username'],
-                None)
+            response_dict['profile_picture_data_url_for_username'],
+            None)
