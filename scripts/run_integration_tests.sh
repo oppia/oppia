@@ -144,7 +144,7 @@ fi
 # Parse additional command line arguments that may be passed to protractor.
 # Credit: http://stackoverflow.com/questions/192249
 SHARDING=true
-SHARD_INSTANCES=5
+SHARD_INSTANCES=3
 for i in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
   # case label, based on a pattern. E.g. Match to -sharding=*, where the
