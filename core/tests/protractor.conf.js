@@ -49,7 +49,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 30000,
+  allScriptsTimeout: 120000,
 
   // ----- What tests to run -----
   //
@@ -166,7 +166,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 900000
+    defaultTimeoutInterval: 1200000
   },
 
   // ----- Options to be passed to mocha -----

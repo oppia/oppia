@@ -11,7 +11,9 @@
     "maxErrors": null,
     "verbose": true,
 
-    "disallowDanglingUnderscores": true,
+    "disallowDanglingUnderscores": {
+        "allExcept": ["_$httpBackend_"]
+    },
     "disallowEmptyBlocks": true,
     "disallowFunctionDeclarations": true,
     "disallowKeywordsOnNewLine": ["else"],
@@ -20,7 +22,7 @@
     "disallowMultipleLineStrings": true,
     "disallowMultipleSpaces": true,
     "disallowMultipleVarDecl": {
-        "strict": true
+        "allExcept": ["undefined"]
     },
     "disallowNamedUnassignedFunctions": true,
     "disallowNewlineBeforeBlockStatements": true,

@@ -24,7 +24,7 @@
     </div>
   </md-card>
 
-  <div role="main" style="margin: 0 auto; position: relative;">
+  <div role="main" style="margin: 0 auto; position: relative;" ng-show="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots" current-dot-index="currentProgressDotIndex" class="conversation-skin-progress-dots" ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
 
@@ -37,7 +37,7 @@
         side-by-side.
       -->
       <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
-               ng-class="{'conversation-skin-left-card': isSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isSupplementalCardNonempty() && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+               ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
           <button class="conversation-skin-tutor-card-feedback-toggle"
                   popover-placement="<[getFeedbackPopoverPlacement()]>"
@@ -124,7 +124,7 @@
         </div>
       </md-card>
 
-      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': isSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}" ng-if="isSupplementalCardNonempty() && activeCard.interactionHtml">
+      <div class="conversation-skin-supplemental-card-container" ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}" ng-if="isCurrentSupplementalCardNonempty() && activeCard.interactionHtml">
         <md-card ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
                  class="conversation-skin-supplemental-card">
           <div ng-if="activeCard.interactionIsDisabled" class="conversation-skin-supplemental-card-overlay">
