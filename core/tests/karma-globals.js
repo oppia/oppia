@@ -16,4 +16,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var GLOBALS = {};
+var GLOBALS = {
+  INTERACTION_SPECS: {},
+  GADGET_SPECS: {},
+  PANEL_SPECS: {}
+};

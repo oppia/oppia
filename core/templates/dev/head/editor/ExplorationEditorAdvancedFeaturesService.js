@@ -48,8 +48,9 @@ oppia.factory('explorationAdvancedFeaturesService', [function() {
         }
       }
 
-      for (var panel in explorationData.skin_customizations.panels_contents) {
-        if (explorationData.skin_customizations.panels_contents[panel].length > 0) {
+      var skinCustomizations = explorationData.skin_customizations;
+      for (var panel in skinCustomizations.panels_contents) {
+        if (skinCustomizations.panels_contents[panel].length > 0) {
           this.enableGadgets();
           break;
         }
