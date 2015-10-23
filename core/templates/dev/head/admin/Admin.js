@@ -21,13 +21,14 @@
 oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
-  $scope.adminJobOutputUrl = '/adminjoboutput';
+  var ADMIN_JOB_OUTPUT_URL_PREFIX = '/adminjoboutput';
   $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
   $scope.configProperties = {};
 
   $scope.showJobOutput = false;
   $scope.getJobOutput = function(jobId) {
-    $http.get($scope.adminJobOutputUrl + '?job_id=' + jobId).success(function(data) {
+    var adminJobOutputUrl = ADMIN_JOB_OUTPUT_URL_PREFIX + '?job_id=' + jobId;
+    $http.get(adminJobOutputUrl).success(function(data) {
       $scope.showJobOutput = true;
       $scope.jobOutput = data.output;
     });
@@ -58,7 +59,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $http.post($scope.adminHandlerUrl, {
       action: 'revert_config_property',
       config_property_id: configPropertyId
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Config property reverted successfully.';
       $scope.reloadConfigProperties();
     }).error(function(errorResponse) {
@@ -70,7 +71,9 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.migrateFeedback = function() {
     $scope.migrationInProcess = true;
 
-    $http.post($scope.adminHandlerUrl, {action: 'migrate_feedback'}).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {
+      action: 'migrate_feedback'
+    }).success(function() {
       $scope.message = 'Feedback migrated successfully.';
       $scope.migrationInProcess = false;
       window.reload();
@@ -84,7 +87,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $http.post($scope.adminHandlerUrl, {
       action: 'refresh_computed_property',
       computed_property_name: computedPropertyId
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Computed property reloaded successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -104,13 +107,14 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
 
     var newConfigPropertyValues = {};
     for (var property in $scope.configProperties) {
-      newConfigPropertyValues[property] = $scope.configProperties[property].value;
+      newConfigPropertyValues[property] = (
+        $scope.configProperties[property].value);
     }
 
     $http.post($scope.adminHandlerUrl, {
-        action: 'save_config_properties',
-        new_config_property_values: newConfigPropertyValues
-    }).success(function(data) {
+      action: 'save_config_properties',
+      new_config_property_values: newConfigPropertyValues
+    }).success(function() {
       $scope.message = 'Data saved successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -130,7 +134,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
 
     $http.post($scope.adminHandlerUrl, {
       action: 'clear_search_index'
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Index successfully cleared.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -151,7 +155,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $http.post($scope.adminHandlerUrl, {
       action: 'reload_exploration',
       exploration_id: String(explorationId)
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Data reloaded successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -173,11 +177,14 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $scope.message = 'Processing...';
     var printResult = function() {
       if (numTried < GLOBALS.DEMO_EXPLORATION_IDS.length) {
-        $scope.message = 'Processing...' + numTried + '/' + GLOBALS.DEMO_EXPLORATION_IDS.length;
+        $scope.message = (
+          'Processing...' + numTried + '/' +
+          GLOBALS.DEMO_EXPLORATION_IDS.length);
         return;
       }
-      $scope.message = 'Reloaded ' + GLOBALS.DEMO_EXPLORATION_IDS.length + ' explorations: ' +
-        numSucceeded + ' succeeded, ' + numFailed + ' failed.';
+      $scope.message = (
+        'Reloaded ' + GLOBALS.DEMO_EXPLORATION_IDS.length + ' explorations: ' +
+        numSucceeded + ' succeeded, ' + numFailed + ' failed.');
     };
 
     for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
@@ -186,11 +193,11 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $http.post($scope.adminHandlerUrl, {
         action: 'reload_exploration',
         exploration_id: exploration[0]
-      }).success(function(data) {
+      }).success(function() {
         ++numSucceeded;
         ++numTried;
         printResult();
-      }).error(function(errorResponse) {
+      }).error(function() {
         ++numFailed;
         ++numTried;
         printResult();
@@ -223,9 +230,9 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $scope.message = 'Starting new job...';
 
     $http.post($scope.adminHandlerUrl, {
-        action: 'start_new_job',
-        job_type: jobType
-    }).success(function(data) {
+      action: 'start_new_job',
+      job_type: jobType
+    }).success(function() {
       $scope.message = 'Job started successfully.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -237,10 +244,10 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $scope.message = 'Cancelling job...';
 
     $http.post($scope.adminHandlerUrl, {
-        action: 'cancel_job',
-        job_id: jobId,
-        job_type: jobType
-    }).success(function(data) {
+      action: 'cancel_job',
+      job_id: jobId,
+      job_type: jobType
+    }).success(function() {
       $scope.message = 'Abort signal sent to job.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -254,7 +261,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $http.post($scope.adminHandlerUrl, {
       action: 'start_computation',
       computation_type: computationType
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Computation started successfully.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -268,7 +275,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $http.post($scope.adminHandlerUrl, {
       action: 'stop_computation',
       computation_type: computationType
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Abort signal sent to computation.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -284,7 +291,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $http.post($scope.adminHandlerUrl, {
         action: 'upload_topic_similarities',
         data: data
-      }).success(function(data) {
+      }).success(function() {
         $scope.message = 'Topic similarities uploaded successfully.';
       }).error(function(errorResponse) {
         $scope.message = 'Server error: ' + errorResponse.error;

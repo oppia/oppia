@@ -36,7 +36,10 @@
                   <em>(try again)</em>
                 </span>
               </div>
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" ng-if="editabilityService.isEditable()" class="protractor-test-delete-response oppia-delete-response-button oppia-transition-200" ng-click="deleteAnswerGroup($index, $event)">
+
+              <span class="protractor-test-delete-response oppia-delete-response-button oppia-transition-200" ng-click="deleteAnswerGroup($index, $event)" ng-if="editabilityService.isEditable()">
+                <i class="material-icons md-18">&#xE5CD;</i>
+              </span>
             </a>
 
             <div ng-if="activeAnswerGroupIndex === $index">

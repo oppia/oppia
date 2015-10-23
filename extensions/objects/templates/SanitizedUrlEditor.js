@@ -15,12 +15,14 @@
 
 // This directive is based on the unicodeStringEditor one.
 
-oppia.directive('sanitizedUrlEditor', function($compile, warningsData) {
+oppia.directive('sanitizedUrlEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'warningsData',
+    function($compile, OBJECT_EDITOR_URL_PREFIX, warningsData) {
   // Editable URL directive.
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'SanitizedUrl';
+        return OBJECT_EDITOR_URL_PREFIX + 'SanitizedUrl';
       };
       $compile(element.contents())(scope);
     },
@@ -72,4 +74,4 @@ oppia.directive('sanitizedUrlEditor', function($compile, warningsData) {
       });
     }
   };
-});
+}]);

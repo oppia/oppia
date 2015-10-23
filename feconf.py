@@ -17,6 +17,7 @@
 """Stores various configuration options and constants for Oppia."""
 
 import copy
+import datetime
 import os
 
 # Whether to unconditionally log info messages.
@@ -57,7 +58,7 @@ DEFAULT_QUERY_LIMIT = 1000
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 6
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -155,6 +156,9 @@ CAN_SEND_EMAILS_TO_USERS = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 
+# When the site terms were last updated, in UTC.
+REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
@@ -167,7 +171,9 @@ SHOW_CUSTOM_PAGES = True
 # The id of the default skin.
 DEFAULT_SKIN_ID = 'conversation_v1'
 
-# User id and username for exploration migration bot.
+# User id and username for exploration migration bot. Commits made by this bot
+# are not reflected in the exploration summary models (for the gallery and
+# last-updated timestamps), but are recorded in the exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
@@ -334,7 +340,6 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
-SHOW_GADGETS_EDITOR = True
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.

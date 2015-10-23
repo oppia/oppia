@@ -55,12 +55,6 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'Invalid generator id'):
             param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
 
-        # Raise an error because the given generator requires initialization
-        # args.
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'require any initialization'):
-            param_domain.ParamChange('abc', 'RestrictedCopier', {}).validate()
-
         # Raise an error because customization_args is not a dict.
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Expected a dict'):

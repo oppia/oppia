@@ -130,7 +130,7 @@ trap cleanup EXIT
 # Start a selenium process.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start )&
 # Start a demo server.
-(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes .)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
@@ -144,7 +144,7 @@ fi
 # Parse additional command line arguments that may be passed to protractor.
 # Credit: http://stackoverflow.com/questions/192249
 SHARDING=true
-SHARD_INSTANCES=5
+SHARD_INSTANCES=3
 for i in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
   # case label, based on a pattern. E.g. Match to -sharding=*, where the

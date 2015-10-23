@@ -68,6 +68,13 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
 /* Bootstrap overrides and additions. */
 html {
   /*
@@ -300,6 +307,7 @@ textarea {
 .oppia-sidebar-menu-icon {
   height: 22px;
   margin: 0 16px 3px 6px;
+  vertical-align: middle;
   width: 22px;
 }
 
@@ -417,18 +425,22 @@ textarea {
 .oppia-navbar-breadcrumb {
   color: #fff;
   cursor: default;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
-  padding-top: 17px;
-  padding-bottom: 15px;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 20px;
+  padding-top: 13px;
 }
 
 .oppia-navbar-breadcrumb-separator {
-  padding-right: 7px;
+  margin-right: 8px;
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
+}
+
+.oppia-navbar-breadcrumb-icon {
+  height: 20px;
+  margin: 0 12px 4px 12px;
+  width: 20px;
 }
 
 .navbar-default .navbar-nav > li > a:hover,
@@ -723,6 +735,7 @@ md-card.oppia-gallery-tile {
 }
 .oppia-gallery-tile-title {
   color: #333;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-weight: bold;
 }
 
@@ -972,7 +985,7 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0 15px 10px;
 }
 
-.oppia-state-content-display {
+.oppia-state-content-display, .oppia-param-changes-display {
   padding: 4px;
   text-align: left;
   max-width: 585px;
@@ -1231,18 +1244,26 @@ md-card.oppia-collection-player-tile {
   padding-top: 3px;
 }
 
+.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
   border: 0;
   color: #000;
   cursor: pointer;
-  height: 20px;
+  height: 30px;
   opacity: 0.5;
   position: absolute;
+  width: 30px;
+}
+.oppia-delete-interaction-button,
+.oppia-close-popover-button {
   right: 8px;
   top: 8px;
-  width: 30px;
+}
+.oppia-delete-param-change-button {
+  right: 0;
+  top: 0;
 }
 .oppia-delete-response-button,
 .oppia-delete-rule-button {
@@ -1253,12 +1274,15 @@ md-card.oppia-collection-player-tile {
   top: 8px;
   width: 20px;
 }
+.oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover,
 .oppia-delete-response-button:hover,
 .oppia-delete-rule-button:hover {
   opacity: 1;
 }
+
+
 
 .oppia-graph-resize-button {
   border: 0;
@@ -1412,21 +1436,31 @@ oppia-parameter {
   white-space: nowrap;
 }
 
+.oppia-param-editor-row {
+  position: relative;
+}
+
+.oppia-param-display-row {
+  margin-bottom: 4px;
+}
+
+.oppia-param-arrow-buttons-container {
+  left: -40px;
+  position: absolute;
+  top: 5px;
+}
+
 .oppia-param-arrow-button {
   border: 0;
   font-size: 14px;
   padding: 0;
 }
+.oppia-param-arrow-button:disabled {
+  color: #999;
+}
 
 .oppia-tutorial-tooltip {
   min-width: 400px !important;
-}
-
-.oppia-post-tutorial-popover {
-   display: block;
-   left: -77px;
-   top: 40px;
-   width: 200px;
 }
 
 /* Hide the search icon in the rule destination dropdown. */
@@ -1811,7 +1845,7 @@ div#ng-curtain {
   font-weight: 300;
   height: 40px;
   margin-left: 6px;
-  margin-top: 9px;
+  margin-top: 8px;
 }
 .oppia-navbar-profile-dropdown-toggle {
   height: 56px;
@@ -2239,6 +2273,129 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #00897B;
 }
 
+.oppia-modal-information-card .modal-dialog {
+  margin: 100px auto;
+  width: 400px;
+}
+
+.oppia-modal-information-card .modal-dialog .modal-content {
+  border-radius: 0;
+}
+
+.oppia-modal-information-card .modal-dialog .modal-content md-card {
+  border-radius:0;
+  margin: 0;
+  padding: 0;
+}
+
+.oppia-info-card-title {
+  bottom: 0;
+  color: white;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin: 12px 0;
+  padding: 0;
+  position: absolute;
+}
+
+.oppia-info-card-logo-thumbnail {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 300px;
+  padding: 20px;
+  position: relative;
+}
+
+.oppia-info-card-content {
+  padding: 10px 20px 10px 20px;
+}
+
+.oppia-info-card-content p {
+  display: block;
+  font-size: 1.0em;
+  line-height: 1;
+  padding: 12px 0 24px 0;
+  position: relative;
+  word-spacing: 0;
+}
+
+.oppia-info-card-content .card-metrics {
+  margin-top: 10px;
+  padding: 0;
+}
+
+.oppia-info-card-content .card-metrics li {
+  font-size: 14px;
+  list-style-type: none;
+  text-align: center;
+}
+
+.oppia-info-card-content .card-metrics li .fa {
+  font-size: 24px;
+  margin-right: 5px;
+}
+
+.oppia-info-card-content .card-metrics ul img {
+  height: 24px;
+  margin-right: 2px;
+  width: 24px;
+}
+
+.oppia-info-card-content .card-metrics ul li .oppia-contributors-circle {
+  height: 20px;
+  width: 20px;
+}
+
+.oppia-contributors-more-circle {
+  background: #888;
+  border-radius: 50%;
+  border-color: black;
+  height: 20px;
+  padding-top: 3px;
+  text-align: center;
+  width: 20px;
+}
+
+.oppia-info-card-bottom-row {
+  margin-top: 20px
+}
+
+.oppia-info-card-bottom-row md-chips md-chip {
+  cursor: default;
+  font-size: 12px;
+  line-height: 1em;
+  margin: 0;
+  padding: 0;
+}
+
+.oppia-info-card-bottom-row ul li {
+  list-style-type: none;
+}
+
+.oppia-info-card-bottom-row ul li a img {
+  border-radius: 2px;
+  height: 20px;
+  margin: 3px;
+  width: 20px;
+}
+
+.oppia-info-card-tooltip-more {
+  color: blue;
+}
+
+.oppia-info-card-tag-icon {
+  padding-top: 6px;
+  width: 28px;
+}
+
+.oppia-info-card-exploration-contributors-profile {
+  padding: 0;
+}
+
+.oppia-info-card-community-editable-icon {
+  color: #009688;
+}
+
 /* Styles for gadget panels and editor. */
 
 .oppia-gadget-tile {
@@ -2380,3 +2537,4 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
+

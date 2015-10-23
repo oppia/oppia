@@ -19,11 +19,13 @@
 //
 // This directive is based on the UnicodeString directive.
 
-oppia.directive('htmlEditor', function($compile, warningsData) {
+oppia.directive('htmlEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Html';
+        return OBJECT_EDITOR_URL_PREFIX + 'Html';
       };
       $compile(element.contents())(scope);
     },
@@ -36,4 +38,4 @@ oppia.directive('htmlEditor', function($compile, warningsData) {
       };
     }
   };
-});
+}]);

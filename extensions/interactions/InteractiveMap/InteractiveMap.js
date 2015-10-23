@@ -43,6 +43,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
         var refreshMap = function() {
           $timeout(function() {
             google.maps.event.trigger($scope.map, 'resize');
+            $scope.map.setCenter({lat: coords[0], lng: coords[1]});
           }, 100);
         };
 

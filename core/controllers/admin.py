@@ -180,7 +180,7 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, exploration_id))
                 exp_services.load_demo(unicode(exploration_id))
                 rights_manager.release_ownership_of_exploration(
-                    feconf.SYSTEM_COMMITTER_ID, exploration_id)
+                    feconf.SYSTEM_COMMITTER_ID, unicode(exploration_id))
             elif self.payload.get('action') == 'reload_collection':
                 collection_id = self.payload.get('collection_id')
                 logging.info(
@@ -188,7 +188,7 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, collection_id))
                 collection_services.load_demo(unicode(collection_id))
                 rights_manager.release_ownership_of_collection(
-                    feconf.SYSTEM_COMMITTER_ID, collection_id)
+                    feconf.SYSTEM_COMMITTER_ID, unicode(collection_id))
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':

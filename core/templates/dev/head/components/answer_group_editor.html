@@ -22,8 +22,10 @@
             </span>
           </div>
         </a>
-        <span ng-if="rules.length > 1">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" ng-if="isEditable" class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer" ng-click="deleteRule($index)">
+        <span ng-if="isEditable && rules.length > 1"
+              class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
+              ng-click="deleteRule($index)">
+          <i class="material-icons md-18">&#xE5CD;</i>
         </span>
 
         <div ng-if="activeRuleIndex === $index">

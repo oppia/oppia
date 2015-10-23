@@ -144,8 +144,6 @@ urls = [
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
-        r'/editor_tutorial', pages.EditorTutorialPage, 'editor_tutorial_page'),
-    get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(
         r'/site_guidelines', pages.ParticipatePage,
