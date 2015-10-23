@@ -18,13 +18,12 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// Note: This file should be assumed to be in an IIFE, and the constants below
+// should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;
 var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
-var TIME_PADDING_MSEC = 250;
-var TIME_SCROLL_MSEC = 600;
-var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
@@ -178,6 +177,8 @@ oppia.directive('conversationSkin', [function() {
       // The minimum width, in pixels, needed to be able to show the feedback
       // popover on the bottom of its click target.
       var FEEDBACK_POPOVER_THRESHOLD_PX = 700;
+      var TIME_PADDING_MSEC = 250;
+      var TIME_SCROLL_MSEC = 600;
 
       var hasInteractedAtLeastOnce = false;
       var _answerIsBeingProcessed = false;
@@ -690,6 +691,8 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
       $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
     }],
     link: function(scope, element) {
+      var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
+
       if (scope.deviceHasTouchEvents) {
         element.on('touchstart', function() {
           scope.opened = true;

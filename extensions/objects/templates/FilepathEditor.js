@@ -17,11 +17,13 @@
 
 oppia.directive('filepathEditor', [
     '$compile', '$http', '$sce', 'warningsData', 'explorationContextService',
-    function($compile, $http, $sce, warningsData, explorationContextService) {
+    'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, $http, $sce, warningsData, explorationContextService,
+             OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Filepath';
+        return OBJECT_EDITOR_URL_PREFIX + 'Filepath';
       };
       $compile(element.contents())(scope);
     },

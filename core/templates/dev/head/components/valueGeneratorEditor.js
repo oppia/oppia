@@ -18,8 +18,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var VALUE_GENERATOR_TEMPLATES_URL = '/value_generator_handler/';
-
 // Individual value generator directives can be found in
 // extensions/value_generators/templates.
 

@@ -25,6 +25,9 @@ from jinja2 import meta
 import json
 
 
+_OPPIA_MODULE_DEFINITION_FILE = 'app.js'
+
+
 class JinjaConfig(object):
     """Contains Jinja configuration properties."""
 
@@ -61,10 +64,16 @@ def get_jinja_env(dir_path):
         os.path.dirname(__file__), feconf.SKINS_TEMPLATES_DIR))
     skins_env = jinja2.Environment(autoescape=True, loader=skins_loader)
 
-    def include_js_file(name):
+    def include_js_file(filepath):
         """Include a raw JS file in the template without evaluating it."""
-        assert name.endswith('.js')
-        return jinja2.Markup(loader.get_source(env, name)[0])
+        assert filepath.endswith('.js')
+        raw_file_contents = loader.get_source(env, filepath)[0]
+        if filepath == _OPPIA_MODULE_DEFINITION_FILE:
+            return jinja2.Markup(raw_file_contents)
+        else:
+            # Wrap the file in an immediately-invoked function expression
+            # (IIFE) to prevent pollution of the global scope.
+            return jinja2.Markup('(function() {%s})();' % raw_file_contents)
 
     def include_skins_js_file(name):
         """Include a raw JS file from extensions/skins in the template."""
