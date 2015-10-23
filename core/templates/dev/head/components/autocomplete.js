@@ -23,45 +23,37 @@ oppia.directive('select2Dropdown', [function() {
   return {
     restrict: 'E',
     scope: {
+      // Whether to allow multiple choices. In order to do so, the value of
+      // this attribute must be the exact string 'true'.
+      allowMultipleChoices: '@',
       choices: '=',
+      // An additional CSS class to add to the select2 dropdown. May be
+      // undefined.
+      dropdownCssClass: '@',
+      // A function that formats a new selection. May be undefined.
+      formatNewSelection: '=',
+      // The message shown when an invalid search term is entered. May be
+      // undefined, in which case this defaults to 'No matches found'.
+      invalidSearchTermMessage: '@',
       item: '=',
       // The regex used to validate newly-entered choices that do not
       // already exist. Use ".^" to reject all new choices.
       newChoiceRegex: '@',
-      placeholder: '@',
-      width: '@',
       onSelectionChange: '&',
-      // The message shown when an invalid search term is entered. May be
-      // undefined, in which case this defaults to 'No matches found'.
-      invalidSearchTermMessage: '@',
-      // A function that formats a new selection. May be undefined.
-      formatNewSelection: '=',
-      // An additional CSS class to add to the select2 dropdown. May be
-      // undefined.
-      dropdownCssClass: '@',
-      // Whether to allow multiple choices. In order to do so, the value of
-      // this attribute must be the exact string 'true'.
-      allowMultipleChoices: '@',
+      placeholder: '@',
       // Whether select2 is in tagging mode.
-      tagMode: '@'
+      tagMode: '@',
+      width: '@'
     },
     template: '<input type="hidden">',
-    controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+    controller: ['$scope', '$element', function($scope, $element) {
       $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 
-      var _defaultFormatNewSelection = function(id) {
-        return id;
-      };
-
-      var _convertNewSelectionToText = (
-        $scope.formatNewSelection ? $scope.formatNewSelection :
-        _defaultFormatNewSelection);
-
       var select2Options = {
-        data: $scope.choices,
-        placeholder: $scope.placeholder,
         allowClear: false,
+        data: $scope.choices,
         multiple: $scope.allowMultipleChoices === 'true',
+        placeholder: $scope.placeholder,
         width: $scope.width || '250px',
         createSearchChoice: function(term, data) {
           if ($(data).filter(function() {
@@ -74,18 +66,23 @@ oppia.directive('select2Dropdown', [function() {
           }
         },
         formatResult: function(queryResult) {
-          var _doesChoiceMatchText = function(choice) {
+          var doesChoiceMatchText = function(choice) {
             return choice.id === queryResult.text;
           };
 
-          if ($scope.choices && $scope.choices.some(_doesChoiceMatchText)) {
+          if ($scope.choices && $scope.choices.some(doesChoiceMatchText)) {
             return queryResult.text;
           } else {
-            return _convertNewSelectionToText(queryResult.text)
+            if ($scope.formatNewSelection) {
+              return $scope.formatNewSelection(queryResult.text);
+            } else {
+              return queryResult.text;
+            }
           }
         },
         formatNoMatches: function(searchTerm) {
-          if ($scope.invalidSearchTermMessage && !searchTerm.match($scope.newChoiceValidator)) {
+          if ($scope.invalidSearchTermMessage &&
+              !searchTerm.match($scope.newChoiceValidator)) {
             return $scope.invalidSearchTermMessage;
           } else {
             return 'No matches found';

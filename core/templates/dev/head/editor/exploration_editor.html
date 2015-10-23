@@ -143,8 +143,8 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
-               class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish to Gallery">
+          <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+             alt="Publish to Gallery">&#xE2C3;</i>
           <span class="hidden-sm hidden-xs">Publish to Gallery</span>
         </button>
       </div>
@@ -156,13 +156,13 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_save_black_48dp.png"
-                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Save Draft">
+              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+             alt="Save Draft">&#xE161;</i>
               <span class="hidden-sm hidden-xs">Save Draft</span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <img src="/third_party/static/material-design-icons-1.0.1/ic_cloud_upload_black_48dp.png"
-                   class="visible-sm visible-xs oppia-save-publish-button-icon" alt="Publish Changes">
+              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+             alt="Publish Changes">&#xE2C3;</i>
               <span class="hidden-sm hidden-xs">Publish Changes</span>
             </span>
             <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
@@ -340,11 +340,8 @@
               <div>
                 {% include 'editor/exploration_graph.html' %}
               </div>
-              <div>
-                {% include 'editor/sidebar_state_parameter_changes.html' %}
-                {% if SHOW_GADGETS_EDITOR %}
-                  {% include 'editor/gadget_editor.html' %}
-                {% endif %}
+              <div ng-show="areGadgetsEnabled()">
+                {% include 'editor/gadget_editor.html' %}
               </div>
             </div>
           </div>
@@ -397,10 +394,6 @@
     </defs>
   </svg>
 
-  <script type="text/ng-template" id="inline/param_change_editor">
-    {% include 'components/param_change_editor.html' %}
-  </script>
-
   <script type="text/ng-template" id="inline/rule_editor">
     {% include 'components/rule_editor.html' %}
   </script>
@@ -410,9 +403,10 @@
   </script>
 
   {% include 'components/exploration_embed_button.html' %}
-  {% include 'components/visualizations.html' %}
   {% include 'components/gadget_panel.html' %}
+  {% include 'components/param_changes_editor.html' %}
   {% include 'components/profile_link.html' %}
+  {% include 'components/visualizations.html' %}
 
 {% endblock content %}
 
@@ -422,9 +416,11 @@
   <script>
     {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('editor/EditorServices.js') }}
+    {{ include_js_file('editor/ExplorationEditorAdvancedFeaturesService.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}
+    {{ include_js_file('components/paramChangesEditor.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ value_generators_js }}
@@ -437,7 +433,7 @@
     {{ include_js_file('editor/HistoryServices.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/SidebarStateName.js') }}
-    {{ include_js_file('editor/SidebarStateParameterChanges.js') }}
+    {{ include_js_file('editor/StateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateResponses.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
@@ -447,7 +443,6 @@
     {{ include_js_file('editor/StateInteraction.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
-    {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
     {{ include_js_file('components/answerGroupEditor.js') }}
     {{ include_js_file('components/profileLink.js') }}

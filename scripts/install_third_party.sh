@@ -19,7 +19,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-python scripts/install_third_party.py
+$PYTHON_CMD scripts/install_third_party.py
 
 # Check if the OS supports node.js installation; if not, return to the calling
 # script.
@@ -100,7 +100,7 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
     sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
-    python $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
+    $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
@@ -109,4 +109,10 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
+fi
+
+echo Checking whether node-jscs dependencies are installed
+if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
+  echo installing node-jscs
+  $NPM_INSTALL jscs@2.3.0
 fi
