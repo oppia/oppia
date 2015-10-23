@@ -403,6 +403,7 @@
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/gadget_panel.html' %}
   {% include 'components/param_changes_editor.html' %}
+  {% include 'components/profile_link.html' %}
   {% include 'components/visualizations.html' %}
 
 {% endblock content %}
@@ -442,6 +443,7 @@
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
     {{ include_js_file('components/answerGroupEditor.js') }}
+    {{ include_js_file('components/profileLink.js') }}
 
     {% for skin_js_url in skin_js_urls %}
       {{ include_skins_js_file(skin_js_url) }}
