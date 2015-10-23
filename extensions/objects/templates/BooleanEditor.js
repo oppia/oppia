@@ -14,7 +14,9 @@
 
 // The value for this editor is always editable.
 
-oppia.directive('booleanEditor', ['$compile', function($compile) {
+oppia.directive('booleanEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     controller: function($scope) {
       // Reset the component each time the value changes (e.g. if this is part
@@ -31,7 +33,7 @@ oppia.directive('booleanEditor', ['$compile', function($compile) {
     },
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Boolean';
+        return OBJECT_EDITOR_URL_PREFIX + 'Boolean';
       };
       $compile(element.contents())(scope);
     },

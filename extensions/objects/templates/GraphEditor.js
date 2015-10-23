@@ -16,11 +16,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('graphEditor', function($compile, warningsData) {
+oppia.directive('graphEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Graph';
+        return OBJECT_EDITOR_URL_PREFIX + 'Graph';
       };
       $compile(element.contents())(scope);
     },
@@ -31,6 +33,4 @@ oppia.directive('graphEditor', function($compile, warningsData) {
       $scope.alwaysEditable = true;
     }
   };
-});
-
-
+}]);

@@ -11,9 +11,6 @@
     "maxErrors": null,
     "verbose": true,
 
-    "disallowDanglingUnderscores": {
-        "allExcept": ["_$httpBackend_"]
-    },
     "disallowEmptyBlocks": true,
     "disallowFunctionDeclarations": true,
     "disallowKeywordsOnNewLine": ["else"],
@@ -150,7 +147,6 @@
     },
     "validateIndentation": 2,
     "validateLineBreaks": "LF",
-    "validateOrderInObjectKeys": "asc-natural",
     "validateParameterSeparator": ", ",
     "validateQuoteMarks": "'"
 }

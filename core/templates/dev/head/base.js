@@ -66,6 +66,8 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
 
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
+oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
+
 // Global utility methods.
 oppia.controller('Base', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',

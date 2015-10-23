@@ -122,15 +122,13 @@
     </li>
 
     {% if username %}
-      <li class="dropdown">
+      <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
+          popover-placement="bottom" popover-trigger="none"
+          popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"
            ng-click="openEditorTutorial()">
           <span class="glyphicon glyphicon-question-sign"></span>
         </a>
-        <div ng-if="postTutorialHelpPopoverIsShown" class="popover bottom oppia-post-tutorial-popover">
-          <div class="arrow"></div>
-          <div class="popover-content">If you need help in the future, click here!</div>
-        </div>
       </li>
     {% endif %}
   </ul>
