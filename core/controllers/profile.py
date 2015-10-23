@@ -82,6 +82,7 @@ class PreferencesPage(base.BaseHandler):
         self.render_template(
             'profile/preferences.html', redirect_url_on_logout='/')
 
+
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
@@ -132,6 +133,7 @@ class ProfilePictureHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+
 class ProfilePictureHandlerByUsername(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID."""
@@ -141,9 +143,10 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
             raise self.PageNotFoundException
         user_settings = user_services.get_user_settings(user_id)
         self.values.update({
-            'profile_picture_data_url_for_user_id': user_settings.profile_picture_data_url
+            'profile_picture_data_url_for_username': user_settings.profile_picture_data_url
         })
         self.render_json(self.values)
+
 
 class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
