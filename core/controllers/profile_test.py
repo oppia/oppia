@@ -111,7 +111,6 @@ class SignupTest(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
     def test_username_check(self):
@@ -217,3 +216,18 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 user_services.get_email_preferences(self.EDITOR_ID),
                 {'can_receive_email_updates': False})
+
+class ProfileLinkTests(test_utils.GenericTestBase):
+
+    USERNAME = 'abc123'
+    EMAIL = 'abc123@gmail.com'
+    PROFILE_PIC_URL = '/preferenceshandler/profile_picture_by_username/'
+
+    def test_get_profile_picture_invalid_username(self):
+        response = self.testapp.get(self.PROFILE_PIC_URL + self.USERNAME, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+    def test_get_profile_picture_valid_username(self):
+        self.signup(self.EMAIL, self.USERNAME)
+        response = self.testapp.get(self.PROFILE_PIC_URL + self.USERNAME)
+        self.assertEqual(response.status_int, 200)

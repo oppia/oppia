@@ -137,14 +137,13 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
     or None if no user picture is uploaded for the user with that ID."""
     def get(self, username):
         user_id = user_services.get_user_id_from_username(username)
-        user_settings = user_services.get_user_settings(user_id)
-        if user_settings is None:
+        if user_id is None:
             raise self.PageNotFoundException
-        else:
-            self.values.update({
-                'profile_picture_data_url_for_user_id': user_settings.profile_picture_data_url
-            })
-            self.render_json(self.values)
+        user_settings = user_services.get_user_settings(user_id)
+        self.values.update({
+            'profile_picture_data_url_for_user_id': user_settings.profile_picture_data_url
+        })
+        self.render_json(self.values)
 
 class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
