@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
+from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -122,31 +123,67 @@ def classify(exp_id, state, answer, params):
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
 
-    # Find the first group that satisfactorily matches the given answer. This is
-    # done by ORing (maximizing) all truth values of all rules over all answer
-    # groups. The group with the highest truth value is considered the best
-    # match.
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec = None
     best_matched_truth_value = 0.0
+
+    fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
+    input_type = interaction_instance.answer_type
+
+    # Find the first hard rule that matches
     for (i, answer_group) in enumerate(state.interaction.answer_groups):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exp_id))
-        input_type = interaction_instance.answer_type
-        ored_truth_value = 0.0
-        best_rule_spec = None
         for rule_spec in answer_group.rule_specs:
-            evaluated_truth_value = rule_domain.evaluate_rule(
-                rule_spec, input_type, params, normalized_answer, fs)
-            if evaluated_truth_value > ored_truth_value:
-                ored_truth_value = evaluated_truth_value
-                best_rule_spec = rule_spec
-        if ored_truth_value > best_matched_truth_value:
-            best_matched_truth_value = ored_truth_value
-            best_matched_rule_spec = best_rule_spec
-            best_matched_answer_group = answer_group
-            best_matched_answer_group_index = i
+            if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
+                evaluated_truth_value = rule_domain.evaluate_rule(
+                    rule_spec, input_type, params, normalized_answer, fs)
+                if evaluated_truth_value > best_matched_truth_value:
+                    best_matched_truth_value = evaluated_truth_value
+                    best_matched_rule_spec = rule_spec
+                    best_matched_answer_group = answer_group
+                    best_matched_answer_group_index = i
+
+    # Find the maximum soft rule that matches. This is
+    # done by ORing (maximizing) all truth values of all rules over all answer
+    # groups. The group with the highest truth value is considered the best
+    # match.
+    if best_matched_answer_group is None:
+        for (i, answer_group) in enumerate(state.interaction.answer_groups):
+            for rule_spec in answer_group.rule_specs:
+                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                    evaluated_truth_value = rule_domain.evaluate_rule(
+                        rule_spec, input_type, params, normalized_answer, fs)
+                    if evaluated_truth_value > best_matched_truth_value:
+                        best_matched_truth_value = evaluated_truth_value
+                        best_matched_rule_spec = rule_spec
+                        best_matched_answer_group = answer_group
+                        best_matched_answer_group_index = i
+
+    # Run the classifier
+    if best_matched_answer_group is None:
+        sc = classifier_services.StringClassifier()
+        training_examples = [[doc, []] for doc in
+            state.interaction.confirmed_unclassified_answers]
+        for (i, answer_group) in enumerate(state.interaction.answer_groups):
+            for rule_spec in answer_group.rule_specs:
+                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                    training_examples.extend([[doc, [str(i)]] for doc in
+                        rule_spec.inputs['training_data']])
+        if len(training_examples) > 0:
+            sc.load_examples(training_examples)
+            doc_ids = sc.add_examples_for_predicting([answer])
+            predicted_label = sc.predict_label_for_doc(doc_ids[0])
+            if predicted_label != '_default':
+                predicted_answer_group_index = int(predicted_label)
+                predicted_answer_group = state.interaction.answer_groups[
+                    predicted_answer_group_index]
+                best_matched_truth_value = rule_domain.CERTAIN_TRUE_VALUE
+                for rule_spec in answer_group.rule_specs:
+                    if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                        best_matched_rule_spec = rule_spec
+                        break
+                best_matched_answer_group = predicted_answer_group
+                best_matched_answer_group_index = predicted_answer_group_index
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches

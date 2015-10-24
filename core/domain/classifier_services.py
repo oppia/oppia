@@ -444,6 +444,8 @@ class StringClassifier(object):
 
     def predict_label_for_doc(self, d):
         """Returns the predicted label from a doc's prediction report."""
+        if self._num_docs < 20 or self._num_labels < 3:
+            return self._DEFAULT_LABEL
         return self._get_prediction_report_for_doc(d)['prediction_label_name']
 
     def to_dict(self):
