@@ -535,10 +535,12 @@ oppia.directive('stateGraphViz', [function() {
     templateUrl: 'visualizations/stateGraphViz',
     controller: [
       '$scope', '$element', '$timeout', '$filter', 'stateGraphArranger',
-      'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
+      'explorationWarningsService', 'MAX_NODES_PER_ROW',
+      'MAX_NODE_LABEL_LENGTH',
       function(
           $scope, $element, $timeout, $filter, stateGraphArranger,
-          MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+          explorationWarningsService, MAX_NODES_PER_ROW,
+          MAX_NODE_LABEL_LENGTH) {
         var redrawGraph = function() {
           if ($scope.graphData()) {
             $scope.graphLoaded = false;
@@ -831,6 +833,14 @@ oppia.directive('stateGraphViz', [function() {
             nodeData[nodeId].canDelete = (nodeId != initStateId);
             $scope.nodeList.push(nodeData[nodeId]);
           }
+
+          $scope.getNodeErrorMessage = function(nodeLabel) {
+            var warnings =
+              explorationWarningsService.getAllStateRelatedWarnings();
+            if (warnings.hasOwnProperty(nodeLabel)) {
+              return warnings[nodeLabel][0].toString();
+            }
+          };
 
           // The translation applied when the graph is first loaded.
           var origTranslations = [0, 0];

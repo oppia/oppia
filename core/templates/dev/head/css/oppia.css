@@ -102,6 +102,7 @@ body {
   font-size: 1.6em;
   height: 100%;
   margin: 0 auto;
+  overflow-x: hidden;
   padding: 0;
   width: 100%;
 }
