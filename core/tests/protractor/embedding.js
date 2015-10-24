@@ -84,8 +84,6 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
 
       // Test of deferred loading (old version)
-      var deferredElement = driver.findElement(by.xpath(
-        "//div[@class='protractor-test-deferred']"));
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-deferred']/oppia/div/button")).click();

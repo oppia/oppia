@@ -52,12 +52,13 @@ var progressInTutorial = function() {
 
 var finishTutorial = function() {
   // Finish the tutorial.
-  var button = element(by.buttonText('Finish'));
-  if (button) {
-    button.click();
-  } else {
-    throw 'Expected to find exactly one \'Finish\' button';
-  }
+  element.all(by.buttonText('Finish')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else {
+      throw 'Expected to find exactly one \'Finish\' button';
+    }
+  });
 };
 
 // NAVIGATION
