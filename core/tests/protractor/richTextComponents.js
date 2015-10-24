@@ -74,7 +74,7 @@ describe('rich-text components', function() {
     users.logout();
   });
 
-  it('should allow nesting of RTE components inside one another', function() {
+  it('should allow rich text inside extensions', function() {
     users.createUser('user12@example.com', 'user12');
     users.login('user12@example.com')
 
