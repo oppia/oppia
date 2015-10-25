@@ -17,8 +17,8 @@
 """Pre-commit script for Oppia.
 
 This script uses the JSCS node module to lint JavaScript code, and prints a
-list of lint errors to the terminal. If the --autofix flag is passed, it will
-also attempt to automatically fix these errors.
+list of lint errors to the terminal. If the directory path is passed, it will
+also lint all JavaScript files in that directory.
 
 IMPORTANT NOTES:
 
@@ -47,11 +47,9 @@ import time
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--autofix',
-    help=(
-        'optional; if specified, automatically fix errors where possible, and '
-        'only display errors which cannot be fixed'),
-    action='store_true')
+    'directory',
+    help='path to the directory with files to be linted',
+    action='store', nargs='*')
 
 
 def _get_changed_filenames():
@@ -80,34 +78,41 @@ def _is_javascript_file(filename):
     return filename.endswith('.js')
 
 
-def _lint_js_files(node_path, jscs_path, autofix, config_jscsrc):
+def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
     """Prints a list of lint errors in changed JavaScript files.
 
     Args:
     - node_path: str. Path to the node binary.
     - jscs_path: str. Path to the JSCS binary.
-    - autofix: bool. Whether to automatically fix errors.
+    - input_dir: str. Path to the folder to be linted(Optional).
     """
     changed_filenames = _get_changed_filenames()
     changed_js_filenames = filter(_is_javascript_file, changed_filenames)
     num_js_files = len(changed_js_filenames)
+    is_directory = False
+    if input_dir:
+        is_directory = os.path.isdir(input_dir)
 
     num_files_with_errors = 0
 
     print '----------------------------------------'
 
-    if not changed_js_filenames:
-        print 'There are no JavaScript files to lint in this commit. Exiting.'
-        print '----------------------------------------'
-        sys.exit(0)
+    if not is_directory:
+        if not changed_js_filenames:
+            print 'There are no JavaScript files to lint in this commit. Exiting.'
+            print '----------------------------------------'
+            sys.exit(0)
+        else:
+            files_to_lint = changed_js_filenames
+    else:
+        js_files = filter(_is_javascript_file, os.listdir(input_dir))
+        files_to_lint = js_files
 
     start_time = time.time()
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
-    if autofix:
-        jscs_cmd_args.append('-x')
 
-    for ind, filename in enumerate(changed_js_filenames):
+    for ind, filename in enumerate(files_to_lint):
         print 'Linting file %d/%d: %s ...' % (
             ind + 1, num_js_files, filename)
 
@@ -140,7 +145,9 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
-    autofix = bool(parsed_args.autofix)
+    input_dir = None
+    if len(parsed_args.directory):
+        input_dir = os.path.join(os.getcwd(), parsed_args.directory[0])
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
@@ -154,7 +161,7 @@ def _pre_commit_linter():
         if os.path.exists(jscs_path):
             print ''
             print 'Starting linter...'
-            _lint_js_files(node_path, jscs_path, autofix, config_jscsrc)
+            _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir)
         else:
             print ''
             print 'ERROR    Please run start.sh first to install node-jscs '
