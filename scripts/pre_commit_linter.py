@@ -107,6 +107,10 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
     else:
         js_files = filter(_is_javascript_file, os.listdir(input_dir))
         files_to_lint = js_files
+        if not files_to_lint:
+            print 'There are no JavaScript files to lint in this folder. Exiting.'
+            print '----------------------------------------'
+            sys.exit(0)
 
     start_time = time.time()
 
