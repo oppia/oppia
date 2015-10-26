@@ -30,11 +30,16 @@ IMPORTANT NOTES:
 
     at least once.
 
-2.  This script should be run from the oppia root folder:
+=====================
+CUSTOMIZATION OPTIONS
+=====================
+1.  To lint only files that have been touched in this commit
+       python scripts/pre_commit_linter.py
 
-        python scripts/pre_commit_linter.py
+2.  To lint all files in  the folder or to lint just a specific file 
+        python scripts/pre_commit_linter.py dir_path
 
- Note that the root folder MUST be named 'oppia'.
+Note that the root folder MUST be named 'oppia'.    
  """
 
 __author__ = "Barnabas Makonda(barnabasmakonda@gmail.com)"
@@ -51,7 +56,7 @@ _PARSER.add_argument(
     'directory',
     help='path to the directory with files to be linted',
     action='store', nargs='?')
-
+files_in_directory = []
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -79,29 +84,55 @@ def _is_javascript_file(filename):
     return filename.endswith('.js')
 
 
+def _get_all_files_in_directory(dir_path):
+    """Recursively collects all files in directory and 
+    subdirectories of specified path.
+
+    Args:
+    - dir_path: str. Path to the folder to be linted.
+
+    Returns:
+        a list of files in directory and subdirectories.
+    """
+    for subdirectory in os.listdir(dir_path):
+        subdirectory = os.path.join(dir_path,subdirectory)
+        if os.path.isdir(subdirectory):
+           _get_all_files_in_directory(subdirectory)
+        else:
+            files_in_directory.append(subdirectory)
+    return files_in_directory
+
+
 def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
     """Prints a list of lint errors in changed JavaScript files.
 
     Args:
     - node_path: str. Path to the node binary.
     - jscs_path: str. Path to the JSCS binary.
-    - input_dir: str. Path to the folder to be linted(Optional).
+    - input_dir: str. Path to the folder to be linted (optional).
     """
-    changed_filenames = _get_changed_filenames()
-    changed_js_filenames = filter(_is_javascript_file, changed_filenames)
-    num_js_files = len(changed_js_filenames)
 
     num_files_with_errors = 0
 
     print '----------------------------------------'
 
     if input_dir:
-        files_to_lint  = filter(_is_javascript_file, os.listdir(input_dir))
+        if os.path.isfile(input_dir):
+            all_files = [input_dir]
+        else:
+            all_files = _get_all_files_in_directory(input_dir)
+
+        files_to_lint  = filter(_is_javascript_file, all_files)
+
+        num_js_files = len(files_to_lint)
         if not files_to_lint:
             print 'There are no JavaScript files to lint in this folder. Exiting.'
             print '----------------------------------------'
             sys.exit(0)        
     else:
+        changed_filenames = _get_changed_filenames()
+        changed_js_filenames = filter(_is_javascript_file, changed_filenames)
+        num_js_files = len(changed_js_filenames)
         if changed_js_filenames:
             files_to_lint = changed_js_filenames            
         else:
@@ -148,9 +179,9 @@ def _pre_commit_linter():
     parsed_args = _PARSER.parse_args()
     input_dir = parsed_args.directory
     if input_dir:
-        input_dir = os.path.join(os.getcwd(), parsed_args.directory[0])
-        if not os.path.isdir(input_dir):
-            print 'Please correct the path to the directory to be linted.Exiting.'
+        input_dir = os.path.join(os.getcwd(), parsed_args.directory)
+        if not os.path.exists(input_dir):
+            print 'Could not locate directory %s. Exiting.' % input_dir
             print '----------------------------------------'
             sys.exit(0)
 
