@@ -17,8 +17,9 @@
 """Pre-commit script for Oppia.
 
 This script uses the JSCS node module to lint JavaScript code, and prints a
-list of lint errors to the terminal. If the directory path is passed, it will
-also lint all JavaScript files in that directory.
+list of lint errors to the terminal. If the directory path is passed,
+it will lint all JavaScript files in that directory; otherwise,
+it will only lint files that have been touched in this commit.
 
 IMPORTANT NOTES:
 
@@ -49,7 +50,7 @@ _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     'directory',
     help='path to the directory with files to be linted',
-    action='store', nargs='*')
+    action='store', nargs='?')
 
 
 def _get_changed_filenames():
@@ -89,26 +90,22 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
     changed_filenames = _get_changed_filenames()
     changed_js_filenames = filter(_is_javascript_file, changed_filenames)
     num_js_files = len(changed_js_filenames)
-    is_directory = False
-    if input_dir:
-        is_directory = os.path.isdir(input_dir)
 
     num_files_with_errors = 0
 
     print '----------------------------------------'
 
-    if not is_directory:
-        if not changed_js_filenames:
-            print 'There are no JavaScript files to lint in this commit. Exiting.'
-            print '----------------------------------------'
-            sys.exit(0)
-        else:
-            files_to_lint = changed_js_filenames
-    else:
-        js_files = filter(_is_javascript_file, os.listdir(input_dir))
-        files_to_lint = js_files
+    if input_dir:
+        files_to_lint  = filter(_is_javascript_file, os.listdir(input_dir))
         if not files_to_lint:
             print 'There are no JavaScript files to lint in this folder. Exiting.'
+            print '----------------------------------------'
+            sys.exit(0)        
+    else:
+        if changed_js_filenames:
+            files_to_lint = changed_js_filenames            
+        else:
+            print 'There are no JavaScript files to lint in this commit. Exiting.'
             print '----------------------------------------'
             sys.exit(0)
 
@@ -149,9 +146,13 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
-    input_dir = None
-    if len(parsed_args.directory):
+    input_dir = parsed_args.directory
+    if input_dir:
         input_dir = os.path.join(os.getcwd(), parsed_args.directory[0])
+        if not os.path.isdir(input_dir):
+            print 'Please correct the path to the directory to be linted.Exiting.'
+            print '----------------------------------------'
+            sys.exit(0)
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
