@@ -40,6 +40,11 @@ oppia.directive('oppiaGadgetScoreBar', [
           if (learnerParamsService.getValue(
               $scope.scoreBarParamName) > $scope.maxValue) {
             return $scope.maxValue;
+          } else if (learnerParamsService.getValue(
+              $scope.scoreBarParamName) < 0) {
+            // Defense-in-depth: although underflows don't break the current
+            // UI, return a sensible minimum.
+            return 0;
           } else {
             return learnerParamsService.getValue($scope.scoreBarParamName);
           }
