@@ -94,11 +94,11 @@
                 <g ng-if="getNodeErrorMessage(node.label) && showWarningSign">
                   <rect ng-click="onClickFunction(node.id)" class="clickable"
                         style="fill: yellow;" width="22" height="22"
-                        ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
+                        ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0 - 8]>"
                         ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
-                      ng-attr-y="<[node.y0 + 17]>"
+                      ng-attr-y="<[node.y0 + 9]>"
                       style="font-size: 22px; font-weight: bold;"
                       ng-attr-transform="<[getHighlightTextTransform(node.x0, node.y0)]>">
                     ⚠

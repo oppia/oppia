@@ -1493,7 +1493,7 @@ oppia.constant('WARNING_TYPES', {
 oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
   STATE_UNREACHABLE: 'This card is unreachable',
-  INCOMPLETE_EXPOLRATION: 'Please make sure there\'s a way to complete ' +
+  UNABLE_TO_END_EXPLORATION: 'Please make sure there\'s a way to complete ' +
               'the exploration starting from this card'
 });
 
@@ -1865,10 +1865,10 @@ oppia.factory('explorationWarningsService', [
             angular.forEach(deadEndStates, function(deadEndState) {
              if (stateWarnings.hasOwnProperty(deadEndState)) {
                stateWarnings[deadEndState].push(
-                 STATE_ERROR_MESSAGES.INCOMPLETE_EXPOLRATION);
+                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
              } else {
                stateWarnings[deadEndState] = [
-                 STATE_ERROR_MESSAGES.INCOMPLETE_EXPOLRATION];
+                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
              }
            });
           }
