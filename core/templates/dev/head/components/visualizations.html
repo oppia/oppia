@@ -91,14 +91,11 @@
                   <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
                   <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
                 </text>
-                <g ng-if="getNodeErrorMessage(node.label)">
+                <g ng-if="getNodeErrorMessage(node.label) && showWarningSign">
                   <rect ng-click="onClickFunction(node.id)" class="clickable"
                         style="fill: yellow;" width="22" height="22"
                         ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                        ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>"
-                        tooltip="<[getNodeErrorMessage(node.label)]>"
-                        tooltip-placement="bottom" tooltip-append-to-body="true"
-                        tooltip-animation="false">
+                        ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
                       ng-attr-y="<[node.y0 + 17]>"
@@ -106,6 +103,7 @@
                       ng-attr-transform="<[getHighlightTextTransform(node.x0, node.y0)]>">
                     ⚠
                   </text>
+                  <title><[getNodeErrorMessage(node.label)]></title>
                 </g>
                 <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
                   <rect height="15" width="15" opacity="0" stroke-width="0"

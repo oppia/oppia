@@ -49,7 +49,7 @@ oppia.factory('baseInteractionValidationService', [
           partialWarningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (
-              'please specify what Oppia should do in answer group ' +
+              'Please specify what Oppia should do in answer group ' +
               String(i + 1) + '.')
           });
         }
@@ -63,7 +63,7 @@ oppia.factory('baseInteractionValidationService', [
         partialWarningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please add feedback for the user if they are to return to the ' +
+            'Please add feedback for the user if they are to return to the ' +
             'same state again.')
         });
       }

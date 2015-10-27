@@ -1908,11 +1908,11 @@ oppia.factory('explorationWarningsService', [
 
       if (Object.keys(stateWarnings).length) {
         _warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: (
-              'The following states have errors: ' +
-              Object.keys(stateWarnings).join(', ') + '.')
-          });
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'The following states have errors: ' +
+            Object.keys(stateWarnings).join(', ') + '.')
+        });
       };
 
       var statesWithAnswerGroupsWithEmptyFuzzyRules = (

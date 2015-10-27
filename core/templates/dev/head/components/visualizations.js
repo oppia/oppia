@@ -530,7 +530,8 @@ oppia.directive('stateGraphViz', [function() {
       onMaximizeFunction: '=',
       // Object whose keys are ids of nodes, and whose values are the
       // corresponding node opacities.
-      opacityMap: '='
+      opacityMap: '=',
+      showWarningSign: '@'
     },
     templateUrl: 'visualizations/stateGraphViz',
     controller: [
