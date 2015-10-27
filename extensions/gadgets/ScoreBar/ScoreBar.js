@@ -21,21 +21,30 @@
  */
 
 oppia.directive('oppiaGadgetScoreBar', [
-  'oppiaHtmlEscaper', 'learnerParamsService', function(oppiaHtmlEscaper, learnerParamsService) {
-
+  'oppiaHtmlEscaper', 'learnerParamsService',
+  function(oppiaHtmlEscaper, learnerParamsService) {
     return {
       restrict: 'E',
       templateUrl: 'gadget/ScoreBar',
-      controller: ['$scope', '$attrs', function ($scope, $attrs) {
-
-        $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj($attrs.gadgetName);
-        $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj($attrs.maxValueWithValue);
-        $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj($attrs.paramNameWithValue);
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.gadgetName);
+        $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.maxValueWithValue);
+        $scope.scoreBarParamName = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.paramNameWithValue);
 
         $scope.getScoreValue = function() {
-          return learnerParamsService.getValue($scope.scoreBarParamName);
+          // If a parameter's value exceeds the ScoreBar's maxValue, return
+          // maxValue to keep the label text visible.
+          if (learnerParamsService.getValue(
+              $scope.scoreBarParamName) > $scope.maxValue) {
+            return $scope.maxValue;
+          } else {
+            return learnerParamsService.getValue($scope.scoreBarParamName);
+          }
         };
-      }],
-    }
+      }]
+    };
   }
 ]);
