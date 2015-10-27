@@ -458,6 +458,7 @@ var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
 };
 
 var _setOutcomeDest = function(destEditorElem, destName, createDest) {
+  expect(destName === null && createDest).toBe(false)
   var destinationElement =
     destEditorElem.element(by.css('.protractor-test-dest-bubble'));
 
