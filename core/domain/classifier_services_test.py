@@ -16,9 +16,6 @@
 
 from core.domain import classifier_services
 from core.tests import test_utils
-import utils
-
-import numpy
 
 
 class StringClassifierUnitTests(test_utils.GenericTestBase):
