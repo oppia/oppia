@@ -79,7 +79,7 @@ describe('Interaction validator', function() {
       var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please specify what Oppia should do in answer group 2.'
+        'message': 'Please specify what Oppia should do in answer group 2.'
       }]);
     });
 
@@ -98,7 +98,7 @@ describe('Interaction validator', function() {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please add feedback for the user if they are to return ' +
+        'message': 'Please add feedback for the user if they are to return ' +
           'to the same state again.'
       }]);
     });
@@ -120,13 +120,13 @@ describe('Interaction validator', function() {
         badAnswerGroups, badOutcome, currentState);
       expect(warnings).toEqual([{
           'type': WARNING_TYPES.ERROR,
-          'message': 'please specify what Oppia should do in answer group 2.'
+          'message': 'Please specify what Oppia should do in answer group 2.'
         }, {
           'type': WARNING_TYPES.ERROR,
-          'message': 'please specify what Oppia should do in answer group 3.'
+          'message': 'Please specify what Oppia should do in answer group 3.'
         }, {
           'type': WARNING_TYPES.ERROR,
-          'message': 'please add feedback for the user if they are to return ' +
+          'message': 'Please add feedback for the user if they are to return ' +
             'to the same state again.'
         }
       ]);
@@ -216,7 +216,7 @@ describe('Interaction validator', function() {
       var warnings = validator(currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please specify what Oppia should do after the button is' +
+        'message': 'Please specify what Oppia should do after the button is' +
           ' clicked.'
       }]);
     });
