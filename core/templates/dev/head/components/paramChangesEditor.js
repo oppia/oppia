@@ -208,6 +208,19 @@ oppia.directive('paramChangesEditor', [function() {
             return;
           }
 
+          // This ensures that any new parameter names that have been added
+          // before the swap are added to the list of possible names in the
+          // select2 dropdowns. Otherwise, after the swap, the dropdowns may
+          // turn blank.
+          $scope.paramChangesService.displayed.forEach(function(paramChange) {
+            if (!explorationParamSpecsService.displayed.hasOwnProperty(
+                paramChange.name)) {
+              explorationParamSpecsService.displayed[paramChange.name] = (
+                angular.copy(DEFAULT_PARAM_SPEC));
+            }
+          });
+          $scope.paramNameChoices = generateParamNameChoices();
+
           var tmp = angular.copy($scope.paramChangesService.displayed[index1]);
           $scope.paramChangesService.displayed[index1] = (
             $scope.paramChangesService.displayed[index2]);
@@ -221,6 +234,19 @@ oppia.directive('paramChangesEditor', [function() {
               'Cannot delete parameter change at position ' + index +
               ': index out of range');
           }
+
+          // This ensures that any new parameter names that have been added
+          // before the deletion are added to the list of possible names in the
+          // select2 dropdowns. Otherwise, after the deletion, the dropdowns
+          // may turn blank.
+          $scope.paramChangesService.displayed.forEach(function(paramChange) {
+            if (!explorationParamSpecsService.displayed.hasOwnProperty(
+                paramChange.name)) {
+              explorationParamSpecsService.displayed[paramChange.name] = (
+                angular.copy(DEFAULT_PARAM_SPEC));
+            }
+          });
+          $scope.paramNameChoices = generateParamNameChoices();
 
           $scope.paramChangesService.displayed.splice(index, 1);
         };
