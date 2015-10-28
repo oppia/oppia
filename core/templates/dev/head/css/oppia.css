@@ -1300,6 +1300,14 @@ pre.oppia-pre-wrapped-text {
   z-index: 1;
 }
 
+.oppia-param-change-sort-handle {
+  cursor: move;
+  left: -20px;
+  opacity: 0.3;
+  position: absolute;
+  top: 4px;
+}
+
 .oppia-rule-edit-feedback {
   position: relative;
 }
@@ -1343,20 +1351,6 @@ oppia-parameter {
 
 .oppia-param-display-row {
   margin-bottom: 4px;
-}
-
-.oppia-param-arrow-buttons-container {
-  left: -40px;
-  top: 5px;
-}
-
-.oppia-param-arrow-button {
-  border: 0;
-  font-size: 14px;
-  padding: 0;
-}
-.oppia-param-arrow-button:disabled {
-  color: #999;
 }
 
 .oppia-tutorial-tooltip {
