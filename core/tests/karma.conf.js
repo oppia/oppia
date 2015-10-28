@@ -12,7 +12,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.3.13/angular-resource.js',
       'third_party/static/angularjs-1.3.13/angular-sanitize.js',
       'third_party/static/angularjs-1.3.13/angular-mocks.js',
-      'third_party/static/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.js',
+      'third_party/static/ui-bootstrap-0.13.4/ui-bootstrap-tpls-0.13.4.js',
       'third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
@@ -77,7 +77,8 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
-      type: 'html',
+      reporters: [{type: 'html'}, {type: 'json'}],
+      subdir: '.',
       dir: '../karma_coverage_reports/'
     },
     autoWatch: true,

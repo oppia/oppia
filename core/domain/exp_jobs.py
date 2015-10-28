@@ -211,3 +211,32 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that produces a list of (exploration, state) pairs, grouped by the
+    interaction they use.
+
+    This job is for demonstration purposes. It is not enabled by default in the
+    jobs registry.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        for state_name, state in exploration.states.iteritems():
+            exp_and_state_key = '%s %s' % (item.id, state_name)
+            yield (state.interaction.id, exp_and_state_key)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

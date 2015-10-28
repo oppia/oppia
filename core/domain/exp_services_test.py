@@ -1253,6 +1253,28 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
 
+    def test_get_last_updated_by_human_ms(self):
+        original_timestamp = utils.get_current_time_in_millisecs()
+
+        v1_exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID, end_state_name='End')
+
+        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
+
+        v2_exploration = exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }], 'Did migration.')
+
+        self.assertLess(
+            original_timestamp,
+            exp_services._get_last_updated_by_human_ms(self.EXP_ID))
+        self.assertLess(
+            exp_services._get_last_updated_by_human_ms(self.EXP_ID),
+            timestamp_after_first_edit)
+
     def test_get_exploration_snapshots_metadata(self):
         v1_exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID, end_state_name='End')

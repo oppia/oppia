@@ -86,41 +86,11 @@ def _migrate_states_schema(versioned_exploration_states):
             'state schemas at present.' %
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-    # Check for conversion to v1.
-    if exploration_states_schema_version == 0:
-        exp_domain.Exploration.update_states_v0_to_v1_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 1
-
-    # Check for conversion to v2.
-    if exploration_states_schema_version == 1:
-        exp_domain.Exploration.update_states_v1_to_v2_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 2
-
-    # Check for conversion to v3.
-    if exploration_states_schema_version == 2:
-        exp_domain.Exploration.update_states_v2_to_v3_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 3
-
-    # Check for conversion to v4.
-    if exploration_states_schema_version == 3:
-        exp_domain.Exploration.update_states_v3_to_v4_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 4
-
-    # Check for conversion to v5.
-    if exploration_states_schema_version == 4:
-        exp_domain.Exploration.update_states_v4_to_v5_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 5
-
-    # Check for conversion to v6.
-    if exploration_states_schema_version == 5:
-        exp_domain.Exploration.update_states_v5_to_v6_from_model(
-            versioned_exploration_states)
-        exploration_states_schema_version = 6
+    while (exploration_states_schema_version <
+           feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+        exp_domain.Exploration.update_states_from_model(
+            versioned_exploration_states, exploration_states_schema_version)
+        exploration_states_schema_version += 1
 
 
 # Repository GET methods.
@@ -940,6 +910,22 @@ def get_exploration_snapshots_metadata(exploration_id):
         exploration_id, version_nums)
 
 
+def _get_last_updated_by_human_ms(exp_id):
+    """Return the last time, in milliseconds, when the given exploration was
+    updated by a human.
+    """
+    # Iterate backwards through the exploration history metadata until we find
+    # the most recent snapshot that was committed by a human.
+    last_human_update_ms = 0
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    for snapshot_metadata in reversed(snapshots_metadata):
+        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
+            last_human_update_ms = snapshot_metadata['created_on_ms']
+            break
+
+    return last_human_update_ms
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
@@ -964,25 +950,25 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
-    # update summary of changed exploration
+    # Update summary of changed exploration.
     update_exploration_summary(exploration.id)
 
 
 def create_exploration_summary(exploration_id):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = get_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     save_exploration_summary(exp_summary)
 
 
 def update_exploration_summary(exploration_id):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = get_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     save_exploration_summary(exp_summary)
 
 
-def get_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
     """
@@ -994,7 +980,8 @@ def get_summary_of_exploration(exploration):
     else:
         ratings = feconf.get_empty_ratings()
 
-    exploration_model_last_updated = exploration.last_updated
+    exploration_model_last_updated = datetime.datetime.fromtimestamp(
+        _get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
 
     exp_summary = exp_domain.ExplorationSummary(
@@ -1020,7 +1007,7 @@ def save_exploration_summary(exp_summary):
         objective=exp_summary.objective,
         language_code=exp_summary.language_code,
         tags=exp_summary.tags,
-        ratings = exp_summary.ratings,
+        ratings=exp_summary.ratings,
         status=exp_summary.status,
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
@@ -1259,14 +1246,7 @@ def _get_search_rank(exp_id):
                 summary.ratings[rating_value] *
                 RATING_WEIGHTINGS[rating_value])
 
-    # Iterate backwards through the exploration history metadata until we find
-    # the most recent snapshot that was committed by a human.
-    last_human_update_ms = 0
-    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
-    for snapshot_metadata in reversed(snapshots_metadata):
-        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
-            last_human_update_ms = snapshot_metadata['created_on_ms']
-            break
+    last_human_update_ms = _get_last_updated_by_human_ms(exp_id)
 
     _TIME_NOW_MS = utils.get_current_time_in_millisecs()
     _MS_IN_ONE_DAY = 24 * 60 * 60 * 1000

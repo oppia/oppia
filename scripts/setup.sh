@@ -34,16 +34,16 @@ then
   return 1
 fi
 
-# TODO: Consider using getopts command.
+# TODO(sll): Consider using getopts command.
 declare -a remaining_params
 for arg in "$@"; do
-  if [ "$arg" == "--nojsrepl" ]; then
-    NO_JSREPL=true
+  if [ "$arg" == "--nojsrepl" ] || [ "$arg" == "--noskulpt" ]; then
+    NO_SKULPT=true
   else
     remaining_params+=($arg)
   fi
 done
-export NO_JSREPL
+export NO_SKULPT
 export remaining_params
 
 EXPECTED_PWD='oppia'
@@ -53,7 +53,11 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
 fi
 
 export OPPIA_DIR=`pwd`
-export COMMON_DIR=$OPPIA_DIR/..
+# Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
+# is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
+# may use it in a situation where relative paths won't work as expected (such
+# as $PYTHONPATH).
+export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
 export NODE_MODULE_DIR=$COMMON_DIR/node_modules
@@ -64,7 +68,7 @@ mkdir -p $THIRD_PARTY_DIR
 mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
-export NODE_PATH=$TOOLS_DIR/node-0.10.33
+export NODE_PATH=$TOOLS_DIR/node-4.2.1
 export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
@@ -96,3 +100,49 @@ else
   # Mac OS.
   export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 fi
+
+# This function takes a command for python as its only input.
+# It checks this input for a specific version of python and returns false
+# if it does not match the expected prefix.
+function test_python_version() {
+  EXPECTED_PYTHON_VERSION_PREFIX="2.7"
+  PYTHON_VERSION=$($1 --version 2>&1)
+  if [[ $PYTHON_VERSION =~ Python[[:space:]](.+) ]]; then
+    PYTHON_VERSION=${BASH_REMATCH[1]}
+  else
+    echo "Unrecognizable Python command output: ${PYTHON_VERSION}"
+    # Return a false condition if output of tested command is unrecognizable.
+    return 0
+  fi
+  if [[ "${PYTHON_VERSION}" = "${EXPECTED_PYTHON_VERSION_PREFIX}*" ]]; then
+    # The value '1' indicates a true return value,
+    # indicating the version of the input Python command is the expected Python version.
+    return 1
+  else
+    return 0
+  fi
+}
+
+# First, check the default Python command (which should be found within the user's $PATH).
+PYTHON_CMD="python"
+# Test whether the 'python' or 'python2.7' commands exist and finally fails when
+# no suitable python version 2.7 can be found.
+if ! test_python_version $PYTHON_CMD; then
+  echo "Unable to find 'python'. Trying python2.7 instead..."
+  PYTHON_CMD="python2.7"
+  if ! test_python_version $PYTHON_CMD; then
+    echo "Could not find a suitable Python environment. Exiting."
+    # If OS is Windows, print helpful error message about adding Python to path.
+    if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
+        echo "It looks like you are using Windows. If you have Python installed,"
+        echo "make sure it is in your PATH and that PYTHONPATH is set."
+        echo "If you have two versions of Python (ie, Python 2.7 and 3), specify 2.7 before other versions of Python when setting the PATH."
+        echo "Here are some helpful articles:"
+        echo "http://docs.python-guide.org/en/latest/starting/install/win/"
+        echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
+    fi
+    # Exit when no suitable Python environment can be found.
+    exit 1
+  fi
+fi
+export PYTHON_CMD

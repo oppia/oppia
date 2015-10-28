@@ -68,6 +68,13 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
 /* Bootstrap overrides and additions. */
 html {
   /*
@@ -95,6 +102,7 @@ body {
   font-size: 1.6em;
   height: 100%;
   margin: 0 auto;
+  overflow-x: hidden;
   padding: 0;
   width: 100%;
 }
@@ -300,6 +308,7 @@ textarea {
 .oppia-sidebar-menu-icon {
   height: 22px;
   margin: 0 16px 3px 6px;
+  vertical-align: middle;
   width: 22px;
 }
 
@@ -910,6 +919,14 @@ md-card.oppia-gallery-tile {
   padding: 0;
 }
 
+.oppia-editor-card-avatar {
+  height: 36px;
+  left: -18px;
+  position: absolute;
+  top: 28px;
+  width: 36px;
+}
+
 .oppia-editor-card {
   background: rgb(255,255,255);
   margin-left: auto;
@@ -931,26 +948,6 @@ pre.oppia-pre-wrapped-text {
   white-space: pre-wrap;
 }
 
-.oppia-pre-avatar-oppia, .oppia-pre-avatar-user {
-  position: relative;
-}
-.oppia-pre-avatar-oppia::before, .oppia-pre-avatar-user::before {
-  background-size: 24px 24px;
-  content: "";
-  height: 24px;
-  left: -42px;
-  position: absolute;
-  width: 24px;
-}
-.oppia-pre-avatar-oppia::before {
-  background-image: url('/images/avatar/oppia_black_48px.png');
-  top: 2px;
-}
-.oppia-pre-avatar-user::before {
-  background-image: url('/images/avatar/user_mint_48px.png');
-  top: 8px;
-}
-
 .oppia-editor-card-body {
   position: relative;
 }
@@ -969,7 +966,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-editor-card-section {
-  padding: 20px 50px 20px 65px;
+  padding: 20px 50px 20px 35px;
 }
 
 .oppia-state-content {
@@ -977,10 +974,9 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0 15px 10px;
 }
 
-.oppia-state-content-display {
-  padding: 4px;
+.oppia-state-content-display, .oppia-param-changes-display {
+  max-width: 610px;
   text-align: left;
-  max-width: 585px;
 }
 
 .oppia-prevent-selection {
@@ -1149,18 +1145,26 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
+.oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
   border: 0;
   color: #000;
   cursor: pointer;
-  height: 20px;
+  height: 30px;
   opacity: 0.5;
   position: absolute;
+  width: 30px;
+}
+.oppia-delete-interaction-button,
+.oppia-close-popover-button {
   right: 8px;
   top: 8px;
-  width: 30px;
+}
+.oppia-delete-param-change-button {
+  right: -30px;
+  top: 0;
 }
 .oppia-delete-response-button,
 .oppia-delete-rule-button {
@@ -1171,12 +1175,15 @@ pre.oppia-pre-wrapped-text {
   top: 8px;
   width: 20px;
 }
+.oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover,
 .oppia-delete-response-button:hover,
 .oppia-delete-rule-button:hover {
   opacity: 1;
 }
+
+
 
 .oppia-graph-resize-button {
   border: 0;
@@ -1330,21 +1337,30 @@ oppia-parameter {
   white-space: nowrap;
 }
 
+.oppia-param-editor-row {
+  position: relative;
+}
+
+.oppia-param-display-row {
+  margin-bottom: 4px;
+}
+
+.oppia-param-arrow-buttons-container {
+  left: -40px;
+  top: 5px;
+}
+
 .oppia-param-arrow-button {
   border: 0;
   font-size: 14px;
   padding: 0;
 }
+.oppia-param-arrow-button:disabled {
+  color: #999;
+}
 
 .oppia-tutorial-tooltip {
   min-width: 400px !important;
-}
-
-.oppia-post-tutorial-popover {
-   display: block;
-   left: -77px;
-   top: 40px;
-   width: 200px;
 }
 
 /* Hide the search icon in the rule destination dropdown. */
@@ -2187,7 +2203,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-size: cover;
   height: 300px;
   padding: 20px;
-  position: relative; 
+  position: relative;
 }
 
 .oppia-info-card-content {
@@ -2200,7 +2216,7 @@ md-card.preview-conversation-skin-supplemental-card {
   line-height: 1;
   padding: 12px 0 24px 0;
   position: relative;
-  word-spacing: 0; 
+  word-spacing: 0;
 }
 
 .oppia-info-card-content .card-metrics {
@@ -2236,7 +2252,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-color: black;
   height: 20px;
   padding-top: 3px;
-  text-align: center; 
+  text-align: center;
   width: 20px;
 }
 

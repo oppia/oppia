@@ -44,7 +44,7 @@ oppia.filter('oppiaInteractiveContinueValidator', [
     if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
-        message: 'please specify what Oppia should do after the button is clicked.'
+        message: 'Please specify what Oppia should do after the button is clicked.'
       });
     }
 

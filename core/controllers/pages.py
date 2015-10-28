@@ -73,14 +73,6 @@ class ParticipatePage(base.BaseHandler):
         self.render_template('pages/participate.html')
 
 
-class EditorTutorialPage(base.BaseHandler):
-    """Page with a full editor tutorial."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('pages/editor_tutorial.html')
-
-
 class ForumPage(base.BaseHandler):
     """Page with an embedded forum."""
 

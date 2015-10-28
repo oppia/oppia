@@ -18,20 +18,24 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var OBJECT_EDITOR_TEMPLATES_URL = '/object_editor_template/';
-
 // Individual object editor directives are in extensions/objects/templates.
 
 oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
   return {
-    scope: {objType: '@', value: '=', initArgs: '=', alwaysEditable: '@', isEditable: '@'},
-    link: function(scope, element, attrs) {
+    scope: {
+      alwaysEditable: '@',
+      initArgs: '=',
+      isEditable: '@',
+      objType: '@',
+      value: '='
+    },
+    link: function(scope, element) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.
       var directiveName = scope.objType.replace(
-          /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+        /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
       if (directiveName) {
         element.html(
-            '<' + directiveName + '-editor></' + directiveName + '-editor>');
+          '<' + directiveName + '-editor></' + directiveName + '-editor>');
         $compile(element.contents())(scope);
       } else {
         $log.error('Error in objectEditor: no editor type supplied.');
