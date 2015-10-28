@@ -57,7 +57,6 @@ oppia.controller('ExplorationHistory', [
   // Compares the two selected versions and displays the comparison results.
   $scope.compareSelectedVersions = function() {
     if($scope.selectedVersionsArray.length === 2) {
-      console.log('comparing selected versions');
       $scope.changeCompareVersion();
       $scope.showHistoryGraph();
     }
@@ -114,7 +113,7 @@ oppia.controller('ExplorationHistory', [
       $scope.hideHistoryGraph = true;
 
       // Disable all comparisons if there are less than two revisions in total.
-      $scope.disableCompare = (currentVersion<2) ? true : false;
+      $scope.disableCompare = (currentVersion < 2);
 
       $scope.hideCompareVersionsButton = $scope.disableCompare;
 
@@ -125,7 +124,7 @@ oppia.controller('ExplorationHistory', [
         versionsTreeService.init(explorationSnapshots);
 
         // Re-populate snapshotOrderArray and explorationVersionMetadata when
-        // history is refreshed.
+        // history    is refreshed.
         $scope.snapshotOrderArray = [];
         $scope.explorationVersionMetadata = {};
         for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
@@ -298,9 +297,10 @@ oppia.controller('ExplorationHistory', [
       $scope.compareVersions && ($scope.selectedVersionsArray.length === 2));
   };
 
+  // Check if other checkboxes should be disabled once two are selected.
   $scope.isCheckboxDisabled = function(versionNumber) {
     if ($scope.selectedVersionsArray.length === 2) {
-      return !($scope.selectedVersionsArray.indexOf(versionNumber) > -1);
+      return ($scope.selectedVersionsArray.indexOf(versionNumber) == -1);
     }
     return false;
   };
