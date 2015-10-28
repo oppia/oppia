@@ -28,7 +28,7 @@ var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     enter: function(element, done) {
-      element.hide().slideDown()
+      element.hide().slideDown();
     },
     leave: function(element, done) {
       element.slideUp();
@@ -605,6 +605,8 @@ oppia.directive('answerFeedbackPair', [function() {
     scope: {
       answer: '&',
       feedback: '&',
+      oppiaAvatarImageUrl: '&',
+      profilePicture: '&',
       shortAnswer: '&'
     },
     templateUrl: 'components/answerFeedbackPair'

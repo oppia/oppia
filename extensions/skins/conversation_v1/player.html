@@ -57,7 +57,9 @@
               <div ng-if="!$last">
                 <answer-feedback-pair answer="responsePair.learnerAnswer"
                                       short-answer="responsePair.shortLearnerAnswer"
-                                      feedback="responsePair.oppiaFeedback">
+                                      feedback="responsePair.oppiaFeedback"
+                                      profile-picture="profilePicture"
+                                      oppia-avatar-image-url="oppiaAvatarImageUrl">
                 </answer-feedback-pair>
               </div>
             </div>
@@ -67,7 +69,9 @@
           <div class="conversation-skin-tutor-card-bottom-section" ng-if="activeCard.answerFeedbackPairs.length > 0">
             <answer-feedback-pair answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].learnerAnswer"
                                   short-answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].shortLearnerAnswer"
-                                  feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback">
+                                  feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback"
+                                  profile-picture="profilePicture"
+                                  oppia-avatar-image-url="oppiaAvatarImageUrl">
             </answer-feedback-pair>
           </div>
 
@@ -153,10 +157,12 @@
 <script type="text/ng-template" id="components/answerFeedbackPair">
   <div class="conversation-skin-learner-answer-container">
     <div class="conversation-skin-learner-answer-content" popover-placement="bottom" popover-template="'popover/answer'" popover-trigger="click" style="cursor: pointer;" ng-if="shortAnswer()">
+      <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
       <div class="conversation-skin-learner-answer" angular-html-bind="shortAnswer()">
       </div>
     </div>
     <div class="conversation-skin-learner-answer-content" ng-if="!shortAnswer()">
+      <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
       <div class="conversation-skin-learner-answer" angular-html-bind="answer()">
       </div>
     </div>
@@ -164,6 +170,7 @@
 
   <div class="conversation-skin-oppia-feedback-container" ng-if="feedback() !== ''">
     <div class="conversation-skin-oppia-feedback-content">
+      <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
       <div ng-if="feedback() === null">
         <div class="conversation-skin-feedback-dot-one"></div>
         <div class="conversation-skin-feedback-dot-two"></div>

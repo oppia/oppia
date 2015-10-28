@@ -54,14 +54,21 @@ html, body {
 .conversation-skin-oppia-avatar,
 .conversation-skin-user-avatar {
   height: 36px;
-  left: -40px;
   position: absolute;
   top: 0;
   width: 36px;
   z-index: 1;
 }
+.conversation-skin-oppia-avatar {
+  left: -38px;
+}
+
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
+  left: -38px;
   top: -2px;
+}
+.conversation-skin-learner-answer-content .conversation-skin-user-avatar {
+  right: -38px;
 }
 
 .conversation-skin-responses-dropdown-icon {
@@ -171,9 +178,9 @@ div.conversation-skin-tutor-card {
   content: " ";
   right: -8px;
   border-right: 8px solid transparent;
-  border-bottom: 12px solid #E8F5E9;
+  border-top: 12px solid #E8F5E9;
   position: absolute;
-  bottom: 0;
+  top: 0;
 }
 
 
