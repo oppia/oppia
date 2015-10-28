@@ -1,8 +1,9 @@
-describe("retrieving threads service", function() {
+describe('retrieving threads service', function() {
+  var expId = '12345';
   beforeEach(function() {
     module('oppia');
     module(function($provide) {
-      $provide.value('explorationData', { explorationId: '12345' });
+      $provide.value('explorationData', { explorationId: expId });
     });
   });
 
@@ -12,40 +13,69 @@ describe("retrieving threads service", function() {
     httpBackend = $httpBackend;
   }));
 
-  iit("should retrieve feeedback threads", function() {
-    var mockThreads = [
+  it('should retrieve feeedback threads', function() {
+    var mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
-        original_author_username: "test_author",
+        original_author_username: 'test_author',
         state_name: null,
-        has_suggestion: false,
-        status: "open",
-        subject: "example feedback",
+        status: 'open',
+        subject: 'example feedback',
         summary: null,
-        threadId: "abc1",
+        threadId: 'abc1',
+        suggestionId: ''
       },
       {
         last_updated: 1441870501230.642,
-        original_author_username: "test_author",
+        original_author_username: 'test_author',
         state_name: null,
-        has_suggestion: true,
-        status: "open",
-        subject: "example suggestion",
+        status: 'open',
+        subject: 'example suggestion',
         summary: null,
-        threadId: "abc2"
+        threadId: 'abc2',
+        suggestionId: ''
       }
     ];
 
-    httpBackend.whenGET("/threadlisthandler/12345").respond({
-      threads: mockThreads
+    var mockOpenSuggestionThreads = [
+      {
+        last_updated: 1441870501230.642,
+        original_author_username: 'test_author',
+        state_name: null,
+        status: 'open',
+        subject: 'example suggestion',
+        summary: null,
+        threadId: 'abc3',
+        suggestionId: '1'
+      },
+      {
+        last_updated: 1441870501230.642,
+        original_author_username: 'test_author',
+        state_name: null,
+        status: 'open',
+        subject: 'example suggestion',
+        summary: null,
+        threadId: 'abc4',
+        suggestionId: '2'
+      }
+    ];
+
+    httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+      threads: mockFeedbackThreads
     });
 
-    var result;
-    threadDataService.fetchThreads(function(){
-      result = true;
+    httpBackend.whenGET('/suggestionlisthandler/' + expId + '?type=open').respond({
+      threads: mockOpenSuggestionThreads
     });
+
+    threadDataService.fetchThreads();
     httpBackend.flush();
-    expect(result).toEqual(true);
-    expect(threadDataService.data.threadList).toEqual(mockThreads);
+
+    for (var i=0; i < mockFeedbackThreads.length; i++) {
+      expect(threadDataService.data.threadList).toContain(mockFeedbackThreads[i]);
+    }
+    for (var i=0; i < mockOpenSuggestionThreads.length; i++) {
+      expect(threadDataService.data.threadList).toContain(mockOpenSuggestionThreads[i]);
+    }
   });
 });
