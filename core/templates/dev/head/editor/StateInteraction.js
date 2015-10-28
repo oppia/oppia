@@ -18,8 +18,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
-
 // A state-specific cache for interaction details. It stores customization args
 // corresponding to an interaction id so that they can be restored if the
 // interaction is changed back while the user is still in this state. This
@@ -61,6 +59,8 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
       interactionDetailsCache, oppiaExplorationHtmlFormatterService) {
+
+  var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
   // interaction preview.

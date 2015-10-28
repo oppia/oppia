@@ -49,6 +49,7 @@ ATTRS_WHITELIST = {
     'li': [],
     'ol': [],
     'p': [],
+    'pre': [],
     'span': [],
     'strong': [],
     'table': ['border'],

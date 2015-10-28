@@ -13,36 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the page showing the user's explorations.
+ * @fileoverview Controllers for the page showing the user's explorations.
  *
  * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('MyExplorations', [
-    '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'ratingVisibilityService',
-    function($scope, $http, $rootScope, oppiaDatetimeFormatter, ratingVisibilityService) {
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  'ratingVisibilityService',
+  function(
+      $scope, $http, $rootScope, oppiaDatetimeFormatter,
+      ratingVisibilityService) {
+    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+        millisSinceEpoch);
+    };
 
-  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
-  };
+    $scope.areRatingsShown = function(ratingFrequencies) {
+      return ratingVisibilityService.areRatingsShown(ratingFrequencies);
+    };
 
-  $scope.areRatingsShown = function(ratingFrequencies) {
-    return ratingVisibilityService.areRatingsShown(ratingFrequencies);
-  };
-
-  $rootScope.loadingMessage = 'Loading';
-  $http.get('/myexplorationshandler/data').success(function(data) {
-    $scope.explorationsList = data.explorations_list;
-    $rootScope.loadingMessage = '';
-  });
-}]);
-
+    $rootScope.loadingMessage = 'Loading';
+    $http.get('/myexplorationshandler/data').success(function(data) {
+      $scope.explorationsList = data.explorations_list;
+      $rootScope.loadingMessage = '';
+    });
+  }
+]);
 
 oppia.controller('CreateExplorationButton', [
-    '$scope', 'CATEGORY_LIST', 'createExplorationButtonService',
-    function($scope, CATEGORY_LIST, createExplorationButtonService) {
-  $scope.showCreateExplorationModal = function() {
-    createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
-  };
-}]);
+  '$scope', 'CATEGORY_LIST', 'createExplorationButtonService',
+  function($scope, CATEGORY_LIST, createExplorationButtonService) {
+    $scope.showCreateExplorationModal = function() {
+      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+    };
+  }
+]);
