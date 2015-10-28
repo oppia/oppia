@@ -273,9 +273,9 @@ DEMO_EXPLORATIONS = [
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
-DEMO_COLLECTIONS = [
-    'welcome_to_collections.yaml'
-]
+DEMO_COLLECTIONS = {
+    u'0': 'welcome_to_collections.yaml'
+}
 
 # TODO(sll): Add all other URLs here.
 CONTRIBUTE_GALLERY_URL = '/contribute'

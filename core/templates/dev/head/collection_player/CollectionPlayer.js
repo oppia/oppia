@@ -23,7 +23,7 @@ oppia.constant(
 
 oppia.controller('CollectionPlayer', [
     '$scope', 'CollectionDataService', 'warningsData',
-    function($scope, collectionDataService, warningsData) {
+    function($scope, CollectionDataService, warningsData) {
 
   $scope.collection = null;
   $scope.collectionId = GLOBALS.collectionId;
@@ -35,7 +35,9 @@ oppia.controller('CollectionPlayer', [
         return collectionNode;
       }
     }
-    return undefined;
+    warningsData.addWarning('There was an error loading the collection.');
+    console.error('There was an error loading the collection.');
+    return null;
   };
 
   $scope.hasFinishedCollection = function() {
@@ -60,7 +62,7 @@ oppia.controller('CollectionPlayer', [
   };
 
   // Load the collection the learner wants to view.
-  collectionDataService.loadCollection(
+  CollectionDataService.loadCollection(
       $scope.collectionId, function(collection) {
     $scope.collection = collection;
   }, function(error, collectionId) {

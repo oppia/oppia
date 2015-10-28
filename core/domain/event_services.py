@@ -23,8 +23,8 @@ import inspect
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
-(stats_models,feedback_models,user_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback, models.NAMES.user])
+(stats_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import feconf
 
@@ -133,28 +133,11 @@ class CompleteExplorationEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(
-            cls, exp_id, exp_version, state_name, collection_id, user_id,
-            session_id, time_spent, params, play_type):
+            cls, exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type):
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
-
-        if user_id and collection_id:
-            exp_completion_model = (
-                user_models.ExplorationInCollectionCompletionModel.get_or_create(
-                    user_id, collection_id))
-
-            completed_explorations = set()
-            if 'exploration_ids' in exp_completion_model.context:
-                completed_explorations = set(exp_completion_model.context[
-                    'exploration_ids'])
-
-            if exp_id not in completed_explorations:
-                completed_explorations.add(exp_id)
-                exp_completion_model.context['exploration_ids'] = list(
-                    completed_explorations)
-                exp_completion_model.put()
-
 
 
 class StateHitEventHandler(BaseEventHandler):

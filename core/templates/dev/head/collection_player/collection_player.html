@@ -10,7 +10,7 @@
     <script type="text/javascript">
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
     </script>
-    
+
     <style>
       html, body {
         background-color: #eee;
@@ -43,10 +43,9 @@
 
         <div ng-repeat="collection_node in getSuggestedCollectionNodes()">
           <md-card layout="row" class="oppia-collection-player-tile protractor-test-collection-player-tile">
-            <a href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>" class="oppia-collection-player-tile-container-link" style="text-decoration: none;">
+            <a ng-href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>" class="oppia-collection-player-tile-container-link" style="text-decoration: none;">
               <div class="oppia-collection-player-tile-contents">
-                <span class="oppia-collection-player-tile-image-container"
-                      style="position: absolute;">
+                <span class="oppia-collection-player-tile-image-container">
                   <img class="oppia-collection-player-tile-image" ng-src="/images/gallery/exploration_background_teal_small.png">
                 </span>
 

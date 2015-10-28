@@ -155,9 +155,9 @@ class ExplorationInCollectionCompletionModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
     collection_id = ndb.StringProperty(required=True, indexed=True)
-    # Contains the list of explorations which have been completed within the
-    # context of the collection specified by the above ID.
-    context = ndb.JsonProperty(required=True, indexed=False, default={})
+    # The list of explorations which have been completed within the context of
+    # the collection represented by collection_id.
+    completed_explorations = ndb.StringProperty(repeated=True)
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -186,7 +186,7 @@ class ExplorationInCollectionCompletionModel(base_models.BaseModel):
     @classmethod
     def get_or_create(cls, user_id, collection_id):
         """Gets the ExplorationInCollectionCompletionModel for the given ids,
-        or creates a new entry with the given IDs if no such instance yet
+        or creates a new entry with the given ids if no such instance yet
         exists within the data store.
         """
         instance_model = cls.get(user_id, collection_id)

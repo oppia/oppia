@@ -317,6 +317,10 @@ def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
 
+def generate_new_session_id():
+    return generate_random_string(24)
+
+
 def vfs_construct_path(a, *p):
     """Mimics behavior of os.path.join on Posix machines."""
     path = a

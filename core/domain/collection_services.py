@@ -264,9 +264,7 @@ def get_completed_exploration_ids(user_id, collection_id):
     """
     completion_model = user_models.ExplorationInCollectionCompletionModel.get(
         user_id, collection_id)
-    if completion_model:
-        return completion_model.context['exploration_ids']
-    return []
+    return completion_model.completed_explorations if completion_model else []
 
 
 def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
@@ -670,7 +668,7 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
 
 def delete_demo(collection_id):
     """Deletes a single demo collection."""
-    if not (0 <= int(collection_id) < len(feconf.DEMO_COLLECTIONS)):
+    if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)
 
     collection = get_collection_by_id(collection_id, strict=False)
@@ -695,7 +693,7 @@ def load_demo(collection_id):
 
     demo_filepath = os.path.join(
         feconf.SAMPLE_COLLECTIONS_DIR,
-        feconf.DEMO_COLLECTIONS[int(collection_id)])
+        feconf.DEMO_COLLECTIONS[collection_id])
 
     if demo_filepath.endswith('yaml'):
         yaml_content = utils.get_file_contents(demo_filepath)
@@ -718,6 +716,20 @@ def load_demo(collection_id):
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
+
+
+def record_played_exploration_in_collection_context(
+        user_id, collection_id, exploration_id):
+    completion_model = (
+        user_models.ExplorationInCollectionCompletionModel.get_or_create(
+            user_id, collection_id))
+
+    completed_explorations = copy.deepcopy(
+        completion_model.completed_explorations)
+    if exploration_id not in completed_explorations:
+        completed_explorations.append(exploration_id)
+        completion_model.completed_explorations = completed_explorations
+        completion_model.put()
 
 
 # TODO(bhenning): Cleanup search logic and abstract it between explorations and

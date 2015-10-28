@@ -70,7 +70,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
     def _record_complete(self, exp_id, exp_version, state, session_id):
         event_services.CompleteExplorationEventHandler.record(
-            exp_id, exp_version, state, None, None, session_id, 27, {},
+            exp_id, exp_version, state, session_id, 27, {},
             feconf.PLAY_TYPE_NORMAL)
 
     def _record_state_hit(self, exp_id, exp_version, state, session_id):

@@ -95,11 +95,7 @@ class AdminPage(base.BaseHandler):
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
 
-        demo_collection_ids = [
-            ind for ind in enumerate(feconf.DEMO_COLLECTIONS)]
-        demo_collections = [
-            (unicode(ind), yaml_file_name) for ind, yaml_file_name
-            in enumerate(feconf.DEMO_COLLECTIONS)]
+        demo_collection_ids = feconf.DEMO_COLLECTIONS.keys()
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
@@ -134,10 +130,10 @@ class AdminPage(base.BaseHandler):
 
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
+            'demo_collections': feconf.DEMO_COLLECTIONS.iteritems(),
+            'demo_collection_ids': demo_collection_ids,
             'demo_explorations': demo_explorations,
             'demo_exploration_ids': demo_exploration_ids,
-            'demo_collections': demo_collections,
-            'demo_collection_ids': demo_collection_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),

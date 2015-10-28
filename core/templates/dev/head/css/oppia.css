@@ -1110,6 +1110,7 @@ md-card.oppia-collection-player-tile {
   left: 0;
   top: 0;
   width: 120px;
+  position: absolute;
 }
 /* This centers the image horizontally and vertically. */
 .oppia-collection-player-tile-image {

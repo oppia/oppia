@@ -19,48 +19,30 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-// TODO(bhenning): For preview mode, this service should be omitted. Instead,
-// a separate collectionDataService should be created which serves a local copy
-// of the collection instead.
+// TODO(bhenning): For preview mode, this service should be replaced by a
+// separate collectionDataService implementation which returns a local copy of
+// the collection instead. This file should not be included on the page in that
+// scenario.
 oppia.factory('CollectionDataService', [
     '$http', 'COLLECTION_DATA_URL', 'UrlInterpolationService',
-    function($http, COLLECTION_DATA_URL, urlInterpolationService) {
+    function($http, COLLECTION_DATA_URL, UrlInterpolationService) {
 
   // Maps previously loaded collections to their IDs.
   var _collectionCache = [];
 
-  // This inserts an extra 'exploration' object into each node. The object
-  // includes the exploration ID and additional meta-information regarding the
-  // exploration that is useful for collection pages (such as the exploration
-  // title).
-  var _populateExplorationsInNodes = function(collection, explorationTitles) {
-    for (var i = 0; i < collection.nodes.length; i++) {
-      var collectionNode = collection.nodes[i];
-      collectionNode.exploration = {
-        'id': collectionNode.exploration_id,
-        'title': explorationTitles[collectionNode.exploration_id]
-      };
-    }
-    return collection;
-  };
-
-  // TODO(bhenning): Figure out what to do about versioning. Should the version
-  // be specified when a collection is fetched?
   var _fetchCollection = function(
       collectionId, successCallback, errorCallback) {
-    var collectionDataUrl = urlInterpolationService.interpolateUrl(
+    var collectionDataUrl = UrlInterpolationService.interpolateUrl(
       COLLECTION_DATA_URL, {'collection_id': collectionId});
 
     $http.get(collectionDataUrl).success(function(data) {
-      var collection = _populateExplorationsInNodes(
-        angular.copy(data.collection), data.exploration_titles);
-      collection.next_exploration_ids = data.next_exploration_ids;
+      var collection = angular.copy(data.collection);
       if (successCallback) {
         successCallback(collection);
       }
     }).error(function(data) {
       if (errorCallback) {
-        errorCallback(data ? data.error : null, collectionId);
+        errorCallback(data ? data.error : null);
       }
     });
   };
@@ -90,8 +72,7 @@ oppia.factory('CollectionDataService', [
      * the collection from the backend, it will store it in the cache to avoid
      * requests from the backend in further function calls.
      *
-     * Note: successCallback may be called before this function returns in the
-     * case that the collection has already been fetched from the backend.
+     * Note: successCallback may be called before this function returns.
      */
     loadCollection: function(collectionId, successCallback, errorCallback) {
       if (_isCached(collectionId)) {

@@ -19,7 +19,8 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-oppia.factory('UrlInterpolationService', [function() {
+oppia.factory('UrlInterpolationService', [
+    'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
   return {
     /**
      * Given a formatted URL, interpolates the URL by inserting values the URL
@@ -34,19 +35,23 @@ oppia.factory('UrlInterpolationService', [function() {
      *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
      *
      * If a URL requires a value which is not keyed within the
-     * interpolationValues object, it will return null.
+     * interpolationValues object, this will return null.
      */
     interpolateUrl: function(formattedUrl, interpolationValues) {
-      var pattern = /<(\w+)>/;
+      var INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
+
       var filledUrl = angular.copy(formattedUrl);
-      var match = filledUrl.match(pattern);
+      var match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       while (match) {
         var varName = match[1];
         if (!interpolationValues.hasOwnProperty(varName)) {
           return null;
         }
-        filledUrl = filledUrl.replace(pattern, interpolationValues[varName]);
-        match = filledUrl.match(pattern);
+        filledUrl = filledUrl.replace(
+          INTERPOLATION_VARIABLE_REGEX,
+          oppiaHtmlEscaper.unescapedStrToEscapedStr(
+            interpolationValues[varName]));
+        match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       }
       return filledUrl;
     }

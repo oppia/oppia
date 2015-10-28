@@ -499,10 +499,9 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
         self.assertGreaterEqual(
             len(feconf.DEMO_COLLECTIONS), 1,
             msg='There must be at least one demo collection.')
-        for ind in range(len(feconf.DEMO_COLLECTIONS)):
+        for collection_id in feconf.DEMO_COLLECTIONS:
             start_time = datetime.datetime.utcnow()
 
-            collection_id = str(ind)
             collection_services.load_demo(collection_id)
             collection = collection_services.get_collection_by_id(
                 collection_id)
@@ -518,8 +517,8 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
             collection_models.CollectionModel.get_collection_count(),
             len(feconf.DEMO_COLLECTIONS))
 
-        for ind in range(len(feconf.DEMO_COLLECTIONS)):
-            collection_services.delete_demo(str(ind))
+        for collection_id in feconf.DEMO_COLLECTIONS:
+            collection_services.delete_demo(collection_id)
         self.assertEqual(
             collection_models.CollectionModel.get_collection_count(), 0)
 
