@@ -45,7 +45,7 @@ describe('Interactions', function() {
           null, [interactionId].concat(test.interactionArguments));
 
         editor.addResponse.apply(null, [
-          interactionId, forms.toRichText('yes'), 'first', false
+          interactionId, forms.toRichText('yes'), null, false
         ].concat(test.ruleArguments));
 
         if (!defaultOutcomeSet) {

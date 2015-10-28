@@ -26,7 +26,8 @@ var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 // constants
-var _OPTION_CREATE_NEW = 'A New Card Called...';
+var _NEW_STATE_OPTION = 'A New Card Called...';
+var _CURRENT_STATE_OPTION = '(try again)'
 
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
@@ -457,35 +458,39 @@ var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
 };
 
 var _setOutcomeDest = function(destEditorElem, destName, createDest) {
+  expect(destName === null && createDest).toBe(false)
   var destinationElement =
     destEditorElem.element(by.css('.protractor-test-dest-bubble'));
 
-  var targetOption = createDest ? _OPTION_CREATE_NEW : destName;
-  _getStateName().then(function(name) {
-    if (name == destName) {
-      // Looping, change the target option.
-      targetOption = '(try again)';
-    }
+  if (createDest) {
+    targetOption = _NEW_STATE_OPTION;
+  } else if (destName === null) {
+    targetOption = _CURRENT_STATE_OPTION;
+  } else {
+    targetOption = destName;
+  }
 
+  destinationElement.element(
+    by.cssContainingText('option', targetOption)).click();
+  if (createDest) {
     destinationElement.element(
-      by.cssContainingText('option', targetOption)).click();
-
-    if (createDest) {
-      element(by.css('.protractor-test-add-state-input')).sendKeys(destName);
-    }
-  });
+      by.css('.protractor-test-add-state-input')
+    ).sendKeys(destName);
+  }
 };
 
 // This clicks the "add new response" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
+// - interactionId: the name of the interaction type, e.g. NumericInput.
+// - feedbackInstructions: a rich-text object containing feedback, or null.
+// - destStateName: the name of the destination state of the rule, or null if
+//     the rule loops to the current state.
+// - createState: true if the rule creates a new state, else false.
+// - ruleName: the name of the rule, e.g. IsGreaterThan.
 //
 // Note that feedbackInstructions may be null (which means 'specify no
 // feedback'), and only represents a single feedback element.
-//
-// - 'destStateName' is the state name to select as the destination.
-// - 'createState' specifies the destination state should be created within the
-//   dialog as part of adding this rule.
 var addResponse = function(interactionId, feedbackInstructions, destStateName,
     createState, ruleName) {
 
@@ -575,9 +580,10 @@ var ResponseEditor = function(responseNum) {
       element(by.css('.protractor-test-save-outcome-feedback')).click();
     },
     // This saves the rule after the destination is selected.
-    // Note that the supplied 'destinationName' must be an existing state. If
-    // 'createState' is true, it will attempt to create a state named after the
-    // input 'destinationName'.
+    //  - destinationName: The name of the state to move to, or null to stay on
+    //    the same state.
+    //  - createState: whether the destination state is new and must be created
+    //    at this point.
     setDestination: function(destinationName, createState) {
       // Begin editing destination.
       element(by.css('.protractor-test-open-outcome-dest-editor')).click();
@@ -595,10 +601,11 @@ var ResponseEditor = function(responseNum) {
       // Begin editing destination.
       element(by.css('.protractor-test-open-outcome-dest-editor')).click();
 
-      var expectedOptionTexts = ['(try again)'].concat(stateNames.slice(1));
+      var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
+        stateNames.slice(1));
 
       // Create new option always at the end of the list.
-      expectedOptionTexts.push(_OPTION_CREATE_NEW);
+      expectedOptionTexts.push(_NEW_STATE_OPTION);
 
       var destElement = element(by.css(
         '.protractor-test-edit-outcome-dest'));
