@@ -10,7 +10,7 @@
       ui-sortable documentation for more details. -->
       <!-- Note that adding "track by $index" here seems to mess up the final
       index in the stop() event handler. -->
-      <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
+      <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
         <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
@@ -22,8 +22,10 @@
             </span>
           </div>
         </a>
-        <span ng-if="rules.length > 1">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" ng-if="isEditable" class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer" ng-click="deleteRule($index)">
+        <span ng-if="isEditable && rules.length > 1"
+              class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
+              ng-click="deleteRule($index)">
+          <i class="material-icons md-18">&#xE5CD;</i>
         </span>
 
         <div ng-if="activeRuleIndex === $index">
@@ -45,7 +47,7 @@
   <br ng-if="rules">
 
   <div ng-if="!feedbackEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this response' : '']>">
-    <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
+    <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button" ng-class="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor" ng-if="isEditable" ng-click="openFeedbackEditor()">
         </div>
@@ -89,7 +91,7 @@
   <br>
 
   <div ng-if="!destinationEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Change the destination card' : '']>">
-    <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
+    <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button" ng-class="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor" ng-if="isEditable" ng-click="openDestinationEditor()">
         </div>

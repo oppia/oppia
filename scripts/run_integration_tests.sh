@@ -94,20 +94,24 @@ fi
 echo Checking whether Protractor is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
   echo Installing Protractor
-  $NPM_INSTALL protractor@1.2.0
+  $NPM_INSTALL protractor@2.5.0
 fi
-# Ensure the Protractor version is set to 1.2.0 in the current branch until the
-# update to Protractor v2 is merged into 'develop'.
 PROTRACTOR_VERSION=$($NPM_CMD list protractor)
-if [[ $PROTRACTOR_VERSION != *"1.2.0"* ]]; then
-  echo Changing Protractor version to 1.2.0.
-  $NPM_INSTALL protractor@1.2.0
+if [[ $PROTRACTOR_VERSION != *"2.5.0"* ]]; then
+  echo Changing Protractor version to 2.5.0.
+  $NPM_INSTALL protractor@2.5.0
 fi
 
 echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
   echo Installing Protractor screenshot reporter
   $NPM_INSTALL protractor-screenshot-reporter@0.0.5
+fi
+
+echo Checking whether Jasmine spec reporter is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/jasmine-spec-reporter" ]; then
+  echo Installing Jasmine spec reporter
+  $NPM_INSTALL jasmine-spec-reporter@2.2.2
 fi
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update
@@ -127,10 +131,12 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
-# Start a selenium process.
-($NODE_MODULE_DIR/.bin/webdriver-manager start )&
+# Start a selenium process. The program sends thousands of lines of useless
+# info logs to stderr so we discard them.
+# TODO(jacob): Find a webdriver or selenium argument that controls log level.
+($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical .)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
@@ -144,7 +150,7 @@ fi
 # Parse additional command line arguments that may be passed to protractor.
 # Credit: http://stackoverflow.com/questions/192249
 SHARDING=true
-SHARD_INSTANCES=5
+SHARD_INSTANCES=3
 for i in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
   # case label, based on a pattern. E.g. Match to -sharding=*, where the

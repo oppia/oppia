@@ -18,16 +18,17 @@
  * @author sll@google.com (Sean Lip)
  */
 
-
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('createExplorationButtonService', [
-    '$filter', '$http', '$modal', '$timeout', '$rootScope', 'validatorsService', 'warningsData', 'focusService',
-    function($filter, $http, $modal, $timeout, $rootScope, validatorsService, warningsData, focusService) {
-  var createExplorationButtonService = {
-    _getCreateModalInstance: function(categoryList, isUploadModal) {
+  '$filter', '$http', '$modal', '$timeout', '$rootScope',
+  'validatorsService', 'warningsData', 'focusService',
+  function(
+      $filter, $http, $modal, $timeout, $rootScope,
+      validatorsService, warningsData, focusService) {
+    var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
-        templateUrl: 'modals/galleryCreateNew',
         backdrop: true,
+        templateUrl: 'modals/galleryCreateNew',
         resolve: {
           categoriesForDropdown: function() {
             var result = [];
@@ -46,7 +47,8 @@ oppia.factory('createExplorationButtonService', [
         },
         controller: [
           '$scope', '$modalInstance', 'categoriesForDropdown', 'isUploadModal',
-          function($scope, $modalInstance, categoriesForDropdown, isUploadModal) {
+          function(
+              $scope, $modalInstance, categoriesForDropdown, isUploadModal) {
             $scope.categoriesForDropdown = categoriesForDropdown;
             $scope.newExplorationTitle = '';
             $scope.newExplorationCategory = '';
@@ -57,21 +59,22 @@ oppia.factory('createExplorationButtonService', [
 
             $scope.getAllLanguageCodes = function() {
               return GLOBALS.ALL_LANGUAGE_CODES;
-            }
+            };
 
-            $scope.save = function(title, newCategory, objective, languageCode) {
+            $scope.save = function(title, category, objective, languageCode) {
               if (!$scope.isTitleValid(title)) {
                 return;
               }
 
-              if (!newCategory) {
-                warningsData.addWarning('Please specify a category for this exploration.');
+              if (!category) {
+                warningsData.addWarning(
+                  'Please specify a category for this exploration.');
                 return;
               }
 
               var returnObj = {
-                title: title,
-                category: newCategory,
+                category: category,
+                title: title
               };
 
               if ($scope.isUploadModal) {
@@ -91,7 +94,6 @@ oppia.factory('createExplorationButtonService', [
 
             // Checks the validity of exploration title.
             $scope.isTitleValid = function(title, changedAtLeastOnce) {
-
               if (changedAtLeastOnce) {
                 $scope.changedAtLeastOnce = true;
               }
@@ -119,7 +121,7 @@ oppia.factory('createExplorationButtonService', [
         ]
       });
 
-      modalInstance.opened.then(function(data) {
+      modalInstance.opened.then(function() {
         // The $timeout seems to be needed in order to give the modal time to
         // render.
         $timeout(function() {
@@ -128,74 +130,76 @@ oppia.factory('createExplorationButtonService', [
       });
 
       return modalInstance;
-    },
-    showCreateExplorationModal: function(categoryList) {
-      warningsData.clear();
+    };
 
-      createExplorationButtonService._getCreateModalInstance(
-          categoryList, false).result.then(function(result) {
-        var category = $filter('normalizeWhitespace')(result.category);
-        if (!validatorsService.isValidEntityName(category, true)) {
-          return;
-        }
+    return {
+      showCreateExplorationModal: function(categoryList) {
+        warningsData.clear();
 
-        $rootScope.loadingMessage = 'Creating exploration';
-        $http.post('/contributehandler/create_new', {
-          title: result.title,
-          category: category,
-          objective: $filter('normalizeWhitespace')(result.objective),
-          language_code: result.languageCode
-        }).success(function(data) {
-          window.location = '/create/' + data.explorationId;
-        }).error(function(data) {
-          $rootScope.loadingMessage = '';
+        getModalInstance(categoryList, false).result.then(function(result) {
+          var category = $filter('normalizeWhitespace')(result.category);
+          if (!validatorsService.isValidEntityName(category, true)) {
+            return;
+          }
+
+          $rootScope.loadingMessage = 'Creating exploration';
+          $http.post('/contributehandler/create_new', {
+            category: category,
+            language_code: result.languageCode,
+            objective: $filter('normalizeWhitespace')(result.objective),
+            title: result.title
+          }).success(function(data) {
+            window.location = '/create/' + data.explorationId;
+          }).error(function() {
+            $rootScope.loadingMessage = '';
+          });
         });
-      });
-    },
-    showUploadExplorationModal: function(categoryList) {
-      warningsData.clear();
+      },
+      showUploadExplorationModal: function(categoryList) {
+        warningsData.clear();
 
-      createExplorationButtonService._getCreateModalInstance(
-          categoryList, true).result.then(function(result) {
-        var title = result.title;
-        var category = $filter('normalizeWhitespace')(result.category);
-        var yamlFile = result.yamlFile;
+        getModalInstance(categoryList, true).result.then(function(result) {
+          var title = result.title;
+          var category = $filter('normalizeWhitespace')(result.category);
+          var yamlFile = result.yamlFile;
 
-        if (!validatorsService.isValidEntityName(category, true)) {
-          return;
-        }
+          if (!validatorsService.isValidEntityName(category, true)) {
+            return;
+          }
 
-        $rootScope.loadingMessage = 'Creating exploration';
+          $rootScope.loadingMessage = 'Creating exploration';
 
-        var form = new FormData();
-        form.append('yaml_file', yamlFile);
-        form.append(
-          'payload', JSON.stringify({category: category, title: title}));
-        form.append('csrf_token', GLOBALS.csrf_token);
+          var form = new FormData();
+          form.append('yaml_file', yamlFile);
+          form.append('payload', JSON.stringify({
+            category: category,
+            title: title
+          }));
+          form.append('csrf_token', GLOBALS.csrf_token);
 
-        $.ajax({
-          url: 'contributehandler/upload',
-          data: form,
-          processData: false,
-          contentType: false,
-          type: 'POST',
-          dataFilter: function(data, type) {
-            // Remove the XSSI prefix.
-            return JSON.parse(data.substring(5));
-          },
-          dataType: 'text'
-        }).done(function(data) {
-          window.location = '/create/' + data.explorationId;
-        }).fail(function(data) {
-          var transformedData = data.responseText.substring(5);
-          var parsedResponse = JSON.parse(transformedData);
-          warningsData.addWarning(
-            parsedResponse.error || 'Error communicating with server.');
-          $rootScope.loadingMessage = '';
-          $scope.$apply();
+          $.ajax({
+            contentType: false,
+            data: form,
+            dataFilter: function(data) {
+              // Remove the XSSI prefix.
+              return JSON.parse(data.substring(5));
+            },
+            dataType: 'text',
+            processData: false,
+            type: 'POST',
+            url: 'contributehandler/upload'
+          }).done(function(data) {
+            window.location = '/create/' + data.explorationId;
+          }).fail(function(data) {
+            var transformedData = data.responseText.substring(5);
+            var parsedResponse = JSON.parse(transformedData);
+            warningsData.addWarning(
+              parsedResponse.error || 'Error communicating with server.');
+            $rootScope.loadingMessage = '';
+            $scope.$apply();
+          });
         });
-      });
-    }
-  };
-  return createExplorationButtonService;
-}]);
+      }
+    };
+  }
+]);
