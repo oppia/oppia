@@ -33,11 +33,10 @@ var customizeComponent = function(modal, heading, contentInstructions) {
 };
 
 var expectComponentDetailsToMatch = function(elem, heading, contentInstructions) {
-  expect(
-    elem.element(by.css('.protractor-test-collapsible-heading')).getText()
-  ).toMatch(heading);
+  headerElement = elem.element(by.css('.protractor-test-collapsible-heading'))
+  expect(headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
-  elem.element(by.css('.glyphicon-plus-sign')).click();
+  headerElement.click();
   general.waitForSystem();
   forms.expectRichText(
     elem.element(by.css('.panel-body')).element(by.xpath('./div'))
