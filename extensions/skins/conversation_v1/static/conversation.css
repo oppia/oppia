@@ -150,6 +150,22 @@ md-card.conversation-skin-tutor-card {
   position: relative;
 }
 
+.conversation-skin-tutor-card-top-content {
+  background-color: #e6e6ff;
+  border-radius: 4px;
+  margin-top: -4px;
+  padding: 8px;
+  position: relative;
+}
+.conversation-skin-tutor-card-top-content::after {
+  border-left: 24px solid transparent;
+  border-top: 24px solid #e6e6ff;
+  content: "";
+  left: -16px;
+  position: absolute;
+  top: 0;
+}
+
 .conversation-skin-tutor-card-bottom-section .conversation-skin-user-avatar,
 .conversation-skin-tutor-card-bottom-section .conversation-skin-oppia-avatar,
 .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
