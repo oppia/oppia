@@ -634,6 +634,13 @@ oppia.factory('ratingService', [
   };
 }]);
 
+oppia.factory('speechService', ['$scope', function($scope) {
+  return {
+    getSpokenText: function(componentId, componentCustomizations) {
+      return "string";
+    }
+  };
+}]);
 
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',

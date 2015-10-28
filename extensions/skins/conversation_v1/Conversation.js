@@ -163,11 +163,11 @@ oppia.directive('conversationSkin', [function() {
     scope: {},
     templateUrl: 'skins/Conversation',
     controller: [
-        '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
+        '$scope', '$timeout', '$rootScope', '$window', 'messengerService', 'oppiaHtmlEscaper',
         'oppiaPlayerService', 'urlService', 'focusService', 'ratingService',
         'windowDimensionsService',
         function(
-          $scope, $timeout, $rootScope, $window, messengerService,
+          $scope, $timeout, $rootScope, $window, messengerService, oppiaHtmlEscaper, 
           oppiaPlayerService, urlService, focusService, ratingService,
           windowDimensionsService) {
 
@@ -284,7 +284,20 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.readSelectedTextAloud = function() {
-        var defaultMessage = 'Clicking this button will read highlighted text aloud';
+        content = $scope.activeCard.contentHtml;
+        var el = document.createElement('div');
+        var snips = "";
+        el.innerHTML = content;
+        for (var i = 0; i < el.childNodes[0].childNodes.length; i ++) {
+          if (el.childNodes[0].childNodes[i].nodeName == "#text") {
+            snips = snips + el.childNodes[0].childNodes[i].nodeValue;
+          };
+          if (el.childNodes[0].childNodes[i].nodeName == "OPPIA-NONINTERACTIVE-LINK") {
+            snips = snips + "Non Interactive Link. ";
+            snips = snips + oppiaHtmlEscaper.escapedStrToUnescapedStr(el.childNodes[0].childNodes[1].attributes.item(1).nodeValue);
+          };
+        };
+        var defaultMessage = snips;
         var selectedText =  $window.getSelection();
         if (selectedText == '') {
           var readText = new SpeechSynthesisUtterance(defaultMessage);
@@ -294,6 +307,7 @@ oppia.directive('conversationSkin', [function() {
         readText.lang = 'en-US';
         $window.speechSynthesis.speak(readText);
       };
+
 
       $scope.resetVisiblePanel = function() {
         if ($scope.panels.length === 0) {
