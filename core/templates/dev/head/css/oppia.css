@@ -1159,15 +1159,20 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-delete-param-change-button,
 .oppia-delete-interaction-button,
-.oppia-close-popover-button {
+.oppia-close-popover-button,
+.oppia-delete-list-entry-button {
   background: none;
   border: 0;
   color: #000;
   cursor: pointer;
   height: 30px;
   opacity: 0.5;
-  position: absolute;
   width: 30px;
+}
+.oppia-delete-param-change-button,
+.oppia-delete-interaction-button,
+.oppia-close-popover-button {
+  position: absolute;
 }
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
@@ -1187,11 +1192,15 @@ pre.oppia-pre-wrapped-text {
   top: 8px;
   width: 20px;
 }
+.oppia-delete-list-entry-button {
+  margin-top: 6px;
+}
 .oppia-delete-param-change-button:hover,
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover,
 .oppia-delete-response-button:hover,
-.oppia-delete-rule-button:hover {
+.oppia-delete-rule-button:hover,
+.oppia-delete-list-entry-button:hover {
   opacity: 1;
 }
 

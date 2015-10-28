@@ -577,7 +577,7 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var fixSupplementOnScroll = function() {
-        var supplementCard = $('md-card.conversation-skin-supplemental-card');
+        var supplementCard = $('div.conversation-skin-supplemental-card');
         var topMargin = $('.navbar-container').height() - 20;
         if ($(window).scrollTop() > topMargin) {
           supplementCard.addClass('conversation-skin-supplemental-card-fixed');
@@ -605,8 +605,6 @@ oppia.directive('answerFeedbackPair', [function() {
     scope: {
       answer: '&',
       feedback: '&',
-      oppiaAvatarImageUrl: '&',
-      profilePicture: '&',
       shortAnswer: '&'
     },
     templateUrl: 'components/answerFeedbackPair'
