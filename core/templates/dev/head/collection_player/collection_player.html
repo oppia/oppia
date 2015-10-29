@@ -9,6 +9,7 @@
   {% if collection_id %}
     <script type="text/javascript">
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+      GLOBALS.isLoggedIn = Boolean(JSON.parse('{{is_logged_in|js_string}}'));
     </script>
 
     <style>
@@ -35,16 +36,21 @@
     <div ng-if="collection" class="oppia-collection-player-tiles-area">
       <div class="oppia-collection-player-tiles-container">
         <div ng-if="!hasFinishedCollection()" class="oppia-collection-player-tiles-header">
-          <span>Begin by playing or continue where you left off:</span>
+          <span ng-if="!hasStartedCollection()">Begin by playing:</span>
+          <span ng-if="hasStartedCollection()">Continue where you left off:</span>
         </div>
         <div ng-if="hasFinishedCollection()" class="oppia-collection-player-tiles-header">
-          <span>You have finished the collection! Feel free to replay any explorations in this collection.</span>
+          <span>You have finished the collection! Feel free to replay any explorations below.</span>
         </div>
 
-        <div ng-repeat="collection_node in getSuggestedCollectionNodes()">
+        {% if not is_logged_in %}
+          <span class="oppia-collection-player-small-text">You must login to save your progress.</span>
+        {% endif %}
+
+        <div ng-repeat="collection_node in getDisplayedCollectionNodes()">
           <md-card layout="row" class="oppia-collection-player-tile protractor-test-collection-player-tile">
             <a ng-href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>" class="oppia-collection-player-tile-container-link" style="text-decoration: none;">
-              <div class="oppia-collection-player-tile-contents">
+              <div ng-class="{'oppia-collection-player-finished-exploration-tile': collection_node.exploration.completed}" class="oppia-collection-player-tile-contents">
                 <span class="oppia-collection-player-tile-image-container">
                   <img class="oppia-collection-player-tile-image" ng-src="/images/gallery/exploration_background_teal_small.png">
                 </span>
@@ -58,6 +64,14 @@
             </a>
           </md-card>
         </div>
+
+        {% if is_logged_in %}
+          <br>
+          <a class="oppia-collection-player-small-text" ng-click="toggleShowAllExplorations()">
+            <span ng-if="!hasFinishedCollection() && !showingAllExplorations">Show all explorations</span>
+            <span ng-if="!hasFinishedCollection() && showingAllExplorations">Show current progress</span>
+          </a>
+        {% endif %}
       </div>
     </div>
   </div>

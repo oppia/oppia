@@ -1123,8 +1123,9 @@ md-card.oppia-collection-player-tile {
   padding: 23px 58px;
   width: 100%;
 }
-.oppia-collection-player-tile-contents:hover {
-  text-decoration: none;
+
+.oppia-collection-player-finished-exploration-tile {
+  opacity: 0.5;
 }
 
 .oppia-collection-player-tile-details {
@@ -1135,6 +1136,10 @@ md-card.oppia-collection-player-tile {
 .oppia-collection-player-tile-title {
   color: #333;
   font-weight: bold;
+}
+.oppia-collection-player-small-text {
+  font-style: italic;
+  font-size: 1em;
 }
 
 @media (max-width: 365px) {

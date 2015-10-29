@@ -67,6 +67,7 @@ class CollectionPage(base.BaseHandler):
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
             ),
+            'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
             'is_private': rights_manager.is_collection_private(collection_id),
@@ -102,6 +103,7 @@ class CollectionDataHandler(base.BaseHandler):
         # TODO(bhenning): Users should not be recommended explorations they
         # have completed outside the context of a collection.
         next_exploration_ids = None
+        completed_exploration_ids = None
         if self.user_id:
             completed_exploration_ids = (
                 collection_services.get_completed_exploration_ids(
@@ -109,13 +111,16 @@ class CollectionDataHandler(base.BaseHandler):
             next_exploration_ids = collection.get_next_exploration_ids(
                 completed_exploration_ids)
         else:
-            # If the user is not logged in or they have not completed any of the
-            # explorations yet within the context of this collection, recommend the
-            # initial explorations.
+            # If the user is not logged in or they have not completed any of
+            # the explorations yet within the context of this collection,
+            # recommend the initial explorations.
             next_exploration_ids = collection.init_exploration_ids
+            completed_exploration_ids = []
 
         collection_dict = collection.to_dict()
         collection_dict['next_exploration_ids'] = next_exploration_ids
+        collection_dict['completed_exploration_ids'] = (
+            completed_exploration_ids)
 
         # Insert an 'exploration' dict into each collection node, where the
         # dict includes meta information about the exploration (ID and title).
