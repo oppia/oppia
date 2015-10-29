@@ -41,7 +41,7 @@ oppia.controller('ExplorationHistory', [
    * comparison), and whose values are an object containing 'newestStateName',
    * 'originalStateName' and 'stateProperty'.
    */
-   
+
   $scope.explorationVersionMetadata = null;
   $scope.snapshotOrderArray = [];
   var explorationSnapshots = null;
@@ -49,11 +49,19 @@ oppia.controller('ExplorationHistory', [
   var nodesData = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
+      $scope.clearAllCheckboxes();
     if (data.forceRefresh || $scope.explorationVersionMetadata === null) {
       $scope.refreshVersionHistory();
     }
   });
 
+  // Uncheck all checkboxes when page is refreshed
+  $scope.clearAllCheckboxes = function() {
+    angular.forEach($scope.snapshotOrderArray, function(versionCheckbox) {
+      versionCheckbox.selected = false;
+    }); 
+  };
+  
   // Compares the two selected versions and displays the comparison results.
   $scope.compareSelectedVersions = function() {
     if($scope.selectedVersionsArray.length === 2) {
@@ -95,9 +103,6 @@ oppia.controller('ExplorationHistory', [
     explorationData.getData().then(function(data) {
       var currentVersion = data.version;
       /**
-       * $scope.compareVersions is an object with keys 'selectedVersion1' and
-       * 'selectedVersion2', whose values are the version numbers of the
-       * compared versions selected on the left and right radio buttons.
        * $scope.compareVersionMetadata is an object with keys 'earlierVersion' and
        * 'laterVersion' whose values are the metadata of the compared versions,
        * containing 'committerId', 'createdOn', 'commitMessage', and 'versionNumber'.
@@ -135,9 +140,8 @@ oppia.controller('ExplorationHistory', [
             'commitMessage': explorationSnapshots[i].commit_message,
             'versionNumber': explorationSnapshots[i].version_number
           };
-          $scope.snapshotOrderArray.push(explorationSnapshots[i].version_number);
+          $scope.snapshotOrderArray.push({vnum:explorationSnapshots[i].version_number, selected:false});
         }
-
         $rootScope.loadingMessage = ''; 
       }); 
 

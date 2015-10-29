@@ -18,23 +18,23 @@
     <h3>List of Changes</h3>
     <div ng-repeat="versionNumber in snapshotOrderArray" class="row">
       <div class="col-sm-2 col-md-2 col-lg-2">
-        <input type="checkbox" name="compareVer" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" ng-hide="disableCompare" class='protractor-test-history-v1-selector'>
-        [<[versionNumber]>]
+        <input type="checkbox" name="compareVer" ng-model="versionNumber.selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionNumber.vnum)" ng-disabled="isCheckboxDisabled(versionNumber.vnum)" ng-hide="disableCompare" class='protractor-test-history-v1-selector'>
+        [<[versionNumber.vnum]>]
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2">
-        <strong><profile-link-text username="explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
+        <strong><profile-link-text username="explorationVersionMetadata[versionNumber.vnum].committerId"></profile-link-text></strong>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
-        <[explorationVersionMetadata[versionNumber].commitMessage]>
+        <[explorationVersionMetadata[versionNumber.vnum].commitMessage]>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
         <span>
-          <em><[explorationVersionMetadata[versionNumber].createdOnStr]></em>
-          <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
-            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
+          <em><[explorationVersionMetadata[versionNumber.vnum].createdOnStr]></em>
+          <span ng-if="versionNumber.vnum !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber.vnum)">Revert</a>
           </span>
           <span>
-            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber.vnum)" title="Download exploration as a zip file.">Download</a>
           </span>
         </span>
       </div>
@@ -52,7 +52,7 @@
   </md-card>
 
   <md-card class="oppia-editor-card" ng-hide="hideHistoryGraph || !explorationVersionMetadata" style="position: relative;">
-    <h3>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h3>
+    <h3>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber.vnum]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h3>
 
     <div ng-hide="diffGraphData" class="oppia-align-center">
       Loading
