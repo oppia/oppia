@@ -6,7 +6,7 @@
     Off-screen preview of the next card in order to pre-determine the target
     height for the card content transition animation.
   -->
-  <div id="conversation-skin-future-tutor-card" class="conversation-skin-tutor-card" aria-hidden="true">
+  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
     <div class="conversation-skin-tutor-card-content">
       <div class="conversation-skin-tutor-card-top-section">
         <div class="conversation-skin-tutor-card-top-content" angular-html-bind="upcomingContentHtml">
@@ -34,8 +34,7 @@
         cards, (b) the screen is wide, in which case both cards appear
         side-by-side.
       -->
-      <div id="conversation-skin-main-tutor-card"
-          class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
+      <div class="conversation-skin-main-tutor-card conversation-skin-tutor-card-active"
           ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}"
           ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"

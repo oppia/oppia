@@ -124,7 +124,8 @@ html, body {
   max-width: 1084px;
 }
 
-.conversation-skin-tutor-card {
+.conversation-skin-main-tutor-card,
+.conversation-skin-future-tutor-card {
   background: #fff;
   border-radius: 2px;
   left: 0;
@@ -138,7 +139,7 @@ html, body {
   z-index: 1;
 }
 
-#conversation-skin-future-tutor-card {
+.conversation-skin-future-tutor-card {
   position: absolute;
   left: -30000px;
   top: -30000px;
@@ -375,15 +376,15 @@ div.conversation-skin-supplemental-card {
   opacity: 1;
 }
 
-.conversation-skin-tutor-card.ng-hide-add.ng-hide-add-active,
-.conversation-skin-tutor-card.ng-hide-remove.ng-hide-remove-active,
+.conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
 .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
 .conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
   -webkit-transition: all ease-out 0.4s;
   transition: all ease-out 0.4s;
 }
 
-.conversation-skin-tutor-card.ng-hide {
+.conversation-skin-main-tutor-card.ng-hide {
   opacity: 0;
   transform: translateX(-1000px);
 }
@@ -400,7 +401,7 @@ div.conversation-skin-supplemental-card {
     'has-subsidiary-cards' class in order to avoid the final ratings section
     displaying at the top of the page.
   */
-  .conversation-skin-tutor-card.conversation-skin-has-subsidiary-cards {
+  .conversation-skin-main-tutor-card.conversation-skin-has-subsidiary-cards {
     position: absolute;
   }
 }
@@ -408,7 +409,7 @@ div.conversation-skin-supplemental-card {
 @media(max-width: 600px) {
   .conversation-skin-right-card-container,
   div.conversation-skin-supplemental-card,
-  .conversation-skin-tutor-card {
+  .conversation-skin-main-tutor-card {
     width: 100%;
   }
 
