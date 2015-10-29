@@ -11,24 +11,20 @@
       fill-opacity: 0;
       pointer-events: all;
     }
-
     .oppia-graph-viz path.link {
       fill: none;
       stroke: rgb(179, 179, 179);
       stroke-width: 3px;
     }
-
     .oppia-graph-viz text {
       font: 12px sans-serif;
       pointer-events: none;
     }
-
     .oppia-graph-viz text.shadow {
       stroke: #fff;
       stroke-width: 3px;
       stroke-opacity: .8;
     }
-
     .oppia-graph-viz .node rect {
       fill: #fff;
       pointer-events: all;
@@ -51,11 +47,9 @@
     .oppia-graph-viz .node rect.normal-node:hover {
       fill: #C8C4C4;
     }
-
     .oppia-graph-viz .clickable {
       cursor: pointer;
     }
-
     .oppia-graph-viz .legend-bar {
       fill: url('#nodegradient');
       stroke: black;
@@ -93,11 +87,24 @@
                       ng-attr-style="<[node.style]>"
                       ng-click="onClickFunction(node.id)">
                 </rect>
-                <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
                   <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
                   <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
                 </text>
+                <g ng-if="getNodeErrorMessage(node.label) && showWarningSign">
+                  <rect ng-click="onClickFunction(node.id)" class="clickable"
+                        style="fill: yellow;" width="22" height="22"
+                        ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0 - 8]>"
+                        ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
+                  </rect>
+                  <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
+                      ng-attr-y="<[node.y0 + 9]>"
+                      style="font-size: 22px; font-weight: bold;"
+                      ng-attr-transform="<[getHighlightTextTransform(node.x0, node.y0)]>">
+                    ⚠
+                  </text>
+                  <title><[getNodeErrorMessage(node.label)]></title>
+                </g>
                 <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
                   <rect height="15" width="15" opacity="0" stroke-width="0"
                         ng-attr-x="<[node.x0 + node.width]>" ng-attr-y="<[node.y0]>"

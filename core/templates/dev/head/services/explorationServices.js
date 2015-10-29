@@ -40,7 +40,7 @@ oppia.factory('oppiaExplorationHtmlFormatterService', [
       var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
       element = (
-        extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
+        extensionTagAssemblerService.formatCustomizationArgAttrs(
           element, interactionCustomizationArgSpecs));
 
       if (labelForFocusTarget) {

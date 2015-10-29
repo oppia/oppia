@@ -338,7 +338,6 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
-SHOW_GADGETS_EDITOR = False
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.
@@ -483,3 +482,5 @@ ALL_LANGUAGE_CODES = [{
 # Defaults for topic similarities
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
+
+SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

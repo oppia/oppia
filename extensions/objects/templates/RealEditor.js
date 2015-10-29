@@ -13,11 +13,13 @@
 // limitations under the License.
 
 
-oppia.directive('realEditor', function($compile, warningsData) {
+oppia.directive('realEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Real';
+        return OBJECT_EDITOR_URL_PREFIX + 'Real';
       };
       $compile(element.contents())(scope);
     },
@@ -40,4 +42,4 @@ oppia.directive('realEditor', function($compile, warningsData) {
       }
     }
   };
-});
+}]);

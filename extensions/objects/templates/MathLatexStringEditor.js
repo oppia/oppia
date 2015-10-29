@@ -17,11 +17,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('mathLatexStringEditor', function($compile, warningsData) {
+oppia.directive('mathLatexStringEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'MathLatexString';
+        return OBJECT_EDITOR_URL_PREFIX + 'MathLatexString';
       };
       $compile(element.contents())(scope);
     },
@@ -68,4 +70,4 @@ oppia.directive('mathLatexStringEditor', function($compile, warningsData) {
       }
     }
   };
-});
+}]);

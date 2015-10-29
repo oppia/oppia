@@ -23,6 +23,7 @@ oppia.directive('oppiaGadgetPanel', function() {
     restrict: 'E',
     scope: {
       panelContents: '&',
+      currentStateName: '&'
     },
     templateUrl: 'components/gadgetPanel'
   };
@@ -32,31 +33,26 @@ oppia.directive('oppiaGadget', function() {
   return {
     restrict: 'E',
     scope: {
-      gadgetType: '&',
-      gadgetName: '&',
       gadgetCustomizationArgs: '&',
-      showInStates: '&'
+      gadgetName: '&',
+      gadgetType: '&'
     },
     templateUrl: 'components/gadget',
     controller: [
-        '$scope', '$filter', 'oppiaHtmlEscaper', 'oppiaPlayerService',
-        'extensionTagAssemblerService',
-        function($scope, $filter, oppiaHtmlEscaper, oppiaPlayerService,
-          extensionTagAssemblerService) {
+      '$scope', '$filter', 'oppiaHtmlEscaper', 'extensionTagAssemblerService',
+      function(
+          $scope, $filter, oppiaHtmlEscaper, extensionTagAssemblerService) {
+        var el = $(
+          '<oppia-gadget-' +
+          $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
+        el = extensionTagAssemblerService.formatCustomizationArgAttrs(
+          el, $scope.gadgetCustomizationArgs());
+        el.attr(
+          'gadget-name',
+          oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
 
-      var el = $(
-        '<oppia-gadget-' + $filter('camelCaseToHyphens')($scope.gadgetType()) + '>');
-      el = extensionTagAssemblerService.formatCustomizationArgAttributesForElement(
-        el, $scope.gadgetCustomizationArgs());
-      el.attr('gadget-name',
-        oppiaHtmlEscaper.objToEscapedJson($scope.gadgetName()));
-      $scope.gadgetHtml = ($('<div>').append(el)).html();
-
-      $scope.$watch(function() {
-        return oppiaPlayerService.getCurrentStateName();
-      }, function(currentStateName) {
-        $scope.isVisible = $scope.showInStates().indexOf(currentStateName) !== -1;
-      });
-    }]
+        $scope.gadgetHtml = ($('<div>').append(el)).html();
+      }
+    ]
   };
 });

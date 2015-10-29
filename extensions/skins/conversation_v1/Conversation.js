@@ -18,13 +18,12 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// Note: This file should be assumed to be in an IIFE, and the constants below
+// should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;
 var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
-var TIME_PADDING_MSEC = 250;
-var TIME_SCROLL_MSEC = 600;
-
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
@@ -178,6 +177,8 @@ oppia.directive('conversationSkin', [function() {
       // The minimum width, in pixels, needed to be able to show the feedback
       // popover on the bottom of its click target.
       var FEEDBACK_POPOVER_THRESHOLD_PX = 700;
+      var TIME_PADDING_MSEC = 250;
+      var TIME_SCROLL_MSEC = 600;
 
       var hasInteractedAtLeastOnce = false;
       var _answerIsBeingProcessed = false;
@@ -187,6 +188,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
       $scope.explorationCompleted = false;
+      $scope.hasFullyLoaded = false;
 
       $scope.oppiaAvatarImageUrl = oppiaPlayerService.getOppiaAvatarImageUrl();
 
@@ -247,8 +249,12 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
-      $scope.isSupplementalCardNonempty = function() {
-        return $scope.activeCard && !$scope.activeCard.interactionIsInline;
+      var isSupplementalCardNonempty = function(card) {
+        return !card.interactionIsInline;
+      };
+
+      $scope.isCurrentSupplementalCardNonempty = function() {
+        return $scope.activeCard && isSupplementalCardNonempty($scope.activeCard);
       };
 
       var _recomputeAndResetPanels = function() {
@@ -256,7 +262,7 @@ oppia.directive('conversationSkin', [function() {
         if (!$scope.canWindowFitTwoCards()) {
           $scope.panels.push($scope.PANEL_TUTOR);
         }
-        if ($scope.isSupplementalCardNonempty()) {
+        if ($scope.isCurrentSupplementalCardNonempty()) {
           $scope.panels.push($scope.PANEL_SUPPLEMENTAL);
         }
         $scope.resetVisiblePanel();
@@ -302,14 +308,6 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var _addNewCard = function(stateName, contentHtml, interactionHtml) {
-        var interactionInstructions = (
-          oppiaPlayerService.getInteractionInstructions(stateName));
-
-        var oldStateName = null;
-        if ($scope.transcript.length >= 1) {
-          oldStateName = $scope.transcript[$scope.transcript.length - 1].stateName;
-        }
-
         oppiaPlayerService.applyCachedParamUpdates();
         $scope.transcript.push({
           stateName: stateName,
@@ -319,16 +317,23 @@ oppia.directive('conversationSkin', [function() {
           interactionIsInline: oppiaPlayerService.isInteractionInline(
             stateName),
           interactionIsDisabled: false,
-          interactionInstructions: interactionInstructions,
+          interactionInstructions: (
+            oppiaPlayerService.getInteractionInstructions(stateName)),
           answerFeedbackPairs: []
         });
 
         $scope.numProgressDots++;
 
+        var previousSupplementalCardIsNonempty = (
+          $scope.transcript.length > 1 &&
+          isSupplementalCardNonempty(
+            $scope.transcript[$scope.transcript.length - 2]));
+        var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
+          $scope.transcript[$scope.transcript.length - 1]);
+
         if ($scope.canWindowFitTwoCards() &&
-            oldStateName &&
-            oppiaPlayerService.isInteractionInline(oldStateName) &&
-            !oppiaPlayerService.isInteractionInline(stateName)) {
+            !previousSupplementalCardIsNonempty &&
+            nextSupplementalCardIsNonempty) {
           $scope.isAnimatingToTwoCards = true;
           $timeout(function() {
             $scope.isAnimatingToTwoCards = false;
@@ -336,9 +341,8 @@ oppia.directive('conversationSkin', [function() {
           }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + TIME_PADDING_MSEC);
         } else if (
             $scope.canWindowFitTwoCards() &&
-            oldStateName &&
-            !oppiaPlayerService.isInteractionInline(oldStateName) &&
-            oppiaPlayerService.isInteractionInline(stateName)) {
+            previousSupplementalCardIsNonempty &&
+            !nextSupplementalCardIsNonempty) {
           $scope.isAnimatingToOneCard = true;
           $timeout(function() {
             $scope.isAnimatingToOneCard = false;
@@ -369,6 +373,7 @@ oppia.directive('conversationSkin', [function() {
             initHtml,
             oppiaPlayerService.getInteractionHtml(stateName, _nextFocusLabel));
           $rootScope.loadingMessage = '';
+          $scope.hasFullyLoaded = true;
 
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
@@ -672,7 +677,44 @@ oppia.directive('progressDots', [function() {
           $scope.changeActiveDot($scope.currentDotIndex + 1);
         }
       };
-
     }]
+  };
+}]);
+
+oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
+  return {
+    restrict: 'A',
+    scope: true,
+    controller: ['$scope', 'deviceInfoService', function(
+      $scope, deviceInfoService) {
+      $scope.opened = false;
+      $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
+    }],
+    link: function(scope, element) {
+      var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
+
+      if (scope.deviceHasTouchEvents) {
+        element.on('touchstart', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+        element.on('touchend', function() {
+          // Set time delay before tooltip close
+          $timeout(function() {
+            scope.opened = false;
+          }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
+        });
+      } else {
+        element.on('mouseenter', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+
+        element.on('mouseleave', function() {
+          scope.opened = false;
+          scope.$apply();
+        });
+      };
+    }
   };
 }]);

@@ -22,8 +22,8 @@ oppia.factory('embedExplorationButtonService', ['$modal', function($modal) {
   var embedExplorationButtonService = {
     showModal: function(explorationId) {
       $modal.open({
-        templateUrl: 'modals/embedExploration',
         backdrop: true,
+        templateUrl: 'modals/embedExploration',
         resolve: {
           explorationId: function() {
             return explorationId;
@@ -32,7 +32,8 @@ oppia.factory('embedExplorationButtonService', ['$modal', function($modal) {
         controller: ['$scope', '$modalInstance', '$window', 'explorationId',
           function($scope, $modalInstance, $window, explorationId) {
             $scope.explorationId = explorationId;
-            $scope.serverName = $window.location.protocol + '//' + $window.location.host;
+            $scope.serverName = (
+              $window.location.protocol + '//' + $window.location.host);
 
             $scope.close = function() {
               $modalInstance.dismiss('close');

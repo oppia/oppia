@@ -15,11 +15,13 @@
 
 // This directive is always editable.
 
-oppia.directive('musicPhraseEditor', function($compile, warningsData) {
+oppia.directive('musicPhraseEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'warningsData',
+    function($compile, OBJECT_EDITOR_URL_PREFIX, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'MusicPhrase';
+        return OBJECT_EDITOR_URL_PREFIX + 'MusicPhrase';
       };
       $compile(element.contents())(scope);
     },
@@ -79,4 +81,4 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
       }, true);
     }]
   };
-});
+}]);

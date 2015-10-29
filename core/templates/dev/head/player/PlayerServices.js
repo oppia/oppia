@@ -710,7 +710,7 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
         var popoverChildElt = null;
         for (var i = 0; i < 10; i++) {
           elt = elt.parent();
-          if (elt.attr('template')) {
+          if (!angular.isUndefined(elt.attr('popover-template-popup'))) {
             popoverChildElt = elt;
             break;
           }
@@ -771,9 +771,9 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
   };
 }]);
 
-oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $modal) {
+oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal) {
 
-  $scope.showInformationCard = function () {
+  $scope.showInformationCard = function() {
 
     var modalInstance = $modal.open({
       animation: true,

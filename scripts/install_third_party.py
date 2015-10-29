@@ -140,19 +140,6 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, target_root_name))
 
 
-# This is a temporary modified version of UI Bootstrap used for displaying
-# HTML in popovers. It should be replaced with UI Bootstrap when version
-# 0.13.0 is released. See https://github.com/angular-ui/bootstrap/issues/220
-# TODO(sll): Delete this snippet of code after v0.13.0 is released.
-UI_BOOTSTRAP_JBRUNI_URL = (
-    'https://raw.githubusercontent.com/jbruni/jbruni.github.io/master/javascripts')
-UI_BOOTSTRAP_JBRUNI_DST = os.path.join(
-    THIRD_PARTY_STATIC_DIR, 'ui-bootstrap-jbruni-0.13.0')
-UI_BOOTSTRAP_JBRUNI_FILES = ['ui-bootstrap-tpls-0.13.0-jbruni.min.js']
-
-download_files(
-    UI_BOOTSTRAP_JBRUNI_URL, UI_BOOTSTRAP_JBRUNI_DST, UI_BOOTSTRAP_JBRUNI_FILES)
-
 
 # Download all the standalone files.
 YUICOMPRESSOR_REV = '2.4.8'
@@ -163,7 +150,7 @@ YUICOMPRESSOR_URL = (
 YUICOMPRESSOR_DST = os.path.join(TOOLS_DIR, YUICOMPRESSOR_FILENAME)
 YUICOMPRESSOR_FILES = ['%s.jar' % YUICOMPRESSOR_FILENAME]
 
-UI_BOOTSTRAP_REV = '0.12.0'
+UI_BOOTSTRAP_REV = '0.13.4'
 UI_BOOTSTRAP_URL = (
     'https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages')
 UI_BOOTSTRAP_DST = os.path.join(
@@ -171,37 +158,6 @@ UI_BOOTSTRAP_DST = os.path.join(
 UI_BOOTSTRAP_FILES = [
     'ui-bootstrap-tpls-%s.%s' % (UI_BOOTSTRAP_REV, suffix)
     for suffix in ['js', 'min.js']]
-
-MATERIAL_DESIGN_ICONS_REV = '1.0.1'
-MATERIAL_DESIGN_ICONS_URL_PREFIX = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s' %
-    MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICONS_ACTION_URL = (
-    '%s/action/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
-MATERIAL_DESIGN_ICONS_COMMUNICATION_URL = (
-    '%s/communication/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
-MATERIAL_DESIGN_ICONS_CONTENT_URL = (
-    '%s/content/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
-MATERIAL_DESIGN_ICONS_FILE_URL = (
-    '%s/file/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
-MATERIAL_DESIGN_ICONS_NAVIGATION_URL = (
-    '%s/navigation/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
-MATERIAL_DESIGN_ICONS_SOCIAL_URL = (
-    '%s/social/drawable-xxxhdpi' % MATERIAL_DESIGN_ICONS_URL_PREFIX)
-MATERIAL_DESIGN_ICONS_DST = os.path.join(
-    THIRD_PARTY_STATIC_DIR,
-    'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICON_ACTION_FILES = [
-    'ic_info_black_48dp.png', 'ic_info_white_48dp.png', 'ic_help_black_48dp.png',
-    'ic_home_black_48dp.png']
-MATERIAL_DESIGN_ICON_COMMUNICATION_FILES = ['ic_forum_black_48dp.png']
-MATERIAL_DESIGN_ICON_CONTENT_FILES = [
-    'ic_link_black_48dp.png', 'ic_save_black_48dp.png']
-MATERIAL_DESIGN_ICON_FILE_FILES = ['ic_cloud_upload_black_48dp.png']
-MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
-    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png',
-    'ic_close_black_48dp.png', 'ic_close_white_48dp.png']
-MATERIAL_DESIGN_ICON_SOCIAL_FILES = ['ic_group_black_48dp.png', 'ic_share_black_48dp.png']
 
 # Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'
@@ -249,36 +205,9 @@ download_files(ANGULAR_URL, ANGULAR_DST, ANGULAR_FILES)
 download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_ACTION_URL, MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_ACTION_FILES)
-download_files(
-    MATERIAL_DESIGN_ICONS_COMMUNICATION_URL, MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_COMMUNICATION_FILES)
-download_files(
-    MATERIAL_DESIGN_ICONS_CONTENT_URL, MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_CONTENT_FILES)
-download_files(
-    MATERIAL_DESIGN_ICONS_FILE_URL, MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_FILE_FILES)
-download_files(
-    MATERIAL_DESIGN_ICONS_NAVIGATION_URL, MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_NAVIGATION_FILES)
-download_files(
-    MATERIAL_DESIGN_ICONS_SOCIAL_URL, MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_SOCIAL_FILES)
-download_files(
     NG_INFINITE_SCROLL_URL, NG_INFINITE_SCROLL_DST, NG_INFINITE_SCROLL_FILES)
 
 # Download all the frontend library zip files.
-MD_ICONIC_FONT_REV = '2.1.2'
-MD_ICONIC_FONT_ROOT_NAME = (
-    'material-design-iconic-font-%s' % MD_ICONIC_FONT_REV)
-MD_ICONIC_FONT_ZIP_URL = (
-    'https://github.com/zavoloklom/material-design-iconic-font'
-    '/archive/%s.zip' % MD_ICONIC_FONT_REV)
-MD_ICONIC_FONT_ZIP_ROOT_NAME = MD_ICONIC_FONT_ROOT_NAME
-MD_ICONIC_FONT_TARGET_ROOT_NAME = 'md-iconic-font-%s' % MD_ICONIC_FONT_REV
-
 BOWER_MATERIAL_REV = '0.6.0-rc1'
 BOWER_MATERIAL_ROOT_NAME = 'bower-material-%s' % BOWER_MATERIAL_REV
 BOWER_MATERIAL_ZIP_URL = (
@@ -302,7 +231,8 @@ SELECT2_TARGET_ROOT_NAME = 'select2-%s' % SELECT2_REV
 
 FONTAWESOME_REV = '4.4.0'
 FONTAWESOME_ZIP_URL = (
-    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' % FONTAWESOME_REV)
+    'https://github.com/FortAwesome/Font-Awesome/archive/v%s.zip' %
+    FONTAWESOME_REV)
 FONTAWESOME_ZIP_ROOT_NAME = 'Font-Awesome-%s' % FONTAWESOME_REV
 FONTAWESOME_TARGET_ROOT_NAME = 'font-awesome-%s' % FONTAWESOME_REV
 
@@ -380,9 +310,6 @@ NG_IMG_CROP_ZIP_URL = (
 NG_IMG_CROP_ZIP_ROOT_NAME = 'ngImgCrop-%s' % NG_IMG_CROP_REV
 NG_IMG_CROP_TARGET_ROOT_NAME = 'ng-img-crop-%s' % NG_IMG_CROP_REV
 
-download_and_unzip_files(
-    MD_ICONIC_FONT_ZIP_URL, THIRD_PARTY_STATIC_DIR,
-    MD_ICONIC_FONT_ZIP_ROOT_NAME, MD_ICONIC_FONT_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOWER_MATERIAL_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOWER_MATERIAL_ZIP_ROOT_NAME, BOWER_MATERIAL_TARGET_ROOT_NAME)
