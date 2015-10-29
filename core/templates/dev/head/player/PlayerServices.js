@@ -634,6 +634,21 @@ oppia.factory('ratingService', [
   };
 }]);
 
+oppia.factory('speechService', ['oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  return {
+    getSpokenText: function(component) {
+      var componentId = component.nodeName;
+      if (componentId == "#text") {
+        return component.nodeValue;
+      }
+      if (componentId == "OPPIA-NONINTERACTIVE-LINK") {
+        var linkPreface = "Clickable Link. "
+        return linkPreface + oppiaHtmlEscaper.escapedStrToUnescapedStr(component.attributes.item(1).nodeValue);
+      }
+      return "";
+    }
+  };
+}]);
 
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',

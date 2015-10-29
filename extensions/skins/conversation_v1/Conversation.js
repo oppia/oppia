@@ -162,13 +162,13 @@ oppia.directive('conversationSkin', [function() {
     scope: {},
     templateUrl: 'skins/Conversation',
     controller: [
-        '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
-        'oppiaPlayerService', 'urlService', 'focusService', 'ratingService',
-        'windowDimensionsService',
+        '$scope', '$timeout', '$rootScope', '$window', 'browserInfoService',  
+        'messengerService', 'oppiaHtmlEscaper', 'oppiaPlayerService', 'urlService', 
+        'focusService', 'ratingService', 'speechService', 'windowDimensionsService',
         function(
-          $scope, $timeout, $rootScope, $window, messengerService,
-          oppiaPlayerService, urlService, focusService, ratingService,
-          windowDimensionsService) {
+          $scope, $timeout, $rootScope, $window, browserInfoService,  
+          messengerService, oppiaHtmlEscaper, oppiaPlayerService, urlService, 
+          focusService, ratingService, speechService, windowDimensionsService) {
 
       // The minimum width, in pixels, needed to be able to show two cards
       // side-by-side.
@@ -186,6 +186,7 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
+      $scope.isSpeechSynthesisEnabled = browserInfoService.isSpeechSynthesisEnabled();
       $rootScope.loadingMessage = 'Loading';
       $scope.explorationCompleted = false;
       $scope.hasFullyLoaded = false;
@@ -283,6 +284,28 @@ oppia.directive('conversationSkin', [function() {
         if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
         }
+      };
+
+      $scope.readSelectedTextAloud = function() {
+        var content = $scope.activeCard.contentHtml;
+        var contentElement = document.createElement('div');
+        contentElement.innerHTML = content;
+        var contentNodes = contentElement.childNodes[0].childNodes;
+        var stringToRead = "";
+        
+        for (var i = 0; i < contentNodes.length; i ++) {
+          var component = contentNodes[i];
+          stringToRead += speechService.getSpokenText(component);
+        };
+        var defaultMessage = stringToRead;
+        var selectedText =  $window.getSelection();
+        if (selectedText == '') {
+          var readText = new SpeechSynthesisUtterance(defaultMessage);
+        } else {
+          var readText = new SpeechSynthesisUtterance(selectedText);
+        };
+        readText.lang = 'en-US';
+        $window.speechSynthesis.speak(readText);
       };
 
       $scope.resetVisiblePanel = function() {
