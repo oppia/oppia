@@ -34,10 +34,12 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchThreads = function(successCallback) {
+    // UI test code: http://pastebin.com/DhL4fGnm
     var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
     var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
       params: {type: 'open'}
     });
+
     $q.all([fPromise, sPromise]).then(function(res) {
       _data.threadList = [].concat(res[0].data.threads, res[1].data.threads);
       if (successCallback) {
