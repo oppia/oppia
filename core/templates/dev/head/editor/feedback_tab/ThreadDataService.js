@@ -20,9 +20,10 @@
  */
 
 oppia.factory('threadDataService', [
-    '$http', 'explorationData', function($http, explorationData) {
+    '$http', '$q', 'explorationData', function($http, $q, explorationData) {
   var _expId = explorationData.explorationId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
+  var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -33,8 +34,12 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchThreads = function(successCallback) {
-    $http.get(_THREAD_LIST_HANDLER_URL).success(function(data) {
-      _data.threadList = data.threads;
+    var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
+    var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
+      params: {type: 'open'}
+    });
+    $q.all([fPromise, sPromise]).then(function(res) {
+      _data.threadList = [].concat(res[0].data.threads, res[1].data.threads);
       if (successCallback) {
         successCallback();
       }
