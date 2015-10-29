@@ -93,6 +93,14 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
+oppia.factory('browserInfoService', ['$window', function($window) {
+  return {
+    isSpeechSynthesisEnabled: function() {
+      return 'speechSynthesis' in $window;
+    }
+  };
+}]);
+
 //Returns true if the user is on a mobile device.
 //See here: http://stackoverflow.com/a/14301832/5020618
 oppia.factory('deviceInfoService', ['$window', function($window) {

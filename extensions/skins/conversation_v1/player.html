@@ -38,6 +38,13 @@
       -->
       <md-card class="conversation-skin-tutor-card conversation-skin-tutor-card-active"
                ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}" ng-show="isPanelVisible(PANEL_TUTOR)">
+        <div class="conversation-skin-tutor-card-read-text-aloud-container" ng-if="activeCard.stateName && !isInPreviewMode && isSpeechSynthesisEnabled">
+          <button class="conversation-skin-tutor-card-read-text-aloud"
+                  tooltip="Click to read highlighted text aloud" tooltip-placement="bottom" 
+                  state-name="<[activeCard.stateName]>" ng-click="readSelectedTextAloud()">
+            <span class="glyphicon glyphicon-volume-up" aria-hidden="true"></span>
+          </button>
+        </div> 
         <div class="conversation-skin-tutor-card-feedback-toggle-container" ng-if="activeCard.stateName && !isInPreviewMode">
           <button class="conversation-skin-tutor-card-feedback-toggle"
                   popover-placement="<[getFeedbackPopoverPlacement()]>"
