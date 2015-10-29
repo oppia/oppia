@@ -249,8 +249,7 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_name': exploration.title,
             # Note that this overwrites the value in base.py.
-            'meta_description': utils.make_first_letter_uppercase(
-                exploration.objective),
+            'meta_description': utils.capitalize_string(exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(

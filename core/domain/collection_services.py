@@ -289,6 +289,20 @@ def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
         return collection.init_exploration_ids
 
 
+def record_played_exploration_in_collection_context(
+        user_id, collection_id, exploration_id):
+    completion_model = (
+        user_models.ExplorationInCollectionCompletionModel.get_or_create(
+            user_id, collection_id))
+
+    completed_explorations = copy.deepcopy(
+        completion_model.completed_explorations)
+    if exploration_id not in completed_explorations:
+        completed_explorations.append(exploration_id)
+        completion_model.completed_explorations = completed_explorations
+        completion_model.put()
+
+
 def _get_collection_summary_dicts_from_models(collection_summary_models):
     """Given an iterable of CollectionSummaryModel instances, create a dict
     containing corresponding collection summary domain objects, keyed by id.
@@ -716,20 +730,6 @@ def load_demo(collection_id):
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
-
-
-def record_played_exploration_in_collection_context(
-        user_id, collection_id, exploration_id):
-    completion_model = (
-        user_models.ExplorationInCollectionCompletionModel.get_or_create(
-            user_id, collection_id))
-
-    completed_explorations = copy.deepcopy(
-        completion_model.completed_explorations)
-    if exploration_id not in completed_explorations:
-        completed_explorations.append(exploration_id)
-        completion_model.completed_explorations = completed_explorations
-        completion_model.put()
 
 
 # TODO(bhenning): Cleanup search logic and abstract it between explorations and

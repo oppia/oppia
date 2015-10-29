@@ -17,8 +17,7 @@ nodes:
   exploration_id: '14'
   prerequisite_skills:
   - Introduced to Oppia
-- acquired_skills:
-  - Learned Gadgets
+- acquired_skills: []
   exploration_id: '15'
   prerequisite_skills:
   - Learned Oppia

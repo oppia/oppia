@@ -159,3 +159,31 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, 'foo')
         p = utils.vfs_normpath('/foo//bar//baz//')
         self.assertEqual(p, '/foo/bar/baz')
+
+    def test_capitalize_string(self):
+        s = utils.capitalize_string(None)
+        self.assertEqual(s, None)
+
+        s = utils.capitalize_string('')
+        self.assertEqual(s, '')
+
+        s = utils.capitalize_string('a')
+        self.assertEqual(s, 'A')
+
+        s = utils.capitalize_string('A')
+        self.assertEqual(s, 'A')
+
+        s = utils.capitalize_string('1')
+        self.assertEqual(s, '1')
+
+        s = utils.capitalize_string('lowercase')
+        self.assertEqual(s, 'Lowercase')
+
+        s = utils.capitalize_string('UPPERCASE')
+        self.assertEqual(s, 'UPPERCASE')
+
+        s = utils.capitalize_string('Partially')
+        self.assertEqual(s, 'Partially')
+
+        s = utils.capitalize_string('2be')
+        self.assertEqual(s, '2be')

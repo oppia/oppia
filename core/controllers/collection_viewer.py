@@ -72,8 +72,7 @@ class CollectionPage(base.BaseHandler):
             'collection_title': collection.title,
             'is_private': rights_manager.is_collection_private(collection_id),
             'meta_name': collection.title,
-            'meta_description': utils.make_first_letter_uppercase(
-                collection.objective)
+            'meta_description': utils.capitalize_string(collection.objective)
         })
 
         self.render_template('collection_player/collection_player.html')
