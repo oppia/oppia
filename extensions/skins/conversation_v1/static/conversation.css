@@ -60,15 +60,20 @@ html, body {
   z-index: 1;
 }
 .conversation-skin-oppia-avatar {
-  left: -38px;
+  left: -20px;
 }
 
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
-  left: -38px;
-  top: -2px;
+  left: -20px;
+  top: 14px;
 }
-.conversation-skin-learner-answer-content .conversation-skin-user-avatar {
-  right: -38px;
+.conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  right: -20px;
+}
+
+.conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+  display: none;
 }
 
 .conversation-skin-responses-dropdown-icon {
@@ -89,7 +94,7 @@ html, body {
   border-bottom: 1px solid #ccc;
   cursor: pointer;
   line-height: 0.1em;
-  margin: 8px auto 20px auto;
+  margin: 8px 20px 20px 20px;
   text-align: center;
 }
 .conversation-skin-responses-dropdown-text {
@@ -119,13 +124,13 @@ html, body {
   max-width: 1084px;
 }
 
-div.conversation-skin-tutor-card {
+.conversation-skin-tutor-card {
   background: #fff;
   border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
   max-width: 472px;
-  padding: 20px;
+  padding-top: 20px;
   position: relative;
   right: 0;
   text-align: left;
@@ -133,10 +138,21 @@ div.conversation-skin-tutor-card {
   z-index: 1;
 }
 
+#conversation-skin-future-tutor-card {
+  position: absolute;
+  left: -30000px;
+  top: -30000px;
+}
+
 .conversation-skin-tutor-card-top-section,
-.conversation-skin-tutor-card-bottom-section,
-.conversation-skin-tutor-card-middle-section {
+.conversation-skin-oppia-feedback-container,
+.conversation-skin-learner-answer-container {
   position: relative;
+}
+.conversation-skin-tutor-card-top-section,
+.conversation-skin-oppia-feedback-container,
+.conversation-skin-learner-answer-container {
+  padding: 0 20px;
 }
 
 .conversation-skin-tutor-card-top-content,
@@ -145,16 +161,22 @@ div.conversation-skin-tutor-card {
   border-radius: 2px;
   display: inline-block;
   margin-bottom: 12px;
-  padding: 8px 12px;
   position: relative;
   text-align: left;
 }
+.conversation-skin-tutor-card-top-content {
+  padding: 12px;
+}
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  padding: 8px 12px;
+}
 .conversation-skin-tutor-card-top-content,
 .conversation-skin-oppia-feedback-content {
-  background-color: #E3F2FD;
+  background-color: rgba(224,242,241,1);
 }
 .conversation-skin-learner-answer-content {
-  background-color: #E8F5E9;
+  background-color: rgba(236,239,241,1);
   border-bottom-right-radius: 0;
 }
 .conversation-skin-tutor-card-top-content,
@@ -164,13 +186,18 @@ div.conversation-skin-tutor-card {
 .conversation-skin-learner-answer-container {
   text-align: right;
 }
-
+.conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,0.4);
+}
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
+  background-color: rgba(224,242,241,0.4);
+}
 .conversation-skin-tutor-card-top-content::before,
 .conversation-skin-oppia-feedback-content::before {
   content: " ";
   left: -8px;
   border-left: 8px solid transparent;
-  border-top: 12px solid #E3F2FD;
+  border-top: 12px solid rgba(224,242,241,1);
   position: absolute;
   top: 0;
 }
@@ -178,12 +205,14 @@ div.conversation-skin-tutor-card {
   content: " ";
   right: -8px;
   border-right: 8px solid transparent;
-  border-top: 12px solid #E8F5E9;
+  border-top: 12px solid rgba(236,239,241,1);
   position: absolute;
   top: 0;
 }
-
-
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
+.conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
+  display: none;
+}
 
 .conversation-skin-interaction-clickable-instructions {
   cursor: pointer;
@@ -209,7 +238,9 @@ div.conversation-skin-tutor-card {
 }
 
 .conversation-skin-inline-interaction {
+  background-color: rgba(236,239,241,1);
   margin-top: 8px;
+  padding: 16px 20px;
   position: relative;
 }
 
@@ -369,7 +400,7 @@ div.conversation-skin-supplemental-card {
     'has-subsidiary-cards' class in order to avoid the final ratings section
     displaying at the top of the page.
   */
-  div.conversation-skin-tutor-card.conversation-skin-has-subsidiary-cards {
+  .conversation-skin-tutor-card.conversation-skin-has-subsidiary-cards {
     position: absolute;
   }
 }
@@ -377,7 +408,7 @@ div.conversation-skin-supplemental-card {
 @media(max-width: 600px) {
   .conversation-skin-right-card-container,
   div.conversation-skin-supplemental-card,
-  div.conversation-skin-tutor-card {
+  .conversation-skin-tutor-card {
     width: 100%;
   }
 
