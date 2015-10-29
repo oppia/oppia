@@ -28,7 +28,7 @@ var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     enter: function(element, done) {
-      element.hide().slideDown()
+      element.hide().slideDown();
     },
     leave: function(element, done) {
       element.slideUp();
@@ -39,7 +39,7 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
 oppia.animation('.conversation-skin-animate-cards', function() {
   // This removes the newly-added class once the animation is finished.
   var animateCards = function(element, className, done) {
-    var tutorCardElt = jQuery(element).find('.conversation-skin-tutor-card');
+    var tutorCardElt = jQuery(element).find('.conversation-skin-main-tutor-card');
     var supplementalCardElt = jQuery(element).find(
       '.conversation-skin-supplemental-card');
 
@@ -124,7 +124,9 @@ oppia.animation('.conversation-skin-animate-card-contents', function() {
     }
 
     var currentHeight = element.height();
-    var expectedNextHeight = $('#futurePreview').height();
+    var expectedNextHeight = $(
+      '.conversation-skin-future-tutor-card .conversation-skin-tutor-card-content'
+    ).height();
 
     // Fix the current card height, so that it does not change during the
     // animation, even though its contents might.
@@ -577,7 +579,7 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var fixSupplementOnScroll = function() {
-        var supplementCard = $('md-card.conversation-skin-supplemental-card');
+        var supplementCard = $('div.conversation-skin-supplemental-card');
         var topMargin = $('.navbar-container').height() - 20;
         if ($(window).scrollTop() > topMargin) {
           supplementCard.addClass('conversation-skin-supplemental-card-fixed');
