@@ -240,6 +240,8 @@ html, body {
 
 .conversation-skin-inline-interaction {
   background-color: rgba(236,239,241,1);
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
   margin-top: 8px;
   padding: 16px 20px;
   position: relative;
@@ -336,6 +338,7 @@ div.conversation-skin-supplemental-card {
 .conversation-skin-left-card {
   float: left;
   margin-left: 0;
+  margin-right: 16px;
 }
 
 .conversation-skin-card-switcher {
