@@ -181,7 +181,7 @@ oppia.directive('conversationSkin', [function() {
       var FEEDBACK_POPOVER_THRESHOLD_PX = 700;
       var TIME_PADDING_MSEC = 250;
       var TIME_SCROLL_MSEC = 600;
-      var MIN_CARD_LOADING_DELAY_MSEC = 750;
+      var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
       var hasInteractedAtLeastOnce = false;
       var _answerIsBeingProcessed = false;
