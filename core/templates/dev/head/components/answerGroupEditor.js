@@ -32,19 +32,15 @@ oppia.directive('answerGroupEditor', [function() {
     templateUrl: 'inline/answer_group_editor',
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
-      'editorContextService', 'routerService', 'warningsData',
-      'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
+      'editorContextService', 'warningsData', 'INTERACTION_SPECS',
+      'FUZZY_RULE_TYPE',
       function(
           $scope, stateInteractionIdService, responsesService,
-          editorContextService, routerService, warningsData, INTERACTION_SPECS,
+          editorContextService, warningsData, INTERACTION_SPECS,
           FUZZY_RULE_TYPE) {
 
         $scope.rulesMemento = null;
-        $scope.outcomeFeedbackMemento = null;
-        $scope.outcomeDestMemento = null;
 
-        $scope.feedbackEditorIsOpen = false;
-        $scope.destinationEditorIsOpen = false;
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
         $scope.editAnswerGroupForm = {};
 
@@ -65,59 +61,7 @@ oppia.directive('answerGroupEditor', [function() {
           return stateInteractionIdService.savedMemento;
         };
 
-        $scope.openFeedbackEditor = function() {
-          if ($scope.isEditable) {
-            $scope.outcomeFeedbackMemento = angular.copy(
-              $scope.outcome.feedback);
-            $scope.feedbackEditorIsOpen = true;
-            if ($scope.outcome.feedback.length === 0) {
-              $scope.outcome.feedback.push('');
-            }
-          }
-        };
-
-        $scope.openDestinationEditor = function() {
-          if ($scope.isEditable) {
-            $scope.outcomeDestMemento = angular.copy($scope.outcome.dest);
-            $scope.destinationEditorIsOpen = true;
-          }
-        };
-
-        $scope.saveThisFeedback = function() {
-          $scope.$broadcast('saveOutcomeFeedbackDetails');
-          $scope.feedbackEditorIsOpen = false;
-          $scope.outcomeFeedbackMemento = null;
-          $scope.onSaveAnswerGroupFeedback();
-        };
-
-        $scope.saveThisDestination = function() {
-          $scope.$broadcast('saveOutcomeDestDetails');
-          $scope.destinationEditorIsOpen = false;
-          $scope.outcomeDestMemento = null;
-          $scope.onSaveAnswerGroupDest();
-        };
-
-        $scope.cancelThisFeedbackEdit = function() {
-          $scope.outcome.feedback = angular.copy($scope.outcomeFeedbackMemento);
-          $scope.outcomeFeedbackMemento = null;
-          $scope.feedbackEditorIsOpen = false;
-        };
-
-        $scope.cancelThisDestinationEdit = function() {
-          $scope.outcome.dest = angular.copy($scope.outcomeDestMemento);
-          $scope.outcomeDestMemento = null;
-          $scope.destinationEditorIsOpen = false;
-        };
-
         $scope.$on('externalSave', function() {
-          if ($scope.feedbackEditorIsOpen &&
-              $scope.editAnswerGroupForm.editFeedbackForm.$valid) {
-            $scope.saveThisFeedback();
-          }
-          if ($scope.destinationEditorIsOpen &&
-              $scope.editAnswerGroupForm.editDestForm.$valid) {
-            $scope.saveThisDestination();
-          }
           if ($scope.isRuleEditorOpen()) {
             $scope.saveRules();
           }
@@ -297,41 +241,7 @@ oppia.directive('answerGroupEditor', [function() {
           return $scope.activeRuleIndex !== -1;
         };
 
-        $scope.isSelfLoop = function(outcome) {
-          return (
-            outcome &&
-            outcome.dest === editorContextService.getActiveStateName());
-        };
-
-        $scope.isSelfLoopWithNoFeedback = function(outcome) {
-          if (!outcome) {
-            return false;
-          }
-
-          var hasFeedback = false;
-          for (var i = 0; i < outcome.feedback.length; i++) {
-            if (outcome.feedback[i]) {
-              hasFeedback = true;
-              break;
-            }
-          }
-
-          return $scope.isSelfLoop(outcome) && !hasFeedback;
-        };
-
-        $scope.navigateToOutcomeDest = function() {
-          routerService.navigateToMainTab($scope.outcome.dest);
-        };
-
         $scope.$on('onInteractionIdChanged', function() {
-          if ($scope.feedbackEditorIsOpen &&
-              $scope.editAnswerGroupForm.editFeedbackForm.$valid) {
-            $scope.saveThisFeedback();
-          }
-          if ($scope.destinationEditorIsOpen &&
-              $scope.editAnswerGroupForm.editDestForm.$valid) {
-            $scope.saveThisDestination();
-          }
           if ($scope.isRuleEditorOpen()) {
             $scope.saveRules();
           }
