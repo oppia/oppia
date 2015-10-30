@@ -402,6 +402,7 @@
 
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/gadget_panel.html' %}
+  {% include 'components/response_header.html' %}
   {% include 'components/param_changes_editor.html' %}
   {% include 'components/profile_link.html' %}
   {% include 'components/visualizations.html' %}
@@ -421,6 +422,7 @@
     {{ include_js_file('components/paramChangesEditor.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ include_js_file('components/gadgetPanel.js') }}
+    {{ include_js_file('components/responseHeader.js') }}
     {{ value_generators_js }}
     {{ include_js_file('services/explorationContextService.js') }}
     {{ include_js_file('services/explorationServices.js') }}
