@@ -179,6 +179,7 @@ oppia.directive('conversationSkin', [function() {
       var TWO_CARD_THRESHOLD_PX = 1120;
       var TIME_PADDING_MSEC = 250;
       var TIME_SCROLL_MSEC = 600;
+      var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
       var hasInteractedAtLeastOnce = false;
       var _answerIsBeingProcessed = false;
@@ -421,70 +422,80 @@ oppia.directive('conversationSkin', [function() {
           oppiaFeedback: null
         });
 
+        var timeAtServerCall = new Date().getTime();
+
         oppiaPlayerService.submitAnswer(answer, function(
             newStateName, refreshInteraction, feedbackHtml, contentHtml) {
-          $scope.waitingForOppiaFeedback = false;
-          var pairs = (
-            $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs);
-          var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
-          if (_oldStateName === newStateName) {
-            // Stay on the same card.
-            lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
-            if (refreshInteraction) {
-              // Replace the previous interaction (even though it might be of
-              // the same type).
-              _nextFocusLabel = focusService.generateFocusLabel();
-              $scope.transcript[$scope.transcript.length - 1].interactionHtml = (
-                oppiaPlayerService.getInteractionHtml(newStateName, _nextFocusLabel) +
-                oppiaPlayerService.getRandomSuffix());
-            }
-            focusService.setFocusIfOnDesktop(_nextFocusLabel);
-            scrollToBottom();
-          } else {
-            // There is a new card. Disable the current interaction -- then, if
-            // there is no feedback, move on immediately. Otherwise, give the
-            // learner a chance to read the feedback, and display a 'Continue'
-            // button.
-            $scope.transcript[$scope.transcript.length - 1].interactionIsDisabled = true;
+          var millisecsLeftToWait = Math.max(
+            MIN_CARD_LOADING_DELAY_MSEC - (
+              new Date().getTime() - timeAtServerCall),
+            1.0);
 
-            _nextFocusLabel = focusService.generateFocusLabel();
+          $timeout(function() {
+            $scope.waitingForOppiaFeedback = false;
+            var pairs = (
+              $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs);
+            var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
-            // These are used to compute the dimensions for the next card.
-            $scope.upcomingStateName = newStateName;
-            $scope.upcomingContentHtml = (
-              contentHtml + oppiaPlayerService.getRandomSuffix());
-            var _isNextInteractionInline = oppiaPlayerService.isInteractionInline(
-              newStateName);
-            $scope.upcomingInlineInteractionHtml = (
-              _isNextInteractionInline ?
-              oppiaPlayerService.getInteractionHtml(
-                newStateName, _nextFocusLabel
-              ) + oppiaPlayerService.getRandomSuffix() : '');
-
-            if (feedbackHtml) {
+            if (_oldStateName === newStateName) {
+              // Stay on the same card.
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
-              $scope.waitingForContinueButtonClick = true;
-              _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
+              if (refreshInteraction) {
+                // Replace the previous interaction (even though it might be of
+                // the same type).
+                _nextFocusLabel = focusService.generateFocusLabel();
+                $scope.transcript[$scope.transcript.length - 1].interactionHtml = (
+                  oppiaPlayerService.getInteractionHtml(newStateName, _nextFocusLabel) +
+                  oppiaPlayerService.getRandomSuffix());
+              }
               focusService.setFocusIfOnDesktop(_nextFocusLabel);
               scrollToBottom();
             } else {
-              // Note that feedbackHtml is an empty string if no feedback has
-              // been specified. This causes the answer-feedback pair to change
-              // abruptly, so we make the change only after the animation has
-              // completed.
-              $scope.showPendingCard(
-                newStateName,
-                contentHtml + oppiaPlayerService.getRandomSuffix(),
-                function() {
-                  lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
-                });
-            }
-          }
+              // There is a new card. Disable the current interaction -- then, if
+              // there is no feedback, move on immediately. Otherwise, give the
+              // learner a chance to read the feedback, and display a 'Continue'
+              // button.
+              $scope.transcript[$scope.transcript.length - 1].interactionIsDisabled = true;
 
-          $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-            newStateName);
-          _answerIsBeingProcessed = false;
+              _nextFocusLabel = focusService.generateFocusLabel();
+
+              // These are used to compute the dimensions for the next card.
+              $scope.upcomingStateName = newStateName;
+              $scope.upcomingContentHtml = (
+                contentHtml + oppiaPlayerService.getRandomSuffix());
+              var _isNextInteractionInline = oppiaPlayerService.isInteractionInline(
+                newStateName);
+              $scope.upcomingInlineInteractionHtml = (
+                _isNextInteractionInline ?
+                oppiaPlayerService.getInteractionHtml(
+                  newStateName, _nextFocusLabel
+                ) + oppiaPlayerService.getRandomSuffix() : '');
+
+              if (feedbackHtml) {
+                lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
+                $scope.waitingForContinueButtonClick = true;
+                _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
+                focusService.setFocusIfOnDesktop(_nextFocusLabel);
+                scrollToBottom();
+              } else {
+                // Note that feedbackHtml is an empty string if no feedback has
+                // been specified. This causes the answer-feedback pair to change
+                // abruptly, so we make the change only after the animation has
+                // completed.
+                $scope.showPendingCard(
+                  newStateName,
+                  contentHtml + oppiaPlayerService.getRandomSuffix(),
+                  function() {
+                    lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
+                  });
+              }
+            }
+
+            $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
+              newStateName);
+            _answerIsBeingProcessed = false;
+          }, millisecsLeftToWait);
         }, true);
       };
 
