@@ -29,7 +29,6 @@ import logging
 import re
 import string
 
-from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -55,6 +54,7 @@ STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
+STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 # These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -182,6 +182,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+        STATE_PROPERTY_INTERACTION_FALLBACKS,
         STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (

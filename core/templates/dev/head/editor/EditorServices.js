@@ -199,6 +199,7 @@ oppia.factory('changeListService', [
     confirmed_unclassified_answers: true,
     content: true,
     default_outcome: true,
+    fallbacks: true,
     param_changes: true,
     state_name: true,
     widget_customization_args: true,
@@ -957,6 +958,14 @@ oppia.factory('stateCustomizationArgsService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_customization_args';
+  return child;
+}]);
+
+// A data service that stores the current interaction fallbacks.
+oppia.factory('stateFallbacksService', [
+    'statePropertyService', function(statePropertyService) {
+  var child = Object.create(statePropertyService);
+  child.propertyName = 'fallbacks';
   return child;
 }]);
 
