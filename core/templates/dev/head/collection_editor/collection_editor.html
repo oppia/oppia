@@ -27,9 +27,11 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
-	  <p>title: <[collection.title]></p>
-    <p>category: <[collection.category]></p>
-    <p>objective: <[collection.objective]></p>
+    <div ng-if="isCollectionLoaded">
+      <p>title: <[collection.title]></p>
+      <p>category: <[collection.category]></p>
+      <p>objective: <[collection.objective]></p>
+    </div>
   </div>
 {% endblock content %}
 
@@ -37,7 +39,8 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('collection_editor/Controllers.js') }}
-    {{ include_js_file('collection_editor/Services.js') }}
+    {{ include_js_file('collection_editor/CollectionEditor.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorDataService.js') }}
+    {{ include_js_file('common/services/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}

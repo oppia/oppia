@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2015 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,10 @@ class CollectionEditorPage(CollectionEditorHandler):
             rights_manager.Actor(self.user_id).can_edit(
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
-        self.values.update({'can_edit': can_edit})
+        self.values.update({
+            'can_edit': can_edit, 
+            'title': collection.title
+        })
 
         self.render_template('collection_editor/collection_editor.html')
 
@@ -70,7 +73,7 @@ class CollectionHandler(CollectionEditorHandler):
     def _get_collection_data(self, collection_id, version=None):
         """Returns a description of the given collection."""
         try:
-            collection = collection_services.get_collection_by_id(collection_id, version)
+            collection = collection_services.get_collection_by_id(collection_id, version=version)
         except:
             raise self.PageNotFoundException
 

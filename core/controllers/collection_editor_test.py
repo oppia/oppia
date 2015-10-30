@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2015 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ import StringIO
 import zipfile
 
 from core.controllers import collection_editor
-from core.domain import config_services
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_services
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.tests import test_utils
 import feconf
+import logging
 
 
 class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
@@ -52,41 +53,58 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the collection is
-        editable."""
+        editable.
+        """
         self.assertIn(self.CAN_EDIT_STR, response_body)
         self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
 
     def assert_cannot_edit(self, response_body):
         """Returns True if the response body indicates that the collection is
-        not editable."""
+        not editable.
+        """
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
         self.assertNotIn(self.CAN_EDIT_STR, response_body)
-
 
 
 class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def setUp(self):
         super(CollectionEditorTest, self).setUp()
-        collection_services.load_demo('0')
+
+        self.COLLECTION_ID = '0'
+
+        collection_services.load_demo(self.COLLECTION_ID)
         rights_manager.release_ownership_of_collection(
-            feconf.SYSTEM_COMMITTER_ID, '0')
+            feconf.SYSTEM_COMMITTER_ID, self.COLLECTION_ID)
 
-    def test_collection_editor_page(self):
-        """Test access to editor pages for the sample exploration."""
+    def test_access_collection_editor_page(self):
+        """Test access to editor pages for the sample collection."""
 
-        # Check that non-editors can access, but not edit, the editor page.
-        response = self.testapp.get('/collection_editor/create/0')
+        # If no collection is found redirect to homepage.
+        response = self.testapp.get(
+            '%s/a' % (feconf.COLLECTION_EDITOR_URL_PREFIX))
+        self.assertEqual(response.status_int, 302)
+
+        # Check that it is possible to access a page with specific version number
+        response = self.testapp.get(
+            '%s/%s?v=1' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        #self.assertIn('Welcome to Collections in Oppia!', response.body)
+        self.assertIn('Welcome to Collections in Oppia!', response.body)
+        
+        # Check that non-editors can access, but not edit, the editor page.
+        response = self.testapp.get(
+            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
+        self.assertEqual(response.status_int, 200)
+        self.assertIn('Welcome to Collections in Oppia!', response.body)
         self.assert_cannot_edit(response.body)
 
-        # Log in as an editor.
-        self.login(self.EDITOR_EMAIL)
-
         # Check that it is now possible to access and edit the editor page.
-        response = self.testapp.get('/collection_editor/create/0')
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        #self.assertIn('Welcome to Collections in Oppia!', response.body)
+        self.assertIn('Welcome to Collections in Oppia!', response.body)
         self.assert_can_edit(response.body)
-
         self.logout()
+
+
+
