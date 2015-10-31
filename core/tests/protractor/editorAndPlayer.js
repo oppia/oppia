@@ -181,9 +181,9 @@ describe('Full exploration editor', function() {
       editor.setContent(forms.toRichText('How are you feeling?'));
       editor.setInteraction('TextInput');
       editor.addResponse('TextInput', forms.toRichText('You must be happy!'),
-        'first card', false, 'Equals', 'happy');
+        null, false, 'Equals', 'happy');
       editor.addResponse('TextInput', forms.toRichText('No being sad!'),
-        'first card', false, 'Contains', 'sad');
+        null, false, 'Contains', 'sad');
       editor.setDefaultOutcome(forms.toRichText(
         'Okay, now this is just becoming annoying.'), 'final card', true);
 

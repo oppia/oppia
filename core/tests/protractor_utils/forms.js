@@ -101,17 +101,17 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = function(elem) {
   // Set focus in the RTE.
-  elem.element(by.model('html')).click();
+  elem.all(by.model('html')).first().click();
 
   var _appendContentText = function(text) {
-    elem.element(by.model('html')).sendKeys(text);
+    elem.all(by.model('html')).first().sendKeys(text);
   };
   var _clickToolbarButton = function(buttonName) {
     elem.element(by.css('[name="' + buttonName + '"]')).click();
   };
   var _clearContent = function() {
-    expect(elem.element(by.model('html')).isPresent()).toBe(true);
-    elem.element(by.model('html')).clear();
+    expect(elem.all(by.model('html')).first().isPresent()).toBe(true);
+    elem.all(by.model('html')).first().clear();
   };
 
   return {
@@ -178,8 +178,8 @@ var RichTextEditor = function(elem) {
       general.waitForSystem();
 
       // Refocus back into the RTE.
-      elem.element(by.model('html')).click();
-      elem.element(by.model('html')).sendKeys(protractor.Key.END);
+      elem.all(by.model('html')).first().click();
+      elem.all(by.model('html')).first().sendKeys(protractor.Key.END);
     },
   };
 };

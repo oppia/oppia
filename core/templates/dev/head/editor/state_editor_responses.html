@@ -17,29 +17,13 @@
               <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
             </span>
             <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
-              <div class="oppia-response-header-block">
-                <div class="oppia-response-header">
-                  <span ng-if="$index != activeAnswerGroupIndex" ng-attr-title="<[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():false]>">
-                    <[answerGroup | summarizeAnswerGroup:getCurrentInteractionId():getAnswerChoices():true]>
-                  </span>
-                  <span ng-if="$index == activeAnswerGroupIndex">&nbsp;</span>
-                </div>
-                <span>→</span>
-                <span ng-if="!isOutcomeLooping(answerGroup.outcome) && !isCreatingNewState(answerGroup.outcome)" ng-click="navigateToState(answerGroup.outcome.dest)" class="oppia-nested-link">
-                  <[answerGroup.outcome.dest]>
-                </span>
-                <span ng-if="!isOutcomeLooping(answerGroup.outcome) && isCreatingNewState(answerGroup.outcome)">
-                  <em ng-if="answerGroup.outcome.newStateName">(<[answerGroup.outcome.newStateName]>)</em>
-                  <em ng-if="!answerGroup.outcome.newStateName">Nowhere yet...</em>
-                </span>
-                <span ng-if="isOutcomeLooping(answerGroup.outcome)">
-                  <em>(try again)</em>
-                </span>
-              </div>
-
-              <span class="protractor-test-delete-response oppia-delete-response-button oppia-transition-200" ng-click="deleteAnswerGroup($index, $event)" ng-if="editabilityService.isEditable()">
-                <i class="material-icons md-18">&#xE5CD;</i>
-              </span>
+              <response-header index="$index"
+                               summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():false"
+                               short-summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():true"
+                               is-active="$index === activeAnswerGroupIndex"
+                               on-delete-fn="deleteAnswerGroup"
+                               outcome="answerGroup.outcome">
+              </response-header>
             </a>
 
             <div ng-if="activeAnswerGroupIndex === $index">
@@ -58,22 +42,12 @@
         <ul class="nav nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
             <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
-              <div class="oppia-response-header-block">
-                <div ng-attr-title="<[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false]>" class="oppia-response-header">
-                  <[defaultOutcome | summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true]>
-                </div>
-                <span>→</span>
-                <span ng-if="!isOutcomeLooping(defaultOutcome) && !isCreatingNewState(defaultOutcome)" ng-click="navigateToState(defaultOutcome.dest)" class="oppia-nested-link">
-                  <[defaultOutcome.dest]>
-                </span>
-                <span ng-if="!isOutcomeLooping(defaultOutcome) && isCreatingNewState(defaultOutcome)">
-                  <em ng-if="defaultOutcome.newStateName">(<[defaultOutcome.newStateName]>)</em>
-                  <em ng-if="!defaultOutcome.newStateName">Nowhere yet...</em>
-                </span>
-                <span ng-if="isOutcomeLooping(defaultOutcome)">
-                  <em>(try again)</em>
-                </span>
-              </div>
+              <response-header index="$index"
+                               is-active="$index === activeAnswerGroupIndex"
+                               summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
+                               short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
+                               outcome="defaultOutcome">
+              </response-header>
             </a>
 
             <div ng-if="activeAnswerGroupIndex === answerGroups.length">
@@ -92,7 +66,7 @@
 
 {% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
   <md-card style="margin: 20px 0px; padding: 0px;" ng-if="isCurrentInteractionTrainable()">
-    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()" class="oppia-add-rule-button-container">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
         + Teach Oppia
       </button>
@@ -102,7 +76,7 @@
 {% else %}
   <md-card style="margin: 0px; padding: 0px;">
 {% endif %}
-    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()" class="oppia-add-rule-button-container">
+    <div ng-if="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
       <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Oppia Response
       </button>
@@ -199,7 +173,7 @@
   <div class="modal-footer">
     <button class="btn btn-default protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
-    <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(true)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
+    <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
   </div>
 </script>
 

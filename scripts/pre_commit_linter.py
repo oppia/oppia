@@ -17,8 +17,9 @@
 """Pre-commit script for Oppia.
 
 This script uses the JSCS node module to lint JavaScript code, and prints a
-list of lint errors to the terminal. If the --autofix flag is passed, it will
-also attempt to automatically fix these errors.
+list of lint errors to the terminal. If the directory path is passed,
+it will lint all JavaScript files in that directory; otherwise,
+it will only lint files that have been touched in this commit.
 
 IMPORTANT NOTES:
 
@@ -29,11 +30,16 @@ IMPORTANT NOTES:
 
     at least once.
 
-2.  This script should be run from the oppia root folder:
+=====================
+CUSTOMIZATION OPTIONS
+=====================
+1.  To lint only files that have been touched in this commit
+       python scripts/pre_commit_linter.py
 
-        python scripts/pre_commit_linter.py
+2.  To lint all files in  the folder or to lint just a specific file 
+        python scripts/pre_commit_linter.py --path filepath
 
- Note that the root folder MUST be named 'oppia'.
+Note that the root folder MUST be named 'oppia'.
  """
 
 __author__ = "Barnabas Makonda(barnabasmakonda@gmail.com)"
@@ -47,12 +53,9 @@ import time
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--autofix',
-    help=(
-        'optional; if specified, automatically fix errors where possible, and '
-        'only display errors which cannot be fixed'),
-    action='store_true')
-
+    '--path',
+    help='path to the directory with files to be linted',
+    action='store')
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -80,34 +83,57 @@ def _is_javascript_file(filename):
     return filename.endswith('.js')
 
 
-def _lint_js_files(node_path, jscs_path, autofix, config_jscsrc):
+def _get_all_files_in_directory(dir_path):
+    """Recursively collects all files in directory and 
+    subdirectories of specified path.
+
+    Args:
+    - dir_path: str. Path to the folder to be linted.
+
+    Returns:
+        a list of files in directory and subdirectories.
+    """
+    files_in_directory = []
+    for _dir, sub_dirs, files in os.walk(dir_path):
+        for file_name in files:
+            files_in_directory.append(
+                os.path.relpath(os.path.join(_dir, file_name), os.getcwd()))
+
+    return files_in_directory
+
+def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
     """Prints a list of lint errors in changed JavaScript files.
 
     Args:
     - node_path: str. Path to the node binary.
     - jscs_path: str. Path to the JSCS binary.
-    - autofix: bool. Whether to automatically fix errors.
+    - input_dir: str. Path to the folder to be linted (optional).
     """
-    changed_filenames = _get_changed_filenames()
-    changed_js_filenames = filter(_is_javascript_file, changed_filenames)
-    num_js_files = len(changed_js_filenames)
-
-    num_files_with_errors = 0
 
     print '----------------------------------------'
 
-    if not changed_js_filenames:
-        print 'There are no JavaScript files to lint in this commit. Exiting.'
+
+    if input_dir:
+        if os.path.isfile(input_dir):
+            all_files = [input_dir]
+        else:
+            all_files = _get_all_files_in_directory(input_dir)
+    else:
+        all_files = _get_changed_filenames()
+
+    start_time = time.time()
+    num_files_with_errors = 0
+
+    files_to_lint = filter(_is_javascript_file, all_files)
+    num_js_files = len(files_to_lint)
+    if not files_to_lint:
+        print 'There are no JavaScript files to lint. Exiting.'
         print '----------------------------------------'
         sys.exit(0)
 
-    start_time = time.time()
-
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
-    if autofix:
-        jscs_cmd_args.append('-x')
 
-    for ind, filename in enumerate(changed_js_filenames):
+    for ind, filename in enumerate(files_to_lint):
         print 'Linting file %d/%d: %s ...' % (
             ind + 1, num_js_files, filename)
 
@@ -140,7 +166,13 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
-    autofix = bool(parsed_args.autofix)
+    input_dir = parsed_args.path
+    if input_dir:
+        input_dir = os.path.join(os.getcwd(), parsed_args.path)
+        if not os.path.exists(input_dir):
+            print 'Could not locate directory %s. Exiting.' % input_dir
+            print '----------------------------------------'
+            sys.exit(0)
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
@@ -154,7 +186,7 @@ def _pre_commit_linter():
         if os.path.exists(jscs_path):
             print ''
             print 'Starting linter...'
-            _lint_js_files(node_path, jscs_path, autofix, config_jscsrc)
+            _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir)
         else:
             print ''
             print 'ERROR    Please run start.sh first to install node-jscs '
