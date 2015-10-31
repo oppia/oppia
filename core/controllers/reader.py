@@ -126,41 +126,53 @@ def classify(exp_id, state, answer, params):
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec = None
-    best_matched_truth_value = 0.0
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
     fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
     input_type = interaction_instance.answer_type
 
     # Find the first hard rule that matches
     for (i, answer_group) in enumerate(state.interaction.answer_groups):
+        ored_truth_value = 0.0
+        best_rule_spec = None
         for rule_spec in answer_group.rule_specs:
             if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
                 evaluated_truth_value = rule_domain.evaluate_rule(
                     rule_spec, input_type, params, normalized_answer, fs)
-                if evaluated_truth_value > best_matched_truth_value:
-                    best_matched_truth_value = evaluated_truth_value
-                    best_matched_rule_spec = rule_spec
-                    best_matched_answer_group = answer_group
-                    best_matched_answer_group_index = i
+                if evaluated_truth_value > ored_truth_value:
+                    ored_truth_value = evaluated_truth_value
+                    best_rule_spec = rule_spec
+        if ored_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+            best_matched_truth_value = ored_truth_value
+            best_matched_rule_spec = best_rule_spec
+            best_matched_answer_group = answer_group
+            best_matched_answer_group_index = i
+            break
 
-    # Find the maximum soft rule that matches. This is
-    # done by ORing (maximizing) all truth values of all rules over all answer
-    # groups. The group with the highest truth value is considered the best
-    # match.
+    # Find the maximum soft rule that matches. This is done by ORing
+    # (maximizing) all truth values of all rules over all answer groups. The
+    # group with the highest truth value is considered the best match.
     if best_matched_answer_group is None:
         for (i, answer_group) in enumerate(state.interaction.answer_groups):
+            ored_truth_value = 0.0
+            best_rule_spec = None
             for rule_spec in answer_group.rule_specs:
                 if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
                     evaluated_truth_value = rule_domain.evaluate_rule(
                         rule_spec, input_type, params, normalized_answer, fs)
-                    if evaluated_truth_value > best_matched_truth_value:
-                        best_matched_truth_value = evaluated_truth_value
-                        best_matched_rule_spec = rule_spec
-                        best_matched_answer_group = answer_group
-                        best_matched_answer_group_index = i
+                    if evaluated_truth_value > ored_truth_value:
+                        ored_truth_value = evaluated_truth_value
+                        best_rule_spec = rule_spec
+            if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+                best_matched_truth_value = evaluated_truth_value
+                best_matched_rule_spec = rule_spec
+                best_matched_answer_group = answer_group
+                best_matched_answer_group_index = i
+                break
 
-    # Run the classifier
-    if best_matched_answer_group is None:
+    # Run the classifier if no prediction has been made yet. Currently this
+    # is behind a development flag.
+    if feconf.ENABLE_STRING_CLASSIFIER and best_matched_answer_group is None:
         sc = classifier_services.StringClassifier()
         training_examples = [[doc, []] for doc in
             state.interaction.confirmed_unclassified_answers]
@@ -173,7 +185,8 @@ def classify(exp_id, state, answer, params):
             sc.load_examples(training_examples)
             doc_ids = sc.add_examples_for_predicting([answer])
             predicted_label = sc.predict_label_for_doc(doc_ids[0])
-            if predicted_label != '_default':
+            if (predicted_label !=
+                    classifier_services.StringClassifier.DEFAULT_LABEL):
                 predicted_answer_group_index = int(predicted_label)
                 predicted_answer_group = state.interaction.answer_groups[
                     predicted_answer_group_index]
