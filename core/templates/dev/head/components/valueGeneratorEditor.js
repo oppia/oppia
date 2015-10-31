@@ -18,22 +18,25 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var VALUE_GENERATOR_TEMPLATES_URL = '/value_generator_handler/';
-
 // Individual value generator directives can be found in
 // extensions/value_generators/templates.
 
 oppia.directive('valueGeneratorEditor', ['$compile', function($compile) {
   return {
-    link: function(scope, element, attrs) {
-      scope.$watch('generatorId', function(newValue, oldValue) {
+    restrict: 'E',
+    scope: {
+      customizationArgs: '=',
+      generatorId: '=',
+      initArgs: '=',
+      objType: '='
+    },
+    link: function(scope, element) {
+      scope.$watch('generatorId', function() {
         var directiveName = scope.generatorId.replace(
             /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
         element.html('<' + directiveName + '></' + directiveName + '>');
         $compile(element.contents())(scope);
       });
-    },
-    restrict: 'E',
-    scope: {generatorId: '=', initArgs: '=', customizationArgs: '=', objType: '='}
+    }
   };
 }]);

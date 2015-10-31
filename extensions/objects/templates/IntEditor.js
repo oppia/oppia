@@ -17,11 +17,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('intEditor', function($compile, warningsData) {
+oppia.directive('intEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'Int';
+        return OBJECT_EDITOR_URL_PREFIX + 'Int';
       };
       $compile(element.contents())(scope);
     },
@@ -38,4 +40,4 @@ oppia.directive('intEditor', function($compile, warningsData) {
       }
     }
   };
-});
+}]);

@@ -19,7 +19,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-python scripts/install_third_party.py
+$PYTHON_CMD scripts/install_third_party.py
 
 # Check if the OS supports node.js installation; if not, return to the calling
 # script.
@@ -42,19 +42,19 @@ if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.33-darwin-x64
+      NODE_FILE_NAME=node-v4.2.1-darwin-x64
     else
-      NODE_FILE_NAME=node-v0.10.33-darwin-x86
+      NODE_FILE_NAME=node-v4.2.1-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.33-linux-x64
+      NODE_FILE_NAME=node-v4.2.1-linux-x64
     else
-      NODE_FILE_NAME=node-v0.10.33-linux-x86
+      NODE_FILE_NAME=node-v4.2.1-linux-x86
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v0.10.33/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -76,11 +76,12 @@ $NPM_CMD config set ca ""
 # patches.
 
 echo Checking whether Skulpt is installed in third_party
-if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt" ]; then
-  if [ ! -d "$TOOLS_DIR/skulpt/dist" ]; then
+if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
+  if [ ! -d "$TOOLS_DIR/skulpt-0.10.0" ]; then
     echo Downloading Skulpt
     cd $TOOLS_DIR
-    rm -rf skulpt
+    mkdir skulpt-0.10.0
+    cd skulpt-0.10.0
     git clone https://github.com/skulpt/skulpt
     cd skulpt
 
@@ -96,16 +97,22 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt" ]; then
     # The Skulpt setup function needs to be tweaked. It fails without certain
     # third party commands. These are only used for unit tests and generating
     # documentation and are not necessary when building Skulpt.
-    sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt/skulpt.py |\
+    sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
     sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
-    mv $TMP_FILE $TOOLS_DIR/skulpt/skulpt.py
-    python $TOOLS_DIR/skulpt/skulpt.py dist
+    mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
+    $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
   fi
 
   # Move the build directory to the static resources folder.
-  mkdir -p $THIRD_PARTY_DIR/static/skulpt
-  cp -r $TOOLS_DIR/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt
+  mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
+  cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
+fi
+
+echo Checking whether node-jscs dependencies are installed
+if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
+  echo installing node-jscs
+  $NPM_INSTALL jscs@2.3.0
 fi

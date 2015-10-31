@@ -90,12 +90,12 @@ for arg in "$@"; do
   fi
 done
 
-python scripts/backend_tests.py $@
+$PYTHON_CMD scripts/backend_tests.py $@
 
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
-    python $COVERAGE_HOME/coverage combine
-    python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/*" --show-missing
+    $PYTHON_CMD $COVERAGE_HOME/coverage combine
+    $PYTHON_CMD $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/*" --show-missing
   fi
 done
 

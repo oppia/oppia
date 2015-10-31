@@ -32,4 +32,4 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
         all_generator_classes = (
             value_generators_domain.Registry.get_all_generator_classes())
-        self.assertEqual(len(all_generator_classes), 4)
+        self.assertEqual(len(all_generator_classes), 2)

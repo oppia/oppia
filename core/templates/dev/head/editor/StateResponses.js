@@ -647,7 +647,9 @@ oppia.controller('StateResponses', [
 }]);
 
 
-oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
+oppia.filter('summarizeAnswerGroup', [
+    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
   return function(answerGroup, interactionId, answerChoices, shortenRule) {
     var summary = '';
     var outcome = answerGroup.outcome;
@@ -661,7 +663,7 @@ oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
 
       if (hasFeedback && shortenRule) {
         summary = $filter('wrapTextWithEllipsis')(
-          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
       }
       summary = '[' + summary + '] ';
     }
@@ -675,8 +677,8 @@ oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
 
 
 oppia.filter('summarizeDefaultOutcome', [
-    '$filter', 'INTERACTION_SPECS',
-    function($filter, INTERACTION_SPECS) {
+    '$filter', 'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+    function($filter, INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
   return function(
       defaultOutcome, interactionId, answerGroupCount, shortenRule) {
     if (!defaultOutcome) {
@@ -697,7 +699,7 @@ oppia.filter('summarizeDefaultOutcome', [
 
     if (hasFeedback && shortenRule) {
       summary = $filter('wrapTextWithEllipsis')(
-        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+        summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
     }
     summary = '[' + summary + '] ';
 

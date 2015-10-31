@@ -24,13 +24,15 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', 'CATEGORY_LIST', function(
+    'explorationWarningsService', 'CATEGORY_LIST',
+    'explorationAdvancedFeaturesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService, CATEGORY_LIST) {
+      explorationWarningsService, CATEGORY_LIST,
+      explorationAdvancedFeaturesService) {
 
   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -134,10 +136,22 @@ oppia.controller('ExplorationSettings', [
     $rootScope.$broadcast('refreshGraph');
   };
 
-  $scope.saveExplorationParamChanges = function() {
-    explorationParamChangesService.saveDisplayedValue();
+  $scope.postSaveParamChangesHook = function() {
     explorationWarningsService.updateWarnings();
   };
+
+  /********************************************
+  * Methods for enabling advanced features.
+  ********************************************/
+  $scope.areParametersEnabled = (
+    explorationAdvancedFeaturesService.areParametersEnabled);
+  $scope.areGadgetsEnabled = (
+    explorationAdvancedFeaturesService.areGadgetsEnabled);
+
+  $scope.enableParameters = (
+    explorationAdvancedFeaturesService.enableParameters);
+  $scope.enableGadgets = (
+    explorationAdvancedFeaturesService.enableGadgets);
 
   /********************************************
   * Methods for rights management.
