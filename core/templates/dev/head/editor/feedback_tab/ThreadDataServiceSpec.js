@@ -34,7 +34,7 @@ describe('retrieving threads service', function() {
     httpBackend = $httpBackend;
   }));
 
-  it('should retrieve feeedback threads', function() {
+  it('should retrieve feedback threads', function() {
     var mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
@@ -43,41 +43,39 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'example feedback',
         summary: null,
-        threadId: 'abc1',
-        suggestionId: ''
+        threadId: 'abc1'
       },
       {
-        last_updated: 1441870501230.642,
+        last_updated: 1441870501231.642,
         original_author_username: 'test_author',
         state_name: null,
         status: 'open',
-        subject: 'example suggestion',
+        subject: 'example feedback',
         summary: null,
-        threadId: 'abc2',
-        suggestionId: ''
+        threadId: 'abc2'
       }
     ];
 
     var mockOpenSuggestionThreads = [
       {
-        last_updated: 1441870501230.642,
+        last_updated: 1441870501232.642,
         original_author_username: 'test_author',
         state_name: null,
         status: 'open',
         subject: 'example suggestion',
         summary: null,
         threadId: 'abc3',
-        suggestionId: '1'
+        suggestion_id: '1'
       },
       {
-        last_updated: 1441870501230.642,
+        last_updated: 1441870501233.642,
         original_author_username: 'test_author',
         state_name: null,
         status: 'open',
         subject: 'example suggestion',
         summary: null,
         threadId: 'abc4',
-        suggestionId: '2'
+        suggestion_id: '2'
       }
     ];
 
