@@ -34,10 +34,12 @@ MAX_USERNAME_LENGTH = 50
 class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
-            self, user_id, email, username=None, last_agreed_to_terms=None,
+            self, user_id, email, created_on=None, username=None,  last_agreed_to_terms=None, 
             last_started_state_editor_tutorial=None,
             profile_picture_data_url=None, user_bio='',
             preferred_language_codes=None):
+        
+        self.created_on = created_on
         self.user_id = user_id
         self.email = email
         self.username = username
@@ -189,7 +191,8 @@ def get_users_settings(user_ids):
                     model.last_started_state_editor_tutorial),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
-                preferred_language_codes=model.preferred_language_codes
+                preferred_language_codes=model.preferred_language_codes,
+                created_on=model.created_on
             ))
         else:
             result.append(None)
@@ -218,11 +221,18 @@ def _save_user_settings(user_settings):
             user_settings.last_started_state_editor_tutorial),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
-        preferred_language_codes=user_settings.preferred_language_codes,
+        preferred_language_codes=user_settings.preferred_language_codes
     ).put()
 
 
+<<<<<<< HEAD
+
+
+
+def has_user_registered_as_editor(user_id):
+=======
 def has_ever_registered(user_id):
+>>>>>>> a9808e47a1c3885c216e5eb7ed5b51d9c60ecbe9
     user_settings = get_user_settings(user_id, strict=True)
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
@@ -245,8 +255,12 @@ def _create_user(user_id, email):
 
     user_settings = UserSettings(
         user_id, email,
-        preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
+        preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE]
+    )
     _save_user_settings(user_settings)
+
+
+
     return user_settings
 
 
