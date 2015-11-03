@@ -774,6 +774,13 @@ oppia.factory('explorationStatesService', [
                 interaction.default_outcome.dest = otherStateName;
               }
             }
+
+            var fallbacks = interaction.fallbacks;
+            for (var i = 0; i < fallbacks.length; i++) {
+              if (fallbacks[i].outcome.dest === deleteStateName) {
+                fallbacks[i].outcome.dest = otherStateName;
+              }
+            }
           }
           changeListService.deleteState(deleteStateName);
 

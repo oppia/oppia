@@ -1517,7 +1517,25 @@ class Exploration(object):
                 for param_change in group.outcome.param_changes:
                     if param_change.name not in self.param_specs:
                         raise utils.ValidationError(
-                            'The parameter %s was used in a rule, but it '
+                            'The parameter %s was used in an answer group, '
+                            'but it does not exist in this exploration'
+                            % param_change.name)
+
+        # Check that all fallbacks are valid.
+        for state in self.states.values():
+            interaction = state.interaction
+
+            for fallback in interaction.fallbacks:
+                # Check fallback destinations.
+                if fallback.outcome.dest not in all_state_names:
+                    raise utils.ValidationError(
+                        'The fallback destination %s is not a valid state.'
+                        % fallback.outcome.dest)
+
+                for param_change in fallback.outcome.param_changes:
+                    if param_change.name not in self.param_specs:
+                        raise utils.ValidationError(
+                            'The parameter %s was used in a fallback, but it '
                             'does not exist in this exploration'
                             % param_change.name)
 

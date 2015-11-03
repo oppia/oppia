@@ -43,14 +43,20 @@ oppia.controller('StateFallbacks', [
       '[Answered ' +
       fallback.trigger.customization_args.num_submits.value +
       ' times] ');
-    return (
-      fallbackDescription +
-      $filter('convertToPlainText')(fallback.outcome.feedback[0]));
+    var feedbackAsPlainText = (
+      fallback.outcome.feedback.length ?
+      $filter('convertToPlainText')(fallback.outcome.feedback[0]) :
+      '');
+    return fallbackDescription + feedbackAsPlainText;
   };
 
   $scope.changeActiveFallbackIndex = function(newIndex) {
-    $rootScope.$broadcast('externalSave');
-    $scope.activeFallbackIndex = newIndex;
+    // If the current fallback is being clicked on again, close it.
+    if (newIndex === $scope.activeFallbackIndex) {
+      $scope.activeFallbackIndex = null;
+    } else {
+      $scope.activeFallbackIndex = newIndex;
+    }
   };
 
   // This returns false if the current interaction ID is null.
@@ -156,7 +162,7 @@ oppia.controller('StateFallbacks', [
         $scope.isDraggingActiveFallback = null;
       }
       $scope.$apply();
-      $rootScope.$broadcast('externalSave');
+      saveFallbacksChanges();
     }
   };
 

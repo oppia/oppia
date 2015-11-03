@@ -19,7 +19,7 @@
                 ng-class="{'active': activeFallbackIndex === $index}"
                 class="oppia-rule-block oppia-sortable-fallback"
                 style="margin-top: 0;">
-              <span class="oppia-rule-sort-handle"
+              <span class="oppia-fallback-sort-handle"
                     ng-if="stateFallbacksService.displayed.length > 1">
                 <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
               </span>
@@ -40,7 +40,7 @@
                   <div class="oppia-rule-body-container protractor-test-fallback-body-<[$index]>">
                     <fallback-editor trigger="fallback.trigger"
                                      outcome="fallback.outcome"
-                                     on-save="onComponentSave"
+                                     on-save="onComponentSave()"
                                      class="protractor-test-fallback-body">
                     </fallback-editor>
                   </div>
@@ -71,10 +71,10 @@
     <form name="addFallbackForm.outcomeDetailsForm"
           class="form-inline protractor-test-add-response-details">
       <div class="oppia-rule-details-header">
-        Once the learner submits an answer
+        Once the learner has made
         <schema-based-editor schema="INT_FORM_SCHEMA" local-value="tmpFallback.trigger.customization_args.num_submits.value">
         </schema-based-editor>
-        time<span ng-if="tmpFallback.trigger.customization_args.num_submits.value !== 1">s</span>:
+        unsuccessful attempt<span ng-if="tmpFallback.trigger.customization_args.num_submits.value !== 1">s</span>:
       </div>
 
       <br>

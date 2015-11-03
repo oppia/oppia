@@ -1301,7 +1301,7 @@ pre.oppia-pre-wrapped-text {
   white-space: nowrap;
 }
 
-.oppia-rule-sort-handle {
+.oppia-rule-sort-handle, .oppia-fallback-sort-handle {
   cursor: move;
   left: 10px;
   margin-left: 5px;

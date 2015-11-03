@@ -55,7 +55,7 @@ oppia.directive('fallbackEditor', [function() {
         $scope.saveThisTrigger = function() {
           $scope.triggerEditorIsOpen = false;
           $scope.triggerMemento = null;
-          $scope.getOnSaveFn()();
+          $scope.onSave();
         };
 
         $scope.cancelThisTriggerEdit = function() {
