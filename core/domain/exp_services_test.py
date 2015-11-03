@@ -1111,13 +1111,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.interaction_default_outcome['dest'] = 'State 2'
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID,
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS,
-                {
+                [{
                     'trigger': {
                         'trigger_type': 'NthResubmission',
                         'customization_args': {
@@ -1125,7 +1124,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         },
                     },
                     'outcome': self.interaction_default_outcome,
-                }))
+                }]),
+            '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         init_state = exploration.init_state
@@ -1135,7 +1135,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(fallbacks[0].trigger.trigger_type, 'NthResubmission')
         self.assertEqual(
             fallbacks[0].trigger.customization_args, {'num_submits': 5})
-        self.assertEqual(fallbacks[0].outcome.feedback, ['Try again'])
+        self.assertEqual(fallbacks[0].outcome.feedback, [
+            'Incorrect', '<b>Wrong answer</b>'])
         self.assertEqual(fallbacks[0].outcome.dest, self.init_state_name)
 
     def test_update_state_invalid_state(self):

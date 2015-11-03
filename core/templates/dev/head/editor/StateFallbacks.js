@@ -39,10 +39,10 @@ oppia.controller('StateFallbacks', [
   });
 
   $scope.getFallbackSummary = function(fallback) {
+    var numSubmits = fallback.trigger.customization_args.num_submits.value;
     var fallbackDescription = (
-      '[Answered ' +
-      fallback.trigger.customization_args.num_submits.value +
-      ' times] ');
+      '[' + numSubmits +
+      ' unsuccessful attempt' + (numSubmits !== 1 ? 's' : '') + '] ');
     var feedbackAsPlainText = (
       fallback.outcome.feedback.length ?
       $filter('convertToPlainText')(fallback.outcome.feedback[0]) :

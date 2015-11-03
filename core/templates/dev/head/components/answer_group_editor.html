@@ -48,8 +48,8 @@
     <br ng-if="rules">
 
     <outcome-editor is-editable="isEditable"
-                    on-save-dest="onSaveAnswerGroupDest()"
-                    on-save-feedback="onSaveAnswerGroupFeedback()"
+                    on-save-dest="getOnSaveAnswerGroupDestFn()"
+                    on-save-feedback="getOnSaveAnswerGroupFeedbackFn()"
                     outcome="outcome">
     </outcome-editor>
   </div>

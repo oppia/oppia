@@ -97,14 +97,14 @@ oppia.directive('outcomeEditor', [function() {
           $scope.$broadcast('saveOutcomeFeedbackDetails');
           $scope.feedbackEditorIsOpen = false;
           $scope.outcomeFeedbackMemento = null;
-          $scope.getOnSaveFeedbackFn();
+          $scope.getOnSaveFeedbackFn()($scope.outcome);
         };
 
         $scope.saveThisDestination = function() {
           $scope.$broadcast('saveOutcomeDestDetails');
           $scope.destinationEditorIsOpen = false;
           $scope.outcomeDestMemento = null;
-          $scope.getOnSaveDestFn();
+          $scope.getOnSaveDestFn()($scope.outcome);
         };
 
         $scope.cancelThisFeedbackEdit = function() {

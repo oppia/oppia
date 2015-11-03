@@ -61,7 +61,7 @@ oppia.factory('responsesService', [
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
   var _activeAnswerGroupIndex = null;
-  var _activeRuleIndex = null;
+  var _activeRuleIndex = -1;
   var _answerGroups = null;
   var _defaultOutcome = null;
   var _confirmedUnclassifiedAnswers = null;
