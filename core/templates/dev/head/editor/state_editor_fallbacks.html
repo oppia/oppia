@@ -25,7 +25,7 @@
                 <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
               </span>
               <a ng-click="changeActiveFallbackIndex($index)"
-                 class="oppia-rule-tab protractor-test-response-tab"
+                 class="oppia-rule-tab protractor-test-fallback-tab"
                  ng-class="{'oppia-rule-tab-active': activeFallbackIndex === $index}">
                 <response-header index="$index"
                                  summary="getFallbackSummary(fallback)"
@@ -70,10 +70,10 @@
 
   <div class="modal-body">
     <form name="addFallbackForm.outcomeDetailsForm"
-          class="form-inline protractor-test-add-response-details">
+          class="form-inline protractor-test-add-fallback-details">
       <div class="oppia-rule-details-header">
         Once the learner has made
-        <schema-based-editor schema="INT_FORM_SCHEMA" local-value="tmpFallback.trigger.customization_args.num_submits.value">
+        <schema-based-editor schema="INT_FORM_SCHEMA" local-value="tmpFallback.trigger.customization_args.num_submits.value" class="protractor-test-fallback-num-submits">
         </schema-based-editor>
         unsuccessful attempt<span ng-if="tmpFallback.trigger.customization_args.num_submits.value !== 1">s</span>:
       </div>
@@ -109,7 +109,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger protractor-test-confirm-delete-response"
+    <button class="btn btn-danger protractor-test-confirm-delete-fallback"
             ng-click="reallyDelete()">
       Delete Fallback
     </button>
