@@ -133,35 +133,23 @@ oppia.controller('StateFallbacks', [
     });
   };
 
-  $scope.isDraggingActiveFallback = null;
-
+  // When the page is scrolled so that the top of the page is above the browser
+  // viewport, there are some bugs in the positioning of the helper. This is a
+  // bug in jQueryUI that has not been fixed yet. For more details, see
+  // http://stackoverflow.com/q/5791886
   $scope.FALLBACK_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
     handle: '.oppia-fallback-sort-handle',
     items: '.oppia-sortable-fallback',
+    revert: 100,
     tolerance: 'pointer',
     start: function(e, ui) {
       $rootScope.$broadcast('externalSave');
-      $scope.$apply();
+      $scope.activeFallbackIndex = null;
       ui.placeholder.height(ui.item.height());
-
-      // This maintains the current open/close state of the answer group. If an
-      // closed answer group is dragged, keep it closed. If the dragged group is
-      // open, keep it open.
-      $scope.isDraggingActiveFallback = (
-        ui.item.index() == $scope.activeFallbackIndex);
     },
     stop: function(e, ui) {
-      saveFallbacksChanges();
-
-      // If the fallback is being dragged, make sure its index is changed to
-      // the answer group's new location.
-      if ($scope.isDraggingActiveFallback) {
-        $scope.changeActiveFallbackIndex(ui.item.index());
-        $scope.isDraggingActiveFallback = null;
-      }
-      $scope.$apply();
       saveFallbacksChanges();
     }
   };

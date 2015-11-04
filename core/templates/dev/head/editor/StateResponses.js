@@ -551,36 +551,24 @@ oppia.controller('StateResponses', [
     });
   };
 
-  $scope.isDraggingActiveAnswerGroup = null;
-
+  // When the page is scrolled so that the top of the page is above the browser
+  // viewport, there are some bugs in the positioning of the helper. This is a
+  // bug in jQueryUI that has not been fixed yet. For more details, see
+  // http://stackoverflow.com/q/5791886
   $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
     handle: '.oppia-rule-sort-handle',
     items: '.oppia-sortable-rule-block',
+    revert: 100,
     tolerance: 'pointer',
     start: function(e, ui) {
       $rootScope.$broadcast('externalSave');
-      $scope.$apply();
+      $scope.changeActiveAnswerGroupIndex(-1);
       ui.placeholder.height(ui.item.height());
-
-      // This maintains the current open/close state of the answer group. If an
-      // closed answer group is dragged, keep it closed. If the dragged group is
-      // open, keep it open.
-      $scope.isDraggingActiveAnswerGroup = (
-        ui.item.index() == responsesService.getActiveAnswerGroupIndex());
     },
     stop: function(e, ui) {
       responsesService.save($scope.answerGroups, $scope.defaultOutcome);
-
-      // If the active group is being dragged, make sure its index is changed to
-      // the answer group's new location.
-      if ($scope.isDraggingActiveAnswerGroup) {
-        $scope.changeActiveAnswerGroupIndex(ui.item.index());
-        $scope.isDraggingActiveAnswerGroup = null;
-      }
-      $scope.$apply();
-      $rootScope.$broadcast('externalSave');
     }
   };
 
