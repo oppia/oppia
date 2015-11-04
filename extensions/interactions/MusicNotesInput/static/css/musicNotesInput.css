@@ -8,6 +8,8 @@
   margin: 0 0 0 11.0784%;
   width: 87.34525%;
   height: 43%;
+  /*display: none; /* Hide valid note area until page loads */
+  visibility: hidden;
 }
 
 /* The box around staff */
@@ -77,12 +79,11 @@
   background-size: 8.5% 89%;
 }
 
-
 /* Individual notes */
 
 .oppia-music-input-note-choices div {
   width: 7.8%;
-  height: 8.2%;
+  height: 9.2%;
   position: relative;
   background: transparent;
 }
