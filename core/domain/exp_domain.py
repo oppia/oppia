@@ -691,15 +691,25 @@ class InteractionInstance(object):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
-    def get_all_outcomes(self):
-        """Returns a list of all outcomes of this interaction, taking into
-        consideration every answer group and the default outcome.
+    def get_all_non_fallback_outcomes(self):
+        """Returns a list of all non-fallback outcomes of this interaction, i.e.
+        every answer group and the default outcome.
         """
         outcomes = []
         for answer_group in self.answer_groups:
             outcomes.append(answer_group.outcome)
         if self.default_outcome is not None:
             outcomes.append(self.default_outcome)
+        return outcomes
+
+    def get_all_outcomes(self):
+        """Returns a list of all outcomes of this interaction, taking into
+        consideration every answer group, the default outcome, and every
+        fallback.
+        """
+        outcomes = self.get_all_non_fallback_outcomes()
+        for fallback in self.fallbacks:
+            outcomes.append(fallback.outcome)
         return outcomes
 
     def validate(self, exp_param_specs_dict):
@@ -1617,7 +1627,9 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that all states can reach a terminal state."""
+        """Verifies that all states can reach a terminal state without using
+        fallbacks.
+        """
         # This queue stores state names.
         processed_queue = []
         curr_queue = []
@@ -1638,7 +1650,8 @@ class Exploration(object):
             for (state_name, state) in self.states.iteritems():
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
-                    all_outcomes = state.interaction.get_all_outcomes()
+                    all_outcomes = (
+                        state.interaction.get_all_non_fallback_outcomes())
                     for outcome in all_outcomes:
                         if outcome.dest == curr_state_name:
                             curr_queue.append(state_name)

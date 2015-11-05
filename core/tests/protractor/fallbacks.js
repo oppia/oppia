@@ -48,6 +48,8 @@ describe('Fallbacks editor', function() {
       editor.setDefaultOutcome(null, 'final card', false);
 
       editor.moveToState('final card');
+      // Do a rename, to ensure that the destination states update accordingly.
+      editor.setStateName('new name for final card');
       editor.setInteraction('EndExploration');
 
       editor.setObjective('To test fallbacks.');
@@ -71,13 +73,25 @@ describe('Fallbacks editor', function() {
       fallbackEditor.expectCannotDeleteFallback();
       fallbackEditor.expectCannotChangeTriggerCondition();
 
-      general.moveToPlayer();
+      general.openPlayer(explorationId);
       player.submitAnswer('NumericInput', 19);
       player.expectLatestFeedbackToMatch(forms.toRichText('try again'));
       player.expectExplorationToNotBeOver();
       player.submitAnswer('NumericInput', 18);
-      player.expectLatestFeedbackToMatch(forms.toRichText('fallback triggered'));
+      player.expectLatestFeedbackToMatch(
+        forms.toRichText('fallback triggered'));
       player.clickThroughToNextCard();
+      player.expectExplorationToBeOver();
+
+      // Verify that an answer which moves to a new state does not trigger a
+      // fallback.
+      general.openPlayer(explorationId);
+      player.submitAnswer('NumericInput', 19);
+      player.expectLatestFeedbackToMatch(forms.toRichText('try again'));
+      player.expectExplorationToNotBeOver();
+      player.submitAnswer('NumericInput', 21);
+      player.expectInteractionToMatch('Continue', 'click here');
+      player.submitAnswer('Continue', null);
       player.expectExplorationToBeOver();
 
       users.logout();

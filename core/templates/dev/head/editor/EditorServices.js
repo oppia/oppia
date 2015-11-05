@@ -825,6 +825,13 @@ oppia.factory('explorationStatesService', [
               interaction.default_outcome.dest = newStateName;
             }
           }
+
+          var fallbacks = interaction.fallbacks;
+          for (var i = 0; i < fallbacks.length; i++) {
+            if (fallbacks[i].outcome.dest === oldStateName) {
+              fallbacks[i].outcome.dest = newStateName;
+            }
+          }
         }
 
         editorContextService.setActiveStateName(newStateName);
@@ -1598,7 +1605,8 @@ oppia.factory('explorationWarningsService', [
       return links.map(function(link) {
         return {
           source: link.target,
-          target: link.source
+          target: link.source,
+          isFallback: link.isFallback
         };
       });
     };

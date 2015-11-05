@@ -772,23 +772,23 @@ var addFallback = function(
     }
   });
 
-  var fallbackElt = element(by.css('.protractor-test-add-fallback-details'));
+  var fallbackElem = element(by.css('.protractor-test-add-fallback-details'));
 
   // Set the fallback description.
-  var numSubmitsField = fallbackElt.element(
+  var numSubmitsField = fallbackElem.element(
     by.css('.protractor-test-fallback-num-submits'));
   var intEditor = forms.getEditor('Real')(numSubmitsField);
   intEditor.setValue(numSubmits);
 
   if (feedbackInstructions) {
     // Set feedback contents.
-    _setOutcomeFeedback(fallbackElt, feedbackInstructions);
+    _setOutcomeFeedback(fallbackElem, feedbackInstructions);
   }
 
   // If the destination is being changed, open the corresponding editor.
   if (destStateName) {
     // Set destination contents.
-    _setOutcomeDest(fallbackElt, destStateName, createState);
+    _setOutcomeDest(fallbackElem, destStateName, createState);
   }
 
   // Close the modal.
