@@ -19,8 +19,7 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-oppia.factory('UrlInterpolationService', [
-    'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+oppia.factory('UrlInterpolationService', [function() {
   return {
     /**
      * Given a formatted URL, interpolates the URL by inserting values the URL
@@ -38,6 +37,13 @@ oppia.factory('UrlInterpolationService', [
      * interpolationValues object, this will return null.
      */
     interpolateUrl: function(formattedUrl, interpolationValues) {
+      if (!formattedUrl) {
+        return formattedUrl;
+      }
+      if (!interpolationValues || !(interpolationValues instanceof Object)) {
+        return null;
+      }
+
       var INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
 
       var filledUrl = angular.copy(formattedUrl);
@@ -49,8 +55,7 @@ oppia.factory('UrlInterpolationService', [
         }
         filledUrl = filledUrl.replace(
           INTERPOLATION_VARIABLE_REGEX,
-          oppiaHtmlEscaper.unescapedStrToEscapedStr(
-            interpolationValues[varName]));
+          escape(interpolationValues[varName]));
         match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       }
       return filledUrl;

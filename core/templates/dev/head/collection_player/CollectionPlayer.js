@@ -86,12 +86,12 @@ oppia.controller('CollectionPlayer', [
   };
 
   // Load the collection the learner wants to view.
-  CollectionDataService.loadCollection(
-      $scope.collectionId, function(collection) {
-    $scope.collection = collection;
-  }, function(error, collectionId) {
-    // TODO(bhenning): Handle not being able to load the collection.
-    warningsData.addWarning(
-      error || 'There was an error loading the collection.');
-  });
+  CollectionDataService.loadCollection($scope.collectionId).then(
+    function(collection) {
+      $scope.collection = collection;
+    }, function(error, collectionId) {
+      // TODO(bhenning): Handle not being able to load the collection.
+      warningsData.addWarning(
+        error || 'There was an error loading the collection.');
+    });
 }]);

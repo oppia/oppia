@@ -24,8 +24,8 @@
 // the collection instead. This file should not be included on the page in that
 // scenario.
 oppia.factory('CollectionDataService', [
-    '$http', 'COLLECTION_DATA_URL', 'UrlInterpolationService',
-    function($http, COLLECTION_DATA_URL, UrlInterpolationService) {
+    '$http', '$q', 'COLLECTION_DATA_URL', 'UrlInterpolationService',
+    function($http, $q, COLLECTION_DATA_URL, UrlInterpolationService) {
 
   // Maps previously loaded collections to their IDs.
   var _collectionCache = [];
@@ -40,9 +40,9 @@ oppia.factory('CollectionDataService', [
       if (successCallback) {
         successCallback(collection);
       }
-    }).error(function(data) {
+    }).error(function(error) {
       if (errorCallback) {
-        errorCallback(data ? data.error : null);
+        errorCallback(error);
       }
     });
   };
@@ -53,39 +53,44 @@ oppia.factory('CollectionDataService', [
 
   return {
     /**
-     * Retrieves a collection from the backend given a collection ID. If the
-     * collection is successfully loaded and a successCallback function is
-     * provided, successCallback is called with the collection passed in as a
-     * parameter. If something goes wrong while trying to fetch the collection,
-     * errorCallback is called instead, if present. errorCallback is passed
-     * the error that occurred and the collection ID.
+     * Retrieves a collection from the backend given a collection ID. This
+     * returns a promise object that allows a success and rejection callbacks to
+     * be registered. If the collection is successfully loaded and a success
+     * callback function is provided to the promise object, the success callback
+     * is called with the collection passed in as a parameter. If something goes
+     * wrong while trying to fetch the collection, the rejection callback is
+     * called instead, if present. The rejection callback function is passed the
+     * error that occurred and the collection ID.
      */
-    fetchCollection: function(collectionId, successCallback, errorCallback) {
-      _fetchCollection(collectionId, successCallback, errorCallback);
+    fetchCollection: function(collectionId) {
+      return $q(function(resolve, reject) {
+        _fetchCollection(collectionId, resolve, reject);
+      });
     },
 
     /**
      * Behaves in the exact same way as fetchCollection (including callback
-     * behavior), except this function will attempt to see whether the given
-     * collection has already been loaded. If it has not yet been loaded, it
-     * will fetch the collection from the backend. If it successfully retrieves
-     * the collection from the backend, it will store it in the cache to avoid
-     * requests from the backend in further function calls.
-     *
-     * Note: successCallback may be called before this function returns.
+     * behavior and returning a promise object), except this function will
+     * attempt to see whether the given collection has already been loaded. If
+     * it has not yet been loaded, it will fetch the collection from the
+     * backend. If it successfully retrieves the collection from the backend, it
+     * will store it in the cache to avoid requests from the backend in further
+     * function calls.
      */
-    loadCollection: function(collectionId, successCallback, errorCallback) {
-      if (_isCached(collectionId)) {
-        if (successCallback) {
-          successCallback(_collectionCache[collectionId]);
+    loadCollection: function(collectionId) {
+      return $q(function(resolve, reject) {
+        if (_isCached(collectionId)) {
+          if (resolve) {
+            resolve(_collectionCache[collectionId]);
+          }
+        } else {
+          _fetchCollection(collectionId, function(collection) {
+            // Save the fetched collection to avoid future fetches.
+            _collectionCache[collectionId] = collection;
+            resolve(collection);
+          }, reject);
         }
-      } else {
-        _fetchCollection(collectionId, function(collection) {
-          // Save the fetched collection to avoid future fetches.
-          _collectionCache[collectionId] = collection;
-          successCallback(collection);
-        }, errorCallback);
-      }
+      });
     },
 
     /**
