@@ -26,11 +26,11 @@ oppia.directive('paramChangesEditor', [function() {
     },
     templateUrl: 'editor/paramChanges',
     controller: [
-      '$scope', 'editabilityService', 'explorationParamSpecsService',
-      'warningsData',
+      '$scope', '$rootScope', 'editabilityService',
+      'explorationParamSpecsService', 'warningsData',
       function(
-          $scope, editabilityService, explorationParamSpecsService,
-          warningsData) {
+          $scope, $rootScope, editabilityService,
+          explorationParamSpecsService, warningsData) {
         $scope.editabilityService = editabilityService;
         $scope.isParamChangesEditorOpen = false;
         $scope.warningText = '';
@@ -43,6 +43,15 @@ oppia.directive('paramChangesEditor', [function() {
         var DEFAULT_PARAM_SPEC = {
           obj_type: 'UnicodeString'
         };
+        var DEFAULT_CUSTOMIZATION_ARGS = {
+          Copier: {
+            parse_with_jinja: true,
+            value: '5'
+          },
+          RandomSelector: {
+            list_of_values: ['sample value']
+          }
+        };
 
         $scope.$on('externalSave', function() {
           if ($scope.isParamChangesEditorOpen) {
@@ -52,10 +61,7 @@ oppia.directive('paramChangesEditor', [function() {
 
         var getDefaultParameterChange = function(name) {
           return angular.copy({
-            customization_args: {
-              parse_with_jinja: true,
-              value: '5'
-            },
+            customization_args: angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier),
             generator_id: 'Copier',
             name: name
           });
@@ -107,6 +113,11 @@ oppia.directive('paramChangesEditor', [function() {
           if ($scope.paramChangesService.displayed.length === 0) {
             $scope.addParamChange();
           }
+        };
+
+        $scope.onChangeGeneratorType = function(paramChange) {
+          paramChange.customization_args = angular.copy(
+            DEFAULT_CUSTOMIZATION_ARGS[paramChange.generator_id]);
         };
 
         $scope.HUMAN_READABLE_ARGS_RENDERERS = {
@@ -194,26 +205,6 @@ oppia.directive('paramChangesEditor', [function() {
           $scope.postSaveHook();
         };
 
-        $scope.swapParamChanges = function(index1, index2) {
-          if (index1 < 0 ||
-              index1 >= $scope.paramChangesService.displayed.length ||
-              index2 < 0 ||
-              index2 >= $scope.paramChangesService.displayed.length) {
-            warningsData.addWarning(
-              'Cannot swap parameter changes at positions ' + index1 +
-              ' and ' + index2 + ': index out of range');
-          }
-
-          if (index1 === index2) {
-            return;
-          }
-
-          var tmp = angular.copy($scope.paramChangesService.displayed[index1]);
-          $scope.paramChangesService.displayed[index1] = (
-            $scope.paramChangesService.displayed[index2]);
-          $scope.paramChangesService.displayed[index2] = tmp;
-        };
-
         $scope.deleteParamChange = function(index) {
           if (index < 0 ||
               index >= $scope.paramChangesService.displayed.length) {
@@ -222,7 +213,48 @@ oppia.directive('paramChangesEditor', [function() {
               ': index out of range');
           }
 
+          // This ensures that any new parameter names that have been added
+          // before the deletion are added to the list of possible names in the
+          // select2 dropdowns. Otherwise, after the deletion, the dropdowns
+          // may turn blank.
+          $scope.paramChangesService.displayed.forEach(function(paramChange) {
+            if (!explorationParamSpecsService.displayed.hasOwnProperty(
+                paramChange.name)) {
+              explorationParamSpecsService.displayed[paramChange.name] = (
+                angular.copy(DEFAULT_PARAM_SPEC));
+            }
+          });
+          $scope.paramNameChoices = generateParamNameChoices();
+
           $scope.paramChangesService.displayed.splice(index, 1);
+        };
+
+        $scope.PARAM_CHANGE_LIST_SORTABLE_OPTIONS = {
+          axis: 'y',
+          containment: '.oppia-param-change-draggable-area',
+          cursor: 'move',
+          handle: '.oppia-param-change-sort-handle',
+          items: '.oppia-param-editor-row',
+          tolerance: 'pointer',
+          start: function(e, ui) {
+            $scope.$apply();
+            ui.placeholder.height(ui.item.height());
+          },
+          stop: function(e, ui) {
+            // This ensures that any new parameter names that have been added
+            // before the swap are added to the list of possible names in the
+            // select2 dropdowns. Otherwise, after the swap, the dropdowns may
+            // turn blank.
+            $scope.paramChangesService.displayed.forEach(function(paramChange) {
+              if (!explorationParamSpecsService.displayed.hasOwnProperty(
+                  paramChange.name)) {
+                explorationParamSpecsService.displayed[paramChange.name] = (
+                  angular.copy(DEFAULT_PARAM_SPEC));
+              }
+            });
+            $scope.paramNameChoices = generateParamNameChoices();
+            $scope.$apply();
+          }
         };
 
         $scope.cancelEdit = function() {

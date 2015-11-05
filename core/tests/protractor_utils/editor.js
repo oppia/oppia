@@ -26,7 +26,8 @@ var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 // constants
-var _OPTION_CREATE_NEW = 'A New Card Called...';
+var _NEW_STATE_OPTION = 'A New Card Called...';
+var _CURRENT_STATE_OPTION = '(try again)'
 
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
@@ -51,10 +52,10 @@ var progressInTutorial = function() {
 };
 
 var finishTutorial = function() {
-  // Finish the tutorial
-  element(by.buttonText('Finish')).then(function(button) {
-    if (button) {
-      button.click();
+  // Finish the tutorial.
+  element.all(by.buttonText('Finish')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
     } else {
       throw 'Expected to find exactly one \'Finish\' button';
     }
@@ -155,34 +156,26 @@ var setInteraction = function(interactionId) {
 
   element(by.css('.protractor-test-open-add-interaction-modal')).click();
 
+  var INTERACTION_ID_TO_TAB_NAME = {
+    'Continue': 'General',
+    'EndExploration': 'General',
+    'ImageClickInput': 'General',
+    'MultipleChoiceInput': 'General',
+    'TextInput': 'General',
+    'GraphInput': 'Math',
+    'LogicProof': 'Math',
+    'NumericInput': 'Math',
+    'SetInput': 'Math',
+    'CodeRepl': 'Programming',
+    'MusicNotesInput': 'Music',
+    'InteractiveMap': 'Geography'
+  }
+
   general.waitForSystem();
-
-  var interactionElem = element(by.css(
-    '.protractor-test-interaction-tile-' + interactionId));
-
-  // Try to find the interaction in one of the tabs.
-  element.all(by.css('.protractor-test-interaction-tab')).map(function(tabElem) {
-    tabElem.click();
-    return interactionElem.isDisplayed().then(function(isInteractionVisible) {
-      if (isInteractionVisible) {
-        return tabElem;
-      }
-    })
-  }).then(function(tabElems) {
-    var interactionTileFound = false;
-    for (var i = 0; i < tabElems.length; i++) {
-      if (tabElems[i]) {
-        interactionTileFound = true;
-        tabElems[i].click();
-        interactionElem.click();
-        break;
-      }
-    }
-
-    if (!interactionTileFound) {
-      throw 'Could not find interaction with id ' + interactionId;
-    }
-  });
+  element(by.css(
+    '.protractor-test-interaction-tab-' +
+    INTERACTION_ID_TO_TAB_NAME[interactionId])).click();
+  element(by.css('.protractor-test-interaction-tile-' + interactionId)).click();
 
   var elem = element(by.css('.protractor-test-interaction-editor'));
   var customizationArgs = [elem];
@@ -299,6 +292,7 @@ var openGadgetEditorModal = function(gadgetName) {
 
 var saveAndCloseGadgetEditorModal = function() {
   element(by.css('.protractor-test-save-gadget-button')).click();
+  general.waitForSystem();
 };
 
 // Enables visibility for a given state.
@@ -419,11 +413,22 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
   ruleElement.element(by.css('.protractor-test-answer-description')).click();
 
   element.all(by.id('select2-drop')).map(function(selectorElement) {
-    selectorElement.element(by.cssContainingText(
+    selectorElement.all(by.cssContainingText(
       'li.select2-results-dept-0', ruleDescriptionInDropdown
-    )).then(function(optionElement) {
-      optionElement.click();
-      protractor.getInstance().waitForAngular();
+    )).filter(function(elem) {
+      // We need to do this check because some options may only have
+      // 'ruleDescriptionInDropdown' as a substring.
+      return elem.getText().then(function(text) {
+        return text === ruleDescriptionInDropdown;
+      });
+    }).then(function(optionElements) {
+      if (optionElements.length !== 1) {
+        throw (
+          'Expected exactly one rule option to match: ' +
+          ruleDescriptionInDropdown + '; found ' + optionElements.length +
+          ' instead');
+      }
+      optionElements[0].click();
     });
   });
 
@@ -453,35 +458,39 @@ var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
 };
 
 var _setOutcomeDest = function(destEditorElem, destName, createDest) {
+  expect(destName === null && createDest).toBe(false)
   var destinationElement =
     destEditorElem.element(by.css('.protractor-test-dest-bubble'));
 
-  var targetOption = createDest ? _OPTION_CREATE_NEW : destName;
-  _getStateName().then(function(name) {
-    if (name == destName) {
-      // Looping, change the target option.
-      targetOption = '(try again)';
-    }
+  if (createDest) {
+    targetOption = _NEW_STATE_OPTION;
+  } else if (destName === null) {
+    targetOption = _CURRENT_STATE_OPTION;
+  } else {
+    targetOption = destName;
+  }
 
+  destinationElement.element(
+    by.cssContainingText('option', targetOption)).click();
+  if (createDest) {
     destinationElement.element(
-      by.cssContainingText('option', targetOption)).click();
-
-    if (createDest) {
-      element(by.css('.protractor-test-add-state-input')).sendKeys(destName);
-    }
-  });
+      by.css('.protractor-test-add-state-input')
+    ).sendKeys(destName);
+  }
 };
 
 // This clicks the "add new response" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
+// - interactionId: the name of the interaction type, e.g. NumericInput.
+// - feedbackInstructions: a rich-text object containing feedback, or null.
+// - destStateName: the name of the destination state of the rule, or null if
+//     the rule loops to the current state.
+// - createState: true if the rule creates a new state, else false.
+// - ruleName: the name of the rule, e.g. IsGreaterThan.
 //
 // Note that feedbackInstructions may be null (which means 'specify no
 // feedback'), and only represents a single feedback element.
-//
-// - 'destStateName' is the state name to select as the destination.
-// - 'createState' specifies the destination state should be created within the
-//   dialog as part of adding this rule.
 var addResponse = function(interactionId, feedbackInstructions, destStateName,
     createState, ruleName) {
 
@@ -571,9 +580,10 @@ var ResponseEditor = function(responseNum) {
       element(by.css('.protractor-test-save-outcome-feedback')).click();
     },
     // This saves the rule after the destination is selected.
-    // Note that the supplied 'destinationName' must be an existing state. If
-    // 'createState' is true, it will attempt to create a state named after the
-    // input 'destinationName'.
+    //  - destinationName: The name of the state to move to, or null to stay on
+    //    the same state.
+    //  - createState: whether the destination state is new and must be created
+    //    at this point.
     setDestination: function(destinationName, createState) {
       // Begin editing destination.
       element(by.css('.protractor-test-open-outcome-dest-editor')).click();
@@ -591,10 +601,11 @@ var ResponseEditor = function(responseNum) {
       // Begin editing destination.
       element(by.css('.protractor-test-open-outcome-dest-editor')).click();
 
-      var expectedOptionTexts = ['(try again)'].concat(stateNames.slice(1));
+      var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
+        stateNames.slice(1));
 
       // Create new option always at the end of the list.
-      expectedOptionTexts.push(_OPTION_CREATE_NEW);
+      expectedOptionTexts.push(_NEW_STATE_OPTION);
 
       var destElement = element(by.css(
         '.protractor-test-edit-outcome-dest'));
@@ -646,8 +657,9 @@ var ResponseEditor = function(responseNum) {
     },
     expectCannotDeleteRule: function(ruleNum) {
       ruleElem = element.all(by.css(
-        '.protractor-test-delete-answer')).get(ruleNum);
-      expect(ruleElem.isPresent()).toBeFalsy();
+        '.protractor-test-rule-block')).get(ruleNum);
+      expect(ruleElem.element(by.css(
+        '.protractor-test-delete-answer')).isPresent()).toBeFalsy();
     },
     expectCannotDeleteResponse: function() {
       expect(headerElem.element(by.css(
@@ -665,8 +677,6 @@ var expectCannotAddResponse = function() {
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
-  general.scrollElementIntoView(
-    element(by.css('.protractor-test-exploration-graph')));
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -696,7 +706,7 @@ var deleteState = function(stateName) {
       if (listOfNames[i] === stateName) {
         element.all(by.css('.protractor-test-node')).get(i).
           element(by.css('.protractor-test-delete-node')).click();
-        protractor.getInstance().waitForAngular();
+        browser.waitForAngular();
         general.waitForSystem();
         element(by.css('.protractor-test-confirm-delete-state')).click();
         matched = true;
@@ -790,19 +800,17 @@ var enableGadgets = function() {
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
-  general.scrollElementIntoView(
-    element(by.css('.protractor-test-save-changes')));
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
       element(by.css('.protractor-test-commit-message-input')).
         sendKeys(commitMessage);
     }
-    protractor.getInstance().waitForAngular();
+    browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-close-save-modal')).click();
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
-    protractor.getInstance().waitForAngular();
+    browser.waitForAngular();
     general.waitForSystem();
   });
 };
@@ -845,7 +853,7 @@ var _selectComparedVersions = function(v1, v2) {
       .get(v1Position).click();
     element.all(by.css('.protractor-test-history-v2-selector'))
       .get(v2Position).click();
-    protractor.getInstance().waitForAngular();
+    browser.waitForAngular();
   });
 
   // Click button to show graph if necessary
@@ -893,15 +901,28 @@ var expectGraphComparisonOf = function(v1, v2) {
     var deletedCount = 0;
     element(by.css('.protractor-test-history-graph'))
         .all(by.css('.protractor-test-link')).map(function(link) {
-      link.getCssValue('stroke').then(function(linkColor) {
-        totalCount++;
+      return link.getCssValue('stroke').then(function(linkColor) {
         if (linkColor == COLOR_ADDED) {
-          addedCount++;
+          return 'added';
         } else if (linkColor == COLOR_DELETED) {
-          deletedCount++;
+          return 'deleted';
+        } else {
+          return 'other';
         }
       });
-    }).then(function() {
+    }).then(function(linkTypes) {
+      var totalCount = 0;
+      var addedCount = 0;
+      var deletedCount = 0;
+      for (var i = 0; i < linkTypes.length; i++) {
+        totalCount++;
+        if (linkTypes[i] === 'added') {
+          addedCount++;
+        } else if (linkTypes[i] === 'deleted') {
+          deletedCount++;
+        }
+      }
+
       if (totalCount != totalLinks) {
         throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + totalLinks + ' links in total, ' +
@@ -1007,15 +1028,14 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
 var revertToVersion = function(version) {
   _runFromHistoryTab(function() {
     var versionPosition = null;
-    element.all(by.css('.protractor-test-history-v1-selector')).first()
-        .then(function(elem) {
-      elem.getAttribute('value').then(function(versionNumber) {
-        // Note: there is no 'revert' link next to the current version
-        versionPosition = versionNumber - version - 1;
-        element.all(by.css('.protractor-test-revert-version'))
-          .get(versionPosition).click();
-        element(by.css('.protractor-test-confirm-revert')).click();
-      });
+    var elem = element.all(by.css(
+      '.protractor-test-history-v1-selector')).first();
+    elem.getAttribute('value').then(function(versionNumber) {
+      // Note: there is no 'revert' link next to the current version
+      versionPosition = versionNumber - version - 1;
+      element.all(by.css('.protractor-test-revert-version'))
+        .get(versionPosition).click();
+      element(by.css('.protractor-test-confirm-revert')).click();
     });
   });
 };

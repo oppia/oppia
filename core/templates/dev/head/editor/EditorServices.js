@@ -1490,18 +1490,26 @@ oppia.constant('WARNING_TYPES', {
   ERROR: 'error'
 });
 
+oppia.constant('STATE_ERROR_MESSAGES', {
+  ADD_INTERACTION: 'Please add an interaction to this card.',
+  STATE_UNREACHABLE: 'This card is unreachable',
+  UNABLE_TO_END_EXPLORATION: 'Please make sure there\'s a way to complete ' +
+              'the exploration starting from this card'
+});
+
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
   '$filter', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'FUZZY_RULE_TYPE',
+  'STATE_ERROR_MESSAGES', 'FUZZY_RULE_TYPE',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES,
-      FUZZY_RULE_TYPE) {
+      STATE_ERROR_MESSAGES, FUZZY_RULE_TYPE) {
     var _warningsList = [];
+    var stateWarnings = {};
 
     var _getStatesWithoutInteractionIds = function() {
       var statesWithoutInteractionIds = [];
@@ -1822,25 +1830,31 @@ oppia.factory('explorationWarningsService', [
       var _graphData = graphDataService.getGraphData();
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
-      if (statesWithoutInteractionIds.length) {
-        _warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please add interactions for these cards: ' +
-            statesWithoutInteractionIds.join(', ') + '.')
-        });
-      }
+      angular.forEach(statesWithoutInteractionIds, function(
+        stateWithoutInteractionIds) {
+        if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
+          stateWarnings[stateWithoutInteractionIds].push(
+              STATE_ERROR_MESSAGES.ADD_INTERACTION);
+        } else {
+          stateWarnings[stateWithoutInteractionIds] = [
+            STATE_ERROR_MESSAGES.ADD_INTERACTION];
+        }
+      });
 
       if (_graphData) {
         var unreachableStateNames = _getUnreachableNodeNames(
           [_graphData.initStateId], _graphData.nodes, _graphData.links);
 
         if (unreachableStateNames.length) {
-          _warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: (
-              'The following card(s) are unreachable: ' +
-              unreachableStateNames.join(', ') + '.')
+          angular.forEach(unreachableStateNames, function(
+            unreachableStateName) {
+            if (stateWarnings.hasOwnProperty(unreachableStateName)) {
+              stateWarnings[unreachableStateName].push(
+                STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
+            } else {
+              stateWarnings[unreachableStateName] =
+                [STATE_ERROR_MESSAGES.STATE_UNREACHABLE];
+            }
           });
         } else {
           // Only perform this check if all states are reachable.
@@ -1848,20 +1862,15 @@ oppia.factory('explorationWarningsService', [
             _graphData.finalStateIds, _graphData.nodes,
             _getReversedLinks(_graphData.links));
           if (deadEndStates.length) {
-            var deadEndStatesString = null;
-            if (deadEndStates.length === 1) {
-              deadEndStatesString = 'the following card: ' + deadEndStates[0];
-            } else {
-              deadEndStatesString = 'each of: ' + deadEndStates.join(', ');
-            }
-
-            _warningsList.push({
-              type: WARNING_TYPES.ERROR,
-              message: (
-                'Please make sure there\'s a way to complete ' +
-                'the exploration starting from ' +
-                deadEndStatesString + '.')
-            });
+            angular.forEach(deadEndStates, function(deadEndState) {
+             if (stateWarnings.hasOwnProperty(deadEndState)) {
+               stateWarnings[deadEndState].push(
+                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
+             } else {
+               stateWarnings[deadEndState] = [
+                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
+             }
+           });
           }
         }
 
@@ -1881,11 +1890,11 @@ oppia.factory('explorationWarningsService', [
             interaction.answer_groups, interaction.default_outcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
-            _warningsList.push({
-              type: interactionWarnings[j].type,
-              message: (
-                'In \'' + stateName + '\', ' + interactionWarnings[j].message)
-            });
+            if (stateWarnings.hasOwnProperty(stateName)) {
+              stateWarnings[stateName].push(interactionWarnings[j].message);
+            } else {
+              stateWarnings[stateName] = [interactionWarnings[j].message];
+            }
           }
         }
       }
@@ -1896,6 +1905,15 @@ oppia.factory('explorationWarningsService', [
           message: 'Please specify an objective (in the Settings tab).'
         });
       }
+
+      if (Object.keys(stateWarnings).length) {
+        _warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'The following states have errors: ' +
+            Object.keys(stateWarnings).join(', ') + '.')
+        });
+      };
 
       var statesWithAnswerGroupsWithEmptyFuzzyRules = (
         _getStatesAndAnswerGroupsWithEmptyFuzzyRules());
@@ -1920,6 +1938,9 @@ oppia.factory('explorationWarningsService', [
     return {
       countWarnings: function() {
         return _warningsList.length;
+      },
+      getAllStateRelatedWarnings: function() {
+        return stateWarnings;
       },
       getWarnings: function() {
         return _warningsList;
