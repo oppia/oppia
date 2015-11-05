@@ -1492,9 +1492,9 @@ oppia.constant('WARNING_TYPES', {
 
 oppia.constant('STATE_ERROR_MESSAGES', {
   ADD_INTERACTION: 'Please add an interaction to this card.',
-  STATE_UNREACHABLE: 'This card is unreachable',
-  UNABLE_TO_END_EXPLORATION: 'Please make sure there\'s a way to complete ' +
-              'the exploration starting from this card'
+  STATE_UNREACHABLE: 'This card is unreachable.',
+  UNABLE_TO_END_EXPLORATION: (
+    'There\'s no way to complete the exploration starting from this card.')
 });
 
 // Service for the list of exploration warnings.
@@ -1825,6 +1825,7 @@ oppia.factory('explorationWarningsService', [
 
     var _updateWarningsList = function() {
       _warningsList = [];
+      stateWarnings = {};
 
       graphDataService.recompute();
       var _graphData = graphDataService.getGraphData();
