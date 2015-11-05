@@ -8,6 +8,7 @@
   margin: 0 0 0 11.0784%;
   width: 87.34525%;
   height: 43%;
+  /* Hide valid note area until page loads */
   visibility: hidden;
 }
 

@@ -154,7 +154,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // displayed. The staffContainerElt and all subsequent measurements
         // must be recalculated in order for the grid to work properly.
         $scope.reinitStaff = function() {
-          // Prevent staff from reinitializing unneccesarily.
           $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
           setTimeout(function() {
             $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
@@ -207,7 +206,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         $(document).ready(function() {
           $scope.reinitStaff();
         });
-        
+
         // Initial notes are are placed on the staff at the
         // start of the exploration and can be removed by the learner.
         function initializeNoteSequence(initialNotesToAdd) {
