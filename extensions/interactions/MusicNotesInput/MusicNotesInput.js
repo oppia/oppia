@@ -150,48 +150,22 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var noteChoicesElt = $element.find('.oppia-music-input-note-choices');
         var staffContainerElt = $element.find('.oppia-music-input-staff');
 
-        // Sets grid positions, displays the staff and note,
-        // and then initializes the view after staff has loaded.
-        $(document).ready(function() {
-          setTimeout(function() {
-            // Display valid note area only after page has fully loaded.
-            $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
-            $scope.init();
-          }, 20);
-        });
-
         // Staff has to be reinitialized every time that the staff is resized or
         // displayed. The staffContainerElt and all subsequent measurements
         // must be recalculated in order for the grid to work properly.
         $scope.reinitStaff = function() {
           // Prevent staff from reinitializing unneccesarily.
-          if (!$('.img-circle').data('fired')) {
-            $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
-            var that = $('.img-circle');
-            setTimeout(function() {
-              $(that).data('fired', true);
-              $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
-              $scope.init();
-            }, 200);
-          }
+          $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
+          setTimeout(function() {
+            $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
+            $scope.init();
+          }, 20);
         };
 
-        // TODO(wagnerdmike): This would be better if it listened for a
-        // card switch event instead of the button click. Reinit needs to be
-        // triggered when page is in the smaller one card format or else
-        // dimensions for the staff will be incorrectly calculated.
-        $('.img-circle').on("click", function(e) {
-          // Reinit staff on click of conversation card switcher button.
-          $('.img-circle').data('fired', false);
-          $scope.reinitStaff();
-        });
-
-        // When page is resized, all notes are removed from sequence and staff
-        // and then repainted in their new corresponding positions.
-        $(window).resize(function() {
-          // Hide the valid note area while the page resizes and
-          // recalculate staff dimensions.
-          $('.img-circle').data('fired', false);
+        // When page is in the smaller one card format, reinitialize staff after
+        // the user navigates to the Interaction Panel. Otherwise the dimensions
+        // for the staff will be incorrectly calculated.
+        $scope.$on('showInteraction', function(event) {
           $scope.reinitStaff();
         });
 
@@ -228,6 +202,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         initializeNoteSequence($scope.initialSequence);
         $scope.init();
 
+        // Sets grid positions, displays the staff and note,
+        // and then initializes the view after staff has loaded.
+        $(document).ready(function() {
+          $scope.reinitStaff();
+        });
+        
         // Initial notes are are placed on the staff at the
         // start of the exploration and can be removed by the learner.
         function initializeNoteSequence(initialNotesToAdd) {
