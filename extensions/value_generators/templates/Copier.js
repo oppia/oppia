@@ -13,17 +13,20 @@
 // limitations under the License.
 
 
+// TODO(sll): Remove this directive (as well as the whole of the value
+// generators framework).
+
 oppia.directive('copier', function($compile) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return VALUE_GENERATOR_TEMPLATES_URL + scope.$parent.generatorId;
+        return '/value_generator_handler/' + scope.$parent.generatorId;
       };
       $compile(element.contents())(scope);
     },
     restrict: 'E',
     scope: true,
-    template: '<div ng-include="getTemplateUrl()"></div>',
+    template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope, $attrs) {
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
         $scope.initArgs = $scope.$parent.initArgs;

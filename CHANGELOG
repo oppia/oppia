@@ -3,6 +3,39 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.0.1 (13 Oct 2015)
+--------------------
+Sitewide changes:
+* Update the terms of use and privacy pages.
+
+Learner page:
+* Make some aesthetic improvements to the learner view, including a new bakground and some styling changes.
+* Implement #963: smoothly animate the expansion of previous answers a learner submitted to a card.
+* Implement #962: animate the appearance of Oppia's response to a learner's answer.
+* Fix a bug where elements at the bottom of the learner view sometimes overlap on mobile screens.
+* Fix #967: animate the automatic scrolling to the top of the screen when the learner transitions to a new card.
+* Introduce an information card which displays the metadata information about an exploration.
+
+Editor page:
+* Fix #950: disallow underscores in state names from causing the exploration editor from becoming broken and unusable.
+
+Interactions:
+* Fix #986: replace the JSRepl dependency with Skulpt for running Python code in the frontend.
+
+Continuous Integration:
+* Introduce continuous integration in the GitHub project using Travis CI. This automatically runs both the backend and frontend tests for all pull requests.
+* Add code coverage and Travis CI badges to the README.
+
+Frontend:
+* Improve a frontend test for the truncation filter.
+* Refactor up how the 'Continue' interaction is used in the frontend.
+
+Backend:
+* Introduce the backend infrastructure for collections.
+* Introduce string classification services which will later be used to classify student answers for the TextInput interaction.
+* Fix a bug which prevents the exploration migration job from resetting the last updated times of all explorations in the gallery.
+
+
 v2.0.0 (26 Sep 2015)
 --------------------
 Learner page:

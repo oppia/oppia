@@ -44,7 +44,6 @@ describe('Editor context service', function() {
   });
 });
 
-
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 
@@ -54,10 +53,10 @@ describe('Change list service', function() {
 
     beforeEach(function() {
       mockWarningsData = {
-        addWarning: function(warning) {}
+        addWarning: function() {}
       };
       module(function($provide) {
-        $provide.value('warningsData', mockWarningsData)
+        $provide.value('warningsData', mockWarningsData);
       });
       spyOn(mockWarningsData, 'addWarning');
     });
@@ -187,52 +186,50 @@ describe('Change list service', function() {
 
       cls.undoLastChange();
       expect(cls.getChangeList()).toEqual([]);
-    })
+    });
 
     it('should correctly add a gadget', function() {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState1');
       var gadgetDict = {
-        'gadget_type': 'TestGadget',
-        'gadget_name': 'TestGadget 1',
-        'customization_args': {
-          'adviceObjects': {
-            'value': [{
-              'adviceHtml': '<p>Tips</p>',
-              'adviceTitle': 'R-Tip'
+        gadget_type: 'TestGadget',
+        gadget_name: 'TestGadget 1',
+        customization_args: {
+          adviceObjects: {
+            value: [{
+              adviceHtml: '<p>Tips</p>',
+              adviceTitle: 'R-Tip'
             }]
           },
-          'title': {
-            'value': 'Tips'
+          title: {
+            value: 'Tips'
           }
         },
-        'visible_in_states': ['newState1']
+        visible_in_states: ['newState1']
       };
       cls.addGadget(gadgetDict);
-      expect(cls.getChangeList()).toEqual([
-        {
-          cmd: 'add_state',
-          state_name: 'newState1'
-        }, {
-          cmd: 'add_gadget',
-          gadget_dict: {
-            'gadget_type': 'TestGadget',
-            'gadget_name': 'TestGadget 1',
-            'customization_args': {
-              'adviceObjects': {
-                'value': [{
-                  'adviceHtml': '<p>Tips</p>',
-                  'adviceTitle': 'R-Tip'
-                }]
-              },
-              'title': {
-                'value': 'Tips'
-              }
+      expect(cls.getChangeList()).toEqual([{
+        cmd: 'add_state',
+        state_name: 'newState1'
+      }, {
+        cmd: 'add_gadget',
+        gadget_dict: {
+          gadget_type: 'TestGadget',
+          gadget_name: 'TestGadget 1',
+          customization_args: {
+            adviceObjects: {
+              value: [{
+                adviceHtml: '<p>Tips</p>',
+                adviceTitle: 'R-Tip'
+              }]
             },
-            'visible_in_states': ['newState1']
+            title: {
+              value: 'Tips'
+            }
           },
+          visible_in_states: ['newState1']
         }
-      ]);
+      }]);
     });
 
     it('should correctly rename a gadget', function() {
@@ -259,28 +256,28 @@ describe('Change list service', function() {
     it('should correctly edit gadget customization args', function() {
       expect(cls.getChangeList()).toEqual([]);
       var oldCustomizationArgs = {
-        'customization_args': {
-          'adviceObjects': {
-            'value': [{
-              'adviceHtml': '<p>Html Data</p>',
-              'adviceTitle': 'advice tip name'
+        customization_args: {
+          adviceObjects: {
+            value: [{
+              adviceHtml: '<p>Html Data</p>',
+              adviceTitle: 'advice tip name'
             }]
           },
-          'title': {
-            'value': 'main Title'
+          title: {
+            value: 'main Title'
           }
         }
       };
       var newCustomizationArgs = {
-        'customization_args': {
-          'adviceObjects': {
-            'value': [{
-              'adviceHtml': '<p>New Html Data</p>',
-              'adviceTitle': 'New advice tip name'
+        customization_args: {
+          adviceObjects: {
+            value: [{
+              adviceHtml: '<p>New Html Data</p>',
+              adviceTitle: 'New advice tip name'
             }]
           },
-          'title': {
-            'value': 'New main Title'
+          title: {
+            value: 'New main Title'
           }
         }
       };
@@ -295,34 +292,33 @@ describe('Change list service', function() {
         gadget_name: 'gadgetName',
         property_name: 'gadget_customization_args',
         new_value: {
-          'customization_args': {
-            'adviceObjects': {
-              'value': [{
-                'adviceHtml': '<p>New Html Data</p>',
-                'adviceTitle': 'New advice tip name'
+          customization_args: {
+            adviceObjects: {
+              value: [{
+                adviceHtml: '<p>New Html Data</p>',
+                adviceTitle: 'New advice tip name'
               }]
             },
-            'title': {
-              'value': 'New main Title'
+            title: {
+              value: 'New main Title'
             }
           }
         },
         old_value: {
-          'customization_args': {
-            'adviceObjects': {
-              'value': [{
-                'adviceHtml': '<p>Html Data</p>',
-                'adviceTitle': 'advice tip name'
+          customization_args: {
+            adviceObjects: {
+              value: [{
+                adviceHtml: '<p>Html Data</p>',
+                adviceTitle: 'advice tip name'
               }]
             },
-            'title': {
-              'value': 'main Title'
+            title: {
+              value: 'main Title'
             }
           }
         }
       }]);
     });
-
 
     it('should correctly edit a gadget visibility property', function() {
       expect(cls.getChangeList()).toEqual([]);
@@ -344,7 +340,6 @@ describe('Change list service', function() {
     });
   });
 });
-
 
 describe('Exploration title service', function() {
   beforeEach(module('oppia'));
@@ -387,7 +382,7 @@ describe('Exploration title service', function() {
       expect(ets.savedMemento).toEqual('New title');
     });
 
-    it('correctly reports whether the title has changed since it was saved', function() {
+    it('reports whether the title has changed since it was saved', function() {
       ets.init('A title');
       expect(ets.hasChanged()).toBe(false);
       ets.displayed = 'A title';
@@ -402,7 +397,6 @@ describe('Exploration title service', function() {
     });
   });
 });
-
 
 describe('Exploration rights service', function() {
   beforeEach(module('oppia'));
@@ -481,111 +475,113 @@ describe('Exploration gadgets service', function() {
   describe('exploration gadgets service', function() {
     var egs = null;
     var mockWarningsData;
+    var TEST_GADGET_NAME = 'TestGadget1';
+
     var GADGET_SPECS = {
-      'ScoreBar': {
-        'type': 'ScoreBar',
-        'width_px': 250,
-        'panel': 'bottom',
-        'customization_arg_specs': [{
-          'name': 'title',
-          'description': 'Optional title for the score bar (e.g. \'Score\')',
-          'schema': {
-            'type': 'unicode'
+      ScoreBar: {
+        type: 'ScoreBar',
+        width_px: 250,
+        panel: 'bottom',
+        customization_arg_specs: [{
+          name: 'title',
+          description: 'Optional title for the score bar (e.g. \'Score\')',
+          schema: {
+            type: 'unicode'
           },
-          'default_value': 'Score'
+          default_value: 'Score'
         }, {
-          'name': 'maxValue',
-          'description': 'Maximum value (bar fills as a % of this value)',
-          'schema': {
-            'type': 'int'
+          name: 'maxValue',
+          description: 'Maximum value (bar fills as a % of this value)',
+          schema: {
+            type: 'int'
           },
-          'default_value': 100
+          default_value: 100
         }, {
-          'name': 'paramName',
-          'description': 'The parameter name this score bar follows.',
-          'schema': {
-            'type': 'unicode'
+          name: 'paramName',
+          description: 'The parameter name this score bar follows.',
+          schema: {
+            type: 'unicode'
           },
-          'default_value': ''
+          default_value: ''
         }],
-        'height_px': 100,
-        'description': 'A visual score bar that can represent progress or success.',
-        'name': 'ScoreBar'
+        height_px: 100,
+        description: 'A visual score bar.',
+        name: 'ScoreBar'
       },
-      'TestGadget': {
-        'type': 'TestGadget',
-        'width_px': 100,
-        'panel': 'bottom',
-        'customization_arg_specs': [{
-          'name': 'title',
-          'description': 'Optional title for the advice bar (e.g. \'Tips\')',
-          'schema': {
-            'type': 'unicode'
+      TestGadget: {
+        type: 'TestGadget',
+        width_px: 100,
+        panel: 'bottom',
+        customization_arg_specs: [{
+          name: 'title',
+          description: 'Optional title for the advice bar (e.g. \'Tips\')',
+          schema: {
+            type: 'unicode'
           },
-          'default_value': '',
+          default_value: ''
         }, {
-          'name': 'adviceObjects',
-          'description': 'Title and content for each tip.',
-          'schema': {
-            'type': 'list',
-            'validators': [{
-              'id': 'has_length_at_least',
-              'min_value': 1
+          name: 'adviceObjects',
+          description: 'Title and content for each tip.',
+          schema: {
+            type: 'list',
+            validators: [{
+              id: 'has_length_at_least',
+              min_value: 1
             }, {
-              'id': 'has_length_at_most',
-              'max_value': 3
+              id: 'has_length_at_most',
+              max_value: 3
             }],
-            'items': {
-              'properties': [{
-                'name': 'adviceTitle',
-                'description': 'Tip title (visible on advice bar)',
-                'schema': {
-                  'type': 'unicode',
-                  'validators': [{
-                    'id': 'is_nonempty'
+            items: {
+              properties: [{
+                name: 'adviceTitle',
+                description: 'Tip title (visible on advice bar)',
+                schema: {
+                  type: 'unicode',
+                  validators: [{
+                    id: 'is_nonempty'
                   }]
-                },
+                }
               }, {
-                'name': 'adviceHtml',
-                'description': 'Advice content (visible upon click)',
-                'schema': {
-                  'type': 'html'
-                },
+                name: 'adviceHtml',
+                description: 'Advice content (visible upon click)',
+                schema: {
+                  type: 'html'
+                }
               }],
-              'type': 'dict'
+              type: 'dict'
             }
           },
-          'default_value': [{
-            'adviceTitle': 'Tip title',
-            'adviceHtml': ''
-          }],
+          default_value: [{
+            adviceTitle: 'Tip title',
+            adviceHtml: ''
+          }]
         }],
-        'height_px': 300,
-        'description': 'Allows learners to receive advice from predefined tips.',
-        'name': 'TestGadget'
+        height_px: 300,
+        description: 'Allows learners to receive advice.',
+        name: 'TestGadget'
       }
     };
     var skinCustomizationsData = {
-      'panels_contents': {
-        'bottom': [{
-          'gadget_name': 'TestGadget1',
-          'visible_in_states': [
+      panels_contents: {
+        bottom: [{
+          gadget_name: TEST_GADGET_NAME,
+          visible_in_states: [
             'Example1',
             'Example2'
           ],
-          'customization_args': {
-            'title': {
-              'value': 'TIP1'
+          customization_args: {
+            title: {
+              value: 'TIP1'
             },
-            'adviceObjects': {
-              'value': [{
-                'adviceTitle': 'title1',
-                'adviceHtml': 'content1'
+            adviceObjects: {
+              value: [{
+                adviceTitle: 'title1',
+                adviceHtml: 'content1'
               }]
             }
           },
-          'gadget_type': 'TestGadget'
-        }],
+          gadget_type: 'TestGadget'
+        }]
       }
     };
     var gadgetData = {
@@ -593,13 +589,13 @@ describe('Exploration gadgets service', function() {
       gadget_name: 'NewTestGadget',
       panel: 'bottom',
       customization_args: {
-        'title': {
-          'value': 'TIP3'
+        title: {
+          value: 'TIP3'
         },
-        'adviceObjects': {
-          'value': [{
-            'adviceTitle': 'title3',
-            'adviceHtml': 'content3'
+        adviceObjects: {
+          value: [{
+            adviceTitle: 'title3',
+            adviceHtml: 'content3'
           }]
         }
       },
@@ -608,7 +604,7 @@ describe('Exploration gadgets service', function() {
 
     beforeEach(function() {
       mockWarningsData = {
-        addWarning: function(warning) {}
+        addWarning: function() {}
       };
       module(function($provide) {
         $provide.value('warningsData', mockWarningsData);
@@ -620,12 +616,12 @@ describe('Exploration gadgets service', function() {
     beforeEach(inject(function($injector) {
       egs = $injector.get('explorationGadgetsService');
       GLOBALS.PANEL_SPECS = {
-        'bottom': {
-          'stackable_axis': 'horizontal',
-          'pixels_between_gadgets': 80,
-          'max_gadgets': 1,
-          'width': 350,
-          'height': 100
+        bottom: {
+          stackable_axis: 'horizontal',
+          pixels_between_gadgets: 80,
+          max_gadgets: 1,
+          width: 350,
+          height: 100
         }
       };
     }));
@@ -634,7 +630,7 @@ describe('Exploration gadgets service', function() {
       egs.init(skinCustomizationsData);
       egs.handleStateDeletion('Example1');
 
-      expect(egs.getGadgets()['TestGadget1'].visible_in_states).toEqual(
+      expect(egs.getGadgets()[TEST_GADGET_NAME].visible_in_states).toEqual(
         ['Example2']
       );
     });
@@ -643,13 +639,15 @@ describe('Exploration gadgets service', function() {
       egs.init(skinCustomizationsData);
       egs.handleStateRenaming('Example2', 'newStateName');
 
-      expect(egs.getGadgets()['TestGadget1'].visible_in_states).toEqual(
+      expect(egs.getGadgets()[TEST_GADGET_NAME].visible_in_states).toEqual(
         ['Example1', 'newStateName']
       );
     });
 
     it('should detect invalid data passed for initialization', function() {
-      egs.init({'wrongObjectKey': 'value'});
+      egs.init({
+        wrongObjectKey: 'value'
+      });
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Gadget Initialization failed. Panel contents were not provided');
     });
@@ -657,7 +655,7 @@ describe('Exploration gadgets service', function() {
     it('init on valid data', function() {
       egs.init(skinCustomizationsData);
       expect(egs.getPanels()).toEqual({
-        'bottom': ['TestGadget1'],
+        bottom: [TEST_GADGET_NAME]
       });
     });
 
@@ -665,7 +663,7 @@ describe('Exploration gadgets service', function() {
       egs.init(skinCustomizationsData);
       egs.addGadget(gadgetData, 'bottom');
       expect(egs.getPanels()).toEqual({
-        'bottom': ['TestGadget1', 'NewTestGadget']
+        bottom: [TEST_GADGET_NAME, 'NewTestGadget']
       });
     });
 
@@ -679,7 +677,7 @@ describe('Exploration gadgets service', function() {
 
     it('should detect same gadget name before adding gadget', function() {
       egs.init(skinCustomizationsData);
-      gadgetData.gadget_name = 'TestGadget1';
+      gadgetData.gadget_name = TEST_GADGET_NAME;
       gadgetData.panel = 'bottom';
       egs.addGadget(gadgetData);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
@@ -695,7 +693,7 @@ describe('Exploration gadgets service', function() {
 
     it('should detect if gadget is not visible in any state.', function() {
       egs.init(skinCustomizationsData);
-      egs.updateGadget('TestGadget1', gadgetData['TestGadget1'], []);
+      egs.updateGadget(TEST_GADGET_NAME, gadgetData[TEST_GADGET_NAME], []);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'This gadget is not visible in any states.');
     });
@@ -717,11 +715,18 @@ describe('New state template service', function() {
       // TODO(sll): Find a way to have this and the backend dict read from the
       // same single source of truth.
       GLOBALS.NEW_STATE_TEMPLATE = {
-        content: [{type: 'text', value: ''}],
+        content: [{
+          type: 'text',
+          value: ''
+        }],
         interaction: {
           customization_args: {
-            rows: {value: 1},
-            placeholder: {value: 'Type your answer here.'}
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: 'Type your answer here.'
+            }
           },
           default_outcome: {
             dest: '(untitled state)',
@@ -731,18 +736,25 @@ describe('New state template service', function() {
           id: 'TextInput'
         },
         param_changes: [],
-        unresolved_answers: {},
+        unresolved_answers: {}
       };
       nsts = $injector.get('newStateTemplateService');
     }));
 
-    it('should correctly make a new state template given a state name', function() {
+    it('should make a new state template given a state name', function() {
       expect(nsts.getNewStateTemplate(NEW_STATE_NAME)).toEqual({
-        content: [{type: 'text', value: ''}],
+        content: [{
+          type: 'text',
+          value: ''
+        }],
         interaction: {
           customization_args: {
-            rows: {value: 1},
-            placeholder: {value: 'Type your answer here.'}
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: 'Type your answer here.'
+            }
           },
           default_outcome: {
             dest: NEW_STATE_NAME,

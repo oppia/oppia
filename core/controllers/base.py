@@ -179,8 +179,7 @@ def require_fully_signed_up(handler):
         """Check that the user has registered as an editor."""
         if (not self.user_id
                 or self.username in config_domain.BANNED_USERNAMES.value
-                or not user_services.has_user_registered_as_editor(
-                    self.user_id)):
+                or not user_services.has_fully_registered(self.user_id)):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
 
@@ -237,7 +236,8 @@ class BaseHandler(webapp2.RequestHandler):
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
     # Whether to redirect requests corresponding to a logged-in user who has
-    # not completed signup in to the signup page.
+    # not completed signup in to the signup page. This ensures that logged-in
+    # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
     @webapp2.cached_property
@@ -267,13 +267,13 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id, email)
             self.values['user_email'] = user_settings.email
 
-            if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
+            if (self.REDIRECT_UNFINISHED_SIGNUPS and not
+                    user_services.has_fully_registered(self.user_id)):
                 _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
                 self.user_id = None
             else:
                 self.username = user_settings.username
-                self.last_agreed_to_terms = user_settings.last_agreed_to_terms
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -409,7 +409,9 @@ class BaseHandler(webapp2.RequestHandler):
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_NAME': SITE_NAME.value,
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
-            'user_is_logged_in': bool(self.username),
+            'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
+            'user_is_logged_in': user_services.has_fully_registered(
+                self.user_id),
         })
 
         if 'meta_name' not in values:

@@ -50,26 +50,35 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
 
   var getPayload = {
     'heightChange': function(data) {
-      return {height: data.height, scroll: data.scroll};
+      return {
+        height: data.height,
+        scroll: data.scroll
+      };
     },
     'explorationLoaded': function(data) {
-      return {};
+      return {
+        explorationVersion: data.explorationVersion
+      };
     },
     'stateTransition': function(data) {
       return {
+        explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
         jsonAnswer: data.jsonAnswer,
         newStateName: data.newStateName
       };
     },
+    'explorationCompleted': function(data) {
+      return {
+        explorationVersion: data.explorationVersion
+      };
+    },
+    // DEPRECATED
     'explorationReset': function(data) {
       return {
         stateName: data
       };
-    },
-    'explorationCompleted': function(data) {
-      return {};
-    },
+    }
   };
 
   var messenger = {

@@ -22,7 +22,6 @@ import logging
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
-from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import user_services
 from core.platform import models
@@ -31,8 +30,6 @@ from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
-
-import jinja2
 
 SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     'splash_page_youtube_video_id', {'type': 'unicode'},
@@ -88,6 +85,9 @@ class GalleryPage(base.BaseHandler):
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_CREATE_MODE_URL)),
+            'has_fully_registered': bool(
+                self.user_id and
+                user_services.has_fully_registered(self.user_id)),
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': [{

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var _RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
+oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
@@ -280,7 +280,9 @@ oppia.filter('convertToPlainText', [function() {
   };
 }]);
 
-oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
+oppia.filter('summarizeAnswerGroup', [
+    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
   return function(answerGroup, interactionId, answerChoices, shortenRule) {
     var summary = '';
     var outcome = answerGroup.outcome;
@@ -294,7 +296,7 @@ oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
 
       if (hasFeedback && shortenRule) {
         summary = $filter('wrapTextWithEllipsis')(
-          summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
       }
       summary = '[' + summary + '] ';
     }
@@ -306,7 +308,9 @@ oppia.filter('summarizeAnswerGroup', ['$filter', function($filter) {
   };
 }]);
 
-oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
+oppia.filter('summarizeDefaultOutcome', [
+    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
   return function(
       defaultOutcome, interactionId, answerGroupCount, shortenRule) {
     if (!defaultOutcome) {
@@ -327,7 +331,7 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
 
     if (hasFeedback && shortenRule) {
       summary = $filter('wrapTextWithEllipsis')(
-        summary, _RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+        summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
     }
     summary = '[' + summary + '] ';
 

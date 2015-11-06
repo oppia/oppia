@@ -17,7 +17,6 @@
 """Custom value generator classes."""
 
 import copy
-import numbers
 
 from core.domain import value_generators_domain
 import jinja_utils
@@ -58,57 +57,3 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     def generate_value(self, context_params, list_of_values):
         return copy.deepcopy(utils.get_random_choice(list_of_values))
-
-
-class RestrictedCopier(value_generators_domain.BaseValueGenerator):
-    """Returns a copy of the input, after checking its existence in a list."""
-
-    choices = []
-
-    @property
-    def default_value(self):
-        return self.choices[0]
-
-    def __init__(self, choices):
-        if not isinstance(choices, list):
-            raise TypeError(
-                'Expected a list of choices, received %s' % choices)
-        self.choices = choices
-
-    def generate_value(self, context_params, value, parse_with_jinja=False):
-        if context_params is None:
-            context_params = {}
-
-        if parse_with_jinja:
-            value = jinja_utils.evaluate_object(value, context_params)
-
-        if not value in self.choices:
-            raise Exception(
-                'Value must be one of %s; received %s' % (self.choices, value))
-        return copy.deepcopy(value)
-
-
-class RangeRestrictedCopier(value_generators_domain.BaseValueGenerator):
-    """Returns the input, after checking it is in a given interval."""
-
-    min_value = 0
-    max_value = 0
-
-    @property
-    def default_value(self):
-        return (self.min_value + self.max_value) / 2
-
-    def __init__(self, min_value, max_value):
-        if not isinstance(min_value, numbers.Number):
-            raise TypeError('Expected a number, received %s' % min_value)
-        if not isinstance(max_value, numbers.Number):
-            raise TypeError('Expected a number, received %s' % max_value)
-        self.min_value = min_value
-        self.max_value = max_value
-
-    def generate_value(self, context_params, value):
-        if not self.min_value <= value <= self.max_value:
-            raise Exception(
-                'Value must be between %s and %s, inclusive; received %s' %
-                (self.min_value, self.max_value, value))
-        return copy.deepcopy(value)
