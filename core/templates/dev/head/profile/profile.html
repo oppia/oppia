@@ -17,37 +17,33 @@
 
 {% block content %}
   <div class="container">
+    
+    <div class="col-xs-12" style="height:50px;"></div>
     <div class="row">
-      <h1>Profile: {{user_username}}</h1>
-    </div>
 
-    <div class="row">
-      <div role="form" class="form-horizontal">
         <div class="form-group">
-          <label class="col-lg-2 col-md-2 col-sm-2">Picture</label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
+          <div class="col-lg-2 col-md-2 col-sm-2">
             {% if user_pic_data_url %}
               <img src="{{user_pic_data_url}}" class="img-thumbnail">
             {% else %}
-              <img src="/images/general/no_profile_picture.png" class="img-thumbnail">
+              <img src="/images/general/no_profile_picture.png" class="no_profile_img-thumbnail">
             {% endif %}
           </div>
+          <div class="col-lg-5 col-md-5 col-sm-5">
+            <h1 id="profile_username_less_margin_top"><strong>{{user_username}}</strong></h1>
+            <h5>
+              {% if user_bio %}
+                {{user_bio}}
+              {% else %}
+                <em>This user has not supplied a bio yet. This user has not supplied a bio yet. This user has not supplied a bio yet. This user has not supplied a bio yet. This user has not supplied a bio yet. (200 char) </em>
+              {% endif %}
+            </h5>
+            <h5>Subject Interests:</br></br>Contributing since...</h5>
+
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div role="form" class="form-horizontal">
-        <div class="form-group">
-          <label class="col-lg-2 col-md-2 col-sm-2">Bio</label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
-            {% if user_bio %}
-              {{user_bio}}
-            {% else %}
-              <em>This user has not supplied a bio yet.</em>
-            {% endif %}
-          </div>
-        </div>
-      </div>
+
+
     </div>
   </div>
 {% endblock %}

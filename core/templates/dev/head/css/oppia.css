@@ -104,6 +104,16 @@ body {
   width: 100%;
 }
 
+/* Special settings for world-viewable profile page*/ 
+.no_profile_img-thumbnail {
+  height:180px;
+  width:180px;
+}
+
+#profile_username_less_margin_top {
+  margin-top: 15px;
+}
+
 /*
   This counteracts the increased line-height of 1.846 introduced by
   angular-material.css.
@@ -196,6 +206,7 @@ p {
   margin-right: auto;
   width: 80%;
 }
+
 
 #wrapper {
   min-height: 100%;
