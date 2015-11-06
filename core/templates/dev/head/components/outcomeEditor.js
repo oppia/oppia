@@ -23,8 +23,8 @@ oppia.directive('outcomeEditor', [function() {
     restrict: 'E',
     scope: {
       isEditable: '&isEditable',
-      onSaveDestFn: '&onSaveDest',
-      onSaveFeedbackFn: '&onSaveFeedback',
+      getOnSaveDestFn: '&onSaveDest',
+      getOnSaveFeedbackFn: '&onSaveFeedback',
       outcome: '=outcome'
     },
     templateUrl: 'components/outcomeEditor',
@@ -97,14 +97,14 @@ oppia.directive('outcomeEditor', [function() {
           $scope.$broadcast('saveOutcomeFeedbackDetails');
           $scope.feedbackEditorIsOpen = false;
           $scope.outcomeFeedbackMemento = null;
-          $scope.onSaveFeedbackFn();
+          $scope.getOnSaveFeedbackFn()($scope.outcome);
         };
 
         $scope.saveThisDestination = function() {
           $scope.$broadcast('saveOutcomeDestDetails');
           $scope.destinationEditorIsOpen = false;
           $scope.outcomeDestMemento = null;
-          $scope.onSaveDestFn();
+          $scope.getOnSaveDestFn()($scope.outcome);
         };
 
         $scope.cancelThisFeedbackEdit = function() {

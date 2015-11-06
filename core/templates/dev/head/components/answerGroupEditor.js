@@ -23,9 +23,9 @@ oppia.directive('answerGroupEditor', [function() {
     restrict: 'E',
     scope: {
       isEditable: '=',
-      onSaveAnswerGroupDest: '&',
-      onSaveAnswerGroupFeedback: '&',
-      onSaveAnswerGroupRules: '&',
+      getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
+      getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
+      getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
       outcome: '=',
       rules: '='
     },
@@ -219,13 +219,13 @@ oppia.directive('answerGroupEditor', [function() {
         $scope.saveRules = function() {
           $scope.changeActiveRuleIndex(-1);
           $scope.rulesMemento = null;
-          $scope.onSaveAnswerGroupRules();
+          $scope.getOnSaveAnswerGroupRulesFn()($scope.rules);
         };
 
         $scope.changeActiveRuleIndex = function(newIndex) {
           responsesService.changeActiveRuleIndex(newIndex);
           $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
-          $scope.onSaveAnswerGroupRules();
+          $scope.getOnSaveAnswerGroupRulesFn()($scope.rules);
         };
 
         $scope.openRuleEditor = function(index) {

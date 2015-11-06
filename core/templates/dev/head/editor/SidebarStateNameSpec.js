@@ -50,7 +50,8 @@ describe('Sidebar state name controller', function() {
               dest: 'Second State',
               feedback: [],
               param_changes: []
-            }
+            },
+            fallbacks: []
           },
           param_changes: []
         },
@@ -65,7 +66,8 @@ describe('Sidebar state name controller', function() {
               dest: 'Second State',
               feedback: [],
               param_changes: []
-            }
+            },
+            fallbacks: []
           },
           param_changes: []
         },
@@ -80,7 +82,8 @@ describe('Sidebar state name controller', function() {
               dest: 'Second State',
               feedback: [],
               param_changes: []
-            }
+            },
+            fallbacks: []
           },
           param_changes: [{
             name: 'comparison',

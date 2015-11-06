@@ -147,11 +147,15 @@ oppia.controller('ExplorationSettings', [
     explorationAdvancedFeaturesService.areParametersEnabled);
   $scope.areGadgetsEnabled = (
     explorationAdvancedFeaturesService.areGadgetsEnabled);
+  $scope.areFallbacksEnabled = (
+    explorationAdvancedFeaturesService.areFallbacksEnabled);
 
   $scope.enableParameters = (
     explorationAdvancedFeaturesService.enableParameters);
   $scope.enableGadgets = (
     explorationAdvancedFeaturesService.enableGadgets);
+  $scope.enableFallbacks = (
+    explorationAdvancedFeaturesService.enableFallbacks);
 
   /********************************************
   * Methods for rights management.
