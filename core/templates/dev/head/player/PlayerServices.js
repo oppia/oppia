@@ -396,6 +396,7 @@ oppia.factory('oppiaPlayerService', [
       learnerParamsService.init({});
       stateHistory = [];
       _currentStateName = null;
+      _numSubmitsForThisState = 0;
 
       if (_editorPreviewMode) {
         if (_exploration) {
