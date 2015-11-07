@@ -133,7 +133,7 @@ def classify(exp_id, state, answer, params):
 
     # Find the first hard rule that matches
     for (i, answer_group) in enumerate(state.interaction.answer_groups):
-        ored_truth_value = 0.0
+        ored_truth_value = rule_domain.CERTAIN_FALSE_VALUE
         best_rule_spec = None
         for rule_spec in answer_group.rule_specs:
             if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
@@ -154,21 +154,16 @@ def classify(exp_id, state, answer, params):
     # group with the highest truth value is considered the best match.
     if best_matched_answer_group is None:
         for (i, answer_group) in enumerate(state.interaction.answer_groups):
-            ored_truth_value = 0.0
-            best_rule_spec = None
-            for rule_spec in answer_group.rule_specs:
-                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
-                    evaluated_truth_value = rule_domain.evaluate_rule(
-                        rule_spec, input_type, params, normalized_answer, fs)
-                    if evaluated_truth_value > ored_truth_value:
-                        ored_truth_value = evaluated_truth_value
-                        best_rule_spec = rule_spec
-            if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
-                best_matched_truth_value = evaluated_truth_value
-                best_matched_rule_spec = rule_spec
-                best_matched_answer_group = answer_group
-                best_matched_answer_group_index = i
-                break
+            fuzzy_rule_spec = answer_group.get_fuzzy_rule_spec()
+            if fuzzy_rule_spec is not None:
+                evaluated_truth_value = rule_domain.evaluate_rule(
+                    rule_spec, input_type, params, normalized_answer, fs)
+                if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+                    best_matched_truth_value = evaluated_truth_value
+                    best_matched_rule_spec = rule_spec
+                    best_matched_answer_group = answer_group
+                    best_matched_answer_group_index = i
+                    break
 
     # Run the classifier if no prediction has been made yet. Currently this
     # is behind a development flag.

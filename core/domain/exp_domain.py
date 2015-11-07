@@ -539,7 +539,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
+        seen_fuzzy_rule = False
         for rule_spec in self.rule_specs:
+            rule_class = None
             try:
                 rule_class = next(
                     r for r in all_rule_classes
@@ -547,12 +549,29 @@ class AnswerGroup(object):
             except StopIteration:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
+            if rule_class.__name__ == rule_domain.FUZZY_RULE_TYPE:
+                if seen_fuzzy_rule:
+                    raise utils.ValidationError(
+                        'AnswerGroup can only have one fuzzy rule.')
+                seen_fuzzy_rule = True
 
             rule_spec.validate(
                 rule_domain.get_param_list(rule_class.description),
                 exp_param_specs_dict)
 
         self.outcome.validate()
+
+    def get_fuzzy_rule_spec(self):
+        """Will return the answer group's fuzzy rule, or None if it doesn't
+        exist.
+
+        Returns the first fuzzy rule found in rule_specs because we guarantee
+        each answer group has only one fuzzy rule.
+        """
+        for rule_spec in self.rule_specs:
+            if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                return rule_spec
+        return None
 
 
 class TriggerInstance(object):

@@ -118,7 +118,16 @@ class StringClassifier(object):
 
     _DEFAULT_PREDICTION_THRESHOLD = 0.5
 
+    """Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
+    likely not be useful for predicting as there are not enough examples to
+    build a generalized model.
+    """
     _DEFAULT_MIN_DOCS_TO_PREDICT = 20
+    """Because prediction uses Prob(the doc should be assigned this label | the
+    doc is not assigned DEFAULT_LABEL), if there are only two labels (the
+    default label and one other) then the one other label will always be
+    predicted.
+    """
     _DEFAULT_MIN_LABELS_TO_PREDICT = 3
 
     DEFAULT_LABEL = '_default'
@@ -446,13 +455,7 @@ class StringClassifier(object):
 
     def predict_label_for_doc(self, d):
         """Returns the predicted label from a doc's prediction report.
-
-        Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
-        likely not be useful for predicting, and could potentially cause
-        more issues with incorrect predictions. Because prediction uses
-        Prob(the doc should be assigned this label | the doc is not assigned
-        DEFAULT_LABEL), if there are only two labels (the default label and
-        one other) then the one other label will always be predicted."""
+        """
         if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
                 self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
             return self.DEFAULT_LABEL

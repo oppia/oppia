@@ -344,6 +344,40 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'destination ABC is not a valid'):
             exploration.validate()
 
+        # Ensure an answer group with two fuzzy rules is invalid
+        init_state = exploration.states[exploration.init_state_name]
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest = exploration.init_state_name
+        init_state.interaction.answer_groups.append(
+            exp_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': exploration.init_state_name,
+                    'feedback': ['Feedback'],
+                    'param_changes': [],
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'training_data': ['Test']
+                    },
+                    'rule_type': 'FuzzyMatches'
+                },
+                {
+                    'inputs': {
+                        'training_data': ['Test']
+                    },
+                    'rule_type': 'FuzzyMatches'
+                }]
+            })
+        )
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'AnswerGroup can only have one fuzzy rule.'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        init_state.interaction.answer_groups.pop()
+        exploration.validate()
+
         # Ensure an invalid destination can also be detected for answer groups.
         # Note: The state must keep its default_outcome, otherwise it will
         # trigger a validation error for non-terminal states needing to have a
