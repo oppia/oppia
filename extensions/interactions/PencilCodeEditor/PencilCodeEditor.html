@@ -1,0 +1,19 @@
+<script type="text/ng-template" id="interaction/PencilCodeEditor">
+  <div style="height: 500px; width: 100%; position: relative;">
+    <div></div>
+  </div>
+  <div style="margin-top: 4px;">
+    <md-button class="md-button-success" ng-click="reset(currentInitialValue)">
+      <i class="material-icons md-18" style="position: relative; top: -2px; vertical-align: middle;">&#xE5D5;</i>
+      <span style="color: #333;">Reset Code</span>
+    </md-button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/PencilCodeEditor">
+  <pre><[answerCode]></pre>
+</script>
+
+<script type="text/ng-template" id="shortResponse/PencilCodeEditor">
+  <pre><[answerCode | truncateAtFirstLine]></pre>
+</script>

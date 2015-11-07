@@ -165,6 +165,30 @@ class NonnegativeInt(BaseObject):
     }
 
 
+class CodeString(BaseObject):
+    """Code string class. This is like a normal string, but it should not
+    contain tab characters.
+    """
+
+    description = 'A code string.'
+    edit_html_filename = 'code_string_editor'
+    edit_js_filename = 'CodeStringEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'ui_config': {
+            'coding_mode': 'none',
+        },
+    }
+
+    @classmethod
+    def normalize(cls, raw):
+        if '\t' in raw:
+            raise TypeError(
+                'Unexpected tab characters in code string: %s' % raw)
+        return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
+
+
 class CodeEvaluation(BaseObject):
     """Evaluation result of programming code."""
 
