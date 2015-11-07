@@ -208,10 +208,21 @@ oppia.directive('conversationSkin', [function() {
       $scope.PANEL_TUTOR = 'tutor';
       $scope.PANEL_SUPPLEMENTAL = 'supplemental';
 
+      $scope.helpHtml = null;
+      $scope.continueToNextCardHtml = null;
+
       $scope.profilePicture = '/images/avatar/user_blue_72px.png';
       oppiaPlayerService.getUserProfileImage().then(function(result) {
         $scope.profilePicture = result;
       });
+
+      $scope.clearHelpHtml = function() {
+        $scope.helpHtml = null;
+      };
+
+      $scope.clearContinueToNextCardHtml = function() {
+        $scope.continueToNextCardHtml = null;
+      };
 
       // If the exploration is iframed, send data to its parent about its
       // height so that the parent can be resized as necessary.
@@ -259,6 +270,8 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var _recomputeAndResetPanels = function() {
+        $scope.clearHelpHtml();
+
         $scope.panels = [];
         if (!$scope.canWindowFitTwoCards()) {
           $scope.panels.push($scope.PANEL_TUTOR);
@@ -281,6 +294,9 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.setVisiblePanel = function(panelName) {
         $scope.currentVisiblePanelName = panelName;
+        if (panelName === $scope.PANEL_TUTOR) {
+          $scope.clearHelpHtml();
+        }
         if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
         }
@@ -299,6 +315,8 @@ oppia.directive('conversationSkin', [function() {
       var _navigateToCard = function(index) {
         $scope.activeCard = $scope.transcript[index];
         $scope.arePreviousResponsesShown = false;
+        $scope.clearHelpHtml();
+        $scope.clearContinueToNextCardHtml();
 
         _recomputeAndResetPanels();
         if (_nextFocusLabel && index === $scope.transcript.length - 1) {
@@ -402,7 +420,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.submitAnswer = function(answer) {
         // For some reason, answers are getting submitted twice when the submit
         // button is clicked. This guards against that.
-        if (_answerIsBeingProcessed) {
+        if (_answerIsBeingProcessed || $scope.activeCard.interactionIsDisabled) {
           return;
         }
 
@@ -441,6 +459,9 @@ oppia.directive('conversationSkin', [function() {
             if (_oldStateName === newStateName) {
               // Stay on the same card.
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
+              if (feedbackHtml && !$scope.activeCard.interactionIsInline) {
+                $scope.helpHtml = feedbackHtml;
+              }
               if (refreshInteraction) {
                 // Replace the previous interaction (even though it might be of
                 // the same type).
@@ -475,6 +496,11 @@ oppia.directive('conversationSkin', [function() {
               if (feedbackHtml) {
                 lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
                 $scope.waitingForContinueButtonClick = true;
+
+                if (!$scope.activeCard.interactionIsInline) {
+                  $scope.continueToNextCardHtml = feedbackHtml;
+                }
+
                 _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                 focusService.setFocusIfOnDesktop(_nextFocusLabel);
                 scrollToBottom();
