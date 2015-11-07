@@ -45,7 +45,7 @@ oppia.controller('ExplorationSettings', [
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-  var GALLERY_PAGE_URL = '/gallery';
+  var MY_EXPLORATIONS_PAGE_URL = '/my_explorations';
   var EXPLORE_PAGE_PREFIX = '/explore/';
 
   $scope.getExplorePageUrl = function() {
@@ -242,7 +242,7 @@ oppia.controller('ExplorationSettings', [
         deleteUrl += ('?role=' + role);
       }
       $http['delete'](deleteUrl).success(function(data) {
-        $window.location = GALLERY_PAGE_URL;
+        $window.location = MY_EXPLORATIONS_PAGE_URL;
       });
     });
   };

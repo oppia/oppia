@@ -126,7 +126,7 @@ oppia.factory('createExplorationButtonService', [
         // render.
         $timeout(function() {
           focusService.setFocus('newExplorationModalOpened');
-        });
+        }, 300);
       });
 
       return modalInstance;
