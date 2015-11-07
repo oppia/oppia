@@ -142,19 +142,19 @@
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
-            <label for="enableParameters" class="col-lg-2 col-md-2 col-sm-2">
-              Parameters
+            <label for="enableFallbacks" class="col-lg-2 col-md-2 col-sm-2">
+              Fallbacks
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-enable-parameters" ng-click="enableParameters()" ng-if="!areParametersEnabled()">
+              <button type="button" class="btn btn-default protractor-test-enable-fallbacks" ng-click="enableFallbacks()" ng-if="!areFallbacksEnabled()">
                 Enable
               </button>
-              <span ng-if="areParametersEnabled()">
+              <span ng-if="areFallbacksEnabled()">
                 Enabled
               </span>
             </span>
             <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
+              Special conditions you can trigger if a learner looks stuck, e.g. if they get a question wrong many times.
             </span>
           </div>
         </div>
@@ -176,6 +176,27 @@
             </span>
             <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
               Customizable components that persist throughout an exploration.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableParameters" class="col-lg-2 col-md-2 col-sm-2">
+              Parameters
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default protractor-test-enable-parameters" ng-click="enableParameters()" ng-if="!areParametersEnabled()">
+                Enable
+              </button>
+              <span ng-if="areParametersEnabled()">
+                Enabled
+              </span>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
             </span>
           </div>
         </div>
