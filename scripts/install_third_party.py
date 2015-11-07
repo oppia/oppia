@@ -146,10 +146,7 @@ def download_and_untar_files(
 
         if post_exe_hook:
             print 'Running post-execution hook for %s...' % tar_root_name
-            DEV_NULL = open(os.devnull, 'w')
-            # Hide the regular output, and show any errors.
-            subprocess.call(
-                post_exe_hook, stdout=DEV_NULL, stderr=subprocess.STDOUT)
+            subprocess.call(post_exe_hook)
 
 
 # Download all the standalone files.
