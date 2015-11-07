@@ -69,17 +69,19 @@ def webapp_add_wsgi_middleware(app):
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 
-THIRD_PARTY_LIBS = [
-    os.path.join(ROOT_PATH, 'third_party', 'bleach-1.2.2'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-0.95'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.15.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
+THIRD_PARTY_LIB_DIRNAMES = [
+    'bleach-1.2.2',
+    'gae-mapreduce-1.9.17.0',
+    'gae-cloud-storage-1.9.15.0',
+    'gae-pipeline-1.9.17.0',
+    'graphy-1.0.0',
+    'html5lib-python-0.95',
+    'numpy-1.6.1',
+    'simplejson-3.7.1',
 ]
 
-for lib_path in THIRD_PARTY_LIBS:
+for lib_dirname in THIRD_PARTY_LIB_DIRNAMES:
+    lib_path = os.path.join(ROOT_PATH, 'third_party', lib_dirname)
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
