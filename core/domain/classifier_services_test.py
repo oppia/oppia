@@ -210,3 +210,23 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         prediction_report = (
             self.string_classifier._get_prediction_report_for_doc(-1))
         self.assertEquals(prediction_report['prediction_label_id'], 1)
+
+    def test_training(self):
+        # Until I come up with larger test data sets, this will do
+        self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
+        self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
+
+        doc_ids = self.string_classifier.add_examples_for_predicting(
+            self._EXAMPLES_TEST)
+        predicted_label = self.string_classifier.predict_label_for_doc(
+            doc_ids[0])
+        self.assertEquals(predicted_label, 'food')
+        predicted_label = self.string_classifier.predict_label_for_doc(
+            doc_ids[1])
+        self.assertEquals(predicted_label, 'pets')
+        # Testing a doc predicted with the default label
+        self.string_classifier._prediction_threshold = 0.7
+        predicted_label = self.string_classifier.predict_label_for_doc(
+            doc_ids[2])
+        self.assertEquals(predicted_label, '_default')
+        self._validate_instance(self.string_classifier)
