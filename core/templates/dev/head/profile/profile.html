@@ -16,34 +16,29 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="container">
-    
-    <div class="col-xs-12" style="height:50px;"></div>
-    <div class="row">
-
+  <div class="oppia-profile-container">
+    <div class="container">
+      <div class="row">
         <div class="form-group">
           <div class="col-lg-2 col-md-2 col-sm-2">
             {% if user_pic_data_url %}
-              <img src="{{user_pic_data_url}}" class="img-thumbnail">
+              <img src="{{user_pic_data_url}}" class="img-thumbnail oppia-profile-picture-fullsize">
             {% else %}
-              <img src="/images/general/no_profile_picture.png" class="no_profile_img-thumbnail">
+              <img src="/images/general/no_profile_picture.png" class="img-thumbnail oppia-profile-picture-fullsize">
             {% endif %}
           </div>
-          <div class="col-lg-5 col-md-5 col-sm-5">
-            <h1 id="profile_username_less_margin_top"><strong>{{user_username}}</strong></h1>
-            <h5>
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <h1 class="oppia-profile-username"><strong>{{user_username}}</strong></h1>
+            <p>
               {% if user_bio %}
                 {{user_bio}}
               {% else %}
-                <em>This user has not supplied a bio yet. This user has not supplied a bio yet. This user has not supplied a bio yet. This user has not supplied a bio yet. This user has not supplied a bio yet. (200 char) </em>
+                <em>This user has not supplied a bio yet. </em>
               {% endif %}
-            </h5>
-            <h5>Subject Interests:</br></br>Contributing since...</h5>
-
+            </p>
+          </div>
         </div>
       </div>
-
-
     </div>
   </div>
 {% endblock %}
