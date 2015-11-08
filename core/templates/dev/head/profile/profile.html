@@ -16,35 +16,26 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="container">
-    <div class="row">
-      <h1>Profile: {{user_username}}</h1>
-    </div>
-
-    <div class="row">
-      <div role="form" class="form-horizontal">
+  <div class="oppia-profile-container">
+    <div class="container">
+      <div class="row">
         <div class="form-group">
-          <label class="col-lg-2 col-md-2 col-sm-2">Picture</label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
+          <div class="col-lg-2 col-md-2 col-sm-2">
             {% if user_pic_data_url %}
-              <img src="{{user_pic_data_url}}" class="img-thumbnail">
+              <img src="{{user_pic_data_url}}" class="img-thumbnail oppia-profile-picture-fullsize">
             {% else %}
-              <img src="/images/general/no_profile_picture.png" class="img-thumbnail">
+              <img src="/images/general/no_profile_picture.png" class="img-thumbnail oppia-profile-picture-fullsize">
             {% endif %}
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div role="form" class="form-horizontal">
-        <div class="form-group">
-          <label class="col-lg-2 col-md-2 col-sm-2">Bio</label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
-            {% if user_bio %}
-              {{user_bio}}
-            {% else %}
-              <em>This user has not supplied a bio yet.</em>
-            {% endif %}
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <h1 class="oppia-profile-username"><strong>{{user_username}}</strong></h1>
+            <p>
+              {% if user_bio %}
+                {{user_bio}}
+              {% else %}
+                <em>This user has not supplied a bio yet. </em>
+              {% endif %}
+            </p>
           </div>
         </div>
       </div>

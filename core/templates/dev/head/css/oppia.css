@@ -104,6 +104,21 @@ body {
   width: 100%;
 }
 
+/* Special settings for world-viewable profile page*/ 
+.oppia-profile-container {
+  margin-top: 60px;
+  margin-bottom: 30px;
+}
+
+.oppia-profile-picture-fullsize {
+  height: 180px;
+  width: 180px;
+}
+
+.oppia-profile-username {
+  margin-top: 15px;
+}
+
 /*
   This counteracts the increased line-height of 1.846 introduced by
   angular-material.css.
