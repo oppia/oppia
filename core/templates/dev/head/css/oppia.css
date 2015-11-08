@@ -105,12 +105,17 @@ body {
 }
 
 /* Special settings for world-viewable profile page*/ 
-.no_profile_img-thumbnail {
-  height:180px;
-  width:180px;
+.oppia-profile-container {
+  margin-top: 60px;
+  margin-bottom: 30px;
 }
 
-#profile_username_less_margin_top {
+.oppia-profile-picture-fullsize {
+  height: 180px;
+  width: 180px;
+}
+
+.oppia-profile-username {
   margin-top: 15px;
 }
 
@@ -206,7 +211,6 @@ p {
   margin-right: auto;
   width: 80%;
 }
-
 
 #wrapper {
   min-height: 100%;
