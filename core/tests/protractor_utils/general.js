@@ -24,8 +24,15 @@ var editor = require('./editor.js');
 // Time (in ms) to wait when the system needs time for some computations.
 var WAIT_TIME = 4000;
 
+// Optionally accepts a waitTime integer in milliseconds.
 var waitForSystem = function() {
-  protractor.getInstance().sleep(WAIT_TIME);
+  var waitTime;
+  if (arguments.length === 1) {
+    waitTime = arguments[0];
+  } else {
+    waitTime = WAIT_TIME;
+  }
+  protractor.getInstance().sleep(waitTime);
 };
 
 // We will report all console logs of level greater than this.

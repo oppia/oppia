@@ -53,13 +53,26 @@ oppia.constant('CATEGORY_LIST', [
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 
+oppia.constant('DEFAULT_RULE_NAME', 'Default');
+
+oppia.constant('FUZZY_RULE_TYPE', 'FuzzyMatches');
+
+oppia.constant('DEFAULT_FUZZY_RULE', {
+  'rule_type': 'FuzzyMatches',
+  'inputs': {
+    'training_data': []
+  }
+})
+
+oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log', '$translate', '$translatePartialLoader',
-    'warningsData', 'activeInputData', 'messengerService',
-    function($scope, $http, $rootScope, $window, $timeout, $document, $log, $translate, $translatePartialLoader,
-             warningsData, activeInputData, messengerService) {
+    '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
+    '$translate', '$translatePartialLoader', 'warningsData', 'activeInputData',
+    function($scope, $http, $rootScope, $window, $timeout, $document, $log,
+             $translate, $translatePartialLoader, warningsData,
+             activeInputData) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;

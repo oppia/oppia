@@ -33,10 +33,11 @@ oppia.directive('answerGroupEditor', [function() {
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
       'editorContextService', 'routerService', 'warningsData',
-      'INTERACTION_SPECS',
+      'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
       function(
         $scope, stateInteractionIdService, responsesService,
-        editorContextService, routerService, warningsData, INTERACTION_SPECS) {
+        editorContextService, routerService, warningsData, INTERACTION_SPECS,
+        FUZZY_RULE_TYPE) {
 
     $scope.rulesMemento = null;
     $scope.outcomeFeedbackMemento = null;
@@ -44,7 +45,7 @@ oppia.directive('answerGroupEditor', [function() {
 
     $scope.feedbackEditorIsOpen = false;
     $scope.destinationEditorIsOpen = false;
-    $scope.activeRuleIndex = -1;
+    $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
     $scope.editAnswerGroupForm = {};
 
     $scope.getAnswerChoices = function() {
@@ -153,6 +154,8 @@ oppia.directive('answerGroupEditor', [function() {
           return [getDefaultInputValue('Real'), getDefaultInputValue('Real')];
         case 'ListOfUnicodeString':
         case 'SetOfUnicodeString':
+        case 'SetOfHtmlString':
+          return [];
         case 'MusicPhrase':
           return [];
         case 'CheckedProof':
@@ -201,14 +204,23 @@ oppia.directive('answerGroupEditor', [function() {
     };
 
     $scope.addNewRule = function() {
-      // Save the state of the rules before adding a new one (in case the user
-      // cancels the addition).
-      $scope.rulesMemento = angular.copy($scope.rules);
-
       // Build an initial blank set of inputs for the initial rule.
       var interactionId = $scope.getCurrentInteractionId();
       var ruleDescriptions = INTERACTION_SPECS[interactionId].rule_descriptions;
-      var ruleType = Object.keys(ruleDescriptions)[0];
+      var ruleTypes = Object.keys(ruleDescriptions);
+      var ruleType = null;
+      for (var i = 0; i < ruleTypes.length; i++) {
+        if (ruleTypes[i] != FUZZY_RULE_TYPE) {
+          ruleType = ruleTypes[i];
+          break;
+        }
+      }
+      if (!ruleType) {
+        // This should never happen. An interaction must have more than just a
+        // fuzzy rule, as verified in a backend test suite:
+        //   extensions.interactions.base_test.InteractionUnitTests.
+        return;
+      }
       var description = ruleDescriptions[ruleType];
 
       var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
@@ -223,6 +235,10 @@ oppia.directive('answerGroupEditor', [function() {
         inputs[varName] = getDefaultInputValue(varType);
         description = description.replace(PATTERN, ' ');
       }
+
+      // Save the state of the rules before adding a new one (in case the user
+      // cancels the addition).
+      $scope.rulesMemento = angular.copy($scope.rules);
 
       // TODO(bhenning): Should use functionality in ruleEditor.js, but move it
       // to responsesService in StateResponses.js to properly form a new rule.
@@ -390,6 +406,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
           return outcome.dest == PLACEHOLDER_OUTCOME_DEST;
         };
 
+        $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
         $scope.destChoices = [];
         $scope.$watch(explorationStatesService.getStates, function(newValue) {
           var _currentStateName = editorContextService.getActiveStateName();

@@ -45,19 +45,52 @@ oppia.filter('camelCaseToHyphens', [function() {
 }]);
 
 // Filter that truncates long descriptors.
-// TODO(sll): Strip out HTML tags before truncating.
-oppia.filter('truncate', [function() {
+oppia.filter('truncate', ['$filter', function($filter) {
   return function(input, length, suffix) {
-    if (!input)
+    if (!input) {
       return '';
-    if (isNaN(length))
+    }
+    if (isNaN(length)) {
       length = 70;
-    if (suffix === undefined)
+    }
+    if (suffix === undefined) {
       suffix = '...';
-    if (!angular.isString(input))
+    }
+    if (!angular.isString(input)) {
       input = String(input);
-    return (input.length <= length ? input
-            : input.substring(0, length - suffix.length) + suffix);
+    }
+    input = $filter('convertToPlainText')(input);
+    return (
+      input.length <= length ? input : (
+        input.substring(0, length - suffix.length) + suffix));
+  };
+}]);
+
+oppia.filter('truncateAtFirstLine', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var pattern = /(\r\n|[\n\v\f\r\x85\u2028\u2029])/g;
+    // Normalize line endings then split using the normalized delimiter.
+    var lines = input.replace(pattern, '\n').split('\n');
+    var firstNonemptyLineIndex = -1;
+    var otherNonemptyLinesExist = false;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].length > 0) {
+        if (firstNonemptyLineIndex === -1) {
+          firstNonemptyLineIndex = i;
+        } else {
+          otherNonemptyLinesExist = true;
+          break;
+        }
+      }
+    }
+    var suffix = otherNonemptyLinesExist ? '...' : '';
+    return (
+      firstNonemptyLineIndex !== -1 ?
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -159,11 +192,24 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput and ImageClickInput
+      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
       if (choices) {
-        for (var i = 0; i < choices.length; i++) {
-          if (choices[i].val === inputs[varName]) {
-            replacementText = '\'' + choices[i].label + '\'';
+        if (varType === 'SetOfHtmlString') {
+          replacementText = '[';
+          var key = inputs[varName];
+          for (var i = 0; i < key.length; i++) {
+            replacementText += key[i];
+            if (i < key.length - 1) {
+              replacementText += ',';
+            }
+          }
+          replacementText += ']';
+        } else {
+          // The following case is for MultipleChoiceInput
+          for (var i = 0; i < choices.length; i++) {
+            if (choices[i].val === inputs[varName]) {
+              replacementText = '\'' + choices[i].label + '\'';
+            }
           }
         }
       // TODO(sll): Generalize this to use the inline string representation of
@@ -224,11 +270,12 @@ oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
     strippedText = strippedText.replace('&nbsp;', ' ');
-    strippedText = strippedText.trim();
-    if (strippedText.length === 0) {
-      return input;
-    } else {
+
+    var trimmedText = strippedText.trim();
+    if (trimmedText.length === 0) {
       return strippedText;
+    } else {
+      return trimmedText;
     }
   };
 }]);
@@ -289,4 +336,41 @@ oppia.filter('summarizeDefaultOutcome', ['$filter', function($filter) {
     }
     return summary;
   }
-}])
+}]);
+
+// Filter that summarizes a large number to a decimal followed by
+// the appropriate metric prefix (K, M or B). For example, 167656
+// becomes 167.7K.
+// Users of this filter should ensure that the input is a non-negative number.
+oppia.filter('summarizeNonnegativeNumber', [function() {
+  return function (input) {
+    input = Number(input)
+    // Nine Zeroes for Billions
+    return input >= 1.0e+9
+    // Example 146008788788 becomes 146.0B
+    ? (input / 1.0e+9).toFixed(1) + 'B'
+
+    // Six Zeroes for Millions
+    : input >= 1.0e+6
+    // Example 146008788 becomes 146.0M
+    ? (input / 1.0e+6).toFixed(1) + 'M'
+
+    // Three Zeroes for Thousands
+    : input >= 1.0e+3
+    // Example 146008 becomes 146.0K
+    ? (input / 1.0e+3).toFixed(1) + 'K'
+    // For small number it should return number as it is
+    // Example 12 becomes 12
+    : input;
+  };
+}]);
+
+oppia.filter('truncateAndCapitalize', [function() {
+  return function(input, maxNumberOfCharacters) {
+    input = input.trim();
+    if(input.length > maxNumberOfCharacters) {
+      input = input.substring(0, maxNumberOfCharacters) + '...';
+    }
+    return input.charAt(0).toUpperCase() + input.slice(1);
+  }
+}]);

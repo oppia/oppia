@@ -126,10 +126,17 @@ oppia.directive('oppiaResponseEndExploration', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/EndExploration',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      templateUrl: 'response/EndExploration'
+    };
+  }
+]);
 
-      }]
+oppia.directive('oppiaShortResponseEndExploration', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/EndExploration'
     };
   }
 ]);

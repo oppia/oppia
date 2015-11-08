@@ -56,13 +56,13 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
-    'SanitizedUrl', 'Graph', 'ImageWithRegions']
+    'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
 # result in any errors.
 # Note to developers: please keep this in sync with
-#     https://code.google.com/p/oppia/wiki/SchemaBasedFormsDesignDoc
+#     https://github.com/oppia/oppia/wiki/Schema-Based-Forms
 UI_CONFIG_SPECS = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},

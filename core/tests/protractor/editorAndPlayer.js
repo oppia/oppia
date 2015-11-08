@@ -52,7 +52,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should walk through the tutorial when user repeteadly clicks Next', function() {
+  it('should walk through the tutorial when user repeatedly clicks Next', function() {
     var NUM_TUTORIAL_STAGES = 5;
     users.createUser('user@example.com', 'user');
     users.login('user@example.com');
@@ -128,6 +128,7 @@ describe('State editor', function() {
     player.expectLatestFeedbackToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('correct');
     });
+    player.clickThroughToNextCard();
     player.expectExplorationToBeOver();
 
     users.logout();
@@ -268,6 +269,7 @@ describe('Full exploration editor', function() {
       player.submitAnswer('NumericInput', 6);
       // This checks the previously-deleted group no longer applies.
       player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
+      player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
 
       editor.discardChanges();
@@ -371,6 +373,7 @@ describe('Full exploration editor', function() {
 
       player.expectLatestFeedbackToMatch(
         forms.toRichText('Okay, now this is just becoming annoying.'));
+      player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
 
       users.logout();
@@ -380,6 +383,146 @@ describe('Full exploration editor', function() {
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
+});
+
+// NOTE: Gadgets are disabled by default. Enable when running gadget-specific
+// integration tests.
+xdescribe('Gadget editor', function() {
+  it('should allow adding a gadget that is listed in the editor side panel ' +
+       ' and visible in the player view.', function() {
+    users.createUser('gadgetuser1@example.com', 'gadgetuser1');
+    users.login('gadgetuser1@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test.'));
+    editor.setInteraction('EndExploration');
+
+    // Setup a parameter for the ScoreBar to follow.
+    editor.addParameterChange('coconuts', 3000);
+
+    editor.addGadget(
+      'ScoreBar', // type
+      'Coconut Surplus', // name
+      '9000', // maxValue
+      'coconuts' // parameter to follow
+    );
+
+    editor.expectGadgetListNameToMatch(
+      'ScoreBar', // type
+      'Score Bar', // short_description
+      'Coconut Surplus' // name
+    );
+
+    editor.saveChanges();
+    general.moveToPlayer();
+
+    player.expectGadgetToMatch(
+      'ScoreBar',
+      'Coconut Surplus',
+      '9000',
+      'coconuts'
+    );
+
+    users.logout();
+  });
+
+  it('should allow configuration of visibility settings, and properly ' +
+      'render as visible or invisible as expected per state.' , function() {
+    users.createUser('gadgetuser2@example.com', 'gadgetuser2');
+    users.login('gadgetuser2@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget visibility integration test card 1.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'second', true);
+
+    // Setup the second state
+    editor.moveToState('second');
+    editor.setContent(forms.toRichText('gadget visibility integration test card 2.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'final card', true);
+
+    // Setup a terminating state
+    editor.moveToState('final card');
+    editor.setContent(forms.toRichText('gadget visibility final card'));
+    editor.setInteraction('EndExploration');
+    editor.moveToState('first');
+
+    // Add a parameter for the ScoreBar to follow.
+    editor.addParameterChange('coconuts', 3000);
+
+    editor.addGadget(
+      'ScoreBar', // type
+      'CoconutSurplus', // name
+      '9000', // maxValue
+      'coconuts' // parameter to follow
+    );
+
+    // Edit visibility
+    editor.openGadgetEditorModal('CoconutSurplus');
+    editor.enableGadgetVisibilityForState('final card');
+    editor.saveAndCloseGadgetEditorModal();
+
+    editor.saveChanges();
+    general.moveToPlayer();
+
+    player.expectVisibleGadget('ScoreBar');
+    player.submitAnswer('Continue', null);
+    general.waitForSystem(2000);
+
+    player.expectInvisibleGadget('ScoreBar');
+    player.submitAnswer('Continue', null);
+    general.waitForSystem(2000);
+
+    player.expectVisibleGadget('ScoreBar');
+    users.logout();
+
+  });
+
+  // This test inspects within the editor view since gadget names only exist
+  // to help authors differentiate between gadgets, and are not visible in the
+  // player view.
+  it('should allow renaming and deleting gadgets', function() {
+    users.createUser('gadgetuser3@example.com', 'gadgetuser3');
+    users.login('gadgetuser3@example.com');
+
+    workflow.createExploration('sums', 'maths');
+
+    // Setup the first state.
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('gadget integration test card 1.'));
+    editor.setInteraction('Continue');
+    editor.setDefaultOutcome(null, 'second', true);
+
+    // Add a parameter for the ScoreBar to follow.
+    editor.addParameterChange('coconuts', 3000);
+
+    editor.addGadget(
+      'ScoreBar', // type
+      'CoconutSurplus', // name
+      '9000', // maxValue
+      'coconuts' // parameter to follow
+    );
+
+    editor.renameGadget('CoconutSurplus', 'SuperCoconuts');
+
+    editor.expectGadgetListNameToMatch(
+      'ScoreBar', // type
+      'Score Bar', // short_description
+      'SuperCoconuts' // name
+    );
+
+    editor.deleteGadget('SuperCoconuts');
+    editor.expectGadgetWithNameDoesNotExist('SuperCoconuts');
+
+  });
+
 });
 
 describe('rich-text components', function() {
@@ -587,15 +730,16 @@ describe('Exploration history', function() {
       11: {text: '    - inputs:', highlighted: true},
       12: {text: '        x: 6.0', highlighted: true},
       13: {text: '      rule_type: Equals', highlighted: true},
-      14: {text: '  customization_args: {}', highlighted: false},
-      15: {text: '  default_outcome:', highlighted: false},
-      16: {text: '    dest: first', highlighted: true},
-      17: {text: '    feedback: []', highlighted: false},
-      18: {text: '    param_changes: []', highlighted: false},
-      19: {text: '  fallbacks: []', highlighted: false},
-      20: {text: '  id: NumericInput', highlighted: true},
-      21: {text: 'param_changes: []', highlighted: false},
-      22: {text: ' ', highlighted: false}
+      14: {text: '  confirmed_unclassified_answers: []', highlighted: false},
+      15: {text: '  customization_args: {}', highlighted: false},
+      16: {text: '  default_outcome:', highlighted: false},
+      17: {text: '    dest: first', highlighted: true},
+      18: {text: '    feedback: []', highlighted: false},
+      19: {text: '    param_changes: []', highlighted: false},
+      20: {text: '  fallbacks: []', highlighted: false},
+      21: {text: '  id: NumericInput', highlighted: true},
+      22: {text: 'param_changes: []', highlighted: false},
+      23: {text: ' ', highlighted: false}
     };
     var VERSION_2_STATE_1_CONTENTS = {
       1: {text: 'content:', highlighted: false},
@@ -603,20 +747,21 @@ describe('Exploration history', function() {
       3: {text: '  value: \'\'', highlighted: true},
       4: {text: 'interaction:', highlighted: false},
       5: {text: '  answer_groups: []', highlighted: true},
-      6: {text: '  customization_args: {}', highlighted: false},
-      7: {text: '  default_outcome:', highlighted: false},
+      6: {text: '  confirmed_unclassified_answers: []', highlighted: false},
+      7: {text: '  customization_args: {}', highlighted: false},
+      8: {text: '  default_outcome:', highlighted: false},
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      8: {
+      9: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true
       },
-      9: {text: '    feedback: []', highlighted: false},
-      10: {text: '    param_changes: []', highlighted: false},
-      11: {text: '  fallbacks: []', highlighted: false},
-      12: {text: '  id: null', highlighted: true},
-      13: {text: 'param_changes: []', highlighted: false},
-      14: {text: ' ', highlighted: false}
+      10: {text: '    feedback: []', highlighted: false},
+      11: {text: '    param_changes: []', highlighted: false},
+      12: {text: '  fallbacks: []', highlighted: false},
+      13: {text: '  id: null', highlighted: true},
+      14: {text: 'param_changes: []', highlighted: false},
+      15: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
@@ -624,6 +769,7 @@ describe('Exploration history', function() {
       '  value: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
+      '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value: Continue\n' +

@@ -18,72 +18,72 @@
 
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 import extensions.rules.set_of_unicode_string as set_rules
-import test_utils
 
 
 class SetOfUnicodeStringRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on SetOfUnicodeString objects."""
 
     def test_equals_rule(self):
-        self.assertTrue(set_rules.Equals(['1', '3']).eval(['3', '1']))
-        self.assertFalse(set_rules.Equals(['1']).eval(['3', '1']))
+        self.assertFuzzyTrue(set_rules.Equals(['1', '3']).eval(['3', '1']))
+        self.assertFuzzyFalse(set_rules.Equals(['1']).eval(['3', '1']))
 
     def test_is_subset_of_rule(self):
         rule = set_rules.IsSubsetOf(['a', 'b'])
 
-        self.assertTrue(rule.eval(['a']))
-        self.assertTrue(rule.eval(['b']))
-        self.assertTrue(rule.eval([]))
-        self.assertFalse(rule.eval(['a', 'b']))
-        self.assertFalse(rule.eval(['c']))
-        self.assertFalse(rule.eval(['a', 'b', 'c']))
+        self.assertFuzzyTrue(rule.eval(['a']))
+        self.assertFuzzyTrue(rule.eval(['b']))
+        self.assertFuzzyTrue(rule.eval([]))
+        self.assertFuzzyFalse(rule.eval(['a', 'b']))
+        self.assertFuzzyFalse(rule.eval(['c']))
+        self.assertFuzzyFalse(rule.eval(['a', 'b', 'c']))
 
     def test_is_superset_of_rule(self):
         rule = set_rules.IsSupersetOf(['a', 'b'])
 
-        self.assertTrue(rule.eval(['a', 'c', 'b']))
-        self.assertTrue(rule.eval(['a', 'ab', 'b']))
-        self.assertFalse(rule.eval(['a', 'c']))
-        self.assertFalse(rule.eval(['a', 'b']))
-        self.assertFalse(rule.eval(['a']))
-        self.assertFalse(rule.eval([]))
+        self.assertFuzzyTrue(rule.eval(['a', 'c', 'b']))
+        self.assertFuzzyTrue(rule.eval(['a', 'ab', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a', 'c']))
+        self.assertFuzzyFalse(rule.eval(['a', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a']))
+        self.assertFuzzyFalse(rule.eval([]))
 
     def test_has_elements_in_rule(self):
         rule = set_rules.HasElementsIn(['a', 'b'])
 
-        self.assertTrue(rule.eval(['a', 'c', 'b']))
-        self.assertTrue(rule.eval(['b']))
-        self.assertFalse(rule.eval(['c']))
-        self.assertFalse(rule.eval([]))
+        self.assertFuzzyTrue(rule.eval(['a', 'c', 'b']))
+        self.assertFuzzyTrue(rule.eval(['b']))
+        self.assertFuzzyFalse(rule.eval(['c']))
+        self.assertFuzzyFalse(rule.eval([]))
 
     def test_has_elements_not_in_rule(self):
         rule = set_rules.HasElementsNotIn(['a', 'b'])
 
-        self.assertTrue(rule.eval(['a', 'c', 'b']))
-        self.assertTrue(rule.eval(['c']))
-        self.assertFalse(rule.eval(['a', 'b']))
-        self.assertFalse(rule.eval(['a']))
-        self.assertFalse(rule.eval([]))
+        self.assertFuzzyTrue(rule.eval(['a', 'c', 'b']))
+        self.assertFuzzyTrue(rule.eval(['c']))
+        self.assertFuzzyFalse(rule.eval(['a', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a']))
+        self.assertFuzzyFalse(rule.eval([]))
 
     def test_omits_elements_in_rule(self):
         rule = set_rules.OmitsElementsIn(['a', 'b'])
 
-        self.assertTrue(rule.eval(['c', 'ab']))
-        self.assertTrue(rule.eval(['c']))
-        self.assertTrue(rule.eval([]))
-        self.assertTrue(rule.eval(['a']))
+        self.assertFuzzyTrue(rule.eval(['c', 'ab']))
+        self.assertFuzzyTrue(rule.eval(['c']))
+        self.assertFuzzyTrue(rule.eval([]))
+        self.assertFuzzyTrue(rule.eval(['a']))
 
-        self.assertFalse(rule.eval(['a', 'c', 'b']))
-        self.assertFalse(rule.eval(['a', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a', 'c', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a', 'b']))
 
     def test_is_disjoint_from_rule(self):
         rule = set_rules.IsDisjointFrom(['a', 'b'])
 
-        self.assertTrue(rule.eval(['c', 'ab']))
-        self.assertTrue(rule.eval(['c']))
-        self.assertTrue(rule.eval([]))
+        self.assertFuzzyTrue(rule.eval(['c', 'ab']))
+        self.assertFuzzyTrue(rule.eval(['c']))
+        self.assertFuzzyTrue(rule.eval([]))
 
-        self.assertFalse(rule.eval(['a', 'c', 'b']))
-        self.assertFalse(rule.eval(['a', 'b']))
-        self.assertFalse(rule.eval(['a']))
+        self.assertFuzzyFalse(rule.eval(['a', 'c', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a', 'b']))
+        self.assertFuzzyFalse(rule.eval(['a']))

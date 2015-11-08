@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -29,7 +28,6 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import gadget_registry
 from core.domain import interaction_registry
-from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -88,7 +86,8 @@ def require_playable(handler):
             return
 
         """Checks if the user for the current session is logged in."""
-        if rights_manager.Actor(self.user_id).can_play(exploration_id):
+        if rights_manager.Actor(self.user_id).can_play(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -96,6 +95,9 @@ def require_playable(handler):
     return test_can_play
 
 
+# TODO(bhenning): Add more tests for classification, such as testing multiple
+# rule specs over multiple answer groups and making sure the best match over all
+# those rules is picked.
 def classify(exp_id, state, answer, params):
     """Normalize the answer and select among the answer groups the group in
     which the answer best belongs. The best group is decided by finding the
@@ -104,6 +106,15 @@ def classify(exp_id, state, answer, params):
         'outcome': A dict representing the outcome of the answer group matched.
         'rule_spec_string': A descriptive string representation of the rule
             matched.
+        'answer_group_index': An index into the answer groups list indicating
+            which one was selected as the group which this answer belongs to.
+            This is equal to the number of answer groups if the default outcome
+            was matched.
+        'classification_certainty': A normalized value within the range of
+            [0, 1] representing at which confidence level the answer belongs in
+            the chosen answer group. A certainty of 1 means it is the best
+            possible match. A certainty of 0 means it is matched to the default
+            outcome.
     When the default rule is matched, outcome is the default_outcome of the
     state's interaction and the rule_spec_string is just 'Default.'
     """
@@ -111,30 +122,51 @@ def classify(exp_id, state, answer, params):
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
 
-    # Find the first group which best matches the given answer.
-    for answer_group in state.interaction.answer_groups:
+    # Find the first group that satisfactorily matches the given answer. This is
+    # done by ORing (maximizing) all truth values of all rules over all answer
+    # groups. The group with the highest truth value is considered the best
+    # match.
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_truth_value = 0.0
+    for (i, answer_group) in enumerate(state.interaction.answer_groups):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exp_id))
         input_type = interaction_instance.answer_type
-        matched_rule_spec = None
+        ored_truth_value = 0.0
+        best_rule_spec = None
         for rule_spec in answer_group.rule_specs:
-            if rule_domain.evaluate_rule(
-                    rule_spec, input_type, params, normalized_answer, fs):
-                matched_rule_spec = rule_spec
-                break
-        if matched_rule_spec is not None:
-            return {
-                'outcome': answer_group.outcome.to_dict(),
-                'rule_spec_string': (
-                    matched_rule_spec.stringify_classified_rule())
-            }
+            evaluated_truth_value = rule_domain.evaluate_rule(
+                rule_spec, input_type, params, normalized_answer, fs)
+            if evaluated_truth_value > ored_truth_value:
+                ored_truth_value = evaluated_truth_value
+                best_rule_spec = rule_spec
+        if ored_truth_value > best_matched_truth_value:
+            best_matched_truth_value = ored_truth_value
+            best_matched_rule_spec = best_rule_spec
+            best_matched_answer_group = answer_group
+            best_matched_answer_group_index = i
 
-    # If no other groups match, then the default group automatically matches
-    # (if there is one present).
-    if state.interaction.default_outcome is not None:
+    # The best matched group must match above a certain threshold. If no group
+    # meets this requirement, then the default 'group' automatically matches
+    # resulting in the outcome of the answer being the default outcome of the
+    # state.
+    if (best_matched_truth_value >=
+            feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
+        return {
+            'outcome': best_matched_answer_group.outcome.to_dict(),
+            'rule_spec_string': (
+                best_matched_rule_spec.stringify_classified_rule()),
+            'answer_group_index': best_matched_answer_group_index,
+            'classification_certainty': best_matched_truth_value
+        }
+    elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
-            'rule_spec_string': exp_domain.DEFAULT_RULESPEC_STR
+            'rule_spec_string': exp_domain.DEFAULT_RULESPEC_STR,
+            'answer_group_index': len(state.interaction.answer_groups),
+            'classification_certainty': 0.0
         }
 
     raise Exception('Something has seriously gone wrong with the exploration. '
@@ -175,13 +207,14 @@ class ExplorationPage(base.BaseHandler):
 
         version = exploration.version
 
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if not rights_manager.Actor(self.user_id).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         is_iframed = (self.request.get('iframed') == 'true')
 
         # TODO(sll): Cache these computations.
-        gadget_ids = exploration.get_gadget_ids()
+        gadget_types = exploration.get_gadget_types()
         interaction_ids = exploration.get_interaction_ids()
         dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -191,7 +224,7 @@ class ExplorationPage(base.BaseHandler):
                 dependency_ids))
 
         gadget_templates = (
-            gadget_registry.Registry.get_gadget_html(gadget_ids))
+            gadget_registry.Registry.get_gadget_html(gadget_types))
 
         interaction_templates = (
             rte_component_registry.Registry.get_html_for_all_components() +
@@ -207,7 +240,8 @@ class ExplorationPage(base.BaseHandler):
             'can_edit': (
                 bool(self.username) and
                 self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)
+                rights_manager.Actor(self.user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)
             ),
             'dependencies_html': jinja2.utils.Markup(
                 dependencies_html),
@@ -227,12 +261,11 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
-                    [exploration.default_skin])),
+                    [feconf.DEFAULT_SKIN_ID])),
             'skin_js_url': skins_services.Registry.get_skin_js_url(
-                exploration.default_skin),
+                feconf.DEFAULT_SKIN_ID),
             'skin_tag': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_tag(exploration.default_skin)
-            ),
+                skins_services.Registry.get_skin_tag(feconf.DEFAULT_SKIN_ID)),
         })
 
         if is_iframed:
@@ -256,7 +289,7 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        intro_card_color = (
+        info_card_color = (
             feconf.CATEGORIES_TO_COLORS[exploration.category] if
             exploration.category in feconf.CATEGORIES_TO_COLORS else
             feconf.DEFAULT_COLOR)
@@ -264,11 +297,12 @@ class ExplorationHandler(base.BaseHandler):
         self.values.update({
             'can_edit': (
                 self.user_id and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)),
+                rights_manager.Actor(self.user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'intro_card_image_url': (
+            'info_card_image_url': (
                 '/images/gallery/exploration_background_%s_large.png' %
-                intro_card_color),
+                info_card_color),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_random_string(24),
             'version': exploration.version,
@@ -453,9 +487,11 @@ class RatingHandler(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'overall_ratings':
-                rating_services.get_overall_ratings(exploration_id),
-            'user_rating': rating_services.get_user_specific_rating(
-                self.user_id, exploration_id) if self.user_id else None
+                rating_services.get_overall_ratings_for_exploration(
+                    exploration_id),
+            'user_rating': (
+                rating_services.get_user_specific_rating_for_exploration(
+                    self.user_id, exploration_id) if self.user_id else None)
         })
         self.render_json(self.values)
 
@@ -465,7 +501,7 @@ class RatingHandler(base.BaseHandler):
         exploration.
         """
         user_rating = self.payload.get('user_rating')
-        rating_services.assign_rating(
+        rating_services.assign_rating_to_exploration(
             self.user_id, exploration_id, user_rating)
         self.render_json({})
 

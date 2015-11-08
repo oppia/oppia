@@ -69,7 +69,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['explorations_list'][0])
 
         # Publicize the demo exploration.
@@ -108,7 +108,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
     def test_gallery_handler_for_created_explorations(self):
@@ -163,7 +163,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
         self.assertDictContainsSubset({
             'id': 'A',
@@ -171,7 +171,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Title A',
             'language_code': 'en',
             'objective': 'Objective A',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['explorations_list'][1])
 
         # Delete exploration A
@@ -186,7 +186,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
     def test_new_exploration_ids(self):

@@ -717,9 +717,7 @@ oppia.config(['$provide', function($provide) {
 
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
-        tooltiptext: (
-          componentDefn.name.charAt(0).toUpperCase() +
-          componentDefn.name.slice(1)),
+        tooltiptext: componentDefn.tooltip,
         onElementSelect: {
           element: 'img',
           filter: function(elt) {
@@ -895,21 +893,35 @@ oppia.filter('isNonempty', [function() {
 
 oppia.filter('isFloat', [function() {
   return function(input) {
-    // TODO(sll): Accept expressions (like '2.') with nothing after the decimal
-    // point.
-    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+    var FLOAT_REGEXP = /(?=.*\d)^\-?\d*(\.|\,)?\d*\%?$/;
+    // This regex accepts floats in the following formats:
+    // 0.
+    // 0.55..
+    // -0.55..
+    // .555..
+    // -.555..
+    // All examples above with '.' replaced with ',' are also valid.
+    // Expressions containing % are also valid (5.1% etc).
 
     var viewValue = '';
     try {
-      var viewValue = input.toString();
+      var viewValue = input.toString().trim();
     } catch(e) {
       return undefined;
     }
 
-    if (viewValue !== '' && viewValue !== '-' && FLOAT_REGEXP.test(viewValue)) {
-      return parseFloat(viewValue.replace(',', '.'));
+    if (viewValue !== '' && FLOAT_REGEXP.test(viewValue)) {
+      if (viewValue.slice(-1) === '%') {
+        // This is a percentage, so the input needs to be divided by 100.
+        return parseFloat(
+          viewValue.substring(0, viewValue.length - 1).replace(',', '.')
+        ) / 100.0;
+      } else {
+        return parseFloat(viewValue.replace(',', '.'));
+      }
+    } else {
+      return undefined;
     }
-    return undefined;
   };
 }]);
 
@@ -1185,18 +1197,19 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
     controller: [
-        '$scope', '$filter', '$timeout', 'parameterSpecsService',
-        function($scope, $filter, $timeout, parameterSpecsService) {
+        '$scope', '$filter', '$timeout', 'parameterSpecsService', 'focusService',
+        function($scope, $filter, $timeout, parameterSpecsService, focusService) {
       $scope.hasLoaded = false;
-      $scope.isInputInFocus = false;
+      $scope.isUserCurrentlyTyping = false;
       $scope.hasFocusedAtLeastOnce = false;
+
+      $scope.labelForErrorFocusTarget = focusService.generateFocusLabel();
 
       $scope.validate = function(localValue) {
         return $filter('isFloat')(localValue) !== undefined;
       };
 
       $scope.onFocus = function() {
-        $scope.isInputInFocus = true;
         $scope.hasFocusedAtLeastOnce = true;
         if ($scope.onInputFocus) {
           $scope.onInputFocus();
@@ -1204,7 +1217,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       };
 
       $scope.onBlur = function() {
-        $scope.isInputInFocus = false;
+        $scope.isUserCurrentlyTyping = false;
         if ($scope.onInputBlur) {
           $scope.onInputBlur();
         }
@@ -1229,7 +1242,14 @@ oppia.directive('schemaBasedFloatEditor', [function() {
 
       $scope.onKeypress = function(evt) {
         if (evt.keyCode === 13) {
-          $scope.$emit('submittedSchemaBasedFloatForm');
+          if (Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
+            $scope.isUserCurrentlyTyping = false;
+            focusService.setFocus($scope.labelForErrorFocusTarget);
+          } else {
+            $scope.$emit('submittedSchemaBasedFloatForm');
+          }
+        } else {
+          $scope.isUserCurrentlyTyping = true;
         }
       };
 

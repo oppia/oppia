@@ -48,7 +48,8 @@ oppia.controller('Signup', [
   $http.get(_SIGNUP_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.username = data.username;
-    $scope.agreedToTerms = data.has_agreed_to_terms;
+    $scope.hasEverRegistered = data.has_ever_registered;
+    $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
     $scope.hasUsername = Boolean($scope.username);
     focusService.setFocus('usernameInputField');
   });
@@ -58,7 +59,7 @@ oppia.controller('Signup', [
 
   $scope.isFormValid = function() {
     return (
-      $scope.agreedToTerms &&
+      $scope.hasAgreedToLatestTerms &&
       ($scope.hasUsername || !$scope.getWarningText($scope.username))
     );
   };
@@ -77,6 +78,9 @@ oppia.controller('Signup', [
   };
 
   $scope.onUsernameInputFormBlur = function(username) {
+    if ($scope.hasUsername) {
+      return;
+    }
     warningsData.clear();
     $scope.blurredAtLeastOnce = true;
     $scope.updateWarningText(username);
@@ -119,7 +123,8 @@ oppia.controller('Signup', [
     $scope.emailPreferencesWarningText = '';
   };
 
-  $scope.submitPrerequisitesForm = function(agreedToTerms, username, canReceiveEmailUpdates) {
+  $scope.submitPrerequisitesForm = function(
+      agreedToTerms, username, canReceiveEmailUpdates) {
     if (!agreedToTerms) {
       warningsData.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
       return;
@@ -137,7 +142,7 @@ oppia.controller('Signup', [
       requestParams.username = username;
     }
 
-    if (GLOBALS.CAN_SEND_EMAILS_TO_USERS) {
+    if (GLOBALS.CAN_SEND_EMAILS_TO_USERS && !$scope.hasUsername) {
       if (canReceiveEmailUpdates === null) {
         $scope.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
         return;

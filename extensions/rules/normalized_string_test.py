@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 from extensions.rules import normalized_string
-import test_utils
 
 
 class NormalizedStringRuleUnitTests(test_utils.GenericTestBase):
@@ -28,39 +28,49 @@ class NormalizedStringRuleUnitTests(test_utils.GenericTestBase):
     def test_equals_rule(self):
         rule = normalized_string.Equals('hello')
 
-        self.assertTrue(rule.eval('hello'))
-        self.assertTrue(rule.eval('Hello'))
-        self.assertFalse(rule.eval('goodbye'))
+        self.assertFuzzyTrue(rule.eval('hello'))
+        self.assertFuzzyTrue(rule.eval('Hello'))
+        self.assertFuzzyFalse(rule.eval('goodbye'))
 
     def test_case_sensitive_equals_rule(self):
         rule = normalized_string.CaseSensitiveEquals('hello')
 
-        self.assertTrue(rule.eval('hello'))
-        self.assertFalse(rule.eval('Hello'))
-        self.assertFalse(rule.eval('goodbye'))
+        self.assertFuzzyTrue(rule.eval('hello'))
+        self.assertFuzzyFalse(rule.eval('Hello'))
+        self.assertFuzzyFalse(rule.eval('goodbye'))
 
     def test_starts_with_rule(self):
-        self.assertTrue(normalized_string.StartsWith('he').eval('hello'))
-        self.assertTrue(normalized_string.StartsWith('HE').eval('hello'))
-        self.assertFalse(normalized_string.StartsWith('hello').eval('he'))
+        self.assertFuzzyTrue(normalized_string.StartsWith('he').eval('hello'))
+        self.assertFuzzyTrue(normalized_string.StartsWith('HE').eval('hello'))
+        self.assertFuzzyFalse(normalized_string.StartsWith('hello').eval('he'))
 
     def test_contains_rule(self):
-        self.assertTrue(normalized_string.Contains('he').eval('hello'))
-        self.assertTrue(normalized_string.Contains('HE').eval('hello'))
-        self.assertTrue(normalized_string.Contains('ll').eval('hello'))
-        self.assertFalse(normalized_string.Contains('ol').eval('hello'))
+        self.assertFuzzyTrue(normalized_string.Contains('he').eval('hello'))
+        self.assertFuzzyTrue(normalized_string.Contains('HE').eval('hello'))
+        self.assertFuzzyTrue(normalized_string.Contains('ll').eval('hello'))
+        self.assertFuzzyFalse(normalized_string.Contains('ol').eval('hello'))
 
     def test_fuzzy_equals_rule(self):
-        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('hello'))
-        self.assertTrue(normalized_string.FuzzyEquals('HEllp').eval('hellp'))
-        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('hell'))
-        self.assertTrue(normalized_string.FuzzyEquals('hell').eval('hello'))
-        self.assertTrue(normalized_string.FuzzyEquals('hellp').eval('hello'))
-        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('hellp'))
-        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('helo'))
-        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('helllo'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hello').eval('hello'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('HEllp').eval('hellp'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hello').eval('hell'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hell').eval('hello'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hellp').eval('hello'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hello').eval('hellp'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hello').eval('helo'))
+        self.assertFuzzyTrue(
+            normalized_string.FuzzyEquals('hello').eval('helllo'))
 
-        self.assertFalse(normalized_string.FuzzyEquals('pleh').eval('help'))
-        self.assertFalse(normalized_string.FuzzyEquals('hello').eval(
+        self.assertFuzzyFalse(
+            normalized_string.FuzzyEquals('pleh').eval('help'))
+        self.assertFuzzyFalse(normalized_string.FuzzyEquals('hello').eval(
             'hellllo'))
-        self.assertFalse(normalized_string.FuzzyEquals('hello').eval('help'))
+        self.assertFuzzyFalse(
+            normalized_string.FuzzyEquals('hello').eval('help'))

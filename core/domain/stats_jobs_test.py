@@ -24,9 +24,12 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.statistics])
 from core.tests import test_utils
+import datetime
 import feconf
+import time
 
 
 class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
@@ -85,48 +88,54 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
-            exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
-            state = exploration.init_state_name
-            state2 = 'sid2'
+            time.sleep(1)
+            stats_jobs._STATE_COUNTER_CUTOFF_DATE = datetime.datetime.utcnow()
+            original_init_state = exploration.init_state_name
+            new_init_state_name = 'New init state'
+            exploration.rename_state(original_init_state, new_init_state_name)
+            exp_services._save_exploration('owner', exploration, '', [])
+            exp_version = 2
+            state2_name = 'sid2'
 
-            self._record_state_hit(exp_id, exp_version, state, 'session1')
-            self._record_state_hit(exp_id, exp_version, state, 'session2')
-            self._create_state_counter(exp_id, state, 18)
-            self._record_state_hit(exp_id, exp_version, state2, 'session1')
-            self._create_state_counter(exp_id, state2, 9)
+            self._record_state_hit(
+                exp_id, exp_version, new_init_state_name, 'session1')
+            self._record_state_hit(
+                exp_id, exp_version, new_init_state_name, 'session2')
+            self._create_state_counter(exp_id, original_init_state, 18)
+            self._record_state_hit(
+                exp_id, exp_version, state2_name, 'session1')
+            self._create_state_counter(exp_id, state2_name, 9)
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            output_model = stats_jobs.StatisticsAggregator.get_statistics(
-                exp_id, exp_version)
+            state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, exp_version)['state_hit_counts']
             self.assertEqual(
-                output_model['state_hit_counts'][state]['first_entry_count'],
-                2)
+                state_hit_counts[new_init_state_name]['first_entry_count'], 2)
             self.assertEqual(
-                output_model['state_hit_counts'][state2]['first_entry_count'],
-                1)
+                state_hit_counts[state2_name]['first_entry_count'], 1)
 
             output_model = stats_jobs.StatisticsAggregator.get_statistics(
                 exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
+            state_hit_counts = output_model['state_hit_counts']
             self.assertEqual(
-                output_model['state_hit_counts'][state]['first_entry_count'],
-                18)
+                state_hit_counts[original_init_state]['first_entry_count'], 18)
             self.assertEqual(
-                output_model['state_hit_counts'][state2]['first_entry_count'],
-                9)
+                state_hit_counts[state2_name]['first_entry_count'], 9)
+            self.assertEqual(output_model['start_exploration_count'], 18)
 
-            output_model = stats_jobs.StatisticsAggregator.get_statistics(
-                exp_id, stats_jobs._ALL_VERSIONS_STRING)
+            state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
+                exp_id, stats_jobs._ALL_VERSIONS_STRING)['state_hit_counts']
             self.assertEqual(
-                output_model['state_hit_counts'][state]['first_entry_count'],
-                20)
+                state_hit_counts[original_init_state]['first_entry_count'], 18)
             self.assertEqual(
-                output_model['state_hit_counts'][state2]['first_entry_count'],
-                10)
+                state_hit_counts[new_init_state_name]['first_entry_count'], 2)
+            self.assertEqual(
+                state_hit_counts[state2_name]['first_entry_count'], 10)
 
     def test_no_completion(self):
         with self.swap(

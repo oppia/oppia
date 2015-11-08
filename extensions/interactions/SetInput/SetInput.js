@@ -51,7 +51,8 @@ oppia.directive('oppiaInteractiveSetInput', [
 
         $scope.submitAnswer = function(answer) {
           if (hasDuplicates(answer)) {
-            $scope.errorMessage = 'Oops, it looks like your set has duplicates!';
+            $scope.errorMessage = (
+              'Oops, it looks like your set has duplicates!');
           } else {
             $scope.errorMessage = '';
             $scope.$parent.$parent.submitAnswer(answer);
@@ -70,6 +71,21 @@ oppia.directive('oppiaResponseSetInput', [
       templateUrl: 'response/SetInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseSetInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/SetInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.displayedAnswer = (
+          _answer.length > 0 ? _answer.join(', ') : 'No answer given.');
       }]
     };
   }
