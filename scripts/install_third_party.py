@@ -14,10 +14,12 @@
 
 """Installation script for Oppia third-party libraries."""
 
+import contextlib
 import itertools
 import os
 import shutil
 import StringIO
+import subprocess
 import tarfile
 import urllib
 import urllib2
@@ -108,7 +110,8 @@ def download_and_unzip_files(
 
 
 def download_and_untar_files(
-        source_url, target_parent_dir, tar_root_name, target_root_name):
+        source_url, target_parent_dir, tar_root_name, target_root_name,
+        post_exe_hook=None):
     """Downloads a tar file, untars it, and saves the result in a given dir.
 
     The download occurs only if the target directory that the tar file untars
@@ -123,6 +126,8 @@ def download_and_untar_files(
       tar_root_name: the name of the top-level folder in the tar directory.
       target_root_name: the name that the top-level folder should be renamed to
         in the local directory.
+      post_exe_hook: if provided, a list of strings to pass into
+        subprocess.call() to execute.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         print 'Downloading and untarring file %s to %s' % (
@@ -130,7 +135,7 @@ def download_and_untar_files(
         common.ensure_directory_exists(target_parent_dir)
 
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with tarfile.open(TMP_UNZIP_PATH, 'r:gz') as t:
+        with contextlib.closing(tarfile.open(TMP_UNZIP_PATH, 'r:gz')) as t:
             t.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 
@@ -139,6 +144,9 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
+        if post_exe_hook:
+            print 'Running post-execution hook for %s...' % tar_root_name
+            subprocess.call(post_exe_hook)
 
 
 # Download all the standalone files.
@@ -443,6 +451,19 @@ SIMPLEJSON_TAR_URL = (
 SIMPLEJSON_TAR_ROOT_NAME = 'simplejson-%s' % SIMPLEJSON_REV
 SIMPLEJSON_TARGET_ROOT_NAME = SIMPLEJSON_ROOT_NAME
 
+NUMPY_REV = '1.6.1'
+NUMPY_ROOT_NAME = 'numpy-%s' % NUMPY_REV
+NUMPY_TAR_URL = (
+   "http://downloads.sourceforge.net/project/numpy/NumPy/"
+   "%s/numpy-%s.tar.gz" % (NUMPY_REV, NUMPY_REV))
+NUMPY_TAR_ROOT_NAME = 'numpy-%s' % NUMPY_REV
+NUMPY_TARGET_ROOT_NAME = NUMPY_ROOT_NAME
+# Build Numpy in-place. For details, see:
+#     http://docs.scipy.org/doc/numpy/user/install.html#basic-installation
+NUMPY_POST_EXE_HOOK = [
+    'python', os.path.join('third_party', NUMPY_ROOT_NAME, 'setup.py'),
+    'build_ext', '--inplace']
+
 download_and_untar_files(
     GAE_MAPREDUCE_TAR_URL, THIRD_PARTY_DIR,
     GAE_MAPREDUCE_TAR_ROOT_NAME, GAE_MAPREDUCE_TARGET_ROOT_NAME)
@@ -458,6 +479,10 @@ download_and_untar_files(
 download_and_untar_files(
     SIMPLEJSON_TAR_URL, THIRD_PARTY_DIR,
     SIMPLEJSON_TAR_ROOT_NAME, SIMPLEJSON_TARGET_ROOT_NAME)
+download_and_untar_files(
+    NUMPY_TAR_URL, THIRD_PARTY_DIR,
+    NUMPY_TAR_ROOT_NAME, NUMPY_TARGET_ROOT_NAME,
+    post_exe_hook=NUMPY_POST_EXE_HOOK)
 
 MIDI_JS_REV = '2ef687b47e5f478f1506b47238f3785d9ea8bd25'
 MIDI_JS_ZIP_URL = (
