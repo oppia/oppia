@@ -24,5 +24,5 @@ The features supported in each version of the embedding script are as follows:
     button.
 
 
-TODO(sll): Write automated integration tests that load the HTML pages and check
+TODO(sll): Write automated end-to-end tests that load the HTML pages and check
 that the relevant embedding assertions are satisfied.
