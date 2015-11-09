@@ -166,11 +166,11 @@ oppia.directive('conversationSkin', [function() {
     controller: [
         '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
         'oppiaPlayerService', 'urlService', 'focusService', 'ratingService',
-        'windowDimensionsService',
+        'windowDimensionsService', 'speechService', 'browserInfoService',
         function(
           $scope, $timeout, $rootScope, $window, messengerService,
           oppiaPlayerService, urlService, focusService, ratingService,
-          windowDimensionsService) {
+          windowDimensionsService, speechService, browserInfoService) {
 
       $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
 
@@ -187,6 +187,8 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
+      $scope.isSpeechSynthesisEnabled = 
+        browserInfoService.isSpeechSynthesisEnabled();
       $rootScope.loadingMessage = 'Loading';
       $scope.explorationCompleted = false;
       $scope.hasFullyLoaded = false;
@@ -284,6 +286,15 @@ oppia.directive('conversationSkin', [function() {
         if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
         }
+      };
+
+      $scope.readSelectedTextAloud = function() {
+        var content = $scope.activeCard.contentHtml;
+        var stringToRead = speechService.getSpokenText(content);
+        var readText = new SpeechSynthesisUtterance(stringToRead);
+        readText.voiceURI = 'native';
+        readText.lang = 'en-US';
+        $window.speechSynthesis.speak(readText);
       };
 
       $scope.resetVisiblePanel = function() {

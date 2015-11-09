@@ -662,6 +662,33 @@ oppia.factory('ratingService', [
   };
 }]);
 
+oppia.factory('speechService', [function() {
+  return {
+    getSpokenText: function(content) {
+        var unstrippedOutput = content
+          .replace(/<oppia-noninteractive-link.*?<\/oppia-noninteractive-link>/g, 
+            function(match) {
+              var linkText = match.match(/text-with-value="(.+?)"/)[1];
+              return 'Link: ' + linkText;})
+          .replace(/<oppia-.*collapsible.*?<\/oppia-.*collapsible>/g, 
+            function(match) {
+              var collapsibleHeader = match.match(/heading-with-value="(.+?)"/)[1];
+              var collapsibleContent = match.match(/content-with-value="(.+?)"/)[1];
+              return collapsibleHeader + ' ' + collapsibleContent;})
+          .replace(/<oppia-noninteractive-image.*?<\/oppia-noninteractive-image>/g, 
+            function(match) {
+              var altText = match.match(/alt-with-value="(.+?)"/)[1];
+              return 'Image: ' + altText;})
+          .replace(/<oppia-noninteractive-math.*?<\/oppia-noninteractive-math>/g, 
+            'Math Formula.')
+          .replace(/<oppia-noninteractive-tabs.*?<\/oppia-noninteractive-tabs>/g, '')
+          .replace(/<oppia-noninteractive-video.*?<\/oppia-noninteractive-video>/g, 
+            'Video.');
+        var strippedOutput = unstrippedOutput.replace(/&amp;|quot;/g, '');
+        return jQuery(strippedOutput).text();
+    }
+  };
+}]);
 
 oppia.controller('LearnerLocalNav', [
     '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
