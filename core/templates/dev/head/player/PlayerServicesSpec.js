@@ -133,3 +133,56 @@ describe('Learner parameters service', function() {
     });
   });
 });
+
+describe('Text to speech service', function() {
+  beforeEach(module('oppia'));
+
+  describe('text to speech service', function() {
+    var speechService = null;
+
+    beforeEach(inject(function($injector) {
+      speechService = $injector.get('speechService');
+    }));
+
+    it('should correctly replace link element', function() {
+      var linkElement = 
+        '<p><oppia-noninteractive-link open_link_in_same_window-with-value="false" text-with-value="&amp;quot;Link text here.&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link></p>'
+      expect(speechService.getSpokenText(linkElement))
+        .toEqual('Link: Link text here.');
+    });
+
+    it('should correctly replace collapsible element', function() {
+      var collapsibleElement = 
+        '<p><oppia-noninteractive-collapsible content-with-value="&amp;quot;You have opened the collapsible block.&amp;quot;" heading-with-value="&amp;quot;This is the collapsible header.&amp;quot;"></oppia-noninteractive-collapsible></p>'
+      expect(speechService.getSpokenText(collapsibleElement))
+        .toEqual('This is the collapsible header. You have opened the collapsible block.');
+    });
+
+    it('should correctly replace image element', function() {
+      var imageElement = 
+        '<p><oppia-noninteractive-image alt-with-value="&amp;quot;Image Alt Text Here.&amp;quot;" filepath-with-value="&amp;quot;defaultuserpic.png&amp;quot;"></oppia-noninteractive-image></p>'
+      expect(speechService.getSpokenText(imageElement))
+        .toEqual('Image: Image Alt Text Here.');
+    });
+
+    it('should correctly replace math element', function() {
+      var mathElement = 
+        '<p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math></p>'
+      expect(speechService.getSpokenText(mathElement))
+        .toEqual('Math Formula.');
+    });
+
+    it('should remove tabs element', function() {
+      var tabsElement = 
+        '<p><oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;This set of tabs shows some hints. Click on the other tabs to display the relevant hints.&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;This is a first hint.&amp;quot;}]"></oppia-noninteractive-tabs></p>'
+      expect(speechService.getSpokenText(tabsElement)).toEqual('');
+    });
+
+    it('should correctly replace video element', function() {
+      var videoElement = 
+        '<p><oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;eNc0R4G79Fc&amp;quot;"></oppia-noninteractive-video></p>'
+      expect(speechService.getSpokenText(videoElement))
+        .toEqual('Video.');
+    });
+  });
+});

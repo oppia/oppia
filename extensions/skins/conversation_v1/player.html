@@ -53,6 +53,8 @@
             </div>
           </div>
 
+          <button ng-click="readSelectedTextAloud()">Speak</button>
+
           <div ng-if="activeCard.answerFeedbackPairs.length > 1">
             <h4 class="conversation-skin-responses-dropdown-container"
                 ng-click="toggleShowPreviousResponses()">
