@@ -17,7 +17,7 @@
 This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
-    bash scripts/test.sh
+    bash scripts/run_backend_tests.sh
 """
 
 import argparse
@@ -328,6 +328,9 @@ def main():
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
+    elif total_errors or total_failures:
+        raise Exception(
+            '%s errors, %s failures' % (total_errors, total_failures))
 
 
 if __name__ == '__main__':

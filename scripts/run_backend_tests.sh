@@ -19,9 +19,9 @@
 # INSTRUCTIONS:
 #
 # Run this script from the oppia root folder:
-#   bash scripts/test.sh
+#   bash scripts/run_backend_tests.sh
 #
-# It runs all the tests, in parallel.
+# It runs all the (Python) backend tests, in parallel.
 #
 # =====================
 # CUSTOMIZATION OPTIONS

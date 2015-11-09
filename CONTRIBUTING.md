@@ -47,7 +47,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
     git checkout -b your-branch-name
   ```
 
-3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made. 
+3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
   * You can refer to relevant issues in the commit message by writing, e.g., "#105".
   * For consistency, please conform to the [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides. In addition, code should be formatted consistently with other code around it. Where these two guidelines differ, prefer the latter.
   * In general, code should be formatted consistently with other code around it; we use Google's Python and JavaScript style guides as a reference. Prior to each commit, please run
@@ -59,9 +59,9 @@ Here's how to make a one-off code change. (If you're working on a larger feature
   * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
 
     ```
-      bash scripts/test.sh
-      bash scripts/run_js_tests.sh
-      bash scripts/run_integration_tests.sh (if necessary)
+      bash scripts/run_backend_tests.sh
+      bash scripts/run_frontend_tests.sh
+      bash scripts/run_e2e_tests.sh (if necessary)
     ```
 
   * To actually make the commit and push it to your GitHub fork, run:
