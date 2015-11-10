@@ -59,9 +59,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
   * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
 
     ```
-      bash scripts/run_backend_tests.sh
-      bash scripts/run_frontend_tests.sh
-      bash scripts/run_e2e_tests.sh (if necessary)
+      bash scripts/run_tests.sh
     ```
 
   * To actually make the commit and push it to your GitHub fork, run:

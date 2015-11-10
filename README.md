@@ -32,9 +32,7 @@ Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for fu
 3. To run tests:
 
   ```
-    bash scripts/run_backend_tests.sh
-    bash scripts/run_frontend_tests.sh
-    bash scripts/run_e2e_tests.sh
+    bash scripts/run_tests.sh
   ```
 
 
