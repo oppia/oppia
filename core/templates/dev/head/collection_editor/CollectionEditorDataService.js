@@ -18,14 +18,12 @@
  * @author mgowano@google.com (Abraham Mgowano)
  */
 
-
 oppia.factory('collectionEditorDataService', [
   '$q', '$http', 'COLLECTION_EDITOR_DATA_URL', '$log', 'UrlInterpolationService', 
   function($q, $http, COLLECTION_EDITOR_DATA_URL, $log, urlInterpolationService) {
 
   //Maps previous loaded collection to their IDs
   var _collectionCache = []
-
 
   // TODO(mgowano): Figure out what to do about versioning. Should the version
   // be specified when a collection is fetched?
@@ -44,7 +42,6 @@ oppia.factory('collectionEditorDataService', [
       }
     });
   };
-
 
   var _isCached = function(collectionId) {
     return _collectionCache.hasOwnProperty(collectionId);

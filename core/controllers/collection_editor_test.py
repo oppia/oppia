@@ -105,6 +105,3 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.assertIn('Welcome to Collections in Oppia!', response.body)
         self.assert_can_edit(response.body)
         self.logout()
-
-
-
