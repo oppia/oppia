@@ -28,13 +28,16 @@ oppia.directive('oppiaInteractiveEndExploration', [
       templateUrl: 'interaction/EndExploration',
       controller: [
           '$scope', '$http', '$attrs', '$q', 'urlService',
-          'explorationContextService', 'PAGE_CONTEXT',
+          'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
           function(
             $scope, $http, $attrs, $q, urlService,
-            explorationContextService, PAGE_CONTEXT) {
+            explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
         $scope.isIframed = urlService.isIframed();
-        $scope.isInEditorPreviewMode = (
+        $scope.isInEditorPage = (
           explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+        $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
+          explorationContextService.getEditorTabContext() ===
+            EDITOR_TAB_CONTEXT.PREVIEW);
         $scope.invalidExpIds = [];
         $scope.recommendedExplorationIds = [];
         $scope.recommendedExplorationSummaries = [];
@@ -58,7 +61,9 @@ oppia.directive('oppiaInteractiveEndExploration', [
               if (explorationSummary) {
                 authorRecommendedExplorationSummaries.push(explorationSummary);
               } else {
-                $scope.invalidExpIds.push(authorRecommendedExplorationIds[index]);
+                if ($scope.isInEditorPage) {
+                  $scope.invalidExpIds.push(authorRecommendedExplorationIds[index]);
+                }
                 authorRecommendedExplorationIds.splice(index, 1);
               }
             });
@@ -71,7 +76,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
           authorRecommendationsDeferred.resolve();
         }
 
-        if (!$scope.isInEditorPreviewMode) {
+        if (!$scope.isInEditorPage) {
           authorRecommendationsPromise.then(function() {
             var explorationId = explorationContextService.getExplorationId();
             var collectionSuffix = '';

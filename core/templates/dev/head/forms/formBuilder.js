@@ -820,7 +820,7 @@ oppia.directive('textAngularRte', [
       $scope.isCustomizationModalOpen = false;
       var toolbarOptions = [
         ['bold', 'italics', 'underline'],
-        ['ol', 'ul'],
+        ['ol', 'ul', 'pre'],
         []
       ];
 

@@ -29,7 +29,6 @@ import logging
 import re
 import string
 
-from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -55,6 +54,7 @@ STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
+STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 # These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -182,6 +182,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+        STATE_PROPERTY_INTERACTION_FALLBACKS,
         STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (
@@ -690,15 +691,25 @@ class InteractionInstance(object):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
-    def get_all_outcomes(self):
-        """Returns a list of all outcomes of this interaction, taking into
-        consideration every answer group and the default outcome.
+    def get_all_non_fallback_outcomes(self):
+        """Returns a list of all non-fallback outcomes of this interaction, i.e.
+        every answer group and the default outcome.
         """
         outcomes = []
         for answer_group in self.answer_groups:
             outcomes.append(answer_group.outcome)
         if self.default_outcome is not None:
             outcomes.append(self.default_outcome)
+        return outcomes
+
+    def get_all_outcomes(self):
+        """Returns a list of all outcomes of this interaction, taking into
+        consideration every answer group, the default outcome, and every
+        fallback.
+        """
+        outcomes = self.get_all_non_fallback_outcomes()
+        for fallback in self.fallbacks:
+            outcomes.append(fallback.outcome)
         return outcomes
 
     def validate(self, exp_param_specs_dict):
@@ -1516,7 +1527,25 @@ class Exploration(object):
                 for param_change in group.outcome.param_changes:
                     if param_change.name not in self.param_specs:
                         raise utils.ValidationError(
-                            'The parameter %s was used in a rule, but it '
+                            'The parameter %s was used in an answer group, '
+                            'but it does not exist in this exploration'
+                            % param_change.name)
+
+        # Check that all fallbacks are valid.
+        for state in self.states.values():
+            interaction = state.interaction
+
+            for fallback in interaction.fallbacks:
+                # Check fallback destinations.
+                if fallback.outcome.dest not in all_state_names:
+                    raise utils.ValidationError(
+                        'The fallback destination %s is not a valid state.'
+                        % fallback.outcome.dest)
+
+                for param_change in fallback.outcome.param_changes:
+                    if param_change.name not in self.param_specs:
+                        raise utils.ValidationError(
+                            'The parameter %s was used in a fallback, but it '
                             'does not exist in this exploration'
                             % param_change.name)
 
@@ -1598,7 +1627,9 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that all states can reach a terminal state."""
+        """Verifies that all states can reach a terminal state without using
+        fallbacks.
+        """
         # This queue stores state names.
         processed_queue = []
         curr_queue = []
@@ -1619,7 +1650,8 @@ class Exploration(object):
             for (state_name, state) in self.states.iteritems():
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
-                    all_outcomes = state.interaction.get_all_outcomes()
+                    all_outcomes = (
+                        state.interaction.get_all_non_fallback_outcomes())
                     for outcome in all_outcomes:
                         if outcome.dest == curr_state_name:
                             curr_queue.append(state_name)

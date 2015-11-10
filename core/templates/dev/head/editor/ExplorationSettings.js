@@ -45,7 +45,7 @@ oppia.controller('ExplorationSettings', [
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-  var GALLERY_PAGE_URL = '/gallery';
+  var MY_EXPLORATIONS_PAGE_URL = '/my_explorations';
   var EXPLORE_PAGE_PREFIX = '/explore/';
 
   $scope.getExplorePageUrl = function() {
@@ -147,11 +147,15 @@ oppia.controller('ExplorationSettings', [
     explorationAdvancedFeaturesService.areParametersEnabled);
   $scope.areGadgetsEnabled = (
     explorationAdvancedFeaturesService.areGadgetsEnabled);
+  $scope.areFallbacksEnabled = (
+    explorationAdvancedFeaturesService.areFallbacksEnabled);
 
   $scope.enableParameters = (
     explorationAdvancedFeaturesService.enableParameters);
   $scope.enableGadgets = (
     explorationAdvancedFeaturesService.enableGadgets);
+  $scope.enableFallbacks = (
+    explorationAdvancedFeaturesService.enableFallbacks);
 
   /********************************************
   * Methods for rights management.
@@ -238,7 +242,7 @@ oppia.controller('ExplorationSettings', [
         deleteUrl += ('?role=' + role);
       }
       $http['delete'](deleteUrl).success(function(data) {
-        $window.location = GALLERY_PAGE_URL;
+        $window.location = MY_EXPLORATIONS_PAGE_URL;
       });
     });
   };

@@ -1,9 +1,9 @@
 <link rel="stylesheet" type="text/css" href="/extensions/interactions/EndExploration/static/css/EndExploration.css">
 
 <script type="text/ng-template" id="interaction/EndExploration">
-  <div ng-if="recommendedExplorationIds.length > 0 && !collectionId">
+  <div ng-if="(recommendedExplorationIds.length > 0 || (isInEditorPage && invalidExpIds.length > 0)) && !collectionId">
     Other explorations you might enjoy:
-    <div style="color: red;" ng-repeat="expId in invalidExpIds" ng-if="isInEditorPreviewMode">
+    <div style="color: red;" ng-repeat="expId in invalidExpIds">
       <strong>Error:</strong> no published exploration found with ID '<[expId]>'
     </div>
     <div layout="row" layout-wrap>
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <div ng-if="!isIframed">
+  <div ng-if="!isIframed && !isInEditorPreviewMode && recommendedExplorationIds.length === 0 && (!isInEditorPage || invalidExpIds.length === 0)">
     <a href="/collection/<[collectionId]>" ng-if="collectionId && !isInEditorPreviewMode">
       <md-button class="md-button-success">
         Return to collection
@@ -40,11 +40,6 @@
     <a href="/" ng-if="!isInEditorPreviewMode">
       <md-button class="md-button-success">
         Return to gallery
-      </md-button>
-    </a>
-    <a href="#/gui" ng-if="isInEditorPreviewMode">
-      <md-button class="md-button-success">
-        Return to editor
       </md-button>
     </a>
   </div>
