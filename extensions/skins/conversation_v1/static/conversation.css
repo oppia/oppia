@@ -64,7 +64,7 @@ html, body {
 }
 .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
   height: 48px;
-  left: -28px;
+  left: -24px;
   width: 48px;
 }
 
@@ -129,28 +129,27 @@ html, body {
   max-width: 1084px;
 }
 
-.conversation-skin-help-card-container.ng-enter,
-.conversation-skin-help-card-container.ng-leave {
-  opacity: 0;
-  transform: translateX(200px);
-}
-.conversation-skin-help-card-container {
-  opacity: 1;
-  position: fixed;
-  right: 30px;
-  top: 80px;
-  transform: translateX(0);
-  transition: all 500ms;
-  z-index: 500;
-}
 .conversation-skin-help-card {
   background: #fff;
   border-radius: 2px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
   min-height: 50px;
+  opacity: 1;
   padding: 12px;
-  position: relative;
+  position: absolute;
+  right: 80px;
+  top: 20px;
   text-align: left;
+  transition: all 350ms;
+  z-index: 500;
+}
+.conversation-skin-help-card.ng-enter,
+.conversation-skin-help-card.ng-leave-active {
+  opacity: 0;
+  transform: translateX(200px);
+}
+.conversation-skin-help-card .conversation-skin-oppia-avatar {
+  top: 12px;
 }
 .conversation-skin-help-card-content {
   width: 270px;
@@ -345,7 +344,7 @@ html, body {
 .conversation-skin-supplemental-card-container {
   display: inline-block;
   margin: 0 auto;
-  position: absolute;
+  position: relative;
   width: 100%;
 }
 
@@ -359,7 +358,7 @@ div.conversation-skin-supplemental-card {
   box-shadow: none;
   border-radius: 2px;
   left: 0;
-  margin: 44px auto 60px auto;
+  margin: 28px auto 60px auto;
   padding: 8px;
   position: absolute;
   right: 0;

@@ -208,20 +208,17 @@ oppia.directive('conversationSkin', [function() {
       $scope.PANEL_TUTOR = 'tutor';
       $scope.PANEL_SUPPLEMENTAL = 'supplemental';
 
-      $scope.helpHtml = null;
-      $scope.continueToNextCardHtml = null;
+      $scope.helpCardHtml = null;
+      $scope.helpCardHasContinueButton = false;
 
       $scope.profilePicture = '/images/avatar/user_blue_72px.png';
       oppiaPlayerService.getUserProfileImage().then(function(result) {
         $scope.profilePicture = result;
       });
 
-      $scope.clearHelpHtml = function() {
-        $scope.helpHtml = null;
-      };
-
-      $scope.clearContinueToNextCardHtml = function() {
-        $scope.continueToNextCardHtml = null;
+      $scope.clearHelpCard = function() {
+        $scope.helpCardHtml = null;
+        $scope.helpCardHasContinueButton = false;
       };
 
       // If the exploration is iframed, send data to its parent about its
@@ -270,7 +267,7 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var _recomputeAndResetPanels = function() {
-        $scope.clearHelpHtml();
+        $scope.clearHelpCard();
 
         $scope.panels = [];
         if (!$scope.canWindowFitTwoCards()) {
@@ -295,7 +292,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.setVisiblePanel = function(panelName) {
         $scope.currentVisiblePanelName = panelName;
         if (panelName === $scope.PANEL_TUTOR) {
-          $scope.clearHelpHtml();
+          $scope.clearHelpCard();
         }
         if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
@@ -315,8 +312,7 @@ oppia.directive('conversationSkin', [function() {
       var _navigateToCard = function(index) {
         $scope.activeCard = $scope.transcript[index];
         $scope.arePreviousResponsesShown = false;
-        $scope.clearHelpHtml();
-        $scope.clearContinueToNextCardHtml();
+        $scope.clearHelpCard();
 
         _recomputeAndResetPanels();
         if (_nextFocusLabel && index === $scope.transcript.length - 1) {
@@ -424,9 +420,7 @@ oppia.directive('conversationSkin', [function() {
           return;
         }
 
-        $timeout(function() {
-          _recomputeAndResetPanels();
-        }, TIME_PADDING_MSEC);
+        $scope.clearHelpCard();
 
         _answerIsBeingProcessed = true;
         hasInteractedAtLeastOnce = true;
@@ -445,10 +439,13 @@ oppia.directive('conversationSkin', [function() {
         oppiaPlayerService.submitAnswer(answer, function(
             newStateName, refreshInteraction, feedbackHtml, contentHtml) {
 
-          var millisecsLeftToWait = Math.max(
-            MIN_CARD_LOADING_DELAY_MSEC - (
+          // Do not wait if the interaction is supplemental -- there's already
+          // a delay bringing in the help card.
+          var millisecsLeftToWait = (
+            !oppiaPlayerService.isInteractionInline(_oldStateName) ? 1.0 :
+            Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
               new Date().getTime() - timeAtServerCall),
-            1.0);
+            1.0));
 
           $timeout(function() {
             $scope.waitingForOppiaFeedback = false;
@@ -460,7 +457,7 @@ oppia.directive('conversationSkin', [function() {
               // Stay on the same card.
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
               if (feedbackHtml && !$scope.activeCard.interactionIsInline) {
-                $scope.helpHtml = feedbackHtml;
+                $scope.helpCardHtml = feedbackHtml;
               }
               if (refreshInteraction) {
                 // Replace the previous interaction (even though it might be of
@@ -498,7 +495,8 @@ oppia.directive('conversationSkin', [function() {
                 $scope.waitingForContinueButtonClick = true;
 
                 if (!$scope.activeCard.interactionIsInline) {
-                  $scope.continueToNextCardHtml = feedbackHtml;
+                  $scope.helpCardHtml = feedbackHtml;
+                  $scope.helpCardHasContinueButton = true;
                 }
 
                 _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
