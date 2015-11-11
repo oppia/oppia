@@ -19,14 +19,15 @@
 # INSTRUCTIONS:
 #
 # Run this script from the oppia root folder:
-#   bash scripts/run_js_integration_tests.sh
+#   bash scripts/run_e2e_tests.sh
+#
 # Optional arguments:
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
+#
 # The root folder MUST be named 'oppia'.
-# It runs integration tests.
 
 function cleanup {
   # Send a kill signal to the dev server.
@@ -119,7 +120,7 @@ $NODE_MODULE_DIR/.bin/webdriver-manager update
 if ( nc -vz localhost 8181 ); then
   echo ""
   echo "  There is already a server running on localhost:8181."
-  echo "  Please terminate it before running the integration tests."
+  echo "  Please terminate it before running the end-to-end tests."
   echo "  Exiting."
   echo ""
   exit 1
@@ -177,7 +178,7 @@ for i in "$@"; do
   esac
 done
 
-# Run the integration tests. The conditional is used to run protractor without
+# Run the end-to-end tests. The conditional is used to run protractor without
 # any sharding parameters if it is disabled. This helps with isolated tests.
 # Isolated tests do not work properly unless no sharding parameters are passed
 # in at all.

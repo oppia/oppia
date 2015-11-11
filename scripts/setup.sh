@@ -19,7 +19,7 @@
 
 
 if [ "$SETUP_DONE" ]; then
-  echo 'done'
+  echo 'Environment setup completed.'
   return 0
 fi
 export SETUP_DONE=true

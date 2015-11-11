@@ -38,7 +38,7 @@ describe('Gadget editor', function() {
 
     // Setup the first state.
     editor.setStateName('first');
-    editor.setContent(forms.toRichText('gadget integration test.'));
+    editor.setContent(forms.toRichText('gadget end-to-end test.'));
     editor.setInteraction('EndExploration');
 
     // Setup a parameter for the ScoreBar to follow.
@@ -79,13 +79,13 @@ describe('Gadget editor', function() {
 
     // Setup the first state.
     editor.setStateName('first');
-    editor.setContent(forms.toRichText('gadget visibility integration test card 1.'));
+    editor.setContent(forms.toRichText('gadget visibility end-to-end test card 1.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'second', true);
 
     // Setup the second state
     editor.moveToState('second');
-    editor.setContent(forms.toRichText('gadget visibility integration test card 2.'));
+    editor.setContent(forms.toRichText('gadget visibility end-to-end test card 2.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'final card', true);
 
@@ -140,7 +140,7 @@ describe('Gadget editor', function() {
 
     // Setup the first state.
     editor.setStateName('first');
-    editor.setContent(forms.toRichText('gadget integration test card 1.'));
+    editor.setContent(forms.toRichText('gadget end-to-end test card 1.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'second', true);
 
