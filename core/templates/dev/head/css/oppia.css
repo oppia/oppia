@@ -254,21 +254,23 @@ textarea {
 }
 
 /*
-  Styles for the site feedback form.
+  Styles for the link to the site feedback form.
 */
 .oppia-site-feedback {
-  bottom: 5px;
-  color: #eee;
+  background-color: #fff;
+  bottom: 4px;
+  color: rgba(0,0,0,0.87);
   cursor: pointer;
-  left: 0;
-  opacity: 0.6;
+  left: 4px;
+  opacity: 0.5;
   padding: 4px 8px;
   position: fixed;
+  z-index: 5;
 }
 .oppia-site-feedback:hover,
 .oppia-site-feedback:focus,
 .oppia-site-feedback:active {
-  color: #eee;
+  color: rgba(0,0,0,0.87);
   opacity: 1.0;
   text-decoration: none;
 }
@@ -934,6 +936,10 @@ md-card.oppia-gallery-tile {
   border-bottom-left-radius: 5px;
   margin: 2px 7px;
   padding: 6px;
+}
+
+.oppia-editor-page-container {
+  margin-bottom: 60px;
 }
 
 .oppia-editor-header {
