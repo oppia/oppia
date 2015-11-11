@@ -26,12 +26,12 @@
   <div role="main" style="margin: 0 auto; position: relative;" ng-show="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots"
                    current-dot-index="currentProgressDotIndex"
+                   progress-dot-clicked="progressDotClicked"
                    class="conversation-skin-progress-dots"
                    ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
 
-    <div class="conversation-skin-cards-container conversation-skin-animate-cards"
-         ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
+    <div class="conversation-skin-cards-container">
       <!--
         If the interaction is not inline, two cases arise: (a) the screen is
         narrow, in which case only one card shows on the screen at a time, and
@@ -40,7 +40,7 @@
         side-by-side.
       -->
       <div class="conversation-skin-main-tutor-card conversation-skin-tutor-card-active"
-          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}"
+          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards(), 'animated': currentProgressDotIndex == transcript.length - 1 && !progressDotClicked}"
           ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
              ng-class="{'animate-card-change': startCardChangeAnimation}">
@@ -131,13 +131,11 @@
         </div>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty()"
+      <div ng-if="isCurrentSupplementalCardNonempty() && loadSupplement"
            class="conversation-skin-supplemental-card-container"
-           ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}">
-        <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
-             class="conversation-skin-supplemental-card"
-             style="height: 550px;">
-
+           ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL), 'animated': currentProgressDotIndex == transcript.length - 1 && !progressDotClicked}"
+           ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)">
+        <div class="conversation-skin-supplemental-card">
           <div class="conversation-skin-help-card" ng-if="helpCardHtml">
             <img class="conversation-skin-oppia-avatar"
                  ng-src="<[oppiaAvatarImageUrl]>" alt="">
