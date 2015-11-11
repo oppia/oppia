@@ -238,12 +238,22 @@
         </div>
       </div>
 
-    {% if DEV_MODE %}
-      <div class="oppia-dev-mode">
-        Development Mode
-      </div>
-    {% endif %}
+      {% if DEV_MODE %}
+        <div class="oppia-dev-mode">
+          Development Mode
+        </div>
+      {% endif %}
 
+      {% if SITE_FEEDBACK_FORM_URL %}
+        <div>
+          <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
+             class="oppia-site-feedback">
+            <i class="material-icons md-18" style="vertical-align: middle;">&#xE87F;</i>
+              Site Feedback
+            </i>
+          </a>
+        </div>
+      {% endif %}
     {% endif %}
 
     {% include 'directives.html' %}

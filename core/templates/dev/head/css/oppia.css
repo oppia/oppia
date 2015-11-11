@@ -104,7 +104,7 @@ body {
   width: 100%;
 }
 
-/* Special settings for world-viewable profile page*/ 
+/* Special settings for world-viewable profile page*/
 .oppia-profile-container {
   margin-top: 60px;
   margin-bottom: 30px;
@@ -242,14 +242,35 @@ textarea {
 */
 .oppia-dev-mode {
   background-color: DarkSlateGray;
+  border-bottom-right-radius: 0.5em;
   border-top-right-radius: 0.5em;
-  bottom: 0;
+  bottom: 40px;
   color: white;
   left: 0;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
   position: fixed;
+}
+
+/*
+  Styles for the site feedback form.
+*/
+.oppia-site-feedback {
+  bottom: 5px;
+  color: #eee;
+  cursor: pointer;
+  left: 0;
+  opacity: 0.6;
+  padding: 4px 8px;
+  position: fixed;
+}
+.oppia-site-feedback:hover,
+.oppia-site-feedback:focus,
+.oppia-site-feedback:active {
+  color: #eee;
+  opacity: 1.0;
+  text-decoration: none;
 }
 
 /*
