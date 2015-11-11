@@ -56,7 +56,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
         angular.element($window).bind('resize', resizeVideo);
         $timeout(function() {
           resizeVideo();
-        });
+        }, 200);
 
         $element.on('$destroy', function() {
           tutorCard.removeClass('contains-video');

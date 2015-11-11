@@ -172,20 +172,25 @@ html, body {
 .conversation-skin-future-tutor-card {
   background: #fff;
   border-radius: 2px;
-  left: 0;
+  display: inline-block;
+  left: 50%;
   margin: 44px auto 60px auto;
   padding-top: 20px;
   position: relative;
-  right: 0;
   text-align: left;
+  transform: translateX(-50%);
   width: 560px;
   z-index: 1;
-  -webkit-transition: all 500ms;
-  transition: all 500ms;
 }
 
 .conversation-skin-main-tutor-card.contains-video {
   width: 620px;
+}
+
+.conversation-skin-main-tutor-card.conversation-skin-left-card {
+  left: 0;
+  transform: translateX(0);
+  width: 360px;
 }
 
 .conversation-skin-future-tutor-card {
@@ -352,22 +357,31 @@ html, body {
   position: absolute;
   width: 100%;
 }
+.conversation-skin-supplemental-card-container.ng-enter,
+.conversation-skin-supplemental-card-container.ng-leave-active {
+  opacity: 0;
+}
+.conversation-skin-supplemental-card-container.ng-enter-active,
+.conversation-skin-supplemental-card-container.ng-leave {
+  opacity: 1;
+}
 
 .conversation-skin-right-card-container {
   margin-left: 12px;
   width: 1036px;
 }
 
-div.conversation-skin-supplemental-card {
+.conversation-skin-supplemental-card {
   background-color: #fff;
   box-shadow: none;
   border-radius: 2px;
+  height: 550px;
   padding: 8px;
   position: relative;
   width: 1036px;
 }
 
-.conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
+.conversation-skin-right-card-container .conversation-skin-supplemental-card-fixed {
   left: inherit;
   margin-top: 8px;
   position: fixed;
@@ -377,13 +391,6 @@ div.conversation-skin-supplemental-card {
 .conversation-skin-final-ratings {
   padding-top: 20px;
   text-align: center;
-}
-
-.conversation-skin-left-card {
-  float: left;
-  margin-left: 0;
-  margin-right: 0;
-  width: 360px;
 }
 
 .conversation-skin-left-card .conversation-skin-oppia-avatar,
@@ -422,29 +429,35 @@ div.conversation-skin-supplemental-card {
 
 .conversation-skin-oppia-feedback.ng-enter {
   opacity: 0;
-  -webkit-transition: all .5s;
-  transition: all .5s;
 }
 .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
   opacity: 1;
 }
 
-.conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
-.conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
-.conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
-.conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
-  -webkit-transition: all ease-out 0.4s;
-  transition: all ease-out 0.4s;
+.conversation-skin-main-tutor-card.animated,
+.conversation-skin-future-tutor-card,
+.conversation-skin-oppia-feedback,
+.conversation-skin-supplemental-card,
+.conversation-skin-supplemental-card-container.animated {
+  -webkit-transition: all 500ms;
+  transition: all 500ms;
 }
 
-.conversation-skin-main-tutor-card.ng-hide {
-  opacity: 0;
+.conversation-skin-main-tutor-card.conversation-skin-has-subsidiary-cards.ng-hide-add,
+.conversation-skin-main-tutor-card.conversation-skin-has-subsidiary-cards.ng-hide-remove,
+.conversation-skin-supplemental-card-container.ng-hide-add,
+.conversation-skin-supplemental-card-container.ng-hide-remove {
+  -webkit-transition: all ease-out 500ms;
+  transition: all ease-out 500ms;
+}
+
+.conversation-skin-main-tutor-card.conversation-skin-has-subsidiary-cards.ng-hide {
   transform: translateX(-1000px);
-}
-
-.conversation-skin-supplemental-card.ng-hide {
   opacity: 0;
+}
+.conversation-skin-supplemental-card-container.ng-hide {
   transform: translateX(1000px);
+  opacity: 0;
 }
 
 @media(max-width: 1119px) {
@@ -461,7 +474,7 @@ div.conversation-skin-supplemental-card {
 
 @media(max-width: 620px) {
   .conversation-skin-right-card-container,
-  div.conversation-skin-supplemental-card,
+  .conversation-skin-supplemental-card,
   .conversation-skin-main-tutor-card,
   .conversation-skin-main-tutor-card.contains-video {
     width: 100%;
