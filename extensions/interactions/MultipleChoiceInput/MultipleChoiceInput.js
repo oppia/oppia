@@ -33,7 +33,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
 
         $scope.submitAnswer = function(answer) {
           answer = parseInt(answer, 10);
-          $scope.$parent.$parent.submitAnswer(answer);
+          $scope.$parent.submitAnswer(answer);
         };
       }]
     };

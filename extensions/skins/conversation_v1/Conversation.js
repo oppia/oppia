@@ -396,10 +396,14 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
             stateName);
+
+          $scope.answerClassificationData =
+            oppiaPlayerService.getAnswerClassificationData(stateName);
         });
       };
 
-      $scope.submitAnswer = function(answer) {
+      $scope.processClassificationResult = function(
+          answer, classificationResult, timeAtSubmission) {
         // For some reason, answers are getting submitted twice when the submit
         // button is clicked. This guards against that.
         if (_answerIsBeingProcessed) {
@@ -422,14 +426,13 @@ oppia.directive('conversationSkin', [function() {
           oppiaFeedback: null
         });
 
-        var timeAtServerCall = new Date().getTime();
-
-        oppiaPlayerService.submitAnswer(answer, function(
+        oppiaPlayerService.processClassificationResult(
+          answer, classificationResult, function(
             newStateName, refreshInteraction, feedbackHtml, contentHtml) {
 
           var millisecsLeftToWait = Math.max(
             MIN_CARD_LOADING_DELAY_MSEC - (
-              new Date().getTime() - timeAtServerCall),
+              new Date().getTime() - timeAtSubmission),
             1.0);
 
           $timeout(function() {
@@ -497,6 +500,18 @@ oppia.directive('conversationSkin', [function() {
             _answerIsBeingProcessed = false;
           }, millisecsLeftToWait);
         }, true);
+      };
+
+      $scope.submitAnswer = function(answer) {
+        var timeAtSubmission = new Date().getTime();
+        if (_answerIsBeingProcessed) {
+          return;
+        }
+        _answerIsBeingProcessed = true;
+        oppiaPlayerService.getClassificationResult(answer).success(function(classificationResult) {
+          _answerIsBeingProcessed = false;
+          $scope.processClassificationResult(answer, classificationResult, timeAtSubmission);
+        });
       };
 
       $scope.startCardChangeAnimation = false;

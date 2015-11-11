@@ -24,21 +24,36 @@ oppia.directive('oppiaInteractiveNumericInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        getAnswerClassificationData: '&answerClassificationData'
+      },
       templateUrl: 'interaction/NumericInput',
-      controller: ['$scope', '$attrs', 'focusService',
-          function($scope, $attrs, focusService) {
+      controller: ['$scope', '$attrs', 'focusService', 'numericInputService',
+          function($scope, $attrs, focusService, numericInputService) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+        var answerClassificationData = $scope.getAnswerClassificationData();
 
         $scope.NUMERIC_INPUT_FORM_SCHEMA = {
           type: 'float',
           ui_config: {}
         };
 
+        var USE_FRONTEND_RULE_EVALUATION = true;
+
         $scope.submitAnswer = function(answer) {
-          if (answer !== undefined && answer !== null) {
-            $scope.$parent.$parent.submitAnswer(Number(answer));
+          if (answer !== undefined && answer !== null && answer !== '') {
+            if (USE_FRONTEND_RULE_EVALUATION) {
+              var timeAtSubmission = new Date().getTime();
+              var answerClassificationOutcome = numericInputService.classifyAnswer(
+                answer, answerClassificationData);
+              $scope.$parent.processClassificationResult(
+                answer, answerClassificationOutcome, timeAtSubmission);
+            } else {
+              if (answer !== undefined && answer !== null) {
+                $scope.submitAnswer(Number(answer));
+              }
+            }
           }
         };
       }]
@@ -79,3 +94,38 @@ oppia.directive('oppiaShortResponseNumericInput', [
     };
   }
 ]);
+
+oppia.factory('numericInputService', [
+    'interactionService', function(interactionService) {
+  var RULES = {
+    'Equals': function(answer, inputs) {
+      return answer == inputs.x;
+    },
+    'IsLessThan': function(answer, inputs) {
+      return answer < inputs.x;
+    },
+    'IsGreaterThan': function(answer, inputs) {
+      return answer > inputs.x;
+    },
+    'IsLessThanOrEqualTo': function(answer, inputs) {
+      return answer <= inputs.x;
+    },
+    'IsGreaterThanOrEqualTo': function(answer, inputs) {
+      return answer >= inputs.x;
+    },
+    'IsInclusivelyBetween': function(answer, inputs) {
+      return answer >= inputs.a && answer <= inputs.b;
+    },
+    'IsWithinTolerance': function(answer, inputs) {
+      return answer >= inputs.x - inputs.tol &&
+      answer <= inputs.x - inputs.tol;
+    }
+  };
+
+  return {
+    'classifyAnswer': function(answer, answerClassificationData) {
+      return interactionService.classifyAnswer(
+        answer, answerClassificationData, RULES);
+    }
+  };
+}]);

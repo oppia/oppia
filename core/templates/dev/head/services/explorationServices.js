@@ -37,7 +37,8 @@ oppia.factory('oppiaExplorationHtmlFormatterService', [
       }
 
       var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
-      var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+      var element = $('<oppia-interactive-' + htmlInteractionId +
+        ' answer-classification-data="answerClassificationData">');
 
       element = (
         extensionTagAssemblerService.formatCustomizationArgAttrs(

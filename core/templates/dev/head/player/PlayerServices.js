@@ -482,6 +482,13 @@ oppia.factory('oppiaPlayerService', [
         INTERACTION_SPECS[interactionId].display_mode ===
           INTERACTION_DISPLAY_MODE_INLINE);
     },
+    getAnswerClassificationData: function(stateName) {
+      var interaction = _exploration.states[stateName].interaction;
+      return {
+        'answerGroups': interaction.answer_groups,
+        'defaultOutcome': interaction.default_outcome
+      };
+    },
     isStateTerminal: function(stateName) {
       return stateName && _exploration.states[stateName].interaction.id &&
         INTERACTION_SPECS[
@@ -526,50 +533,57 @@ oppia.factory('oppiaPlayerService', [
           answer, currentInteraction.id, currentInteraction.customization_args);
       }
     },
-    submitAnswer: function(answer, successCallback, delayParamUpdates) {
+    getClassificationResult: function(answer) {
+      if (answerIsBeingProcessed) {
+        return;
+      }
+
+      var oldState = angular.copy(_exploration.states[_currentStateName]);
+
+      return answerClassificationService.getMatchingClassificationResult(
+        _explorationId, oldState, answer
+      );
+    },
+    processClassificationResult: function(
+        answer, classificationResult, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
 
       answerIsBeingProcessed = true;
-      var oldState = angular.copy(_exploration.states[_currentStateName]);
 
-      answerClassificationService.getMatchingClassificationResult(
-        _explorationId, oldState, answer
-      ).success(function(classificationResult) {
-        var outcome = classificationResult.outcome;
+      var outcome = classificationResult.outcome;
 
-        if (!_editorPreviewMode) {
-          var answerRecordingUrl = (
-            '/explorehandler/answer_submitted_event/' + _explorationId);
-          $http.post(answerRecordingUrl, {
-            answer: answer,
-            params: learnerParamsService.getAllParams(),
-            version: version,
-            old_state_name: _currentStateName,
-            rule_spec_string: classificationResult.rule_spec_string
-          });
-        }
+      if (!_editorPreviewMode) {
+        var answerRecordingUrl = (
+          '/explorehandler/answer_submitted_event/' + _explorationId);
+        $http.post(answerRecordingUrl, {
+          answer: answer,
+          params: learnerParamsService.getAllParams(),
+          version: version,
+          old_state_name: _currentStateName,
+          rule_spec_string: classificationResult.rule_spec_string
+        });
+      }
 
-        var newStateName = outcome.dest;
+      var newStateName = outcome.dest;
 
-        // Compute the data for the next state. This may be null if there are
-        // malformed expressions.
-        var nextStateData = stateTransitionService.getNextStateData(
-          outcome, _exploration.states[newStateName], answer);
+      // Compute the data for the next state. This may be null if there are
+      // malformed expressions.
+      var nextStateData = stateTransitionService.getNextStateData(
+        outcome, _exploration.states[newStateName], answer);
 
-        if (nextStateData) {
-          nextStateData['state_name'] = newStateName;
-          answerIsBeingProcessed = false;
-          _onStateTransitionProcessed(
-            nextStateData.state_name, nextStateData.params,
-            nextStateData.question_html, nextStateData.feedback_html,
-            answer, successCallback, delayParamUpdates);
-        } else {
-          answerIsBeingProcessed = false;
-          warningsData.addWarning('Expression parsing error.');
-        }
-      });
+      if (nextStateData) {
+        nextStateData.state_name = newStateName;
+        answerIsBeingProcessed = false;
+        _onStateTransitionProcessed(
+          nextStateData.state_name, nextStateData.params,
+          nextStateData.question_html, nextStateData.feedback_html,
+          answer, successCallback, delayParamUpdates);
+      } else {
+        answerIsBeingProcessed = false;
+        warningsData.addWarning('Expression parsing error.');
+      }
     },
     isAnswerBeingProcessed: function() {
       return answerIsBeingProcessed;
