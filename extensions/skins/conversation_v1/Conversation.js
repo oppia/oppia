@@ -208,10 +208,18 @@ oppia.directive('conversationSkin', [function() {
       $scope.PANEL_TUTOR = 'tutor';
       $scope.PANEL_SUPPLEMENTAL = 'supplemental';
 
+      $scope.helpCardHtml = null;
+      $scope.helpCardHasContinueButton = false;
+
       $scope.profilePicture = '/images/avatar/user_blue_72px.png';
       oppiaPlayerService.getUserProfileImage().then(function(result) {
         $scope.profilePicture = result;
       });
+
+      $scope.clearHelpCard = function() {
+        $scope.helpCardHtml = null;
+        $scope.helpCardHasContinueButton = false;
+      };
 
       // If the exploration is iframed, send data to its parent about its
       // height so that the parent can be resized as necessary.
@@ -259,6 +267,8 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var _recomputeAndResetPanels = function() {
+        $scope.clearHelpCard();
+
         $scope.panels = [];
         if (!$scope.canWindowFitTwoCards()) {
           $scope.panels.push($scope.PANEL_TUTOR);
@@ -281,6 +291,9 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.setVisiblePanel = function(panelName) {
         $scope.currentVisiblePanelName = panelName;
+        if (panelName === $scope.PANEL_TUTOR) {
+          $scope.clearHelpCard();
+        }
         if (panelName === $scope.PANEL_SUPPLEMENTAL) {
           $scope.$broadcast('showInteraction');
         }
@@ -299,6 +312,7 @@ oppia.directive('conversationSkin', [function() {
       var _navigateToCard = function(index) {
         $scope.activeCard = $scope.transcript[index];
         $scope.arePreviousResponsesShown = false;
+        $scope.clearHelpCard();
 
         _recomputeAndResetPanels();
         if (_nextFocusLabel && index === $scope.transcript.length - 1) {
@@ -402,13 +416,11 @@ oppia.directive('conversationSkin', [function() {
       $scope.submitAnswer = function(answer) {
         // For some reason, answers are getting submitted twice when the submit
         // button is clicked. This guards against that.
-        if (_answerIsBeingProcessed) {
+        if (_answerIsBeingProcessed || $scope.activeCard.interactionIsDisabled) {
           return;
         }
 
-        $timeout(function() {
-          _recomputeAndResetPanels();
-        }, TIME_PADDING_MSEC);
+        $scope.clearHelpCard();
 
         _answerIsBeingProcessed = true;
         hasInteractedAtLeastOnce = true;
@@ -427,10 +439,13 @@ oppia.directive('conversationSkin', [function() {
         oppiaPlayerService.submitAnswer(answer, function(
             newStateName, refreshInteraction, feedbackHtml, contentHtml) {
 
-          var millisecsLeftToWait = Math.max(
-            MIN_CARD_LOADING_DELAY_MSEC - (
+          // Do not wait if the interaction is supplemental -- there's already
+          // a delay bringing in the help card.
+          var millisecsLeftToWait = (
+            !oppiaPlayerService.isInteractionInline(_oldStateName) ? 1.0 :
+            Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
               new Date().getTime() - timeAtServerCall),
-            1.0);
+            1.0));
 
           $timeout(function() {
             $scope.waitingForOppiaFeedback = false;
@@ -441,6 +456,9 @@ oppia.directive('conversationSkin', [function() {
             if (_oldStateName === newStateName) {
               // Stay on the same card.
               lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
+              if (feedbackHtml && !$scope.activeCard.interactionIsInline) {
+                $scope.helpCardHtml = feedbackHtml;
+              }
               if (refreshInteraction) {
                 // Replace the previous interaction (even though it might be of
                 // the same type).
@@ -475,6 +493,12 @@ oppia.directive('conversationSkin', [function() {
               if (feedbackHtml) {
                 lastAnswerFeedbackPair.oppiaFeedback = feedbackHtml;
                 $scope.waitingForContinueButtonClick = true;
+
+                if (!$scope.activeCard.interactionIsInline) {
+                  $scope.helpCardHtml = feedbackHtml;
+                  $scope.helpCardHasContinueButton = true;
+                }
+
                 _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                 focusService.setFocusIfOnDesktop(_nextFocusLabel);
                 scrollToBottom();
