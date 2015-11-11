@@ -27,6 +27,9 @@
 # - End-to-end Protractor tests
 #
 # If any of these tests result in errors, this script will terminate.
+#
+# Note: The test scripts are arranged in increasing order of time taken. This
+# enables a broken build to be detected as quickly as possible.
 
 if [ -z "$BASH_VERSION" ]
 then
