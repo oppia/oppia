@@ -103,7 +103,9 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           $scope.evaluation = (evaluation || '');
           $scope.err = (err || '');
           $scope.$parent.$parent.submitAnswer({
-            code: $scope.code || '',
+            // Replace tabs with 2 spaces.
+            // TODO(sll): Change the default Python indentation to 4 spaces.
+            code: $scope.code.replace(/\t/g, '  ') || '',
             output: $scope.output,
             evaluation: $scope.evaluation,
             error: $scope.err
