@@ -76,7 +76,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
             var explorationId = explorationContextService.getExplorationId();
             var recommendationsUrlParams = {};
             if ($scope.collectionId) {
-              recommendationsUrlParams['collection_id'] = $scope.collectionId;
+              recommendationsUrlParams.collection_id = $scope.collectionId;
             }
             $http.get('/explorehandler/recommendations/' + explorationId, {
               params: recommendationsUrlParams

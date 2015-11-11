@@ -27,7 +27,7 @@ import feconf
 class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for learners to view collections."""
 
-    COL_ID = 'cid'
+    COLLECTION_ID = 'cid'
 
     def setUp(self):
         """Before each individual test, create a dummy collection."""
@@ -36,21 +36,21 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.VIEWER_ID = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.NEW_USER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.save_new_valid_collection(self.COL_ID, self.EDITOR_ID)
+        self.save_new_valid_collection(self.COLLECTION_ID, self.EDITOR_ID)
 
     def test_unpublished_collections_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID),
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_unpublished_collections_are_invisible_to_unconnected_users(self):
-        self.login(self.VIEWER_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID),
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
@@ -64,7 +64,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
         self.login(OTHER_EDITOR_EMAIL)
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID),
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
@@ -72,7 +72,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
     def test_unpublished_collections_are_visible_to_their_editors(self):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID))
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -81,24 +81,24 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_EMAIL])
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID))
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_published_collections_are_visible_to_guests(self):
-        rights_manager.publish_collection(self.EDITOR_ID, self.COL_ID)
+    def test_published_collections_are_visible_to_logged_out_users(self):
+        rights_manager.publish_collection(self.EDITOR_ID, self.COLLECTION_ID)
 
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID),
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
 
-    def test_published_collections_are_visible_to_anyone_logged_in(self):
-        rights_manager.publish_collection(self.EDITOR_ID, self.COL_ID)
+    def test_published_collections_are_visible_to_logged_in_users(self):
+        rights_manager.publish_collection(self.EDITOR_ID, self.COLLECTION_ID)
 
-        self.login(self.VIEWER_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COL_ID),
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
 

@@ -88,6 +88,8 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+    NEW_USER_EMAIL = 'new.user@example.com'
+    NEW_USER_USERNAME = 'newuser'
     DEFAULT_END_STATE_NAME = 'End'
 
     VERSION_0_STATES_DICT = {

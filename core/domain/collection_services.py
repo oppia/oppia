@@ -260,11 +260,21 @@ def get_collection_titles_and_categories(collection_ids):
 def get_completed_exploration_ids(user_id, collection_id):
     """Returns a list of explorations the user has completed within the context
     of the provided collection. Returns an empty list if the user has not yet
-    completed any explorations within the collection.
+    completed any explorations within the collection. Note that this function
+    will also return an empty list if either the collection and/or user do not
+    exist.
+
+    A progress model isn't added until the first exploration of a collection is
+    completed, so, if a model is missing, there isn't enough information to
+    infer whether that means the collection doesn't exist, the user doesn't
+    exist, or if they just haven't mdae any progress in that collection yet.
+    Thus, we just assume the user and collection exist for the sake of this
+    call, so it returns an empty list, indicating that no progress has yet been
+    made.
     """
-    completion_model = user_models.ExplorationInCollectionCompletionModel.get(
+    progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
-    return completion_model.completed_explorations if completion_model else []
+    return progress_model.completed_explorations if progress_model else []
 
 
 def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
@@ -291,16 +301,12 @@ def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
 
 def record_played_exploration_in_collection_context(
         user_id, collection_id, exploration_id):
-    completion_model = (
-        user_models.ExplorationInCollectionCompletionModel.get_or_create(
-            user_id, collection_id))
+    progress_model = user_models.CollectionProgressModel.get_or_create(
+        user_id, collection_id)
 
-    completed_explorations = copy.deepcopy(
-        completion_model.completed_explorations)
-    if exploration_id not in completed_explorations:
-        completed_explorations.append(exploration_id)
-        completion_model.completed_explorations = completed_explorations
-        completion_model.put()
+    if exploration_id not in progress_model.completed_explorations:
+        progress_model.completed_explorations.append(exploration_id)
+        progress_model.put()
 
 
 def _get_collection_summary_dicts_from_models(collection_summary_models):

@@ -146,9 +146,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
             instance_id, strict=False)
 
 
-class ExplorationInCollectionCompletionModel(base_models.BaseModel):
-    """Stores all explorations which have been completed within the context of
-    a collection.
+class CollectionProgressModel(base_models.BaseModel):
+    """Stores progress a user has made within a collection, including all
+    explorations which have been completed within the context of the collection.
+
+    Please note instances of this progress model will persist even after a
+    collection is deleted.
+
+    TODO(bhenning): Implement a job which removes stale versions of this model
+    in the data store. That is, it should go through all completion models and
+    ensure both the user and collection it is associated with still exist within
+    the data store, otherwise it should remove the instance of the completion
+    model.
     """
 
     # The user id.
@@ -165,8 +174,7 @@ class ExplorationInCollectionCompletionModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, collection_id):
-        """Creates a new ExplorationInCollectionCompletionModel entry and
-        returns it.
+        """Creates a new CollectionProgressModel entry and returns it.
 
         Note: the client is responsible for actually saving this entity to the
         datastore.
@@ -177,17 +185,17 @@ class ExplorationInCollectionCompletionModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, collection_id):
-        """Gets the ExplorationInCollectionCompletionModel for the given ids.
-        """
+        """Gets the CollectionProgressModel for the given ids."""
+
         instance_id = cls._generate_id(user_id, collection_id)
-        return super(ExplorationInCollectionCompletionModel, cls).get(
+        return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
 
     @classmethod
     def get_or_create(cls, user_id, collection_id):
-        """Gets the ExplorationInCollectionCompletionModel for the given ids,
-        or creates a new entry with the given ids if no such instance yet
-        exists within the data store.
+        """Gets the CollectionProgressModel for the given ids, or creates a new
+        entry with the given ids if no such instance yet exists within the data
+        store.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:

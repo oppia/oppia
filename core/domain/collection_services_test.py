@@ -117,9 +117,10 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 })
 
 
-class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
-    """Tests query and recording methods related to explorations which are
-    played in the context of a collection.
+class CollectionProgressUnitTests(CollectionServicesUnitTests):
+    """Tests functions which deal with any progress a user has made within a
+    collection, including query and recording methods related to explorations
+    which are played in the context of the collection.
     """
 
     COL_ID_0 = '0_collection_id'
@@ -128,16 +129,15 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
     EXP_ID_1 = '1_exploration_id'
     EXP_ID_2 = '2_exploration_id'
 
-    def _get_completion_model(self, user_id, collection_id):
-        return user_models.ExplorationInCollectionCompletionModel.get(
-            user_id, collection_id)
+    def _get_progress_model(self, user_id, collection_id):
+        return user_models.CollectionProgressModel.get(user_id, collection_id)
 
     def _record_completion(self, user_id, collection_id, exploration_id):
         collection_services.record_played_exploration_in_collection_context(
             user_id, collection_id, exploration_id)
 
     def setUp(self):
-        super(ExplorationInCollectionContextUnitTests, self).setUp()
+        super(CollectionProgressUnitTests, self).setUp()
 
         # Create a new collection and exploration.
         self.save_new_valid_collection(
@@ -153,22 +153,23 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
                 }], 'Added new exploration')
 
     def test_get_completed_exploration_ids(self):
-        # There should be no exception if the user or collection do not exist.
-        collection_services.get_completed_exploration_ids(
-            'Fake', self.COL_ID_0)
-        collection_services.get_completed_exploration_ids(
-            self.OWNER_ID, 'Fake')
+        # There should be no exception if the user or collection do not exist;
+        # it should also returns an empty list in both of these situations.
+        self.assertEqual(collection_services.get_completed_exploration_ids(
+            'Fake', self.COL_ID_0), [])
+        self.assertEqual(collection_services.get_completed_exploration_ids(
+            self.OWNER_ID, 'Fake'), [])
 
         # If no model exists, there should be no completed exploration IDs.
         self.assertIsNone(
-            self._get_completion_model(self.OWNER_ID, self.COL_ID_0))
+            self._get_progress_model(self.OWNER_ID, self.COL_ID_0))
         self.assertEqual(collection_services.get_completed_exploration_ids(
             self.OWNER_ID, self.COL_ID_0), [])
 
         # If the first exploration is completed, it should be reported.
         self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
         self.assertIsNotNone(
-            self._get_completion_model(self.OWNER_ID, self.COL_ID_0))
+            self._get_progress_model(self.OWNER_ID, self.COL_ID_0))
         self.assertEqual(collection_services.get_completed_exploration_ids(
             self.OWNER_ID, self.COL_ID_0), [self.EXP_ID_0])
 
@@ -183,7 +184,7 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
 
     def test_get_next_exploration_ids_to_complete_by_user(self):
         # This is an integration test depending on
-        # get_completed_exploration_ids and logic interal collection_domain
+        # get_completed_exploration_ids and logic interal to collection_domain
         # which is tested in isolation in collection_domain_test.
 
         # Setup the connection graph. The user must complete the first
@@ -202,16 +203,19 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
                     'new_value': ['0_exp_skill']
                 }], 'Updated exp 2 to require exp 0 before being playable')
 
-        # There should not be an exception if the user does not exist.
-        collection_services.get_next_exploration_ids_to_complete_by_user(
-            'Fake', self.COL_ID_0)
+        # If the user doesn't exist, assume they haven't made any progress on
+        # the collection. This means the initial explorations should be
+        # suggested.
+        self.assertEqual(
+            collection_services.get_next_exploration_ids_to_complete_by_user(
+                'Fake', self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
 
         # There should be an exception if the collection does not exist.
         with self.assertRaises(Exception):
             collection_services.get_next_exploration_ids_to_complete_by_user(
                 self.OWNER_ID, 'Fake')
 
-        # If the user hasn't made any progress in the colleciton yet, only the
+        # If the user hasn't made any progress in the collection yet, only the
         # initial explorations should be suggested.
         self.assertEqual(
             collection_services.get_collection_by_id(
@@ -244,7 +248,7 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
 
         # By default, no completion model should exist for a given user and
         # collection.
-        completion_model = self._get_completion_model(
+        completion_model = self._get_progress_model(
             self.OWNER_ID, self.COL_ID_0)
         self.assertIsNone(completion_model)
 
@@ -252,7 +256,7 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
         collection_services.record_played_exploration_in_collection_context(
             self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
 
-        completion_model = self._get_completion_model(
+        completion_model = self._get_progress_model(
             self.OWNER_ID, self.COL_ID_0)
         self.assertIsNotNone(completion_model)
         self.assertEqual(completion_model.completed_explorations, [
@@ -262,7 +266,7 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
         # collection, it should not be duplicated.
         collection_services.record_played_exploration_in_collection_context(
             self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
-        completion_model = self._get_completion_model(
+        completion_model = self._get_progress_model(
             self.OWNER_ID, self.COL_ID_0)
         self.assertEqual(completion_model.completed_explorations, [
             self.EXP_ID_0])
@@ -274,7 +278,7 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
             self.OWNER_ID, self.COL_ID_1, self.EXP_ID_0)
         collection_services.record_played_exploration_in_collection_context(
             self.OWNER_ID, self.COL_ID_1, self.EXP_ID_1)
-        completion_model = self._get_completion_model(
+        completion_model = self._get_progress_model(
             self.OWNER_ID, self.COL_ID_0)
         self.assertEqual(completion_model.completed_explorations, [
             self.EXP_ID_0])
@@ -285,7 +289,7 @@ class ExplorationInCollectionContextUnitTests(CollectionServicesUnitTests):
             self.OWNER_ID, self.COL_ID_0, self.EXP_ID_2)
         collection_services.record_played_exploration_in_collection_context(
             self.OWNER_ID, self.COL_ID_0, self.EXP_ID_1)
-        completion_model = self._get_completion_model(
+        completion_model = self._get_progress_model(
             self.OWNER_ID, self.COL_ID_0)
         self.assertEqual(completion_model.completed_explorations, [
             self.EXP_ID_0, self.EXP_ID_2, self.EXP_ID_1])

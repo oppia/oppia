@@ -39,6 +39,18 @@ oppia.factory('warningsData', ['$log', function($log) {
   };
 
   /**
+   * Adds a warning in the same way as addWarning(), except it also throws an
+   * exception to cause a hard failure in the frontend.
+   *
+   * TODO(bhenning): This should display some sort of 'Oops' error page to avoid
+   * the frontend going into an undefined state.
+   */
+  warningsData.fatalWarning = function(warning) {
+    warningsData.addWarning(warning);
+    throw new Error(warning);
+  };
+
+  /**
    * Deletes the warning at a given index.
    * @param {int} index The index of the warning to delete.
    */

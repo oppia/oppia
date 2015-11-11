@@ -278,6 +278,8 @@ DEMO_COLLECTIONS = {
 }
 
 # TODO(sll): Add all other URLs here.
+COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
+COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -287,8 +289,6 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-COLLECTION_URL_PREFIX = '/collection'
-COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
 GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'

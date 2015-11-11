@@ -37,8 +37,16 @@ oppia.controller('CollectionPlayer', [
       }
     }
     warningsData.addWarning('There was an error loading the collection.');
-    console.error('There was an error loading the collection.');
     return null;
+  };
+
+  $scope.getCollectionNodesForExplorationIds = function(explorationIds) {
+    var collectionNodes = [];
+    for (var i = 0; i < explorationIds.length; i++) {
+      collectionNodes[i] = $scope.getCollectionNodeForExplorationId(
+        explorationIds[i]);
+    }
+    return collectionNodes;
   };
 
   $scope.hasStartedCollection = function() {
@@ -49,40 +57,56 @@ oppia.controller('CollectionPlayer', [
     return $scope.collection.next_exploration_ids.length == 0;
   };
 
-  $scope.getDisplayedCollectionNodes = function() {
-    // If the collection has been finished, show all explorations so users may
-    // replay any of their choice.
-    if ($scope.hasFinishedCollection() || $scope.showingAllExplorations) {
-      return $scope.collection.nodes;
+  $scope.getNextRecommendedCollectionNodeCount = function() {
+    return $scope.collection.next_exploration_ids.length;
+  };
+
+  $scope.getNextRecommendedCollectionNodes = function() {
+    return $scope.getCollectionNodesForExplorationIds(
+      $scope.collection.next_exploration_ids);
+  };
+
+  $scope.getCompletedExplorationNodeCount = function() {
+    return $scope.collection.completed_exploration_ids.length;
+  };
+
+  $scope.getCompletedExplorationNodes = function() {
+    return $scope.getCollectionNodesForExplorationIds(
+      $scope.collection.completed_exploration_ids);
+  };
+
+  $scope.getNonRecommendedCollectionNodeCount = function() {
+    return $scope.collection.nodes.length - (
+      $scope.getNextRecommendedCollectionNodeCount() +
+      $scope.getCompletedExplorationNodeCount());
+  };
+
+  $scope.getNonRecommendedCollectionNodes = function() {
+    var displayedExplorationIds = $scope.collection.next_exploration_ids.concat(
+      $scope.collection.completed_exploration_ids);
+    var nonRecommendedCollectionNodes = [];
+    for (var i = 0; i < $scope.collection.nodes.length; i++) {
+      var collectionNode = $scope.collection.nodes[i];
+      var searchIndex = -1;
+      for (var j = 0; j < displayedExplorationIds.length; j++) {
+        if (displayedExplorationIds[j] == collectionNode.exploration_id) {
+          searchIndex = j;
+          break;
+        }
+      }
+      if (searchIndex == -1) {
+        nonRecommendedCollectionNodes.push(collectionNode);
+      }
     }
+    return nonRecommendedCollectionNodes;
+  };
 
-    var nextExplorationIds = $scope.collection.next_exploration_ids;
-    var completedExplorationIds = $scope.collection.completed_exploration_ids;
-    var displayedExplorationIds = nextExplorationIds.concat(
-      completedExplorationIds);
-
-    var displayedCollectionNodes = [];
-    for (var i = 0; i < displayedExplorationIds.length; i++) {
-      var collectionNode = (
-        $scope.getCollectionNodeForExplorationId(displayedExplorationIds[i]));
-
-      // The completed explorations are listed first, so their index falls
-      // within [0:nextExplorationIds.length).
-      collectionNode.exploration.completed = (i >= nextExplorationIds.length);
-      displayedCollectionNodes.push(collectionNode);
-    }
-
-    return displayedCollectionNodes;
+  $scope.getAllCollectionNodes = function() {
+    return $scope.collection.nodes;
   };
 
   $scope.toggleShowAllExplorations = function() {
-    var showingAllExplorations = $scope.showingAllExplorations;
-    $scope.showingAllExplorations = !showingAllExplorations;
-    if (!showingAllExplorations) {
-      for (var i = 0; i < $scope.collection.nodes.length; i++) {
-        $scope.collection.nodes[i].exploration.completed = false;
-      }
-    }
+    $scope.showingAllExplorations = !$scope.showingAllExplorations;
   };
 
   // Load the collection the learner wants to view.

@@ -81,13 +81,13 @@ oppia.factory('CollectionDataService', [
       return $q(function(resolve, reject) {
         if (_isCached(collectionId)) {
           if (resolve) {
-            resolve(_collectionCache[collectionId]);
+            resolve(angular.copy(_collectionCache[collectionId]));
           }
         } else {
           _fetchCollection(collectionId, function(collection) {
             // Save the fetched collection to avoid future fetches.
             _collectionCache[collectionId] = collection;
-            resolve(collection);
+            resolve(angular.copy(collection));
           }, reject);
         }
       });

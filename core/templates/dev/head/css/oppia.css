@@ -1051,18 +1051,8 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the collections learner view */
 
-.oppia-collection-player-tiles-area {
-  background-color: #eee;
-  position: relative;
-}
-
-.oppia-collection-player-tiles-header {
-  font-size: 1.4em;
-  padding-top: 40px;
-  padding-bottom: 40px;
-}
-
 .oppia-collection-player-tiles-container {
+  background-color: #eee;
   height: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -1070,6 +1060,7 @@ pre.oppia-pre-wrapped-text {
   min-height: 500px;
   padding-bottom: 25px;
   padding-top: 56px;
+  position: relative;
 }
 
 md-card.oppia-collection-player-tile {
@@ -1081,6 +1072,7 @@ md-card.oppia-collection-player-tile {
   position: relative;
   width: 100%;
 }
+
 .oppia-collection-player-tile:hover {
   background-color: #f9f9f9;
 }
@@ -1109,10 +1101,6 @@ md-card.oppia-collection-player-tile {
   width: 100%;
 }
 
-.oppia-collection-player-finished-exploration-tile {
-  opacity: 0.5;
-}
-
 .oppia-collection-player-tile-details {
   padding-left: 100px;
   padding-top: 5px;
@@ -1133,12 +1121,6 @@ md-card.oppia-collection-player-tile {
   }
   .oppia-collection-player-tile-details {
     padding-left: 0;
-  }
-}
-@media (max-width: 800px) {
-  .oppia-collection-player-tiles-header {
-    margin-left: 20px;
-    margin-right: 20px;
   }
 }
 

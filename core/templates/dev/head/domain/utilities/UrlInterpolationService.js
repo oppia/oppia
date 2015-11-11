@@ -19,11 +19,17 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-oppia.factory('UrlInterpolationService', [function() {
+oppia.factory('UrlInterpolationService', ['warningsData',
+    function(warningsData) {
+  // http://stackoverflow.com/questions/203739
+  var _isString = function(value) {
+    return (typeof(value) === 'string') || (value instanceof String);
+  };
+
   return {
     /**
      * Given a formatted URL, interpolates the URL by inserting values the URL
-     * needs using the interpolationValues object. For example, formattedUrl
+     * needs using the interpolationValues object. For example, urlTemplate
      * might be:
      *
      *   /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
@@ -36,26 +42,71 @@ oppia.factory('UrlInterpolationService', [function() {
      * If a URL requires a value which is not keyed within the
      * interpolationValues object, this will return null.
      */
-    interpolateUrl: function(formattedUrl, interpolationValues) {
-      if (!formattedUrl) {
-        return formattedUrl;
-      }
-      if (!interpolationValues || !(interpolationValues instanceof Object)) {
+    interpolateUrl: function(urlTemplate, interpolationValues) {
+      if (!urlTemplate) {
+        warningsData.fatalWarning('Invalid or empty URL template passed in: ' +
+          '\'' + new String(urlTemplate) + '\'');
         return null;
       }
 
+      // http://stackoverflow.com/questions/4775722
+      if (!(interpolationValues instanceof Object) || (
+          Object.prototype.toString.call(
+            interpolationValues) === '[object Array]')) {
+        warningsData.fatalWarning('Expected an object of interpolation ' +
+          'values to be passed into interpolateUrl.');
+        return null;
+      }
+
+      // Valid pattern: <stuff>
       var INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
 
-      var filledUrl = angular.copy(formattedUrl);
+      // Invalid patterns: <<stuff>>, <stuff>>>, <>
+      var EMPTY_VARIABLE_REGEX = /<>/;
+      var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
+
+      if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
+          urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
+        warningsData.fatalWarning(
+          'Invalid URL template received: \'' + urlTemplate + '\'');
+        return null;
+      }
+
+      var escapedInterpolationValues = {};
+      for (var varName in interpolationValues) {
+        var value = interpolationValues[varName];
+        if (!_isString(value)) {
+          warningsData.fatalWarning(
+            'Parameters passed into interpolateUrl must be strings.');
+          return null;
+        }
+
+        // Ensure the value has no brackets.
+        if (value.match(INTERPOLATION_VARIABLE_REGEX) ||
+            value.match(EMPTY_VARIABLE_REGEX)) {
+          warningsData.fatalWarning(
+            'Parameters should not have embedded angle brackets: \'' +
+            value + '\'');
+          return null;
+        }
+
+        escapedInterpolationValues[varName] = encodeURI(value.replace());
+      }
+
+      // Ensure the URL has no nested brackets (which would lead to indirection
+      // in the interpolated variables).
+      var filledUrl = angular.copy(urlTemplate);
       var match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       while (match) {
         var varName = match[1];
-        if (!interpolationValues.hasOwnProperty(varName)) {
+        if (!escapedInterpolationValues.hasOwnProperty(varName)) {
+          warningsData.fatalWarning('Expected variable \'' + varName +
+            '\' when interpolating URL.');
           return null;
         }
         filledUrl = filledUrl.replace(
           INTERPOLATION_VARIABLE_REGEX,
-          escape(interpolationValues[varName]));
+          escapedInterpolationValues[varName]);
         match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       }
       return filledUrl;

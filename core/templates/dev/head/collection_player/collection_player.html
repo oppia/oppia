@@ -26,63 +26,70 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="protractor-test-collection-header" itemprop="description">{{collection_title}}</span>
+      <span class="protractor-test-collection-header" itemprop="description">Collection > {{collection_title}}</span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
   <div ng-controller="CollectionPlayer">
-    <div ng-if="collection" class="oppia-collection-player-tiles-area">
-      <div class="oppia-collection-player-tiles-container">
-        <div ng-if="!hasFinishedCollection()" class="oppia-collection-player-tiles-header">
-          <span ng-if="!hasStartedCollection()">Begin by playing:</span>
-          <span ng-if="hasStartedCollection()">Continue where you left off:</span>
-        </div>
-        <div ng-if="hasFinishedCollection()" class="oppia-collection-player-tiles-header">
-          <span>You have finished the collection! Feel free to replay any explorations below.</span>
-        </div>
+    <div ng-if="collection" class="oppia-collection-player-tiles-container">
+      <h2 ng-if="!hasFinishedCollection()" class="oppia-page-heading">
+        <span ng-if="!hasStartedCollection()">Begin <[collection.title]>:</span>
+        <span ng-if="hasStartedCollection()">Continue <[collection.title]>:</span>
+      </h2>
+      <h2 ng-if="hasFinishedCollection()" class="oppia-page-heading">
+        <span>You have finished the collection! Feel free to replay any explorations below.</span>
+      </h2>
 
-        {% if not is_logged_in %}
-          <span class="oppia-collection-player-small-text">You must login to save your progress.</span>
-        {% endif %}
-
-        <div ng-repeat="collection_node in getDisplayedCollectionNodes()">
-          <md-card layout="row" class="oppia-collection-player-tile protractor-test-collection-player-tile">
-            <a ng-href="/explore/<[collection_node.exploration.id]>?collection_id=<[collectionId]>" class="oppia-collection-player-tile-container-link" style="text-decoration: none;">
-              <div ng-class="{'oppia-collection-player-finished-exploration-tile': collection_node.exploration.completed}" class="oppia-collection-player-tile-contents">
-                <span class="oppia-collection-player-tile-image-container">
-                  <img class="oppia-collection-player-tile-image" ng-src="/images/gallery/exploration_background_teal_small.png">
-                </span>
-
-                <div class="oppia-collection-player-tile-details">
-                  <span class="oppia-collection-player-tile-title protractor-test-gallery-tile-title">
-                    <[collection_node.exploration.title]>
-                  </span>
-                </div>
-              </div>
-            </a>
-          </md-card>
+      {% if is_logged_in %}
+        <div ng-if="getNextRecommendedCollectionNodeCount() > 0">
+          <span class="oppia-collection-player-small-text">
+            Next exploration<span ng-if="getNextRecommendedCollectionNodeCount() > 1">s</span> to play
+          </span>
+          <collection-node-list-directive collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()" />
         </div>
 
-        {% if is_logged_in %}
-          <br>
-          <a class="oppia-collection-player-small-text" ng-click="toggleShowAllExplorations()">
-            <span ng-if="!hasFinishedCollection() && !showingAllExplorations">Show all explorations</span>
-            <span ng-if="!hasFinishedCollection() && showingAllExplorations">Show current progress</span>
-          </a>
-        {% endif %}
-      </div>
+        <br ng-if="getCompletedExplorationNodeCount() > 0">
+
+        <div ng-if="getCompletedExplorationNodeCount() > 0">
+          <span class="oppia-collection-player-small-text">
+            Completed exploration<span ng-if="getCompletedExplorationNodeCount() > 1">s</span>
+          </span>
+          <collection-node-list-directive collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()" />
+        </div>
+
+        <br ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)">
+
+        <div ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)">
+          <span class="oppia-collection-player-small-text">
+            Future exploration<span ng-if="getNonRecommendedCollectionNodeCount() > 1">s</span> in this collection
+          </span>
+          <collection-node-list-directive collection-id="collectionId" collection-nodes="getNonRecommendedCollectionNodes()" />
+        </div>
+
+        <br ng-if="getNonRecommendedCollectionNodeCount() > 0">
+
+        <a class="oppia-collection-player-small-text" ng-if="getNonRecommendedCollectionNodeCount() > 0" ng-click="toggleShowAllExplorations()">
+          <span ng-if="!showingAllExplorations"><span class="fa fa-chevron-down"></span> Show future explorations</span>
+          <span ng-if="showingAllExplorations"><span class="fa fa-chevron-up"></span> Only show current progress</span>
+        </a>
+      {% else %}
+        <span class="oppia-collection-player-small-text">You must login to save your progress.</span>
+        <collection-node-list-directive collection-id="collectionId" collection-nodes="getAllCollectionNodes()" />
+      {% endif %}
     </div>
   </div>
 
   {% include 'attribution_guide.html' %}
+  {% include 'collection_player/collection_node_list_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('collection_player/CollectionPlayer.js') }}
+    {{ include_js_file('collection_player/CollectionNodeListDirective.js') }}
     {{ include_js_file('domain/collection/CollectionDataService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
