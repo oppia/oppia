@@ -25,7 +25,8 @@ oppia.directive('oppiaNoninteractiveVideo', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Video',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', '$element', '$window', '$timeout',
+                  function($scope, $attrs, $element, $window, $timeout) {
         var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue),
             end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
         $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj($attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
@@ -34,6 +35,33 @@ oppia.directive('oppiaNoninteractiveVideo', [
         $scope.videoUrl = $sce.trustAsResourceUrl(
           'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
           $scope.timingParams + $scope.autoplaySuffix);
+
+        $scope.videoWidth = 560;
+        $scope.videoHeight = 315;
+
+        var aspectRatio = $scope.videoHeight / $scope.videoWidth;
+
+        var tutorCard = $(".conversation-skin-main-tutor-card");
+        tutorCard.addClass('contains-video');
+
+        var outerPadding = 60;
+
+        var resizeVideo = function() {
+          var newWidth = tutorCard.width() - outerPadding;
+
+          $scope.videoWidth = newWidth;
+          $scope.videoHeight = newWidth * aspectRatio;
+        }
+
+        angular.element($window).bind('resize', resizeVideo);
+        $timeout(function() {
+          resizeVideo();
+        });
+
+        $element.on('$destroy', function() {
+          tutorCard.removeClass('contains-video');
+        });
+
       }]
     };
   }

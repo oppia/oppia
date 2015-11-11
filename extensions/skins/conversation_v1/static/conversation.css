@@ -174,13 +174,18 @@ html, body {
   border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
-  max-width: 472px;
   padding-top: 20px;
   position: relative;
   right: 0;
   text-align: left;
-  width: 472px;
+  width: 560px;
   z-index: 1;
+  -webkit-transition: all 500ms;
+  transition: all 500ms;
+}
+
+.conversation-skin-main-tutor-card.contains-video {
+  width: 620px;
 }
 
 .conversation-skin-future-tutor-card {
@@ -343,26 +348,23 @@ html, body {
 
 .conversation-skin-supplemental-card-container {
   display: inline-block;
-  margin: 0 auto;
-  position: relative;
+  margin: 44px auto;
+  position: absolute;
   width: 100%;
 }
 
 .conversation-skin-right-card-container {
   margin-left: 12px;
-  width: 1040px;
+  width: 1036px;
 }
 
 div.conversation-skin-supplemental-card {
   background-color: #fff;
   box-shadow: none;
   border-radius: 2px;
-  left: 0;
-  margin: 28px auto 60px auto;
   padding: 8px;
-  position: absolute;
-  right: 0;
-  width: 1040px;
+  position: relative;
+  width: 1036px;
 }
 
 .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
@@ -457,10 +459,11 @@ div.conversation-skin-supplemental-card {
   }
 }
 
-@media(max-width: 600px) {
+@media(max-width: 620px) {
   .conversation-skin-right-card-container,
   div.conversation-skin-supplemental-card,
-  .conversation-skin-main-tutor-card {
+  .conversation-skin-main-tutor-card,
+  .conversation-skin-main-tutor-card.contains-video {
     width: 100%;
   }
 
