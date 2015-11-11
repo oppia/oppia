@@ -198,6 +198,8 @@ oppia.directive('conversationSkin', [function() {
       $scope.currentProgressDotIndex = null;
       $scope.arePreviousResponsesShown = false;
 
+      $scope.loadSupplement = true;
+
       $scope.waitingForContinueButtonClick = false;
 
       $scope.upcomingStateName = null;
@@ -249,8 +251,22 @@ oppia.directive('conversationSkin', [function() {
         if (panelName === $scope.PANEL_TUTOR) {
           return oppiaPlayerService.getOppiaAvatarImageUrl();
         } else if (panelName === $scope.PANEL_SUPPLEMENTAL) {
-          return oppiaPlayerService.getInteractionThumbnailSrc(
-            $scope.activeCard.stateName);
+          // TODO(sll): Modify this to handle the case when there are both
+          // interactions and gadgets.
+          if (!$scope.activeCard.interactionIsInline) {
+            return oppiaPlayerService.getInteractionThumbnailSrc(
+              $scope.activeCard.stateName);
+          } else {
+            // For now, pick the first available gadget.
+            // TODO(sll): Modify this; we should show thumbnails for all the
+            // gadgets.
+            for (var i = 0; i < $scope.gadgetPanelsContents.supplemental.length; i++) {
+              var gadgetSpec = $scope.gadgetPanelsContents.supplemental[i];
+              if (gadgetSpec.visible_in_states.indexOf($scope.activeCard.stateName) !== -1) {
+                return oppiaPlayerService.getGadgetThumbnailSrc(gadgetSpec.gadget_type);
+              }
+            }
+          }
         } else {
           throw Error(
             'Found a panel not corresponding to a tutor or interaction: ' +
@@ -259,7 +275,8 @@ oppia.directive('conversationSkin', [function() {
       };
 
       var isSupplementalCardNonempty = function(card) {
-        return !card.interactionIsInline;
+        return (
+          !card.interactionIsInline || doesCardHaveSupplementalGadgets(card));
       };
 
       $scope.isCurrentSupplementalCardNonempty = function() {
@@ -280,6 +297,15 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.currentVisiblePanelName = null;
+
+      var doesCardHaveSupplementalGadgets = function(card) {
+        return (
+          $scope.gadgetPanelsContents.supplemental &&
+          $scope.gadgetPanelsContents.supplemental.length > 0 &&
+          $scope.gadgetPanelsContents.supplemental.some(function(gadgetSpec) {
+            return gadgetSpec.visible_in_states.indexOf(card.stateName) !== -1;
+          }));
+      };
 
       $scope.isPanelVisible = function(panelName) {
         if (panelName === $scope.PANEL_TUTOR && $scope.canWindowFitTwoCards()) {
@@ -368,8 +394,13 @@ oppia.directive('conversationSkin', [function() {
 
         if ($scope.canWindowFitTwoCards() && !previousSupplementalCardIsNonempty &&
             nextSupplementalCardIsNonempty) {
+          // TODO(sll): Remove this hack. (It exists to ensure that Pencil
+          // Code's loading does not interfere with the animation to two
+          // side-by-side cards.
+          $scope.loadSupplement = false;
           animateToTwoCards(function() {
             $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
+            $scope.loadSupplement = true;
           });
         } else if (
             $scope.canWindowFitTwoCards() && previousSupplementalCardIsNonempty &&

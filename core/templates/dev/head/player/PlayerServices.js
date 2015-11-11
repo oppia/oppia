@@ -461,6 +461,17 @@ oppia.factory('oppiaPlayerService', [
     getGadgetPanelsContents: function() {
       return angular.copy(_exploration.skin_customizations.panels_contents);
     },
+    getGadgetThumbnailSrc: function(gadgetType) {
+      // TODO(sll): unify this with the relevant method in
+      // state_editor_interaction.html.
+      if (!gadgetType) {
+        return '';
+      } else {
+        return (
+          '/extensions/gadgets/' + gadgetType + '/static/images/' +
+          gadgetType + '.png');
+      }
+    },
     getInteractionThumbnailSrc: function(stateName) {
       // TODO(sll): unify this with the 'choose interaction' modal in
       // state_editor_interaction.html.
