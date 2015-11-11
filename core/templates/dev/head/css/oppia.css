@@ -258,6 +258,7 @@ textarea {
 */
 .oppia-site-feedback {
   background-color: #fff;
+  border-radius: 2px;
   bottom: 4px;
   color: rgba(0,0,0,0.87);
   cursor: pointer;
