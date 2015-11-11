@@ -42,9 +42,9 @@
           <button class="conversation-skin-tutor-card-feedback-toggle"
                   popover-placement="<[getFeedbackPopoverPlacement()]>"
                   popover-template="popover/feedback" popover-trigger="click"
-                  tooltip="Feedback" tooltip-placement="bottom"
+                  tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom"
                   state-name="<[activeCard.stateName]>">
-            <span class="sr-only">Leave feedback on this card</span>
+            <span class="sr-only" translate="I18N_PLAYER_LEAVE_FEEDBACK_CARD"></span>
             <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
           </button>
         </div>
@@ -59,7 +59,7 @@
           <div ng-if="activeCard.answerFeedbackPairs.length > 1">
             <h4 class="conversation-skin-responses-dropdown-container" ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
-                Previous responses
+                <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"></span>
                 <span ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}" class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"></span>
               </span>
             </h4>
@@ -102,8 +102,7 @@
               <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture]>" alt="">
               <div ng-if="waitingForContinueButtonClick">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
-                  Continue
+                           ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
                 </md-button>
               </div>
               <div ng-if="activeCard.interactionHtml && !activeCard.interactionIsDisabled">
@@ -141,9 +140,7 @@
 
   <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1" class="conversation-skin-final-ratings">
 
-    <div style="color: #eee; margin-bottom: 20px;">
-      Learned something new? How would you rate this exploration?
-    </div>
+    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_RATE_EXPLORATION"></div>
     <div popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
       <rating-from-value rating-value="userRating" is-editable="true" on-edit="submitUserRating" style="letter-spacing: 10px; color: #fff;">
       </rating-from-value>
@@ -283,7 +280,7 @@
     <li ng-repeat="dot in dots track by $index"
         class="oppia-animate-progress-dot"
         ng-show="$index >= leftmostVisibleDotIndex && $index <= rightmostVisibleDotIndex"
-        tooltip="Card #<[$index +1]>" tooltip-placement="bottom">
+        tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index + 1]>" tooltip-placement="bottom">
       <span class="oppia-progress-dot oppia-progress-dot-active"
             ng-if="$index === currentDotIndex" ng-show="dots.length > 1">
       </span>

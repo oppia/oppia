@@ -2,9 +2,9 @@
 
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="recommendedExplorationIds.length > 0">
-    Other explorations you might enjoy:
+    <span translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"> </span>
     <div style="color: red;" ng-repeat="expId in invalidExpIds" ng-if="isInEditorPreviewMode">
-      <strong>Error:</strong> no published exploration found with ID '<[expId]>'
+      <strong translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS_ERROR"></strong> <span translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS_WRONG_ID" translate-values="{expId: <[expId]>}"></span>
     </div>
     <div layout="row" layout-wrap>
       <md-card class="oppia-end-exploration-recommendation-card" ng-repeat="expId in recommendedExplorationIds track by $index">
@@ -20,14 +20,10 @@
 
   <div ng-if="!isIframed">
     <a href="/" ng-if="!isInEditorPreviewMode">
-      <md-button class="md-button-success">
-        Return to gallery
-      </md-button>
+      <md-button class="md-button-success" translate="I18N_PLAYER_RETURN_TO_GALLERY"></md-button>
     </a>
     <a href="#/gui" ng-if="isInEditorPreviewMode">
-      <md-button class="md-button-success">
-        Return to editor
-      </md-button>
+      <md-button class="md-button-success" translate="I18N_PLAYER_RETURN_TO_EDITOR"></md-button>
     </a>
   </div>
 </script>
