@@ -19,9 +19,9 @@
 # INSTRUCTIONS:
 #
 # Run this script from the oppia root folder:
-#   bash scripts/run_js_tests.sh
+#   bash scripts/run_frontend_tests.sh
 # The root folder MUST be named 'oppia'.
-# It runs tests.
+# It runs unit tests for frontend JavaScript code (using Karma).
 
 if [ -z "$BASH_VERSION" ]
 then

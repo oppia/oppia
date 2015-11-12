@@ -36,9 +36,9 @@ How to update the parser:
 
       bash scripts/create_expression_parser.sh
 
-   which updates parser.js. Then run the JS tests using
+   which updates parser.js. Then run the frontend unit tests using
 
-      bash scripts/run_js_tests.sh
+      bash scripts/run_frontend_tests.sh
 
    to ensure that the new grammar passes the tests in parserSpec.js and
    evaluatorSpec.js.

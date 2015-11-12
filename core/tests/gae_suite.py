@@ -17,7 +17,7 @@
 In general, this script should not be run directly. Instead, invoke
 it from the command line by running
 
-    bash scripts/test.sh
+    bash scripts/run_backend_tests.sh
 
 from the oppia/ root folder.
 """
