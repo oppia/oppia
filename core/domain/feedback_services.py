@@ -31,17 +31,22 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-def get_threadlist(exploration_id):
-    return [{
-        'last_updated': utils.get_time_in_millisecs(t.last_updated),
+def _get_thread_dict_from_model_instance(thread):
+    return {
+        'last_updated': utils.get_time_in_millisecs(thread.last_updated),
         'original_author_username': user_services.get_username(
-            t.original_author_id) if t.original_author_id else None,
-        'state_name': t.state_name,
-        'status': t.status,
-        'subject': t.subject,
-        'summary': t.summary,
-        'thread_id': t.id,
-    } for t in feedback_models.FeedbackThreadModel.get_threads(exploration_id)]
+            thread.original_author_id) if thread.original_author_id else None,
+        'state_name': thread.state_name,
+        'status': thread.status,
+        'subject': thread.subject,
+        'summary': thread.summary,
+        'thread_id': thread.id}
+
+
+def get_threadlist(exploration_id):
+    return [_get_thread_dict_from_model_instance(t)
+        for t in feedback_models.FeedbackThreadModel.get_threads(
+            exploration_id)]
 
 
 def _create_models_for_thread_and_first_message(
@@ -203,9 +208,29 @@ def create_suggestion(exploration_id, author_id, exploration_version,
         suggestion_content)
 
 
+def _get_suggestion_dict_from_model_instance(suggestion):
+    if suggestion is None:
+        return suggestion
+    return {
+        'id': suggestion.id,
+        'author_id': suggestion.author_id,
+        'exploration_id': suggestion.exploration_id,
+        'exploration_version': suggestion.exploration_version,
+        'state_name': suggestion.state_name,
+        'state_content': suggestion.state_content}
+
+
 def get_suggestion(exploration_id, thread_id):
-    return feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-        exploration_id, thread_id)
+    return _get_suggestion_dict_from_model_instance(
+        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+            exploration_id, thread_id))
+
+
+def _string_to_bool(str):
+    if str.lower() == 'true':
+        return True
+    if str.lower() == 'false':
+        return False
 
 
 def get_open_threads(exploration_id, has_suggestion):
@@ -216,10 +241,11 @@ def get_open_threads(exploration_id, has_suggestion):
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     open_threads = []
     for thread in threads:
-        if (thread.has_suggestion == has_suggestion and
+        if (thread.has_suggestion == _string_to_bool(has_suggestion) and
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
-    return open_threads
+    return [_get_thread_dict_from_model_instance(t)
+        for t in open_threads]
 
 
 def get_closed_threads(exploration_id, has_suggestion):
@@ -230,16 +256,16 @@ def get_closed_threads(exploration_id, has_suggestion):
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     closed_threads = []
     for thread in threads:
-        if (thread.has_suggestion == has_suggestion and 
+        if (thread.has_suggestion == _string_to_bool(has_suggestion) and 
                 thread.status != feedback_models.STATUS_CHOICES_OPEN):
             closed_threads.append(thread)
-    return closed_threads
+    return [_get_thread_dict_from_model_instance(t)
+        for t in closed_threads]
 
 
 def get_all_suggestion_threads(exploration_id):
     """Return a list of all threads with suggestions."""
 
-    return [
-        thread for thread in 
-        feedback_models.FeedbackThreadModel.get_threads_with_suggestions(
-            exploration_id)] 
+    return [_get_thread_dict_from_model_instance(t)
+        for t in feedback_models.FeedbackThreadModel
+            .get_threads_with_suggestions(exploration_id)]

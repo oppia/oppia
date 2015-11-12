@@ -84,7 +84,8 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         # Non-logged-in users can see individual messages.
         first_thread_id = response_dict['threads'][0]['thread_id']
         thread_url = '%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, first_thread_id)
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, 
+            first_thread_id.split(".")[1])
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
         self.assertDictContainsSubset({
@@ -152,7 +153,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX,
             self.EXP_ID,
-            threadlist[0]['thread_id'])
+            threadlist[0]['thread_id'].split(".")[1])
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
         self.assertDictContainsSubset({
@@ -211,7 +212,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Then, create a new message in that thread.
         thread_url = '%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID,
+            thread_id.split(".")[1])
         self.post_json(thread_url, {
             'updated_status': None,
             'updated_subject': None,
@@ -268,7 +270,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json('%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, NEW_EXP_ID,
-            threadlist[0]['thread_id']))
+            threadlist[0]['thread_id'].split(".")[1]))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
@@ -289,7 +291,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         thread_id = response_dict['threads'][0]['thread_id']
         thread_url = '%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, 
+            thread_id.split(".")[1])
 
         def _get_username(n):
             return 'editor%s' % n
@@ -336,3 +339,109 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['messages'][num + 1]['text'],
                 'New Message %s' % num)
+
+    def _return_true(self, thread_id, exploration_id):
+        return True
+
+    def _return_null(self, param_one, param_two, param_three, param_four):
+        return None
+
+    def test_create_fetch_and_action_suggestions(self):
+        # Create suggestions.
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+        # Create suggestions.
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'state_one',
+                'suggestion_content': {'old_content': {}},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'state_one',
+                'suggestion_content': {'old_content': {}},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'state_one',
+                'suggestion_content': {'old_content': {}},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'state_one',
+                'suggestion_content': {'old_content': {}},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'state_one',
+                'suggestion_content': {'old_content': {}},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'state_one',
+                'suggestion_content': {'old_content': {}},
+            }, csrf_token)
+
+        # Create a thread without suggestions.
+        self.post_json( 
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
+                'state_name': None,
+                'subject': u'New Thread ¡unicode!',
+                'text': 'Message 0'}, csrf_token)     
+
+        # Get a list of open threads without suggestions. 
+        response_dict = self.get_json( 
+            '%s/%s/%s/%s' % ( 
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'OPEN', False))  
+        self.assertEqual(len(response_dict['threads']), 1)       
+ 
+        # Get a list of all threads with suggestion. 
+        response_dict = self.get_json(
+            '%s/%s/%s/%s' % (
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'ALL', 'True'))
+        threads = response_dict['threads']
+        self.assertEqual(len(threads), 6)
+
+        # Get a suggestion.
+        thread_id_1 = threads[0]['thread_id']
+        thread_id_2 = threads[1]['thread_id']
+        response_dict = self.get_json(
+            '%s/%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX,
+                          self.EXP_ID, thread_id_1.split('.')[1]))
+        self.assertEqual(
+            response_dict['suggestion']['id'], thread_id_1)
+
+        # Accept a suggestion.
+        with self.swap(exp_services, '_is_suggestion_valid',
+                       self._return_true):
+            with self.swap(exp_services, 'update_exploration',
+                           self._return_null):
+                self.put_json(
+                    '%s/%s/%s' % (feconf.SUGGESTION_ACTION_URL_PREFIX,
+                                  self.EXP_ID, thread_id_1.split('.')[1]), {
+                        'action': u'accept',
+                        'change_list': [{
+                            'cmd': 'add_state',
+                            'state_name': 'name'
+                        }],
+                        'commit_message': 'Add new state'},
+                    csrf_token)
+
+        # Reject a suggestion.
+        self.put_json(
+            '%s/%s/%s' % (feconf.SUGGESTION_ACTION_URL_PREFIX,
+                          self.EXP_ID, thread_id_2.split('.')[1]), 
+            {'action': u'reject'}, csrf_token)
+
+        # Get a list of closed threads with suggestion. 
+        response_dict = self.get_json(
+            '%s/%s/%s/%s' % (
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'CLOSED', True))
+        self.assertEqual(len(response_dict['threads']), 2)

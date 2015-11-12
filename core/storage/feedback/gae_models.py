@@ -261,14 +261,14 @@ class SuggestionModel(base_models.BaseModel):
         Throws an exception if a suggestion with the given thread id already
         exists.
         """
-        instance_id = '.'.join([exploration_id, thread_id])
+        instance_id = cls._get_instance_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
             raise Exception('There is already a feedback thread with the given '
                             'thread id: %s' % instance_id)
-        return cls(id=instance_id, author_id=author_id,
-                   exploration_id=exploration_id,
-                   exploration_version=exploration_version,
-                   state_name=state_name, state_content=state_content).put()
+        cls(id=instance_id, author_id=author_id,
+            exploration_id=exploration_id,
+            exploration_version=exploration_version,
+            state_name=state_name, state_content=state_content).put()
 
     @classmethod
     def _get_instance_id(cls, exploration_id, thread_id):

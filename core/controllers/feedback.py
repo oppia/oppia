@@ -17,6 +17,7 @@
 __author__ = 'kashida@google.com (Koji Ashida)'
 
 from core.controllers import base
+from core.domain import exp_services
 from core.domain import feedback_services
 
 
@@ -58,7 +59,12 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):
         self.values.update({
-            'messages': feedback_services.get_messages(thread_id)})
+            'messages': feedback_services.get_messages(".".join((
+                exploration_id, thread_id)))})
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        if suggestion is not None:
+            self.values.update({
+                'suggestion': suggestion})
         self.render_json(self.values)
 
     @base.require_user
@@ -70,7 +76,7 @@ class ThreadHandler(base.BaseHandler):
                 'Text for the message must be specified.')
 
         feedback_services.create_message(
-            thread_id,
+            ".".join((exploration_id, thread_id)),
             self.user_id,
             updated_status,
             self.payload.get('updated_subject'),
@@ -108,3 +114,66 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
+
+
+class SuggestionHandler(base.BaseHandler):
+    """"Handles operations relating to learner suggestions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_user
+    def post(self, exploration_id):
+        feedback_services.create_suggestion(
+            exploration_id,
+            self.user_id,
+            self.payload.get('exploration_version'),
+            self.payload.get('state_name'),
+            self.payload.get('suggestion_content'))
+        self.render_json(self.values)
+
+
+class SuggestionActionHandler(base.BaseHandler):
+    """"Handles actions performed on threads with suggestions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+    ACCEPT_ACTION = 'accept'
+    REJECT_ACTION = 'reject'    
+
+    @base.require_user
+    def put(self, exploration_id, thread_id):
+        action = self.payload.get('action')
+        if action.lower() == self.ACCEPT_ACTION.lower():
+            exp_services.accept_suggestion(
+                self.user_id,
+                self.payload.get('change_list'),
+                thread_id,
+                exploration_id,
+                self.payload.get('commit_message'))
+        elif action.lower() == self.REJECT_ACTION.lower():
+             exp_services.reject_suggestion(thread_id, exploration_id)
+        self.render_json(self.values)
+
+
+class SuggestionListHandler(base.BaseHandler):
+    """Handles operations relating to list of threads with suggestions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+    OPEN_LIST_TYPE = 'open'
+    CLOSED_LIST_TYPE = 'closed'
+    ALL_LIST_TYPE = 'all'
+
+    @base.require_user
+    def get(self, exploration_id, list_type, has_suggestion):
+        threads = None
+        if list_type.lower() == self.OPEN_LIST_TYPE.lower():
+            threads = feedback_services.get_open_threads(
+                exploration_id, has_suggestion)
+        elif list_type.lower() == self.CLOSED_LIST_TYPE.lower():
+            threads = feedback_services.get_closed_threads(
+                exploration_id, has_suggestion)
+        elif list_type.lower() == self.ALL_LIST_TYPE.lower():
+            threads = feedback_services.get_all_suggestion_threads(
+                exploration_id)
+         
+        self.values.update({'threads': threads})
+        self.render_json(self.values)
