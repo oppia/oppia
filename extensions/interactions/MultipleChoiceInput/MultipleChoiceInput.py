@@ -48,3 +48,29 @@ class MultipleChoiceInput(base.BaseInteraction):
         },
         'default_value': ['Sample multiple-choice answer'],
     }]
+
+    _answer_visualization_specs = [{
+        # Bar chart with answer counts.
+        'id': 'BarChart',
+        'options': {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
+        },
+        'calculation_id': 'AnswerCounts',
+    }, {
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 5 answers'
+        },
+        'calculation_id': 'Top5AnswerCounts',
+    }, {
+        # Table with answer counts.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'All answers'
+        },
+        'calculation_id': 'AnswerCounts',
+    }]

@@ -61,6 +61,8 @@
       <strong>Times entered</strong>: <[stateStats.totalEntryCount]>
     </p>
 
+    <div angular-html-bind="visualizationsHtml"></div>
+
     <div ng-if="stateStats.totalEntryCount">
       <h5>Answers</h5>
       <div ng-show="doesAnswerExist()">

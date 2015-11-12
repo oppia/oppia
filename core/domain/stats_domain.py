@@ -20,7 +20,11 @@ __author__ = 'Sean Lip'
 
 import copy
 import operator
+import sys
+import utils
 
+from core.domain import exp_services
+from core.domain import interaction_registry
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -84,3 +88,127 @@ class StateRuleAnswerLog(object):
         return sorted(
             self.answers.iteritems(), key=operator.itemgetter(1),
             reverse=True)[:N]
+
+
+class StateAnswers(object):
+    """Domain object containing answers of states."""
+
+    def __init__(self, exploration_id, exploration_version, state_name,
+                 interaction_id, answers_list):
+        """
+        Initialize domain object for state answers.
+
+        interaction_id contains interaction type of the state, e.g. multiple
+        choice. It is None if no interaction id can be retrieved.
+
+        answers_list contains a list of answer dicts, each of which
+        contains information about an answer, e.g. answer_value, session_id,
+        time_spent_in_sec.
+        """
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_name = state_name
+        self.interaction_id = interaction_id
+        self.answers_list = answers_list
+
+    def validate(self):
+        """Validates StateAnswers domain object entity."""
+
+        if not isinstance(self.exploration_id, basestring):
+            raise utils.ValidationError(
+                'Expected exploration_id to be a string, received %s' %
+                self.exploration_id)
+
+        if not isinstance(self.state_name, basestring):
+            raise utils.ValidationError(
+                'Expected state_name to be a string, received %s' %
+                self.state_name)
+
+        if self.interaction_id is not None:
+            if not isinstance(self.interaction_id, basestring):
+                raise utils.ValidationError(
+                    'Expected interaction_id to be a string, received %s' %
+                    str(self.interaction_id))
+
+            # check if interaction_id is valid
+            if (self.interaction_id not in
+                interaction_registry.Registry.get_all_interaction_ids()):
+                raise utils.ValidationError(
+                    'Unknown interaction id %s' % self.interaction_id)
+
+        if not isinstance(self.answers_list, list):
+            raise utils.ValidationError(
+                'Expected answers_list to be a list, received %s' %
+                self.answers_list)
+
+        # Note: There is no need to validate content of answers_list here
+        # because each answer is validated before it is appended to
+        # answers_list (which is faster than validating whole answers_list
+        # each time a new answer is recorded).
+
+
+class StateAnswersCalcOutput(object):
+    """
+    Domain object that represents output of calculations operating on
+    state answers.
+    """
+
+    def __init__(self, exploration_id, exploration_version, state_name,
+                 calculation_id, calculation_output):
+        """
+        Initialize domain object for state answers calculation output.
+
+        calculation_output is a dict with keys calculation_description
+        and data.
+        """
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_name = state_name
+        self.calculation_id = calculation_id
+        self.calculation_output = calculation_output
+
+    def save(self):
+        """
+        Validate domain object and commit to storage.
+        """
+        self.validate()
+        stats_models.StateAnswersCalcOutputModel.create_or_update(
+            self.exploration_id, self.exploration_version, self.state_name,
+            self.calculation_id, self.calculation_output)
+
+    def validate(self):
+        """
+        Validates StateAnswersCalcOutputModel domain object entity before
+        it is commited to storage.
+        """
+
+        # There is a danger of data overflow if answer_opts exceeds 1
+        # MB. We will address this later if it happens regularly. At
+        # the moment, a ValidationError is raised if an answer exceeds
+        # the maximum size.
+        MAX_BYTES_PER_CALC_OUTPUT_DATA = 999999
+
+        if not isinstance(self.exploration_id, basestring):
+            raise utils.ValidationError(
+                'Expected exploration_id to be a string, received %s' %
+                self.exploration_id)
+
+        if not isinstance(self.state_name, basestring):
+            raise utils.ValidationError(
+                'Expected state_name to be a string, received %s' %
+                self.state_name)
+
+        if not isinstance(self.calculation_id, basestring):
+            raise utils.ValidationError(
+                'Expected calculation_id to be a string, received %s' %
+                self.calculation_id)
+
+        output_data = self.calculation_output
+        if not (sys.getsizeof(output_data) <=
+                MAX_BYTES_PER_CALC_OUTPUT_DATA):
+            # TODO(msl): find a better way to deal with big
+            # calculation output data, e.g. just skip. At the moment,
+            # too long answers produce a ValidationError.
+            raise utils.ValidationError(
+                "calculation_output is too big to be stored: %s" %
+                str(output_data))
