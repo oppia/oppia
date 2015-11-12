@@ -205,7 +205,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
             self.string_classifier._get_prediction_report_for_doc(-1))
         self.assertEquals(prediction_report['prediction_label_id'], 1)
 
-    def test_training(self):
+    def test_predict_label_for_doc(self):
         # Until I come up with larger test data sets, this will do
         self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
         self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0

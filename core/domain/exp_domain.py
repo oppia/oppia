@@ -528,7 +528,11 @@ class AnswerGroup(object):
         self.outcome = outcome
 
     def validate(self, obj_type, exp_param_specs_dict):
-        # Rule validation.
+        """Rule validation.
+
+        Verifies that all rule classes are valid, and that the AnswerGroup only
+        has one fuzzy rule.
+        """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
@@ -552,7 +556,7 @@ class AnswerGroup(object):
             if rule_class.__name__ == rule_domain.FUZZY_RULE_TYPE:
                 if seen_fuzzy_rule:
                     raise utils.ValidationError(
-                        'AnswerGroup can only have one fuzzy rule.')
+                        'AnswerGroups can only have one fuzzy rule.')
                 seen_fuzzy_rule = True
 
             rule_spec.validate(
@@ -564,9 +568,6 @@ class AnswerGroup(object):
     def get_fuzzy_rule_spec(self):
         """Will return the answer group's fuzzy rule, or None if it doesn't
         exist.
-
-        Returns the first fuzzy rule found in rule_specs because we guarantee
-        each answer group has only one fuzzy rule.
         """
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:

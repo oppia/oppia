@@ -360,8 +360,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'training_data': ['Test']
                     },
                     'rule_type': 'FuzzyMatches'
-                },
-                {
+                }, {
                     'inputs': {
                         'training_data': ['Test']
                     },
@@ -371,7 +370,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                'AnswerGroup can only have one fuzzy rule.'):
+                'AnswerGroups can only have one fuzzy rule.'):
             exploration.validate()
 
         # Restore a valid exploration.

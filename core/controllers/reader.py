@@ -172,10 +172,10 @@ def classify(exp_id, state, answer, params):
         training_examples = [[doc, []] for doc in
             state.interaction.confirmed_unclassified_answers]
         for (i, answer_group) in enumerate(state.interaction.answer_groups):
-            for rule_spec in answer_group.rule_specs:
-                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
-                    training_examples.extend([[doc, [str(i)]] for doc in
-                        rule_spec.inputs['training_data']])
+            fuzzy_rule_spec = answer_group.get_fuzzy_rule_spec()
+            if fuzzy_rule_spec is not None:
+                training_examples.extend([[doc, [str(i)]] for doc in
+                    rule_spec.inputs['training_data']])
         if len(training_examples) > 0:
             sc.load_examples(training_examples)
             doc_ids = sc.add_examples_for_predicting([answer])
