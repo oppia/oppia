@@ -67,7 +67,7 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-pip install numpy==1.6.1 –target="$THIRD_PARTY_DIR"
+pip install numpy==1.6.1 --target="$THIRD_PARTY_DIR"
 
 # Install webtest.
 echo Checking if webtest is installed in third_party
