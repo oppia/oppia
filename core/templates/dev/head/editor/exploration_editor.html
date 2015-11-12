@@ -213,23 +213,6 @@
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/deleteExploration">
-      <div class="modal-header">
-        <h3>Delete Exploration</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          Really delete this exploration? <strong>This action cannot be reversed.</strong>
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
-      </div>
-    </script>
-
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">
         <h3>
@@ -316,7 +299,7 @@
       </div>
     </script>
 
-    <div class="container-fluid" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
+    <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">

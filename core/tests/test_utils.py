@@ -431,8 +431,8 @@ class TestBase(unittest.TestCase):
         functionality. This is replicated here so backend tests may utilize the
         functionality of PlayerServices.js without being able to access it.
 
-        TODO(bhenning): Replicate this in an integration test to protect
-        against code skew here.
+        TODO(bhenning): Replicate this in an end-to-end Protractor test to
+        protect against code skew here.
         """
         if params is None:
             params = {}

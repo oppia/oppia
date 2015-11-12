@@ -104,6 +104,21 @@ body {
   width: 100%;
 }
 
+/* Special settings for world-viewable profile page*/
+.oppia-profile-container {
+  margin-top: 60px;
+  margin-bottom: 30px;
+}
+
+.oppia-profile-picture-fullsize {
+  height: 180px;
+  width: 180px;
+}
+
+.oppia-profile-username {
+  margin-top: 15px;
+}
+
 /*
   This counteracts the increased line-height of 1.846 introduced by
   angular-material.css.
@@ -227,14 +242,38 @@ textarea {
 */
 .oppia-dev-mode {
   background-color: DarkSlateGray;
+  border-bottom-right-radius: 0.5em;
   border-top-right-radius: 0.5em;
-  bottom: 0;
+  bottom: 40px;
   color: white;
   left: 0;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
   position: fixed;
+}
+
+/*
+  Styles for the link to the site feedback form.
+*/
+.oppia-site-feedback {
+  background-color: #fff;
+  border-radius: 2px;
+  bottom: 4px;
+  color: rgba(0,0,0,0.87);
+  cursor: pointer;
+  left: 4px;
+  opacity: 0.5;
+  padding: 4px 8px;
+  position: fixed;
+  z-index: 5;
+}
+.oppia-site-feedback:hover,
+.oppia-site-feedback:focus,
+.oppia-site-feedback:active {
+  color: rgba(0,0,0,0.87);
+  opacity: 1.0;
+  text-decoration: none;
 }
 
 /*
@@ -898,6 +937,10 @@ md-card.oppia-gallery-tile {
   border-bottom-left-radius: 5px;
   margin: 2px 7px;
   padding: 6px;
+}
+
+.oppia-editor-page-container {
+  margin-bottom: 60px;
 }
 
 .oppia-editor-header {
