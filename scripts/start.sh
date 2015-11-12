@@ -104,6 +104,7 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-$PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
+
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG .
 
 echo Done!

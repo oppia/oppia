@@ -116,3 +116,39 @@ if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
   echo installing node-jscs
   $NPM_INSTALL jscs@2.3.0
 fi
+
+echo Checking whether gulp is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp" ]; then
+  echo installing gulp
+  $NPM_INSTALL gulp@3.9.0
+fi
+
+echo Checking whether through2 is installed
+if [ ! -d "$NODE_MODULE_DIR/through2" ]; then
+  echo installing through2
+  $NPM_INSTALL through2@2.0.0
+fi
+
+echo Checking whether yargs is installed
+if [ ! -d "$NODE_MODULE_DIR/yargs" ]; then
+  echo installing yargs
+  $NPM_INSTALL yargs@3.29.0
+fi
+
+echo Checking whether gulp-concat is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp-concat" ]; then
+  echo installing gulp-concat
+  $NPM_INSTALL gulp-concat@2.6.0
+fi
+
+echo Checking whether gulp-minify-css is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp-minify-css" ]; then
+  echo installing gulp-minify-css
+  $NPM_INSTALL gulp-minify-css@1.2.1
+fi
+
+echo Checking whether gulp-util is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp-util" ]; then
+  echo installing gulp-util
+  $NPM_INSTALL gulp-util@3.0.7
+fi
