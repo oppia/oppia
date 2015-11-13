@@ -339,7 +339,7 @@ html, body {
 .conversation-skin-supplemental-card-container {
   display: inline-block;
   margin: 0 auto;
-  position: relative;
+  position: absolute;
   width: 100%;
 }
 
@@ -353,7 +353,7 @@ div.conversation-skin-supplemental-card {
   box-shadow: none;
   border-radius: 2px;
   left: 0;
-  margin: 28px auto 60px auto;
+  margin: 44px auto 60px auto;
   padding: 8px;
   position: relative;
   right: 0;
