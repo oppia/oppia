@@ -19,8 +19,8 @@ __author__ = 'Sean Lip'
 from core.domain import exp_services
 from core.domain import user_services
 from core.tests import test_utils
+from datetime import datetime
 import feconf
-
 
 class SignupTest(test_utils.GenericTestBase):
 
@@ -282,3 +282,28 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
+
+
+class FirstContributionDateTests(test_utils.GenericTestBase):
+
+    USERNAME = 'abc123'
+    EMAIL = 'abc123@gmail.com'
+
+    def test_contribution_datetime(self):
+        """Test the contribution date shows up correctly as nonexist."""
+        self.signup(self.EMAIL, self.USERNAME)
+        self.login(self.EMAIL)
+        user_services.get_or_create_user(self.USERNAME, self.EMAIL)
+        self.user_id = self.get_user_id_from_email(self.EMAIL)
+
+        response = self.testapp.get('/profile/%s' % self.USERNAME)
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain('This user has not contributed yet.')
+
+        user_services.set_contribution_date(self.user_id, datetime.utcnow())
+
+        """Test the contribution date correctly changes to set date time."""
+        response = self.testapp.get('/profile/%s' % self.USERNAME)
+        print response
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain('Contributing since')
