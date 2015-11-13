@@ -80,6 +80,7 @@ oppia.directive('answerGroupEditor', [function() {
             case 'Int':
             case 'NonnegativeInt':
               return 0;
+            case 'CodeString':
             case 'UnicodeString':
             case 'NormalizedString':
             case 'MathLatexString':
