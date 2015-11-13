@@ -355,7 +355,7 @@ div.conversation-skin-supplemental-card {
   left: 0;
   margin: 28px auto 60px auto;
   padding: 8px;
-  position: absolute;
+  position: relative;
   right: 0;
   width: 600px;
 }

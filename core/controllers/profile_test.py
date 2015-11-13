@@ -283,6 +283,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
 
+
 class FirstContributionDateTests(test_utils.GenericTestBase):
 
     USERNAME = 'abc123'
