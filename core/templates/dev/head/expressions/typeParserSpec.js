@@ -29,8 +29,8 @@ describe('Expression type parser service', function() {
       strXYZ: 'UnicodeString',
       num100_001: 'Real',
       boolFalse: 'UnicodeString',
-      strNull: 'UnicodeString',
-    },
+      strNull: 'UnicodeString'
+    }
   ];
 
   it('should evaluate to correct values', function() {
@@ -56,24 +56,24 @@ describe('Expression type parser service', function() {
       ['num100_001 / 0', 'Real'],
       ['abs(-3)', 'Real'],
       ['pow(num100_001, numZero)', 'Real'],
-      ['log(9, 3)', 'Real'],
+      ['log(9, 3)', 'Real']
     ].forEach(function(test) {
       var expression = test[0];
       var expected = test[1];
 
-      // 'expected' should be either a JavaScript primitive value that would be the
-      // result of evaluation 'expression', or an exception that is expected to be
-      // thrown.
+      // 'expected' should be either a JavaScript primitive value that would be
+      // the result of evaluation 'expression', or an exception that is
+      // expected to be thrown.
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
-      var parsed = typeof(expression) == 'string' ?
+      var parsed = typeof (expression) == 'string' ?
           eps.parse(expression) : expression;
-      var parsed_json = JSON.stringify(parsed);
+      var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
       var recordFailure = function(result, exception) {
         console.error('input     : ' + expression);
-        console.error('parsed    : ' + parsed_json);
+        console.error('parsed    : ' + parsedJson);
         if (result !== undefined) {
           console.error('evaluated : ' + result);
           console.error('expected  : ' + expected);
@@ -83,26 +83,8 @@ describe('Expression type parser service', function() {
           console.error('expected  : (exception)');
         }
         failed = true;
-      }
+      };
 
-      try {
-        var evaled = ees.evaluateParseTree(parsed, ENVS);
-        if (expected instanceof Error || evaled !== expected) {
-          recordFailure(evaled, undefined);
-        }
-      } catch (e) {
-        if (!(e instanceof expected)) {
-          // Wrong or unexpected exception.
-          recordFailure(undefined, e);
-        }
-      }
-      expect(failed).toBe(false);
-
-      if (typeof(expression) != 'string') {
-        return;
-      }
-
-      failed = false;
       try {
         evaled = ees.evaluateExpression(expression, ENVS);
         if (expected instanceof Error || evaled !== expected) {
