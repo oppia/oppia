@@ -40,6 +40,11 @@
                 <em>This user has not supplied a bio yet.</em>
               </span>
             </p>
+             <p>
+              <span ng-if="firstContributionDateTime">Contributing since 
+                <[getLocaleAbbreviatedDatetimeString(firstContributionDateTime)]></span>
+              </span>
+            </p>
           </div>
         </div>
       </div>
