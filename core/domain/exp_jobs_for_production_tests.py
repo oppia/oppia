@@ -22,6 +22,8 @@ __author__ = 'Marcel Schmittfull'
 
 from core import jobs
 from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -72,7 +74,6 @@ class ExpCopiesMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
         if ExpCopiesMRJobManager._entity_created_before_job_queued(item):
             for count in range(10):
                 yield ('%scopy%d' % (item.id, count),
@@ -80,8 +81,6 @@ class ExpCopiesMRJobManager(
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
-        from core.domain import exp_services
-        from core.domain import rights_manager
         for stringified_exp in list_of_exps:
             exploration = exp_domain.Exploration.from_untitled_yaml(
                 exp_id, 'Copy', 'Copies', stringified_exp)
@@ -132,7 +131,6 @@ class DeleteExpCopiesMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
         if item.category == 'Copies':
             exp_services.delete_exploration(
                 feconf.SYSTEM_COMMITTER_ID, item.id, force_deletion=True)

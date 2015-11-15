@@ -2025,55 +2025,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
 
 
-class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
-
-    def test_exploration_contents_change_event_triggers(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationContentChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
-            exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
-
-        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID])
-
-    def test_exploration_status_change_event(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationStatusChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-            rights_manager.create_new_exploration_rights(
-                self.EXP_ID, self.OWNER_ID)
-            rights_manager.publish_exploration(
-                self.OWNER_ID, self.EXP_ID)
-            rights_manager.publicize_exploration(
-                self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublicize_exploration(
-                self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublish_exploration(
-                self.user_id_admin, self.EXP_ID)
-
-        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
-                                        self.EXP_ID, self.EXP_ID])
-
-
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
 

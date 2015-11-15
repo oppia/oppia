@@ -21,6 +21,9 @@ __author__ = 'Frederik Creemers'
 import logging
 
 from core import jobs
+from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -46,7 +49,6 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(exploration_model):
-        from core.domain import exp_services
         if not exploration_model.deleted:
             exp_services.create_exploration_summary(exploration_model.id)
 
@@ -64,11 +66,6 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        # We're inline importing here to break import loops like this: (->
-        # means imports):
-        #   exp_services -> event_services -> jobs_registry ->
-        #   exp_jobs_one_off -> exp_services.
-        from core.domain import exp_services
         if not item.deleted:
             exp_services.index_explorations_given_ids([item.id])
 
@@ -84,9 +81,6 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
-        from core.domain import rights_manager
-
         if item.deleted:
             return
 
@@ -121,9 +115,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        from core.domain import exp_domain
-        from core.domain import exp_services
-
         if item.deleted:
             return
 
@@ -175,8 +166,6 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
-
         if item.deleted:
             return
 

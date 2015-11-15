@@ -1407,61 +1407,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             _BASE_SEARCH_RANK + 30)
 
 
-class CollectionChangedEventsTests(CollectionServicesUnitTests):
-
-    def test_collection_contents_change_event_triggers(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, collection_id):
-            recorded_ids.append(collection_id)
-
-        record_event_swap = self.swap(
-            event_services.CollectionContentChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_valid_collection(self.COLLECTION_ID, self.OWNER_ID)
-            collection_services.update_collection(
-                self.OWNER_ID, self.COLLECTION_ID,
-                _get_collection_change_list('title', 'Title'), '')
-
-        self.assertEqual(
-            recorded_ids, [self.COLLECTION_ID, self.COLLECTION_ID])
-
-    def test_collection_status_change_event(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, collection_id):
-            recorded_ids.append(collection_id)
-
-        record_event_swap = self.swap(
-            event_services.CollectionStatusChangeEventHandler,
-            'record', mock_record)
-
-        with record_event_swap:
-            self.save_new_default_collection(self.COLLECTION_ID, self.OWNER_ID)
-            rights_manager.create_new_collection_rights(
-                self.COLLECTION_ID, self.OWNER_ID)
-            rights_manager.publish_collection(
-                self.OWNER_ID, self.COLLECTION_ID)
-            rights_manager.publicize_collection(
-                self.user_id_admin, self.COLLECTION_ID)
-            rights_manager.unpublicize_collection(
-                self.user_id_admin, self.COLLECTION_ID)
-            rights_manager.unpublish_collection(
-                self.user_id_admin, self.COLLECTION_ID)
-
-        # There are only 4 CollectionStatusChangeEvents fired because
-        # create_new_collection_rights does not fire a
-        # CollectionStatusChangeEvent.
-        self.assertEqual(recorded_ids, [
-            self.COLLECTION_ID, self.COLLECTION_ID,
-            self.COLLECTION_ID, self.COLLECTION_ID])
-
-
 class CollectionSummaryTests(CollectionServicesUnitTests):
     """Test collection summaries."""
 

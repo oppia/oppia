@@ -19,6 +19,7 @@ import collections
 import datetime
 
 from core import jobs
+from core.domain import exp_services
 from core.platform import models
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
@@ -225,8 +226,6 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
-        from core.domain import exp_services
-
         exploration = None
         exp_id, version = key.split(':')
         try:

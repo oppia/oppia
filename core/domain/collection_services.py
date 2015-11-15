@@ -29,7 +29,6 @@ import logging
 import os
 
 from core.domain import collection_domain
-from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
@@ -428,7 +427,6 @@ def _save_collection(committer_id, collection, commit_message, change_list):
 
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
-    event_services.CollectionContentChangeEventHandler.record(collection.id)
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -455,7 +453,6 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         ],
     )
     model.commit(committer_id, commit_message, commit_cmds)
-    event_services.CollectionContentChangeEventHandler.record(collection.id)
     collection.version += 1
     create_collection_summary(collection.id)
 

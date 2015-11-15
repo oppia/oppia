@@ -19,6 +19,7 @@
 __author__ = 'Frederik Creemers'
 
 from core import jobs
+from core.domain import exp_services
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -68,7 +69,6 @@ class SearchRankerMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])
 
     @staticmethod
