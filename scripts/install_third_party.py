@@ -34,7 +34,7 @@ TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
 
 
 # Check that the current directory is correct.
-common.require_cwd_to_be_oppia()
+common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 
 def download_files(source_url_root, target_dir, source_filenames):
