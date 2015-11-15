@@ -44,8 +44,9 @@ oppia.factory('UrlInterpolationService', ['warningsData',
      */
     interpolateUrl: function(urlTemplate, interpolationValues) {
       if (!urlTemplate) {
-        warningsData.fatalWarning('Invalid or empty URL template passed in: ' +
-          '\'' + new String(urlTemplate) + '\'');
+        warningsData.fatalWarning(
+          'Invalid or empty URL template passed in: \'' +
+          new String(urlTemplate) + '\'');
         return null;
       }
 
@@ -53,17 +54,21 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       if (!(interpolationValues instanceof Object) || (
           Object.prototype.toString.call(
             interpolationValues) === '[object Array]')) {
-        warningsData.fatalWarning('Expected an object of interpolation ' +
-          'values to be passed into interpolateUrl.');
+        warningsData.fatalWarning(
+          'Expected an object of interpolation values to be passed into ' +
+          'interpolateUrl.');
         return null;
       }
 
-      // Valid pattern: <stuff>
+      // Valid pattern: <alphanum>
       var INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
 
       // Invalid patterns: <<stuff>>, <stuff>>>, <>
       var EMPTY_VARIABLE_REGEX = /<>/;
       var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
+
+      // Parameter values can only contain alphanumerical characters.
+      var VALID_PARAMETER_VALUE_REGEX = /^(\w| )+$/;
 
       if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
           urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
@@ -81,16 +86,15 @@ oppia.factory('UrlInterpolationService', ['warningsData',
           return null;
         }
 
-        // Ensure the value has no brackets.
-        if (value.match(INTERPOLATION_VARIABLE_REGEX) ||
-            value.match(EMPTY_VARIABLE_REGEX)) {
+        // Ensure the value is valid.
+        if (!value.match(VALID_PARAMETER_VALUE_REGEX)) {
           warningsData.fatalWarning(
-            'Parameters should not have embedded angle brackets: \'' +
-            value + '\'');
+            'Parameter values must only contain alphanumerical characters or ' +
+            'spaces: \'' + value + '\'');
           return null;
         }
 
-        escapedInterpolationValues[varName] = encodeURI(value.replace());
+        escapedInterpolationValues[varName] = encodeURI(value);
       }
 
       // Ensure the URL has no nested brackets (which would lead to indirection

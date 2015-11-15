@@ -3,7 +3,7 @@
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="recommendedExplorationIds.length > 0">
     <span ng-if="!collectionId">Other explorations you might enjoy:</span>
-    <span ng-if="collectionId">Continue the collection:</span>
+    <span ng-if="collectionId">Continue <[collectionTitle]>:</span>
     <div style="color: red;" ng-repeat="expId in invalidExpIds" ng-if="isInEditorPreviewMode">
       <strong>Error:</strong> no published exploration found with ID '<[expId]>'
     </div>

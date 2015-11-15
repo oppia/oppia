@@ -130,7 +130,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
             'To introduce collections using demo explorations.')
         self.assertEqual(collection_dict['category'], 'Welcome')
         self.assertEqual(
-            collection_dict['title'], 'Welcome to Collections in Oppia!')
+            collection_dict['title'], 'Introduction to Collections in Oppia')
 
         # Verify there are 5 explorations in this collection, the initial
         # explorations to be completed, and that there are no explorations

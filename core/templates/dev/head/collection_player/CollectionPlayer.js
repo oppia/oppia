@@ -21,6 +21,17 @@
 oppia.constant(
   'COLLECTION_DATA_URL', '/collectionhandler/data/<collection_id>');
 
+oppia.animation('.oppia-collection-animate-slide', function() {
+    return {
+        enter: function(element, done) {
+            element.hide().slideDown();
+        },
+        leave: function(element, done) {
+            element.slideUp();
+        }
+    };
+});
+
 oppia.controller('CollectionPlayer', [
     '$scope', 'CollectionDataService', 'warningsData',
     function($scope, CollectionDataService, warningsData) {
@@ -89,7 +100,7 @@ oppia.controller('CollectionPlayer', [
       var collectionNode = $scope.collection.nodes[i];
       var searchIndex = -1;
       for (var j = 0; j < displayedExplorationIds.length; j++) {
-        if (displayedExplorationIds[j] == collectionNode.exploration_id) {
+        if (displayedExplorationIds[j] === collectionNode.exploration_id) {
           searchIndex = j;
           break;
         }

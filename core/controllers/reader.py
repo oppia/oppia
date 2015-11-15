@@ -197,6 +197,16 @@ class ExplorationPage(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        collection_title = None
+        if collection_id:
+            try:
+                collection = collection_services.get_collection_by_id(
+                    collection_id)
+                if collection:
+                    collection_title = collection.title
+            except Exception as e:
+                raise self.PageNotFoundException(e)
+
         version = exploration.version
 
         if not rights_manager.Actor(self.user_id).can_view(
@@ -240,6 +250,7 @@ class ExplorationPage(base.BaseHandler):
             'exploration_title': exploration.title,
             'exploration_version': version,
             'collection_id': collection_id,
+            'collection_title': collection_title,
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'iframed': is_iframed,
             'interaction_templates': jinja2.utils.Markup(

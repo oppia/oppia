@@ -47,16 +47,12 @@ describe('URL Interpolation Service', function() {
     expect(function() { uis.interpolateUrl('url', undefined); }).toThrow(
       new Error('Expected an object of interpolation values to be passed ' +
         'into interpolateUrl.'));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<param>', 'value');
       }).toThrow(new Error(
         'Expected an object of interpolation values to be passed into ' +
         'interpolateUrl.'));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<param>', ['value']);
       }).toThrow(new Error(
         'Expected an object of interpolation values to be passed into ' +
@@ -106,17 +102,15 @@ describe('URL Interpolation Service', function() {
       '/test_url/<first_param>?<query_name>=<query_value>', {
         'first_param': 'SEARCH',
         'query_name': 'title or website',
-        'query_value': 'https://www.oppia.org/'
-      })).toBe('/test_url/SEARCH?title%20or%20website=https://www.oppia.org/');
+        'query_value': 'oppia'
+      })).toBe('/test_url/SEARCH?title%20or%20website=oppia');
   });
 
   it('should not interpolate bad parameter names and values', function() {
     // Empty angle brackets indicate a malformed URL.
     expect(function() { uis.interpolateUrl('/test_url/<>', {}); }).toThrow(
       new Error('Invalid URL template received: \'/test_url/<>\''));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<>', {'': 'value'});
       }).toThrow(new Error('Invalid URL template received: \'/test_url/<>\''));
 
@@ -130,68 +124,72 @@ describe('URL Interpolation Service', function() {
       'parameter with spaces': 'value'
     })).toBe('/test_url/<parameter with spaces>');
 
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<<name>>', {'name': 'value'});
       }).toThrow(new Error(
         'Invalid URL template received: \'/test_url/<<name>>\''));
 
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<name>', {'name': '<value>'});
       }).toThrow(new Error(
-        'Parameters should not have embedded angle brackets: \'<value>\''));
+        'Parameter values must only contain alphanumerical characters or ' +
+        'spaces: \'<value>\''));
 
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<name>', {'name': '<<value>>'});
       }).toThrow(new Error(
-        'Parameters should not have embedded angle brackets: \'<<value>>\''));
+        'Parameter values must only contain alphanumerical characters or ' +
+        'spaces: \'<<value>>\''));
 
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<name>', {'name': '<>'});
       }).toThrow(new Error(
-        'Parameters should not have embedded angle brackets: \'<>\''));
+        'Parameter values must only contain alphanumerical characters or ' +
+        'spaces: \'<>\''));
+
+    // Values cannot contain non-alphanumerical characters or spaces, including
+    // newlines or website symbols.
+    expect(function() {
+        uis.interpolateUrl('/test_url/?<query_name>=<query_value>', {
+          'query_name': 'website',
+          'query_value': 'https://www.oppia.org/'
+        });
+      }).toThrow(new Error(
+        'Parameter values must only contain alphanumerical characters or ' +
+        'spaces: \'https://www.oppia.org/\''));
+
+    expect(function() {
+        uis.interpolateUrl('/test_url/<name>', {
+          'name': 'value\nmultiple lines'
+        });
+      }).toThrow(new Error(
+        'Parameter values must only contain alphanumerical characters or ' +
+        'spaces: \'value\nmultiple lines\''));
   });
 
   it('should throw an exception for missing parameters', function() {
     expect(function() { uis.interpolateUrl('/test_url/<page>', {}); }).toThrow(
       new Error('Expected variable \'page\' when interpolating URL.'));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<page1>', {'page2': 'v'});
       }).toThrow(new Error(
         'Expected variable \'page1\' when interpolating URL.'));
   });
 
   it('should throw an exception for non-string parameters', function() {
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<page>', {'page': 0});
       }).toThrow(new Error(
         'Parameters passed into interpolateUrl must be strings.'));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<page>', {'page': {}});
       }).toThrow(new Error(
         'Parameters passed into interpolateUrl must be strings.'));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<page>', {'page': []});
       }).toThrow(new Error(
         'Parameters passed into interpolateUrl must be strings.'));
-    expect(
-      function()
-      {
+    expect(function() {
         uis.interpolateUrl('/test_url/<page>', {'page': /abc/});
       }).toThrow(new Error(
         'Parameters passed into interpolateUrl must be strings.'));

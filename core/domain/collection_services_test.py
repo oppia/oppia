@@ -154,7 +154,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
 
     def test_get_completed_exploration_ids(self):
         # There should be no exception if the user or collection do not exist;
-        # it should also returns an empty list in both of these situations.
+        # it should also return an empty list in both of these situations.
         self.assertEqual(collection_services.get_completed_exploration_ids(
             'Fake', self.COL_ID_0), [])
         self.assertEqual(collection_services.get_completed_exploration_ids(

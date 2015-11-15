@@ -1054,12 +1054,12 @@ pre.oppia-pre-wrapped-text {
 .oppia-collection-player-tiles-container {
   background-color: #eee;
   height: 100%;
+  margin-top: 60px;
   margin-left: auto;
   margin-right: auto;
   max-width: 800px;
   min-height: 500px;
   padding-bottom: 25px;
-  padding-top: 56px;
   position: relative;
 }
 
@@ -1089,6 +1089,11 @@ md-card.oppia-collection-player-tile {
   width: 120px;
   position: absolute;
 }
+
+.oppia-collection-player-tile-section {
+  margin-bottom: 24px;
+}
+
 /* This centers the image horizontally and vertically. */
 .oppia-collection-player-tile-image {
   height: 120px;
@@ -1113,6 +1118,8 @@ md-card.oppia-collection-player-tile {
 .oppia-collection-player-small-text {
   font-style: italic;
   font-size: 1em;
+  margin-top: 12px;
+  margin-bottom: 6px;
 }
 
 @media (max-width: 365px) {

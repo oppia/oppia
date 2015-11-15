@@ -39,6 +39,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
         $scope.recommendedExplorationIds = [];
         $scope.recommendedExplorationSummaries = [];
         $scope.collectionId = GLOBALS.collectionId;
+        $scope.collectionTitle = GLOBALS.collectionTitle;
 
         var authorRecommendationsDeferred = $q.defer();
         var authorRecommendationsPromise = authorRecommendationsDeferred.promise;

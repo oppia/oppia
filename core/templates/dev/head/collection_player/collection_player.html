@@ -26,7 +26,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="protractor-test-collection-header" itemprop="description">Collection > {{collection_title}}</span>
+      <span class="protractor-test-collection-header" itemprop="description">Collection <span class="oppia-navbar-breadcrumb-separator"></span> {{collection_title}}</span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -43,40 +43,34 @@
       </h2>
 
       {% if is_logged_in %}
-        <div ng-if="getNextRecommendedCollectionNodeCount() > 0">
-          <span class="oppia-collection-player-small-text">
+        <div ng-if="getNextRecommendedCollectionNodeCount() > 0" class="oppia-collection-player-tile-section">
+          <div class="oppia-collection-player-small-text">
             Next exploration<span ng-if="getNextRecommendedCollectionNodeCount() > 1">s</span> to play
-          </span>
-          <collection-node-list-directive collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()" />
+          </div>
+          <collection-node-list-directive collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()"></collection-node-list-directive>
         </div>
 
-        <br ng-if="getCompletedExplorationNodeCount() > 0">
-
-        <div ng-if="getCompletedExplorationNodeCount() > 0">
-          <span class="oppia-collection-player-small-text">
+        <div ng-if="getCompletedExplorationNodeCount() > 0" class="oppia-collection-player-tile-section">
+          <div class="oppia-collection-player-small-text">
             Completed exploration<span ng-if="getCompletedExplorationNodeCount() > 1">s</span>
-          </span>
-          <collection-node-list-directive collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()" />
+          </div>
+          <collection-node-list-directive collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()"></collection-node-list-directive>
         </div>
 
-        <br ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)">
-
-        <div ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)">
-          <span class="oppia-collection-player-small-text">
-            Future exploration<span ng-if="getNonRecommendedCollectionNodeCount() > 1">s</span> in this collection
-          </span>
-          <collection-node-list-directive collection-id="collectionId" collection-nodes="getNonRecommendedCollectionNodes()" />
+        <div ng-if="showingAllExplorations && (getNonRecommendedCollectionNodeCount() > 0)" class="oppia-collection-player-tile-section oppia-collection-animate-slide">
+          <div class="oppia-collection-player-small-text">
+            Upcoming exploration<span ng-if="getNonRecommendedCollectionNodeCount() > 1">s</span> in this collection
+          </div>
+          <collection-node-list-directive collection-id="collectionId" collection-nodes="getNonRecommendedCollectionNodes()"></collection-node-list-directive>
         </div>
-
-        <br ng-if="getNonRecommendedCollectionNodeCount() > 0">
 
         <a class="oppia-collection-player-small-text" ng-if="getNonRecommendedCollectionNodeCount() > 0" ng-click="toggleShowAllExplorations()">
-          <span ng-if="!showingAllExplorations"><span class="fa fa-chevron-down"></span> Show future explorations</span>
+          <span ng-if="!showingAllExplorations"><span class="fa fa-chevron-down"></span> Show upcoming explorations</span>
           <span ng-if="showingAllExplorations"><span class="fa fa-chevron-up"></span> Only show current progress</span>
         </a>
       {% else %}
-        <span class="oppia-collection-player-small-text">You must login to save your progress.</span>
-        <collection-node-list-directive collection-id="collectionId" collection-nodes="getAllCollectionNodes()" />
+        <div class="oppia-collection-player-small-text">You must login to save your progress.</div>
+        <collection-node-list-directive collection-id="collectionId" collection-nodes="getAllCollectionNodes()"></collection-node-list-directive>
       {% endif %}
     </div>
   </div>
