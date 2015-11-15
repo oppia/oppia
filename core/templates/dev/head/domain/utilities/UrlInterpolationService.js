@@ -94,7 +94,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
           return null;
         }
 
-        escapedInterpolationValues[varName] = encodeURI(value);
+        escapedInterpolationValues[varName] = encodeURIComponent(value);
       }
 
       // Ensure the URL has no nested brackets (which would lead to indirection
