@@ -104,6 +104,21 @@ body {
   width: 100%;
 }
 
+/* Special settings for world-viewable profile page*/
+.oppia-profile-container {
+  margin-top: 60px;
+  margin-bottom: 30px;
+}
+
+.oppia-profile-picture-fullsize {
+  height: 180px;
+  width: 180px;
+}
+
+.oppia-profile-username {
+  margin-top: 15px;
+}
+
 /*
   This counteracts the increased line-height of 1.846 introduced by
   angular-material.css.
@@ -227,14 +242,38 @@ textarea {
 */
 .oppia-dev-mode {
   background-color: DarkSlateGray;
+  border-bottom-right-radius: 0.5em;
   border-top-right-radius: 0.5em;
-  bottom: 0;
+  bottom: 40px;
   color: white;
   left: 0;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
   position: fixed;
+}
+
+/*
+  Styles for the link to the site feedback form.
+*/
+.oppia-site-feedback {
+  background-color: #fff;
+  border-radius: 2px;
+  bottom: 4px;
+  color: rgba(0,0,0,0.87);
+  cursor: pointer;
+  left: 4px;
+  opacity: 0.5;
+  padding: 4px 8px;
+  position: fixed;
+  z-index: 5;
+}
+.oppia-site-feedback:hover,
+.oppia-site-feedback:focus,
+.oppia-site-feedback:active {
+  color: rgba(0,0,0,0.87);
+  opacity: 1.0;
+  text-decoration: none;
 }
 
 /*
@@ -900,6 +939,10 @@ md-card.oppia-gallery-tile {
   padding: 6px;
 }
 
+.oppia-editor-page-container {
+  margin-bottom: 60px;
+}
+
 .oppia-editor-header {
   font-size: 16px;
   margin-top: 35px;
@@ -1149,7 +1192,8 @@ md-card.oppia-collection-player-tile {
 }
 
 .oppia-add-interaction-button,
-.oppia-add-response-button {
+.oppia-add-response-button,
+.oppia-add-fallback-button {
   background-color: rgba(5,140,166,0.9);
   border: 0;
   border-radius: 0;
@@ -1164,7 +1208,10 @@ md-card.oppia-collection-player-tile {
 .oppia-add-interaction-button:hover,
 .oppia-add-response-button:active,
 .oppia-add-response-button:focus,
-.oppia-add-response-button:hover {
+.oppia-add-response-button:hover,
+.oppia-add-fallback-button:active,
+.oppia-add-fallback-button:focus,
+.oppia-add-fallback-button:hover {
   background-color: rgba(5,140,166,1);
   color: white;
   opacity: 1;
@@ -1376,7 +1423,7 @@ md-card.oppia-collection-player-tile {
   white-space: nowrap;
 }
 
-.oppia-rule-sort-handle {
+.oppia-rule-sort-handle, .oppia-fallback-sort-handle {
   cursor: move;
   left: 10px;
   margin-left: 5px;

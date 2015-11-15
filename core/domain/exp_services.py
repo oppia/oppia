@@ -457,6 +457,9 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
+                    state.update_interaction_fallbacks(change.new_value)
             elif change.cmd == exp_domain.CMD_ADD_GADGET:
                 exploration.add_gadget(change.gadget_dict, change.panel)
             elif change.cmd == exp_domain.CMD_RENAME_GADGET:

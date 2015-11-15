@@ -201,7 +201,10 @@ urls = [
         galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
     get_redirect_route(
-        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
+        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
+    get_redirect_route(
+        r'/profilehandler/data/<username>', profile.ProfileHandler,
+        'profile_handler'),
     get_redirect_route(
         r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(

@@ -239,3 +239,46 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['profile_picture_data_url_for_username'],
             None)
+
+
+class ProfileDataHandlerTests(test_utils.GenericTestBase):
+
+    def test_profile_data_is_independent_of_currently_logged_in_user(self):
+        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'user_bio', 'data': 'My new editor bio'},
+            csrf_token=csrf_token)
+        self.logout()
+
+        self.signup(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'user_bio', 'data': 'My new viewer bio'},
+            csrf_token=csrf_token)
+        self.logout()
+
+        # Viewer looks at editor's profile page.
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json(
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+        self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.logout()
+
+        # Editor looks at their own profile page.
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_json(
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+        self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.logout()
+
+        # Looged-out user looks at editor's profile page/
+        response = self.get_json(
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+        self.assertEqual(response['user_bio'], 'My new editor bio')
