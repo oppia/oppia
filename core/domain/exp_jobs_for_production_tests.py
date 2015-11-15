@@ -27,8 +27,6 @@ from core.platform import models
     models.NAMES.base_model, models.NAMES.exploration])
 import feconf
 
-from google.appengine.ext import ndb
-
 
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):

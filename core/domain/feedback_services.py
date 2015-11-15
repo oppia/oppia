@@ -18,7 +18,7 @@
 
 __author__ = 'Koji Ashida'
 
-from core.domain import feedback_jobs
+from core.domain import feedback_jobs_continuous
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -54,7 +54,7 @@ def create_thread(
     thread.state_name = state_name
     thread.original_author_id = original_author_id
     # The feedback analytics jobs rely on the thread status being set to 'open'
-    # when a new thread is created. If this is changed, changes need to be 
+    # when a new thread is created. If this is changed, changes need to be
     # made there as well
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
@@ -111,13 +111,13 @@ def create_message(
             # Thread status changed.
             event_services.FeedbackThreadStatusChangedEventHandler.record(
                 thread.exploration_id, thread.status, updated_status)
-            
+
         msg.updated_status = updated_status
     if updated_subject:
         msg.updated_subject = updated_subject
     msg.text = text
     msg.put()
-    
+
     # We do a put() even if the status and subject are not updated, so that the
     # last_updated time of the thread reflects the last time a message was
     # added to it.
@@ -170,5 +170,5 @@ def get_thread_analytics(exploration_id):
     - 'num_total_threads': the total number of feedback threads for this
          exploration.
     """
-    return feedback_jobs.FeedbackAnalyticsAggregator.get_thread_analytics(
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics(
         exploration_id)

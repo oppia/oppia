@@ -24,7 +24,7 @@ import zipfile
 
 from core.domain import event_services
 from core.domain import exp_domain
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
@@ -2786,8 +2786,8 @@ title: Old Title
         # Version 4 is an upgrade based on the migration job.
 
         # Start migration job on sample exploration.
-        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
         self.process_and_flush_pending_tasks()
 

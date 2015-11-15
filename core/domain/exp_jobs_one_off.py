@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for explorations."""
+"""One-off jobs for explorations."""
 
 __author__ = 'Frederik Creemers'
 
@@ -56,7 +56,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
-    """Job that indexes all explorations"""
+    """One-off job that indexes all explorations"""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -67,7 +67,7 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
         # We're inline importing here to break import loops like this: (->
         # means imports):
         #   exp_services -> event_services -> jobs_registry ->
-        #   exp_jobs -> exp_services.
+        #   exp_jobs_one_off -> exp_services.
         from core.domain import exp_services
         if not item.deleted:
             exp_services.index_explorations_given_ids([item.id])
@@ -104,58 +104,6 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class SearchRankerRealtimeModel(
-        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    pass
-
-
-class SearchRanker(jobs.BaseContinuousComputationManager):
-    """A continuous-computation job that refreshes the search ranking.
-
-    This job does not have a realtime component. There will be a delay in
-    propagating new updates to the gallery; the length of the delay will be
-    approximately the time it takes a batch job to run.
-    """
-    @classmethod
-    def get_event_types_listened_to(cls):
-        return []
-
-    @classmethod
-    def _get_realtime_datastore_class(cls):
-        return SearchRankerRealtimeModel
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return SearchRankerMRJobManager
-
-    @classmethod
-    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
-
-
-class SearchRankerMRJobManager(
-        jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """Manager for a MapReduce job that iterates through all explorations and
-    recomputes their search rankings.
-    """
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return SearchRanker
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        from core.domain import exp_services
-        exp_services.index_explorations_given_ids([item.id])
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        pass
 
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
