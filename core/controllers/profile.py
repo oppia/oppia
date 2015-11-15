@@ -77,14 +77,11 @@ class ProfileHandler(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
-        if user_settings.first_contribution_datetime:
-           self.values.update({
-                'first_contribution_datetime':
-                utils.get_time_in_millisecs(user_settings.first_contribution_datetime),
-            })
-
         self.values.update({
             'user_bio': user_settings.user_bio,
+            'first_contribution_datetime': (
+                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
+                if user_settings.first_contribution_datetime else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
         })
         self.render_json(self.values)

@@ -310,7 +310,7 @@ def update_user_bio(user_id, user_bio):
     _save_user_settings(user_settings)
 
 
-def set_contribution_date(user_id, first_contribution_datetime):
+def update_first_contribution_datetime(user_id, first_contribution_datetime):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.first_contribution_datetime = first_contribution_datetime
     _save_user_settings(user_settings)

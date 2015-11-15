@@ -20,12 +20,12 @@
 
 oppia.controller('Profile', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  function($scope, $http, $rootScope, $oppiaDatetimeFormatter) {
+  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
-    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+    $scope.getLocaleAbbreviatedDateString = function(millisSinceEpoch) {
+      return oppiaDatetimeFormatter.getLocaleAbbreviatedDateString(
         millisSinceEpoch);
     };
 
@@ -33,7 +33,7 @@ oppia.controller('Profile', [
     $http.get(profileDataUrl).success(function(data) {
       $rootScope.loadingMessage = '';
       $scope.userBio = data.user_bio;
-      $scope.firstContributionDateTime = data.first_contribution_datetime;
+      $scope.firstContributionDatetime = data.first_contribution_datetime;
       $scope.profilePictureDataUrl = (
         data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
       $rootScope.loadingMessage = '';
