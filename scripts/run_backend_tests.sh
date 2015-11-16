@@ -68,6 +68,10 @@ source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
 # Install numpy.
+# Numpy needs to be built after downloading and can't be installed with the pattern in 
+# install_third_party. If you are still having trouble, please make sure you have pip configured properly with
+# the Python installation Oppia is using. Installing python-dev should take care of it on most linux distros.
+# Please see our wiki for more complete instructions.
 echo Checking if numpy is installed in third_party/pip_packages
 if [ ! -d "$THIRD_PARTY_DIR/pip_packages/numpy" ]; then
   echo Installing numpy
