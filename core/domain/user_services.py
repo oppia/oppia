@@ -23,10 +23,10 @@ import logging
 import re
 
 from core.platform import models
-import feconf
-import utils
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+import feconf
+import utils
 
 MAX_USERNAME_LENGTH = 50
 
