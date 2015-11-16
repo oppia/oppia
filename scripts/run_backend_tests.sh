@@ -61,7 +61,7 @@ then
   echo "     bash $0"
   echo ""
   return 1
-fi 
+fi
 
 set -e
 source $(dirname $0)/setup.sh || exit 1
