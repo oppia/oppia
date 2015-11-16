@@ -197,13 +197,9 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
       return date.toLocaleDateString();
     },
     // Returns just the date.
-    getLocaleAbbreviatedDateString: function(millisSinceEpoch) {
+    getLocaleDateString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
-      if (date.toLocaleDateString() == new Date().toLocaleDateString()) {
-        // If the date is the same, return current date.
-        return new Date().toLocaleDateString();
-      }
-      return date.toLocaleDateString;
+      return date.toLocaleDateString();
     }
   };
 }]);

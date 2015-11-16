@@ -16,12 +16,13 @@
 
 __author__ = 'Sean Lip'
 
-from core.domain import exp_services
-from core.domain import user_services
-from core.tests import test_utils
 import datetime
 import feconf
 import utils
+
+from core.domain import exp_services
+from core.domain import user_services
+from core.tests import test_utils
 
 
 class SignupTest(test_utils.GenericTestBase):
@@ -295,21 +296,18 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         """Test the contribution date shows up correctly as nonexist."""
         self.signup(self.EMAIL, self.USERNAME)
         self.login(self.EMAIL)
-        user_services.get_or_create_user(self.USERNAME, self.EMAIL)
         self.user_id = self.get_user_id_from_email(self.EMAIL)
-        response = self.testapp.get('/profile/%s' % self.USERNAME)
-        self.assertEqual(response.status_int, 200)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(response_dict['first_contribution_datetime'], None)
 
         current_datetime = datetime.datetime.utcnow()
-        user_services.update_first_contribution_datetime(self.user_id, current_datetime)
+        user_services.update_first_contribution_datetime(self.user_id,
+            current_datetime)
 
         """Test the contribution date correctly changes to set date time."""
         self.login(self.EMAIL)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
-        self.assertEqual(response_dict['first_contribution_datetime'], utils.get_time_in_millisecs(current_datetime))
-        response = self.testapp.get('/profile/%s' % self.USERNAME)
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response_dict['first_contribution_datetime'],
+            utils.get_time_in_millisecs(current_datetime))

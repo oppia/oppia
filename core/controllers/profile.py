@@ -16,11 +16,12 @@
 
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
+import feconf
+import utils
+
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import user_services
-import feconf
-import utils
 
 
 def require_user_id_else_redirect_to_homepage(handler):

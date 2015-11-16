@@ -39,9 +39,11 @@
               <span ng-if="!userBio">
                 <em>This user has not supplied a bio yet.</em>
               </span>
-            </br>
-              <span ng-if="firstContributionDatetime">Contributing since 
-                <[getLocaleAbbreviatedDateString(firstContributionDatetime)]></span>
+            </p>
+            <p>
+              <span ng-if="firstContributionDatetime">
+                Contributing since
+                <[getLocaleDateString(firstContributionDatetime)]></span>
               </span>
             </p>
           </div>

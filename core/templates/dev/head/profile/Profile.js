@@ -24,9 +24,8 @@ oppia.controller('Profile', [
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
-    $scope.getLocaleAbbreviatedDateString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDateString(
-        millisSinceEpoch);
+    $scope.getLocaleDateString = function(millisSinceEpoch) {
+      return oppiaDatetimeFormatter.getLocaleDateString(millisSinceEpoch);
     };
 
     $rootScope.loadingMessage = 'Loading';
