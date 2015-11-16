@@ -75,7 +75,7 @@ source $(dirname $0)/setup_gae.sh || exit 1
 echo Checking if numpy is installed in third_party/pip_packages
 if [ ! -d "$THIRD_PARTY_DIR/pip_packages/numpy" ]; then
   echo Installing numpy
-  pip install numpy==$NUMPY_REV --target="$THIRD_PARTY_DIR/pip_packages"
+  pip install numpy==1.6.1 --target="$THIRD_PARTY_DIR/pip_packages"
 fi
 
 # Install webtest.
