@@ -1305,6 +1305,49 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             ), None)
 
 
+class UpdateExplorationContributionDatetimeTests(ExplorationServicesUnitTests):
+    """Test whether contribution date changes with publication of exploration
+    and update of already published exploration
+    """
+
+    def setUp(self):
+        """Before each individual test, create a dummy exploration."""
+        super(UpdateExplorationContributionDatetimeTests, self).setUp()
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID, end_state_name='End')
+        self.init_state_name = exploration.init_state_name
+
+    def test_publishing_exploration_updates_contribution_datetime(self):
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        self.assertIsNotNone(
+            user_services.get_user_settings(self.OWNER_ID).first_contribution_datetime)
+
+    def test_updating_exploration_updates_contribution_datetime(self) :
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        #Test that commit to unpublished exploration does not update
+        #contribution datetime
+        exp_services.update_exploration(
+            self.OWNER_ID, self.EXP_ID, _get_change_list(
+                self.init_state_name, 'content', [{
+                    'type': 'text',
+                    'value': '<b>Test content</b>',
+                }]),
+            '')
+        self.assertIsNone(
+            user_services.get_user_settings(self.OWNER_ID).first_contribution_datetime)
+
+        #Test that commit to published exploration updates contribution datetime
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
+            'cmd': 'rename_state',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_state_name': 'new name',
+        }], 'Change state name')
+        self.assertIsNotNone(
+            user_services.get_user_settings(self.OWNER_ID).first_contribution_datetime)
+
+
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
 

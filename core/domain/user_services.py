@@ -310,11 +310,17 @@ def update_user_bio(user_id, user_bio):
     _save_user_settings(user_settings)
 
 
-def update_first_contribution_datetime(user_id, first_contribution_datetime):
+def _update_first_contribution_datetime_if_necessary(user_id, first_contribution_datetime):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.first_contribution_datetime = first_contribution_datetime
     _save_user_settings(user_settings)
 
+
+def update_first_contribution_datetime(user_id, first_contribution_datetime):
+    user_settings = get_user_settings(user_id, strict=True)
+    if (user_settings.first_contribution_datetime == None):
+        _update_first_contribution_datetime_if_necessary(
+            user_id, first_contribution_datetime)
 
 def update_preferred_language_codes(user_id, preferred_language_codes):
     user_settings = get_user_settings(user_id, strict=True)

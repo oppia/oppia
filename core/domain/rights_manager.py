@@ -18,7 +18,7 @@
 
 __author__ = 'Sean Lip'
 
-
+import datetime
 import logging
 
 from core.domain import collection_domain
@@ -627,6 +627,16 @@ def _publish_activity(committer_id, activity_id, activity_type):
     _change_activity_status(
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
         '%s published.' % activity_type)
+
+    #Add contribution dates to the owners and editors
+    exploration_rights = get_exploration_rights(activity_id)
+    for owner_id in exploration_rights.owner_ids:
+        user_services.update_first_contribution_datetime(
+            owner_id, datetime.datetime.utcnow())
+        user_settings = user_services.get_user_settings(owner_id)
+    for editor_id in exploration_rights.editor_ids:
+        user_services.update_first_contribution_datetime(
+            editor_id, datetime.datetime.utcnow())
 
 
 def _unpublish_activity(committer_id, activity_id, activity_type):

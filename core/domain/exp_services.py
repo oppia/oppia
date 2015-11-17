@@ -36,6 +36,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -948,6 +949,10 @@ def update_exploration(
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
+
+    if is_public:
+        user_services.update_first_contribution_datetime(
+            committer_id, datetime.datetime.utcnow())
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
