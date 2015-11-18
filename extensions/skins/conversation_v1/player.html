@@ -137,7 +137,8 @@
            class="conversation-skin-supplemental-card-container"
            ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}">
         <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
-             class="conversation-skin-supplemental-card">
+             class="conversation-skin-supplemental-card"
+             style="height: 550px;">
 
           <div class="conversation-skin-help-card" ng-if="helpCardHtml">
             <img class="conversation-skin-oppia-avatar"
@@ -158,7 +159,15 @@
             </md-button>
           </div>
 
-          <div ng-if="!activeCard.interactionIsInline">
+          <!--
+            The loadSupplement and the forced height of 550px above are here to
+            ensure that the supplemental card loads fully before the Pencil Code
+            interaction starts loading. Otherwise, the transition is very janky.
+
+            TODO(sll): This is a custom hack for Pencil Code. If it becomes a
+            more general thing, we need to find another way to do it.
+          -->
+          <div ng-if="!activeCard.interactionIsInline && loadSupplement">
             <div class="protractor-test-conversation-input"
                  angular-html-bind="transcript[currentProgressDotIndex].interactionHtml">
             </div>
