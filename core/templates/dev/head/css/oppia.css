@@ -230,7 +230,7 @@ p {
   container's width.
 */
 img, video, canvas {
-  max-width: 100%
+  max-width: 100%;
 }
 
 textarea {
@@ -926,10 +926,15 @@ md-card.oppia-gallery-tile {
   font-style: italic;
 }
 
-.oppia-save-publish-button-icon {
-  height: 18px;
-  margin: 0 0 2px 0;
-  width: 18px;
+@media(min-width: 1100px) {
+  .material-icons.oppia-save-publish-button-icon {
+    display: none;
+  }
+}
+@media(max-width: 1100px) {
+  .oppia-save-publish-button-label {
+    display: none;
+  }
 }
 
 .oppia-state-name-container {

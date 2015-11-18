@@ -169,13 +169,25 @@ html, body {
   border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
-  max-width: 472px;
   padding-top: 20px;
   position: relative;
   right: 0;
   text-align: left;
-  width: 472px;
+  width: 560px;
   z-index: 1;
+}
+
+.conversation-skin-main-tutor-card.conversation-skin-left-card,
+.conversation-skin-future-tutor-card.conversation-skin-left-card {
+  float: left;
+  margin-left: 0;
+  margin-right: 0;
+  width: 472px;
+}
+
+.conversation-skin-main-tutor-card.animate-card-width {
+  -webkit-transition: width 500ms;
+  transition: width 500ms;
 }
 
 .conversation-skin-future-tutor-card {
@@ -201,6 +213,7 @@ html, body {
 .conversation-skin-help-card-content {
   border-radius: 2px;
   display: inline-block;
+  max-width: 100%;
   position: relative;
   text-align: left;
 }
@@ -370,12 +383,6 @@ div.conversation-skin-supplemental-card {
 .conversation-skin-final-ratings {
   padding-top: 20px;
   text-align: center;
-}
-
-.conversation-skin-left-card {
-  float: left;
-  margin-left: 0;
-  margin-right: 0;
 }
 
 .conversation-skin-left-card .conversation-skin-oppia-avatar,
