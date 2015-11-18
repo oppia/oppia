@@ -202,8 +202,7 @@ class ExplorationPage(base.BaseHandler):
             try:
                 collection = collection_services.get_collection_by_id(
                     collection_id)
-                if collection:
-                    collection_title = collection.title
+                collection_title = collection.title
             except Exception as e:
                 raise self.PageNotFoundException(e)
 

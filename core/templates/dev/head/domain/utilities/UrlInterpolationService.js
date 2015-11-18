@@ -89,8 +89,8 @@ oppia.factory('UrlInterpolationService', ['warningsData',
         // Ensure the value is valid.
         if (!value.match(VALID_PARAMETER_VALUE_REGEX)) {
           warningsData.fatalWarning(
-            'Parameter values must only contain alphanumerical characters or ' +
-            'spaces: \'' + value + '\'');
+            'Parameter values passed into interpolateUrl must only contain ' +
+            'alphanumerical characters or spaces: \'' + value + '\'');
           return null;
         }
 

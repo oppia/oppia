@@ -22,14 +22,14 @@ oppia.constant(
   'COLLECTION_DATA_URL', '/collectionhandler/data/<collection_id>');
 
 oppia.animation('.oppia-collection-animate-slide', function() {
-    return {
-        enter: function(element, done) {
-            element.hide().slideDown();
-        },
-        leave: function(element, done) {
-            element.slideUp();
-        }
-    };
+  return {
+    enter: function(element, done) {
+      element.hide().slideDown();
+    },
+    leave: function(element, done) {
+      element.slideUp();
+    }
+  };
 });
 
 oppia.controller('CollectionPlayer', [

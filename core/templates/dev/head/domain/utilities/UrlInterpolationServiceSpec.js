@@ -132,20 +132,20 @@ describe('URL Interpolation Service', function() {
     expect(function() {
         uis.interpolateUrl('/test_url/<name>', {'name': '<value>'});
       }).toThrow(new Error(
-        'Parameter values must only contain alphanumerical characters or ' +
-        'spaces: \'<value>\''));
+        'Parameter values passed into interpolateUrl must only contain ' +
+        'alphanumerical characters or spaces: \'<value>\''));
 
     expect(function() {
         uis.interpolateUrl('/test_url/<name>', {'name': '<<value>>'});
       }).toThrow(new Error(
-        'Parameter values must only contain alphanumerical characters or ' +
-        'spaces: \'<<value>>\''));
+        'Parameter values passed into interpolateUrl must only contain ' +
+        'alphanumerical characters or spaces: \'<<value>>\''));
 
     expect(function() {
         uis.interpolateUrl('/test_url/<name>', {'name': '<>'});
       }).toThrow(new Error(
-        'Parameter values must only contain alphanumerical characters or ' +
-        'spaces: \'<>\''));
+        'Parameter values passed into interpolateUrl must only contain ' +
+        'alphanumerical characters or spaces: \'<>\''));
 
     // Values cannot contain non-alphanumerical characters or spaces, including
     // newlines or website symbols.
@@ -155,16 +155,16 @@ describe('URL Interpolation Service', function() {
           'query_value': 'https://www.oppia.org/'
         });
       }).toThrow(new Error(
-        'Parameter values must only contain alphanumerical characters or ' +
-        'spaces: \'https://www.oppia.org/\''));
+        'Parameter values passed into interpolateUrl must only contain ' +
+        'alphanumerical characters or spaces: \'https://www.oppia.org/\''));
 
     expect(function() {
         uis.interpolateUrl('/test_url/<name>', {
           'name': 'value\nmultiple lines'
         });
       }).toThrow(new Error(
-        'Parameter values must only contain alphanumerical characters or ' +
-        'spaces: \'value\nmultiple lines\''));
+        'Parameter values passed into interpolateUrl must only contain ' +
+        'alphanumerical characters or spaces: \'value\nmultiple lines\''));
   });
 
   it('should throw an exception for missing parameters', function() {
