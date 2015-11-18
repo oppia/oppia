@@ -807,6 +807,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     index_explorations_given_ids([exploration.id])
 
+    is_public = rights_manager.is_exploration_public(exploration.id)
+    if is_public:
+        user_services.update_first_contribution_datetime_if_not_set(
+        committer_id, datetime.datetime.utcnow())
+
     exploration.version += 1
 
 
@@ -949,10 +954,6 @@ def update_exploration(
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
-
-    if is_public:
-        user_services.update_first_contribution_datetime(
-            committer_id, datetime.datetime.utcnow())
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)

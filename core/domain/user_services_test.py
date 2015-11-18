@@ -16,8 +16,12 @@
 
 __author__ = 'Stephanie Federwisch'
 
+from core.domain import collection_services
+from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
+import feconf
 import utils
 
 
@@ -129,3 +133,238 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames which don't exist.
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
+
+
+class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
+    """Test whether contribution date changes with publication of
+    exploration/collection and update of already published exploration/collection
+    """
+
+    EXP_ID = 'test_exp'
+    COL_ID = 'test_col'
+    COLLECTION_TITLE = 'title'
+    COLLECTION_CATEGORY = 'category'
+    COLLECTION_OBJECTIVE = 'objective'
+
+    def test_contribution_datetime_updates_on_published_explorations(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.admin_id, end_state_name='End')
+        self.init_state_name = exploration.init_state_name
+        rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
+
+        # Test all owners and editors of exploration after publication have
+        # updated datetimes
+        self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_datetime)
+
+        # Test editor of published exploration has updated datetime
+        rights_manager.release_ownership_of_exploration(self.admin_id,
+            self.EXP_ID)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [{
+            'cmd': 'edit_state_property',
+            'state_name': self.init_state_name,
+            'property_name': 'widget_id',
+            'new_value': 'MultipleChoiceInput'
+            }], 'commit')
+
+        self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
+            .first_contribution_datetime)
+
+    def test_contribution_datetime_updates_on_unpublished_explorations(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.admin_id, end_state_name='End')
+        self.init_state_name = exploration.init_state_name
+
+        # Test that saving an exploration does not update first contribution
+        # datetime
+        self.assertIsNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_datetime)
+
+        # Test that commit to unpublished exploration does not update
+        # contribution datetime
+        exp_services.update_exploration(
+            self.admin_id, self.EXP_ID, [{
+            'cmd': 'edit_state_property',
+            'state_name': self.init_state_name,
+            'property_name': 'widget_id',
+            'new_value': 'MultipleChoiceInput'
+            }], '')
+        self.assertIsNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_datetime)
+
+        # Test that another user who commits to unpublished exploration does not
+        # have updated datetime
+        rights_manager.assign_role_for_exploration(
+            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [{
+            'cmd': 'rename_state',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_state_name': u'¡Hola! αβγ',
+            }], '')
+        self.assertIsNone(user_services.get_user_settings(self.editor_id)
+            .first_contribution_datetime)
+
+        # Test that after an exploration is published, all contributors have
+        # updated first contribution datetime
+        rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
+        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        for owner_id in exploration_rights.owner_ids:
+            self.assertIsNotNone(user_services.get_user_settings(owner_id)
+            .first_contribution_datetime)
+        for editor_id in exploration_rights.editor_ids:
+            self.assertIsNotNone(user_services.get_user_settings(editor_id)
+            .first_contribution_datetime)
+
+    def test_contribution_datetime_does_not_change_if_exploration_unpublished(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_EMAIL])
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        self.init_state_name = exploration.init_state_name
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+
+        # Test that contribution datetime is not eliminated if exploration is
+        # unpublished
+        self.assertIsNotNone(user_services.get_user_settings(self.owner_id)
+            .first_contribution_datetime)
+
+    def test_contribution_datetime_updates_on_published_collections(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        collection = self.save_new_valid_collection(
+            self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
+            category=self.COLLECTION_CATEGORY,
+            objective=self.COLLECTION_OBJECTIVE,
+            exploration_id=self.EXP_ID)
+
+        #collection = self.save_new_valid_collection(
+        #    self.COL_ID, self.admin_id, end_state_name='End')
+        rights_manager.publish_collection(self.admin_id, self.COL_ID)
+
+        # Test all owners and editors of collection after publication have
+        # updated datetimes
+        self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_datetime)
+
+        # Test editor of published collection has updated datetime
+        rights_manager.release_ownership_of_collection(self.admin_id,
+            self.COL_ID)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        collection_services.update_collection(
+            self.editor_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'Some new title'
+            }], 'Changed the title')
+
+        self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
+            .first_contribution_datetime)
+
+    def test_contribution_datetime_updates_on_unpublished_collections(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        collection = self.save_new_valid_collection(
+            self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
+            category=self.COLLECTION_CATEGORY,
+            objective=self.COLLECTION_OBJECTIVE,
+            exploration_id=self.EXP_ID)
+
+        # Test that saving a collection does not update first contribution
+        # datetime
+        self.assertIsNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_datetime)
+
+        # Test that commit to unpublished collection does not update
+        # contribution datetime
+        collection_services.update_collection(
+            self.admin_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'Some new title'
+            }], '')
+        self.assertIsNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_datetime)
+
+        # Test that another user who commits to unpublished collection does not
+        # have updated datetime
+        rights_manager.assign_role_for_collection(
+            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+        collection_services.update_collection(
+                self.editor_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'category',
+                'new_value': 'Some new category'
+            }], '')
+        self.assertIsNone(user_services.get_user_settings(self.editor_id)
+            .first_contribution_datetime)
+
+        # Test that after an collection is published, all contributors have
+        # updated first contribution datetime
+        rights_manager.publish_collection(self.admin_id, self.COL_ID)
+        collection_rights = rights_manager.get_collection_rights(self.COL_ID)
+        for owner_id in collection_rights.owner_ids:
+            self.assertIsNotNone(user_services.get_user_settings(owner_id)
+            .first_contribution_datetime)
+        for editor_id in collection_rights.editor_ids:
+            self.assertIsNotNone(user_services.get_user_settings(editor_id)
+            .first_contribution_datetime)
+
+    def test_contribution_datetime_does_not_change_if_collection_unpublished(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_EMAIL])
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        collection = self.save_new_valid_collection(
+            self.COL_ID, self.owner_id, title=self.COLLECTION_TITLE,
+            category=self.COLLECTION_CATEGORY,
+            objective=self.COLLECTION_OBJECTIVE,
+            exploration_id=self.EXP_ID)
+        rights_manager.publish_collection(self.owner_id, self.COL_ID)
+        rights_manager.unpublish_collection(self.admin_id, self.COL_ID)
+
+        # Test that contribution datetime is not eliminated if collection is
+        # unpublished
+        self.assertIsNotNone(user_services.get_user_settings(self.owner_id)
+            .first_contribution_datetime)

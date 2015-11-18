@@ -244,13 +244,17 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(OneOffReindexExplorationsJobTest, self).setUp()
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s%s' % (self.EXP_ID, i), 'title %d' % i, 'category%d' % i)
             for i in xrange(5)]
 
         for exp in explorations:
-            exp_services.save_new_exploration('owner_id', exp)
-            rights_manager.publish_exploration('owner_id', exp.id)
+            exp_services.save_new_exploration(self.owner_id, exp)
+            rights_manager.publish_exploration(self.owner_id, exp.id)
 
         self.process_and_flush_pending_tasks()
 

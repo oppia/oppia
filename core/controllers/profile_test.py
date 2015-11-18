@@ -303,7 +303,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
 
         #Update the first_contribution_datetime to the current datetime.
         current_datetime = datetime.datetime.utcnow()
-        user_services.update_first_contribution_datetime(
+        user_services.update_first_contribution_datetime_if_not_set(
             self.user_id,current_datetime)
 
         #Test the contribution date correctly changes to set date time.

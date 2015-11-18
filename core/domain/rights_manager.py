@@ -432,6 +432,7 @@ class Actor(object):
             return False
         if activity_rights.community_owned:
             return False
+
         return self.is_moderator()
 
     def can_modify_roles(self, activity_type, activity_id):
@@ -628,14 +629,13 @@ def _publish_activity(committer_id, activity_id, activity_type):
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
         '%s published.' % activity_type)
 
-    #Add contribution dates to the owners and editors
-    exploration_rights = get_exploration_rights(activity_id)
+    # Add contribution dates to the owners and editors
+    exploration_rights = _get_activity_rights(activity_type, activity_id)
     for owner_id in exploration_rights.owner_ids:
-        user_services.update_first_contribution_datetime(
+        user_services.update_first_contribution_datetime_if_not_set(
             owner_id, datetime.datetime.utcnow())
-        user_settings = user_services.get_user_settings(owner_id)
     for editor_id in exploration_rights.editor_ids:
-        user_services.update_first_contribution_datetime(
+        user_services.update_first_contribution_datetime_if_not_set(
             editor_id, datetime.datetime.utcnow())
 
 
