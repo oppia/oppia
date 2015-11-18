@@ -6,7 +6,8 @@
     Off-screen preview of the next card in order to pre-determine the target
     height for the card content transition animation.
   -->
-  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
+  <div class="conversation-skin-future-tutor-card" aria-hidden="true"
+       ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}">
     <div class="conversation-skin-tutor-card-content">
       <div class="conversation-skin-tutor-card-top-section">
         <div class="conversation-skin-tutor-card-top-content"
@@ -40,7 +41,8 @@
         side-by-side.
       -->
       <div class="conversation-skin-main-tutor-card conversation-skin-tutor-card-active"
-          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}"
+          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards(),
+            'animate-card-width': startCardChangeAnimation}"
           ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
              ng-class="{'animate-card-change': startCardChangeAnimation}">
