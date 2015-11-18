@@ -4,6 +4,6 @@ queue:
 # Users might wish to speed this up temporarily for one-off
 # computations. (The default used to be 5/s.)
 - name: default
-  rate: 3/m
+  rate: 5/s
 - name: events
   rate: 5/s

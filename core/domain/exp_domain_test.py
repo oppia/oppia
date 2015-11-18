@@ -1045,11 +1045,12 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.from_yaml(
                 'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
 
-        with self.assertRaisesRegexp(
-                Exception, 'No title or category need to be provided for an '
-                'exploration encoded in the YAML version:'):
-            exp_domain.Exploration.from_untitled_yaml(
-                'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
+        # No exception is raised if a title/category is passed in
+        # unnecessarily; those arguments are simply ignored.
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'exp4', 'Ignored Title', 'Ignored Category', SAMPLE_YAML_CONTENT)
+        self.assertEqual(exploration.title, 'Title')
+        self.assertEqual(exploration.category, 'Category')
 
     def test_yaml_import_and_export_without_gadgets(self):
         """Test from_yaml() and to_yaml() methods without gadgets."""

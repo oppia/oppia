@@ -23,8 +23,8 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'base_model', 'collection', 'config', 'email', 'exploration', 'feedback',
-    'file', 'job', 'recommendations', 'statistics', 'user')
+    'base_model', 'collection', 'config', 'email', 'event', 'exploration',
+    'feedback', 'file', 'job', 'recommendations', 'statistics', 'user')
 
 
 class _Platform(object):
@@ -51,6 +51,9 @@ class _Gae(_Platform):
             elif name == NAMES.email:
                 from core.storage.email import gae_models as email_models
                 returned_models.append(email_models)
+            elif name == NAMES.event:
+                from core.storage.event import gae_models as event_models
+                returned_models.append(event_models)
             elif name == NAMES.exploration:
                 from core.storage.exploration import gae_models as exp_models
                 returned_models.append(exp_models)

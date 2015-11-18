@@ -79,6 +79,10 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+
+        self.redirect('/collection/1')
+        return
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
@@ -124,7 +128,6 @@ class GalleryHandler(base.BaseHandler):
             'status': exp_summary.status,
             'ratings': exp_summary.ratings,
             'community_owned': exp_summary.community_owned,
-            # TODO(sll): Replace these with per-category thumbnails.
             'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                 exp_summary.category),
             'thumbnail_bg_color': utils.get_hex_color_for_category(

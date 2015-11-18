@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry

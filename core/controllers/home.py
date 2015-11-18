@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
+from core.controllers import galleries
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -111,6 +112,8 @@ class MyExplorationsPage(base.BaseHandler):
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
+                'allow_yaml_file_upload': (
+                    galleries.ALLOW_YAML_FILE_UPLOAD.value),
             })
             self.render_template(
                 'dashboard/my_explorations.html', redirect_url_on_logout='/')
@@ -160,8 +163,7 @@ class MyExplorationsHandler(base.BaseHandler):
                 'community_owned': exp_summary.community_owned,
                 'is_editable': True,
                 'thumbnail_image_url': (
-                    '/images/gallery/exploration_background_%s_small.png' %
-                    _get_intro_card_color(exp_summary.category)),
+                    '/images/gallery/exploration_background_teal_small.png'),
                 'ratings': exp_summary.ratings,
                 'num_open_threads': (
                     feedback_thread_analytics['num_open_threads']),

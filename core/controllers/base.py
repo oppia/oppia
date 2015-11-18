@@ -32,6 +32,7 @@ import urlparse
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import event_services
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
@@ -77,6 +78,16 @@ OBJECT_EDITORS_JS = config_domain.ComputedProperty(
     'object_editors_js', {'type': 'unicode'},
     'JavaScript code for the object editors',
     obj_services.get_all_object_editor_js_templates)
+
+# EXPERIMENTAL
+ALLOWED_TEMPORARY_IDS_STRING = config_domain.ConfigProperty(
+    'allowed_temporary_ids_string', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
+    'Enter allowed temporary IDs here, one per line', 'tmpid1\ntmpid2')
 
 SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
     'sidebar_menu_additional_links', {
@@ -400,6 +411,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'ALLOWED_TEMPORARY_IDS': ALLOWED_TEMPORARY_IDS_STRING.value.split(),
             'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
@@ -615,3 +627,23 @@ class CsrfTokenManager(object):
             return False
         except Exception:
             return False
+
+
+# TEMPORARY CODE -- NOT FOR MERGE INTO DEVELOP
+class ResearchEventsHandler(BaseHandler):
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self, event_type):
+        """Handles POST requests."""
+        event_data = self.payload.get('event_data')
+        page_url = self.payload.get('page_url')
+        temporary_id = self.payload.get('temporary_id')
+
+        if not temporary_id:
+            return
+
+        event_services.record_research_event(
+            temporary_id, page_url,
+            utils.get_current_time_in_millisecs(),
+            event_type, event_data)

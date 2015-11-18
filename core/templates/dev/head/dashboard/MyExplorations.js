@@ -47,5 +47,9 @@ oppia.controller('CreateExplorationButton', [
     $scope.showCreateExplorationModal = function() {
       createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
     };
+
+    $scope.showUploadExplorationModal = function() {
+      createExplorationButtonService.showUploadExplorationModal(CATEGORY_LIST);
+    };
   }
 ]);

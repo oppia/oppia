@@ -392,6 +392,65 @@ oppia.factory('extensionTagAssemblerService', [
   };
 }]);
 
+// TEMPORARY
+GLOBALS.TEMPORARY_ID = null;
+
+oppia.factory('researchEventsService', ['$http', '$window', function($http, $window) {
+  return {
+    recordEvent: function(eventType, eventData) {
+      if (!GLOBALS.TEMPORARY_ID) {
+        return;
+      }
+
+      var url = $window.location.pathname;
+      if (url.indexOf('collection') !== -1 || url.indexOf('explore') !== -1) {
+        $http.post('/researcheventshandler/' + eventType, {
+          event_data: eventData,
+          page_url: url,
+          temporary_id: GLOBALS.TEMPORARY_ID
+        });
+      }
+    }
+  };
+}]);
+
+
+oppia.constant('PAGE_CONTEXT', {
+  EDITOR: 'editor',
+  LEARNER: 'learner'
+});
+
+oppia.factory('pageContextService', [
+    '$window', 'PAGE_CONTEXT', function($window, PAGE_CONTEXT) {
+
+  var _pageContext = null;
+
+  return {
+    // Returns a string representing the context of the current page.
+    // This is either PAGE_CONTEXT.EDITOR or PAGE_CONTEXT.LEARNER.
+    // If the current page is not one of these, an error is raised.
+    getPageContext: function() {
+      if (_pageContext) {
+        return _pageContext;
+      } else {
+        var pathnameArray = $window.location.pathname.split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'explore') {
+            _pageContext = PAGE_CONTEXT.LEARNER;
+            return PAGE_CONTEXT.LEARNER;
+          } else if (pathnameArray[i] === 'create') {
+            _pageContext = PAGE_CONTEXT.EDITOR;
+            return PAGE_CONTEXT.EDITOR;
+          }
+        }
+
+        return null;
+      }
+    }
+  };
+}]);
+
+
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {

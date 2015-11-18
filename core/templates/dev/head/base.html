@@ -68,6 +68,7 @@
             null,
           {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
+        ALLOWED_TEMPORARY_IDS: JSON.parse('{{ALLOWED_TEMPORARY_IDS|js_string}}'),
         ACTIVITY_STATUS_PRIVATE: JSON.parse(
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
         ACTIVITY_STATUS_PUBLIC: JSON.parse(
@@ -110,10 +111,7 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
-                      <img src="/images/general/menu.png">
-                    </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>" style="margin-left: 10px;">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
@@ -203,20 +201,6 @@
                               </li>
                             </ul>
                           </li>
-                        {% else %}
-                          <li class="dropdown oppia-clickable-dropdown pull-right">
-                            <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
-                              Sign in
-                              <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                              <li>
-                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
-                                  <img src="/images/signin/Red-signin-Long-base-44dp.png">
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
                         {% endif %}
                       </ul>
                     </div>
@@ -238,18 +222,9 @@
 
               {{ warnings_and_loader() }}
             </div>
-
-            {% include 'side_nav.html' %}
-
           </div>
         </div>
       </div>
-
-      {% if DEV_MODE %}
-        <div class="oppia-dev-mode">
-          Dev Mode
-        </div>
-      {% endif %}
 
       {% if SITE_FEEDBACK_FORM_URL %}
         <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"

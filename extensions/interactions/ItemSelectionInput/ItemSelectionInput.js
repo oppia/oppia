@@ -61,6 +61,11 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           $scope.notEnoughSelections = ($scope.selectionCount < $scope.minAllowableSelectionCount);
         };
 
+        $scope.submitMultipleChoiceAnswer = function(index) {
+          $scope.userSelections[$scope.choices[index]] = true;
+          $scope.submitAnswer($scope.userSelections);
+        };
+
         $scope.submitAnswer = function(answer) {
           var answers = Object.keys($scope.userSelections).filter(function(obj) {
             return $scope.userSelections[obj];

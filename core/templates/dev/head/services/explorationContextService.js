@@ -18,11 +18,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.constant('PAGE_CONTEXT', {
-  EDITOR: 'editor',
-  LEARNER: 'learner'
-});
-
 oppia.constant('EDITOR_TAB_CONTEXT', {
   EDITOR: 'editor',
   PREVIEW: 'preview'

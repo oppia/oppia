@@ -197,6 +197,8 @@ oppia.directive('conversationSkin', [function() {
       $scope.currentProgressDotIndex = null;
       $scope.arePreviousResponsesShown = false;
 
+      $scope.loadSupplement = true;
+
       $scope.waitingForContinueButtonClick = false;
 
       $scope.upcomingStateName = null;
@@ -372,8 +374,13 @@ oppia.directive('conversationSkin', [function() {
 
         if ($scope.canWindowFitTwoCards() && !previousSupplementalCardIsNonempty &&
             nextSupplementalCardIsNonempty) {
+          // TODO(sll): Remove this hack. (It exists to ensure that Pencil
+          // Code's loading does not interfere with the animation to two
+          // side-by-side cards.
+          $scope.loadSupplement = false;
           animateToTwoCards(function() {
             $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
+            $scope.loadSupplement = true;
           });
         } else if (
             $scope.canWindowFitTwoCards() && previousSupplementalCardIsNonempty &&
@@ -390,28 +397,33 @@ oppia.directive('conversationSkin', [function() {
         $scope.arePreviousResponsesShown = !$scope.arePreviousResponsesShown;
       };
 
+      // This is set to true when init is called.
+      var hasExplorationStarted = false;
+
+      var getNewIntroInteractionHtml = function() {
+        _nextFocusLabel = focusService.generateFocusLabel();
+        return (
+          '<oppia-interactive-text-input rows-with-value="1" ' +
+          'placeholder-with-value="&amp;quot;Enter ID here&amp;quot;" ' +
+          'label-for-focus-target="' + _nextFocusLabel + '">' +
+          '</oppia-interactive-text-input>' +
+          oppiaPlayerService.getRandomSuffix());
+      };
+
       $scope.initializePage = function() {
         $scope.transcript = [];
         $scope.waitingForOppiaFeedback = false;
         hasInteractedAtLeastOnce = false;
+        hasExplorationStarted = false;
 
-        oppiaPlayerService.init(function(stateName, initHtml) {
-          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
-          _nextFocusLabel = focusService.generateFocusLabel();
-          $scope.gadgetPanelsContents = (
-            oppiaPlayerService.getGadgetPanelsContents());
+        // MODIFIED FOR EXPERIMENT
+        _addNewCard(
+          oppiaPlayerService.getInitialLoginCardStateName(),
+          'Please enter your user id.', getNewIntroInteractionHtml());
 
-          _addNewCard(
-            stateName,
-            initHtml,
-            oppiaPlayerService.getInteractionHtml(stateName, _nextFocusLabel));
-          $rootScope.loadingMessage = '';
-          $scope.hasFullyLoaded = true;
-
-          $scope.adjustPageHeight(false, null);
-          $window.scrollTo(0, 0);
-          focusService.setFocusIfOnDesktop(_nextFocusLabel);
-        });
+        $rootScope.loadingMessage = '';
+        $scope.hasFullyLoaded = true;
+        focusService.setFocus(_nextFocusLabel);
       };
 
       $scope.submitAnswer = function(answer, interactionRulesService) {
@@ -424,8 +436,64 @@ oppia.directive('conversationSkin', [function() {
         $scope.clearHelpCard();
 
         _answerIsBeingProcessed = true;
-        hasInteractedAtLeastOnce = true;
         $scope.waitingForOppiaFeedback = true;
+        hasInteractedAtLeastOnce = true;
+
+        // The user is answering the login card.
+        if (!hasExplorationStarted) {
+          // TODO
+          var isValid = (GLOBALS.ALLOWED_TEMPORARY_IDS.indexOf(answer) !== -1);
+          if (!isValid) {
+            $scope.transcript[$scope.transcript.length - 1].interactionHtml = (
+              getNewIntroInteractionHtml());
+            $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs.push({
+              learnerAnswer: answer,
+              shortLearnerAnswer: answer,
+              oppiaFeedback: 'ID not recognized. Please try again.'
+            });
+            _answerIsBeingProcessed = false;
+            $scope.waitingForOppiaFeedback = false;
+
+            focusService.setFocus(_nextFocusLabel);
+          } else {
+            // Past this point, the user id is valid.
+            GLOBALS.TEMPORARY_ID = answer;
+            hasExplorationStarted = true;
+
+            $scope.transcript[$scope.transcript.length - 1].answerFeedbackPairs.push({
+              learnerAnswer: answer,
+              shortLearnerAnswer: answer,
+              oppiaFeedback: ''
+            });
+
+            oppiaPlayerService.init(function(stateName, initHtml) {
+              $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+              _nextFocusLabel = focusService.generateFocusLabel();
+              $scope.gadgetPanelsContents = (
+                oppiaPlayerService.getGadgetPanelsContents());
+
+              _addNewCard(
+                stateName,
+                initHtml,
+                oppiaPlayerService.getInteractionHtml(stateName, _nextFocusLabel));
+
+              $scope.adjustPageHeight(false, null);
+              $window.scrollTo(0, 0);
+              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+
+              $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
+                stateName);
+
+              // Without this guard, submissions happen twice for the initial
+              // card when the initial state of the exploration is changed.
+              $timeout(function() {
+                _answerIsBeingProcessed = false;
+                $scope.waitingForOppiaFeedback = false;
+              });
+            });
+          }
+          return;
+        }
 
         var _oldStateName = (
           $scope.transcript[$scope.transcript.length - 1].stateName);

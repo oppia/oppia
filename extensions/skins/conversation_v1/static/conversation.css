@@ -42,7 +42,7 @@ html, body {
   margin: 0 auto;
   position: fixed;
   right: 0;
-  z-index: 100;
+  z-index: 1;
 }
 .conversation-skin-progress-dots-not-iframed {
   top: 56px;
@@ -61,6 +61,11 @@ html, body {
 }
 .conversation-skin-oppia-avatar {
   left: -20px;
+}
+.conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
+  height: 48px;
+  left: -28px;
+  width: 48px;
 }
 
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
@@ -121,7 +126,10 @@ html, body {
   /* This is the width of the main card, plus the width of the supplemental
      card, plus a 12px margin between them.
   */
-  max-width: 1084px;
+  max-width: 1420px;
+  padding-left: 6px;
+  padding-right: 6px;
+  position: relative;
 }
 
 .conversation-skin-help-card {
@@ -132,8 +140,8 @@ html, body {
   opacity: 1;
   padding: 12px;
   position: absolute;
-  right: -12px;
-  top: -12px;
+  right: 12px;
+  bottom: 12px;
   text-align: left;
   transition: all 350ms;
   z-index: 500;
@@ -182,7 +190,7 @@ html, body {
   float: left;
   margin-left: 0;
   margin-right: 0;
-  width: 472px;
+  width: 360px;
 }
 
 .conversation-skin-main-tutor-card.animate-card-width {
@@ -357,8 +365,8 @@ html, body {
 }
 
 .conversation-skin-right-card-container {
-  margin-left: 12px;
-  width: 600px;
+  margin-left: 6px;
+  width: calc(100% - 380px);
 }
 
 div.conversation-skin-supplemental-card {
@@ -366,7 +374,6 @@ div.conversation-skin-supplemental-card {
   margin: 44px auto 60px auto;
   position: relative;
   right: 0;
-  width: 600px;
 }
 
 .conversation-skin-supplemental-interaction-container {
@@ -467,11 +474,6 @@ div.conversation-skin-supplemental-card {
   div.conversation-skin-supplemental-card,
   .conversation-skin-main-tutor-card {
     width: 100%;
-  }
-
-  .conversation-skin-help-card {
-    right: 4px;
-    top: 4px;
   }
 
   .conversation-skin-user-avatar,

@@ -72,8 +72,10 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 oppia.controller('Base', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
     'warningsData', 'activeInputData', 'LABEL_FOR_CLEARING_FOCUS',
+    'researchEventsService', 'pageContextService', 'PAGE_CONTEXT',
     function($scope, $http, $rootScope, $window, $timeout, $document, $log,
-             warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS) {
+             warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS,
+             researchEventsService, pageContextService, PAGE_CONTEXT) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;

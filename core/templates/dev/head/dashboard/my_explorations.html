@@ -28,6 +28,14 @@
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
           <span>Create Exploration</span>
         </a>
+
+        {% if allow_yaml_file_upload %}
+          <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
+             ng-click="showUploadExplorationModal()">
+            <span class="oppia-navbar-add-exploration-button-plus">+</span>
+            <span>Upload Exploration</span>
+          </a>
+        {% endif %}
       </div>
     </li>
   </ul>

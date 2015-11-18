@@ -2325,8 +2325,8 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content, title=None,
-            category=None):
+    def _migrate_to_latest_yaml_version(
+            cls, yaml_content, title=None, category=None):
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -2414,18 +2414,15 @@ class Exploration(object):
     def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string. This is
         for importing explorations using YAML schema version 9 or earlier.
+
+        NOTE: For schema versions 10 and later, the title/category are
+        specified within the yaml file, and the passed-in 'title' and
+        'category' arguments are ignored.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
         exploration_dict = migration_result[0]
         initital_schema_version = migration_result[1]
-
-        if (initital_schema_version >
-                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
-            raise Exception(
-                'No title or category need to be provided for an exploration '
-                'encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
@@ -2492,8 +2489,11 @@ class Exploration(object):
 
     def get_interaction_ids(self):
         """Get all interaction ids used in this exploration."""
-        return list(set([
-            state.interaction.id for state in self.states.itervalues()]))
+        all_interactions = [
+            state.interaction.id for state in self.states.itervalues()]
+        # EXPERIMENTAL. Needed for first card.
+        all_interactions.append('TextInput')
+        return list(set(all_interactions))
 
 
 class ExplorationSummary(object):

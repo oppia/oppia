@@ -121,13 +121,13 @@ class CollectionDataHandler(base.BaseHandler):
             summary = exp_summaries_dict.get(collection_node['exploration_id'])
             collection_node['exploration'] = {
                 'id': collection_node['exploration_id'],
-                'title': summary.title if summary else None,
-                'category': summary.category if summary else None,
-                'objective': summary.objective if summary else None,
-                'ratings': summary.ratings if summary else None,
+                'title': summary.title,
+                'category': summary.category,
+                'objective': summary.objective,
+                'ratings': summary.ratings,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     summary.exploration_model_last_updated
-                ) if summary else None,
+                ),
                 'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                     summary.category),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
