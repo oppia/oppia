@@ -161,6 +161,16 @@
         {% endif %}
       </div>
 
+      <div>
+        <exploration-summary-tile title="summaryTileData.title"
+                                  last-updated-msec="summaryTileData.lastUpdatedMsec"
+                                  num-views="summaryTileData.numViews"
+                                  objective="summaryTileData.objective"
+                                  star-rating="summaryTileData.starRating"
+                                  thumbnail-image-url="summaryTileData.thumbnailImageUrl">
+        </exploration-summary-tile>
+      </div>
+
       <div class="oppia-gallery-tiles-area">
         <div class="oppia-gallery-tiles-container">
           <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
@@ -252,6 +262,7 @@
 
   {% include 'components/exploration_creation_button.html' %}
   {% include 'components/ratings.html' %}
+  {% include 'components/exploration_summary_tile.html' %}
 
   <script type="text/ng-template" id="modals/splashVideo">
     <div class="modal-body">
@@ -265,6 +276,7 @@
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/explorationSummaryTile.js') }}
     {{ include_js_file('components/explorationCreationButton.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
     {{ include_js_file('components/ratings.js')}}
