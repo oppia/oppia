@@ -213,6 +213,7 @@ html, body {
 .conversation-skin-help-card-content {
   border-radius: 2px;
   display: inline-block;
+  max-width: 100%;
   position: relative;
   text-align: left;
 }
