@@ -198,6 +198,8 @@ oppia.directive('conversationSkin', [function() {
       $scope.currentProgressDotIndex = null;
       $scope.arePreviousResponsesShown = false;
 
+      $scope.loadSupplement = true;
+
       $scope.waitingForContinueButtonClick = false;
 
       $scope.upcomingStateName = null;
@@ -368,8 +370,13 @@ oppia.directive('conversationSkin', [function() {
 
         if ($scope.canWindowFitTwoCards() && !previousSupplementalCardIsNonempty &&
             nextSupplementalCardIsNonempty) {
+          // TODO(sll): Remove this hack. (It exists to ensure that Pencil
+          // Code's loading does not interfere with the animation to two
+          // side-by-side cards.
+          $scope.loadSupplement = false;
           animateToTwoCards(function() {
             $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
+            $scope.loadSupplement = true;
           });
         } else if (
             $scope.canWindowFitTwoCards() && previousSupplementalCardIsNonempty &&
