@@ -81,7 +81,7 @@ oppia.animation('.conversation-skin-animate-cards', function() {
     } else if (className === 'animate-to-one-card') {
       supplementalCardElt.css('opacity', '0');
       tutorCardElt.animate({
-        'margin-left': '306px'
+        'margin-left': '262px'
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
         tutorCardElt.css('margin-left', 'auto');
         tutorCardElt.css('margin-right', 'auto');
