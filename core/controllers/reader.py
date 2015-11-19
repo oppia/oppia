@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the Oppia learner view."""
+"""Controllers for the Oppia exploration learner view."""
 
 __author__ = 'Sean Lip'
 
 import logging
 
 from core.controllers import base
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -179,31 +181,30 @@ class ExplorationPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'player'
 
-    def _make_first_letter_uppercase(self, s):
-        """Converts the first letter of a string to its uppercase equivalent,
-        and returns the result.
-        """
-        # This guards against empty strings.
-        if s:
-            return s[0].upper() + s[1:]
-        else:
-            return s
-
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
-        version = self.request.get('v')
-        if not version:
-            # The default value for a missing parameter seems to be ''.
-            version = None
-        else:
-            version = int(version)
+        version_str = self.request.get('v')
+        version = int(version_str) if version_str else None
+
+        # Note: this is an optional argument and will be None when the
+        # exploration is being played outside the context of a collection.
+        collection_id = self.request.get('collection_id')
 
         try:
             exploration = exp_services.get_exploration_by_id(
                 exploration_id, version=version)
         except Exception as e:
             raise self.PageNotFoundException(e)
+
+        collection_title = None
+        if collection_id:
+            try:
+                collection = collection_services.get_collection_by_id(
+                    collection_id)
+                collection_title = collection.title
+            except Exception as e:
+                raise self.PageNotFoundException(e)
 
         version = exploration.version
 
@@ -247,6 +248,8 @@ class ExplorationPage(base.BaseHandler):
                 dependencies_html),
             'exploration_title': exploration.title,
             'exploration_version': version,
+            'collection_id': collection_id,
+            'collection_title': collection_title,
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'iframed': is_iframed,
             'interaction_templates': jinja2.utils.Markup(
@@ -256,8 +259,7 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_name': exploration.title,
             # Note that this overwrites the value in base.py.
-            'meta_description': self._make_first_letter_uppercase(
-                exploration.objective),
+            'meta_description': utils.capitalize_string(exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
@@ -289,22 +291,16 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        info_card_color = (
-            feconf.CATEGORIES_TO_COLORS[exploration.category] if
-            exploration.category in feconf.CATEGORIES_TO_COLORS else
-            feconf.DEFAULT_COLOR)
-
         self.values.update({
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'info_card_image_url': (
-                '/images/gallery/exploration_background_%s_large.png' %
-                info_card_color),
+            'info_card_image_url': utils.get_info_card_url_for_category(
+                exploration.category),
             'is_logged_in': bool(self.user_id),
-            'session_id': utils.generate_random_string(24),
+            'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
         })
         self.render_json(self.values)
@@ -442,6 +438,12 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests."""
+
+        # This will be None if the exploration is not being played within the
+        # context of a collection.
+        collection_id = self.payload.get('collection_id')
+        user_id = self.user_id
+
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
@@ -450,6 +452,10 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+
+        if user_id and collection_id:
+            collection_services.record_played_exploration_in_collection_context(
+                user_id, collection_id, exploration_id)
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
@@ -507,14 +513,29 @@ class RatingHandler(base.BaseHandler):
 
 
 class RecommendationsHandler(base.BaseHandler):
-    """Provides recommendations to be displayed at the end of explorations."""
+    """Provides recommendations to be displayed at the end of explorations.
+    Which explorations are provided depends on whether the exploration was
+    played within the context of a collection and whether the user is logged in.
+    If both are true, then the explorations are suggested from the collection,
+    if there are upcoming explorations for the learner to complete.
+    """
 
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
-        self.values.update({
-            'recommended_exp_ids': (
+        collection_id = self.request.get('collection_id')
+
+        recommended_exp_ids = []
+        if self.user_id and collection_id:
+            recommended_exp_ids = (
+                collection_services.get_next_exploration_ids_to_complete_by_user(
+                    self.user_id, collection_id))
+        else:
+            recommended_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
                     exploration_id))
+
+        self.values.update({
+            'recommended_exp_ids': recommended_exp_ids
         })
         self.render_json(self.values)

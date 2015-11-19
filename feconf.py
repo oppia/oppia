@@ -276,11 +276,13 @@ DEMO_EXPLORATIONS = [
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
-DEMO_COLLECTIONS = [
-    'welcome_to_collections.yaml'
-]
+DEMO_COLLECTIONS = {
+    u'0': 'welcome_to_collections.yaml'
+}
 
 # TODO(sll): Add all other URLs here.
+COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
+COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'

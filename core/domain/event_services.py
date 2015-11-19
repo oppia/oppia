@@ -23,7 +23,7 @@ import inspect
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
-(stats_models,feedback_models) = models.Registry.import_models([
+(stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import feconf
