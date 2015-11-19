@@ -390,12 +390,15 @@ oppia.factory('extensionTagAssemblerService', [
 }]);
 
 // TEMPORARY
-oppia.factory('researchEventsService', ['$http', function($http) {
+oppia.factory('researchEventsService', ['$http', '$window', function($http, $window) {
   return {
     recordEvent: function(eventType, eventData) {
-      $http.post('/researcheventshandler/' + eventType, {
-        event_data: eventData
-      });
+      var url = $window.location.href;
+      if (url.indexOf('collection') !== -1 || url.indexOf('explore') !== -1) {
+        $http.post('/researcheventshandler/' + eventType, {
+          event_data: eventData
+        });
+      }
     }
   };
 }]);

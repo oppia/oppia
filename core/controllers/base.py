@@ -625,6 +625,9 @@ class ResearchEventsHandler(BaseHandler):
 
     def post(self, event_type):
         """Handles POST requests."""
+        if not self.user_id:
+            return
+
         event_data = self.payload.get('event_data')
 
         event_services.record_research_event(
