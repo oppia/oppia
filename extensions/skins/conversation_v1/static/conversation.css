@@ -137,8 +137,8 @@ html, body {
   opacity: 1;
   padding: 12px;
   position: absolute;
-  right: -12px;
-  top: -12px;
+  right: 12px;
+  bottom: 12px;
   text-align: left;
   transition: all 350ms;
   z-index: 500;
@@ -468,11 +468,6 @@ div.conversation-skin-supplemental-card {
   div.conversation-skin-supplemental-card,
   .conversation-skin-main-tutor-card {
     width: 100%;
-  }
-
-  .conversation-skin-help-card {
-    right: 4px;
-    top: 4px;
   }
 
   .conversation-skin-user-avatar,
