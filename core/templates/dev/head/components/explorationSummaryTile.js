@@ -20,15 +20,10 @@
 
 oppia.directive('explorationSummaryTile', [function() {
   return {
-    // This will display a star-rating based on the given data. The attributes
-    // passed in are as follows:
-    //  - isEditable: true or false; whether the rating is user-editable.
-    //  - onEdit: should be supplied iff isEditable is true, and be a function
-    //    that will be supplied with the new rating when the rating is changed.
-    //  - ratingValue: an integer 1-5 giving the rating
     restrict: 'E',
     scope: {
-      getId: '&explorationId',
+      getCollectionId: '&collectionId',
+      getExplorationId: '&explorationId',
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getNumViews: '&numViews',
       getObjective: '&objective',
@@ -43,6 +38,12 @@ oppia.directive('explorationSummaryTile', [function() {
         $scope.lastUpdatedDatetime = (
           oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec()));
+
+        $scope.explorationLink = '/explore/' + $scope.getExplorationId();
+        if ($scope.getCollectionId()) {
+          $scope.explorationLink += (
+            '?collection_id=' + $scope.getCollectionId());
+        }
       }
     ]
   };

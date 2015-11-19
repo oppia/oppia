@@ -393,10 +393,11 @@ oppia.factory('extensionTagAssemblerService', [
 oppia.factory('researchEventsService', ['$http', '$window', function($http, $window) {
   return {
     recordEvent: function(eventType, eventData) {
-      var url = $window.location.href;
+      var url = $window.location.pathname;
       if (url.indexOf('collection') !== -1 || url.indexOf('explore') !== -1) {
         $http.post('/researcheventshandler/' + eventType, {
-          event_data: eventData
+          event_data: eventData,
+          page_url: url
         });
       }
     }

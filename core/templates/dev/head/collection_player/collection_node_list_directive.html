@@ -1,17 +1,11 @@
 <script type="text/ng-template" id="inline/collection_node_list_directive">
-  <md-card ng-repeat="collection_node in getCollectionNodes()" layout="row" class="oppia-collection-player-tile protractor-test-collection-player-tile">
-    <a ng-href="/explore/<[collection_node.exploration.id]>?collection_id=<[getCollectionId()]>" class="oppia-collection-player-tile-container-link" style="text-decoration: none;">
-      <div class="oppia-collection-player-tile-contents">
-        <span class="oppia-collection-player-tile-image-container">
-          <img class="oppia-collection-player-tile-image" ng-src="/images/gallery/exploration_background_teal_small.png">
-        </span>
 
-        <div class="oppia-collection-player-tile-details">
-          <span class="oppia-collection-player-tile-title protractor-test-gallery-tile-title">
-            <[collection_node.exploration.title]>
-          </span>
-        </div>
-      </div>
-    </a>
-  </md-card>
+  <exploration-summary-tile ng-repeat="collection_node in getCollectionNodes()"
+                            collection-id="getCollectionId()"
+                            exploration-id="collection_node.exploration.id"
+                            last-updated-msec="collection_node.exploration.last_updated_msec"
+                            objective="collection_node.exploration.objective"
+                            title="collection_node.exploration.title"
+                            thumbnail-image-url="DEFAULT_EXPLORATION_IMAGE_URL">
+  </exploration-summary-tile>
 </script>

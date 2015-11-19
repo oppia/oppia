@@ -14,6 +14,10 @@ nodes:
   exploration_id: 'oKguvdSoVcmZ'
   prerequisite_skills:
   - Variables
+- acquired_skills: []
+  exploration_id: '.n8ct5R2M5TTx'
+  prerequisite_skills:
+  - Conditionals
 objective: Learn how to code!
 schema_version: 1
 title: Programming with Carla

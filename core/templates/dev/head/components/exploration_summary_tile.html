@@ -7,6 +7,7 @@
     padding: 0;
     position: relative;
     text-align: left;
+    vertical-align: top;
     width: 240px;
   }
 
@@ -49,7 +50,7 @@
     display: block;
     margin: 0 auto;
     height: 50px;
-    top: 24px;
+    top: 36px;
     position: relative;
   }
 
@@ -92,9 +93,9 @@
 
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-exploration-summary-tile">
-    <a ng-href="/explore/<[getId()]>">
+    <a ng-href="<[explorationLink]>">
       <div class="top-section">
-        <img class="thumbnail-image" src="/images/gallery/arithmetic.svg">
+        <img class="thumbnail-image" src="/images/gallery/computer.svg">
         <h2 class="exploration-title"><[getTitle()]></h2>
       </div>
 
@@ -103,23 +104,22 @@
           <[getObjective() | truncateAndCapitalize: 95]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
-        <ul layout="row" class="metrics" layout-align="space-between center">
-          <li>
+        <ul layout="row" class="metrics pull-right" layout-align="space-between center">
+          <li ng-if="getStarRating()">
             <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
             </span>
             <span ng-if="explorationRatings === 0">Unrated</span>
             <span ng-if="explorationRatings !== 0"><[getStarRating()]></span>
           </li>
 
-          <li>
+          <li ng-if="getNumViews()">
             <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top">
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
 
           <li>
-            <span class="fa fa-clock-o fa-lg" tooltip="Last Updated" tooltip-placement="top">
-            </span>
+            <em>Last updated:</em>&nbsp;
             <[lastUpdatedDatetime]>
           </li>
         </ul>

@@ -629,8 +629,9 @@ class ResearchEventsHandler(BaseHandler):
             return
 
         event_data = self.payload.get('event_data')
+        page_url = self.payload.get('page_url')
 
         event_services.record_research_event(
-            self.user_id, self.request.uri,
+            self.user_id, page_url,
             utils.get_current_time_in_millisecs(),
             event_type, event_data)

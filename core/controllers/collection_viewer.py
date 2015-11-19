@@ -17,15 +17,12 @@
 __author__ = 'Ben Henning'
 
 from core.controllers import base
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
 (user_models,) = models.Registry.import_models([models.NAMES.user])
-import feconf
 import utils
 
 
@@ -94,10 +91,10 @@ class CollectionDataHandler(base.BaseHandler):
         exp_summaries = (
             exp_services.get_exploration_summaries_matching_ids(exp_ids))
 
-        exp_titles_dict = {}
+        exp_summaries_dict = {}
         for (ind, exp_id) in enumerate(exp_ids):
             exp_summary = exp_summaries[ind]
-            exp_titles_dict[exp_id] = exp_summary.title if exp_summary else ''
+            exp_summaries_dict[exp_id] = exp_summary
 
         # TODO(bhenning): Users should not be recommended explorations they
         # have completed outside the context of a collection.
@@ -126,7 +123,21 @@ class CollectionDataHandler(base.BaseHandler):
         for collection_node in collection_dict['nodes']:
             collection_node['exploration'] = {
                 'id': collection_node['exploration_id'],
-                'title': exp_titles_dict[collection_node['exploration_id']]
+                'title': (
+                    exp_summaries_dict[collection_node['exploration_id']].title
+                    if exp_summaries_dict[collection_node['exploration_id']]
+                    else None),
+                'objective': (
+                    exp_summaries_dict[
+                        collection_node['exploration_id']].objective
+                    if exp_summaries_dict[collection_node['exploration_id']]
+                    else None),
+                'last_updated_msec': (
+                    utils.get_time_in_millisecs(exp_summaries_dict[
+                        collection_node['exploration_id']
+                    ].exploration_model_last_updated)
+                    if exp_summaries_dict[collection_node['exploration_id']]
+                    else None),
             }
 
         self.values.update({
