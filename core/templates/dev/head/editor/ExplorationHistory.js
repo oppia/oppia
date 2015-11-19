@@ -97,6 +97,7 @@ oppia.controller('ExplorationHistory', [
       }
     }
   };
+
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
     $rootScope.loadingMessage = 'Loading';
