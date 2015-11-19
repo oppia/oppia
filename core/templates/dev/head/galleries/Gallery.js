@@ -130,7 +130,7 @@ oppia.controller('Gallery', [
   $scope.summaryTileData = {
     lastUpdatedMsec: 1447842330649,
     numViews: 1800,
-    objective: 'An introduction to proofs, logic, and solving problems.',
+    objective: 'An introduction to proofs, logic, and solving problems. Testing how long this can go. Lots and lots of lines are being placed here, thanks.',
     starRating: 4.5,
     thumbnailImageUrl: '/images/gallery/exploration_background_teal_small.png',
     title: 'Thinking like a mathematician'
