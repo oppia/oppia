@@ -22,6 +22,9 @@
 
   <div ng-hide="!isInteractionIdSet || isCurrentStateTerminal">
     {% include 'editor/state_editor_responses.html' %}
+    <div ng-if="areFallbacksEnabled()">
+      {% include 'editor/state_editor_fallbacks.html' %}
+    </div>
   </div>
 
   <div>

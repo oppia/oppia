@@ -21,10 +21,7 @@ __author__ = 'Sean Lip'
 
 import logging
 
-from core.domain import collection_domain
 from core.domain import config_domain
-from core.domain import event_services
-from core.domain import exp_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -610,11 +607,6 @@ def _change_activity_status(
         committer_id, activity_rights, activity_type, commit_message,
         commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
-
-    if activity_type == ACTIVITY_TYPE_EXPLORATION:
-        event_services.ExplorationStatusChangeEventHandler.record(activity_id)
-    elif activity_type == ACTIVITY_TYPE_COLLECTION:
-        event_services.CollectionStatusChangeEventHandler.record(activity_id)
 
 
 def _publish_activity(committer_id, activity_id, activity_type):

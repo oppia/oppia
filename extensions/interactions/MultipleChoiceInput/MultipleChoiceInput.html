@@ -1,20 +1,22 @@
 <style>
-  .multiple-choice-form-container {
-    margin-left: -15px;
-    margin-top: -10px;
+  .multiple-choice-option-container {
+    padding: 4px 0;
   }
 
   .multiple-choice-option {
     background: none;
     border: none;
     color: #0D48A1;
-    margin: 0;
-    padding-left: 0;
-    padding-top: 15px;
     text-align: left;
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
   }
+
+  .multiple-choice-radio-button-container,
+  .multiple-choice-content-container {
+    display: table-cell;
+  }
+
 
   .multiple-choice-option:hover {
     color: #115FD4;
@@ -33,50 +35,32 @@
     border-color: #115FD4;
   }
 
-  .multiple-choice-option-container {
-    margin-bottom: 5px;
-  }
-
-  .multiple-choice-radio-container {
-    display: inline-block;
-    padding-right: 5px;
-  }
-
   .multiple-choice-outer-radio-button {
     border: 2px solid #0D48A1;
     border-radius: 50%;
-    display: block;
-    float: left;
+    display: inline-block;
     height: 16px;
     margin-bottom: -2px;
+    margin-right: 12px;
     width: 16px;
   }
 </style>
 
 <script type="text/ng-template" id="interaction/MultipleChoiceInput">
-  <div class="multiple-choice-form-container">
-    <form ng-submit="submitAnswer(answer)">
-      <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
-        <button class="multiple-choice-option" ng-click="submitAnswer($index)">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                <div class="multiple-choice-radio-container">
-                  <span class="multiple-choice-outer-radio-button">
-                    <span class="multiple-choice-inner-radio-button"></span>
-                  </span>
-                </div>
-              </div>
-              <!-- With col-xs-11, the choice text gets pushed to the next line on small screens. So we use col-xs-10 instead. -->
-              <div class="col-lg-11 col-md-11 col-sm-11 col-xs-10">
-                <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
-              </div>
-            </div>
-          </div>
-        </button>
-      </div>
-    </form>
-  </div>
+  <form ng-submit="submitAnswer(answer)">
+    <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
+      <button class="multiple-choice-option" ng-click="submitAnswer($index)">
+        <div class="multiple-choice-radio-button-container">
+          <span class="multiple-choice-outer-radio-button">
+            <span class="multiple-choice-inner-radio-button"></span>
+          </span>
+        </div>
+        <div class="multiple-choice-content-container">
+          <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
+        </div>
+      </button>
+    </div>
+  </form>
 </script>
 
 <script type="text/ng-template" id="response/MultipleChoiceInput">

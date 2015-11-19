@@ -88,6 +88,8 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
+    NEW_USER_EMAIL = 'new.user@example.com'
+    NEW_USER_USERNAME = 'newuser'
     DEFAULT_END_STATE_NAME = 'End'
 
     VERSION_0_STATES_DICT = {
@@ -431,8 +433,8 @@ class TestBase(unittest.TestCase):
         functionality. This is replicated here so backend tests may utilize the
         functionality of PlayerServices.js without being able to access it.
 
-        TODO(bhenning): Replicate this in an integration test to protect
-        against code skew here.
+        TODO(bhenning): Replicate this in an end-to-end Protractor test to
+        protect against code skew here.
         """
         if params is None:
             params = {}

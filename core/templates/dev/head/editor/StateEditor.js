@@ -35,6 +35,8 @@ oppia.controller('StateEditor', [
 
   $scope.areParametersEnabled = (
     explorationAdvancedFeaturesService.areParametersEnabled);
+  $scope.areFallbacksEnabled = (
+    explorationAdvancedFeaturesService.areFallbacksEnabled);
 
   $scope.isCurrentStateTerminal = false;
   $scope.isInteractionIdSet = false;

@@ -394,8 +394,7 @@ class Collection(object):
     @classmethod
     def is_demo_collection_id(cls, collection_id):
         """Whether the collection id is that of a demo collection."""
-        return collection_id.isdigit() and (
-            0 <= int(collection_id) < len(feconf.DEMO_COLLECTIONS))
+        return collection_id in feconf.DEMO_COLLECTIONS
 
     @property
     def is_demo(self):

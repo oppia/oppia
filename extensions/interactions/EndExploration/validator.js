@@ -30,14 +30,14 @@ oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
     if (answerGroups.length != 0) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
-        message: 'please make sure end exploration interactions do not have ' +
+        message: 'Please make sure end exploration interactions do not have ' +
           'any answer groups.'
       });
     }
     if (defaultOutcome) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
-        message: 'please make sure end exploration interactions do not have ' +
+        message: 'Please make sure end exploration interactions do not have ' +
           'a default outcome.'
       });
     }
@@ -45,7 +45,7 @@ oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
     if (customizationArgs.recommendedExplorationIds.value.length > 8) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'at most 8 explorations can be recommended.'
+        message: 'At most 8 explorations can be recommended.'
       });
     }
 
