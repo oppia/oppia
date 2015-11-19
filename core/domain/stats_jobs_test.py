@@ -389,17 +389,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             FIRST_STATE_NAME = exp.init_state_name
             SECOND_STATE_NAME = 'State 2'
             exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': 'edit_state_property',
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': FIRST_STATE_NAME,
-                'property_name': 'widget_id',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput',
             }, {
-                'cmd': 'add_state',
+                'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': SECOND_STATE_NAME,
             }, {
-                'cmd': 'edit_state_property',
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': SECOND_STATE_NAME,
-                'property_name': 'widget_id',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput',
             }], 'Add new state')
             exp = exp_services.get_exploration_by_id(exp_id)
@@ -408,10 +408,10 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             time_spent = 5.0
             params = {}
 
-            self._record_start(exp_id, exp_version, FIRST_STATE_NAME,
-                               'session1')
-            self._record_start(exp_id, exp_version, FIRST_STATE_NAME,
-                               'session2')
+            self._record_start(
+                exp_id, exp_version, FIRST_STATE_NAME, 'session1')
+            self._record_start(
+                exp_id, exp_version, FIRST_STATE_NAME, 'session2')
             self.process_and_flush_pending_tasks()
 
             # add some answers
@@ -438,14 +438,14 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
 
-            calc_id = 'AnswerCounts'
-            
+            calc_id = 'AnswerFrequencies'
+
             # get job output of first state and check it
             calc_output_domain_object = (
                 stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
                     exp_id, exp_version, FIRST_STATE_NAME, calc_id))
-            self.assertEqual('AnswerCounts',
-                             calc_output_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies', calc_output_domain_object.calculation_id)
 
             calculation_output = calc_output_domain_object.calculation_output
 
@@ -457,17 +457,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'frequency': 1
             }]
 
-            self.assertEqual(calculation_output,
-                             expected_calculation_output)
+            self.assertEqual(
+                calculation_output, expected_calculation_output)
 
             # get job output of second state and check it
             calc_output_domain_object = (
                 stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
                     exp_id, exp_version, SECOND_STATE_NAME, calc_id))
 
-            self.assertEqual('AnswerCounts',
-                             calc_output_domain_object.calculation_id)
-            
+            self.assertEqual(
+                'AnswerFrequencies', calc_output_domain_object.calculation_id)
+
             calculation_output = calc_output_domain_object.calculation_output
 
             expected_calculation_output = [{

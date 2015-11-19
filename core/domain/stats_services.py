@@ -228,33 +228,29 @@ def get_exploration_stats(exploration_id, exploration_version):
 def record_answer(exploration_id, exploration_version, state_name,
                   handler_name, rule_str, session_id, time_spent_in_sec,
                   params, answer_value):
-    """
-    Record an answer by storing it to the corresponding StateAnswers entity.
+    """Record an answer by storing it to the corresponding StateAnswers entity.
     """
     # Retrieve state_answers from storage
     state_answers = get_state_answers(
         exploration_id, exploration_version, state_name)
 
     # Get interaction id from state_answers if it is stored there or
-    # obtain it from the exploration (note that if the interaction id 
+    # obtain it from the exploration (note that if the interaction id
     # of a state is changed by editing the exploration then this will
     # correspond to a new version of the exploration, for which a new
     # state_answers entity with correct updated interaction_id will
     # be created when the first answer is recorded).
     # If no interaction id exists, use None as placeholder.
-    interaction_id = None
-    if state_answers is not None:
-        interaction_id = state_answers.interaction_id
+    interaction_id = state_answers.interaction_id if state_answers else None
 
-    if interaction_id is None:
+    if not interaction_id:
         # retrieve exploration and read its interaction id
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=exploration_version)
-        if exploration.states[state_name].interaction.id:
-            interaction_id = exploration.states[state_name].interaction.id
+        interaction_id = exploration.states[state_name].interaction.id
 
     # Construct answer_dict and validate it
-    answer_dict = {'answer_value': answer_value, 
+    answer_dict = {'answer_value': answer_value,
                    'time_spent_in_sec': time_spent_in_sec,
                    'rule_str': rule_str,
                    'session_id': session_id,
@@ -268,27 +264,25 @@ def record_answer(exploration_id, exploration_version, state_name,
         state_answers.answers_list.append(answer_dict)
     else:
         state_answers = stats_domain.StateAnswers(
-            exploration_id, exploration_version, 
+            exploration_id, exploration_version,
             state_name, interaction_id, [answer_dict])
     _save_state_answers(state_answers)
 
 
 def _save_state_answers(state_answers):
-    """
-    Validate StateAnswers domain object and commit to storage.
-    """
-    stats_domain.StateAnswers.validate(state_answers)
+    """Validate StateAnswers domain object and commit to storage."""
+
+    state_answers.validate()
     state_answers_model = stats_models.StateAnswersModel.create_or_update(
-        state_answers.exploration_id, state_answers.exploration_version, 
-        state_answers.state_name, state_answers.interaction_id, 
+        state_answers.exploration_id, state_answers.exploration_version,
+        state_answers.state_name, state_answers.interaction_id,
         state_answers.answers_list)
     state_answers_model.save()
 
 
 def get_state_answers(exploration_id, exploration_version, state_name):
-    """
-    Get state answers domain object obtained from 
-    StateAnswersModel instance stored in data store.
+    """Get state answers domain object obtained from StateAnswersModel instance
+    stored in data store.
     """
     state_answers_model = stats_models.StateAnswersModel.get_model(
         exploration_id, exploration_version, state_name)
@@ -302,8 +296,7 @@ def get_state_answers(exploration_id, exploration_version, state_name):
 
 
 def _validate_answer(answer_dict):
-    """
-    Validate answer dicts. In particular, check the following:
+    """Validate answer dicts. In particular, check the following:
 
     - Minimum set of keys: 'answer_value', 'time_spent_in_sec',
             'session_id'
@@ -313,7 +306,7 @@ def _validate_answer(answer_dict):
 
     # TODO(msl): These validation methods need tests to ensure that
     # the right errors show up in the various cases.
-    
+
     # Minimum set of keys required for answer_dicts in answers_list
     REQUIRED_ANSWER_DICT_KEYS = ['answer_value', 'time_spent_in_sec',
                                  'session_id']
@@ -342,7 +335,7 @@ def _validate_answer(answer_dict):
     if not required_keys.issubset(actual_keys):
         missing_keys = required_keys.difference(actual_keys)
         raise utils.ValidationError(
-            ('answer_dict misses required keys %s' % missing_keys))
+            'answer_dict is missing required keys %s' % missing_keys)
 
     # check entries of answer_dict
     if (sys.getsizeof(answer_dict['answer_value']) >
@@ -374,4 +367,4 @@ def _validate_answer(answer_dict):
         raise utils.ValidationError(
             'Expected time_spent_in_sec to be non-negative, received %f' %
             answer_dict['time_spent_in_sec'])
-        
+

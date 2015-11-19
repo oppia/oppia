@@ -98,8 +98,8 @@ class StateAnswers(object):
         """
         Initialize domain object for state answers.
 
-        interaction_id contains interaction type of the state, e.g. multiple
-        choice. It is None if no interaction id can be retrieved.
+        interaction_id contains the interaction type of the state, e.g.
+        multiple choice.
 
         answers_list contains a list of answer dicts, each of which
         contains information about an answer, e.g. answer_value, session_id,
@@ -132,7 +132,7 @@ class StateAnswers(object):
 
             # check if interaction_id is valid
             if (self.interaction_id not in
-                interaction_registry.Registry.get_all_interaction_ids()):
+                    interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
                     'Unknown interaction id %s' % self.interaction_id)
 
@@ -148,18 +148,16 @@ class StateAnswers(object):
 
 
 class StateAnswersCalcOutput(object):
-    """
-    Domain object that represents output of calculations operating on
+    """Domain object that represents output of calculations operating on
     state answers.
     """
 
     def __init__(self, exploration_id, exploration_version, state_name,
                  calculation_id, calculation_output):
-        """
-        Initialize domain object for state answers calculation output.
+        """Initialize domain object for state answers calculation output.
 
-        calculation_output is a dict with keys calculation_description
-        and data.
+        calculation_output is a list of dicts containing the results of the
+        specific calculation.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -168,17 +166,14 @@ class StateAnswersCalcOutput(object):
         self.calculation_output = calculation_output
 
     def save(self):
-        """
-        Validate domain object and commit to storage.
-        """
+        """Validate the domain object and commit it to storage."""
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
             self.calculation_id, self.calculation_output)
 
     def validate(self):
-        """
-        Validates StateAnswersCalcOutputModel domain object entity before
+        """Validates StateAnswersCalcOutputModel domain object entity before
         it is commited to storage.
         """
 

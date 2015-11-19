@@ -60,7 +60,7 @@ class LogicProof(base.BaseInteraction):
             'column_headers': ['Answer', 'Count'],
             'title': 'Top 5 answers'
         },
-        'calculation_id': 'Top5AnswerCounts',
+        'calculation_id': 'Top5AnswerFrequencies',
     }, {
         # Table with answer counts.
         'id': 'FrequencyTable',
@@ -68,6 +68,6 @@ class LogicProof(base.BaseInteraction):
             'column_headers': ['Answer', 'Count'],
             'title': 'All answers'
         },
-        'calculation_id': 'AnswerCounts',
+        'calculation_id': 'AnswerFrequencies',
     }]
 

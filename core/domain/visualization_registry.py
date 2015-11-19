@@ -59,8 +59,9 @@ class Registry(object):
     def get_visualization_class(cls, visualization_id):
         """Gets a visualization class by its id (which is also its class name).
 
-        Refreshes once if the class is not found; subsequently, throws an
-        error."""
+        The registry will refresh if the desired class is not found. If it's
+        still not found after the refresh, this method will throw an error.
+        """
         if visualization_id not in cls.visualizations_dict:
             cls._refresh_registry()
         if visualization_id not in cls.visualizations_dict:
@@ -71,9 +72,6 @@ class Registry(object):
     @classmethod
     def get_all_visualization_ids(cls):
         """Gets a visualization class by its id (which is also its class name).
-
-        Refreshes once if the class is not found; subsequently, throws an
-        error.
         """
         if not cls.visualizations_dict:
             cls._refresh_registry()

@@ -50,5 +50,3 @@ class EndExploration(base.BaseInteraction):
         },
         'default_value': [],
     }]
-
-    _answer_visualization_specs = []

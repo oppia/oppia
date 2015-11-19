@@ -92,8 +92,7 @@ class FrequencyTable(BaseVisualization):
             },
             'len': 2,
         },
-    },
-    {
+    }, {
         'name': 'title',
         'description': 'The title of the visualization.',
         'schema': {'type': 'unicode'}

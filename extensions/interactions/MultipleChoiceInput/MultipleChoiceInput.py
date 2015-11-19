@@ -56,7 +56,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             'x_axis_label': 'Answer',
             'y_axis_label': 'Count',
         },
-        'calculation_id': 'AnswerCounts',
+        'calculation_id': 'AnswerFrequencies',
     }, {
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
@@ -64,7 +64,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             'column_headers': ['Answer', 'Count'],
             'title': 'Top 5 answers'
         },
-        'calculation_id': 'Top5AnswerCounts',
+        'calculation_id': 'Top5AnswerFrequencies',
     }, {
         # Table with answer counts.
         'id': 'FrequencyTable',
@@ -72,5 +72,5 @@ class MultipleChoiceInput(base.BaseInteraction):
             'column_headers': ['Answer', 'Count'],
             'title': 'All answers'
         },
-        'calculation_id': 'AnswerCounts',
+        'calculation_id': 'AnswerFrequencies',
     }]

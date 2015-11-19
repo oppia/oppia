@@ -581,9 +581,6 @@ class StateAnswersModel(base_models.BaseModel):
                          str(exploration_version),
                          state_name])
 
-    def get_exploration_id_and_version_and_state_name(self):
-        return self.exploration_id, self.exploration_version, self.state_name
-
     def save(self):
         """Commit to storage."""
         # This may fail if answers_list is too large.
@@ -607,8 +604,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def create_or_update(cls, exploration_id, exploration_version, state_name,
                          calculation_id, calculation_output):
-        instance_id = cls._get_entity_id(exploration_id, exploration_version,
-                                         state_name, calculation_id)
+        instance_id = cls._get_entity_id(
+            exploration_id, exploration_version, state_name, calculation_id)
         instance = cls.get(instance_id, strict=False)
         if not instance:
             # create new instance
@@ -628,7 +625,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             pass
 
     @classmethod
-    def get_model(cls, exploration_id, exploration_version, state_name, 
+    def get_model(cls, exploration_id, exploration_version, state_name,
                   calculation_id):
         entity_id = cls._get_entity_id(
             exploration_id, str(exploration_version), state_name, calculation_id)
@@ -638,7 +635,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def _get_entity_id(cls, exploration_id, exploration_version, state_name,
                        calculation_id):
-        return ':'.join([exploration_id,
-                         str(exploration_version),
-                         state_name,
-                         calculation_id])
+        return ':'.join([
+            exploration_id, str(exploration_version), state_name,
+            calculation_id])

@@ -173,17 +173,17 @@ class StateAnswersTests(test_utils.GenericTestBase):
         FIRST_STATE_NAME = exp.init_state_name
         SECOND_STATE_NAME = 'State 2'
         exp_services.update_exploration('fake@user.com', 'eid', [{
-            'cmd': 'edit_state_property',
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': FIRST_STATE_NAME,
-            'property_name': 'widget_id',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput',
         }, {
-            'cmd': 'add_state',
+            'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': SECOND_STATE_NAME,
         }, {
-            'cmd': 'edit_state_property',
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': SECOND_STATE_NAME,
-            'property_name': 'widget_id',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput',
         }], 'Add new state')
         exp = exp_services.get_exploration_by_id('eid')
@@ -224,27 +224,27 @@ class StateAnswersTests(test_utils.GenericTestBase):
         expected_answers_list1 = [
             {'handler_name': 'submit', 'answer_value': 'answer1',
              'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid1', 'interaction_id': 'TextInput', 
+             'session_id': 'sid1', 'interaction_id': 'TextInput',
              'params': {}},
             {'handler_name': 'submit', 'answer_value': 'answer1',
              'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid2', 'interaction_id': 'TextInput', 
+             'session_id': 'sid2', 'interaction_id': 'TextInput',
              'params': {}},
-            {'handler_name': 'submit', 
+            {'handler_name': 'submit',
              'answer_value': {'x': 1.0, 'y': 5.0},
              'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid1', 'interaction_id': 'TextInput', 
+             'session_id': 'sid1', 'interaction_id': 'TextInput',
              'params': {}}]
         expected_answers_list2 = [
-            {'handler_name': 'submit', 
+            {'handler_name': 'submit',
              'answer_value': [2, 4, 8],
              'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid3', 'interaction_id': 'TextInput', 
+             'session_id': 'sid3', 'interaction_id': 'TextInput',
              'params': {}},
-            {'handler_name': 'submit', 
+            {'handler_name': 'submit',
              'answer_value': self.UNICODE_TEST_STRING,
              'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid4', 'interaction_id': 'TextInput', 
+             'session_id': 'sid4', 'interaction_id': 'TextInput',
              'params': {}}]
 
         state_answers = stats_services.get_state_answers(

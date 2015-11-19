@@ -37,7 +37,7 @@ class SetInput(base.BaseInteraction):
             'column_headers': ['Answer', 'Count'],
             'title': 'Top 5 answers'
         },
-        'calculation_id': 'Top5AnswerCounts',
+        'calculation_id': 'Top5AnswerFrequencies',
     }, {
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
@@ -53,5 +53,5 @@ class SetInput(base.BaseInteraction):
             'column_headers': ['Answer', 'Count'],
             'title': 'All answers'
         },
-        'calculation_id': 'AnswerCounts',
+        'calculation_id': 'AnswerFrequencies',
     }]
