@@ -39,10 +39,6 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', 'oppiaDatetimeFormatter',
       function($scope, oppiaDatetimeFormatter) {
-        $scope.summaryTileBackgroundImageCss = {
-          'background-image': 'url(' + $scope.getThumbnailImageUrl() + ')'
-        };
-
         $scope.lastUpdatedDatetime = (
           oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec()));
