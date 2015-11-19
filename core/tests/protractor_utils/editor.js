@@ -845,8 +845,8 @@ var _runFromHistoryTab = function(callbackFunction) {
 var _selectComparedVersions = function(v1, v2) {
   var v1Position = null;
   var v2Position = null;
-  element.all(by.css('.protractor-test-history-checkbox-selector')).count().then(function(versionNumber) {
-
+  element.all(by.css('.protractor-test-history-checkbox-selector')).count()
+      .then(function(versionNumber) {
     if (v1 < 0) {
       throw Error('In editor._selectComparedVersions(' + v1 + '),' +
       'expected v1 to be >= 0');
@@ -1047,8 +1047,8 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
 var revertToVersion = function(version) {
   _runFromHistoryTab(function() {
     var versionPosition = null;
-    var elem = element.all(by.css(
-      '.protractor-test-history-checkbox-selector')).count().then(function(versionNumber) {
+    var elem = element.all(by.css('.protractor-test-history-checkbox-selector')).count()
+        .then(function(versionNumber) {
       // Note: there is no 'revert' link next to the current version
       versionPosition = versionNumber - version - 1;
       element.all(by.css('.protractor-test-revert-version'))
