@@ -137,13 +137,15 @@ oppia.factory('oppiaPlayerService', [
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
+    'researchEventsService',
     function(
       $http, $rootScope, $modal, $filter, $q, $log, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       answerClassificationService, stateTransitionService,
       extensionTagAssemblerService, INTERACTION_SPECS,
       INTERACTION_DISPLAY_MODE_INLINE, explorationContextService,
-      PAGE_CONTEXT, oppiaExplorationHtmlFormatterService) {
+      PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
+      researchEventsService) {
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _infoCardImageUrl = null;
@@ -166,6 +168,46 @@ oppia.factory('oppiaPlayerService', [
   var _currentStateName = null;
   var answerIsBeingProcessed = false;
   var _viewerHasEditingRights = false;
+
+  // Overwrites similar methods in base.js
+  document.body.addEventListener('click', function() {
+    researchEventsService.recordEvent('click', {
+      exploration_id: _explorationId,
+      state_name: _currentStateName
+    });
+  }, true);
+  document.body.addEventListener('keypress', function(evt) {
+    var key = evt.which || evt.keyCode;
+    if (key === 13) {
+      researchEventsService.recordEvent('enter_keypress', {
+        exploration_id: _explorationId,
+        state_name: _currentStateName
+      });
+    }
+  }, true);
+
+  // Contains list of dicts; each dict has keys:
+  // - state name
+  // - entry_time
+  // - answer_list
+  //   - answer
+  //   - submission_time
+  var _transcript = [];
+
+  var _addStateToTranscript = function(stateName) {
+    _transcript.push({
+      state_name: stateName,
+      entry_time: Date.now(),
+      answer_list: []
+    });
+  };
+
+  var _addAnswerToTranscript = function(answer) {
+    _transcript[_transcript.length - 1].answer_list.push({
+      answer: angular.copy(answer),
+      submission_time: Date.now()
+    });
+  };
 
   // The number of submissions made so far for this state. Incremented
   // immediately after every submit event.
@@ -241,6 +283,12 @@ oppia.factory('oppiaPlayerService', [
           version: version,
           collection_id: _collection_id,
         });
+
+        researchEventsService.recordEvent('complete_activity', {
+          exploration_id: _explorationId,
+          params: angular.copy(learnerParamsService.getAllParams()),
+          transcript: angular.copy(_transcript)
+        });
       }
     }
 
@@ -286,6 +334,9 @@ oppia.factory('oppiaPlayerService', [
     var initStateData = stateTransitionService.getInitStateData(
       _exploration.param_specs, _exploration.param_changes,
       _exploration.states[initStateName]);
+
+    _transcript = [];
+    _addStateToTranscript(initStateName);
 
     if (initStateData) {
       if (!_editorPreviewMode) {
@@ -546,6 +597,15 @@ oppia.factory('oppiaPlayerService', [
 
       answerIsBeingProcessed = true;
       var oldState = angular.copy(_exploration.states[_currentStateName]);
+
+      _addAnswerToTranscript(answer);
+      researchEventsService.recordEvent('submit_answer', {
+        exploration_id: _explorationId,
+        state_name: _currentStateName,
+        answer: angular.copy(answer),
+        params: angular.copy(learnerParamsService.getAllParams()),
+        transcript: angular.copy(_transcript)
+      });
 
       answerClassificationService.getMatchingClassificationResult(
         _explorationId, oldState, answer

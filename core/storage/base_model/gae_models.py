@@ -119,7 +119,7 @@ class BaseModel(ndb.Model):
         return query
 
     @classmethod
-    def get_new_id(cls, entity_name):
+    def get_new_id(cls, entity_name, prefix=''):
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this
@@ -145,9 +145,10 @@ class BaseModel(ndb.Model):
         RAND_RANGE = 127 * 127
         ID_LENGTH = 12
         for i in range(MAX_RETRIES):
-            new_id = utils.convert_to_hash(
+            random_hash = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH)
+            new_id = '.'.join([prefix, random_hash])
             if not cls.get_by_id(new_id):
                 return new_id
 

@@ -32,6 +32,7 @@ import urlparse
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import event_services
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
@@ -615,3 +616,18 @@ class CsrfTokenManager(object):
             return False
         except Exception:
             return False
+
+
+# TEMPORARY CODE -- NOT FOR MERGE INTO DEVELOP
+class ResearchEventsHandler(BaseHandler):
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self, event_type):
+        """Handles POST requests."""
+        event_data = self.payload.get('event_data')
+
+        event_services.record_research_event(
+            self.user_id, self.request.uri,
+            utils.get_current_time_in_millisecs(),
+            event_type, event_data)
