@@ -120,13 +120,16 @@ class StringClassifier(object):
 
     """Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
     likely not be useful for predicting as there are not enough examples to
-    build a generalized model.
+    build a generalized model. The value 20 was chosen as a balance between a
+    reasonable number of data to learn from and a low entry barrier to using
+    the classifier.
     """
     _DEFAULT_MIN_DOCS_TO_PREDICT = 20
     """Because prediction uses Prob(the doc should be assigned this label | the
     doc is not assigned DEFAULT_LABEL), if there are only two labels (the
     default label and one other) then the one other label will always be
-    predicted.
+    predicted. Therefore, a minimum of 3 labels are needed to perform a valid
+    prediction.
     """
     _DEFAULT_MIN_LABELS_TO_PREDICT = 3
 

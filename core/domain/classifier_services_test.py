@@ -206,7 +206,14 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(prediction_report['prediction_label_id'], 1)
 
     def test_predict_label_for_doc(self):
-        # Until I come up with larger test data sets, this will do
+        """This test ensures that the predictor is predicting the labels that
+        are provided (in this case, 'food', 'pets', and the generic label
+        '_default'). This test does not cover prediction accuracy, so
+        _DEFAULT_MIN_DOCS_TO_PREDICT and _DEFAULT_MIN_LABELS_TO_PREDICT have
+        been set to zero. This allows the predictor to predict on smaller data
+        sets, useful for testing purposes. Setting the above constants to zero
+        is not recommended in a serving system.
+        """
         self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
         self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
 

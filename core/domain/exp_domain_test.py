@@ -344,10 +344,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'destination ABC is not a valid'):
             exploration.validate()
 
-        # Ensure an answer group with two fuzzy rules is invalid
+        # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        # Ensure an answer group with two fuzzy rules is invalid
         init_state.interaction.answer_groups.append(
             exp_domain.AnswerGroup.from_dict({
                 'outcome': {

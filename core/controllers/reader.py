@@ -159,7 +159,7 @@ def classify(exp_id, state, answer, params):
             fuzzy_rule_spec = answer_group.get_fuzzy_rule_spec()
             if fuzzy_rule_spec is not None:
                 evaluated_truth_value = rule_domain.evaluate_rule(
-                    rule_spec, input_type, params, normalized_answer, fs)
+                    fuzzy_rule_spec, input_type, params, normalized_answer, fs)
                 if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
                     best_matched_truth_value = evaluated_truth_value
                     best_matched_rule_spec = rule_spec
@@ -177,7 +177,7 @@ def classify(exp_id, state, answer, params):
             fuzzy_rule_spec = answer_group.get_fuzzy_rule_spec()
             if fuzzy_rule_spec is not None:
                 training_examples.extend([[doc, [str(i)]] for doc in
-                    rule_spec.inputs['training_data']])
+                    fuzzy_rule_spec.inputs['training_data']])
         if len(training_examples) > 0:
             sc.load_examples(training_examples)
             doc_ids = sc.add_examples_for_predicting([answer])
