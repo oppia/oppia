@@ -258,11 +258,10 @@
         </schema-based-editor>
       </td>
       <td ng-if="!len && (!minListLength || localValue.length > minListLength)" style="vertical-align: top;">
-        <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button"
+        <button class="oppia-delete-list-entry-button oppia-transition-200 protractor-test-delete-list-entry" type="button"
                 ng-click="deleteElement($index)"
                 ng-disabled="isDisabled()">
-          <span class="glyphicon glyphicon-remove" title="Delete item">
-          </span>
+          <i class="material-icons md-18">&#xE5CD;</i>
         </button>
       </td>
     </tr>

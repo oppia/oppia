@@ -59,7 +59,7 @@ else:
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-RELEASE_DIR_NAME = '%s-experimental-deploy-%s' % (
+RELEASE_DIR_NAME = 'deploy-EXPERIMENT-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)

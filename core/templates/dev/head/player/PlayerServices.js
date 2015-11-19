@@ -159,12 +159,17 @@ oppia.factory('oppiaPlayerService', [
   var sessionId = null;
   var _isLoggedIn = GLOBALS.userIsLoggedIn;
   var _exploration = null;
+  var _collection_id = GLOBALS.collectionId;
 
   learnerParamsService.init({});
   var stateHistory = [];
   var _currentStateName = null;
   var answerIsBeingProcessed = false;
   var _viewerHasEditingRights = false;
+
+  // The number of submissions made so far for this state. Incremented
+  // immediately after every submit event.
+  var _numSubmitsForThisState = 0;
 
   var _updateStatus = function(newParams, newStateName) {
     learnerParamsService.init(newParams);
@@ -191,6 +196,10 @@ oppia.factory('oppiaPlayerService', [
       oldStateName !== newStateName ||
       INTERACTION_SPECS[oldStateInteractionId].display_mode ===
         INTERACTION_DISPLAY_MODE_INLINE);
+
+    if (oldStateName !== newStateName) {
+      _numSubmitsForThisState = 0;
+    }
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -229,7 +238,8 @@ oppia.factory('oppiaPlayerService', [
           params: learnerParamsService.getAllParams(),
           session_id: sessionId,
           state_name: newStateName,
-          version: version
+          version: version,
+          collection_id: _collection_id,
         });
       }
     }
@@ -388,6 +398,7 @@ oppia.factory('oppiaPlayerService', [
       learnerParamsService.init({});
       stateHistory = [];
       _currentStateName = null;
+      _numSubmitsForThisState = 0;
 
       if (_editorPreviewMode) {
         if (_exploration) {
@@ -531,6 +542,8 @@ oppia.factory('oppiaPlayerService', [
         return;
       }
 
+      _numSubmitsForThisState++;
+
       answerIsBeingProcessed = true;
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
@@ -549,6 +562,23 @@ oppia.factory('oppiaPlayerService', [
             old_state_name: _currentStateName,
             rule_spec_string: classificationResult.rule_spec_string
           });
+        }
+
+        // If this is a return to the same state, and the resubmission trigger
+        // kicks in, replace the dest, feedback and param changes with that
+        // of the trigger.
+        if (outcome.dest === _currentStateName) {
+          for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
+            var fallback = oldState.interaction.fallbacks[i];
+            if (fallback.trigger.trigger_type == 'NthResubmission' &&
+                fallback.trigger.customization_args.num_submits.value ===
+                  _numSubmitsForThisState) {
+              outcome.dest = fallback.outcome.dest;
+              outcome.feedback = fallback.outcome.feedback;
+              outcome.param_changes = fallback.outcome.param_changes;
+              break;
+            }
+          }
         }
 
         var newStateName = outcome.dest;

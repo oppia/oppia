@@ -21,6 +21,9 @@ __author__ = 'Xinyu Wu'
 import ast
 
 from core import jobs
+from core.domain import exp_services
+from core.domain import recommendations_services
+from core.domain import rights_manager
 from core.platform import models
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -72,10 +75,6 @@ class ExplorationRecommendationsMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
-        from core.domain import recommendations_services
-        from core.domain import rights_manager
-
         # Only process the exploration if it is not private
         if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             return
@@ -115,8 +114,6 @@ class ExplorationRecommendationsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
-        from core.domain import recommendations_services
-
         MAX_RECOMMENDATIONS = 10
 
         other_exploration_similarities = sorted(

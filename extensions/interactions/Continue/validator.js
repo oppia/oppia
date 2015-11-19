@@ -26,18 +26,18 @@ oppia.filter('oppiaInteractiveContinueValidator', [
 
     baseInteractionValidationService.requireCustomizationArguments(
       customizationArgs, ['buttonText']);
-    
+
     if (customizationArgs.buttonText.value.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'the button text should not be empty.'
+        message: 'The button text should not be empty.'
       });
     }
 
     if (answerGroups.length > 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'only the default outcome is necessary for a continue interaction.'
+        message: 'Only the default outcome is necessary for a continue interaction.'
       });
     }
 

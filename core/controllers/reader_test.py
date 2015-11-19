@@ -49,6 +49,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -87,9 +88,19 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_published_explorations_are_visible_to_anyone(self):
+    def test_published_explorations_are_visible_to_logged_out_users(self):
         rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
 
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+
+    def test_published_explorations_are_visible_to_logged_in_users(self):
+        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
