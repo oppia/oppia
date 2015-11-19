@@ -129,6 +129,12 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
+    # TEMPORARY
+    get_redirect_route(
+        r'/researcheventshandler/<event_type>', base.ResearchEventsHandler,
+        'research_events_handler'),
+    # END OF TEMPORARY CODE
+
     get_redirect_route(
         r'/notifications_dashboard', home.NotificationsDashboardPage,
         'notifications_dashboard_handler'),
@@ -152,8 +158,6 @@ urls = [
         r'/contact', pages.AboutPage, 'redirect_to_about_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
-    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
-    get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),

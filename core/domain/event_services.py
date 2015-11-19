@@ -19,12 +19,13 @@
 __author__ = 'Sean Lip'
 
 import inspect
+import logging
 
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
-(stats_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback])
+(stats_models, event_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.event, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import feconf
 
@@ -210,3 +211,37 @@ class Registry(object):
         if event_type not in cls._event_types_to_classes:
             cls._refresh_registry()
         return cls._event_types_to_classes[event_type]
+
+
+# TEMPORARY
+def _validate_research_event(event_type, event_data):
+    _EXPECTED_KEYS = {
+        event_models.EVENT_TYPE_VISIT_PAGE: [],
+        event_models.EVENT_TYPE_COMPLETE_ACTIVITY: [
+            'exploration_id', 'params', 'transcript'],
+        event_models.EVENT_TYPE_SUBMIT_ANSWER: [
+            'exploration_id', 'state_name', 'answer_json', 'params',
+            'transcript'],
+        event_models.EVENT_TYPE_CLICK: ['exploration_id', 'state_name'],
+        event_models.EVENT_TYPE_ENTER_KEYPRESS: [
+            'exploration_id', 'state_name'],
+    }
+
+    if event_type not in _EXPECTED_KEYS:
+        logging.error('Error: Unknown event type %s' % event_type)
+
+    actual_keys = sorted(event_data.keys())
+    expected_keys = sorted(_EXPECTED_KEYS[event_type])
+
+    if set(event_data.keys()) != set(_EXPECTED_KEYS[event_type]):
+        logging.error(
+            'Error: expected event type %s to have keys %s, but '
+            'received keys %s' % (event_type, expected_keys, actual_keys))
+
+
+def record_research_event(
+        user_id, page_url, time_msec, event_type, event_data):
+    # TODO(sll): could make this optional, once dev work is finished.
+    _validate_research_event(event_type, event_data)
+    event_models.ResearchEventModel.create(
+        user_id, page_url, time_msec, event_type, event_data)

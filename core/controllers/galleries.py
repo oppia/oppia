@@ -79,6 +79,10 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+
+        self.redirect('/collection/1')
+        return
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
