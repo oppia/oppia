@@ -23,6 +23,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import base
 from core.controllers import editor
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
@@ -94,6 +95,8 @@ class AdminPage(base.BaseHandler):
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
 
+        demo_collection_ids = feconf.DEMO_COLLECTIONS.keys()
+
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
         for job in unfinished_job_data:
@@ -127,6 +130,8 @@ class AdminPage(base.BaseHandler):
 
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
+            'demo_collections': feconf.DEMO_COLLECTIONS.iteritems(),
+            'demo_collection_ids': demo_collection_ids,
             'demo_explorations': demo_explorations,
             'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
@@ -172,6 +177,14 @@ class AdminHandler(base.BaseHandler):
                 exp_services.load_demo(unicode(exploration_id))
                 rights_manager.release_ownership_of_exploration(
                     feconf.SYSTEM_COMMITTER_ID, unicode(exploration_id))
+            elif self.payload.get('action') == 'reload_collection':
+                collection_id = self.payload.get('collection_id')
+                logging.info(
+                    '[ADMIN] %s reloaded collection %s' %
+                    (self.user_id, collection_id))
+                collection_services.load_demo(unicode(collection_id))
+                rights_manager.release_ownership_of_collection(
+                    feconf.SYSTEM_COMMITTER_ID, unicode(collection_id))
             elif self.payload.get('action') == 'clear_search_index':
                 exp_services.clear_search_index()
             elif self.payload.get('action') == 'save_config_properties':

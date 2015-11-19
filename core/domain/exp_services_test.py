@@ -24,7 +24,7 @@ import zipfile
 
 from core.domain import event_services
 from core.domain import exp_domain
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
@@ -2025,55 +2025,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
 
 
-class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
-
-    def test_exploration_contents_change_event_triggers(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationContentChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
-            exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
-
-        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID])
-
-    def test_exploration_status_change_event(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationStatusChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-            rights_manager.create_new_exploration_rights(
-                self.EXP_ID, self.OWNER_ID)
-            rights_manager.publish_exploration(
-                self.OWNER_ID, self.EXP_ID)
-            rights_manager.publicize_exploration(
-                self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublicize_exploration(
-                self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublish_exploration(
-                self.user_id_admin, self.EXP_ID)
-
-        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
-                                        self.EXP_ID, self.EXP_ID])
-
-
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
 
@@ -2786,8 +2737,8 @@ title: Old Title
         # Version 4 is an upgrade based on the migration job.
 
         # Start migration job on sample exploration.
-        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
         self.process_and_flush_pending_tasks()
 
