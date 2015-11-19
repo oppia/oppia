@@ -17,7 +17,7 @@
 """Tests for continuous computations relating to feedback analytics."""
 
 from core import jobs_registry
-from core.domain import feedback_jobs
+from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 
 class ModifiedFeedbackAnalyticsAggregator(
-        feedback_jobs.FeedbackAnalyticsAggregator):
+        feedback_jobs_continuous.FeedbackAnalyticsAggregator):
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
@@ -39,7 +39,7 @@ class ModifiedFeedbackAnalyticsAggregator(
 
 
 class ModifiedFeedbackAnalyticsMRJobManager(
-        feedback_jobs.FeedbackAnalyticsMRJobManager):
+        feedback_jobs_continuous.FeedbackAnalyticsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -503,8 +503,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger close event.
             threadlist = feedback_services.get_threadlist(exp_id)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
-                feedback_models.STATUS_CHOICES_FIXED, None, 'some text') 
+            feedback_services.create_message(thread_id, 'author',
+                feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
             self.process_and_flush_pending_tasks()
 
             self.assertEqual(
@@ -538,8 +538,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger close event.
             threadlist = feedback_services.get_threadlist(exp_id)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
-                feedback_models.STATUS_CHOICES_FIXED, None, 'some text') 
+            feedback_services.create_message(thread_id, 'author',
+                feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
             self.process_and_flush_pending_tasks()
 
             self.assertEqual(
@@ -552,10 +552,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger reopen event.
             threadlist = feedback_services.get_threadlist(exp_id)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
-                feedback_models.STATUS_CHOICES_OPEN, None, 'some text') 
+            feedback_services.create_message(thread_id, 'author',
+                feedback_models.STATUS_CHOICES_OPEN, None, 'some text')
             self.process_and_flush_pending_tasks()
-            
+
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
                     exp_id), {
@@ -587,8 +587,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger close event.
             threadlist = feedback_services.get_threadlist(exp_id)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
-                feedback_models.STATUS_CHOICES_FIXED, None, 'some text') 
+            feedback_services.create_message(thread_id, 'author',
+                feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
             self.process_and_flush_pending_tasks()
 
             self.assertEqual(
@@ -601,17 +601,17 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread status change event.
             threadlist = feedback_services.get_threadlist(exp_id)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
-                feedback_models.STATUS_CHOICES_IGNORED, None, 'some text') 
+            feedback_services.create_message(thread_id, 'author',
+                feedback_models.STATUS_CHOICES_IGNORED, None, 'some text')
             self.process_and_flush_pending_tasks()
-            
+
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
                     exp_id), {
                 'num_open_threads': 0,
                 'num_total_threads': 1,
             })
-            
+
     def test_realtime_with_batch_computation(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -639,12 +639,12 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'num_open_threads': 1,
                 'num_total_threads': 1,
             })
-   
+
             # Create another thread but don't start job.
             feedback_services.create_thread(
                 exp_id, 'a_state_name', None, 'a subject', 'some text')
-            self.process_and_flush_pending_tasks()           
- 
+            self.process_and_flush_pending_tasks()
+
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
                     exp_id), {
