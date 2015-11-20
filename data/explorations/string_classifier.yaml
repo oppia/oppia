@@ -112,6 +112,9 @@ states:
             - I think it is 6 because you can start with each of 3 balls and there
               are two permutations for each start colour.
           rule_type: FuzzyMatches
+        - inputs:
+            x: permutations
+          rule_type: StartsWith
       - outcome:
           dest: Home
           feedback:
