@@ -1097,7 +1097,6 @@ pre.oppia-pre-wrapped-text {
 /* Styles for the collections learner view */
 
 .oppia-collection-player-tiles-container {
-  background-color: #eee;
   height: 100%;
   margin-top: 60px;
   margin-left: auto;
@@ -1106,6 +1105,10 @@ pre.oppia-pre-wrapped-text {
   min-height: 500px;
   padding-bottom: 25px;
   position: relative;
+}
+
+.oppia-collection-player-tiles-container .oppia-page-heading {
+  color: #fff;
 }
 
 md-card.oppia-collection-player-tile {
@@ -1161,6 +1164,7 @@ md-card.oppia-collection-player-tile {
   font-weight: bold;
 }
 .oppia-collection-player-small-text {
+  color: #fff;
   font-style: italic;
   font-size: 1em;
   margin-top: 12px;
