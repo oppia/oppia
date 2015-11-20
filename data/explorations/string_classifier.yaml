@@ -1310,7 +1310,7 @@ states:
             - don't know
           rule_type: FuzzyMatches
         - inputs:
-            x: cheatcode
+            x: hardrule
           rule_type: StartsWith
       confirmed_unclassified_answers:
       - What's the question?
