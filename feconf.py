@@ -340,8 +340,8 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = True
-ENABLE_STRING_CLASSIFIER = True
+SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+ENABLE_STRING_CLASSIFIER = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
