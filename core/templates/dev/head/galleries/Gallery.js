@@ -128,6 +128,7 @@ oppia.controller('Gallery', [
 
   // TEMPORARY
   $scope.summaryTileData = {
+    explorationId: '0',
     lastUpdatedMsec: 1447842330649,
     numViews: 1800,
     objective: 'An introduction to proofs, logic, and solving problems. Testing how long this can go. Lots and lots of lines are being placed here, thanks.',

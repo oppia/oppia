@@ -28,6 +28,7 @@ oppia.directive('explorationSummaryTile', [function() {
     //  - ratingValue: an integer 1-5 giving the rating
     restrict: 'E',
     scope: {
+      getId: '&explorationId',
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getNumViews: '&numViews',
       getObjective: '&objective',
