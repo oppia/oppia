@@ -759,9 +759,6 @@ def load_demo(collection_id):
     # Now, load all of the demo explorations that are part of the collection.
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
-        # Only load the demo exploration if it is not yet loaded.
-        if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
-            exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
 
