@@ -165,20 +165,20 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         """
         self.init_player(
             '16', 'Testing String Classifier', 'do you think three things can')
-        self.submit_and_compare(('Because you can arrange each colour '
-            'systematically and there are two permutations of each colour'),
+        self.submit_and_compare('Because you can arrange each colour '
+            'systematically and there are two permutations of each colour',
             'Detected permutation', 'do you think three things can')
-        self.submit_and_compare(('Because these are the number of '
-            'combinations...'), 'Detected combination',
+        self.submit_and_compare('Because these are the number of '
+            'combinations...', 'Detected combination',
             'do you think three things can')
-        self.submit_and_compare(('First ball can be of any color among three '
+        self.submit_and_compare('First ball can be of any color among three '
             '(for that we have three ways), after the first ball has been '
             'selected two balls are there of remaining two colors. Now second '
             'ball can be selected of any color among the remaining two (for '
             'that there are two ways), now the remaining ball is the last '
             'ball of remaining color (for that we have only one way). Now we '
             'have to multiply the ways because the events were independent. '
-            'Eventually we get the answer as 3*2*1=6.'),
+            'Eventually we get the answer as 3*2*1=6.',
             'Detected factorial', 'do you think three things can')
         self.submit_and_compare('Ryb rby etc',
             'Detected listing', 'do you think three things can')
@@ -194,8 +194,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
             self.submit_and_compare('it\'s a permutation of 3 elements',
                 'Detected permutation', 'do you think three things can')
-            self.submit_and_compare(('There are 3 options for the first ball, '
-                'and 2 for the remaining two. So 3*2=6.'), 'Detected '
+            self.submit_and_compare('There are 3 options for the first ball, '
+                'and 2 for the remaining two. So 3*2=6.', 'Detected '
                 'factorial', 'do you think three things can')
             self.submit_and_compare('abc acb bac bca cbb cba',
                 'Detected listing', 'do you think three things can')
