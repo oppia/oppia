@@ -65,7 +65,7 @@ class ActivityRights(object):
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
                  status=ACTIVITY_STATUS_PRIVATE,
-                 viewable_if_private=False):
+                 viewable_if_private=False, first_published=None):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -74,6 +74,7 @@ class ActivityRights(object):
         self.cloned_from = cloned_from
         self.status = status
         self.viewable_if_private = viewable_if_private
+        self.first_published = first_published
 
     def validate(self):
         """Validates an ActivityRights object.
@@ -175,6 +176,7 @@ def _save_activity_rights(
     model.community_owned = activity_rights.community_owned
     model.status = activity_rights.status
     model.viewable_if_private = activity_rights.viewable_if_private
+    model.first_published = activity_rights.first_published
 
     model.commit(committer_id, commit_message, commit_cmds)
 
@@ -212,6 +214,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
         viewable_if_private=exploration_rights.viewable_if_private,
+        first_published=exploration_rights.first_published,
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
     subscription_services.subscribe_to_exploration(
@@ -240,6 +243,17 @@ def is_exploration_public(exploration_id):
 def is_exploration_cloned(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
     return bool(exploration_rights.cloned_from)
+
+
+def _update_first_published_datetime(exploration_id, first_published):
+    exploration_rights = get_exploration_rights(exploration_id)
+    exploration_rights.first_published = first_published
+    _update_activity_summary(ACTIVITY_TYPE_EXPLORATION, exploration_rights)
+
+def update_first_published_datetime_if_not_set(exploration_id, first_published):
+    exploration_rights = get_exploration_rights(exploration_id)
+    if exploration_rights.first_published == None:
+        _update_first_published_datetime(exploration_id, first_published)
 
 
 def create_new_collection_rights(collection_id, committer_id):

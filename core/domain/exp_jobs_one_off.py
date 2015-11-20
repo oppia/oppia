@@ -56,6 +56,25 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     def reduce(exp_id, list_of_exps):
         pass
 
+class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that finds first published datetime for all explorations"""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotContentModel]
+
+    @staticmethod
+    def map(item):
+        import utils
+        if item.content['status'] == 'public':
+            yield(item.id.split("-")[0],utils.get_time_in_millisecs(item.created_on))
+
+    @staticmethod
+    def reduce(exp_id, list_of_commit_times):
+        first_publish = min(list_of_commit_times)
+        rights_manager.update_first_published_datetime_if_not_set(
+            exp_id, first_publish)
+
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
     """One-off job that indexes all explorations"""

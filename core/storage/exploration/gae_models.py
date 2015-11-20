@@ -176,6 +176,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # by anyone who has the URL. If the exploration is not private, this
     # setting is ignored.
     viewable_if_private = ndb.BooleanProperty(indexed=True, default=False)
+    # The datetime in which the exploration was first published.
+    first_published = ndb.DateTimeProperty(indexed=True, default=None)
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
