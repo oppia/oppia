@@ -186,15 +186,16 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.submit_and_compare('doont know',
             'Detected unsure', 'do you think three things can')
         # No soft rule, force the classifier to run
-        self.submit_and_compare('it\'s a permutation of 3 elements',
-            'Detected permutation', 'do you think three things can')
-        self.submit_and_compare(('There are 3 options for the first ball, and '
-            '2 for the remaining two. So 3*2=6.'), 'Detected factorial',
-            'do you think three things can')
-        self.submit_and_compare('abc acb bac bca cab cba',
-            'Detected listing', 'do you think three things can')
-        self.submit_and_compare('dunno, just guessed',
-            'Detected unsure', 'do you think three things can')
+        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+            self.submit_and_compare('it\'s a permutation of 3 elements',
+                'Detected permutation', 'do you think three things can')
+            self.submit_and_compare(('There are 3 options for the first ball, '
+                'and 2 for the remaining two. So 3*2=6.'), 'Detected '
+                'factorial', 'do you think three things can')
+            self.submit_and_compare('abc acb bac bca cab cba',
+                'Detected listing', 'do you think three things can')
+            self.submit_and_compare('dunno, just guessed',
+                'Detected unsure', 'do you think three things can')
 
     def test_binary_search(self):
         """Test the binary search (lazy magician) exploration."""

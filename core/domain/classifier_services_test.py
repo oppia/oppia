@@ -211,8 +211,8 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         '_default'). This test does not cover prediction accuracy, so
         _DEFAULT_MIN_DOCS_TO_PREDICT and _DEFAULT_MIN_LABELS_TO_PREDICT have
         been set to zero. This allows the predictor to predict on smaller data
-        sets, useful for testing purposes. Setting the above constants to zero
-        is not recommended in a serving system.
+        sets, which is useful for testing purposes. Setting the above constants
+        to zero is not recommended in a serving system.
         """
         self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
         self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
