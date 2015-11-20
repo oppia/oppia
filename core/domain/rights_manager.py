@@ -29,6 +29,7 @@ current_user_services = models.Registry.import_current_user_services()
 (collection_models, exp_models,) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
+import feconf
 import utils
 
 
@@ -41,6 +42,7 @@ CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
 CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
 CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
 CMD_RELEASE_OWNERSHIP = 'release_ownership'
+CMD_UPDATE_FIRST_PUBLISHED = 'update_first_published_datetime'
 
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
@@ -65,7 +67,7 @@ class ActivityRights(object):
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
                  status=ACTIVITY_STATUS_PRIVATE,
-                 viewable_if_private=False, first_published=None):
+                 viewable_if_private=False, first_published_in_ms=None):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -74,7 +76,7 @@ class ActivityRights(object):
         self.cloned_from = cloned_from
         self.status = status
         self.viewable_if_private = viewable_if_private
-        self.first_published = first_published
+        self.first_published_in_ms=first_published_in_ms
 
     def validate(self):
         """Validates an ActivityRights object.
@@ -153,6 +155,7 @@ def _get_activity_rights_from_model(activity_rights_model, activity_type):
             if activity_type == ACTIVITY_TYPE_EXPLORATION else None),
         status=activity_rights_model.status,
         viewable_if_private=activity_rights_model.viewable_if_private,
+        first_published_in_ms=activity_rights_model.first_published_in_ms
     )
 
 
@@ -176,7 +179,7 @@ def _save_activity_rights(
     model.community_owned = activity_rights.community_owned
     model.status = activity_rights.status
     model.viewable_if_private = activity_rights.viewable_if_private
-    model.first_published = activity_rights.first_published
+    model.first_published_in_ms = activity_rights.first_published_in_ms
 
     model.commit(committer_id, commit_message, commit_cmds)
 
@@ -214,7 +217,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
         viewable_if_private=exploration_rights.viewable_if_private,
-        first_published=exploration_rights.first_published,
+        first_published_in_ms=exploration_rights.first_published_in_ms
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
     subscription_services.subscribe_to_exploration(
@@ -245,15 +248,26 @@ def is_exploration_cloned(exploration_id):
     return bool(exploration_rights.cloned_from)
 
 
-def _update_first_published_datetime(exploration_id, first_published):
+def _update_exploration_first_published_in_ms(
+    exploration_id, first_published_in_ms):
     exploration_rights = get_exploration_rights(exploration_id)
-    exploration_rights.first_published = first_published
-    _update_activity_summary(ACTIVITY_TYPE_EXPLORATION, exploration_rights)
+    exploration_rights.first_published_in_ms = first_published_in_ms
+    commit_cmds = [{
+        'cmd': CMD_UPDATE_FIRST_PUBLISHED,
+        'first_published': first_published_in_ms
+    }]
+    _save_activity_rights(feconf.SYSTEM_COMMITTER_ID, exploration_rights, ACTIVITY_TYPE_EXPLORATION,
+        'set first published time in ms', commit_cmds)
 
-def update_first_published_datetime_if_not_set(exploration_id, first_published):
+
+# This function guards against the case that an exploration is published, then
+# unpublished, and then republished. The first_published time in ms should be the
+# time in ms of the first publication.
+def update_exploration_first_published_in_ms_if_not_set(
+    exploration_id, first_published_in_ms):
     exploration_rights = get_exploration_rights(exploration_id)
-    if exploration_rights.first_published == None:
-        _update_first_published_datetime(exploration_id, first_published)
+    if exploration_rights.first_published_in_ms == None:
+        _update_exploration_first_published_in_ms(exploration_id, first_published_in_ms)
 
 
 def create_new_collection_rights(collection_id, committer_id):
@@ -268,6 +282,7 @@ def create_new_collection_rights(collection_id, committer_id):
         community_owned=collection_rights.community_owned,
         status=collection_rights.status,
         viewable_if_private=collection_rights.viewable_if_private,
+        first_published_in_ms=collection_rights.first_published_in_ms
     ).commit(committer_id, 'Created new collection', commit_cmds)
 
     subscription_services.subscribe_to_collection(committer_id, collection_id)
@@ -290,6 +305,27 @@ def is_collection_private(collection_id):
 def is_collection_public(collection_id):
     collection_rights = get_collection_rights(collection_id)
     return collection_rights.status == ACTIVITY_STATUS_PUBLIC
+
+
+def _update_collection_first_published_in_ms(collection_id, first_published_in_ms):
+    collection_rights = get_collection_rights(collection_id)
+    collection_rights.first_published_in_ms = first_published_in_ms
+    commit_cmds = [{
+        'cmd': CMD_UPDATE_FIRST_PUBLISHED,
+        'first_published': first_published_in_ms
+    }]
+    _save_activity_rights(feconf.SYSTEM_COMMITTER_ID, collection_rights, ACTIVITY_TYPE_COLLECTION,
+        'set first published time in ms', commit_cmds)
+
+
+# This function guards against the case that an collection is published, then
+# unpublished, and then republished. The first_published time in ms should be the
+# time in ms of the first publication.
+def update_collection_first_published_in_ms_if_not_set(
+    collection_id, first_published_in_ms):
+    collection_rights = get_collection_rights(exploration_id)
+    if collection_rights.first_published_in_ms == None:
+        _update_collection_first_published_in_ms(collection_id, first_published_in_ms)
 
 
 def _get_activity_rights(activity_type, activity_id):

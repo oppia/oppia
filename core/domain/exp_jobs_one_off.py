@@ -18,6 +18,7 @@
 
 __author__ = 'Frederik Creemers'
 
+import ast
 import logging
 
 from core import jobs
@@ -65,15 +66,14 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        import utils
-        if item.content['status'] == 'public':
-            yield(item.id.split("-")[0],utils.get_time_in_millisecs(item.created_on))
+        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            yield(item.id.split('-')[0], utils.get_time_in_millisecs(item.created_on))
 
     @staticmethod
     def reduce(exp_id, list_of_commit_times):
-        first_publish = min(list_of_commit_times)
-        rights_manager.update_first_published_datetime_if_not_set(
-            exp_id, first_publish)
+        first_publish_in_ms = ast.literal_eval(min(list_of_commit_times))
+        rights_manager.update_exploration_first_published_in_ms_if_not_set(
+            exp_id, first_publish_in_ms)
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):

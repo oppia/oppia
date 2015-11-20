@@ -28,6 +28,7 @@ from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 (job_models, exp_models,) = models.Registry.import_models([
    models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
@@ -237,6 +238,45 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     self.assertEqual(
                         getattr(actual_job_output[exp_id], prop),
                         getattr(expected_job_output[exp_id], prop))
+
+
+class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(OneOffExplorationFirstPublishedJobTest, self).setUp()
+
+    def test_first_published_time_of_exploration_that_is_unpublished(self):
+        """This tests that the set first published datetime job for exploration
+        takes the first published datetime,regardless if the exploration is
+        published, unpublished, and then republished multiple times.
+        """
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_EMAIL])
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+
+        job_id = (exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new())
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        exp_rights_model = exp_models.ExplorationRightsModel.get(self.EXP_ID)
+        last_published_time_in_ms = utils.get_time_in_millisecs(
+            exp_rights_model.last_updated)
+        if exploration_rights.first_published_in_ms >= last_published_time_in_ms:
+            raise Exception('Last published datetime incorrectly updated.')
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):

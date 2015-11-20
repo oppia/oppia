@@ -138,7 +138,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, created_on=exploration_model.created_on,
-        last_updated=exploration_model.last_updated)
+        last_updated=exploration_model.last_updated
+        )
 
 
 def get_exploration_summary_from_model(exp_summary_model):
@@ -990,7 +991,7 @@ def compute_summary_of_exploration(exploration):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated
+        exploration_model_created_on, exploration_model_last_updated,
     )
 
     return exp_summary
@@ -1017,7 +1018,7 @@ def save_exploration_summary(exp_summary):
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
         exploration_model_created_on=(
-            exp_summary.exploration_model_created_on)
+            exp_summary.exploration_model_created_on),
     )
 
     exp_summary_model.put()
