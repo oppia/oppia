@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
@@ -331,6 +332,13 @@ urls = [
     get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
+        collection_viewer.CollectionPage, 'collection_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
+        collection_viewer.CollectionDataHandler, 'collection_data_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

@@ -195,6 +195,11 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
         return date.toLocaleTimeString().replace(/:\d\d /, ' ');
       }
       return date.toLocaleDateString();
+    },
+    // Returns just the date.
+    getLocaleDateString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toLocaleDateString();
     }
   };
 }]);

@@ -47,8 +47,11 @@ export NO_SKULPT
 export remaining_params
 
 EXPECTED_PWD='oppia'
-if [ ${PWD##*/} != $EXPECTED_PWD ]; then
-  echo This script should be run from the oppia/ root folder.
+# The second option allows this script to also be run from deployment folders.
+if [[ ${PWD##*/} != $EXPECTED_PWD ]] && [[ ${PWD##*/} != deploy-* ]]; then
+  echo ""
+  echo "  WARNING   This script should be run from the oppia/ root folder."
+  echo ""
   return 1
 fi
 
