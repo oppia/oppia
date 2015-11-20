@@ -118,6 +118,12 @@ def classify(exp_id, state, answer, params):
             the chosen answer group. A certainty of 1 means it is the best
             possible match. A certainty of 0 means it is matched to the default
             outcome.
+        'matched_rule_type': A value that is either 'hard', 'soft', or
+            'classifier' based on which match rule matched a given response. If
+            multiple matches occur, the match priority is given in the order
+            described in the previous sentence. I.e. hard rules have a higher
+            priority than soft rules which have a higher priority than
+            classifier rules.
     When the default rule is matched, outcome is the default_outcome of the
     state's interaction and the rule_spec_string is just 'Default.'
     """
@@ -129,6 +135,7 @@ def classify(exp_id, state, answer, params):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec = None
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+    matched_rule_type = None
 
     fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
     input_type = interaction_instance.answer_type
@@ -149,6 +156,7 @@ def classify(exp_id, state, answer, params):
             best_matched_rule_spec = best_rule_spec
             best_matched_answer_group = answer_group
             best_matched_answer_group_index = i
+            matched_rule_type = 'hard'
             break
 
     # Find the maximum soft rule that matches. This is done by ORing
@@ -165,6 +173,7 @@ def classify(exp_id, state, answer, params):
                     best_matched_rule_spec = rule_spec
                     best_matched_answer_group = answer_group
                     best_matched_answer_group_index = i
+                    matched_rule_type = 'soft'
                     break
 
     # Run the classifier if no prediction has been made yet. Currently this
@@ -194,6 +203,7 @@ def classify(exp_id, state, answer, params):
                         break
                 best_matched_answer_group = predicted_answer_group
                 best_matched_answer_group_index = predicted_answer_group_index
+                matched_rule_type = 'classifier'
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
@@ -206,14 +216,16 @@ def classify(exp_id, state, answer, params):
             'rule_spec_string': (
                 best_matched_rule_spec.stringify_classified_rule()),
             'answer_group_index': best_matched_answer_group_index,
-            'classification_certainty': best_matched_truth_value
+            'classification_certainty': best_matched_truth_value,
+            'matched_rule_type': matched_rule_type
         }
     elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
             'rule_spec_string': exp_domain.DEFAULT_RULESPEC_STR,
             'answer_group_index': len(state.interaction.answer_groups),
-            'classification_certainty': 0.0
+            'classification_certainty': 0.0,
+            'matched_rule_type': matched_rule_type
         }
 
     raise Exception('Something has seriously gone wrong with the exploration. '

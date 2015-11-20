@@ -274,7 +274,7 @@ DEMO_EXPLORATIONS = [
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
-    ('string_classifier.yaml', 'String Classifier', 'Test'),
+    ('string_classifier.yaml', 'Testing String Classifier', 'Test'),
 ]
 
 DEMO_COLLECTIONS = {
@@ -340,8 +340,8 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
-ENABLE_STRING_CLASSIFIER = False
+SHOW_TRAINABLE_UNRESOLVED_ANSWERS = True
+ENABLE_STRING_CLASSIFIER = True
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
