@@ -151,6 +151,7 @@ def get_file_contents(filepath, mode='r'):
     with open(filepath, mode) as f:
         return f.read().decode('utf-8')
 
+
 def return_json(source_url):
     """Return json object when provided url
     Args:

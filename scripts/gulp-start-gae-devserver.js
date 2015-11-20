@@ -67,6 +67,7 @@ module.exports = function(action, args, params) {
     gulpUtil.log('[gulp-gae]', 'stopping script');
     proc && proc.kill('SIGHUP');
     proc = null;
+    process.exit();
   };
 
   var bufferContents = function(file, enc, cb) {

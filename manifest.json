@@ -137,9 +137,9 @@
       },
       "jqueryThemes": {
         "version": "1.10.3",
-        "zipUrl": "http://jqueryui.com/resources/download/1.10.3.zip",
-        "rootDirPrefix": "jqueryui-",
-        "targetDirPrefix": "jqueryui-"
+        "zipUrl": "http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip",
+        "rootDirPrefix": "jquery-ui-themes-",
+        "targetDirPrefix": "jquery-ui-themes-"
       },
       "mathJax": {
         "version": "2.4-latest",
@@ -185,7 +185,7 @@
         "targetDirPrefix": "select2-",
         "jsFiles": ["select2.js"],
         "cssFiles": ["select2.css"],
-        "css_background_image": ["select2.png", "select2x2.png"]
+        "cssBackgroundImage": ["select2.png", "select2x2.png", "select2-spinner.gif"]
       },
       "textAngular": {
         "version": "1.3.7",

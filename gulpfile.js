@@ -70,13 +70,12 @@ for (var dependencyId in frontendDependencies) {
       dependency.targetDirPrefix + dependency.version,
       dependency.fontsPath, fontPrefix));
   }
-  if (dependency.hasOwnProperty('cssBackgroundPath_image')) {
-    var backgroundImage = dependency.cssBackgroundPath_image;
-    for (var image in backgroundImage) {
+  if (dependency.hasOwnProperty('cssBackgroundImage')) {
+    dependency.cssBackgroundImage.forEach(function(imagePath) {
       cssBackgroundPath.push(path.join(
         'third_party', 'static', dependency.targetDirPrefix +
-        dependency.version, backgroundImage[image]));
-    }
+        dependency.version, imagePath));
+    });
   }
 }
 gulp.task('css', function() {
@@ -89,9 +88,12 @@ gulp.task('css', function() {
 gulp.task('copyFonts', function() {
   gulp.src(fontFolderPath)
   .pipe(gulp.dest(path.join(
-    'third_party', 'generated', isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
+    'third_party', 'generated',
+    isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
 });
 
+// TODO(Barnabas) find a way of removing this task.
+// It is a bit of a hacky method and does not seem to scale with a program
 gulp.task('copyCssBackgroundImages', function() {
   gulp.src(cssBackgroundPath)
   .pipe(gulp.dest(generatedCssTargetDir));
