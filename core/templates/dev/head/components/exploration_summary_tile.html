@@ -2,18 +2,34 @@
   <style>
     .oppia-exploration-summary-tile {
       background-color: #fff;
+      cursor: pointer;
       display: inline-block;
       height: 300px;
       padding: 0;
+      position: relative;
       text-align: left;
       width: 240px;
     }
 
+    .oppia-exploration-summary-tile:hover {
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+
     .oppia-exploration-summary-tile .top-section {
-      background-color: #05a69a;
+      background-color: rgba(0,150,136,1);
       height: 164px;
       position: relative;
       width: 100%;
+    }
+
+    .oppia-exploration-summary-tile:hover .top-section {
+      background-color: rgba(0,150,136,0.8);
+    }
+
+    .oppia-exploration-summary-tile,
+    .oppia-exploration-summary-tile .top-section {
+      -webkit-transition: all 300ms;
+      transition: all 300ms;
     }
 
     .oppia-exploration-summary-tile .author-image {
