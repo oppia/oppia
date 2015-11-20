@@ -13,8 +13,8 @@
 // limitations under the License.
 
 oppia.factory('expressionTypeParserService', ['$log',
-    'expressionSyntaxTreeService',
-    function($log, expressionSyntaxTreeService) {
+  'expressionSyntaxTreeService',
+  function($log, expressionSyntaxTreeService) {
       var evaluateExpression = function(expression, envs) {
         return expressionSyntaxTreeService.evaluateExpression(expression, envs,
           evaluate);

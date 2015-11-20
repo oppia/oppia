@@ -60,91 +60,91 @@
 
 // Service for expression evaluation.
 oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
-    'expressionSyntaxTreeService', function($log, expressionParserService,
-    expressionSyntaxTreeService) {
-      var evaluateExpression = function(expression, envs) {
-        return expressionSyntaxTreeService.evaluateExpression(expression, envs,
-           evaluate);
-      };
+  'expressionSyntaxTreeService', function($log, expressionParserService,
+  expressionSyntaxTreeService) {
+    var evaluateExpression = function(expression, envs) {
+      return expressionSyntaxTreeService.evaluateExpression(expression, envs,
+         evaluate);
+    };
 
-      /**
-       * @param {*} parsed Parse output from the parser. See parser.pegjs for
-       *     the data structure.
-       * @param {!Array.<!Object>} envs Represents a nested name space
-       *     environment to look up the name in. The first element is looked up
-       *     first (i.e. has higher precedence).
-       */
-      var evaluate = function(parsed, envs) {
-        // The intermediate nodes of the parse tree are arrays. The terminal
-        // nodes are JavaScript primitives (as described in the "Parser output"
-        // section of parser.pegjs).
-        if (parsed instanceof Array) {
-          if (parsed.length == 0) {
-            throw 'Parser generated an intermediate node with zero children';
-          }
-
-          // Now the first element should be a function name.
-          var op = expressionSyntaxTreeService.lookupEnvs(parsed[0], envs).eval;
-
-          // Evaluate rest of the elements, i.e. the arguments.
-          var args = parsed.slice(1).map(function(item) {
-            return evaluate(item, envs);
-          });
-          return op(args, envs);
-        }
-
-        // This should be a terminal node with the actual value.
-        return parsed;
-      };
-
-      var validateExpression = function(expression, envs) {
-        try {
-          return validate(expressionParserService.parse(expression),
-            envs.concat(system));
-        } catch (err) {
-          return false;
-        }
-      };
-
-      /**
-       * @param {*} parsed Parse output from the parser. See parser.pegjs for
-       *     the data structure.
-       * @param {!Array.<!Object>} envs Represents a nested name space
-       *     environment to look up the name in. The first element is looked
-       *     up first (i.e. has higher precedence).
-       * @return {boolean} True when validation succeeds.
-       */
-      var validate = function(parsed, envs) {
-        if (!(parsed instanceof Array)) {
-          return true;
-        }
-
+    /**
+     * @param {*} parsed Parse output from the parser. See parser.pegjs for
+     *     the data structure.
+     * @param {!Array.<!Object>} envs Represents a nested name space
+     *     environment to look up the name in. The first element is looked up
+     *     first (i.e. has higher precedence).
+     */
+    var evaluate = function(parsed, envs) {
+      // The intermediate nodes of the parse tree are arrays. The terminal
+      // nodes are JavaScript primitives (as described in the "Parser output"
+      // section of parser.pegjs).
+      if (parsed instanceof Array) {
         if (parsed.length == 0) {
-          // This should not happen.
-          return false;
+          throw 'Parser generated an intermediate node with zero children';
         }
 
-        // Make sure we can find the operator.
-        expressionSyntaxTreeService.lookupEnvs(parsed[0], envs);
+        // Now the first element should be a function name.
+        var op = expressionSyntaxTreeService.lookupEnvs(parsed[0], envs).eval;
 
         // Evaluate rest of the elements, i.e. the arguments.
         var args = parsed.slice(1).map(function(item) {
-          return validate(item, envs);
+          return evaluate(item, envs);
         });
+        return op(args, envs);
+      }
 
-        // If it is a name look up, make sure the name exists.
-        // TODO: Validate args for other operators.
-        if (parsed[0] == '#') {
-          expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
-        }
+      // This should be a terminal node with the actual value.
+      return parsed;
+    };
 
+    var validateExpression = function(expression, envs) {
+      try {
+        return validate(expressionParserService.parse(expression),
+          envs.concat(system));
+      } catch (err) {
+        return false;
+      }
+    };
+
+    /**
+     * @param {*} parsed Parse output from the parser. See parser.pegjs for
+     *     the data structure.
+     * @param {!Array.<!Object>} envs Represents a nested name space
+     *     environment to look up the name in. The first element is looked
+     *     up first (i.e. has higher precedence).
+     * @return {boolean} True when validation succeeds.
+     */
+    var validate = function(parsed, envs) {
+      if (!(parsed instanceof Array)) {
         return true;
-      };
+      }
 
-      return {
-        evaluate: evaluate,
-        evaluateExpression: evaluateExpression,
-        validate: validate,
-        validateExpression: validateExpression
-      };
-    }]);
+      if (parsed.length == 0) {
+        // This should not happen.
+        return false;
+      }
+
+      // Make sure we can find the operator.
+      expressionSyntaxTreeService.lookupEnvs(parsed[0], envs);
+
+      // Evaluate rest of the elements, i.e. the arguments.
+      var args = parsed.slice(1).map(function(item) {
+        return validate(item, envs);
+      });
+
+      // If it is a name look up, make sure the name exists.
+      // TODO: Validate args for other operators.
+      if (parsed[0] == '#') {
+        expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
+      }
+
+      return true;
+    };
+
+    return {
+      evaluate: evaluate,
+      evaluateExpression: evaluateExpression,
+      validate: validate,
+      validateExpression: validateExpression
+    };
+  }]);

@@ -98,12 +98,19 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
         throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
       };
 
-      var _verifyArgsHaveType = function(args, type) {
+      var _verifyArgsHaveType = function(args, expectedType) {
         for (var i = 0; i < args.length; i++) {
-          if (args[i] != type) {
+          if (args[i] != expectedType) {
             throw new ExprWrongArgTypeError(
-              originalValue, typeof originalValue, 'Number');
+              originalValue, typeof originalValue, expectedType);
           }
+        }
+        return true;
+      };
+
+      var _verifyArgsHaveSameType = function(arg1, arg2) {
+        if (arg1 != arg2) {
+          throw new ExprWrongArgTypeError(arg1, arg1, arg2);
         }
         return true;
       };
@@ -171,250 +178,250 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
       // TODO(kashida): Document all operators input and output contracts.
 
       var system = {
-    '#': {
-      type: function(args, envs) {
-        return lookupEnvs(args + '', envs);
-      },
-      eval: function(args, envs) {
-        return lookupEnvs(args[0] + '', envs);
-      }
-    },
-    '+': {
-      type: function(args, envs) {
-        verifyNumArgs(args, 1, 2);
-        _verifyArgsHaveType(args, 'Real');
-        return 'Real';
-      },
-      eval: function(args, envs) {
-        verifyNumArgs(args, 1, 2);
-        var numericArgs = _coerceAllArgsToNumber(args);
-        return numericArgs.length == 1 ? numericArgs[0] :
-          numericArgs[0] + numericArgs[1];
-      }
-    },
-    '-': {
-      type: function(args, envs) {
-        verifyNumArgs(args, 1, 2);
-        _verifyArgsHaveType(args, 'Real');
-        return 'Real';
-      },
-      eval: function(args, envs) {
-        verifyNumArgs(args, 1, 2);
-        var numericArgs = _coerceAllArgsToNumber(args);
-        return numericArgs.length == 1 ? -numericArgs[0] :
-          numericArgs[0] - numericArgs[1];
-      }
-    },
-    '*': {
-      type: function(args, envs) {
-        verifyNumArgs(args, 2);
-        _verifyArgsHaveType(args, 'Real');
-        return 'Real';
-      },
-      eval: function(args, envs) {
-        verifyNumArgs(args, 2);
-        var numericArgs = _coerceAllArgsToNumber(args);
-        return numericArgs[0] * numericArgs[1];
-      }
-    },
-    '/': {
-      type: function(args, envs) {
-           verifyNumArgs(args, 2);
-           _verifyArgsHaveType(args, 'Real');
-           return 'Real';
-         },
-      eval: function(args, envs) {
-           verifyNumArgs(args, 2);
-           var numericArgs = _coerceAllArgsToNumber(args);
-           return numericArgs[0] / numericArgs[1];
-         }
-    },
-    '%': {
-      type: function(args, envs) {
-           verifyNumArgs(args, 2);
-           _verifyArgsHaveType(args, 'Real');
-           return 'Real';
-         },
-      eval: function(args, envs) {
-           verifyNumArgs(args, 2);
-           var numericArgs = _coerceAllArgsToNumber(args);
-           return numericArgs[0] % numericArgs[1];
-         }
-    },
-    '<=': {
-      type: function(args, envs) {
+        '#': {
+          type: function(args, envs) {
+            return lookupEnvs(args + '', envs);
+          },
+          eval: function(args, envs) {
+            return lookupEnvs(args[0] + '', envs);
+          }
+        },
+        '+': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 1, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 1, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs.length == 1 ? numericArgs[0] :
+              numericArgs[0] + numericArgs[1];
+          }
+        },
+        '-': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 1, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 1, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs.length == 1 ? -numericArgs[0] :
+              numericArgs[0] - numericArgs[1];
+          }
+        },
+        '*': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs[0] * numericArgs[1];
+          }
+        },
+        '/': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs[0] / numericArgs[1];
+          }
+        },
+        '%': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs[0] % numericArgs[1];
+          }
+        },
+        '<=': {
+          type: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'UnicodeString';
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] <= numericArgs[1];
           }
-    },
-    '>=': {
-      type: function(args, envs) {
+        },
+        '>=': {
+          type: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'UnicodeString';
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] >= numericArgs[1];
           }
-    },
-    '<': {
-      type: function(args, envs) {
-           verifyNumArgs(args, 2);
-           _verifyArgsHaveType(args, 'Real');
-           return 'UnicodeString';
-         },
-      eval: function(args, envs) {
-           verifyNumArgs(args, 2);
-           var numericArgs = _coerceAllArgsToNumber(args);
-           return numericArgs[0] < numericArgs[1];
-         }
-    },
-    '>': {
-      type: function(args, envs) {
-           verifyNumArgs(args, 2);
-           _verifyArgsHaveType(args, 'Real');
-           return 'UnicodeString';
-         },
-      eval: function(args, envs) {
-           verifyNumArgs(args, 2);
-           var numericArgs = _coerceAllArgsToNumber(args);
-           return numericArgs[0] > numericArgs[1];
-         }
-    },
-    '!': {
-      type: function(args, envs) {
-           verifyNumArgs(args, 1);
-           _verifyArgsHaveType(args, 'UnicodeString');
-           return 'UnicodeString';
-         },
-      eval: function(args, envs) {
-           verifyNumArgs(args, 1);
-           return !args[0];
-         }
-    },
-    '==': {
-      type: function(args, envs) {
+        },
+        '<': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'UnicodeString';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs[0] < numericArgs[1];
+          }
+        },
+        '>': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'UnicodeString';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return numericArgs[0] > numericArgs[1];
+          }
+        },
+        '!': {
+          type: function(args, envs) {
+            verifyNumArgs(args, 1);
+            _verifyArgsHaveType(args, 'UnicodeString');
+            return 'UnicodeString';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 1);
+            return !args[0];
+          }
+        },
+        '==': {
+          type: function(args, envs) {
             verifyNumArgs(args, 2);
             return 'UnicodeString';
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             verifyNumArgs(args, 2);
             return args[0] == args[1];
           }
-    },
-    '!=': {
-      type: function(args, envs) {
+        },
+        '!=': {
+          type: function(args, envs) {
             verifyNumArgs(args, 2);
             return 'UnicodeString';
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             verifyNumArgs(args, 2);
             return args[0] != args[1];
           }
-    },
-    '&&': {
-      type: function(args, envs) {
+        },
+        '&&': {
+          type: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'UnicodeString');
             return 'UnicodeString';
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             // TODO(kashida): Make this short-circuit.
             verifyNumArgs(args, 2);
             return Boolean(args[0] && args[1]);
           }
-    },
-    '||': {
-      type: function(args, envs) {
+        },
+        '||': {
+          type: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'UnicodeString');
             return 'UnicodeString';
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             // TODO(kashida): Make this short-circuit.
             verifyNumArgs(args, 2);
             return Boolean(args[0] || args[1]);
           }
-    },
-    if: {
-      type: function(args, envs) {
+        },
+        if: {
+          type: function(args, envs) {
             verifyNumArgs(args, 3);
             _verifyArgsHaveType([args[0]], 'UnicodeString');
-            _verifyArgsHaveType([args[2]], args[1]);
+            _verifyArgsHaveSameType(args[1], args[2]);
             return args[1];
           },
-      eval: function(args, envs) {
+          eval: function(args, envs) {
             // TODO(kashida): Make this short-circuit.
             verifyNumArgs(args, 3);
             return args[0] ? args[1] : args[2];
           }
-    },
-    floor: {
-      type: function(args, envs) {
-               verifyNumArgs(args, 1);
-               _verifyArgsHaveType(args, 'Real');
-               return 'Real';
-             },
-      eval: function(args, envs) {
-               verifyNumArgs(args, 1);
-               var numericArgs = _coerceAllArgsToNumber(args);
-               return Math.floor(numericArgs[0]);
-             }
-    },
-    pow: {
-      type: function(args, envs) {
-             verifyNumArgs(args, 2);
-             _verifyArgsHaveType(args, 'Real');
-             return 'Real';
-           },
-      eval: function(args, envs) {
-             verifyNumArgs(args, 2);
-             var numericArgs = _coerceAllArgsToNumber(args);
-             return Math.pow(args[0], args[1]);
-           }
-    },
-    log: {
-      type: function(args, envs) {
-             verifyNumArgs(args, 2);
-             _verifyArgsHaveType(args, 'Real');
-             return 'Real';
-           },
-      eval: function(args, envs) {
-             verifyNumArgs(args, 2);
-             var numericArgs = _coerceAllArgsToNumber(args);
-             return Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
-           }
-    },
-    abs: {
-      type: function(args, envs) {
-             verifyNumArgs(args, 1);
-             _verifyArgsHaveType(args, 'Real');
-             return 'Real';
-           },
-      eval: function(args, envs) {
-             verifyNumArgs(args, 1);
-             var numericArgs = _coerceAllArgsToNumber(args);
-             return Math.abs(numericArgs[0]);
-           }
-    }
-  };
+        },
+        floor: {
+          type: function(args, envs) {
+            verifyNumArgs(args, 1);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 1);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return Math.floor(numericArgs[0]);
+          }
+        },
+        pow: {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return Math.pow(args[0], args[1]);
+          }
+        },
+        log: {
+          type: function(args, envs) {
+            verifyNumArgs(args, 2);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 2);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
+          }
+        },
+        abs: {
+          type: function(args, envs) {
+            verifyNumArgs(args, 1);
+            _verifyArgsHaveType(args, 'Real');
+            return 'Real';
+          },
+          eval: function(args, envs) {
+            verifyNumArgs(args, 1);
+            var numericArgs = _coerceAllArgsToNumber(args);
+            return Math.abs(numericArgs[0]);
+          }
+        }
+      };
 
       return {
-    ExpressionError: ExpressionError,
-    ExprUndefinedVarError: ExprUndefinedVarError,
-    ExprWrongNumArgsError: ExprWrongNumArgsError,
-    ExprWrongArgTypeError: ExprWrongArgTypeError,
-    evaluateExpression: evaluateExpression,
-    evaluateParseTree: evaluateParseTree,
-    getParamsUsedInExpression: getParamsUsedInExpression,
-    lookupEnvs: lookupEnvs
-  };
+        ExpressionError: ExpressionError,
+        ExprUndefinedVarError: ExprUndefinedVarError,
+        ExprWrongNumArgsError: ExprWrongNumArgsError,
+        ExprWrongArgTypeError: ExprWrongArgTypeError,
+        evaluateExpression: evaluateExpression,
+        evaluateParseTree: evaluateParseTree,
+        getParamsUsedInExpression: getParamsUsedInExpression,
+        lookupEnvs: lookupEnvs
+      };
     }]);

@@ -20,6 +20,7 @@ describe('Expression type parser service', function() {
   beforeEach(inject(function($injector) {
     ees = $injector.get('expressionTypeParserService');
     eps = $injector.get('expressionParserService');
+    ests = $injector.get('expressionSyntaxTreeService');
   }));
 
   var ENVS = [
@@ -33,7 +34,7 @@ describe('Expression type parser service', function() {
     }
   ];
 
-  it('should evaluate to correct values', function() {
+  it('should determine the correct types for the expressions', function() {
     [
       ['2', 'Real'],
       ['numZero', 'Real'],
@@ -53,6 +54,7 @@ describe('Expression type parser service', function() {
       ['boolTrue == boolFalse', 'UnicodeString'],
       ['strNull != strXYZ', 'UnicodeString'],
       ['if boolFalse then 8 else numZero', 'Real'],
+      ['if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError],
       ['num100_001 / 0', 'Real'],
       ['abs(-3)', 'Real'],
       ['pow(num100_001, numZero)', 'Real'],
@@ -85,6 +87,24 @@ describe('Expression type parser service', function() {
         failed = true;
       };
 
+      try {
+        var evaled = ests.evaluateParseTree(parsed, ENVS, ees.evaluate);
+        if (expected instanceof Error || evaled !== expected) {
+          recordFailure(evaled, undefined);
+        }
+      } catch (e) {
+        if (!(e instanceof expected)) {
+          // Wrong or unexpected exception.
+          recordFailure(undefined, e);
+        }
+      }
+      expect(failed).toBe(false);
+
+      if (typeof (expression) != 'string') {
+        return;
+      }
+
+      failed = false;
       try {
         evaled = ees.evaluateExpression(expression, ENVS);
         if (expected instanceof Error || evaled !== expected) {
