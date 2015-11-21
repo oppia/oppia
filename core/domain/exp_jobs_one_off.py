@@ -58,7 +58,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job that finds first published datetime for all explorations"""
+    """One-off job that finds first published datetime for all explorations."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -67,13 +67,18 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            yield(item.id.split('-')[0], utils.get_time_in_millisecs(item.created_on))
+            snapshot_id = item.id
+            yield(snapshot_id[:snapshot_id.rfind("-")], utils.get_time_in_millisecs(
+                item.created_on))
 
     @staticmethod
-    def reduce(exp_id, list_of_commit_times):
-        first_publish_in_ms = ast.literal_eval(min(list_of_commit_times))
-        rights_manager.update_exploration_first_published_in_ms_if_not_set(
-            exp_id, first_publish_in_ms)
+    def reduce(exp_id, stringified_commit_times):
+        commit_times = [ast.literal_eval(
+            commit_time_string) for commit_time_string in stringified_commit_times]
+        first_publish_in_msec = min(commit_times)
+        rights_manager.update_activity_first_published_in_msec_if_necessary(
+            rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            first_publish_in_msec)
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
