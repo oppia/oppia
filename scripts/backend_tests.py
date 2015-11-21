@@ -17,7 +17,7 @@
 This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
 
-    bash scripts/test.sh
+    bash scripts/run_backend_tests.sh
 """
 
 import argparse
@@ -30,7 +30,7 @@ import time
 
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
-EXPECTED_TEST_COUNT = 604
+EXPECTED_TEST_COUNT = 615
 
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
@@ -328,6 +328,9 @@ def main():
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
+    elif total_errors or total_failures:
+        raise Exception(
+            '%s errors, %s failures' % (total_errors, total_failures))
 
 
 if __name__ == '__main__':

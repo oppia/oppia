@@ -104,7 +104,7 @@ body {
   width: 100%;
 }
 
-/* Special settings for world-viewable profile page*/ 
+/* Special settings for world-viewable profile page*/
 .oppia-profile-container {
   margin-top: 60px;
   margin-bottom: 30px;
@@ -230,7 +230,7 @@ p {
   container's width.
 */
 img, video, canvas {
-  max-width: 100%
+  max-width: 100%;
 }
 
 textarea {
@@ -242,14 +242,38 @@ textarea {
 */
 .oppia-dev-mode {
   background-color: DarkSlateGray;
+  border-bottom-right-radius: 0.5em;
   border-top-right-radius: 0.5em;
-  bottom: 0;
+  bottom: 40px;
   color: white;
   left: 0;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
   position: fixed;
+}
+
+/*
+  Styles for the link to the site feedback form.
+*/
+.oppia-site-feedback {
+  background-color: #fff;
+  border-radius: 2px;
+  bottom: 4px;
+  color: rgba(0,0,0,0.87);
+  cursor: pointer;
+  left: 4px;
+  opacity: 0.5;
+  padding: 4px 8px;
+  position: fixed;
+  z-index: 5;
+}
+.oppia-site-feedback:hover,
+.oppia-site-feedback:focus,
+.oppia-site-feedback:active {
+  color: rgba(0,0,0,0.87);
+  opacity: 1.0;
+  text-decoration: none;
 }
 
 /*
@@ -902,10 +926,15 @@ md-card.oppia-gallery-tile {
   font-style: italic;
 }
 
-.oppia-save-publish-button-icon {
-  height: 18px;
-  margin: 0 0 2px 0;
-  width: 18px;
+@media(min-width: 1100px) {
+  .material-icons.oppia-save-publish-button-icon {
+    display: none;
+  }
+}
+@media(max-width: 1100px) {
+  .oppia-save-publish-button-label {
+    display: none;
+  }
 }
 
 .oppia-state-name-container {
@@ -913,6 +942,10 @@ md-card.oppia-gallery-tile {
   border-bottom-left-radius: 5px;
   margin: 2px 7px;
   padding: 6px;
+}
+
+.oppia-editor-page-container {
+  margin-bottom: 60px;
 }
 
 .oppia-editor-header {
@@ -1062,6 +1095,88 @@ pre.oppia-pre-wrapped-text {
   height: 400px;
   overflow-y: hidden;
   position: relative;
+}
+
+/* Styles for the collections learner view */
+
+.oppia-collection-player-tiles-container {
+  background-color: #eee;
+  height: 100%;
+  margin-top: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 800px;
+  min-height: 500px;
+  padding-bottom: 25px;
+  position: relative;
+}
+
+md-card.oppia-collection-player-tile {
+  background-color: #fff;
+  color: #888;
+  height: 120px;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+.oppia-collection-player-tile:hover {
+  background-color: #f9f9f9;
+}
+
+.oppia-collection-player-tile-container-link {
+  height: 100%;
+  width: 100%;
+}
+
+.oppia-collection-player-tile-image-container {
+  height: 120px;
+  left: 0;
+  top: 0;
+  width: 120px;
+  position: absolute;
+}
+
+.oppia-collection-player-tile-section {
+  margin-bottom: 24px;
+}
+
+/* This centers the image horizontally and vertically. */
+.oppia-collection-player-tile-image {
+  height: 120px;
+  width: 120px;
+}
+
+.oppia-collection-player-tile-contents {
+  height: 100%;
+  padding: 23px 58px;
+  width: 100%;
+}
+
+.oppia-collection-player-tile-details {
+  padding-left: 100px;
+  padding-top: 5px;
+  margin-bottom: 8px;
+}
+.oppia-collection-player-tile-title {
+  color: #333;
+  font-weight: bold;
+}
+.oppia-collection-player-small-text {
+  font-style: italic;
+  font-size: 1em;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 365px) {
+  .oppia-collection-player-tile-image-container {
+    display: none;
+  }
+  .oppia-collection-player-tile-details {
+    padding-left: 0;
+  }
 }
 
 /* Styles for the statistics page. */

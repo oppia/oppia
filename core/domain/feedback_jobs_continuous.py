@@ -26,6 +26,7 @@ import feconf
 
 from google.appengine.ext import ndb
 
+
 class FeedbackAnalyticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
         num_open_threads = ndb.IntegerProperty(default=0)
@@ -104,7 +105,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             old_status = args[1]
             updated_status = args[2]
             # Status changed from closed to open.
-            if (old_status != feedback_models.STATUS_CHOICES_OPEN 
+            if (old_status != feedback_models.STATUS_CHOICES_OPEN
                     and updated_status == feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
                      _increment_open_threads_count)
@@ -113,7 +114,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                   and updated_status != feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
                     _decrement_open_threads_count)
-         
+
     # Public query methods.
     @classmethod
     def get_thread_analytics(cls, exploration_id):
@@ -134,7 +135,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         num_open_threads = 0
         num_total_threads = 0
         if realtime_model:
-            num_open_threads = realtime_model.num_open_threads 
+            num_open_threads = realtime_model.num_open_threads
             num_total_threads = realtime_model.num_total_threads
         if feedback_thread_analytics_model:
             num_open_threads += feedback_thread_analytics_model.num_open_threads

@@ -19,25 +19,21 @@
 __author__ = 'Sean Lip'
 
 from core import jobs_registry
-from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
-from core.domain import subscription_services
-from core.domain import user_jobs
+from core.domain import user_jobs_continuous
 from core.platform import models
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 import feconf
-import utils
 
 
 class ModifiedRecentUpdatesAggregator(
-        user_jobs.DashboardRecentUpdatesAggregator):
+        user_jobs_continuous.DashboardRecentUpdatesAggregator):
     """A modified DashboardRecentUpdatesAggregator that does not start a new
      batch job when the previous one has finished.
     """
@@ -50,7 +46,8 @@ class ModifiedRecentUpdatesAggregator(
         pass
 
 
-class ModifiedRecentUpdatesMRJobManager(user_jobs.RecentUpdatesMRJobManager):
+class ModifiedRecentUpdatesMRJobManager(
+        user_jobs_continuous.RecentUpdatesMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -141,8 +138,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # Start migration job on all explorations, including this one.
-            job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-            exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+            job_id = (
+                exp_jobs_one_off.ExplorationMigrationJobManager.create_new())
+            exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
             # Confirm that the exploration is at version 2.
@@ -593,351 +591,3 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertLess(
                 last_updated_ms_before_deletion,
                 recent_notifications[0]['last_updated_ms'])
-
-
-class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off dashboard subscriptions job."""
-    EXP_ID_1 = 'exp_id_1'
-    EXP_ID_2 = 'exp_id_2'
-    COLLECTION_ID_1 = 'col_id_1'
-    COLLECTION_ID_2 = 'col_id_2'
-    EXP_ID_FOR_COLLECTION_1 = 'id_of_exp_in_collection_1'
-    USER_A_EMAIL = 'a@example.com'
-    USER_A_USERNAME = 'a'
-    USER_B_EMAIL = 'b@example.com'
-    USER_B_USERNAME = 'b'
-    USER_C_EMAIL = 'c@example.com'
-    USER_C_USERNAME = 'c'
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = user_jobs.DashboardSubscriptionsOneOffJob.create_new()
-        user_jobs.DashboardSubscriptionsOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        self.process_and_flush_pending_tasks()
-
-    def _null_fn(self, *args, **kwargs):
-        """A mock for functions of the form subscribe_to_*() to represent
-        behavior prior to the implementation of subscriptions.
-        """
-        pass
-
-    def setUp(self):
-        super(DashboardSubscriptionsOneOffJobTests, self).setUp()
-
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
-
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
-            # User A creates and saves a new valid exploration.
-            self.save_new_valid_exploration(
-                self.EXP_ID_1, self.user_a_id, end_state_name='End')
-
-    def test_null_case(self):
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id, strict=False)
-        self.assertEqual(user_b_subscriptions_model, None)
-
-        self._run_one_off_job()
-
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id, strict=False)
-        self.assertEqual(user_b_subscriptions_model, None)
-
-    def test_feedback_thread_subscription(self):
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id, strict=False)
-        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_c_id, strict=False)
-
-        self.assertEqual(user_b_subscriptions_model, None)
-        self.assertEqual(user_c_subscriptions_model, None)
-
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
-            # User B starts a feedback thread.
-            feedback_services.create_thread(
-                self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
-            # User C adds to that thread.
-            thread_id = feedback_services.get_threadlist(
-                self.EXP_ID_1)[0]['thread_id']
-            feedback_services.create_message(
-                thread_id, self.user_c_id, None, None, 'more text')
-
-        self._run_one_off_job()
-
-        # Both users are subscribed to the feedback thread.
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id)
-        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_c_id)
-
-        self.assertEqual(user_b_subscriptions_model.activity_ids, [])
-        self.assertEqual(user_c_subscriptions_model.activity_ids, [])
-        self.assertEqual(
-            user_b_subscriptions_model.feedback_thread_ids, [thread_id])
-        self.assertEqual(
-            user_c_subscriptions_model.feedback_thread_ids, [thread_id])
-
-    def test_exploration_subscription(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
-            # User A adds user B as an editor to the exploration.
-            rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
-            # User A adds user C as a viewer of the exploration.
-            rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
-
-        self._run_one_off_job()
-
-        # Users A and B are subscribed to the exploration. User C is not.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id)
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id)
-        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_c_id, strict=False)
-
-        self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_c_subscriptions_model, None)
-
-    def test_two_explorations(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
-            # User A creates and saves another valid exploration.
-            self.save_new_valid_exploration(self.EXP_ID_2, self.user_a_id)
-
-        self._run_one_off_job()
-
-        # User A is subscribed to two explorations.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id)
-
-        self.assertEqual(
-            sorted(user_a_subscriptions_model.activity_ids),
-            sorted([self.EXP_ID_1, self.EXP_ID_2]))
-
-    def test_community_owned_exploration(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
-            # User A adds user B as an editor to the exploration.
-            rights_manager.assign_role_for_exploration(
-                self.user_a_id, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
-            # The exploration becomes community-owned.
-            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
-            rights_manager.release_ownership_of_exploration(
-                self.user_a_id, self.EXP_ID_1)
-            # User C edits the exploration.
-            exp_services.update_exploration(
-                self.user_c_id, self.EXP_ID_1, [], 'Update exploration')
-
-        self._run_one_off_job()
-
-        # User A and user B are subscribed to the exploration; user C is not.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id)
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id)
-        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_c_id, strict=False)
-
-        self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(user_c_subscriptions_model, None)
-
-    def test_deleted_exploration(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
-
-            # User A deletes the exploration.
-            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
-
-        self._run_one_off_job()
-
-        # User A is not subscribed to the exploration.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id, strict=False)
-        self.assertEqual(user_a_subscriptions_model, None)
-
-    def test_collection_subscription(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
-            # User A creates and saves a new valid collection.
-            self.save_new_valid_collection(
-                self.COLLECTION_ID_1, self.user_a_id,
-                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
-
-            # User A adds user B as an editor to the collection.
-            rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
-            # User A adds user C as a viewer of the collection.
-            rights_manager.assign_role_for_collection(
-                self.user_a_id, self.COLLECTION_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
-
-        self._run_one_off_job()
-
-        # Users A and B are subscribed to the collection. User C is not.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id)
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id)
-        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_c_id, strict=False)
-
-        self.assertEqual(
-            user_a_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
-        # User A is also subscribed to the exploration within the collection
-        # because they created both.
-        self.assertEqual(
-            sorted(user_a_subscriptions_model.activity_ids), [
-                self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
-        self.assertEqual(
-            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_c_subscriptions_model, None)
-
-    def test_two_collections(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
-            # User A creates and saves a new valid collection.
-            self.save_new_valid_collection(
-                self.COLLECTION_ID_1, self.user_a_id,
-                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
-
-            # User A creates and saves another valid collection.
-            self.save_new_valid_collection(
-                self.COLLECTION_ID_2, self.user_a_id,
-                exploration_id=self.EXP_ID_FOR_COLLECTION_1)
-
-        self._run_one_off_job()
-
-        # User A is subscribed to two collections.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id)
-
-        self.assertEqual(
-            sorted(user_a_subscriptions_model.collection_ids),
-            sorted([self.COLLECTION_ID_1, self.COLLECTION_ID_2]))
-
-    def test_deleted_collection(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
-            # User A creates and saves a new collection.
-            self.save_new_default_collection(
-                self.COLLECTION_ID_1, self.user_a_id)
-
-            # User A deletes the collection.
-            collection_services.delete_collection(
-                self.user_a_id, self.COLLECTION_ID_1)
-
-            # User A deletes the exploration from earlier.
-            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
-
-        self._run_one_off_job()
-
-        # User A is not subscribed to the collection.
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id, strict=False)
-        self.assertEqual(user_a_subscriptions_model, None)
-
-    def test_adding_exploration_to_collection(self):
-        with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
-            ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
-            # User B creates and saves a new collection.
-            self.save_new_default_collection(
-                self.COLLECTION_ID_1, self.user_b_id)
-
-            # User B adds the exploration created by user A to the collection.
-            collection_services.update_collection(
-                self.user_b_id, self.COLLECTION_ID_1, [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': self.EXP_ID_1
-                }], 'Add new exploration to collection.')
-
-        # Users A and B have no subscriptions (to either explorations or
-        # collections).
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id, strict=False)
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id, strict=False)
-        self.assertEqual(user_a_subscriptions_model, None)
-        self.assertEqual(user_b_subscriptions_model, None)
-
-        self._run_one_off_job()
-
-        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_a_id)
-        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
-            self.user_b_id)
-
-        # User B should be subscribed to the collection and user A to the
-        # exploration.
-        self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(
-            user_a_subscriptions_model.collection_ids, [])
-        self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [])
-        self.assertEqual(
-            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])

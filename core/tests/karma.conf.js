@@ -53,9 +53,12 @@ module.exports = function(config) {
       // accident, that directory will not have coverage statistics generated
       // for it, which is easily fixed.
       'core/templates/dev/head/admin/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/collection_player/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/css/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/dashboard/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/domain/collection/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/domain/utilities/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/error/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
