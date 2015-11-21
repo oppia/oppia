@@ -201,8 +201,8 @@ def download_manifest_files(source_url):
                     DEPENDENCY_TARGET_ROOT_NAME = (
                         dependency_contents['targetDirPrefix'] + DEPENDENCY_REV)
                 download_and_unzip_files(
-                        DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
-                        DEPENDENCY_ZIP_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
+                    DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
+                    DEPENDENCY_ZIP_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
 
             elif 'tarUrl' in dependency_contents:
                 DEPENDENCY_REV = dependency_contents['version']
@@ -212,8 +212,8 @@ def download_manifest_files(source_url):
                 DEPENDENCY_TARGET_ROOT_NAME = (
                     dependency_contents['targetDirPrefix'] + DEPENDENCY_REV)
                 download_and_untar_files(
-                        DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
-                        DEPENDENCY_TAR_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
+                    DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
+                    DEPENDENCY_TAR_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
 
 
 download_manifest_files(MANIFEST_FILE_PATH)
