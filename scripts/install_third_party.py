@@ -38,7 +38,7 @@ TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
 # Check that the current directory is correct.
 common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
-DOWNLOAD_DICT ={
+TARGET_DOWNLOAD_DIRS = {
     'frontend': THIRD_PARTY_STATIC_DIR,
     'backend': THIRD_PARTY_DIR,
     'oppiaTools': TOOLS_DIR
@@ -146,6 +146,7 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
+
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
     with open(filepath, mode) as f:
@@ -162,7 +163,8 @@ def return_json(source_url):
     response = get_file_contents(source_url)
     return json.loads(response)
 
-def download_third_party(source_url):
+
+def download_manifest_files(source_url):
     """This download all files to the required folders
     Args:
       source_url: the URL fof the json file.
@@ -177,10 +179,10 @@ def download_third_party(source_url):
                 DEPENDENCY_REV = dependency_contents['version']
                 DEPENDENCY_URL = dependency_contents['srcUrl']
                 DEPENDENCY_FILES = dependency_contents['files']
-                FOLDER_NAME = (
+                TARGET_DIRNAME = (
                     dependency_contents['targetDirPrefix'] + DEPENDENCY_REV)
                 DEPENDENCY_DST = os.path.join(
-                        DOWNLOAD_DICT[data], FOLDER_NAME)
+                    TARGET_DOWNLOAD_DIRS[data], TARGET_DIRNAME)
                 download_files(DEPENDENCY_URL, DEPENDENCY_DST, DEPENDENCY_FILES)
 
             elif 'zipUrl' in dependency_contents:
@@ -199,7 +201,7 @@ def download_third_party(source_url):
                     DEPENDENCY_TARGET_ROOT_NAME = (
                         dependency_contents['targetDirPrefix'] + DEPENDENCY_REV)
                 download_and_unzip_files(
-                        DEPENDENCY_URL, DOWNLOAD_DICT[data],
+                        DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
                         DEPENDENCY_ZIP_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
 
             elif 'tarUrl' in dependency_contents:
@@ -210,11 +212,11 @@ def download_third_party(source_url):
                 DEPENDENCY_TARGET_ROOT_NAME = (
                     dependency_contents['targetDirPrefix'] + DEPENDENCY_REV)
                 download_and_untar_files(
-                        DEPENDENCY_URL, DOWNLOAD_DICT[data],
+                        DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
                         DEPENDENCY_TAR_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
 
 
-download_third_party(MANIFEST_FILE_PATH)
+download_manifest_files(MANIFEST_FILE_PATH)
 
 MATHJAX_REV = '2.4-latest'
 MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV

@@ -77,7 +77,7 @@ for (var dependencyId in frontendDependencies) {
     });
   }
 }
-gulp.task('css', function() {
+gulp.task('generateCss', function() {
   gulp.src(cssFilesPath)
     .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
     .pipe(concat('third_party.css'))
@@ -108,13 +108,13 @@ gulp.task('gulpStartGae', function() {
 
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
-gulp.task('build', ['css', 'copyFonts', 'copyCssBackgroundImages']);
+gulp.task('build', ['generateCss', 'copyFonts', 'copyCssBackgroundImages']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
     gulp.watch('gulpfile.js', ['build']);
-    gulp.watch(cssFilesPath, ['css']);
+    gulp.watch(cssFilesPath, ['generateCss']);
     gulp.watch('manifest.json', ['build']);
     gulp.slurped = true;
   }
