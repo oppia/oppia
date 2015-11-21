@@ -264,21 +264,30 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        job_id = (exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new())
+        job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        exp_first_published = exploration_rights.first_published_in_msec
+
+        # Test to see whether first_published_msec was correctly updated.
+        exp_first_published = exploration_rights.first_published_msec
+        exp_rights_model = exp_models.ExplorationRightsModel.get(self.EXP_ID)
+        last_updated_time_msec = utils.get_time_in_millisecs(
+            exp_rights_model.last_updated)
+        self.assertLess(
+            exp_first_published, last_updated_time_msec)
 
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        job_id = (exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new())
+        job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
+        # Test to see whether first_published_msec remains the same despite the
+        # republication.
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertEqual(
-            exp_first_published, exploration_rights.first_published_in_msec)
+            exp_first_published, exploration_rights.first_published_msec)
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
