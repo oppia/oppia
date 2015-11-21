@@ -34,7 +34,7 @@ var File = gulpUtil.File;
 var PluginError = gulpUtil.PluginError;
 
 module.exports = function(action, args, params) {
-  action = action || defaultStartAction;
+  action = action;
   args = args || [];
   params = params || {};
 
