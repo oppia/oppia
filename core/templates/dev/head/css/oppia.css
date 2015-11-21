@@ -119,6 +119,78 @@ body {
   margin-top: 15px;
 }
 
+.oppia-profile-tabs md-content {
+  background-color: white !important; 
+}
+
+.oppia-profile-tabs md-content md-tabs {
+  background: #f6f6f6;
+  border: 1px solid #e1e1e1; 
+}
+
+.oppia-profile-tabs md-content md-tabs md-tabs-wrapper {
+  background: white; 
+}
+
+.oppia-profile-tabs md-content h1:first-child {
+  margin-top: 0; 
+}
+
+.oppia-profile-tabs md-tab {
+  background-color: #009688;
+}
+
+.oppia-profile-tabs md-tab-ink-bar {
+  background-color: black;
+}
+
+md-tabs. md-padding {
+  width: 20%;
+}
+
+.oppia-profile-tabs md-tab-label {
+    color: #ffffff;
+}
+
+.stat-container-top {
+    display: inline-block;
+    width: 45%;
+}
+
+.stat-container {
+    display: inline-block;
+    width: 15%;
+}
+
+.stat-big-container {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.big-top-container {
+    margin-bottom: 70px;
+}
+
+.stat-container-top span {
+    display: block;
+}
+
+.stat-container span {
+    display: block;
+}
+
+.big-number {
+    font-size: 50px;
+}
+
+.small-number {
+    font-size: 25px;
+}
+
+
+
 /*
   This counteracts the increased line-height of 1.846 introduced by
   angular-material.css.

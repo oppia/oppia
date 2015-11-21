@@ -19,8 +19,8 @@
  */
 
 oppia.controller('Profile', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'ratingVisibilityService',
+  function($scope, $http, $rootScope, oppiaDatetimeFormatter, ratingVisibilityService) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
@@ -28,6 +28,21 @@ oppia.controller('Profile', [
       return oppiaDatetimeFormatter.getLocaleDateString(millisSinceEpoch);
     };
 
+      //to be redefined to pull from the back end instead of 4.5s
+      
+      $scope.userAverageRating = 4.5;
+      $scope.numUserCreatedExplorations = 4.5;
+      $scope.numUserEditedExplorations = 4.5;
+      $scope.userFeedbackGiven = 4.5;
+      $scope.userFeedbackResponses = 4.5;
+      $scope.userExplorationsLearned = 4.5;
+    
+      $scope.areRatingsShown = function(ratingFrequencies) {
+    return ratingVisibilityService.areRatingsShown(ratingFrequencies);
+  };
+      
+      $scope.userCreatedExplorations = [{"status": "publicized", "community_owned": true, "last_updated": 1447362647145.1201,   "is_editable": true, "language_code": "en", "id": "0", "category": "Welcome", "ratings": {"1": 1, "3": 1, "2": 0, "5": 5, "4": 3}, "title": "Welcome to Oppia!", "objective": "become familiar with Oppia's capabilities", "thumbnail_image_url": "/images/gallery/exploration_background_teal_small.png"}, {"status": "public", "community_owned": false, "last_updated": 1448031062905.04, "is_editable": false, "language_code": "en", "id": "TZTJWx0kA4ML", "category": "Education", "ratings": {"1": 0, "3": 0, "2": 0, "5": 1, "4": 0}, "title": "TEST", "objective": "THE BENEFITS OF 3D MOOCS", "thumbnail_image_url": "/images/gallery/exploration_background_teal_small.png"}, {"status": "public", "community_owned": false, "last_updated": 1448029838111.9199, "is_editable": false, "language_code": "en", "id": "Xtn9w_HYzm1Y", "category": "Education", "ratings": {"1": 0, "3": 0, "2": 0, "5": 0, "4": 0}, "title": "Programme Rep Training", "objective": "To introduce the role of Programme Rep and provide the key information to get started in the role.", "thumbnail_image_url": "/images/gallery/exploration_background_teal_small.png"}, {"status": "public", "community_owned": false, "last_updated": 1448044088407.8799, "is_editable": false, "language_code": "en", "id": "C-UDcqyIDAf4", "category": "Education", "ratings": {"1": 0, "3": 0, "2": 0, "5": 0, "4": 0}, "title": "Turtle Geometry", "objective": "Create algorithms to draw shapes", "thumbnail_image_url": "/images/gallery/exploration_background_teal_small.png"}];
+     
     $rootScope.loadingMessage = 'Loading';
     $http.get(profileDataUrl).success(function(data) {
       $rootScope.loadingMessage = '';
@@ -39,3 +54,5 @@ oppia.controller('Profile', [
     });
   }
 ]);
+
+
