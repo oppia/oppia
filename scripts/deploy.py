@@ -29,8 +29,8 @@ IMPORTANT NOTES:
     folder should contain a folder called /images, which in turn should
     contain:
     - one file: favicon.ico
-    - three folders: /logo, /splash and /sidebar, containing images used for
-        the logo, gallery carousel and sidebar, respectively.
+    - four folders: /avatar, /logo, /splash and /sidebar, containing images
+        used for the avatar, logo, gallery carousel and sidebar, respectively.
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -120,7 +120,7 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
-    IMAGE_DIRS = ['splash', 'sidebar', 'logo']
+    IMAGE_DIRS = ['avatar', 'splash', 'sidebar', 'logo']
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
