@@ -258,6 +258,11 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
+      $scope.isEndInteraction = function() {
+        return $scope.activeCard &&
+          oppiaPlayerService.isEndInteraction($scope.activeCard.stateName);
+      };
+
       var isSupplementalCardNonempty = function(card) {
         return !card.interactionIsInline;
       };

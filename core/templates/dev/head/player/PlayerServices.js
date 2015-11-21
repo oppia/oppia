@@ -436,6 +436,10 @@ oppia.factory('oppiaPlayerService', [
     getExplorationId: function() {
       return _explorationId;
     },
+    isEndInteraction: function(stateName) {
+      return _exploration.states[stateName].interaction.id ==
+        'EndExploration';
+    },
     getInformationCardData: function() {
       var informationCardData = {
         explorationTags: _explorationTags,
