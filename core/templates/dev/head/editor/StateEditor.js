@@ -184,7 +184,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
                   $scope.trainingDataFeedback = feedback;
                   $scope.trainingDataOutcomeDest = dest;
                   $scope.classification.answerGroupIndex = (
-                    classificationResult.answer_group_index);
+                    classificationResult.answerGroupIndex);
                 });
             };
 

@@ -410,14 +410,10 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
             stateName);
-
-          $scope.answerClassificationData =
-            oppiaPlayerService.getAnswerClassificationData(stateName);
         });
       };
 
-      $scope.processClassificationResult = function(
-          answer, classificationResult, timeAtSubmission) {
+       $scope.submitAnswer = function(answer, interactionRulesService) {
         // For some reason, answers are getting submitted twice when the submit
         // button is clicked. This guards against that.
         if (_answerIsBeingProcessed || $scope.activeCard.interactionIsDisabled) {
@@ -438,8 +434,10 @@ oppia.directive('conversationSkin', [function() {
           oppiaFeedback: null
         });
 
-        oppiaPlayerService.processClassificationResult(
-          answer, classificationResult, function(
+        var timeAtServerCall = new Date().getTime();
+
+        oppiaPlayerService.submitAnswer(answer, interactionRulesService,
+          function(
             newStateName, refreshInteraction, feedbackHtml, contentHtml) {
 
           // Do not wait if the interaction is supplemental -- there's already
@@ -447,7 +445,7 @@ oppia.directive('conversationSkin', [function() {
           var millisecsLeftToWait = (
             !oppiaPlayerService.isInteractionInline(_oldStateName) ? 1.0 :
             Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
-              new Date().getTime() - timeAtSubmission),
+              new Date().getTime() - timeAtServerCall),
             1.0));
 
           $timeout(function() {
@@ -525,19 +523,6 @@ oppia.directive('conversationSkin', [function() {
           }, millisecsLeftToWait);
         }, true);
       };
-
-      $scope.submitAnswer = function(answer) {
-        var timeAtSubmission = new Date().getTime();
-        if (_answerIsBeingProcessed) {
-          return;
-        }
-        _answerIsBeingProcessed = true;
-        oppiaPlayerService.getClassificationResult(answer).success(function(classificationResult) {
-          _answerIsBeingProcessed = false;
-          $scope.processClassificationResult(answer, classificationResult, timeAtSubmission);
-        });
-      };
-
       $scope.startCardChangeAnimation = false;
       $scope.showPendingCard = function(newStateName, newContentHtml, successCallback) {
         $scope.waitingForContinueButtonClick = false;

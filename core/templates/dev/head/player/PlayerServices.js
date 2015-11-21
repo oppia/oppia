@@ -86,40 +86,6 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   };
 }]);
 
-// A service that, given an answer, classifies it and returns the corresponding
-// answerGroup.
-oppia.factory('answerClassificationService', [
-    '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
-  var _USE_CLIENT_SIDE_CLASSIFICATION = false;
-
-  return {
-    // Returns a promise with the corresponding ruleSpec.
-    getMatchingClassificationResult: function(explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: learnerParamsService.getAllParams(),
-          answer: answer
-        });
-      }
-    },
-    getMatchingEditorClassificationResult: function(
-        explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        // TODO(bhenning): Figure out a long-term solution for determining what
-        // params should be passed to the batch classifier.
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: {},
-          answer: answer
-        });
-      }
-    },
-  };
-}]);
-
 // A service that provides a number of utility functions for JS used by
 // individual player skins.
 // Note that this service is used both in the learner and the editor views.
@@ -491,13 +457,6 @@ oppia.factory('oppiaPlayerService', [
         INTERACTION_SPECS[interactionId].display_mode ===
           INTERACTION_DISPLAY_MODE_INLINE);
     },
-    getAnswerClassificationData: function(stateName) {
-      var interaction = _exploration.states[stateName].interaction;
-      return {
-        'answerGroups': interaction.answer_groups,
-        'defaultOutcome': interaction.default_outcome
-      };
-    },
     isStateTerminal: function(stateName) {
       return stateName && _exploration.states[stateName].interaction.id &&
         INTERACTION_SPECS[
@@ -542,76 +501,71 @@ oppia.factory('oppiaPlayerService', [
           answer, currentInteraction.id, currentInteraction.customization_args);
       }
     },
-    getClassificationResult: function(answer) {
+    submitAnswer: function(
+        answer, interactionRulesService, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
 
       _numSubmitsForThisState++;
 
+      answerIsBeingProcessed = true;
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
-      return answerClassificationService.getMatchingClassificationResult(
-        _explorationId, oldState, answer
-      );
-    },
-    processClassificationResult: function(
-        answer, classificationResult, successCallback, delayParamUpdates) {
-      if (answerIsBeingProcessed) {
-        return;
-      }
+      answerClassificationService.getMatchingClassificationResult(
+        _explorationId, oldState, answer, interactionRulesService
+      ).then(function(classificationResult) {
+        var outcome = classificationResult.outcome;
 
-      answerIsBeingProcessed = true;
+        if (!_editorPreviewMode) {
+          var answerRecordingUrl = (
+            '/explorehandler/answer_submitted_event/' + _explorationId);
+          $http.post(answerRecordingUrl, {
+            answer: answer,
+            params: learnerParamsService.getAllParams(),
+            version: version,
+            old_state_name: _currentStateName,
+            answer_group_index: classificationResult.answerGroupIndex,
+            rule_spec_index: classificationResult.ruleSpecIndex
+          });
+        }
 
-      var outcome = classificationResult.outcome;
-
-      if (!_editorPreviewMode) {
-        var answerRecordingUrl = (
-          '/explorehandler/answer_submitted_event/' + _explorationId);
-        $http.post(answerRecordingUrl, {
-          answer: answer,
-          params: learnerParamsService.getAllParams(),
-          version: version,
-          old_state_name: _currentStateName,
-          rule_spec_string: classificationResult.rule_spec_string
-        });
-      }
-
-      // If this is a return to the same state, and the resubmission trigger
-      // kicks in, replace the dest, feedback and param changes with that
-      // of the trigger.
-      if (outcome.dest === _currentStateName) {
-        for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
-          var fallback = oldState.interaction.fallbacks[i];
-          if (fallback.trigger.trigger_type == 'NthResubmission' &&
-              fallback.trigger.customization_args.num_submits.value ===
-                _numSubmitsForThisState) {
-            outcome.dest = fallback.outcome.dest;
-            outcome.feedback = fallback.outcome.feedback;
-            outcome.param_changes = fallback.outcome.param_changes;
-            break;
+        // If this is a return to the same state, and the resubmission trigger
+        // kicks in, replace the dest, feedback and param changes with that
+        // of the trigger.
+        if (outcome.dest === _currentStateName) {
+          for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
+            var fallback = oldState.interaction.fallbacks[i];
+            if (fallback.trigger.trigger_type == 'NthResubmission' &&
+                fallback.trigger.customization_args.num_submits.value ===
+                  _numSubmitsForThisState) {
+              outcome.dest = fallback.outcome.dest;
+              outcome.feedback = fallback.outcome.feedback;
+              outcome.param_changes = fallback.outcome.param_changes;
+              break;
+            }
           }
         }
-      }
 
-      var newStateName = outcome.dest;
+        var newStateName = outcome.dest;
 
-      // Compute the data for the next state. This may be null if there are
-      // malformed expressions.
-      var nextStateData = stateTransitionService.getNextStateData(
-        outcome, _exploration.states[newStateName], answer);
+        // Compute the data for the next state. This may be null if there are
+        // malformed expressions.
+        var nextStateData = stateTransitionService.getNextStateData(
+          outcome, _exploration.states[newStateName], answer);
 
-      if (nextStateData) {
-        nextStateData.state_name = newStateName;
-        answerIsBeingProcessed = false;
-        _onStateTransitionProcessed(
-          nextStateData.state_name, nextStateData.params,
-          nextStateData.question_html, nextStateData.feedback_html,
-          answer, successCallback, delayParamUpdates);
-      } else {
-        answerIsBeingProcessed = false;
-        warningsData.addWarning('Expression parsing error.');
-      }
+        if (nextStateData) {
+          nextStateData.state_name = newStateName;
+          answerIsBeingProcessed = false;
+          _onStateTransitionProcessed(
+            nextStateData.state_name, nextStateData.params,
+            nextStateData.question_html, nextStateData.feedback_html,
+            answer, successCallback, delayParamUpdates);
+        } else {
+          answerIsBeingProcessed = false;
+          warningsData.addWarning('Expression parsing error.');
+        }
+      });
     },
     isAnswerBeingProcessed: function() {
       return answerIsBeingProcessed;
