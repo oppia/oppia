@@ -68,14 +68,15 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     def map(item):
         if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
             snapshot_id = item.id
-            yield(
-                snapshot_id[:snapshot_id.rfind("-")],
+            yield (
+                snapshot_id[:snapshot_id.rfind('-')],
                 utils.get_time_in_millisecs(item.created_on))
 
     @staticmethod
     def reduce(exp_id, stringified_commit_times_msecs):
-        commit_times_msecs = [ast.literal_eval(commit_time_string) for
-        commit_time_string in stringified_commit_times_msecs]
+        commit_times_msecs = [
+            ast.literal_eval(commit_time_string) for
+            commit_time_string in stringified_commit_times_msecs]
         first_publish_msec = min(commit_times_msecs)
         rights_manager.update_activity_first_published_msec_if_necessary(
             rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
