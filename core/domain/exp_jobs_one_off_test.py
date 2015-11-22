@@ -22,7 +22,7 @@ __author__ = 'Frederik Creemers'
 
 from core import jobs_registry
 from core.domain import exp_domain
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
@@ -36,7 +36,8 @@ search_services = models.Registry.import_search_services()
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [exp_jobs.ExpSummariesCreationOneOffJob]
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.ExpSummariesCreationOneOffJob]
 
     def test_all_exps_publicized(self):
         """Test exploration summary batch job if all explorations are
@@ -211,8 +212,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         exploration.version)
 
             # run batch job
-            job_id = exp_jobs.ExpSummariesCreationOneOffJob.create_new()
-            exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
+            job_id = (
+                exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
+            exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
             # get job output
@@ -255,8 +257,8 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_standard_operation(self):
-        job_id = (exp_jobs.IndexAllExplorationsJobManager.create_new())
-        exp_jobs.IndexAllExplorationsJobManager.enqueue(job_id)
+        job_id = (exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
+        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(job_id)
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
@@ -318,8 +320,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         self._before_converted_yaml = exploration.to_yaml()
 
         # Start migration job on sample exploration.
-        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the exploration is exactly the same after migration.
@@ -339,8 +341,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
             self.NEW_EXP_ID, self.ALBERT_ID, self.EXP_TITLE)
 
         # Start migration job on sample exploration.
-        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
@@ -372,8 +374,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
         # Start migration job on sample exploration.
-        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
         # This running without errors indicates the deleted exploration is
         # being ignored, since otherwise exp_services.get_exploration_by_id

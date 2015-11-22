@@ -95,7 +95,10 @@
                   <rect ng-click="onClickFunction(node.id)" class="clickable"
                         style="fill: yellow;" width="22" height="22"
                         ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0 - 8]>"
-                        ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
+                        ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>"
+                        tooltip="<[getNodeErrorMessage(node.label)]>"
+                        tooltip-placement="bottom" tooltip-animation="true"
+                        tooltip-append-to-body="true">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
                       ng-attr-y="<[node.y0 + 9]>"
@@ -103,7 +106,6 @@
                       ng-attr-transform="<[getHighlightTextTransform(node.x0, node.y0)]>">
                     ⚠
                   </text>
-                  <title><[getNodeErrorMessage(node.label)]></title>
                 </g>
                 <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
                   <rect height="15" width="15" opacity="0" stroke-width="0"

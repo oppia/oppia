@@ -34,7 +34,7 @@ TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
 
 
 # Check that the current directory is correct.
-common.require_cwd_to_be_oppia()
+common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 
 def download_files(source_url_root, target_dir, source_filenames):
@@ -172,7 +172,7 @@ JQUERYUI_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV)
 JQUERYUI_FILES = ['jquery-ui.min.js']
 
-ANGULAR_REV = '1.3.13'
+ANGULAR_REV = '1.4.7'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
 ANGULAR_TEST_URL = 'https://code.angularjs.org/%s' % ANGULAR_REV

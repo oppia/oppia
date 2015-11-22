@@ -21,10 +21,9 @@ __author__ = 'Sean Lip'
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
-from core.domain import stats_jobs
+from core.domain import stats_jobs_continuous
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-import feconf
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
@@ -118,7 +117,7 @@ def get_state_improvements(exploration_id, exploration_version):
             'rule_str': exp_domain.DEFAULT_RULESPEC_STR
         } for state_name in state_names])
 
-    statistics = stats_jobs.StatisticsAggregator.get_statistics(
+    statistics = stats_jobs_continuous.StatisticsAggregator.get_statistics(
         exploration_id, exploration_version)
     state_hit_counts = statistics['state_hit_counts']
 
@@ -160,9 +159,10 @@ def get_state_improvements(exploration_id, exploration_version):
                 'type': eligible_flags[0]['improve_type'],
             })
 
-    return sorted(
-        [state for state in ranked_states if state['rank'] != 0],
-        key=lambda x: -x['rank'])
+    return sorted([
+        ranked_state for ranked_state in ranked_states
+        if ranked_state['rank'] != 0
+    ], key=lambda x: -x['rank'])
 
 
 def get_versions_for_exploration_stats(exploration_id):
@@ -177,7 +177,7 @@ def get_exploration_stats(exploration_id, exploration_version):
     Note that exploration_version should be a string.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
-    exp_stats = stats_jobs.StatisticsAggregator.get_statistics(
+    exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
         exploration_id, exploration_version)
 
     last_updated = exp_stats['last_updated']

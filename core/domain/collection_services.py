@@ -29,11 +29,11 @@ import logging
 import os
 
 from core.domain import collection_domain
-from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
-(collection_models,) = models.Registry.import_models([models.NAMES.collection])
+(collection_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 import feconf
@@ -256,6 +256,58 @@ def get_collection_titles_and_categories(collection_ids):
     return result
 
 
+def get_completed_exploration_ids(user_id, collection_id):
+    """Returns a list of explorations the user has completed within the context
+    of the provided collection. Returns an empty list if the user has not yet
+    completed any explorations within the collection. Note that this function
+    will also return an empty list if either the collection and/or user do not
+    exist.
+
+    A progress model isn't added until the first exploration of a collection is
+    completed, so, if a model is missing, there isn't enough information to
+    infer whether that means the collection doesn't exist, the user doesn't
+    exist, or if they just haven't mdae any progress in that collection yet.
+    Thus, we just assume the user and collection exist for the sake of this
+    call, so it returns an empty list, indicating that no progress has yet been
+    made.
+    """
+    progress_model = user_models.CollectionProgressModel.get(
+        user_id, collection_id)
+    return progress_model.completed_explorations if progress_model else []
+
+
+def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
+    """Returns a list of exploration IDs in the specified collection that the
+    given user has not yet attempted and has the prerequisite skills to play.
+
+    Returns the collection's initial explorations if the user has yet to
+    complete any explorations within the collection. Returns an empty list if
+    the user has completed all of the explorations within the collection.
+
+    See collection_domain.Collection.get_next_exploration_ids for more
+    information.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+
+    collection = get_collection_by_id(collection_id)
+    if completed_exploration_ids:
+        return collection.get_next_exploration_ids(completed_exploration_ids)
+    else:
+        # The user has yet to complete any explorations inside the collection.
+        return collection.init_exploration_ids
+
+
+def record_played_exploration_in_collection_context(
+        user_id, collection_id, exploration_id):
+    progress_model = user_models.CollectionProgressModel.get_or_create(
+        user_id, collection_id)
+
+    if exploration_id not in progress_model.completed_explorations:
+        progress_model.completed_explorations.append(exploration_id)
+        progress_model.put()
+
+
 def _get_collection_summary_dicts_from_models(collection_summary_models):
     """Given an iterable of CollectionSummaryModel instances, create a dict
     containing corresponding collection summary domain objects, keyed by id.
@@ -428,7 +480,6 @@ def _save_collection(committer_id, collection, commit_message, change_list):
 
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
-    event_services.CollectionContentChangeEventHandler.record(collection.id)
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -455,7 +506,6 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         ],
     )
     model.commit(committer_id, commit_message, commit_cmds)
-    event_services.CollectionContentChangeEventHandler.record(collection.id)
     collection.version += 1
     create_collection_summary(collection.id)
 
@@ -635,7 +685,7 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
 
 def delete_demo(collection_id):
     """Deletes a single demo collection."""
-    if not (0 <= int(collection_id) < len(feconf.DEMO_COLLECTIONS)):
+    if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)
 
     collection = get_collection_by_id(collection_id, strict=False)
@@ -660,7 +710,7 @@ def load_demo(collection_id):
 
     demo_filepath = os.path.join(
         feconf.SAMPLE_COLLECTIONS_DIR,
-        feconf.DEMO_COLLECTIONS[int(collection_id)])
+        feconf.DEMO_COLLECTIONS[collection_id])
 
     if demo_filepath.endswith('yaml'):
         yaml_content = utils.get_file_contents(demo_filepath)

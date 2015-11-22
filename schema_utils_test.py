@@ -88,7 +88,7 @@ UI_CONFIG_SPECS = {
         },
         'coding_mode': {
             'type': SCHEMA_TYPE_UNICODE,
-            'choices': ['none', 'python'],
+            'choices': ['none', 'python', 'coffeescript'],
         }
     },
 }

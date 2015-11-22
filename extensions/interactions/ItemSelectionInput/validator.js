@@ -45,14 +45,14 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
     if (areAnyChoicesEmpty) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the choices are nonempty.'
+        message: 'Please ensure the choices are nonempty.'
       });
     }
 
     if (areAnyChoicesDuplicated) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the choices are unique.'
+        message: 'Please ensure the choices are unique.'
       });
     }
 
@@ -62,19 +62,19 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
     if (minAllowedCount > maxAllowedCount) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure that the max allowed count is not less than the min count.'
+        message: 'Please ensure that the max allowed count is not less than the min count.'
       });
     }
 
     if (numChoices < minAllowedCount) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure that you have enough choices to reach the min count.'
+        message: 'Please ensure that you have enough choices to reach the min count.'
       });
     } else if (numChoices < maxAllowedCount) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure that you have enough choices to reach the max count.'
+        message: 'Please ensure that you have enough choices to reach the max count.'
       });
     }
 
@@ -87,7 +87,7 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (
-          'please clarify the default outcome so it is less confusing to ' +
+          'Please clarify the default outcome so it is less confusing to ' +
           'the user.')
       });
     }

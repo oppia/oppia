@@ -19,16 +19,23 @@
 
 oppia.factory('explorationAdvancedFeaturesService', [function() {
   var _settings = {
-    areParametersEnabled: false,
-    areGadgetsEnabled: false
+    areFallbacksEnabled: false,
+    areGadgetsEnabled: false,
+    areParametersEnabled: false
   };
 
   return {
+    areFallbacksEnabled: function() {
+      return _settings.areFallbacksEnabled;
+    },
     areGadgetsEnabled: function() {
       return _settings.areGadgetsEnabled;
     },
     areParametersEnabled: function() {
       return _settings.areParametersEnabled;
+    },
+    enableFallbacks: function() {
+      _settings.areFallbacksEnabled = true;
     },
     enableGadgets: function() {
       _settings.areGadgetsEnabled = true;
@@ -37,14 +44,10 @@ oppia.factory('explorationAdvancedFeaturesService', [function() {
       _settings.areParametersEnabled = true;
     },
     init: function(explorationData) {
-      if (explorationData.param_changes.length > 0) {
-        this.enableParameters();
-      } else {
-        for (var state in explorationData.states) {
-          if (explorationData.states[state].param_changes.length > 0) {
-            this.enableParameters();
-            break;
-          }
+      for (var state in explorationData.states) {
+        if (explorationData.states[state].interaction.fallbacks.length > 0) {
+          this.enableFallbacks();
+          break;
         }
       }
 
@@ -53,6 +56,17 @@ oppia.factory('explorationAdvancedFeaturesService', [function() {
         if (skinCustomizations.panels_contents[panel].length > 0) {
           this.enableGadgets();
           break;
+        }
+      }
+
+      if (explorationData.param_changes.length > 0) {
+        this.enableParameters();
+      } else {
+        for (var state in explorationData.states) {
+          if (explorationData.states[state].param_changes.length > 0) {
+            this.enableParameters();
+            break;
+          }
         }
       }
     }
