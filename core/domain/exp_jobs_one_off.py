@@ -77,10 +77,10 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
         commit_times_msecs = [
             ast.literal_eval(commit_time_string) for
             commit_time_string in stringified_commit_times_msecs]
-        first_publish_msec = min(commit_times_msecs)
+        first_published_msec = min(commit_times_msecs)
         rights_manager.update_activity_first_published_msec_if_necessary(
             rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
-            first_publish_msec)
+            first_published_msec)
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):

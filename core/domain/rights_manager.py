@@ -207,11 +207,11 @@ def _update_activity_summary(activity_type, activity_rights):
 def update_activity_first_published_msec_if_necessary(
     activity_type, activity_id, first_published_msec):
     activity_rights = _get_activity_rights(activity_type, activity_id)
-    if activity_rights.first_published_msec == None:
+    if activity_rights.first_published_msec is None:
         activity_rights.first_published_msec = first_published_msec
         commit_cmds = [{
-                'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-                'first_published': first_published_msec
+            'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+            'first_published': first_published_msec
         }]
         _save_activity_rights(
             feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
