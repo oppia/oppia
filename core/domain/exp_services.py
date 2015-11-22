@@ -990,8 +990,7 @@ def compute_summary_of_exploration(exploration):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated
-    )
+        exploration_model_created_on, exploration_model_last_updated)
 
     return exp_summary
 
