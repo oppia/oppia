@@ -188,7 +188,6 @@ oppia.directive('conversationSkin', [function() {
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
-      $scope.explorationCompleted = false;
       $scope.hasFullyLoaded = false;
 
       $scope.oppiaAvatarImageUrl = oppiaPlayerService.getOppiaAvatarImageUrl();
@@ -258,9 +257,9 @@ oppia.directive('conversationSkin', [function() {
         }
       };
 
-      $scope.isEndInteraction = function() {
+      $scope.isOnFinalCard = function() {
         return $scope.activeCard &&
-          oppiaPlayerService.isEndInteraction($scope.activeCard.stateName);
+          oppiaPlayerService.isStateTerminal($scope.activeCard.stateName);
       };
 
       var isSupplementalCardNonempty = function(card) {
@@ -412,9 +411,6 @@ oppia.directive('conversationSkin', [function() {
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
           focusService.setFocusIfOnDesktop(_nextFocusLabel);
-
-          $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-            stateName);
         });
       };
 
@@ -521,8 +517,6 @@ oppia.directive('conversationSkin', [function() {
               }
             }
 
-            $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-              newStateName);
             _answerIsBeingProcessed = false;
           }, millisecsLeftToWait);
         }, true);
@@ -594,7 +588,7 @@ oppia.directive('conversationSkin', [function() {
       });
 
       $window.addEventListener('beforeunload', function(e) {
-        if (hasInteractedAtLeastOnce && !$scope.explorationCompleted &&
+        if (hasInteractedAtLeastOnce && !$scope.isOnFinalCard() &&
             !$scope.isInPreviewMode) {
           oppiaPlayerService.registerMaybeLeaveEvent();
           var confirmationMessage = (

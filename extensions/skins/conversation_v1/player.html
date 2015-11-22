@@ -173,7 +173,7 @@
                       current-state-name="activeCard.stateName">
   </oppia-gadget-panel>
 
-  <div ng-if="isEndInteraction() && explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1"
+  <div ng-if="isOnFinalCard() && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1"
        class="conversation-skin-final-ratings">
 
     <div style="color: #eee; margin-bottom: 20px;">
