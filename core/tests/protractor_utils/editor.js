@@ -848,20 +848,20 @@ var _selectComparedVersions = function(v1, v2) {
   element.all(by.css('.protractor-test-history-checkbox-selector')).count()
       .then(function(versionNumber) {
     if (v1 < 0) {
-      throw Error('In editor._selectComparedVersions(' + v1 + '),' +
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
       'expected v1 to be >= 0');
     }
     if (v2 < 0) {
-      throw Error('In editor._selectComparedVersions(' + v2 + '),' +
-      'expected v1 to be >= 0');
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+      'expected v2 to be >= 0');
     }
     // Check to ensure no negative indices are queried
     if (v1 > versionNumber) {
-      throw Error('In editor._selectComparedVersions(' + v1 + '),' +
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
       'expected v1 to be less than or equal to total number of saved revisions');
     }
     if (v2 > versionNumber) {
-      throw Error('In editor._selectComparedVersions(' + v2 + '),' +
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
       'expected v2 be less than or equal to total number of saved revisions');
     }
 

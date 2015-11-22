@@ -35,7 +35,7 @@ oppia.controller('ExplorationHistory', [
    * whose values are objects containing data of that revision (that is to be
    * displayed) with the keys 'committerId', 'createdOn', 'commitMessage', and
    * 'versionNumber'. It contains a maximum of 30 versions.
-   * snapshotOrderArray is an array of the version numbers of the revisions to
+   * versionCheckboxArray is an array of the version numbers of the revisions to
    * be displayed on the page, in the order they are displayed in.
    * nodesData is an object whose keys are nodeIds (assigned in version
    * comparison), and whose values are an object containing 'newestStateName',
@@ -43,13 +43,13 @@ oppia.controller('ExplorationHistory', [
    */
 
   $scope.explorationVersionMetadata = null;
-  $scope.snapshotOrderArray = [];
+  $scope.versionCheckboxArray = [];
   var explorationSnapshots = null;
   var versionTreeParents = null;
   var nodesData = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
-      $scope.clearAllCheckboxes();
+    $scope.clearAllCheckboxes();
     if (data.forceRefresh || $scope.explorationVersionMetadata === null) {
       $scope.refreshVersionHistory();
     }
@@ -57,37 +57,37 @@ oppia.controller('ExplorationHistory', [
 
   // Uncheck all checkboxes when page is refreshed
   $scope.clearAllCheckboxes = function() {
-    angular.forEach($scope.snapshotOrderArray, function(versionCheckbox) {
+    angular.forEach($scope.versionCheckboxArray, function(versionCheckbox) {
       versionCheckbox.selected = false;
     }); 
   };
   
   // Compares the two selected versions and displays the comparison results.
   $scope.compareSelectedVersions = function() {
-    if($scope.selectedVersionsArray.length === 2) {
+    if ($scope.selectedVersionsArray.length === 2) {
       $scope.changeCompareVersion();
       $scope.showHistoryGraph();
     }
   };
   // Changes the checkbox selection and provides an appropriate user prompt.
-  $scope.changeSelectedVersions = function($event, versionNumber) {
-    var checkbox = $event.target;
-    var id = $scope.selectedVersionsArray.indexOf(versionNumber);
-    if (checkbox.checked && id === -1) {
+  $scope.changeSelectedVersions = function(evt, versionNumber) {
+    var checkbox = evt.target;
+    var selectedVersionsArrayPos = $scope.selectedVersionsArray.indexOf(versionNumber);
+    if (checkbox.checked && selectedVersionsArrayPos === -1) {
       $scope.selectedVersionsArray.push(versionNumber);
     }
-    if (!checkbox.checked && id !== -1) {
-      $scope.selectedVersionsArray.splice(id, 1);
+    if (!checkbox.checked && selectedVersionsArrayPos !== -1) {
+      $scope.selectedVersionsArray.splice(selectedVersionsArrayPos, 1);
     }
     
     if ($scope.selectedVersionsArray.length === 2) {
-      $scope.versionCountPrompt = "";
-      // Disable checkboxes
+      // Disable version count prompt if two checkboxes are selected.
+      $scope.versionCountPrompt = '';
     }
-    else if (!$scope.disableCompare) {
+    else if (!$scope.comparisonsAreDisabled) {
 
       $scope.hideHistoryGraph = true;
-      $scope.hideCompareVersionsButton = false;
+      $scope.compareVersionsButtonIsHidden = false;
 
       if ($scope.selectedVersionsArray.length === 0) {
         $scope.versionCountPrompt = "Please select any two.";
@@ -119,9 +119,9 @@ oppia.controller('ExplorationHistory', [
       $scope.hideHistoryGraph = true;
 
       // Disable all comparisons if there are less than two revisions in total.
-      $scope.disableCompare = (currentVersion < 2);
+      $scope.comparisonsAreDisabled = (currentVersion < 2);
 
-      $scope.hideCompareVersionsButton = $scope.disableCompare;
+      $scope.compareVersionsButtonIsHidden = $scope.comparisonsAreDisabled;
 
       $scope.versionCountPrompt = "Please select any 2.";  
 
@@ -129,9 +129,9 @@ oppia.controller('ExplorationHistory', [
         explorationSnapshots = response.data.snapshots;
         versionsTreeService.init(explorationSnapshots);
 
-        // Re-populate snapshotOrderArray and explorationVersionMetadata when
-        // history    is refreshed.
-        $scope.snapshotOrderArray = [];
+        // Re-populate versionCheckboxArray and explorationVersionMetadata when
+        // history is refreshed.
+        $scope.versionCheckboxArray = [];
         $scope.explorationVersionMetadata = {};
         for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
           $scope.explorationVersionMetadata[explorationSnapshots[i].version_number] = {
@@ -141,7 +141,10 @@ oppia.controller('ExplorationHistory', [
             'commitMessage': explorationSnapshots[i].commit_message,
             'versionNumber': explorationSnapshots[i].version_number
           };
-          $scope.snapshotOrderArray.push({vnum:explorationSnapshots[i].version_number, selected:false});
+          $scope.versionCheckboxArray.push({
+            vnum: explorationSnapshots[i].version_number,
+            selected: false
+          });
         }
         $rootScope.loadingMessage = ''; 
       }); 
@@ -299,7 +302,7 @@ oppia.controller('ExplorationHistory', [
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
     return (
-      $scope.compareVersions && ($scope.selectedVersionsArray.length === 2));
+      $scope.compareVersions && $scope.selectedVersionsArray.length === 2);
   };
 
   // Check if other checkboxes should be disabled once two are selected.
@@ -319,7 +322,7 @@ oppia.controller('ExplorationHistory', [
   // Functions to show history state graph
   $scope.showHistoryGraph = function() {
     $scope.hideHistoryGraph = false;
-    $scope.hideCompareVersionsButton = true;
+    $scope.compareVersionsButtonIsHidden = true;
   };
 
   // Functions to show modal of history diff of a state
