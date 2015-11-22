@@ -20,10 +20,11 @@
 
 var argv = require('yargs')
     .usage(
-      'Usage: $0 --gaeDevserverPath [path to app engine]' +
+      'Usage: $0 --gae_devserver_path [path to app engine]' +
       '--clear_datastore [whether to clear all data storage]' +
       '--enable_sendmail [whether to send emails]' +
-      '--minify [whether to minify third-party dependencies]').argv;
+      '--minify [whether to minify third-party dependencies]')
+    .demand(['gae_devserver_path']).argv;
 var concat = require('gulp-concat');
 var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
@@ -32,7 +33,7 @@ var manifest = require('./manifest.json');
 var minifyCss = require('gulp-minify-css');
 var path = require('path');
 
-var gaeDevserverPath = argv.gaeDevserverPath;
+var gaeDevserverPath = argv.gae_devserver_path;
 var params = {
   admin_host: '0.0.0.0',
   admin_port: 8000,
