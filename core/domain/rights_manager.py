@@ -29,6 +29,7 @@ current_user_services = models.Registry.import_current_user_services()
 (collection_models, exp_models,) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
+import feconf
 import utils
 
 
@@ -41,6 +42,7 @@ CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
 CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
 CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
 CMD_RELEASE_OWNERSHIP = 'release_ownership'
+CMD_UPDATE_FIRST_PUBLISHED_MSEC = 'update_first_published_msec'
 
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
@@ -65,7 +67,7 @@ class ActivityRights(object):
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
                  status=ACTIVITY_STATUS_PRIVATE,
-                 viewable_if_private=False):
+                 viewable_if_private=False, first_published_msec=None):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -74,6 +76,7 @@ class ActivityRights(object):
         self.cloned_from = cloned_from
         self.status = status
         self.viewable_if_private = viewable_if_private
+        self.first_published_msec=first_published_msec
 
     def validate(self):
         """Validates an ActivityRights object.
@@ -152,6 +155,7 @@ def _get_activity_rights_from_model(activity_rights_model, activity_type):
             if activity_type == ACTIVITY_TYPE_EXPLORATION else None),
         status=activity_rights_model.status,
         viewable_if_private=activity_rights_model.viewable_if_private,
+        first_published_msec=activity_rights_model.first_published_msec
     )
 
 
@@ -175,6 +179,7 @@ def _save_activity_rights(
     model.community_owned = activity_rights.community_owned
     model.status = activity_rights.status
     model.viewable_if_private = activity_rights.viewable_if_private
+    model.first_published_msec = activity_rights.first_published_msec
 
     model.commit(committer_id, commit_message, commit_cmds)
 
@@ -199,6 +204,20 @@ def _update_activity_summary(activity_type, activity_rights):
         _update_collection_summary(activity_rights)
 
 
+def update_activity_first_published_msec_if_necessary(
+    activity_type, activity_id, first_published_msec):
+    activity_rights = _get_activity_rights(activity_type, activity_id)
+    if activity_rights.first_published_msec is None:
+        activity_rights.first_published_msec = first_published_msec
+        commit_cmds = [{
+            'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+            'first_published': first_published_msec
+        }]
+        _save_activity_rights(
+            feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
+            'set first published time in msec', commit_cmds)
+
+
 def create_new_exploration_rights(exploration_id, committer_id):
     exploration_rights = ActivityRights(
         exploration_id, [committer_id], [], [])
@@ -212,6 +231,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
         viewable_if_private=exploration_rights.viewable_if_private,
+        first_published_msec=exploration_rights.first_published_msec
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
     subscription_services.subscribe_to_exploration(
@@ -254,6 +274,7 @@ def create_new_collection_rights(collection_id, committer_id):
         community_owned=collection_rights.community_owned,
         status=collection_rights.status,
         viewable_if_private=collection_rights.viewable_if_private,
+        first_published_msec=collection_rights.first_published_msec
     ).commit(committer_id, 'Created new collection', commit_cmds)
 
     subscription_services.subscribe_to_collection(committer_id, collection_id)

@@ -3,6 +3,36 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.0.3 (21 Nov 2015)
+--------------------
+Learner page:
+- Add help cards for Oppia's responses for supplemental interactions.
+- Increase width of cards without supplements.
+- Animate changes in card widths.
+- Change the 'Previous responses' heading to 'Previous answers'.
+
+Interactions:
+- Fix a bug where rule fields of type CodeString default to None instead of the empty string.
+
+Editor page:
+- Partially fix a bug where the save and publish buttons drop off the navbar on small screens.
+
+Rich-text editor components:
+- Fix a bug where images overspill their boundaries in Firefox.
+- Fix a bug that caused images to display inline; they should display as centered block elements instead.
+- Remove whitespace around links.
+
+Other pages:
+- Make the site feedback form more prominent.
+- Add a frontend learner view for collections.
+
+Infrastructure:
+- Reduce the time taken for backend tests by splitting up the jobs files.
+- Rename test scripts to run_backend_tests.sh, run_frontend_tests.sh and run_e2e_tests.sh.
+- Create a run_tests.sh script to run all of the tests.
+- Run all tests on deployment, instead of just the backend ones.
+
+
 v2.0.2 (8 Nov 2015)
 -------------------
 Learner page:
