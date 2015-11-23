@@ -18,13 +18,11 @@
 
 import contextlib
 import copy
-import datetime
 import os
 import re
 import unittest
 import webtest
 
-from core.controllers import reader
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain

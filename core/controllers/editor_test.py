@@ -22,6 +22,7 @@ import zipfile
 
 from core.controllers import editor
 from core.domain import config_services
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -973,3 +974,244 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.assertEqual(response_dict['code'], 401)
 
         self.logout()
+
+
+class ModeratorEmailsTest(test_utils.GenericTestBase):
+    """Integration test for post-moderator action emails."""
+
+    def setUp(self):
+        super(ModeratorEmailsTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.MODERATOR_ID = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_EMAIL])
+
+        # The editor publishes an exploration.
+        self.EXP_ID = 'eid'
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.EDITOR_ID, title='My Exploration',
+            end_state_name='END')
+        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
+
+        # Set the default email config.
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.ADMIN_ID = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        config_services.set_property(
+            self.ADMIN_ID, 'publicize_exploration_email_html_body',
+            'Default publicization email body')
+        config_services.set_property(
+            self.ADMIN_ID, 'unpublish_exploration_email_html_body',
+            'Default unpublishing email body')
+
+    def test_error_cases_for_email_sending(self):
+        with self.swap(feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True):
+            # Log in as a moderator.
+            self.login(self.MODERATOR_EMAIL)
+
+            # Go to the exploration editor page.
+            response = self.testapp.get('/create/%s' % self.EXP_ID)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            # Submit an invalid action. This should cause an error.
+            response_dict = self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                    'action': 'random_action',
+                    'email_body': None,
+                    'version': 1,
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+            self.assertEqual(
+                response_dict['error'], 'Invalid moderator action.')
+
+            # Try to publicize the exploration without an email body. This
+            # should cause an error.
+            response_dict = self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                    'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                    'email_body': None,
+                    'version': 1,
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+            self.assertIn(
+                'Moderator actions should include an email',
+                response_dict['error'])
+
+            response_dict = self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                    'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                    'email_body': '',
+                    'version': 1,
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+            self.assertIn(
+                'Moderator actions should include an email',
+                response_dict['error'])
+
+            # Try to publicize the exploration even if the relevant feconf
+            # flags are not set. This should cause a system error.
+            VALID_PAYLOAD = {
+                'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                'email_body': 'Your exploration is featured!',
+                'version': 1,
+            }
+            self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                VALID_PAYLOAD, csrf_token, expect_errors=True,
+                expected_status_int=500)
+
+            with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+                # Now the email gets sent with no error.
+                self.put_json(
+                    '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                    VALID_PAYLOAD, csrf_token)
+
+            # Log out.
+            self.logout()
+
+    def test_email_is_sent_correctly_when_publicizing(self):
+        with self.swap(
+                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            ), self.swap(
+                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+            # Log in as a moderator.
+            self.login(self.MODERATOR_EMAIL)
+
+            # Go to the exploration editor page.
+            response = self.testapp.get('/create/%s' % self.EXP_ID)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            NEW_EMAIL_BODY = 'Your exploration is featured!'
+
+            VALID_PAYLOAD = {
+                'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                'email_body': NEW_EMAIL_BODY,
+                'version': 1,
+            }
+
+            self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                VALID_PAYLOAD, csrf_token)
+
+            # Check that an email was sent with the correct content.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.EDITOR_EMAIL)
+            self.assertEqual(1, len(messages))
+
+            self.assertEqual(
+                messages[0].sender,
+                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(
+                messages[0].subject,
+                'Featuring "My Exploration" in the gallery')
+            self.assertEqual(messages[0].body.decode(), (
+                'Hi %s,\n\n'
+                '%s\n\n'
+                'Thanks,\n'
+                '%s\n\n'
+                'You can unsubscribe from these emails from the Preferences '
+                'page.' % (
+                    self.EDITOR_USERNAME,
+                    NEW_EMAIL_BODY,
+                    self.MODERATOR_USERNAME)))
+            self.assertEqual(messages[0].html.decode(), (
+                'Hi %s,<br><br>'
+                '%s<br><br>'
+                'Thanks,<br>'
+                '%s<br><br>'
+                'You can unsubscribe from these emails from the '
+                '<a href="https://www.example.com">Preferences</a> page.' % (
+                    self.EDITOR_USERNAME,
+                    NEW_EMAIL_BODY,
+                    self.MODERATOR_USERNAME)))
+
+            self.logout()
+
+    def test_email_is_sent_correctly_when_unpublishing(self):
+        with self.swap(
+                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            ), self.swap(
+                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+            # Log in as a moderator.
+            self.login(self.MODERATOR_EMAIL)
+
+            # Go to the exploration editor page.
+            response = self.testapp.get('/create/%s' % self.EXP_ID)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            NEW_EMAIL_BODY = 'Your exploration is unpublished :('
+
+            VALID_PAYLOAD = {
+                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
+                'email_body': NEW_EMAIL_BODY,
+                'version': 1,
+            }
+
+            self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                VALID_PAYLOAD, csrf_token)
+
+            # Check that an email was sent with the correct content.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.EDITOR_EMAIL)
+            self.assertEqual(1, len(messages))
+
+            self.assertEqual(
+                messages[0].sender,
+                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(
+                messages[0].subject, 'Unpublishing "My Exploration"')
+            self.assertEqual(messages[0].body.decode(), (
+                'Hi %s,\n\n'
+                '%s\n\n'
+                'Thanks,\n'
+                '%s\n\n'
+                'You can unsubscribe from these emails from the Preferences '
+                'page.' % (
+                    self.EDITOR_USERNAME,
+                    NEW_EMAIL_BODY,
+                    self.MODERATOR_USERNAME)))
+            self.assertEqual(messages[0].html.decode(), (
+                'Hi %s,<br><br>'
+                '%s<br><br>'
+                'Thanks,<br>'
+                '%s<br><br>'
+                'You can unsubscribe from these emails from the '
+                '<a href="https://www.example.com">Preferences</a> page.' % (
+                    self.EDITOR_USERNAME,
+                    NEW_EMAIL_BODY,
+                    self.MODERATOR_USERNAME)))
+
+            self.logout()
+
+    def test_email_functionality_cannot_be_used_by_non_moderators(self):
+        with self.swap(
+                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            ), self.swap(
+                feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+            # Log in as a non-moderator.
+            self.login(self.EDITOR_EMAIL)
+
+            # Go to the exploration editor page.
+            response = self.testapp.get('/create/%s' % self.EXP_ID)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            NEW_EMAIL_BODY = 'Your exploration is unpublished :('
+
+            VALID_PAYLOAD = {
+                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
+                'email_body': NEW_EMAIL_BODY,
+                'version': 1,
+            }
+
+            # The user should receive an 'unauthorized user' error.
+            self.put_json(
+                '/createhandler/moderatorrights/%s' % self.EXP_ID,
+                VALID_PAYLOAD, csrf_token, expect_errors=True,
+                expected_status_int=401)
+
+            self.logout()

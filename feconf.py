@@ -155,6 +155,33 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 CAN_SEND_EMAILS_TO_USERS = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
+# Whether to require an email to be sent, following a moderator action.
+REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
+
+EMAIL_INTENT_SIGNUP = 'signup'
+EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
+EMAIL_INTENT_MARKETING = 'marketing'
+EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
+EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
+EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
+
+MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
+MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
+
+VALID_MODERATOR_ACTIONS = {
+    MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
+        'email_config': 'publicize_exploration_email_html_body',
+        'email_subject_fn': (
+            lambda exp_title: 'Featuring "%s" in the gallery' % exp_title),
+        'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
+    },
+    MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
+        'email_config': 'unpublish_exploration_email_html_body',
+        'email_subject_fn': (
+            lambda exp_title: 'Unpublishing "%s"' % exp_title),
+        'email_intent': 'unpublish_exploration',
+    },
+}
 
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
