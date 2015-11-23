@@ -6,7 +6,8 @@
     Off-screen preview of the next card in order to pre-determine the target
     height for the card content transition animation.
   -->
-  <div class="conversation-skin-future-tutor-card" aria-hidden="true">
+  <div class="conversation-skin-future-tutor-card" aria-hidden="true"
+       ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}">
     <div class="conversation-skin-tutor-card-content">
       <div class="conversation-skin-tutor-card-top-section">
         <div class="conversation-skin-tutor-card-top-content"
@@ -40,7 +41,8 @@
         side-by-side.
       -->
       <div class="conversation-skin-main-tutor-card conversation-skin-tutor-card-active"
-          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}"
+          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards(),
+            'animate-card-width': startCardChangeAnimation}"
           ng-show="isPanelVisible(PANEL_TUTOR)">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
              ng-class="{'animate-card-change': startCardChangeAnimation}">
@@ -53,11 +55,11 @@
             </div>
           </div>
 
-          <div ng-if="activeCard.answerFeedbackPairs.length > 1">
+          <div ng-if="(activeCard.answerFeedbackPairs.length > 1 && activeCard.interactionIsInline) || (activeCard.answerFeedbackPairs.length > 0 && !activeCard.interactionIsInline)">
             <h4 class="conversation-skin-responses-dropdown-container"
                 ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
-                Previous responses (<[activeCard.answerFeedbackPairs.length - 1]>)
+                Previous answers (<[activeCard.answerFeedbackPairs.length - (activeCard.interactionIsInline ? 1 : 0)]>)
                 <span class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"
                       ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">
                 </span>
@@ -68,7 +70,7 @@
           <div ng-if="arePreviousResponsesShown"
                class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
             <div ng-repeat="responsePair in activeCard.answerFeedbackPairs track by $index">
-              <div ng-if="!$last">
+              <div ng-if="!$last || !activeCard.interactionIsInline">
                 <answer-feedback-pair answer="responsePair.learnerAnswer"
                                       short-answer="responsePair.shortLearnerAnswer"
                                       feedback="responsePair.oppiaFeedback"
@@ -79,8 +81,8 @@
             </div>
           </div>
 
-          <!-- Always show the most recent response pair, if there is one. -->
-          <div class="conversation-skin-tutor-card-bottom-section" ng-if="activeCard.answerFeedbackPairs.length > 0">
+          <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
+          <div class="conversation-skin-tutor-card-bottom-section" ng-if="activeCard.interactionIsInline && activeCard.answerFeedbackPairs.length > 0">
             <answer-feedback-pair answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].learnerAnswer"
                                   short-answer="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].shortLearnerAnswer"
                                   feedback="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedback"
@@ -97,10 +99,13 @@
 
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
+
+            Note also that explorationCompleted gets set on the penultimate
+            card after the learner has submitted the final answer.
           -->
-          <div ng-if="!waitingForOppiaFeedback && (activeCard.interactionHtml || waitingForContinueButtonClick) && (!explorationCompleted || !isIframed || waitingForContinueButtonClick) && currentProgressDotIndex === transcript.length - 1">
+          <div ng-if="(!waitingForOppiaFeedback || !activeCard.interactionIsInline) && ((activeCard.interactionHtml && !waitingForContinueButtonClick) || (waitingForContinueButtonClick && !helpCardHasContinueButton)) && (!explorationCompleted || !isIframed || (waitingForContinueButtonClick && !helpCardHasContinueButton)) && currentProgressDotIndex === transcript.length - 1">
             <div class="conversation-skin-inline-interaction">
-              <div ng-if="waitingForContinueButtonClick">
+              <div ng-if="waitingForContinueButtonClick && !helpCardHasContinueButton">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                            focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
@@ -128,16 +133,35 @@
         </div>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty() && activeCard.interactionHtml"
+      <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container"
            ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}">
         <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
              class="conversation-skin-supplemental-card">
-          <div ng-if="activeCard.interactionIsDisabled"
-               class="conversation-skin-supplemental-card-overlay">
+
+          <div class="conversation-skin-help-card" ng-if="helpCardHtml">
+            <img class="conversation-skin-oppia-avatar"
+                 ng-src="<[oppiaAvatarImageUrl]>" alt="">
+            <button type="button" class="conversation-skin-close-help-card-button"
+                    ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+              <i class="material-icons md-18">&#xE5CD;</i>
+            </button>
+            <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
+            </div>
+            <br>
+            <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+               focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+               ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)"
+               ng-if="helpCardHasContinueButton"
+               style="margin-top: 12px;">
+              Continue to next card
+            </md-button>
           </div>
-          <div class="protractor-test-conversation-input"
-               angular-html-bind="transcript[currentProgressDotIndex].interactionHtml">
+
+          <div ng-if="!activeCard.interactionIsInline">
+            <div class="protractor-test-conversation-input"
+                 angular-html-bind="transcript[currentProgressDotIndex].interactionHtml">
+            </div>
           </div>
         </div>
       </div>

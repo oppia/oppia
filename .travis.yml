@@ -42,9 +42,9 @@ install:
 - if [[ $BACKEND_TEST == 'true' ]]; then bash -x scripts/install_third_party.sh; fi
 
 script:
-- if [[ $BACKEND_TEST == 'true' ]]; then bash scripts/test.sh --generate_coverage_report;
+- if [[ $BACKEND_TEST == 'true' ]]; then bash scripts/run_backend_tests.sh --generate_coverage_report;
   fi
-- if [[ $JS_TEST == 'true' ]]; then bash -x scripts/run_js_tests.sh; fi
+- if [[ $JS_TEST == 'true' ]]; then bash -x scripts/run_frontend_tests.sh; fi
 
 after_success:
 - if [[ $BACKEND_TEST == 'true' ]]; then codecov; fi

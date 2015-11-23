@@ -18,7 +18,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import feedback_services
 from core.domain import rights_manager
-from core.domain import user_jobs
+from core.domain import user_jobs_continuous
 from core.tests import test_utils
 import feconf
 
@@ -236,7 +236,7 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
         and that anonymous authors are handled correctly.
         """
         with self.swap(
-                user_jobs.DashboardRecentUpdatesAggregator,
+                user_jobs_continuous.DashboardRecentUpdatesAggregator,
                 'get_recent_notifications',
                 self._get_recent_notifications_mock_by_viewer):
             self.login(self.VIEWER_EMAIL)
@@ -248,7 +248,7 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
         with self.swap(
-                user_jobs.DashboardRecentUpdatesAggregator,
+                user_jobs_continuous.DashboardRecentUpdatesAggregator,
                 'get_recent_notifications',
                 self._get_recent_notifications_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)

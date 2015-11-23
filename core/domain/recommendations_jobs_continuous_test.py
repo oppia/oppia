@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for recommendations_jobs."""
+"""Tests for recommendations_jobs_continuous."""
 
 __author__ = 'Xinyu Wu'
 
 from core import jobs_registry
-from core.domain import recommendations_jobs
+from core.domain import recommendations_jobs_continuous
 from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
@@ -30,9 +30,10 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class ModifiedExplorationRecommendationsAggregator(
-        recommendations_jobs.ExplorationRecommendationsAggregator):
-    """A modified ExplorationRecommendationsAggregator that does not start a new
-    batch job when the previous one has finished."""
+        recommendations_jobs_continuous.ExplorationRecommendationsAggregator):
+    """A modified ExplorationRecommendationsAggregator that does not start a
+    new batch job when the previous one has finished.
+    """
 
     @classmethod
     def _get_batch_job_manager_class(cls):
@@ -44,7 +45,7 @@ class ModifiedExplorationRecommendationsAggregator(
 
 
 class ModifiedExplorationRecommendationsMRJobManager(
-        recommendations_jobs.ExplorationRecommendationsMRJobManager):
+        recommendations_jobs_continuous.ExplorationRecommendationsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):

@@ -24,7 +24,7 @@ import zipfile
 
 from core.domain import event_services
 from core.domain import exp_domain
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
@@ -1102,6 +1102,61 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
+    def test_update_interaction_fallbacks(self):
+        """Test updating of interaction_fallbacks."""
+        exp_services.update_exploration(
+            self.OWNER_ID, self.EXP_ID,
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS,
+                [{
+                    'trigger': {
+                        'trigger_type': 'NthResubmission',
+                        'customization_args': {
+                            'num_submits': 5,
+                        },
+                    },
+                    'outcome': self.interaction_default_outcome,
+                }]),
+            '')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        init_state = exploration.init_state
+        init_interaction = init_state.interaction
+        fallbacks = init_interaction.fallbacks
+        self.assertEqual(len(fallbacks), 1)
+        self.assertEqual(fallbacks[0].trigger.trigger_type, 'NthResubmission')
+        self.assertEqual(
+            fallbacks[0].trigger.customization_args, {'num_submits': 5})
+        self.assertEqual(fallbacks[0].outcome.feedback, [
+            'Incorrect', '<b>Wrong answer</b>'])
+        self.assertEqual(fallbacks[0].outcome.dest, self.init_state_name)
+
+    def test_update_interaction_fallbacks_invalid_dest(self):
+        """Test updating of interaction_fallbacks with an invalid dest state."""
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'The fallback destination INVALID is not a valid state'):
+            exp_services.update_exploration(
+                self.OWNER_ID, self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS,
+                    [{
+                        'trigger': {
+                            'trigger_type': 'NthResubmission',
+                            'customization_args': {
+                                'num_submits': 5,
+                            },
+                        },
+                        'outcome': {
+                            'dest': 'INVALID',
+                            'feedback': [],
+                            'param_changes': []
+                        }
+                    }]),
+                '')
+
     def test_update_state_invalid_state(self):
         """Test that rule destination states cannot be non-existent."""
         self.interaction_answer_groups[0]['outcome']['dest'] = 'INVALID'
@@ -1970,55 +2025,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
 
 
-class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
-
-    def test_exploration_contents_change_event_triggers(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationContentChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
-            exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
-
-        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID])
-
-    def test_exploration_status_change_event(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationStatusChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-            rights_manager.create_new_exploration_rights(
-                self.EXP_ID, self.OWNER_ID)
-            rights_manager.publish_exploration(
-                self.OWNER_ID, self.EXP_ID)
-            rights_manager.publicize_exploration(
-                self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublicize_exploration(
-                self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublish_exploration(
-                self.user_id_admin, self.EXP_ID)
-
-        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
-                                        self.EXP_ID, self.EXP_ID])
-
-
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
 
@@ -2731,8 +2737,8 @@ title: Old Title
         # Version 4 is an upgrade based on the migration job.
 
         # Start migration job on sample exploration.
-        job_id = exp_jobs.ExplorationMigrationJobManager.create_new()
-        exp_jobs.ExplorationMigrationJobManager.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
         self.process_and_flush_pending_tasks()
 

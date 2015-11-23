@@ -18,21 +18,21 @@ __author__ = 'Stephanie Federwisch'
 
 """Tests for statistics continuous computations."""
 
+import datetime
+import time
+
 from core import jobs_registry
 from core.domain import event_services
-from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import stats_jobs
+from core.domain import stats_jobs_continuous
 from core.platform import models
 (exp_models, stats_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics])
 from core.tests import test_utils
-import datetime
 import feconf
-import time
 
 
-class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
+class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
     """A modified StatisticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
@@ -45,7 +45,8 @@ class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
         pass
 
 
-class ModifiedStatisticsMRJobManager(stats_jobs.StatisticsMRJobManager):
+class ModifiedStatisticsMRJobManager(
+        stats_jobs_continuous.StatisticsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -90,7 +91,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id = 'eid'
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
             time.sleep(1)
-            stats_jobs._STATE_COUNTER_CUTOFF_DATE = datetime.datetime.utcnow()
+            stats_jobs_continuous._STATE_COUNTER_CUTOFF_DATE = (
+                datetime.datetime.utcnow())
             original_init_state = exploration.init_state_name
             new_init_state_name = 'New init state'
             exploration.rename_state(original_init_state, new_init_state_name)
@@ -112,15 +114,17 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
-                exp_id, exp_version)['state_hit_counts']
+            state_hit_counts = (
+                stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                    exp_id, exp_version)['state_hit_counts'])
             self.assertEqual(
                 state_hit_counts[new_init_state_name]['first_entry_count'], 2)
             self.assertEqual(
                 state_hit_counts[state2_name]['first_entry_count'], 1)
 
-            output_model = stats_jobs.StatisticsAggregator.get_statistics(
-                exp_id, stats_jobs._NO_SPECIFIED_VERSION_STRING)
+            output_model = (
+                stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                    exp_id, stats_jobs_continuous._VERSION_NONE))
             state_hit_counts = output_model['state_hit_counts']
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
@@ -128,8 +132,10 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 state_hit_counts[state2_name]['first_entry_count'], 9)
             self.assertEqual(output_model['start_exploration_count'], 18)
 
-            state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
-                exp_id, stats_jobs._ALL_VERSIONS_STRING)['state_hit_counts']
+            state_hit_counts = (
+                stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                    exp_id,
+                    stats_jobs_continuous._VERSION_ALL)['state_hit_counts'])
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
             self.assertEqual(
@@ -171,11 +177,13 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             self._record_start(exp_id, exp_version, state, 'session1')
             self._record_complete(
-                exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session1')
+                exp_id, exp_version, stats_jobs_continuous.OLD_END_DEST,
+                'session1')
 
             self._record_start(exp_id, exp_version, state, 'session2')
             self._record_complete(
-                exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session2')
+                exp_id, exp_version, stats_jobs_continuous.OLD_END_DEST,
+                'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -269,7 +277,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self._record_leave(exp_id, exp_version, state, 'session1')
             self._record_leave(exp_id, exp_version, state, 'session1')
             self._record_complete(
-                exp_id, exp_version, stats_jobs.OLD_END_DEST, 'session1')
+                exp_id, exp_version, stats_jobs_continuous.OLD_END_DEST,
+                'session1')
 
             self._record_start(exp_id, exp_version, state, 'session2')
             self._record_leave(exp_id, exp_version, state, 'session2')

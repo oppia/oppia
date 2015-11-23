@@ -30,7 +30,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     if (customizationArgs.graph.value.vertices.length > 50) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'note that only graphs with at most 50 nodes are supported.'
+        message: 'Note that only graphs with at most 50 nodes are supported.'
       });
     }
 
@@ -38,7 +38,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
         customizationArgs.canEditEdgeWeight.value) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'the learner cannot edit edge weights for an unweighted graph.'
+        message: 'The learner cannot edit edge weights for an unweighted graph.'
       });
     }
 
@@ -46,7 +46,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
         customizationArgs.canEditVertexLabel.value) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'the learner cannot edit vertex labels for an unlabeled graph.'
+        message: 'The learner cannot edit vertex labels for an unlabeled graph.'
       });
     }
 
