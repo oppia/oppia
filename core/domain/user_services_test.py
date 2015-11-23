@@ -135,7 +135,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_id_from_username('fakeUsername'))
 
 
-class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
+class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
     exploration/collection and update of already published exploration/collection
     """
@@ -146,7 +146,7 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
     COLLECTION_CATEGORY = 'category'
     COLLECTION_OBJECTIVE = 'objective'
 
-    def test_contribution_datetime_updates_on_published_explorations(self):
+    def test_contribution_msec_updates_on_published_explorations(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -157,11 +157,11 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
-        # updated datetimes
+        # updated first contribution times in msecs.
         self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-        # Test editor of published exploration has updated datetime
+        # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(self.admin_id,
             self.EXP_ID)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -177,9 +177,9 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
             }], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-    def test_contribution_datetime_updates_on_unpublished_explorations(self):
+    def test_contribution_msec_updates_on_unpublished_explorations(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -193,12 +193,12 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
         self.init_state_name = exploration.init_state_name
 
         # Test that saving an exploration does not update first contribution
-        # datetime
+        # time.
         self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
         # Test that commit to unpublished exploration does not update
-        # contribution datetime
+        # contribution time.
         exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [{
             'cmd': 'edit_state_property',
@@ -207,10 +207,10 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
             'new_value': 'MultipleChoiceInput'
             }], '')
         self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
         # Test that another user who commits to unpublished exploration does not
-        # have updated datetime
+        # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
             self.admin_id, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(
@@ -220,20 +220,20 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
             'new_state_name': u'¡Hola! αβγ',
             }], '')
         self.assertIsNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
         # Test that after an exploration is published, all contributors have
-        # updated first contribution datetime
+        # updated first contribution time.
         rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         for owner_id in exploration_rights.owner_ids:
             self.assertIsNotNone(user_services.get_user_settings(owner_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
         for editor_id in exploration_rights.editor_ids:
             self.assertIsNotNone(user_services.get_user_settings(editor_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-    def test_contribution_datetime_does_not_change_if_exploration_unpublished(self):
+    def test_contribution_msec_does_not_change_if_exploration_unpublished(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -249,12 +249,12 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
 
-        # Test that contribution datetime is not eliminated if exploration is
-        # unpublished
+        # Test that contribution time is not eliminated if exploration is
+        # unpublished.
         self.assertIsNotNone(user_services.get_user_settings(self.owner_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-    def test_contribution_datetime_updates_on_published_collections(self):
+    def test_contribution_msec_updates_on_published_collections(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -265,16 +265,14 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
 
-        #collection = self.save_new_valid_collection(
-        #    self.COL_ID, self.admin_id, end_state_name='End')
         rights_manager.publish_collection(self.admin_id, self.COL_ID)
 
         # Test all owners and editors of collection after publication have
-        # updated datetimes
+        # updated first contribution times.
         self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-        # Test editor of published collection has updated datetime
+        # Test editor of published collection has updated first contribution time.
         rights_manager.release_ownership_of_collection(self.admin_id,
             self.COL_ID)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -289,9 +287,9 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
             }], 'Changed the title')
 
         self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-    def test_contribution_datetime_updates_on_unpublished_collections(self):
+    def test_contribution_msec_updates_on_unpublished_collections(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -307,12 +305,12 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID)
 
         # Test that saving a collection does not update first contribution
-        # datetime
+        # time.
         self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
         # Test that commit to unpublished collection does not update
-        # contribution datetime
+        # contribution time.
         collection_services.update_collection(
             self.admin_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
@@ -320,10 +318,10 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
                 'new_value': 'Some new title'
             }], '')
         self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
         # Test that another user who commits to unpublished collection does not
-        # have updated datetime
+        # have updated first contribution time.
         rights_manager.assign_role_for_collection(
             self.admin_id, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(
@@ -333,20 +331,20 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
                 'new_value': 'Some new category'
             }], '')
         self.assertIsNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
         # Test that after an collection is published, all contributors have
-        # updated first contribution datetime
+        # updated first contribution times.
         rights_manager.publish_collection(self.admin_id, self.COL_ID)
         collection_rights = rights_manager.get_collection_rights(self.COL_ID)
         for owner_id in collection_rights.owner_ids:
             self.assertIsNotNone(user_services.get_user_settings(owner_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
         for editor_id in collection_rights.editor_ids:
             self.assertIsNotNone(user_services.get_user_settings(editor_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)
 
-    def test_contribution_datetime_does_not_change_if_collection_unpublished(self):
+    def test_contribution_msec_does_not_change_if_collection_unpublished(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -364,7 +362,7 @@ class UpdateContributionDatetimeTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner_id, self.COL_ID)
         rights_manager.unpublish_collection(self.admin_id, self.COL_ID)
 
-        # Test that contribution datetime is not eliminated if collection is
-        # unpublished
+        # Test that first contribution msec is not eliminated if collection is
+        # unpublished.
         self.assertIsNotNone(user_services.get_user_settings(self.owner_id)
-            .first_contribution_datetime)
+            .first_contribution_msec)

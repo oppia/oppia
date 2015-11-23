@@ -18,7 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import datetime
 import logging
 
 from core.domain import config_domain
@@ -646,13 +645,19 @@ def _publish_activity(committer_id, activity_id, activity_type):
         '%s published.' % activity_type)
 
     # Add contribution dates to the owners and editors
-    exploration_rights = _get_activity_rights(activity_type, activity_id)
-    for owner_id in exploration_rights.owner_ids:
-        user_services.update_first_contribution_datetime_if_not_set(
-            owner_id, datetime.datetime.utcnow())
-    for editor_id in exploration_rights.editor_ids:
-        user_services.update_first_contribution_datetime_if_not_set(
-            editor_id, datetime.datetime.utcnow())
+    activity_rights = _get_activity_rights(activity_type, activity_id)
+    for owner_id in activity_rights.owner_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            owner_id, utils.get_current_time_in_millisecs())
+    for editor_id in activity_rights.editor_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            editor_id, utils.get_current_time_in_millisecs())
+
+    # Set first_published_msec for published activity if necessary
+    if activity_rights.first_published_msec is None:
+        update_activity_first_published_msec(
+            activity_type, activity_id,
+            utils.get_current_time_in_millisecs())
 
 
 def _unpublish_activity(committer_id, activity_id, activity_type):

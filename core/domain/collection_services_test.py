@@ -1271,7 +1271,8 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         - (5) Albert edits the title of COLLECTION_ID_2.
         - (6) Albert deletes COLLECTION_ID_1.
         - Bob tries to publish COLLECTION_ID_2, and is denied access.
-        - (7) Albert publishes COLLECTION_ID_2.
+        - (7) Albert publishes COLLECTION_ID_2. This updates first_published_msec
+              for the collection.
         """
         super(CollectionCommitLogUnitTests, self).setUp()
 
@@ -1324,7 +1325,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
 
     def test_get_next_page_of_all_commits(self):
         all_commits = collection_services.get_next_page_of_all_commits()[0]
-        self.assertEqual(len(all_commits), 7)
+        self.assertEqual(len(all_commits), 8)
         for ind, commit in enumerate(all_commits):
             if ind != 0:
                 self.assertGreater(
@@ -1353,10 +1354,10 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         # TODO(frederikcreemers@gmail.com) test max_age here.
         all_commits = (
             collection_services.get_next_page_of_all_non_private_commits()[0])
-        self.assertEqual(len(all_commits), 1)
+        self.assertEqual(len(all_commits), 2)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[0])
+            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[-1])
 
     def test_paging(self):
         all_commits, cursor, more = (
@@ -1364,19 +1365,19 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.assertEqual(len(all_commits), 5)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_COLLECTION_2, commit_dicts[-1])
+            self.COMMIT_ALBERT_EDIT_COLLECTION_1, commit_dicts[-1])
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_COLLECTION_1, commit_dicts[-2])
+            self.COMMIT_ALBERT_EDIT_COLLECTION_2, commit_dicts[-2])
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_COLLECTION_2, commit_dicts[-3])
+            self.COMMIT_ALBERT_DELETE_COLLECTION_1, commit_dicts[-3])
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_COLLECTION_1, commit_dicts[-4])
+            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[-4])
         self.assertTrue(more)
 
         all_commits, cursor, more = (
             collection_services.get_next_page_of_all_commits(
                 page_size=5, urlsafe_start_cursor=cursor))
-        self.assertEqual(len(all_commits), 2)
+        self.assertEqual(len(all_commits), 3)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_CREATE_COLLECTION_1, commit_dicts[-1])

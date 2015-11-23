@@ -18,11 +18,14 @@ import ast
 
 from core import jobs
 from core.domain import subscription_services
+from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
+import utils
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
@@ -130,3 +133,43 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_exploration(key, item['id'])
             elif item['type'] == 'collection':
                 subscription_services.subscribe_to_collection(key, item['id'])
+
+
+class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that updates first contribution time in milliseconds for
+    current users. This job makes the assumption that once an exploration is
+    published, it remains published. This job is not completely precise in that
+    (1) we ignore explorations that have been published in the past but are now
+    unpublished, and (2) commits that were made during an interim unpublished
+    period are counted against the first publication date instead of the second
+    publication date.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(item):
+        snapshot_id = item.id
+        exp_id = snapshot_id[:snapshot_id.rfind('-')]
+        exp_first_published_msec = rights_manager.get_exploration_rights(
+            exp_id).first_published_msec
+        # First contribution time in msec is only set from contributions to
+        # explorations that are currently published.
+        if rights_manager.is_exploration_public(exp_id):
+            created_on_msecs = utils.get_time_in_millisecs(item.created_on)
+            if (created_on_msecs < exp_first_published_msec):
+                yield (item.committer_id, exp_first_published_msec)
+            else:
+                yield (item.committer_id, created_on_msecs)
+
+    @staticmethod
+    def reduce(user_id, stringified_commit_times_msecs):
+        commit_times_msecs = [
+            ast.literal_eval(commit_time_string) for
+            commit_time_string in stringified_commit_times_msecs]
+        first_contribution_msec = min(commit_times_msecs)
+        user_services.update_first_contribution_msec_if_not_set(
+            user_id, first_contribution_msec
+            )

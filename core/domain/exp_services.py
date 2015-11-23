@@ -808,8 +808,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     is_public = rights_manager.is_exploration_public(exploration.id)
     if is_public:
-        user_services.update_first_contribution_datetime_if_not_set(
-        committer_id, datetime.datetime.utcnow())
+        user_services.update_first_contribution_msec_if_not_set(
+        committer_id, utils.get_current_time_in_millisecs())
 
     exploration.version += 1
 

@@ -292,23 +292,23 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
     USERNAME = 'abc123'
     EMAIL = 'abc123@gmail.com'
 
-    def test_contribution_datetime(self):
+    def test_contribution_msec(self):
         #Test the contribution date shows up correctly as nonexist.
         self.signup(self.EMAIL, self.USERNAME)
         self.login(self.EMAIL)
         self.user_id = self.get_user_id_from_email(self.EMAIL)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
-        self.assertEqual(response_dict['first_contribution_datetime'], None)
+        self.assertEqual(response_dict['first_contribution_msec'], None)
 
-        #Update the first_contribution_datetime to the current datetime.
-        current_datetime = datetime.datetime.utcnow()
-        user_services.update_first_contribution_datetime_if_not_set(
-            self.user_id,current_datetime)
+        #Update the first_contribution_msec to the current time in milliseconds.
+        current_time_in_msecs = utils.get_current_time_in_millisecs()
+        user_services.update_first_contribution_msec_if_not_set(
+            self.user_id, current_time_in_msecs)
 
         #Test the contribution date correctly changes to set date time.
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
-            response_dict['first_contribution_datetime'],
-            utils.get_time_in_millisecs(current_datetime))
+            response_dict['first_contribution_msec'],
+            current_time_in_msecs)

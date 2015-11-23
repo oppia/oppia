@@ -59,7 +59,9 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job that finds first published datetime for all explorations."""
+    """One-off job that finds first published time in milliseconds for all
+    explorations.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):

@@ -1682,6 +1682,17 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         'post_commit_status': 'public'
     }
 
+    COMMIT_UPDATE_FIRST_PUBLISHED_MSEC_EXP_2 = {
+        'username': '',
+        'version': None,
+        'exploration_id': EXP_ID_2,
+        'commit_type': 'edit',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': False,
+        'commit_message': 'Set first_published_msec time',
+        'post_commit_status': 'public'
+    }
+
     def setUp(self):
         """Populate the database of explorations to be queried against.
 
@@ -1694,7 +1705,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         - (6) Bob reverts Albert's last edit to EXP_ID_1.
         - (7) Albert deletes EXP_ID_1.
         - Bob tries to publish EXP_ID_2, and is denied access.
-        - (8) Albert publishes EXP_ID_2.
+        - (8) Albert publishes EXP_ID_2. This updates first_publised_msec for the
+              exploration.
         """
         super(ExplorationCommitLogUnitTests, self).setUp()
 
@@ -1741,7 +1753,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
     def test_get_next_page_of_all_commits(self):
         all_commits = exp_services.get_next_page_of_all_commits()[0]
-        self.assertEqual(len(all_commits), 8)
+        self.assertEqual(len(all_commits), 9)
         for ind, commit in enumerate(all_commits):
             if ind != 0:
                 self.assertGreater(
@@ -1771,10 +1783,10 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     def test_get_next_page_of_all_non_private_commits(self):
         all_commits = (
             exp_services.get_next_page_of_all_non_private_commits()[0])
-        self.assertEqual(len(all_commits), 1)
+        self.assertEqual(len(all_commits), 2)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-1])
 
         #TODO(frederikcreemers@gmail.com) test max_age here.
 
@@ -1784,20 +1796,20 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(all_commits), 5)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-1])
+            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-1])
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-2])
+            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-2])
         self.assertDictContainsSubset(
-            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-3])
+            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-3])
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-4])
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-4])
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-5])
+            self.COMMIT_UPDATE_FIRST_PUBLISHED_MSEC_EXP_2, commit_dicts[-5])
         self.assertTrue(more)
 
         all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
             page_size=5, urlsafe_start_cursor=cursor)
-        self.assertEqual(len(all_commits), 3)
+        self.assertEqual(len(all_commits), 4)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])

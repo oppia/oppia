@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
@@ -25,10 +26,12 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_one_off
+from core.domain import user_services
 from core.platform import models
+from core.tests import test_utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
-from core.tests import test_utils
+search_services = models.Registry.import_search_services()
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
@@ -377,3 +380,77 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+
+
+class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
+
+    EXP_ID = 'test_exp'
+
+    def setUp(self):
+        super(UserFirstContributionMsecOneOffJobTests, self).setUp()
+
+    def test_contribution_msec_updates_on_published_explorations(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.admin_id, end_state_name='End')
+        self.init_state_name = exploration.init_state_name
+
+        # Test that no contribution time is set.
+        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        self.assertIsNone(
+            user_services.get_user_settings(self.admin_id).first_contribution_msec)
+
+        # Test all owners and editors of exploration after publication have
+        # updated times.
+        rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(self.admin_id,
+            self.EXP_ID)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [{
+            'cmd': 'edit_state_property',
+            'state_name': self.init_state_name,
+            'property_name': 'widget_id',
+            'new_value': 'MultipleChoiceInput'
+            }], 'commit')
+        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
+            .first_contribution_msec)
+
+    def test_contribution_msec_updates_on_published_explorations(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_EMAIL])
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        self.init_state_name = exploration.init_state_name
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        user_services.update_first_contribution_msec_if_not_set(
+            self.owner_id, None)
+        rights_manager.release_ownership_of_exploration(self.admin_id,
+            self.EXP_ID)
+
+        # Test that first contribution time is not set for unpublished
+        # explorations.
+        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        self.assertIsNone(user_services.get_user_settings(self.admin_id)
+            .first_contribution_msec)

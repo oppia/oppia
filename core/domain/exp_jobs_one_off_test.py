@@ -250,7 +250,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
         then published again, the job uses the first publication date as the
-        first published datetime.
+        first published time.
         """
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL)
