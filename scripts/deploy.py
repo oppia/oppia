@@ -18,8 +18,9 @@ USE THIS SCRIPT AT YOUR OWN RISK! A safe option is to modify app.yaml manually
 and run the 'appcfg.py update' command.
 
 This script performs a deployment of Oppia to a Google App Engine appspot
-instance. It creates a build with unnecessary files removed, which is saved
-in ../deployment_history. It then pushes this build to the production server.
+instance. It creates a build with unnecessary files removed, and saves a copy
+of the uploaded files to a deployment folder in the parent directory of the
+oppia/ folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
 
@@ -28,8 +29,8 @@ IMPORTANT NOTES:
     folder should contain a folder called /images, which in turn should
     contain:
     - one file: favicon.ico
-    - three folders: /logo, /splash and /sidebar, containing images used for
-        the logo, gallery carousel and sidebar, respectively.
+    - four folders: /avatar, /logo, /splash and /sidebar, containing images
+        used for the avatar, logo, gallery carousel and sidebar, respectively.
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -66,7 +67,7 @@ else:
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-RELEASE_DIR_NAME = '%s-deploy-%s' % (
+RELEASE_DIR_NAME = 'deploy-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
@@ -119,7 +120,7 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
-    IMAGE_DIRS = ['splash', 'sidebar', 'logo']
+    IMAGE_DIRS = ['avatar', 'splash', 'sidebar', 'logo']
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
@@ -176,11 +177,15 @@ with common.CD(RELEASE_DIR_PATH):
 
     # Run the tests; ensure there are no errors.
     print 'Running tests...'
-    test_output = subprocess.check_output([
-        'python', 'scripts/backend_tests.py'])
+    tests_proc = subprocess.Popen([
+        'bash', os.path.join('scripts', 'run_tests.sh')],
+        stdout=subprocess.PIPE)
+    tests_stdout, tests_stderr = tests_proc.communicate()
+    print tests_stdout
+    print tests_stderr
 
-    if 'All tests passed.' not in test_output:
-        raise Exception('Tests failed. Halting deployment.\n%s' % test_output)
+    if tests_proc.returncode != 0:
+        raise Exception('Tests failed. Halting deployment.')
 
     # Deploy to GAE.
     subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])

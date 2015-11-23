@@ -317,6 +317,10 @@ def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
 
+def generate_new_session_id():
+    return generate_random_string(24)
+
+
 def vfs_construct_path(a, *p):
     """Mimics behavior of os.path.join on Posix machines."""
     path = a
@@ -399,9 +403,9 @@ def require_valid_name(name, name_type):
                 'Invalid character %s in %s: %s' % (c, name_type, name))
 
 
-def make_first_letter_uppercase(s):
-    """Converts the first letter of a string to its uppercase equivalent,
-    and returns the result.
+def capitalize_string(s):
+    """Converts the first character of a string to its uppercase equivalent (if
+    it's a letter), and returns the result.
     """
     # This guards against empty strings.
     if s:

@@ -42,6 +42,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
         $scope.recommendedExplorationIds = [];
         $scope.recommendedExplorationSummaries = [];
         $scope.collectionId = GLOBALS.collectionId;
+        $scope.collectionTitle = GLOBALS.collectionTitle;
 
         var authorRecommendationsDeferred = $q.defer();
         var authorRecommendationsPromise = authorRecommendationsDeferred.promise;
@@ -79,15 +80,12 @@ oppia.directive('oppiaInteractiveEndExploration', [
         if (!$scope.isInEditorPage) {
           authorRecommendationsPromise.then(function() {
             var explorationId = explorationContextService.getExplorationId();
-            var collectionSuffix = '';
+            var recommendationsUrlParams = {};
             if ($scope.collectionId) {
-              collectionSuffix = '?collection_id=' + $scope.collectionId;
+              recommendationsUrlParams.collection_id = $scope.collectionId;
             }
-            $http({
-              method: 'GET',
-              url: (
-                '/explorehandler/recommendations/' + explorationId +
-                collectionSuffix)
+            $http.get('/explorehandler/recommendations/' + explorationId, {
+              params: recommendationsUrlParams
             }).success(function(data) {
               var allRecommendedExplorationIds = data.recommended_exp_ids;
               var systemRecommendedExplorationIds = [];
@@ -150,5 +148,26 @@ oppia.directive('oppiaShortResponseEndExploration', [
       scope: {},
       templateUrl: 'shortResponse/EndExploration'
     };
+  }
+]);
+
+oppia.directive('oppiaEndExplorationRecommendedExplorations', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {
+        recommendedExplorationIds: '=',
+        recommendedExplorationSummaries: '=',
+        collectionId: '='
+      },
+      templateUrl: 'interaction/EndExploration/RecommendedExplorations',
+      controller: ['$scope', function($scope) {
+        if ($scope.collectionId) {
+          $scope.collectionSuffix = '?collection_id=' + $scope.collectionId;
+        } else {
+          $scope.collectionSuffix = '';
+        }
+      }]
+    }
   }
 ]);

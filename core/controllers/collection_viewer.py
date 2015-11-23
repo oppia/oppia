@@ -28,12 +28,17 @@ from core.platform import models
 import feconf
 import utils
 
+
 def require_collection_playable(handler):
     """Decorator that checks if the user can play the given collection."""
     def test_can_play(self, collection_id, **kwargs):
         """Check if the current user can play the collection."""
-        if rights_manager.Actor(self.user_id).can_play(
-                rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id):
+        actor = rights_manager.Actor(self.user_id)
+        can_play = actor.can_play(
+            rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+        can_view = actor.can_view(
+            rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+        if can_play and can_view:
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -55,12 +60,6 @@ class CollectionPage(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        version = collection.version
-
-        if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id):
-            raise self.PageNotFoundException
-
         self.values.update({
             'can_edit': (
                 bool(self.username) and
@@ -68,15 +67,15 @@ class CollectionPage(base.BaseHandler):
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
             ),
+            'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
             'collection_title': collection.title,
             'is_private': rights_manager.is_collection_private(collection_id),
             'meta_name': collection.title,
-            'meta_description': utils.make_first_letter_uppercase(
-                collection.objective)
+            'meta_description': utils.capitalize_string(collection.objective)
         })
 
-        self.render_template('pages/collection_player/collection_player.html')
+        self.render_template('collection_player/collection_player.html')
 
 
 class CollectionDataHandler(base.BaseHandler):
@@ -90,9 +89,7 @@ class CollectionDataHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        exp_ids = [
-            collection_node.exploration_id
-            for collection_node in collection.nodes]
+        exp_ids = collection.exploration_ids
 
         exp_summaries = (
             exp_services.get_exploration_summaries_matching_ids(exp_ids))
@@ -105,6 +102,7 @@ class CollectionDataHandler(base.BaseHandler):
         # TODO(bhenning): Users should not be recommended explorations they
         # have completed outside the context of a collection.
         next_exploration_ids = None
+        completed_exploration_ids = None
         if self.user_id:
             completed_exploration_ids = (
                 collection_services.get_completed_exploration_ids(
@@ -112,22 +110,34 @@ class CollectionDataHandler(base.BaseHandler):
             next_exploration_ids = collection.get_next_exploration_ids(
                 completed_exploration_ids)
         else:
-            # If the user is not logged in or they have not completed any of the
-            # explorations yet within the context of this collection, recommend the
-            # initial explorations.
+            # If the user is not logged in or they have not completed any of
+            # the explorations yet within the context of this collection,
+            # recommend the initial explorations.
             next_exploration_ids = collection.init_exploration_ids
+            completed_exploration_ids = []
+
+        collection_dict = collection.to_dict()
+        collection_dict['next_exploration_ids'] = next_exploration_ids
+        collection_dict['completed_exploration_ids'] = (
+            completed_exploration_ids)
+
+        # Insert an 'exploration' dict into each collection node, where the
+        # dict includes meta information about the exploration (ID and title).
+        for collection_node in collection_dict['nodes']:
+            collection_node['exploration'] = {
+                'id': collection_node['exploration_id'],
+                'title': exp_titles_dict[collection_node['exploration_id']]
+            }
 
         self.values.update({
             'can_edit': (
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
-            'collection': collection.to_dict(),
-            'exploration_titles': exp_titles_dict,
-            'next_exploration_ids': next_exploration_ids,
+            'collection': collection_dict,
             'info_card_image_url': utils.get_info_card_url_for_category(
                 collection.category),
             'is_logged_in': bool(self.user_id),
-            'session_id': utils.generate_random_string(24),
+            'session_id': utils.generate_new_session_id(),
         })
 
         self.render_json(self.values)
