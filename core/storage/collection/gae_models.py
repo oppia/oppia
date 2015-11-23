@@ -140,6 +140,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     # by anyone who has the URL. If the collection is not private, this
     # setting is ignored.
     viewable_if_private = ndb.BooleanProperty(indexed=True, default=False)
+    # Time, in milliseconds, when the collection was first published.
+    first_published_msec = ndb.FloatProperty(indexed=True, default=None)
 
     # The publication status of this collection.
     status = ndb.StringProperty(

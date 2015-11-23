@@ -205,6 +205,27 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }
   };
 
+  $scope.reloadCollection = function(collectionId) {
+    if ($scope.message.startsWith('Processing...')) {
+      return;
+    }
+
+    if (!confirm('This action is irreversible. Are you sure?')) {
+      return;
+    }
+
+    $scope.message = 'Processing...';
+
+    $http.post($scope.adminHandlerUrl, {
+      action: 'reload_collection',
+      collection_id: String(collectionId)
+    }).success(function(data) {
+      $scope.message = 'Data reloaded successfully.';
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
+
   $scope.startNewJob = function(jobType) {
     $scope.message = 'Starting new job...';
 

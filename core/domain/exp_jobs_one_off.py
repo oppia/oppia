@@ -14,13 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for explorations."""
+"""One-off jobs for explorations."""
 
 __author__ = 'Frederik Creemers'
 
+import ast
 import logging
 
 from core import jobs
+from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -46,7 +50,6 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(exploration_model):
-        from core.domain import exp_services
         if not exploration_model.deleted:
             exp_services.create_exploration_summary(exploration_model.id)
 
@@ -55,8 +58,34 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         pass
 
 
+class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that finds first published datetime for all explorations."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotContentModel]
+
+    @staticmethod
+    def map(item):
+        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            snapshot_id = item.id
+            yield (
+                snapshot_id[:snapshot_id.rfind('-')],
+                utils.get_time_in_millisecs(item.created_on))
+
+    @staticmethod
+    def reduce(exp_id, stringified_commit_times_msecs):
+        commit_times_msecs = [
+            ast.literal_eval(commit_time_string) for
+            commit_time_string in stringified_commit_times_msecs]
+        first_published_msec = min(commit_times_msecs)
+        rights_manager.update_activity_first_published_msec(
+            rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            first_published_msec)
+
+
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
-    """Job that indexes all explorations"""
+    """One-off job that indexes all explorations"""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -64,11 +93,6 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        # We're inline importing here to break import loops like this: (->
-        # means imports):
-        #   exp_services -> event_services -> jobs_registry ->
-        #   exp_jobs -> exp_services.
-        from core.domain import exp_services
         if not item.deleted:
             exp_services.index_explorations_given_ids([item.id])
 
@@ -84,9 +108,6 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
-        from core.domain import rights_manager
-
         if item.deleted:
             return
 
@@ -106,58 +127,6 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
         yield (key, values)
 
 
-class SearchRankerRealtimeModel(
-        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    pass
-
-
-class SearchRanker(jobs.BaseContinuousComputationManager):
-    """A continuous-computation job that refreshes the search ranking.
-
-    This job does not have a realtime component. There will be a delay in
-    propagating new updates to the gallery; the length of the delay will be
-    approximately the time it takes a batch job to run.
-    """
-    @classmethod
-    def get_event_types_listened_to(cls):
-        return []
-
-    @classmethod
-    def _get_realtime_datastore_class(cls):
-        return SearchRankerRealtimeModel
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return SearchRankerMRJobManager
-
-    @classmethod
-    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
-
-
-class SearchRankerMRJobManager(
-        jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """Manager for a MapReduce job that iterates through all explorations and
-    recomputes their search rankings.
-    """
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return SearchRanker
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        from core.domain import exp_services
-        exp_services.index_explorations_given_ids([item.id])
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        pass
-
-
 class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
@@ -173,9 +142,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        from core.domain import exp_domain
-        from core.domain import exp_services
-
         if item.deleted:
             return
 
@@ -227,8 +193,6 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        from core.domain import exp_services
-
         if item.deleted:
             return
 
