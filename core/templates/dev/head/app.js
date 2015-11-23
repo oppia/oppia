@@ -390,14 +390,21 @@ oppia.factory('extensionTagAssemblerService', [
 }]);
 
 // TEMPORARY
+GLOBALS.TEMPORARY_ID = null;
+
 oppia.factory('researchEventsService', ['$http', '$window', function($http, $window) {
   return {
     recordEvent: function(eventType, eventData) {
+      if (!GLOBALS.TEMPORARY_ID) {
+        return;
+      }
+
       var url = $window.location.pathname;
       if (url.indexOf('collection') !== -1 || url.indexOf('explore') !== -1) {
         $http.post('/researcheventshandler/' + eventType, {
           event_data: eventData,
-          page_url: url
+          page_url: url,
+          temporary_id: GLOBALS.TEMPORARY_ID
         });
       }
     }

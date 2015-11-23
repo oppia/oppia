@@ -625,13 +625,14 @@ class ResearchEventsHandler(BaseHandler):
 
     def post(self, event_type):
         """Handles POST requests."""
-        if not self.user_id:
-            return
-
         event_data = self.payload.get('event_data')
         page_url = self.payload.get('page_url')
+        temporary_id = self.payload.get('temporary_id')
+
+        if not temporary_id:
+            return
 
         event_services.record_research_event(
-            self.user_id, page_url,
+            temporary_id, page_url,
             utils.get_current_time_in_millisecs(),
             event_type, event_data)

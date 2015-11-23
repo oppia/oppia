@@ -78,27 +78,6 @@ oppia.controller('Base', [
              researchEventsService, pageContextService, PAGE_CONTEXT) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
-  researchEventsService.recordEvent('visit_page', {});
-
-  // This is overwritten in playerservices for the learner view case.
-  if (pageContextService.getPageContext() !== PAGE_CONTEXT.LEARNER) {
-    document.body.addEventListener('click', function() {
-      researchEventsService.recordEvent('click', {
-        exploration_id: null,
-        state_name: null
-      });
-    }, true);
-    document.body.addEventListener('keypress', function(evt) {
-      var key = evt.which || evt.keyCode;
-      if (key === 13) {
-        researchEventsService.recordEvent('enter_keypress', {
-          exploration_id: null,
-          state_name: null
-        });
-      }
-    }, true);
-  }
-
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
   $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;

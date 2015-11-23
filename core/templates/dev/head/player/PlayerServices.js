@@ -135,7 +135,7 @@ oppia.factory('oppiaPlayerService', [
   var answerIsBeingProcessed = false;
   var _viewerHasEditingRights = false;
 
-  // Overwrites similar methods in base.js
+  // TEMPORARY
   document.body.addEventListener('click', function() {
     researchEventsService.recordEvent('click', {
       exploration_id: _explorationId,
@@ -607,6 +607,9 @@ oppia.factory('oppiaPlayerService', [
               break;
             }
           }
+        } else if (_transcript.length === 1 && !GLOBALS.TEMPORARY_ID) {
+          // This is the first correct answer to the first card.
+          GLOBALS.TEMPORARY_ID = answer;
         }
 
         var newStateName = outcome.dest;

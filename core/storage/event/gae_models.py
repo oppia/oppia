@@ -51,7 +51,7 @@ class ResearchEventModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, page_url, time_msec, event_type, event_data):
-        prefix = '.'.join([user_id, page_url, str(int(time_msec))])
+        prefix = ':'.join([user_id, page_url, str(int(time_msec))])
         new_id = cls.get_new_id('event', prefix=prefix)
         cls(
             id=new_id, user_id=user_id, page_url=page_url, time_msec=time_msec,
