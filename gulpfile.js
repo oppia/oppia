@@ -18,13 +18,23 @@
  * @author barnabasmakonda@gmail.com (Barnabas Makonda)
  */
 
-var argv = require('yargs')
-    .usage(
-      'Usage: $0 --gae_devserver_path [path to app engine]' +
-      '--clear_datastore [whether to clear all data storage]' +
-      '--enable_sendmail [whether to send emails]' +
-      '--minify [whether to minify third-party dependencies]')
-    .demand(['gae_devserver_path']).argv;
+var yargs = require('yargs')
+    .option('minify', {describe: 'Whether to minify third-party dependencies'})
+    .command('build', 'generate optimimized third party library for production'),
+    argv = yargs.argv;
+// If gulp is not run from scripts/build.py, then argument
+// gae_devserver_path must be passed . 
+if (!argv.build) {
+  yargs.reset()
+  .usage('Usage: $0 [--gae_devserver_path] [--clear_datastore]'+
+    '[--enable_sendmail] [--minify]')
+  .option('gae_devserver_path', {describe: 'A path to app engine'})
+  .option('clear_datastore', {describe: 'Whether to clear all data storage'})
+  .option('enable_sendmail', {describe: 'Whether to send emails'})
+  .option('clear_datastore', {describe: 'Whether to clear all data storage'})
+  .demand(['gae_devserver_path'])
+  .argv;
+}
 var concat = require('gulp-concat');
 var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
