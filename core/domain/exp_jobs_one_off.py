@@ -57,6 +57,7 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     def reduce(exp_id, list_of_exps):
         pass
 
+
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job that finds first published datetime for all explorations."""
 
@@ -78,7 +79,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             ast.literal_eval(commit_time_string) for
             commit_time_string in stringified_commit_times_msecs]
         first_published_msec = min(commit_times_msecs)
-        rights_manager.update_activity_first_published_msec_if_necessary(
+        rights_manager.update_activity_first_published_msec(
             rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
             first_published_msec)
 
