@@ -266,7 +266,6 @@ textarea {
   opacity: 0.5;
   padding: 4px 8px;
   position: fixed;
-  z-index: 5;
 }
 .oppia-site-feedback:hover,
 .oppia-site-feedback:focus,
@@ -700,12 +699,6 @@ textarea {
 
 .btn.oppia-unresolved-answer-button:hover {
   background-color: #eee;
-}
-
-.oppia-gallery-tiles-area {
-  background-color: #eee;
-  position: relative;
-  z-index: 2;
 }
 
 .oppia-gallery-tiles-introduction {
