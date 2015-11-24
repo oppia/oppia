@@ -21,10 +21,13 @@
 describe('Answer classifiation service', function() {
   beforeEach(module('oppia'));
 
-  var acs, $httpBackend;
+  var acs, $httpBackend, successHandler, failHandler, $rootScope;
   beforeEach(inject(function($injector) {
     acs = $injector.get('answerClassificationService');
     $httpBackend = $injector.get('$httpBackend');
+    $rootScope = $injector.get('$rootScope');
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
   }));
 
   var explorationId = 'exploration';
@@ -81,13 +84,13 @@ describe('Answer classifiation service', function() {
     $httpBackend.expectPOST(
       '/explorehandler/classify/' + explorationId).respond(
       backendClassifiedOutcome);
-    var classificationResult;
     acs.getMatchingClassificationResult(explorationId, state, 0, false).
-      then(function(outcome) {
-        classificationResult = outcome;
-    });
+      then(successHandler, failHandler);
     $httpBackend.flush();
-    expect(classificationResult).toEqual(expectedClassificationResult);
+
+    expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
+    expect(failHandler).not.toHaveBeenCalled();
+
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
@@ -95,43 +98,45 @@ describe('Answer classifiation service', function() {
   it('should return the first matching answer group and first matching rule' +
      'spec', function() {
     acs.getMatchingClassificationResult(
-      explorationId, state, 10, false, rules).then(
-        function(classificationResult) {
-          expect(classificationResult).toEqual({
-            outcome: 'outcome 1',
-            answerGroupIndex: 0,
-            ruleSpecIndex: 0
-          });
+      explorationId, state, 10, false, rules).then(successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).toHaveBeenCalledWith({
+      outcome: 'outcome 1',
+      answerGroupIndex: 0,
+      ruleSpecIndex: 0
     });
+    expect(failHandler).not.toHaveBeenCalled();
+
     acs.getMatchingClassificationResult(
-      explorationId, state, 5, rules, false).then(
-        function(classificationResult) {
-          expect(classificationResult).toEqual({
-            outcome: 'outcome 2',
-            answerGroupIndex: 1,
-            ruleSpecIndex: 0
-          });
+      explorationId, state, 5, false, rules).then(successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).toHaveBeenCalledWith({
+      outcome: 'outcome 2',
+      answerGroupIndex: 1,
+      ruleSpecIndex: 0
     });
+    expect(failHandler).not.toHaveBeenCalled();
+
     acs.getMatchingClassificationResult(
-      explorationId, state, 6, rules, false).then(
-        function(classificationResult) {
-          expect(classificationResult).toEqual({
-            outcome: 'outcome 2',
-            answerGroupIndex: 1,
-            ruleSpecIndex: 1
-          });
+      explorationId, state, 6, false, rules).then(successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).toHaveBeenCalledWith({
+      outcome: 'outcome 2',
+      answerGroupIndex: 1,
+      ruleSpecIndex: 1
     });
+    expect(failHandler).not.toHaveBeenCalled();
   });
 
   it('should return the default rule if no answer group matches', function() {
     acs.getMatchingClassificationResult(
-      explorationId, state, 7, rules, false).then(
-        function(classificationResult) {
-          expect(classificationResult).toEqual({
-            outcome: 'default',
-            answerGroupIndex: 2,
-            ruleSpecIndex: 0
-          });
+      explorationId, state, 7, false, rules).then(successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).toHaveBeenCalledWith({
+      outcome: 'default',
+      answerGroupIndex: 2,
+      ruleSpecIndex: 0
     });
+    expect(failHandler).not.toHaveBeenCalled();
   });
 });

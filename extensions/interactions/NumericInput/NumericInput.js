@@ -40,8 +40,6 @@ oppia.directive('oppiaInteractiveNumericInput', [
           ui_config: {}
         };
 
-        var USE_FRONTEND_RULE_EVALUATION = true;
-
         $scope.submitAnswer = function(answer) {
           if (answer !== undefined && answer !== null && answer !== '') {
             $scope.$parent.submitAnswer(answer, numericInputRulesService);
