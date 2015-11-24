@@ -38,11 +38,6 @@ describe('Exploration history', function() {
     var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
     var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
-    // Compare a version to itself (just contains first node)
-    editor.expectGraphComparisonOf(1, 1).toBe([
-      {'label': general.FIRST_STATE_DEFAULT_NAME, 'color': COLOR_UNCHANGED}
-    ], [0, 0, 0]);
-
     // Check renaming state, editing text, editing interactions and adding state
     editor.moveToState(general.FIRST_STATE_DEFAULT_NAME);
     editor.setStateName('first');

@@ -18,6 +18,7 @@
 
 __author__ = 'Frederik Creemers'
 
+import ast
 import logging
 
 from core import jobs
@@ -55,6 +56,32 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(exp_id, list_of_exps):
         pass
+
+
+class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that finds first published datetime for all explorations."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotContentModel]
+
+    @staticmethod
+    def map(item):
+        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+            snapshot_id = item.id
+            yield (
+                snapshot_id[:snapshot_id.rfind('-')],
+                utils.get_time_in_millisecs(item.created_on))
+
+    @staticmethod
+    def reduce(exp_id, stringified_commit_times_msecs):
+        commit_times_msecs = [
+            ast.literal_eval(commit_time_string) for
+            commit_time_string in stringified_commit_times_msecs]
+        first_published_msec = min(commit_times_msecs)
+        rights_manager.update_activity_first_published_msec(
+            rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            first_published_msec)
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):

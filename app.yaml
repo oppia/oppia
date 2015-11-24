@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-0-2
+version: 2-0-3
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -99,5 +99,7 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
+- name: numpy
+  version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
