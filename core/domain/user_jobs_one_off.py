@@ -17,8 +17,8 @@
 import ast
 
 from core import jobs
-from core.domain import subscription_services
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 (exp_models, collection_models, feedback_models, user_models) = (
@@ -157,19 +157,18 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
             exp_id).first_published_msec
         # First contribution time in msec is only set from contributions to
         # explorations that are currently published.
-        if rights_manager.is_exploration_public(exp_id):
-            created_on_msecs = utils.get_time_in_millisecs(item.created_on)
-            if (created_on_msecs < exp_first_published_msec):
-                yield (item.committer_id, exp_first_published_msec)
-            else:
-                yield (item.committer_id, created_on_msecs)
+        if not rights_manager.is_exploration_private(exp_id):
+            created_on_msec = utils.get_time_in_millisecs(item.created_on)
+            yield (
+                item.committer_id,
+                max(exp_first_published_msec, created_on_msec)
+            )
 
     @staticmethod
-    def reduce(user_id, stringified_commit_times_msecs):
-        commit_times_msecs = [
+    def reduce(user_id, stringified_commit_times_msec):
+        commit_times_msec = [
             ast.literal_eval(commit_time_string) for
-            commit_time_string in stringified_commit_times_msecs]
-        first_contribution_msec = min(commit_times_msecs)
+            commit_time_string in stringified_commit_times_msec]
+        first_contribution_msec = min(commit_times_msec)
         user_services.update_first_contribution_msec_if_not_set(
-            user_id, first_contribution_msec
-            )
+            user_id, first_contribution_msec)

@@ -484,11 +484,6 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     memcache_services.delete(_get_collection_memcache_key(collection.id))
     index_collections_given_ids([collection.id])
 
-    is_public = rights_manager.is_collection_public(collection.id)
-    if is_public:
-        user_services.update_first_contribution_msec_if_not_set(
-        committer_id, utils.get_current_time_in_millisecs())
-
     collection.version += 1
 
 
@@ -606,6 +601,10 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id)
+
+    if not rights_manager.is_collection_private(collection.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
 def create_collection_summary(collection_id):

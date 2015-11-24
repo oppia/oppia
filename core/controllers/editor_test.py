@@ -668,7 +668,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
-        self.editor_id= self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)

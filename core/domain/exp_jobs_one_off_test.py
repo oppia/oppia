@@ -249,11 +249,10 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
-        then published again, the job uses the first publication date as the
-        first published time.
+        then published again, the job uses the first publication time as the
+        value for first_published_msec.
         """
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_EMAIL])
 
@@ -264,6 +263,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        self.logout()
         job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -277,7 +277,10 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
+        self.login(self.ADMIN_EMAIL)
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+        self.logout()
+        self.login(self.OWNER_EMAIL)
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)

@@ -213,11 +213,11 @@ def update_activity_first_published_msec(
     activity_rights.first_published_msec = first_published_msec
     commit_cmds = [{
         'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'first_published_msec': first_published_msec
+        'first_published': first_published_msec
     }]
     _save_activity_rights(
         feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
-        'Set first_published_msec time', commit_cmds)
+        'set first published time in msec', commit_cmds)
 
 
 def create_new_exploration_rights(exploration_id, committer_id):
@@ -626,6 +626,10 @@ def _change_activity_status(
 
     if new_status != ACTIVITY_STATUS_PRIVATE:
         activity_rights.viewer_ids = []
+        # Change first_published_msec in activity rights if necessary.
+        if activity_rights.first_published_msec is None:
+            activity_rights.first_published_msec = (
+                utils.get_current_time_in_millisecs())
 
     _save_activity_rights(
         committer_id, activity_rights, activity_type, commit_message,
@@ -644,7 +648,9 @@ def _publish_activity(committer_id, activity_id, activity_type):
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
         '%s published.' % activity_type)
 
-    # Add contribution dates to the owners and editors
+    # Add contribution dates to the owners and editors. This assumes that the
+    # only people who could possibly make commits to the exploration are those
+    # listed explicitly as owners/editors of the exploration.
     activity_rights = _get_activity_rights(activity_type, activity_id)
     for owner_id in activity_rights.owner_ids:
         user_services.update_first_contribution_msec_if_not_set(
@@ -652,12 +658,6 @@ def _publish_activity(committer_id, activity_id, activity_type):
     for editor_id in activity_rights.editor_ids:
         user_services.update_first_contribution_msec_if_not_set(
             editor_id, utils.get_current_time_in_millisecs())
-
-    # Set first_published_msec for published activity if necessary
-    if activity_rights.first_published_msec is None:
-        update_activity_first_published_msec(
-            activity_type, activity_id,
-            utils.get_current_time_in_millisecs())
 
 
 def _unpublish_activity(committer_id, activity_id, activity_type):

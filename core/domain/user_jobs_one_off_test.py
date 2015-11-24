@@ -399,7 +399,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.init_state_name = exploration.init_state_name
 
         # Test that no contribution time is set.
-        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(
@@ -408,19 +409,21 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # Test all owners and editors of exploration after publication have
         # updated times.
         rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
-        rights_manager.release_ownership_of_exploration(self.admin_id,
-            self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            self.admin_id, self.EXP_ID)
+        self.logout()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
-            'cmd': 'edit_state_property',
-            'state_name': self.init_state_name,
-            'property_name': 'widget_id',
-            'new_value': 'MultipleChoiceInput'
+                'cmd': 'edit_state_property',
+                'state_name': self.init_state_name,
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput'
             }], 'commit')
-        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
@@ -428,9 +431,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
             .first_contribution_msec)
 
-    def test_contribution_msec_updates_on_published_explorations(self):
+    def test_contribution_msec_does_not_update_on_unpublished_explorations(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_EMAIL])
 
@@ -442,15 +444,19 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, end_state_name='End')
         self.init_state_name = exploration.init_state_name
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        user_services.update_first_contribution_msec_if_not_set(
+        # User's first_contribution_msec is reset to None after publish_exploration
+        # sets it. This is to test that the one off job skips over the unpublished
+        # exploration and does not reset the user's first_contribution_msec.
+        user_services._update_first_contribution_msec(
             self.owner_id, None)
-        rights_manager.release_ownership_of_exploration(self.admin_id,
-            self.EXP_ID)
+        self.logout()
+        self.login(self.ADMIN_EMAIL)
+        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished
         # explorations.
         job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
-        self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.owner_id).first_contribution_msec)

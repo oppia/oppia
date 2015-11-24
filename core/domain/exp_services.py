@@ -806,11 +806,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     index_explorations_given_ids([exploration.id])
 
-    is_public = rights_manager.is_exploration_public(exploration.id)
-    if is_public:
-        user_services.update_first_contribution_msec_if_not_set(
-        committer_id, utils.get_current_time_in_millisecs())
-
     exploration.version += 1
 
 
@@ -958,6 +953,10 @@ def update_exploration(
 
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id)
+
+    if not rights_manager.is_exploration_private(exploration.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
 def create_exploration_summary(exploration_id):
