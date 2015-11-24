@@ -413,7 +413,7 @@ oppia.directive('conversationSkin', [function() {
         });
       };
 
-       $scope.submitAnswer = function(answer, interactionRulesService) {
+      $scope.submitAnswer = function(answer, interactionRulesService) {
         // For some reason, answers are getting submitted twice when the submit
         // button is clicked. This guards against that.
         if (_answerIsBeingProcessed || $scope.activeCard.interactionIsDisabled) {

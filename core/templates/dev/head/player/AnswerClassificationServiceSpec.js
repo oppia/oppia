@@ -82,8 +82,8 @@ describe('Answer classifiation service', function() {
       '/explorehandler/classify/' + explorationId).respond(
       backendClassifiedOutcome);
     var classificationResult;
-    acs.getMatchingClassificationResult(explorationId, state, 0).then(
-      function(outcome) {
+    acs.getMatchingClassificationResult(explorationId, state, 0, false).
+      then(function(outcome) {
         classificationResult = outcome;
     });
     $httpBackend.flush();
@@ -94,40 +94,44 @@ describe('Answer classifiation service', function() {
 
   it('should return the first matching answer group and first matching rule' +
      'spec', function() {
-    acs.getMatchingClassificationResult(explorationId, state, 10, rules).then(
-      function(classificationResult) {
-        expect(classificationResult).toEqual({
-          outcome: 'outcome 1',
-          answerGroupIndex: 0,
-          ruleSpecIndex: 0
-        });
+    acs.getMatchingClassificationResult(
+      explorationId, state, 10, false, rules).then(
+        function(classificationResult) {
+          expect(classificationResult).toEqual({
+            outcome: 'outcome 1',
+            answerGroupIndex: 0,
+            ruleSpecIndex: 0
+          });
     });
-    acs.getMatchingClassificationResult(explorationId, state, 5, rules).then(
-      function(classificationResult) {
-        expect(classificationResult).toEqual({
-          outcome: 'outcome 2',
-          answerGroupIndex: 1,
-          ruleSpecIndex: 0
-        });
+    acs.getMatchingClassificationResult(
+      explorationId, state, 5, rules, false).then(
+        function(classificationResult) {
+          expect(classificationResult).toEqual({
+            outcome: 'outcome 2',
+            answerGroupIndex: 1,
+            ruleSpecIndex: 0
+          });
     });
-    acs.getMatchingClassificationResult(explorationId, state, 6, rules).then(
-      function(classificationResult) {
-        expect(classificationResult).toEqual({
-          outcome: 'outcome 2',
-          answerGroupIndex: 1,
-          ruleSpecIndex: 1
-        });
+    acs.getMatchingClassificationResult(
+      explorationId, state, 6, rules, false).then(
+        function(classificationResult) {
+          expect(classificationResult).toEqual({
+            outcome: 'outcome 2',
+            answerGroupIndex: 1,
+            ruleSpecIndex: 1
+          });
     });
   });
 
   it('should return the default rule if no answer group matches', function() {
-    acs.getMatchingClassificationResult(explorationId, state, 7, rules).then(
-      function(classificationResult) {
-        expect(classificationResult).toEqual({
-          outcome: 'default',
-          answerGroupIndex: 2,
-          ruleSpecIndex: 0
-        });
+    acs.getMatchingClassificationResult(
+      explorationId, state, 7, rules, false).then(
+        function(classificationResult) {
+          expect(classificationResult).toEqual({
+            outcome: 'default',
+            answerGroupIndex: 2,
+            ruleSpecIndex: 0
+          });
     });
   });
 });

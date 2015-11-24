@@ -39,7 +39,7 @@ oppia.factory('answerClassificationService', [
    *   <li> **outcome**: the outcome of the answer group
    *   <li> **answerGroupIndex**: the index of the matched answer group
    *   <li> **ruleSpecIndex**: the index of the rule in the matched answer group
-   * <ul>
+   * </ul>
    */
   var classifyAnswer = function(
       answer, answerGroups, defaultOutcome, interactionRulesService) {
@@ -49,9 +49,9 @@ oppia.factory('answerClassificationService', [
         var ruleSpec = answerGroups[i].rule_specs[j];
         if (interactionRulesService[ruleSpec.rule_type](answer, ruleSpec.inputs)) {
           return {
-            'outcome': answerGroups[i].outcome,
-            'answerGroupIndex': i,
-            'ruleSpecIndex': j
+            outcome: answerGroups[i].outcome,
+            answerGroupIndex: i,
+            ruleSpecIndex: j
           };
         }
       }
@@ -61,9 +61,9 @@ oppia.factory('answerClassificationService', [
     // returned. Throws an error if the default outcome is not defined.
     if (defaultOutcome) {
       return {
-        'outcome': defaultOutcome,
-        'answerGroupIndex': answerGroups.length,
-        'ruleSpecIndex': 0
+        outcome: defaultOutcome,
+        answerGroupIndex: answerGroups.length,
+        ruleSpecIndex: 0
       };
     } else {
       warningsData.addWarning('No default outcome found.');
@@ -75,22 +75,26 @@ oppia.factory('answerClassificationService', [
      * Gets a promise to the matching answer group.
      *
      * @param {string} explorationId The exploration ID.
-     * @param {*} answer The answer that the user has submitted.
      * @param {object} oldState The state where the user submitted the answer.
+     * @param {*} answer The answer that the user has submitted.
+     * @param {boolean} isInEditorMode Whether the function is being called in
+     *     editor mode.
      * @param {?function} interactionRulesService The service which contains the
      *     rules of that interaction. If this is undefined, then the function
-     *     server-side classification.
+     *     uses server-side classification.
      *
-     * @return {promise} An promise for an object representing the answer group
+     * @return {promise} A promise for an object representing the answer group
      *     with the following properties:
      * <ul>
      *   <li> **outcome**: the outcome of the answer group
      *   <li> **answerGroupIndex**: the index of the matched answer group
-     *   <li> **ruleSpecIndex**: the index of the rule in the matched answer group
-     * <ul>
+     *   <li> **ruleSpecIndex**: the index of the rule in the matched answer
+     *            group
+     * </ul>
      */
     getMatchingClassificationResult: function(
-        explorationId, oldState, answer, interactionRulesService) {
+        explorationId, oldState, answer, isInEditorMode,
+        interactionRulesService) {
       var deferred = $q.defer();
       if (interactionRulesService) {
         var answerGroups = oldState.interaction.answer_groups;
@@ -99,10 +103,14 @@ oppia.factory('answerClassificationService', [
         deferred.resolve(classifyAnswer(
           answer, answerGroups, defaultOutcome, interactionRulesService));
       } else {
+        // TODO(bhenning): Figure out a long-term solution for determining what
+        // params should be passed to the batch classifier.
         var classifyUrl = '/explorehandler/classify/' + explorationId;
+        var params = (isInEditorMode) ? {} : learnerParamsService.getAllParams();
+
         $http.post(classifyUrl, {
           old_state: oldState,
-          params: learnerParamsService.getAllParams(),
+          params: params,
           answer: answer
         }).success(function(result) {
           deferred.resolve({
@@ -113,30 +121,6 @@ oppia.factory('answerClassificationService', [
         });
       }
       return deferred.promise;
-    },
-    getMatchingEditorClassificationResult: function(
-        explorationId, oldState, answer, interactionRulesService) {
-      if (interactionRulesService) {
-        var answerGroups = oldState.interaction.answer_groups;
-        var defaultOutcome = oldState.interaction.default_outcome;
-        return $q(classifyAnswer(
-          answer, answerGroups, defaultOutcome, interactionRulesService));
-      } else {
-        // TODO(bhenning): Figure out a long-term solution for determining what
-        // params should be passed to the batch classifier.
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: {},
-          answer: answer
-        }).then(function(result) {
-          return {
-            outcome: result.outcome,
-            ruleSpecIndex: result.rule_spec_index,
-            answerGroupIndex: result.answer_group_index
-          };
-        });
-      }
-    },
+    }
   };
 }]);

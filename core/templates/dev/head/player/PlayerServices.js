@@ -515,7 +515,7 @@ oppia.factory('oppiaPlayerService', [
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
       answerClassificationService.getMatchingClassificationResult(
-        _explorationId, oldState, answer, interactionRulesService
+        _explorationId, oldState, answer, false, interactionRulesService
       ).then(function(classificationResult) {
         var outcome = classificationResult.outcome;
 

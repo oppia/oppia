@@ -128,22 +128,23 @@ def classify(exp_id, state, answer, params):
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
     best_matched_truth_value = 0.0
-    for (i, answer_group) in enumerate(state.interaction.answer_groups):
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exp_id))
         input_type = interaction_instance.answer_type
         ored_truth_value = 0.0
         best_rule_spec_index = None
-        for (j, rule_spec) in enumerate(answer_group.rule_specs):
+        for (rule_spec_index, rule_spec) in enumerate(answer_group.rule_specs):
             evaluated_truth_value = rule_domain.evaluate_rule(
                 rule_spec, input_type, params, normalized_answer, fs)
             if evaluated_truth_value > ored_truth_value:
                 ored_truth_value = evaluated_truth_value
-                best_rule_spec_index = j
+                best_rule_spec_index = rule_spec_index
         if ored_truth_value > best_matched_truth_value:
             best_matched_truth_value = ored_truth_value
             best_matched_answer_group = answer_group
-            best_matched_answer_group_index = i
+            best_matched_answer_group_index = answer_group_index
             best_matched_rule_spec_index = best_rule_spec_index
 
     # The best matched group must match above a certain threshold. If no group

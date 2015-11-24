@@ -18,7 +18,7 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
-describe('Numberic Input service', function() {
+describe('Numeric Input service', function() {
   beforeEach(module('oppia'));
 
   var nirs = null;
