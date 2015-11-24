@@ -19,6 +19,7 @@
  */
 
 var yargs = require('yargs')
+    .usage('Usage: $0 build [--minify]')
     .option('minify', {describe: 'Whether to minify third-party dependencies'})
     .command('build', 'generate optimimized third party library for production'),
     argv = yargs.argv;
@@ -27,7 +28,7 @@ var yargs = require('yargs')
 if (!argv.build) {
   yargs.reset()
   .usage('Usage: $0 [--gae_devserver_path] [--clear_datastore]'+
-    '[--enable_sendmail] [--minify]')
+    '[--enable_sendmail]')
   .option('gae_devserver_path', {describe: 'A path to app engine'})
   .option('clear_datastore', {describe: 'Whether to clear all data storage'})
   .option('enable_sendmail', {describe: 'Whether to send emails'})
