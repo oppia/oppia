@@ -79,22 +79,18 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
 
-        # If no collection is found redirect to homepage.
-        response = self.testapp.get(
-            '%s/a' % (feconf.COLLECTION_EDITOR_URL_PREFIX))
-        self.assertEqual(response.status_int, 302)
 
         # Check that it is possible to access a page with specific version number
         response = self.testapp.get(
             '%s/%s?v=1' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Collections in Oppia!', response.body)
-        
+        self.assertIn('Introduction to Collections in Oppia', response.body)
+     
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Collections in Oppia!', response.body)
+        self.assertIn('Introduction to Collections in Oppia', response.body)
         self.assert_cannot_edit(response.body)
 
         # Check that it is now possible to access and edit the editor page.
@@ -102,6 +98,6 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Collections in Oppia!', response.body)
+        self.assertIn('Introduction to Collections in Oppia', response.body)
         self.assert_can_edit(response.body)
         self.logout()
