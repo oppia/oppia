@@ -286,12 +286,17 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
         answer = self.payload.get('answer')
+        # The answer handler (submit, click, etc.)
+        handler_name = self.payload.get('handler')
         # Parameters associated with the learner.
         old_params = self.payload.get('params', {})
         old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
         rule_spec_string = self.payload.get('rule_spec_string')
+        session_id = self.payload.get('session_id')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
@@ -301,10 +306,12 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
                 old_interaction.id))
+
         normalized_answer = old_interaction_instance.normalize_answer(answer)
-        # TODO(sll): Should this also depend on `params`?
+
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name, rule_spec_string,
+            exploration_id, version, old_state_name, handler_name,
+            rule_spec_string, session_id, client_time_spent_in_secs, old_params,
             old_interaction_instance.get_stats_log_html(
                 old_interaction.customization_args, normalized_answer))
         self.render_json({})
