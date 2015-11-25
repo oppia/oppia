@@ -18,12 +18,48 @@ import ast
 
 from core import jobs
 from core.domain import subscription_services
+from core.domain import user_services
 from core.platform import models
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
 
+class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for creating and populating UserContributionsModels for 
+    all registered users.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapchatMetadataModel]
+
+    @staticmethod
+    def map(item):
+        split_id = item.id.split("-")
+        yield (item.committer_id, {
+            'version_number': split_id[1],
+            'exploration_id': split_id[0]
+        })
+
+    @staticmethod
+    def reduce(key, version_and_exp_ids):
+
+        created_explorations = []
+        edited_explorations = []
+
+        for edit in version_and_exp_ids
+            if(edit.version_number == 1){
+                created_explorations.append(edit.exploration_id)
+            edited_explorations.append(edit.exploration_id)
+
+        if isinstance(UserContributionsModel.get(key), user_models.UserContributionsModel)
+            user_services.update_user_contributions(key, set(created_explorations),
+                set(edited_explorations))
+
+        else                
+            user_contributions = user_services.create_user_contributions(key, set(created_explorations),
+                set(edited_explorations))
+      
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and

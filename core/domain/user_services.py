@@ -390,3 +390,97 @@ def get_email_preferences(user_id):
             if email_preferences_model is None
             else email_preferences_model.site_updates)
     }
+
+
+class UserContributions(object):
+   """Value object representing a user's contributions."""
+    def __init__(
+            self, user_id, created_explorations=None, edited_explorations=None):
+        self.user_id = user_id
+        self.created_explorations = created_explorations
+        self.edited_explorations = edited_explorations)
+
+
+    def validate(self):
+        if not isinstance(self.user_id, basestring):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+
+
+def get_user_contributions(user_id):
+    """Gets domain object representing the contributions for the given user_id.
+
+    If the given user_id does not exist, returns None.
+    """
+    model = user_models.UserContributionsModel.get(user_id)
+    if model is not None
+        result = UserSettings(
+                    model.id, created_explorations=model.created_explorations,
+                    edited_explorations=model.edited_explorations)
+    else
+        result = None
+    return result
+
+
+def create_user_contributions(user_id, created_explorations, edited_explorations):
+    """Creates a new UserContributionsModel and returns the domain object."""
+    user_contributions = get_user_contributions(user_id)
+    if user_contributions is not None:
+        raise Exception('User %s already exists.' % user_id)
+    else
+
+        user_contributions = UserContributions(
+            user_id, created_explorations=created_explorations,
+            edited_explorations=edited_explorations)
+        _save_user_contributions(user_contributions)
+    return user_contributions
+
+
+def update_user_contributions(user_id, created_explorations, edited_explorations):
+    """Updates an existing UserContributionsModel with new calculated contributions"""
+    
+    user_contributions = get_user_contributions(user_id)
+    if user_contributions is None:
+        raise Exception('User %s contributions does not exist.' % user_id)
+
+    user_contributions.created_explorations=created_explorations
+    user_contributions.edited_explorations=edited_explorations
+
+    _save_user_contributions(user_contributions)
+
+
+def add_created_exploration(user_id, exploration_id):
+    """Adds an exploration_id to a user_id's UserContributionsModel collection
+    of created explorations."""
+
+    user_contributions = get_user_contributions(user_id)
+
+    if user_contributions is None:
+        raise Exception('User %s contributions does not exist.' % user_id)
+
+    user_contributions.created_explorations.add(exploration_id)
+    _save_user_contributions(user_contributions)
+
+def add_edited_exploration(user_id, exploration_id):
+    """Adds an exploration_id to a user_id's UserContributionsModel collection
+    of edited explorations."""
+    user_contributions = get_user_contributions(user_id)
+
+    if user_contributions is None:
+        raise Exception('User %s contributions does not exist.' % user_id)
+    else
+        user_contributions.edited_explorations.add(exploration_id)
+        _save_user_contributions(user_contributions)
+
+def _save_user_contributions(user_contributions):
+    """Commits a user contributions object to the datastore."""
+    user_contributions.validate()
+    user_models.UserContributionsModel(
+        id=user_contributions.user_id,
+        created_explorations=user_contributions.created_explorations,
+        edited_explorations=user_contributions.edited_explorations,
+    ).put()
+
+#def count_explorations(exploration_ids):
