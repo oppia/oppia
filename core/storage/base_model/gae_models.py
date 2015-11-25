@@ -152,7 +152,8 @@ class BaseModel(ndb.Model):
             random_hash = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH)
-            new_id = '.'.join([prefix, random_hash])
+            # NB: be wary about adding the 'prefix' stuff into develop.
+            new_id = '.'.join([prefix, random_hash]) if prefix else random_hash
             if not cls.get_by_id(new_id):
                 return new_id
 
