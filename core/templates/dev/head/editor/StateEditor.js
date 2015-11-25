@@ -160,8 +160,8 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
               var currentStateName = editorContextService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
 
-              answerClassificationService.getMatchingEditorClassificationResult(
-                explorationId, state, unhandledAnswer).success(
+              answerClassificationService.getMatchingClassificationResult(
+                explorationId, state, unhandledAnswer, true).success(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
@@ -184,7 +184,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
                   $scope.trainingDataFeedback = feedback;
                   $scope.trainingDataOutcomeDest = dest;
                   $scope.classification.answerGroupIndex = (
-                    classificationResult.answer_group_index);
+                    classificationResult.answerGroupIndex);
                 });
             };
 
