@@ -24,16 +24,13 @@ oppia.directive('oppiaInteractiveNumericInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
-      scope: {
-        getAnswerClassificationData: '&answerClassificationData'
-      },
+      scope: {},
       templateUrl: 'interaction/NumericInput',
       controller: ['$scope', '$attrs', 'focusService',
           'numericInputRulesService', function(
             $scope, $attrs, focusService, numericInputRulesService) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-        var answerClassificationData = $scope.getAnswerClassificationData();
 
         $scope.NUMERIC_INPUT_FORM_SCHEMA = {
           type: 'float',
