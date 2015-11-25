@@ -488,9 +488,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_save_and_retrieve_exploration(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
-        exploration.param_specs = {
-            'theParameter': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        exp_services.update_exploration(
+            self.OWNER_ID, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'param_specs',
+                'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
+            }],
+            '')
 
         retrieved_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(retrieved_exploration.title, 'A title')
@@ -503,9 +507,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_save_and_retrieve_exploration_summary(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
-        exploration.param_specs = {
-            'theParameter': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+
+        # change param spec
+        exp_services.update_exploration(
+            self.OWNER_ID, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'param_specs',
+                'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
+            }],
+            '')
 
         # change title and category
         exp_services.update_exploration(
@@ -2103,21 +2113,29 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         exploration_1 = self.save_new_valid_exploration(
             self.EXP_ID_1, self.ALBERT_ID)
 
-        exploration_1.title = 'Exploration 1 title'
-        exp_services._save_exploration(
-            self.BOB_ID, exploration_1, 'Changed title.', [])
+        exp_services.update_exploration(
+            self.BOB_ID, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }],'Changed title.')
 
         exploration_2 = self.save_new_valid_exploration(
             self.EXP_ID_2, self.ALBERT_ID)
 
-        exploration_1.title = 'Exploration 1 Albert title'
-        exp_services._save_exploration(
-            self.ALBERT_ID, exploration_1,
-            'Changed title to Albert1 title.', [])
+        exp_services.update_exploration(
+            self.ALBERT_ID, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 Albert title'
+            }],'Changed title to Albert1 title.')
 
-        exploration_2.title = 'Exploration 2 Albert title'
-        exp_services._save_exploration(
-            self.ALBERT_ID, exploration_2, 'Changed title to Albert2.', [])
+        exp_services.update_exploration(
+            self.ALBERT_ID, self.EXP_ID_2, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 2 Albert title'
+            }],'Changed title to Albert2 title.')
 
         exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
 

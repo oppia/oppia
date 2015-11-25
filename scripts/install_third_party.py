@@ -14,6 +14,7 @@
 
 """Installation script for Oppia third-party libraries."""
 
+import contextlib
 import itertools
 import os
 import shutil
@@ -130,7 +131,7 @@ def download_and_untar_files(
         common.ensure_directory_exists(target_parent_dir)
 
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with tarfile.open(TMP_UNZIP_PATH, 'r:gz') as t:
+        with contextlib.closing(tarfile.open(TMP_UNZIP_PATH, 'r:gz')) as t:
             t.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 
