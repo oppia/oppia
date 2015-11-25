@@ -136,69 +136,141 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         exp_services.load_demo(exp_id)
 
         # Since this test is looking for the top 5 answers, it will submit ten
-        # different answers are varying frequency:
+        # different answers with varying frequency:
         #   English (12 times), French (9), Finnish (7), Italian (4),
         #   Spanish (3), Japanese (3), Hungarian (2), Portuguese (1),
         #   German (1), and Gaelic (1).
         # Note that there are some ties here, including on the border of the
         # top 5 most frequent answers.
-        english_answers_list = self._create_sample_answers(
-            'English', [1., 2., 3.], ['sid1', 'sid2', 'sid3', 'sid4'], 12)
-        french_answers_list = self._create_sample_answers(
-            'French', [4., 5., 6.], ['sid2', 'sid3', 'sid5'], 9)
-        finnish_answers_list = self._create_sample_answers(
-            'Finnish', [7., 8., 9.], ['sid1', 'sid3', 'sid5', 'sid6'], 7)
-        italian_answers_list = self._create_sample_answers(
-            'Italian', [1., 4., 7.], ['sid1', 'sid6'], 4)
-        spanish_answers_list = self._create_sample_answers(
-            'Spanish', [2., 5., 8.], ['sid3'], 3)
-        japanese_answers_list = self._create_sample_answers(
-            'Japanese', [3., 6., 9.], ['sid1', 'sid2'], 3)
-        hungarian_answers_list = self._create_sample_answers(
-            'Hungarian', [1., 5.], ['sid6', 'sid7'], 2)
-        portuguese_answers_list = self._create_sample_answers(
-            'Portuguese', [5.], ['sid1'], 1)
-        german_answers_list = self._create_sample_answers(
-            'German', [4.], ['sid7'], 1)
-        gaelic_answers_list = self._create_sample_answers(
-            'Gaelic', [7.], ['sid8'], 1)
+        all_answer_lists = {
+            'english': self._create_sample_answers(
+                'English', [1., 2., 3.], ['sid1', 'sid2', 'sid3', 'sid4'], 12),
+            'french': self._create_sample_answers(
+                'French', [4., 5., 6.], ['sid2', 'sid3', 'sid5'], 9),
+            'finnish': self._create_sample_answers(
+                'Finnish', [7., 8., 9.], ['sid1', 'sid3', 'sid5', 'sid6'], 7),
+            'italian': self._create_sample_answers(
+                'Italian', [1., 4., 7.], ['sid1', 'sid6'], 4),
+            'spanish': self._create_sample_answers(
+                'Spanish', [2., 5., 8.], ['sid3'], 3),
+            'japanese': self._create_sample_answers(
+                'Japanese', [3., 6., 9.], ['sid1', 'sid2'], 3),
+            'hungarian': self._create_sample_answers(
+                'Hungarian', [1., 5.], ['sid6', 'sid7'], 2),
+            'portuguese': self._create_sample_answers(
+                'Portuguese', [5.], ['sid1'], 1),
+            'german': self._create_sample_answers('German', [4.], ['sid7'], 1),
+            'gaelic': self._create_sample_answers('Gaelic', [7.], ['sid8'], 1)
+        }
 
-        all_answer_lists = [
-            english_answers_list, french_answers_list, finnish_answers_list,
-            italian_answers_list, spanish_answers_list, japanese_answers_list,
-            hungarian_answers_list, portuguese_answers_list,
-            german_answers_list, gaelic_answers_list
+        # This is a combined list of answers generated above. This list is a
+        # special selection of answers from the generated lists such that
+        # answers are submitted in varying orders and times.
+        answer_submission_queue = [
+            all_answer_lists['french'][0],
+            all_answer_lists['finnish'][4],
+            all_answer_lists['english'][11],
+            all_answer_lists['japanese'][0],
+            all_answer_lists['english'][0],
+            all_answer_lists['italian'][1],
+            all_answer_lists['french'][8],
+            all_answer_lists['spanish'][0],
+            all_answer_lists['english'][3],
+            all_answer_lists['finnish'][6],
+            all_answer_lists['portuguese'][0],
+            all_answer_lists['japanese'][2],
+            all_answer_lists['italian'][3],
+            all_answer_lists['english'][9],
+            all_answer_lists['french'][6],
+            all_answer_lists['french'][1],
+            all_answer_lists['finnish'][1],
+            all_answer_lists['english'][2],
+            all_answer_lists['french'][7],
+            all_answer_lists['italian'][2],
+            all_answer_lists['english'][4],
+            all_answer_lists['finnish'][2],
+            all_answer_lists['gaelic'][0],
+            all_answer_lists['japanese'][1],
+            all_answer_lists['french'][4],
+            all_answer_lists['finnish'][0],
+            all_answer_lists['french'][5],
+            all_answer_lists['english'][7],
+            all_answer_lists['german'][0],
+            all_answer_lists['finnish'][5],
+            all_answer_lists['hungarian'][0],
+            all_answer_lists['french'][2],
+            all_answer_lists['finnish'][3],
+            all_answer_lists['english'][5],
+            all_answer_lists['spanish'][2],
+            all_answer_lists['english'][1],
+            all_answer_lists['english'][6],
+            all_answer_lists['english'][8],
+            all_answer_lists['italian'][0],
+            all_answer_lists['english'][10],
+            all_answer_lists['french'][3],
+            all_answer_lists['spanish'][1],
+            all_answer_lists['hungarian'][1]
         ]
 
-        # The answer list based on submitting each of the above answers at
-        # different times.
-        dummy_answers_list = [
-            all_answer_lists[1][0], all_answer_lists[2][4],
-            all_answer_lists[0][11], all_answer_lists[5][0],
-            all_answer_lists[0][0], all_answer_lists[3][1],
-            all_answer_lists[1][8], all_answer_lists[4][0],
-            all_answer_lists[0][3], all_answer_lists[2][6],
-            all_answer_lists[7][0], all_answer_lists[5][2],
-            all_answer_lists[3][3], all_answer_lists[0][9],
-            all_answer_lists[1][6], all_answer_lists[1][1],
-            all_answer_lists[2][1], all_answer_lists[0][2],
-            all_answer_lists[1][7], all_answer_lists[3][2],
-            all_answer_lists[0][4], all_answer_lists[2][2],
-            all_answer_lists[9][0], all_answer_lists[5][1],
-            all_answer_lists[1][4], all_answer_lists[2][0],
-            all_answer_lists[1][5], all_answer_lists[0][7],
-            all_answer_lists[8][0], all_answer_lists[2][5],
-            all_answer_lists[6][0], all_answer_lists[1][2],
-            all_answer_lists[2][3], all_answer_lists[0][5],
-            all_answer_lists[4][2], all_answer_lists[0][1],
-            all_answer_lists[0][6], all_answer_lists[0][8],
-            all_answer_lists[3][0], all_answer_lists[0][10],
-            all_answer_lists[1][3], all_answer_lists[4][1],
-            all_answer_lists[6][1]
-        ]
+        # Ensure the submission queue includes all of the answers from the
+        # generated answer lists. This protects further changes to the test.
+        total_answer_count = sum([
+            len(all_answer_lists[list_name])
+            for list_name in all_answer_lists])
+        self.assertEquals(total_answer_count, len(answer_submission_queue))
+
+        # Verify the frequencies of answers in the submission queue. This is
+        # another quick check to protect changes to this test.
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'English']), 12)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'French']), 9)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Finnish']), 7)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Italian']), 4)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Spanish']), 3)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Japanese']), 3)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Hungarian']), 2)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Portuguese']), 1)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'German']), 1)
+        self.assertEquals(len([
+            answer_submission
+            for answer_submission in answer_submission_queue
+            if answer_submission['answer_value'] == 'Gaelic']), 1)
+
+        # Finally, verify that all of the answers in the answer lists are
+        # represents in the submission queue (in case another answer is added to
+        # the answer list but not added to the queue).
+        self.assertEquals(len(set([
+            answer_submission['answer_value']
+            for answer_submission in answer_submission_queue])), 10)
 
         # Record answers.
-        for answer in dummy_answers_list:
+        for answer in answer_submission_queue:
             stats_services.record_answer(
                 exp_id, exp_version, state_name, 'test_handler',
                 DEFAULT_RULE_STR, answer['session_id'],
@@ -254,8 +326,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(actual_calc_output, expected_answer_counts)
 
     def test_top5_answer_frequencies_calculation_with_less_than_5_answers(self):
-        """Ensure the top 5 most frequent answers are submitted for TextInput,
-        even if only one answer is actually submitted.
+        """Verify the top 5 answer frequencies calculation still works if only
+        one answer is submitted.
         """
         exp_id = '0'
         exp_version = 1
@@ -291,9 +363,6 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'Top5AnswerFrequencies')
         actual_calc_output = actual_state_answers_calc_output.calculation_output
 
-        # Note that the expected answers are based on the order in which they
-        # were submitted in order to resolve ties. These are the top 5 answers,
-        # by submission frequency.
         expected_answer_counts = [{
             'answer': 'English',
             'frequency': 1

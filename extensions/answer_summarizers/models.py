@@ -165,6 +165,9 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         # and split at commas ', ' to convert string to set.
         # TODO(msl): This will yield wrong results if answers contain ',',
         # '[', or ']'. Consider saving sets instead of stringified sets.
+        # TODO(bhenning): Remove this string parsing in favor of directly
+        # working with the set itself, rather than a stringified representation
+        # of it.
         list_of_all_elements = []
         for setstring in answer_values:
             elts_this_set = (

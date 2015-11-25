@@ -234,22 +234,22 @@ def record_answer(exploration_id, exploration_version, state_name,
     state_answers = get_state_answers(
         exploration_id, exploration_version, state_name)
 
-    # Get interaction id from state_answers if it is stored there or
-    # obtain it from the exploration (note that if the interaction id
-    # of a state is changed by editing the exploration then this will
-    # correspond to a new version of the exploration, for which a new
-    # state_answers entity with correct updated interaction_id will
-    # be created when the first answer is recorded).
-    # If no interaction id exists, use None as placeholder.
+    # Get interaction id from state_answers if it is stored there or obtain it
+    # from the exploration (note that if the interaction id of a state is
+    # changed by editing the exploration then this will correspond to a new
+    # version of the exploration, for which a new state_answers entity with
+    # correct updated interaction_id will be created when the first answer is
+    # recorded). If no answers have yet been recorded for the given exploration
+    # ID, version, and state name, then interaction_id will be None here.
     interaction_id = state_answers.interaction_id if state_answers else None
 
     if not interaction_id:
-        # retrieve exploration and read its interaction id
+        # Retrieve the interaction ID from the exploration itself.
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=exploration_version)
         interaction_id = exploration.states[state_name].interaction.id
 
-    # Construct answer_dict and validate it
+    # Construct answer_dict and validate it.
     answer_dict = {'answer_value': answer_value,
                    'time_spent_in_sec': time_spent_in_sec,
                    'rule_str': rule_str,
@@ -259,7 +259,7 @@ def record_answer(exploration_id, exploration_version, state_name,
                    'params': params}
     _validate_answer(answer_dict)
 
-    # Add answer to state_answers and commit to storage
+    # Add answer to state_answers (or create a new one) and commit it.
     if state_answers:
         state_answers.answers_list.append(answer_dict)
     else:
