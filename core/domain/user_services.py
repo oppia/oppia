@@ -393,12 +393,12 @@ def get_email_preferences(user_id):
 
 
 class UserContributions(object):
-   """Value object representing a user's contributions."""
+    """Value object representing a user's contributions."""
     def __init__(
             self, user_id, created_explorations=None, edited_explorations=None):
         self.user_id = user_id
         self.created_explorations = created_explorations
-        self.edited_explorations = edited_explorations)
+        self.edited_explorations = edited_explorations
 
 
     def validate(self):
@@ -415,11 +415,11 @@ def get_user_contributions(user_id):
     If the given user_id does not exist, returns None.
     """
     model = user_models.UserContributionsModel.get(user_id)
-    if model is not None
+    if model is not None:
         result = UserSettings(
                     model.id, created_explorations=model.created_explorations,
                     edited_explorations=model.edited_explorations)
-    else
+    else:
         result = None
     return result
 
@@ -429,8 +429,7 @@ def create_user_contributions(user_id, created_explorations, edited_explorations
     user_contributions = get_user_contributions(user_id)
     if user_contributions is not None:
         raise Exception('User %s already exists.' % user_id)
-    else
-
+    else:
         user_contributions = UserContributions(
             user_id, created_explorations=created_explorations,
             edited_explorations=edited_explorations)
@@ -470,7 +469,7 @@ def add_edited_exploration(user_id, exploration_id):
 
     if user_contributions is None:
         raise Exception('User %s contributions does not exist.' % user_id)
-    else
+    else:
         user_contributions.edited_explorations.add(exploration_id)
         _save_user_contributions(user_contributions)
 

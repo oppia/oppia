@@ -47,16 +47,16 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
         created_explorations = []
         edited_explorations = []
 
-        for edit in version_and_exp_ids
-            if(edit.version_number == 1){
+        for edit in version_and_exp_ids:
+            if edit.version_number == 1:
                 created_explorations.append(edit.exploration_id)
             edited_explorations.append(edit.exploration_id)
 
-        if isinstance(UserContributionsModel.get(key), user_models.UserContributionsModel)
+        if isinstance(UserContributionsModel.get(key), user_models.UserContributionsModel):
             user_services.update_user_contributions(key, set(created_explorations),
                 set(edited_explorations))
 
-        else                
+        else:                
             user_contributions = user_services.create_user_contributions(key, set(created_explorations),
                 set(edited_explorations))
       
