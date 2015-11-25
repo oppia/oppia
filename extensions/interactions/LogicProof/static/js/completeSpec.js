@@ -146,6 +146,6 @@ describe('Full system', function() {
     ).toBeUndefined();
 
     var endTime = new Date().getTime();
-    expect(endTime < startTime + 10000).toBe(true);
+    expect(endTime < startTime + 20000).toBe(true);
   });
 });

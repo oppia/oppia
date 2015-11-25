@@ -18,24 +18,30 @@
  * @author barnabasmakonda@gmail.com (Barnabas Makonda)
  */
 
-var yargs = require('yargs')
-    .usage('Usage: $0 build [--minify]')
-    .option('minify', {describe: 'Whether to minify third-party dependencies'})
-    .command('build', 'generate optimimized third party library for production'),
-    argv = yargs.argv;
-// If gulp is not run from scripts/build.py, then argument
-// gae_devserver_path must be passed . 
-if (!argv.build) {
-  yargs.reset()
-  .usage('Usage: $0 [--gae_devserver_path] [--clear_datastore]'+
-    '[--enable_sendmail]')
-  .option('gae_devserver_path', {describe: 'A path to app engine'})
-  .option('clear_datastore', {describe: 'Whether to clear all data storage'})
-  .option('enable_sendmail', {describe: 'Whether to send emails'})
-  .option('clear_datastore', {describe: 'Whether to clear all data storage'})
-  .demand(['gae_devserver_path'])
-  .argv;
-}
+var yargs = require('yargs');
+var argv = yargs
+    .usage('Usage: $0 <command> [<options>]')
+    .example('$0 build --minify=True')
+    .command('build', 'generate optimimized third party library for production',
+      function(yargs) {
+        argv = yargs
+          .usage('Usage: $0 build [--minify]')
+          .option('minify', {describe: 'Whether to minify third-party dependencies'})
+          .demand(['minify'])
+          .argv;
+    })
+    .command('start_devserver', 'start GAE development server', function(yargs) {
+      argv = yargs
+        .usage('Usage: $0 start_devserver [--gae_devserver_path] [--clear_datastore]'+
+          '[--enable_sendmail]')
+        .option('gae_devserver_path', {describe: 'A path to app engine'})
+        .option('clear_datastore', {describe: 'Whether to clear all data storage'})
+        .option('enable_sendmail', {describe: 'Whether to send emails'})
+        .option('clear_datastore', {describe: 'Whether to clear all data storage'})
+        .demand(['gae_devserver_path'])
+        .argv;
+    })
+    .argv;
 var concat = require('gulp-concat');
 var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
@@ -58,6 +64,19 @@ if (argv.clear_datastore) {
 if (argv.enable_sendmail) {
   params.enable_sendmail = argv.enable_sendmail;
 }
+
+// Check if there are enough commands/actions/tasks to run gulp.
+function checkCommands (yargs, argv, numRequired) {
+  if (argv._.length < numRequired) {
+    // Display help(usage) message.
+    console.log(yargs.help());
+    // Stop gulp and exit.
+    process.exit();
+  }
+}
+// There should atleast be minimum of two defined tasks,
+// one being the default task('.').
+checkCommands(yargs, argv, 2)
 
 var isMinificationNeeded = (argv.minify == 'True');
 var frontendDependencies = manifest.dependencies.frontend;
@@ -133,7 +152,12 @@ gulp.task('watch', function() {
 });
 
 // This takes all default task which must be run when start.sh is started.
-// TODO (barnabas) check if files are already generated and if so
+// TODO(Barnabas Makonda): check if files are already generated and if so
 // do not build.
-gulp.task('.', ['build', 'gulpStartGae', 'watch']);
+gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
+
+// Gulp requires a default task to be defined and is executed if 
+// no command/action/task is defined or whenever server is started.
+// Example: gulp [<args>]
+gulp.task('.',[]);
 

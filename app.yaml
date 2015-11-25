@@ -106,5 +106,7 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
+- name: numpy
+  version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
