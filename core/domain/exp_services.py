@@ -149,7 +149,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.version,
+        exp_summary_model.contributor_ids, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
@@ -977,8 +977,10 @@ def compute_summary_of_exploration(exploration):
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        contributor_ids = old_exp_summary.contributor_ids or []
     else:
         ratings = feconf.get_empty_ratings()
+        contributor_ids = []
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -989,11 +991,11 @@ def compute_summary_of_exploration(exploration):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated)
+        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated)
 
     return exp_summary
-
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity

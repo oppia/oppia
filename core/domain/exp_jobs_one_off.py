@@ -57,6 +57,31 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     def reduce(exp_id, list_of_exps):
         pass
 
+class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
+    """ One-off job that finds the user id's of the contributors
+    (defined as any human who has made a positive (i.e. not just
+    a reversion) for each exploration.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def map(item):
+        restricted_ids = ['admin', 'OppiaMigrationBot']
+        _VERSION_DELIMITER = '-'
+        if item.commit_type != 'revert' and item.committer_id not in restricted_ids:
+            snapshot_id = item.id
+            exp_id = snapshot_id[:snapshot_id.rfind(_VERSION_DELIMITER)]
+            yield (exp_id, item.committer_id)
+
+    @staticmethod
+    def reduce(exp_id, committer_id_list):
+        committer_ids = set(committer_id_list)
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
+        exp_summary_model.contributor_ids = list(committer_ids)
+        exp_summary_model.put()
+
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job that finds first published datetime for all explorations."""
