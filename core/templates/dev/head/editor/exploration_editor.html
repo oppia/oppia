@@ -116,7 +116,7 @@
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom" tooltip-append-to-body="true" ng-click="selectFeedbackTab()">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
@@ -426,6 +426,7 @@
     {{ include_js_file('editor/GadgetValidationService.js') }}
     {{ include_js_file('editor/GadgetEditor.js') }}
     {{ include_js_file('editor/StateInteraction.js') }}
+    {{ include_js_file('player/AnswerClassificationService.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
