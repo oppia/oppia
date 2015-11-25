@@ -26,20 +26,12 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
-      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
-    </li>
   </ul>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
   <div ng-controller="LearnerLocalNav">
     <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
-      <li popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
-        <a href="" tooltip="Feedback" tooltip-placement="bottom">
-          <span class="glyphicon glyphicon-comment"></span>
-        </a>
-      </li>
       {% if can_edit %}
         <li>
           <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">

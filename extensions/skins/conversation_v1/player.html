@@ -182,21 +182,6 @@
                       current-state-name="activeCard.stateName">
   </oppia-gadget-panel>
 
-  <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1"
-       class="conversation-skin-final-ratings">
-
-    <div style="color: #eee; margin-bottom: 20px;">
-      Learned something new? How would you rate this exploration?
-    </div>
-    <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
-      <rating-from-value rating-value="userRating"
-                         is-editable="true"
-                         on-edit="submitUserRating"
-                         style="letter-spacing: 10px; color: #fff;">
-      </rating-from-value>
-    </div>
-  </div>
-
   <div class="conversation-skin-card-switcher" ng-if="panels.length >= 2">
     <div class="conversation-skin-card-switcher-thumbnails-container">
       <span ng-repeat="panelName in panels">
