@@ -126,6 +126,18 @@ oppia.controller('Gallery', [
       urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService,
       ratingVisibilityService) {
 
+  // TEMPORARY
+  $scope.summaryTileData = {
+    explorationId: '0',
+    lastUpdatedMsec: 1447842330649,
+    numViews: 1800,
+    objective: 'An introduction to proofs, logic, and solving problems. Testing how long this can go. Lots and lots of lines are being placed here, thanks.',
+    starRating: 4.5,
+    thumbnailImageUrl: '/images/gallery/exploration_background_teal_small.png',
+    title: 'Thinking like a mathematician'
+  };
+
+
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
     var oppiaTagline = $('.oppia-gallery-banner-tagline');
