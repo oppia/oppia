@@ -69,7 +69,7 @@ def process_third_party_libs():
         parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
     gulp_path = os.path.join(
         parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
-    gulp_build_cmd = [node_path, gulp_path, 'build', '--minjify=True']
+    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True']
     proc = subprocess.Popen(
         gulp_build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     gulp_stdout, gulp_stderr = proc.communicate()
