@@ -2162,8 +2162,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     def test_get_all_exploration_summaries(self):
         actual_summaries = exp_services.get_all_exploration_summaries()
 
-        print "Albert id: ", self.ALBERT_ID, "Bob id: ", self.BOB_ID
-
         expected_summaries = {
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
