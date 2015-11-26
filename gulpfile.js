@@ -20,28 +20,35 @@
 
 var yargs = require('yargs');
 var argv = yargs
-    .usage('Usage: $0 <command> [<options>]')
-    .example('$0 build --minify=True')
-    .command('build', 'generate optimimized third party library for production',
-      function(yargs) {
-        argv = yargs
-          .usage('Usage: $0 build [--minify]')
-          .option('minify', {describe: 'Whether to minify third-party dependencies'})
-          .demand(['minify'])
-          .argv;
-    })
-    .command('start_devserver', 'start GAE development server', function(yargs) {
+  .usage('Usage: $0 <command> [<options>]')
+  .example('$0 build --minify=True')
+  .command('build', 'generate optimimized third party library for production',
+    function(yargs) {
       argv = yargs
-        .usage('Usage: $0 start_devserver [--gae_devserver_path] [--clear_datastore]'+
-          '[--enable_sendmail]')
-        .option('gae_devserver_path', {describe: 'A path to app engine'})
-        .option('clear_datastore', {describe: 'Whether to clear all data storage'})
-        .option('enable_sendmail', {describe: 'Whether to send emails'})
-        .option('clear_datastore', {describe: 'Whether to clear all data storage'})
-        .demand(['gae_devserver_path'])
+        .usage('Usage: $0 build [--minify]')
+        .option('minify', {
+          describe: 'Whether to minify third-party dependencies'
+        })
+        .demand(['minify'])
         .argv;
     })
-    .argv;
+  .command('start_devserver', 'start GAE development server',
+    function(yargs) {
+      argv = yargs
+        .usage('Usage: $0 start_devserver [--gae_devserver_path]' +
+         '[--clear_datastore] [--enable_sendmail]')
+        .option('gae_devserver_path', {
+          describe: 'A path to app engine'
+        })
+        .option('enable_sendmail', {
+          describe: 'Whether to send emails'
+        })
+        .option('clear_datastore', {
+          describe: 'Whether to clear all data storage'
+        })
+        .demand(['gae_devserver_path'])
+        .argv;
+    }).argv;
 var concat = require('gulp-concat');
 var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
@@ -66,17 +73,17 @@ if (argv.enable_sendmail) {
 }
 
 // Check if there are enough commands/actions/tasks to run gulp.
-function checkCommands (yargs, argv, numRequired) {
+var checkCommands = function(yargs, argv, numRequired) {
   if (argv._.length < numRequired) {
     // Display help(usage) message.
     console.log(yargs.help());
     // Stop gulp and exit.
     process.exit();
   }
-}
+};
 // There should atleast be minimum of two defined tasks,
 // one being the default task('.').
-checkCommands(yargs, argv, 2)
+checkCommands(yargs, argv, 2);
 
 var isMinificationNeeded = (argv.minify == 'True');
 var frontendDependencies = manifest.dependencies.frontend;
@@ -124,9 +131,12 @@ gulp.task('copyFonts', function() {
       isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
 });
 
-// This is a task which copies backgroun image used by select2.css
+// This is a task which copies background image used by css
 // TODO(Barnabas) find a way of removing this task.
-// It is a bit of a hacky method and does not seems to scale with a program
+// It is a bit of a hack,
+// because it depends on the relative location of the CSS background images
+// of a third-party library with respect to the CSS file that uses them.
+// The currently-affected libraries include select2.css.
 gulp.task('copyCssBackgroundImages', function() {
   gulp.src(cssBackgroundPath)
     .pipe(gulp.dest(generatedCssTargetDir));
@@ -156,8 +166,7 @@ gulp.task('watch', function() {
 // do not build.
 gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
 
-// Gulp requires a default task to be defined and is executed if 
+// Gulp requires a default task to be defined and is executed if
 // no command/action/task is defined or whenever server is started.
 // Example: gulp [<args>]
-gulp.task('.',[]);
-
+gulp.task('.', []);
