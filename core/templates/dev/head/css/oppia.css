@@ -144,52 +144,48 @@ body {
   background-color: black;
 }
 
-md-tabs. md-padding {
-  width: 20%;
-}
 
 .oppia-profile-tabs md-tab-label {
-    color: #ffffff;
+  color: #ffffff;
 }
 
-.stat-container-top {
-    display: inline-block;
-    width: 45%;
+.oppia-stat-container-top {
+  display: inline-block;
+  width: 45%;
 }
 
-.stat-container {
-    display: inline-block;
-    width: 25%;
+.oppia-stat-container {
+  display: inline-block;
+  width: 25%;
 }
 
-.stat-big-container {
-    display: block;
-    width: 100%;
-    text-align: center;
-    margin-bottom: 50px;
+.oppia-stat-big-container {
+  display: block;
+  margin-bottom: 50px;
+  text-align: center;
+  width: 100%;
+    
 }
 
-.big-top-container {
-    margin-bottom: 70px;
+.oppia-big-top-container {
+  margin-bottom: 70px;
 }
 
-.stat-container-top span {
-    display: block;
+.oppia-stat-container-top span {
+  display: block;
 }
 
-.stat-container span {
-    display: block;
+.oppia-stat-container span {
+  display: block;
 }
 
-.big-number {
-    font-size: 50px;
+.oppia-big-number {
+  font-size: 50px;
 }
 
-.small-number {
-    font-size: 25px;
+.oppia-small-number {
+  font-size: 25px;
 }
-
-
 
 /*
   This counteracts the increased line-height of 1.846 introduced by
