@@ -30,14 +30,14 @@
   }
 
   .oppia-exploration-summary-tile .top-section {
-    background-color: rgba(0,150,136,1);
     height: 164px;
+    opacity: 1.0;
     position: relative;
     width: 100%;
   }
 
   .oppia-exploration-summary-tile:hover .top-section {
-    background-color: rgba(0,150,136,0.8);
+    opacity: 0.8;
   }
 
   .oppia-exploration-summary-tile,
@@ -94,8 +94,8 @@
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-exploration-summary-tile">
     <a ng-href="<[explorationLink]>">
-      <div class="top-section">
-        <img class="thumbnail-image" src="/images/gallery/computer.svg">
+      <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
+        <img class="thumbnail-image" ng-src="<[getThumbnailImageUrl()]>">
         <h2 class="exploration-title"><[getTitle()]></h2>
       </div>
 

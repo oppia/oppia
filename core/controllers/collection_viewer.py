@@ -121,12 +121,13 @@ class CollectionDataHandler(base.BaseHandler):
         # Insert an 'exploration' dict into each collection node, where the
         # dict includes meta information about the exploration (ID and title).
         for collection_node in collection_dict['nodes']:
+            exp_title = (
+                exp_summaries_dict[collection_node['exploration_id']].title
+                if exp_summaries_dict[collection_node['exploration_id']]
+                else '')
             collection_node['exploration'] = {
                 'id': collection_node['exploration_id'],
-                'title': (
-                    exp_summaries_dict[collection_node['exploration_id']].title
-                    if exp_summaries_dict[collection_node['exploration_id']]
-                    else None),
+                'title': exp_title,
                 'objective': (
                     exp_summaries_dict[
                         collection_node['exploration_id']].objective
@@ -138,6 +139,13 @@ class CollectionDataHandler(base.BaseHandler):
                     ].exploration_model_last_updated)
                     if exp_summaries_dict[collection_node['exploration_id']]
                     else None),
+                'thumbnail_image_url': (
+                    '/images/gallery/thumbnail_form.svg'
+                    if 'tionnaire' in exp_title
+                    else '/images/gallery/thumbnail_computer.svg'),
+                'thumbnail_bg_color': (
+                    '#1565C0' if 'tionnaire' in exp_title
+                    else 'rgb(0,150,136)'),
             }
 
         self.values.update({
