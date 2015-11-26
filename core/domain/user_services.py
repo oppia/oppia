@@ -253,7 +253,7 @@ def _create_user(user_id, email):
         user_id, email,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
-    #create_user_contributions(user_id, [], [])
+    create_user_contributions(user_id, [], [])
     return user_settings
 
 
@@ -458,8 +458,7 @@ def add_created_exploration(user_id, exploration_id):
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if user_contributions is None:
-        raise Exception('User %s contributions does not exist.' % user_id)
-
+        create_user_contributions(user_id, [exploration_id], [])
     elif exploration_id not in user_contributions.created_explorations:
         user_contributions.created_explorations.append(exploration_id)
         user_contributions.created_explorations.sort()
@@ -472,7 +471,7 @@ def add_edited_exploration(user_id, exploration_id):
     user_contributions = get_user_contributions(user_id, strict=False)
 
     if user_contributions is None:
-        raise Exception('User %s contributions does not exist.' % user_id)
+        create_user_contributions(user_id, [], [exploration_id])
 
     elif exploration_id not in user_contributions.edited_explorations:
         user_contributions.edited_explorations.append(exploration_id)

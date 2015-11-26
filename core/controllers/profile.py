@@ -53,6 +53,9 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
+        user_contributions = user_services.get_user_contributions(
+            user_services.get_user_id_from_username(username), strict=False)
+
         if not user_settings:
             raise self.PageNotFoundException
 
@@ -83,6 +86,9 @@ class ProfileHandler(base.BaseHandler):
                 utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
                 if user_settings.first_contribution_datetime else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'created_explorations_count': len(user_contributions.created_explorations),
+            'created_explorations_count': len(user_contributions.edited_explorations)
+
         })
         self.render_json(self.values)
 

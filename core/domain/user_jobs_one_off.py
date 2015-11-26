@@ -31,16 +31,23 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationSnapshotMetadataModel]
+        return [exp_models.ExplorationSnapshotMetadataModel,
+            user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
 
-        split_id = item.id.split("-")
-        yield (item.committer_id, {
-            'version_number': split_id[1],
-            'exploration_id': split_id[0]
-        })
+        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
+
+            split_id = item.id.split("-")
+            yield (item.committer_id, {
+                'version_number': split_id[1],
+                'exploration_id': split_id[0]
+            })
+        elif isinstance(item, user_models.UserSettingsModel):
+
+            yield(item.id, None)
+
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
@@ -51,11 +58,13 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
 
         for edit in edits:
-            edited_explorations.append(edit['exploration_id'])
-            if edit['version_number'] == '1':
-                created_explorations.append(edit['exploration_id'])
+            if edit is not None:
+                edited_explorations.append(edit['exploration_id'])
+                if edit['version_number'] == '1':
+                    created_explorations.append(edit['exploration_id'])
 
-
+        print edited_explorations
+        #update or create contributions model
         if user_services.get_user_contributions(key, strict=False) is not None:
             user_services.update_user_contributions(key, list(set(created_explorations)),
                 list(set(edited_explorations)))

@@ -96,7 +96,9 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
         user_a_contributions_model = user_models.UserContributionsModel.get(
             self.user_a_id, strict=False)
-        self.assertEqual(user_a_contributions_model, None)
+        self.assertEqual(user_a_contributions_model.created_explorations, [])
+        self.assertEqual(user_a_contributions_model.edited_explorations, [])
+
 
     def test_created_exp(self):
         """Tests the case where user has created (and therefore edited) 
