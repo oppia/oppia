@@ -71,12 +71,13 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        restricted_ids = ['admin', 'OppiaMigrationBot']
         _VERSION_DELIMITER = '-'
-        if item.commit_type != 'revert' and item.committer_id not in restricted_ids:
-            snapshot_id = item.id
-            exp_id = snapshot_id[:snapshot_id.rfind(_VERSION_DELIMITER)]
-            yield (exp_id, item.committer_id)
+        _COMMIT_TYPE_REVERT = 'revert'
+        if item.commit_type != _COMMIT_TYPE_REVERT:
+            if item.committer_id not in feconf.SYSTEM_USER_IDS:
+                snapshot_id = item.id
+                exp_id = snapshot_id[:snapshot_id.rfind(_VERSION_DELIMITER)]
+                yield (exp_id, item.committer_id)
 
     @staticmethod
     def reduce(exp_id, committer_id_list):
