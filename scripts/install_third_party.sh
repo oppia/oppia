@@ -116,3 +116,12 @@ if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
   echo installing node-jscs
   $NPM_INSTALL jscs@2.3.0
 fi
+
+# Note that numpy needs to be built after downloading. If you are having
+# trouble, please ensure that you have pip installed (see "Installing Oppia"
+# on the Oppia developers' wiki page).
+echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
+  echo Installing numpy
+  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
+fi
