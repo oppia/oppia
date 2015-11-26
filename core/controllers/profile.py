@@ -17,7 +17,6 @@
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import email_manager
 from core.domain import user_services
 import feconf
@@ -43,8 +42,10 @@ def require_user_id_else_redirect_to_homepage(handler):
     return test_login
 
 
-class ViewProfilePage(base.BaseHandler):
-    """The (view-only) profile page."""
+class ProfilePage(base.BaseHandler):
+    """The world-viewable profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'profile'
 
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
@@ -57,11 +58,33 @@ class ViewProfilePage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
-            'user_username': username,
-            'user_bio': user_settings.user_bio,
-            'user_pic_data_url': user_settings.profile_picture_data_url
+            'PROFILE_USERNAME': username,
         })
         self.render_template('profile/profile.html')
+
+
+class ProfileHandler(base.BaseHandler):
+    """Provides data for the profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'profile'
+
+    def get(self, username):
+        """Handles GET requests."""
+        if not username:
+            raise self.PageNotFoundException
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if not user_settings:
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'user_bio': user_settings.user_bio,
+            'first_contribution_datetime': (
+                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
+                if user_settings.first_contribution_datetime else None),
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+        })
+        self.render_json(self.values)
 
 
 class PreferencesPage(base.BaseHandler):
@@ -120,6 +143,8 @@ class PreferencesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
 
+        self.render_json({})
+
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
@@ -135,6 +160,20 @@ class ProfilePictureHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ProfilePictureHandlerByUsername(base.BaseHandler):
+    """ Provides the dataURI of the profile picture of the specified user,
+    or None if no user picture is uploaded for the user with that ID."""
+    def get(self, username):
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.PageNotFoundException
+        user_settings = user_services.get_user_settings(user_id)
+        self.values.update({
+            'profile_picture_data_url_for_username': user_settings.profile_picture_data_url
+        })
+        self.render_json(self.values)
+
+
 class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
@@ -146,15 +185,13 @@ class SignupPage(base.BaseHandler):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
 
-        user_settings = user_services.get_user_settings(self.user_id)
-        if user_settings.last_agreed_to_terms and user_settings.username:
+        if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
-            'SITE_NAME': pages.SITE_NAME.value,
         })
         self.render_template('profile/signup.html')
 
@@ -170,7 +207,12 @@ class SignupHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
-            'has_agreed_to_terms': bool(user_settings.last_agreed_to_terms),
+            'has_agreed_to_latest_terms': (
+                user_settings.last_agreed_to_terms and
+                user_settings.last_agreed_to_terms >=
+                feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),
+            'has_ever_registered': bool(
+                user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,
         })
 
@@ -182,10 +224,10 @@ class SignupHandler(base.BaseHandler):
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
 
-        has_previously_registered = (
-            user_services.has_user_registered_as_editor(self.user_id))
+        has_ever_registered = user_services.has_ever_registered(self.user_id)
+        has_fully_registered = user_services.has_fully_registered(self.user_id)
 
-        if has_previously_registered:
+        if has_fully_registered:
             self.render_json({})
             return
 
@@ -208,7 +250,7 @@ class SignupHandler(base.BaseHandler):
 
         # Note that an email is only sent when the user registers for the first
         # time.
-        if feconf.CAN_SEND_EMAILS_TO_USERS:
+        if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         self.render_json({})

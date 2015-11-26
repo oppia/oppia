@@ -23,6 +23,7 @@ import json
 import os
 import random
 import re
+import string
 import StringIO
 import time
 import unicodedata
@@ -30,6 +31,8 @@ import urllib
 import urlparse
 import yaml
 import zipfile
+
+import feconf
 
 
 class InvalidInputException(Exception):
@@ -314,6 +317,10 @@ def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
 
+def generate_new_session_id():
+    return generate_random_string(24)
+
+
 def vfs_construct_path(a, *p):
     """Mimics behavior of os.path.join on Posix machines."""
     path = a
@@ -365,3 +372,52 @@ def get_short_language_description(full_language_description):
     else:
         ind = full_language_description.find(' (')
         return full_language_description[:ind]
+
+
+def require_valid_name(name, name_type):
+    """Generic name validation.
+
+    Args:
+      name: the name to validate.
+      name_type: a human-readable string, like 'the exploration title' or
+        'a state name'. This will be shown in error messages.
+    """
+    # This check is needed because state names are used in URLs and as ids
+    # for statistics, so the name length should be bounded above.
+    if len(name) > 50 or len(name) < 1:
+        raise ValidationError(
+            'The length of %s should be between 1 and 50 '
+            'characters; received %s' % (name_type, name))
+
+    if name[0] in string.whitespace or name[-1] in string.whitespace:
+        raise ValidationError(
+            'Names should not start or end with whitespace.')
+
+    if re.search('\s\s+', name):
+        raise ValidationError(
+            'Adjacent whitespace in %s should be collapsed.' % name_type)
+
+    for c in feconf.INVALID_NAME_CHARS:
+        if c in name:
+            raise ValidationError(
+                'Invalid character %s in %s: %s' % (c, name_type, name))
+
+
+def capitalize_string(s):
+    """Converts the first character of a string to its uppercase equivalent (if
+    it's a letter), and returns the result.
+    """
+    # This guards against empty strings.
+    if s:
+        return s[0].upper() + s[1:]
+    else:
+        return s
+
+
+def get_info_card_url_for_category(category):
+    info_card_color = (
+        feconf.CATEGORIES_TO_COLORS[category] if
+        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
+    return (
+        '/images/gallery/exploration_background_%s_large.png' %
+        info_card_color)

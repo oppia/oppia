@@ -23,7 +23,7 @@ import datetime
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rating_services
-import test_utils
+from core.tests import test_utils
 
 
 class RatingServicesTests(test_utils.GenericTestBase):
@@ -41,31 +41,35 @@ class RatingServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.EXP_ID, self.exploration)
 
         self.assertEqual(
-            rating_services.get_overall_ratings(self.EXP_ID),
+            rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_1, self.EXP_ID), None)
 
-        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 2)
-        rating_services.assign_rating(self.USER_ID_2, self.EXP_ID, 4)
-        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 3)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 2)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_2, self.EXP_ID, 4)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 3)
 
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_1, self.EXP_ID), 3)
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_2, self.EXP_ID), 4)
         self.assertEqual(
-            rating_services.get_overall_ratings(self.EXP_ID),
+            rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
             {'1': 0, '2': 0, '3': 1, '4': 1, '5': 0})
 
-        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 4)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 4)
 
         self.assertEqual(
-            rating_services.get_overall_ratings(self.EXP_ID),
+            rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
             {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
 
     def test_time_of_ratings_recorded(self):
@@ -77,11 +81,13 @@ class RatingServicesTests(test_utils.GenericTestBase):
             self.EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.EXP_ID, self.exploration)
 
-        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 1)
-        first_rating_time = rating_services.get_when_rated(
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 1)
+        first_rating_time = rating_services.get_when_exploration_rated(
             self.USER_ID_1, self.EXP_ID)
-        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 3)
-        second_rating_time = rating_services.get_when_rated(
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 3)
+        second_rating_time = rating_services.get_when_exploration_rated(
             self.USER_ID_1, self.EXP_ID)
 
         self.assertLess(
@@ -103,51 +109,60 @@ class RatingServicesTests(test_utils.GenericTestBase):
             EXP_ID_B, 'A title', 'A category')
         exp_services.save_new_exploration(EXP_ID_B, self.exploration)
 
-        rating_services.assign_rating(self.USER_ID_1, EXP_ID_A, 1)
-        rating_services.assign_rating(self.USER_ID_1, EXP_ID_B, 3)
-        rating_services.assign_rating(self.USER_ID_2, EXP_ID_A, 2)
-        rating_services.assign_rating(self.USER_ID_2, EXP_ID_B, 5)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, EXP_ID_A, 1)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, EXP_ID_B, 3)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_2, EXP_ID_A, 2)
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_2, EXP_ID_B, 5)
 
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_1, EXP_ID_A), 1)
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_1, EXP_ID_B), 3)
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_2, EXP_ID_A), 2)
         self.assertEqual(
-            rating_services.get_user_specific_rating(
+            rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_2, EXP_ID_B), 5)
 
         self.assertEqual(
-            rating_services.get_overall_ratings(EXP_ID_A),
+            rating_services.get_overall_ratings_for_exploration(EXP_ID_A),
             {'1': 1, '2': 1, '3': 0, '4': 0, '5': 0})
         self.assertEqual(
-            rating_services.get_overall_ratings(EXP_ID_B),
+            rating_services.get_overall_ratings_for_exploration(EXP_ID_B),
             {'1': 0, '2': 0, '3': 1, '4': 0, '5': 1})
 
     def test_invalid_ratings_are_forbidden(self):
         with self.assertRaisesRegexp(
                 ValueError, 'Expected a rating 1-5, received 0'):
-            rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 0)
+            rating_services.assign_rating_to_exploration(
+                self.USER_ID_1, self.EXP_ID, 0)
 
         with self.assertRaisesRegexp(
                 ValueError, 'Expected a rating 1-5, received 7'):
-            rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 7)
+            rating_services.assign_rating_to_exploration(
+                self.USER_ID_1, self.EXP_ID, 7)
 
         with self.assertRaisesRegexp(
                 ValueError,
                 'Expected the rating to be an integer, received 2'):
-            rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, '2')
+            rating_services.assign_rating_to_exploration(
+                self.USER_ID_1, self.EXP_ID, '2')
 
         with self.assertRaisesRegexp(
                 ValueError,
                 'Expected the rating to be an integer, received aaa'):
-            rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 'aaa')
+            rating_services.assign_rating_to_exploration(
+                self.USER_ID_1, self.EXP_ID, 'aaa')
 
     def test_invalid_exploration_ids_are_forbidden(self):
         with self.assertRaisesRegexp(
                 Exception, 'Invalid exploration id invalid_id'):
-            rating_services.assign_rating(self.USER_ID_1, 'invalid_id', 3)
+            rating_services.assign_rating_to_exploration(
+                self.USER_ID_1, 'invalid_id', 3)

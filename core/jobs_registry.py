@@ -18,33 +18,37 @@
 
 __author__ = 'Sean Lip'
 
-from core.domain import exp_jobs
-from core.domain import stats_jobs
-from core.domain import user_jobs
-from core.domain import feedback_jobs
-from core.domain import recommendations_jobs
+from core.domain import exp_jobs_continuous
+from core.domain import exp_jobs_one_off
+from core.domain import feedback_jobs_continuous
+from core.domain import recommendations_jobs_continuous
+from core.domain import stats_jobs_continuous
+from core.domain import stats_jobs_one_off
+from core.domain import user_jobs_continuous
+from core.domain import user_jobs_one_off
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
-    user_jobs.DashboardSubscriptionsOneOffJob,
-    exp_jobs.IndexAllExplorationsJobManager,
-    exp_jobs.ExpSummariesCreationOneOffJob,
-    exp_jobs.ExplorationValidityJobManager,
-    stats_jobs.StatisticsAudit,
-    exp_jobs.ExplorationMigrationJobManager]
+    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
+    exp_jobs_one_off.IndexAllExplorationsJobManager,
+    exp_jobs_one_off.ExpSummariesCreationOneOffJob,
+    exp_jobs_one_off.ExplorationValidityJobManager,
+    stats_jobs_one_off.StatisticsAudit,
+    exp_jobs_one_off.ExplorationMigrationJobManager]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
-    exp_jobs.SearchRanker,
-    stats_jobs.StatisticsAggregator,
-    user_jobs.DashboardRecentUpdatesAggregator,
-    feedback_jobs.FeedbackAnalyticsAggregator,
-    recommendations_jobs.ExplorationRecommendationsAggregator,
-    stats_jobs.InteractionAnswerSummariesAggregator]
+    exp_jobs_continuous.SearchRanker,
+    stats_jobs_continuous.InteractionAnswerSummariesAggregator,
+    stats_jobs_continuous.StatisticsAggregator,
+    user_jobs_continuous.DashboardRecentUpdatesAggregator,
+    feedback_jobs_continuous.FeedbackAnalyticsAggregator,
+    recommendations_jobs_continuous.ExplorationRecommendationsAggregator]
 
 
 class ContinuousComputationEventDispatcher(object):

@@ -26,7 +26,7 @@ var admin = require('./admin.js');
 var login = function(email, isSuperAdmin) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
-  var driver = protractor.getInstance().driver;
+  var driver = browser.driver;
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
   driver.findElement(protractor.By.name('email')).clear();
@@ -38,7 +38,7 @@ var login = function(email, isSuperAdmin) {
 };
 
 var logout = function() {
-  var driver = protractor.getInstance().driver;
+  var driver = browser.driver;
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   driver.findElement(protractor.By.id('submit-logout')).click();
 };

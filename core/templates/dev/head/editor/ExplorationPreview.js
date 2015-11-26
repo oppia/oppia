@@ -19,30 +19,40 @@
  */
 
 oppia.controller('ExplorationPreview', [
-    '$scope', 'learnerParamsService', 'explorationData',
+    '$scope', '$timeout', 'learnerParamsService', 'explorationData',
     'explorationStatesService', 'explorationInitStateNameService',
     'explorationParamSpecsService', 'explorationTitleService',
     'explorationCategoryService', 'explorationParamChangesService',
-    'oppiaPlayerService',
-    function($scope, learnerParamsService, explorationData,
+    'explorationGadgetsService', 'oppiaPlayerService',
+    function($scope, $timeout, learnerParamsService, explorationData,
              explorationStatesService, explorationInitStateNameService,
              explorationParamSpecsService, explorationTitleService,
              explorationCategoryService, explorationParamChangesService,
-             oppiaPlayerService) {
+             explorationGadgetsService, oppiaPlayerService) {
   $scope.isExplorationPopulated = false;
   explorationData.getData().then(function(data) {
-    oppiaPlayerService.populateExploration({
-      category: explorationCategoryService.savedMemento,
-      init_state_name: explorationInitStateNameService.savedMemento,
-      param_changes: explorationParamChangesService.savedMemento,
-      param_specs: explorationParamSpecsService.savedMemento,
-      states: explorationStatesService.getStates(),
-      title: explorationTitleService.savedMemento,
-      // TODO(sll): Change this to use a service once an editor for
-      // gadgets/panels is implemented.
-      skin_customizations: data.skin_customizations
-    });
-    $scope.isExplorationPopulated = true;
+    // There is a race condition here that can sometimes occur when the editor
+    // preview tab is loaded: the exploration in PlayerServices is populated,
+    // but with null values for the category, init_state_name, etc. fields,
+    // presumably because the various exploration property services have not
+    // yet been updated. The timeout alleviates this.
+    // TODO(sll): Refactor the editor frontend to create a single place for
+    // obtaining the current version of the exploration, so that the use of
+    // $timeout isn't necessary.
+    $timeout(function() {
+      oppiaPlayerService.populateExploration({
+        category: explorationCategoryService.savedMemento,
+        init_state_name: explorationInitStateNameService.savedMemento,
+        param_changes: explorationParamChangesService.savedMemento,
+        param_specs: explorationParamSpecsService.savedMemento,
+        states: explorationStatesService.getStates(),
+        title: explorationTitleService.savedMemento,
+        skin_customizations: {
+          panels_contents: explorationGadgetsService.getPanelsContents()
+        }
+      });
+      $scope.isExplorationPopulated = true;
+    }, 200);
   });
 
   $scope.allParams = {};

@@ -21,7 +21,7 @@ from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import subscription_services
-from core.domain import user_jobs
+from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
 import utils
@@ -35,7 +35,7 @@ class NotificationsDashboardPage(base.BaseHandler):
         if self.username in config_domain.BANNED_USERNAMES.value:
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        elif user_services.has_user_registered_as_editor(self.user_id):
+        elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
@@ -60,7 +60,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         job_queued_msec, recent_notifications = (
-            user_jobs.DashboardRecentUpdatesAggregator.get_recent_notifications(
+            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
                 self.user_id))
 
         last_seen_msec = (
@@ -108,7 +108,7 @@ class MyExplorationsPage(base.BaseHandler):
         if self.username in config_domain.BANNED_USERNAMES.value:
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        elif user_services.has_user_registered_as_editor(self.user_id):
+        elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
@@ -129,7 +129,7 @@ class MyExplorationsHandler(base.BaseHandler):
 
         subscribed_summaries = (
             exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_activity_ids_subscribed_to(
+                subscription_services.get_exploration_ids_subscribed_to(
                     self.user_id)))
 
         def _get_intro_card_color(category):
@@ -191,7 +191,7 @@ class NotificationsHandler(base.BaseHandler):
                 subscription_services.get_last_seen_notifications_msec(
                     self.user_id))
             _, recent_notifications = (
-                user_jobs.DashboardRecentUpdatesAggregator.get_recent_notifications(
+                user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
                     self.user_id))
             for notification in recent_notifications:
                 if (notification['last_updated_ms'] > last_seen_msec and

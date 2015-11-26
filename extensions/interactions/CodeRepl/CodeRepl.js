@@ -26,15 +26,19 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       scope: {},
       templateUrl: 'interaction/CodeRepl',
       controller:  ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.language = oppiaHtmlEscaper.escapedJsonToObj($attrs.languageWithValue);
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
-        $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.preCodeWithValue);
-        $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.postCodeWithValue);
+        $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.languageWithValue);
+        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.placeholderWithValue);
+        $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.preCodeWithValue);
+        $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.postCodeWithValue);
 
         $scope.hasLoaded = false;
 
-        // Keep the code string given by the user and the stdout from the evaluation
-        // until sending them back to the server.
+        // Keep the code string given by the user and the stdout from the
+        // evaluation until sending them back to the server.
         $scope.code = ($scope.placeholder || '');
         $scope.output = '';
 
@@ -58,55 +62,50 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           editor.on('change', function(instance, change) {
             $scope.code = editor.getValue();
           });
+
+          $scope.hasLoaded = true;
         };
 
-
-        // Set up the jsrepl instance with callbacks set.
-        var jsrepl = new JSREPL({
+        // Configure Skulpt.
+        Sk.configure({
           output: function(out) {
-            // For successful evaluation, this is called before 'result', so just keep
-            // the output string here.
-            $scope.output = out;
+            // This output function is called continuously throughout the
+            // runtime of the script.
+            $scope.output += out;
           },
-          result: function(res) {
-            $scope.sendResponse(res, '');
+          timeoutMsg: function() {
+            $scope.sendResponse('', 'timeout');
           },
-          error: function(err) {
-            if ($scope.output) {
-              // Part of the error message can be in the output string.
-              err += $scope.output;
-              $scope.output = '';
-            }
-            $scope.sendResponse('', err);
-          },
-          timeout: {
-            time: 10000,
-            callback: function() {
-              $scope.sendResponse('', 'timeout');
-            },
-          },
-        });
-
-        jsrepl.loadLanguage($scope.language, function() {
-          $scope.hasLoaded = true;
-          $scope.$apply();
+          execLimit: 10000,
         });
 
         $scope.runCode = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
 
-          // Running the code. This triggers one of the callbacks set to jsrepl which
-          // then calls sendResponse with the result.
-          var fullCode = $scope.preCode + '\n' + codeInput + '\n' + $scope.postCode;
-          jsrepl.eval(fullCode);
+          var fullCode = (
+            $scope.preCode + '\n' + codeInput + '\n' + $scope.postCode);
+
+          // Evaluate the program asynchronously using Skulpt.
+          Sk.misceval.asyncToPromise(function() {
+            Sk.importMainWithBody('<stdin>', false, fullCode, true);
+          }).then(function(res) {
+            // Finished evaluating.
+            $scope.sendResponse('', '');
+          }, function(err) {
+            if (!(err instanceof Sk.builtin.TimeLimitError)) {
+              $scope.sendResponse('', String(err));
+            }
+          });
         };
 
         $scope.sendResponse = function(evaluation, err) {
           $scope.evaluation = (evaluation || '');
           $scope.err = (err || '');
           $scope.$parent.$parent.submitAnswer({
-            code: $scope.code || '',
+            // Replace tabs with 2 spaces.
+            // TODO(sll): Change the default Python indentation to 4 spaces.
+            code: $scope.code.replace(/\t/g, '  ') || '',
             output: $scope.output,
             evaluation: $scope.evaluation,
             error: $scope.err
@@ -117,13 +116,30 @@ oppia.directive('oppiaInteractiveCodeRepl', [
   }
 ]);
 
-
 oppia.directive('oppiaResponseCodeRepl', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/CodeRepl',
+      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+
+        if ($scope.answer.error) {
+          $scope.errorFocusLabel = focusService.generateFocusLabel();
+          focusService.setFocus($scope.errorFocusLabel);
+        }
+      }]
+    };
+  }
+]);
+
+oppia.directive('oppiaShortResponseCodeRepl', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'shortResponse/CodeRepl',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
       }]

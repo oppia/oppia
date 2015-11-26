@@ -36,10 +36,8 @@ var oppia = angular.module(
 // Set default headers for POST and PUT requests.
 // Add an interceptor to convert requests to strings and to log and show
 // warnings for error responses.
-// Disable ng-animate for carousel: see
-//     https://github.com/angular-ui/bootstrap/issues/1565
-oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
-    function($interpolateProvider, $httpProvider, $animateProvider) {
+oppia.config(['$interpolateProvider', '$httpProvider',
+    function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
@@ -72,8 +70,6 @@ oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
       };
     }
   ]);
-
-  $animateProvider.classNameFilter(/carousel/);
 }]);
 
 oppia.config(['$provide', function($provide) {
@@ -95,6 +91,19 @@ oppia.config(['$provide', function($provide) {
 
     return $delegate;
   }]);
+}]);
+
+//Returns true if the user is on a mobile device.
+//See here: http://stackoverflow.com/a/14301832/5020618
+oppia.factory('deviceInfoService', ['$window', function($window) {
+  return {
+    isMobileDevice: function() {
+      return typeof $window.orientation !== 'undefined';
+    },
+    hasTouchEvents: function() {
+      return 'ontouchstart' in $window;
+    }
+  };
 }]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
@@ -186,6 +195,11 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
         return date.toLocaleTimeString().replace(/:\d\d /, ' ');
       }
       return date.toLocaleDateString();
+    },
+    // Returns just the date.
+    getLocaleDateString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toLocaleDateString();
     }
   };
 }]);
@@ -216,7 +230,7 @@ oppia.factory('validatorsService', [
           if (showWarnings) {
             warningsData.addWarning(
              'Invalid input. Please use a non-empty description consisting ' +
-             'of alphanumeric characters, underscores, spaces and/or hyphens.'
+             'of alphanumeric characters, spaces and/or hyphens.'
             );
           }
           return false;
@@ -255,11 +269,20 @@ oppia.factory('validatorsService', [
   }
 }]);
 
+oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
+
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
-oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+// Note: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
+// page.
+oppia.factory('focusService', [
+    '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
+    function($rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS) {
   var _nextLabelToFocusOn = null;
   return {
+    clearFocus: function() {
+      this.setFocus(LABEL_FOR_CLEARING_FOCUS);
+    },
     setFocus: function(name) {
       if (_nextLabelToFocusOn) {
         return;
@@ -270,10 +293,18 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
         $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
         _nextLabelToFocusOn = null;
       });
+    },
+    setFocusIfOnDesktop: function(newFocusLabel) {
+      if (!deviceInfoService.isMobileDevice()) {
+        this.setFocus(newFocusLabel);
+      }
+    },
+    // Generates a random string (to be used as a focus label).
+    generateFocusLabel: function() {
+      return Math.random().toString(36).slice(2);
     }
   };
 }]);
-
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
@@ -287,6 +318,17 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    }
+  };
+}]);
+
+// Service for computing the window dimensions.
+oppia.factory('windowDimensionsService', ['$window', function($window) {
+  return {
+    getWidth: function() {
+      return (
+        $window.innerWidth || document.documentElement.clientWidth ||
+        document.body.clientWidth);
     }
   };
 }]);
@@ -335,7 +377,7 @@ oppia.factory('oppiaDebouncer', ['$log', function($log) {
 oppia.factory('extensionTagAssemblerService', [
     '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
   return {
-    formatCustomizationArgAttributesForElement: function(element, customizationArgSpecs) {
+    formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
       for (var caSpecName in customizationArgSpecs) {
         var caSpecValue = customizationArgSpecs[caSpecName].value;
         element.attr(

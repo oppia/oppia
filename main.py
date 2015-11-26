@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
@@ -31,7 +32,6 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
-from core.controllers import services
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
@@ -144,8 +144,6 @@ urls = [
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
-        r'/editor_tutorial', pages.EditorTutorialPage, 'editor_tutorial_page'),
-    get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(
         r'/site_guidelines', pages.ParticipatePage,
@@ -154,6 +152,8 @@ urls = [
         r'/contact', pages.AboutPage, 'redirect_to_about_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
+    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
+    get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
@@ -201,7 +201,10 @@ urls = [
         galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
     get_redirect_route(
-        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
+        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
+    get_redirect_route(
+        r'/profilehandler/data/<username>', profile.ProfileHandler,
+        'profile_handler'),
     get_redirect_route(
         r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
@@ -210,6 +213,9 @@ urls = [
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
         'profle_picture_handler'),
+    get_redirect_route(
+        r'/preferenceshandler/profile_picture_by_username/<username>', profile.ProfilePictureHandlerByUsername,
+        'profile_picture_handler_by_username'),
     get_redirect_route(
         r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
     get_redirect_route(
@@ -282,6 +288,9 @@ urls = [
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
+        r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
+        editor.UntrainedAnswersHandler, 'training_data_handler'),
+    get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
     get_redirect_route(
@@ -325,11 +334,15 @@ urls = [
         feedback.ThreadHandler, 'feedback_thread_handler'),
 
     get_redirect_route(
-        r'/notificationshandler', home.NotificationsHandler,
-        'notifications_handler'),
+        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
+        collection_viewer.CollectionPage, 'collection_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
+        collection_viewer.CollectionDataHandler, 'collection_data_handler'),
 
     get_redirect_route(
-        r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
+        r'/notificationshandler', home.NotificationsHandler,
+        'notifications_handler'),
 
     get_redirect_route(
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),

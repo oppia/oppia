@@ -37,6 +37,7 @@ class UserSettings(object):
             self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None,
             profile_picture_data_url=None, user_bio='',
+            first_contribution_datetime=None,
             preferred_language_codes=None):
         self.user_id = user_id
         self.email = email
@@ -46,6 +47,7 @@ class UserSettings(object):
             last_started_state_editor_tutorial)
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
+        self.first_contribution_datetime = first_contribution_datetime
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
 
@@ -189,6 +191,7 @@ def get_users_settings(user_ids):
                     model.last_started_state_editor_tutorial),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
+                first_contribution_datetime = model.first_contribution_datetime,
                 preferred_language_codes=model.preferred_language_codes
             ))
         else:
@@ -218,13 +221,24 @@ def _save_user_settings(user_settings):
             user_settings.last_started_state_editor_tutorial),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
+        first_contribution_datetime=user_settings.first_contribution_datetime,
         preferred_language_codes=user_settings.preferred_language_codes,
     ).put()
 
 
-def has_user_registered_as_editor(user_id):
+def has_ever_registered(user_id):
     user_settings = get_user_settings(user_id, strict=True)
-    return user_settings.username and user_settings.last_agreed_to_terms
+    return bool(user_settings.username and user_settings.last_agreed_to_terms)
+
+
+def has_fully_registered(user_id):
+    if user_id is None:
+        return False
+
+    user_settings = get_user_settings(user_id, strict=True)
+    return user_settings.username and user_settings.last_agreed_to_terms and (
+        user_settings.last_agreed_to_terms >=
+        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
 def _create_user(user_id, email):
@@ -293,6 +307,12 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
 def update_user_bio(user_id, user_bio):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_first_contribution_datetime(user_id, first_contribution_datetime):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.first_contribution_datetime = first_contribution_datetime
     _save_user_settings(user_settings)
 
 

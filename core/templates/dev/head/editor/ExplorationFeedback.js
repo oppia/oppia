@@ -19,160 +19,181 @@
  */
 
 oppia.controller('ExplorationFeedback', [
-    '$scope', '$http', '$modal', '$rootScope', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
-    function($scope, $http, $modal, $rootScope, warningsData, explorationData, oppiaDatetimeFormatter) {
-  var expId = explorationData.explorationId;
-  var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
-  var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
+  '$scope', '$http', '$modal', '$rootScope', 'warningsData', 'explorationData',
+  'oppiaDatetimeFormatter',
+  function(
+      $scope, $http, $modal, $rootScope, warningsData, explorationData,
+      oppiaDatetimeFormatter) {
+    var expId = explorationData.explorationId;
+    var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
+    var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
-  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
-  };
+    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+        millisSinceEpoch);
+    };
 
-  $scope._getThreadById = function(threadId) {
-    for (var i = 0; i < $scope.threads.length; i++) {
-      if ($scope.threads[i].thread_id == threadId) {
-        return $scope.threads[i];
+    $scope._getThreadById = function(threadId) {
+      for (var i = 0; i < $scope.threads.length; i++) {
+        if ($scope.threads[i].thread_id == threadId) {
+          return $scope.threads[i];
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    };
 
-  $scope._getThreadList = function(successCallback) {
-    $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
-      $scope.threads = data.threads;
-      if (successCallback) {
-        successCallback();
+    $scope._getThreadList = function(successCallback) {
+      $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
+        $scope.threads = data.threads;
+        if (successCallback) {
+          successCallback();
+        }
+      });
+    };
+
+    $scope._createThread = function(newThreadSubject, newThreadText) {
+      $http.post(THREAD_LIST_HANDLER_URL, {
+        state_name: null,
+        subject: newThreadSubject,
+        text: newThreadText
+      }).success(function() {
+        $scope._getThreadList();
+        $scope.setCurrentThread(null);
+      });
+    };
+
+    $scope.setCurrentThread = function(threadId) {
+      if (threadId === null) {
+        $scope.currentThreadId = null;
+        $scope.currentThreadData = null;
+        $scope.currentThreadMessages = null;
+        $scope.updatedStatus = null;
+        return;
       }
-    });
-  };
 
-  $scope._createThread = function(newThreadSubject, newThreadText) {
-    $http.post(THREAD_LIST_HANDLER_URL, {
-      state_name: null,
-      subject: newThreadSubject,
-      text: newThreadText
-    }).success(function() {
-      $scope._getThreadList();
-      $scope.setCurrentThread(null);
-    });
-  };
+      $http.get(THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+        $scope.currentThreadId = threadId;
+        $scope.currentThreadData = $scope._getThreadById(threadId);
+        $scope.currentThreadMessages = data.messages;
+        $scope.updatedStatus = $scope.currentThreadData.status;
+      });
+    };
 
-  $scope.setCurrentThread = function(threadId) {
-    if (threadId === null) {
-      $scope.currentThreadId = null;
-      $scope.currentThreadData = null;
-      $scope.currentThreadMessages = null;
-      $scope.updatedStatus = null;
-      return;
-    }
+    $scope.showCreateThreadModal = function() {
+      warningsData.clear();
 
-    $http.get(THREAD_HANDLER_PREFIX + threadId).success(function(data) {
-      $scope.currentThreadId = threadId;
-      $scope.currentThreadData = $scope._getThreadById(threadId);
-      $scope.currentThreadMessages = data.messages;
-      $scope.updatedStatus = $scope.currentThreadData.status;
-    });
-  };
+      $modal.open({
+        backdrop: true,
+        resolve: {},
+        templateUrl: 'modals/editorFeedbackCreateThread',
+        controller: ['$scope', '$modalInstance', function(
+            $scope, $modalInstance) {
+          $scope.create = function(newThreadSubject, newThreadText) {
+            if (!newThreadSubject) {
+              warningsData.addWarning('Please specify a thread subject.');
+              return;
+            }
+            if (!newThreadText) {
+              warningsData.addWarning('Please specify a message.');
+              return;
+            }
 
-  $scope.showCreateThreadModal = function() {
-    warningsData.clear();
+            // Clear the form variables so that they are empty on the next load
+            // of the modal.
+            $scope.newThreadSubject = '';
+            $scope.newThreadText = '';
 
-    $modal.open({
-      templateUrl: 'modals/editorFeedbackCreateThread',
-      backdrop: true,
-      resolve: {},
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.create = function(newThreadSubject, newThreadText) {
-          if (!newThreadSubject) {
-            warningsData.addWarning('Please specify a thread subject.');
-            return;
-          }
-          if (!newThreadText) {
-            warningsData.addWarning('Please specify a message.');
-            return;
-          }
+            $modalInstance.close({
+              newThreadSubject: newThreadSubject,
+              newThreadText: newThreadText
+            });
+          };
 
-          // Clear the form variables so that they are empty on the next load
-          // of the modal.
-          $scope.newThreadSubject = '';
-          $scope.newThreadText = '';
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }]
+      }).result.then(function(result) {
+        $scope._createThread(result.newThreadSubject, result.newThreadText);
+      });
+    };
 
-          $modalInstance.close({
-            newThreadSubject: newThreadSubject,
-            newThreadText: newThreadText
-          });
-        };
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    }).result.then(function(result) {
-      $scope._createThread(result.newThreadSubject, result.newThreadText);
-    });
-  };
-
-  $scope.getLabelClass = function(status) {
-    if (status === 'open') {
-      return 'label label-info';
-    } else {
-      return 'label label-default';
-    }
-  };
-
-  $scope.newMessageText = '';
-  $scope.addMessage = function(threadId, newMessageText, updatedStatus) {
-    if (threadId === null) {
-      warningsData.addWarning(
-        'Current thread ID not set. Required to create a message');
-      return;
-    }
-    $scope.messageSendingInProgress = true;
-    $http.post(THREAD_HANDLER_PREFIX + threadId, {
-      updated_status: (
-        updatedStatus !== $scope.currentThreadData.status ? updatedStatus : null),
-      updated_subject: null,
-      text: newMessageText
-    }).success(function() {
-      $scope.currentThreadData.status = updatedStatus;
-      $scope.setCurrentThread(threadId);
-      $scope.messageSendingInProgress = false;
-      $scope.newMessageText = '';
-    }).error(function(data) {
-      $scope.messageSendingInProgress = false;
-    });
-  };
-
-  // We do not permit 'Duplicate' as a valid status for now, since it should
-  // require the id of the duplicated thread to be specified.
-  $scope.STATUS_CHOICES = [
-    {id: 'open', text: 'Open'},
-    {id: 'fixed', text: 'Fixed'},
-    {id: 'ignored', text: 'Ignored'},
-    {id: 'compliment', text: 'Compliment'},
-    {id: 'not_actionable', text: 'Not Actionable'}
-  ];
-
-  $scope.getHumanReadableStatus = function(status) {
-    for (var i = 0; i < $scope.STATUS_CHOICES.length; i++) {
-      if ($scope.STATUS_CHOICES[i].id === status) {
-        return $scope.STATUS_CHOICES[i].text;
+    $scope.getLabelClass = function(status) {
+      if (status === 'open') {
+        return 'label label-info';
+      } else {
+        return 'label label-default';
       }
-    }
-    return '';
-  };
+    };
 
-  $rootScope.loadingMessage = 'Loading';
+    $scope.newMessageText = '';
+    $scope.addMessage = function(threadId, newMessageText, updatedStatus) {
+      if (threadId === null) {
+        warningsData.addWarning(
+          'Current thread ID not set. Required to create a message');
+        return;
+      }
+      $scope.messageSendingInProgress = true;
+      $http.post(THREAD_HANDLER_PREFIX + threadId, {
+        updated_status: (
+          updatedStatus !== $scope.currentThreadData.status ?
+          updatedStatus : null),
+        updated_subject: null,
+        text: newMessageText
+      }).success(function() {
+        $scope.currentThreadData.status = updatedStatus;
+        $scope.setCurrentThread(threadId);
+        $scope.messageSendingInProgress = false;
+        $scope.newMessageText = '';
+      }).error(function() {
+        $scope.messageSendingInProgress = false;
+      });
+    };
 
-  // Initial load of the thread list.
-  $scope.currentThreadId = null;
-  $scope.currentThreadData = null;
-  $scope.currentThreadMessages = null;
-  $scope.updatedStatus = null;
-  $scope._getThreadList(function() {
-    $rootScope.loadingMessage = '';
-  });
-}]);
+    $scope.isSendButtonDisabled = function(newMessageText, updatedStatus) {
+      return $scope.messageSendingInProgress || (
+        !$scope.newMessageText &&
+        $scope.currentThreadData.status == updatedStatus);
+    };
+
+    // We do not permit 'Duplicate' as a valid status for now, since it should
+    // require the id of the duplicated thread to be specified.
+    $scope.STATUS_CHOICES = [{
+      id: 'open',
+      text: 'Open'
+    }, {
+      id: 'fixed',
+      text: 'Fixed'
+    }, {
+      id: 'ignored',
+      text: 'Ignored'
+    }, {
+      id: 'compliment',
+      text: 'Compliment'
+    }, {
+      id: 'not_actionable',
+      text: 'Not Actionable'
+    }];
+
+    $scope.getHumanReadableStatus = function(status) {
+      for (var i = 0; i < $scope.STATUS_CHOICES.length; i++) {
+        if ($scope.STATUS_CHOICES[i].id === status) {
+          return $scope.STATUS_CHOICES[i].text;
+        }
+      }
+      return '';
+    };
+
+    $rootScope.loadingMessage = 'Loading';
+
+    // Initial load of the thread list.
+    $scope.currentThreadId = null;
+    $scope.currentThreadData = null;
+    $scope.currentThreadMessages = null;
+    $scope.updatedStatus = null;
+    $scope._getThreadList(function() {
+      $rootScope.loadingMessage = '';
+    });
+  }
+]);

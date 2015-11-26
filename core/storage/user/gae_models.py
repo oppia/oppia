@@ -45,6 +45,8 @@ class UserSettingsModel(base_models.BaseModel):
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
+    # When the user first contributed to Oppia. May be None.
+    first_contribution_datetime = ndb.DateTimeProperty(default=None)
     # Language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
@@ -81,7 +83,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
     # IDs of activities (e.g., explorations) that this user subscribes to.
+    # TODO(bhenning): Rename this to exploration_ids and perform a migration.
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of collections that this user subscribes to.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
@@ -141,3 +146,61 @@ class ExplorationUserDataModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
+
+
+class CollectionProgressModel(base_models.BaseModel):
+    """Stores progress a user has made within a collection, including all
+    explorations which have been completed within the context of the collection.
+
+    Please note instances of this progress model will persist even after a
+    collection is deleted.
+
+    TODO(bhenning): Implement a job which removes stale versions of this model
+    in the data store. That is, it should go through all completion models and
+    ensure both the user and collection it is associated with still exist within
+    the data store, otherwise it should remove the instance of the completion
+    model.
+    """
+
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The collection id.
+    collection_id = ndb.StringProperty(required=True, indexed=True)
+    # The list of explorations which have been completed within the context of
+    # the collection represented by collection_id.
+    completed_explorations = ndb.StringProperty(repeated=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, collection_id):
+        return '%s.%s' % (user_id, collection_id)
+
+    @classmethod
+    def create(cls, user_id, collection_id):
+        """Creates a new CollectionProgressModel entry and returns it.
+
+        Note: the client is responsible for actually saving this entity to the
+        datastore.
+        """
+        instance_id = cls._generate_id(user_id, collection_id)
+        return cls(
+            id=instance_id, user_id=user_id, collection_id=collection_id)
+
+    @classmethod
+    def get(cls, user_id, collection_id):
+        """Gets the CollectionProgressModel for the given ids."""
+
+        instance_id = cls._generate_id(user_id, collection_id)
+        return super(CollectionProgressModel, cls).get(
+            instance_id, strict=False)
+
+    @classmethod
+    def get_or_create(cls, user_id, collection_id):
+        """Gets the CollectionProgressModel for the given ids, or creates a new
+        entry with the given ids if no such instance yet exists within the data
+        store.
+        """
+        instance_model = cls.get(user_id, collection_id)
+        if instance_model:
+            return instance_model
+        else:
+            return cls.create(user_id, collection_id)

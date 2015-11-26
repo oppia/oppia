@@ -38,7 +38,7 @@ var editConfigProperty = function(propertyName, objectType, editingInstructions)
         element(by.css('.protractor-test-save-all-configs')).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.
-        protractor.getInstance().waitForAngular();
+        browser.waitForAngular();
         return true;
       }
     });
@@ -68,7 +68,7 @@ var reloadExploration = function(name) {
         ).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the reloading to complete.
-        protractor.getInstance().waitForAngular();
+        browser.waitForAngular();
       }
     });
   });

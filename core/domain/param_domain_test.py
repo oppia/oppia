@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import param_domain
-import test_utils
+from core.tests import test_utils
 import utils
 
 
@@ -54,12 +54,6 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid generator id'):
             param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
-
-        # Raise an error because the given generator requires initialization
-        # args.
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'require any initialization'):
-            param_domain.ParamChange('abc', 'RestrictedCopier', {}).validate()
 
         # Raise an error because customization_args is not a dict.
         with self.assertRaisesRegexp(

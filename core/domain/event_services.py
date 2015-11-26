@@ -23,7 +23,7 @@ import inspect
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
-(stats_models,feedback_models) = models.Registry.import_models([
+(stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import feconf
@@ -183,33 +183,6 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exp_id, old_status, new_status):
-        pass
-
-
-class ExplorationContentChangeEventHandler(BaseEventHandler):
-    """Event handler for receiving exploration change events. This event is
-    triggered whenever changes to an exploration's contents or metadata (title,
-    blurb etc.) are persisted. This includes when a a new exploration is
-    created.
-    """
-
-    EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
-
-    @classmethod
-    def _handle_event(cls, *args, **kwargs):
-        pass
-
-
-class ExplorationStatusChangeEventHandler(BaseEventHandler):
-    """Event handler for receiving exploration status change events.
-    These events are triggered whenever an exploration is published,
-    publicized, unpublished or unpublicized.
-    """
-
-    EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_STATUS_CHANGE
-
-    @classmethod
-    def _handle_event(cls, *args, **kwargs):
         pass
 
 

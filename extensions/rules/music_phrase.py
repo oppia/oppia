@@ -18,6 +18,7 @@
 
 __author__ = 'Michael Wagner'
 
+from core.domain import rule_domain
 from extensions.rules import base
 
 
@@ -42,15 +43,17 @@ class Equals(base.MusicPhraseRule):
     description = 'is equal to {{x|MusicPhrase}}'
 
     def _evaluate(self, subject):
-        return (_convert_sequence_to_midi(subject) ==
-                _convert_sequence_to_midi(self.x))
+        return self._fuzzify_truth_value(
+            _convert_sequence_to_midi(subject) ==
+            _convert_sequence_to_midi(self.x))
 
 
 class IsLongerThan(base.MusicPhraseRule):
     description = 'has more than {{k|NonnegativeInt}} notes'
 
     def _evaluate(self, subject):
-        return len(_convert_sequence_to_midi(subject)) > self.k
+        return self._fuzzify_truth_value(
+            len(_convert_sequence_to_midi(subject)) > self.k)
 
 
 class HasLengthInclusivelyBetween(base.MusicPhraseRule):
@@ -58,7 +61,8 @@ class HasLengthInclusivelyBetween(base.MusicPhraseRule):
                    '{{b|NonnegativeInt}} notes, inclusive')
 
     def _evaluate(self, subject):
-        return (self.a <= len(_convert_sequence_to_midi(subject)) <= self.b)
+        return self._fuzzify_truth_value(
+            self.a <= len(_convert_sequence_to_midi(subject)) <= self.b)
 
 
 class IsEqualToExceptFor(base.MusicPhraseRule):
@@ -69,12 +73,13 @@ class IsEqualToExceptFor(base.MusicPhraseRule):
         midi_target_sequence = _convert_sequence_to_midi(self.x)
         midi_user_sequence = _convert_sequence_to_midi(subject)
         if len(midi_user_sequence) != len(midi_target_sequence):
-            return False
+            return rule_domain.CERTAIN_FALSE_VALUE
         num_correct_notes = (
             sum(1 for x in zip(
                 midi_target_sequence, midi_user_sequence) if x[0] == x[1])
         )
-        return len(midi_target_sequence) - num_correct_notes <= self.k
+        return self._fuzzify_truth_value(
+            len(midi_target_sequence) - num_correct_notes <= self.k)
 
 
 class IsTranspositionOf(base.MusicPhraseRule):
@@ -84,13 +89,13 @@ class IsTranspositionOf(base.MusicPhraseRule):
     def _evaluate(self, subject):
         target_sequence_length = len(self.x)
         if len(subject) != target_sequence_length:
-            return False
+            return rule_domain.CERTAIN_FALSE_VALUE
         midi_target_sequence = _convert_sequence_to_midi(self.x)
         midi_user_sequence = _convert_sequence_to_midi(subject)
         for i in range(target_sequence_length):
             if midi_user_sequence[i] - self.y != midi_target_sequence[i]:
-                return False
-        return True
+                return rule_domain.CERTAIN_FALSE_VALUE
+        return rule_domain.CERTAIN_TRUE_VALUE
 
 
 class IsTranspositionOfExceptFor(base.MusicPhraseRule):
@@ -103,9 +108,10 @@ class IsTranspositionOfExceptFor(base.MusicPhraseRule):
         midi_user_sequence = _convert_sequence_to_midi(subject)
         target_sequence_length = len(midi_target_sequence)
         if len(midi_user_sequence) != target_sequence_length:
-            return False
+            return rule_domain.CERTAIN_FALSE_VALUE
         num_correct_notes = (
             sum(1 for x in zip(
                 midi_target_sequence, midi_user_sequence) if x[0] == x[1] - self.y)
         )
-        return len(midi_target_sequence) - num_correct_notes <= self.k
+        return self._fuzzify_truth_value(
+            len(midi_target_sequence) - num_correct_notes <= self.k)

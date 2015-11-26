@@ -41,7 +41,7 @@
                 </select>
                 <span class="help-block" style="font-size: smaller">
                   <em>
-                    Don't see the language you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
+                    Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank">Tell us.</a>
                   </em>
                 </span>
               </div>
@@ -130,6 +130,74 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <[explorationInitStateNameService.displayed]>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+    <h3>Advanced Features</h3>
+    <div class="row">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableFallbacks" class="col-lg-2 col-md-2 col-sm-2">
+              Fallbacks
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default protractor-test-enable-fallbacks" ng-click="enableFallbacks()" ng-if="!areFallbacksEnabled()">
+                Enable
+              </button>
+              <span ng-if="areFallbacksEnabled()">
+                Enabled
+              </span>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Special conditions you can trigger if a learner looks stuck, e.g. if they get a question wrong many times.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableGadgets" class="col-lg-2 col-md-2 col-sm-2">
+              Gadgets
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default protractor-test-enable-gadgets" ng-click="enableGadgets()" ng-if="!areGadgetsEnabled()">
+                Enable
+              </button>
+              <span ng-if="areGadgetsEnabled()">
+                Enabled
+              </span>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Customizable components that persist throughout an exploration.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableParameters" class="col-lg-2 col-md-2 col-sm-2">
+              Parameters
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default protractor-test-enable-parameters" ng-click="enableParameters()" ng-if="!areParametersEnabled()">
+                Enable
+              </button>
+              <span ng-if="areParametersEnabled()">
+                Enabled
+              </span>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
+            </span>
           </div>
         </div>
       </div>
@@ -345,12 +413,11 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card">
-    <h3>Parameters</h3>
+  <md-card class="oppia-editor-card" ng-if="areParametersEnabled()">
+    <h3>Parameters used in this exploration</h3>
 
     <div class="row">
-      <div class="col-lg-6 col-md-6 col-sm-6">
-        <h5>Parameters used in this exploration</h5>
+      <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
           <em>No parameters used.</em>
         </div>
@@ -360,36 +427,21 @@
           </li>
         </ol>
       </div>
+    </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6">
-        <h5>
-          Parameters initialized at start of exploration
-          <span class="glyphicon glyphicon-info-sign" tooltip="These changes are applied before the learner begins the exploration." tooltip-placement="right" style="font-size: 12px; padding-left: 18px;"></span>
-        </h5>
+    <h3>
+      Initial parameter changes
+      <span class="glyphicon glyphicon-info-sign" tooltip="These changes are applied before the learner begins the exploration." tooltip-placement="right" style="font-size: 12px; padding-left: 18px;"></span>
+    </h3>
 
-        <param-change-editor param-changes="explorationParamChangesService.displayed"
-                             save-param-changes="saveExplorationParamChanges"
-                             is-editable="editabilityService.isEditable()">
-        </param-change-editor>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <param-changes-editor param-changes-service="explorationParamChangesService"
+                              post-save-hook="postSaveParamChangesHook">
+        </param-changes-editor>
       </div>
     </div>
   </md-card>
-
-  {% if SHOW_SKIN_CHOOSER %}
-    <md-card class="oppia-editor-card">
-      <h3>Skin chooser</h3>
-
-      <div class="form-horizontal">
-        <div class="form-group">
-          <label for="defaultSkinId" class="col-lg-2 col-md-2 col-sm-2">Default skin</label>
-          <div class="col-lg-4 col-md-4 col-sm-4">
-            <select class="form-control" ng-model="$parent.defaultSkinId" ng-options="skinId as skinId for skinId in allSkinIds">
-            </select>
-          </div>
-        </div>
-      </div>
-    </md-card>
-  {% endif %}
 </div>
 
 
@@ -435,8 +487,8 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
-    <button class="btn btn-default" ng-click="cancel()">Close</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
   </div>
 </script>
 

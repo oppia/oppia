@@ -39,7 +39,7 @@
             <div><[t.summary]></div>
           </td>
           <td class="col-lg-3 col-md-3 col-sm-3">
-            <span ng-if="t.original_author_username"><[t.original_author_username]></span>
+            <span ng-if="t.original_author_username"><profile-link-text username="t.original_author_username"></profile-link-text></span>
           </td>
           <td class="col-lg-2 col-md-2 col-sm-2">
             <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
@@ -92,7 +92,7 @@
                         #<[m.message_id]>
                       </span>
                       <span ng-if="m.author_username">
-                        by <strong><[m.author_username]></strong>
+                        by <strong><profile-link-text username="m.author_username"></profile-link-text></strong>
                       </span>
                       <span ng-if="!m.author_username">
                         (anonymously submitted)
@@ -139,7 +139,7 @@
                 <select ng-model="updatedStatus" ng-options="choice.id as choice.text for choice in STATUS_CHOICES"></select>
               </span>
               <br>
-              <button style="margin-top: 10px;" class="btn btn-success" ng-click="addMessage(currentThreadId, $parent.$parent.newMessageText, updatedStatus)" ng-disabled="messageSendingInProgress || !$parent.$parent.newMessageText">
+              <button style="margin-top: 10px;" class="btn btn-success" ng-click="addMessage(currentThreadId, $parent.$parent.newMessageText, updatedStatus)" ng-disabled="isSendButtonDisabled($parent.$parent.newMessageText, updatedStatus)">
                 <span ng-if="messageSendingInProgress">Sending...</span>
                 <span ng-if="!messageSendingInProgress">Send</span>
               </button>

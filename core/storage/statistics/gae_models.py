@@ -381,6 +381,11 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     - session_id: ID of current student's session
     - params: current parameter values, in the form of a map of parameter name
               to its value
+    NOTE TO DEVELOPERS: Unlike other events, this event does not have a
+    client_time_spent_in_secs. Instead, it is the reference event for
+    all other client_time_spent_in_secs values, which each represent the
+    amount of time between this event (i.e., the learner entering the
+    state) and the other event.
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1

@@ -43,7 +43,6 @@ source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 set -- "${remaining_params[@]}"
 
-
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   echo Installing Google App Engine
@@ -104,5 +103,7 @@ echo Starting GAE development server
 # To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
-python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
+
+$PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
+
 echo Done!

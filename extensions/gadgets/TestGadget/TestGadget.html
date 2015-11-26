@@ -1,6 +1,12 @@
+<link rel="stylesheet" type="text/css" href="/extensions/gadgets/AdviceBar/static/css/adviceBar.css">
+
 <script type="text/ng-template" id="gadget/TestGadget">
   <!-- TestGadget assists validation from gadgets.base_test. -->
-  <div>
-    TestGadget
+  <div class="oppia-test-gadget-container">
+    <div ng-repeat="resource in testGadgetAdviceResources track by $index">
+      <div class="oppia-test-gadget-resource" ng-click="overlayAdviceModal($index)">
+        <[resource.adviceTitle]>
+      </div>
+    </div>
   </div>
 </script>

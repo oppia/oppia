@@ -23,7 +23,7 @@ oppia.controller('DashboardNotifications', [
     function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
   $scope.navigateToItem = function(activityId, notificationType) {
     window.location.href = '/create/' + activityId + (
-        notificationType === 'feedback_thread' ? '#/feedback': '');
+      notificationType === 'feedback_thread' ? '#/feedback' : '');
   };
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {

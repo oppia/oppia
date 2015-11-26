@@ -18,7 +18,7 @@ __author__ = 'Sean Lip'
 
 from core.controllers import galleries
 from core.domain import config_services
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
@@ -69,7 +69,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['explorations_list'][0])
 
         # Publicize the demo exploration.
@@ -80,8 +80,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # This is not necessary, but serves as additional check that
         # the migration job works well and gives correct galleries.
         self.process_and_flush_pending_tasks()
-        job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
-        exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
+        job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
+        exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
         self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self.count_jobs_in_taskqueue(), 0)
@@ -108,7 +108,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
     def test_gallery_handler_for_created_explorations(self):
@@ -163,7 +163,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
         self.assertDictContainsSubset({
             'id': 'A',
@@ -171,7 +171,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Title A',
             'language_code': 'en',
             'objective': 'Objective A',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['explorations_list'][1])
 
         # Delete exploration A
@@ -186,7 +186,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
     def test_new_exploration_ids(self):

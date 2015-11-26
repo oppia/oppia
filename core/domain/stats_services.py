@@ -26,10 +26,9 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import stats_domain
-from core.domain import stats_jobs
+from core.domain import stats_jobs_continuous
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-import feconf
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
@@ -104,7 +103,7 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
         # This is None if the calculation job has not yet been run for this
         # state.
         calc_output_domain_object = (
-            stats_jobs.InteractionAnswerSummariesAggregator.get_calc_output(
+            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
                 exploration_id, exploration_version, state_name, calculation_id))
 
         # If the calculation job has not yet been run for this state, we simply
@@ -125,6 +124,29 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
     return results_list
 
 
+def get_top_state_rule_answers(
+        exploration_id, state_name, rule_str_list, top_answer_count_per_rule):
+    """Returns a list of top answers (by submission frequency) submitted to the
+    given state in the given exploration which were mapped to any of the rules
+    listed in 'rule_str_list'. The number of answers returned is the number of
+    rule spec strings based in multiplied by top_answer_count_per_rule.
+    """
+    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+        exploration_id, [{
+            'state_name': state_name,
+            'rule_str': rule_str
+        } for rule_str in rule_str_list])
+
+    all_top_answers = []
+    for answer_log in answer_logs:
+        top_answers = answer_log.get_top_answers(top_answer_count_per_rule)
+        all_top_answers += [
+            {'value': top_answer[0], 'count': top_answer[1]}
+            for top_answer in top_answers
+        ]
+    return all_top_answers
+
+
 def get_state_improvements(exploration_id, exploration_version):
     """Returns a list of dicts, each representing a suggestion for improvement
     to a particular state.
@@ -140,7 +162,7 @@ def get_state_improvements(exploration_id, exploration_version):
             'rule_str': exp_domain.DEFAULT_RULESPEC_STR
         } for state_name in state_names])
 
-    statistics = stats_jobs.StatisticsAggregator.get_statistics(
+    statistics = stats_jobs_continuous.StatisticsAggregator.get_statistics(
         exploration_id, exploration_version)
     state_hit_counts = statistics['state_hit_counts']
 
@@ -182,9 +204,10 @@ def get_state_improvements(exploration_id, exploration_version):
                 'type': eligible_flags[0]['improve_type'],
             })
 
-    return sorted(
-        [state for state in ranked_states if state['rank'] != 0],
-        key=lambda x: -x['rank'])
+    return sorted([
+        ranked_state for ranked_state in ranked_states
+        if ranked_state['rank'] != 0
+    ], key=lambda x: -x['rank'])
 
 
 def get_versions_for_exploration_stats(exploration_id):
@@ -199,7 +222,7 @@ def get_exploration_stats(exploration_id, exploration_version):
     Note that exploration_version should be a string.
     """
     exploration = exp_services.get_exploration_by_id(exploration_id)
-    exp_stats = stats_jobs.StatisticsAggregator.get_statistics(
+    exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
         exploration_id, exploration_version)
 
     last_updated = exp_stats['last_updated']

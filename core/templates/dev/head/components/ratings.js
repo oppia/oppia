@@ -23,7 +23,7 @@
 oppia.factory('ratingVisibilityService', [function() {
   return {
     areRatingsShown: function(ratingFrequencies) {
-      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
+      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 3;
 
       var totalNumber = 0;
       for (var value in ratingFrequencies) {
@@ -35,31 +35,26 @@ oppia.factory('ratingVisibilityService', [function() {
   };
 }]);
 
-
 oppia.directive('ratingFromValue', [function() {
   return {
-    // This will display a star-rating based on the given data. Exactly one of
-    // 'ratingValue' and 'ratingFrequencies' should be specified.
-    //  - ratingValue: an integer 1-5 giving the rating
-    //  - ratingFrequencies: a dictionary with keys '1' to '5' giving the
-    //    number of times each rating has been awarded; from this the average
-    //    rating will be computed and displayed.
+    // This will display a star-rating based on the given data. The attributes
+    // passed in are as follows:
     //  - isEditable: true or false; whether the rating is user-editable.
     //  - onEdit: should be supplied iff isEditable is true, and be a function
     //    that will be supplied with the new rating when the rating is changed.
+    //  - ratingValue: an integer 1-5 giving the rating
     restrict: 'E',
     scope: {
-      ratingValue: '=',
       isEditable: '=',
-      onEdit: '='
+      onEdit: '=',
+      ratingValue: '='
     },
     templateUrl: 'rating/fromValue',
     controller: ['$scope', function($scope) {
-
       var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
         return {
-          cssClass: 'glyphicon-star-empty',
+          cssClass: 'fa-star-o',
           value: starValue
         };
       });
@@ -71,12 +66,14 @@ oppia.directive('ratingFromValue', [function() {
 
       var displayValue = function(ratingValue) {
         for (var i = 0; i < $scope.stars.length; i++) {
-          $scope.stars[i].cssClass =
-            ratingValue === undefined ? 'glyphicon-star-empty' :
-            ratingValue < $scope.stars[i].value  - 0.5 ?
-            'glyphicon-star-empty' :
-            'glyphicon-star';
-          if ($scope.status === STATUS_ACTIVE && ratingValue >= $scope.stars[i].value) {
+          $scope.stars[i].cssClass = (
+            ratingValue === undefined ? 'fa-star-o' :
+            ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
+            ratingValue < $scope.stars[i].value - 0.25 ? 'fa-star-half-o' :
+            'fa-star');
+
+          if ($scope.status === STATUS_ACTIVE &&
+              ratingValue >= $scope.stars[i].value) {
             $scope.stars[i].cssClass += ' oppia-rating-star-active';
           }
         }
@@ -111,39 +108,41 @@ oppia.directive('ratingFromValue', [function() {
 
       $scope.getCursorStyle = function() {
         return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
-      }
+      };
     }]
   };
 }]);
-
 
 oppia.directive('ratingFromFrequencies', [function() {
   return {
     restrict: 'E',
     scope: {
+      // A dictionary with keys '1' to '5' giving the number of times each
+      // rating has been awarded; from this the average rating will be computed
+      // and displayed.
       ratingFrequencies: '&'
     },
     templateUrl: 'rating/fromFrequencies',
     controller: [
-        '$scope', 'ratingVisibilityService',
-        function($scope, ratingVisibilityService) {
-
-      $scope.computeAverageRating = function(ratingFrequencies) {
-        if (!ratingVisibilityService.areRatingsShown(ratingFrequencies)) {
-          return undefined;
-        } else {
-          var totalNumber = 0;
-          var totalValue = 0.0;
-          for (var value in ratingFrequencies) {
-            totalValue += value * ratingFrequencies[value];
-            totalNumber += ratingFrequencies[value];
+      '$scope', 'ratingVisibilityService',
+      function($scope, ratingVisibilityService) {
+        $scope.computeAverageRating = function(ratingFrequencies) {
+          if (!ratingVisibilityService.areRatingsShown(ratingFrequencies)) {
+            return undefined;
+          } else {
+            var totalNumber = 0;
+            var totalValue = 0.0;
+            for (var value in ratingFrequencies) {
+              totalValue += value * ratingFrequencies[value];
+              totalNumber += ratingFrequencies[value];
+            }
+            return totalValue / totalNumber;
           }
-          return totalValue / totalNumber;
-        }
-      };
+        };
 
-      $scope.ratingValue = $scope.computeAverageRating(
-        $scope.ratingFrequencies());
-    }]
+        $scope.ratingValue = $scope.computeAverageRating(
+          $scope.ratingFrequencies());
+      }
+    ]
   };
 }]);

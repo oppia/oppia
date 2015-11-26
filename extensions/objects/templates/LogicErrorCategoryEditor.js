@@ -17,11 +17,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('logicErrorCategoryEditor', function($compile, warningsData) {
+oppia.directive('logicErrorCategoryEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'LogicErrorCategory';
+        return OBJECT_EDITOR_URL_PREFIX + 'LogicErrorCategory';
       };
       $compile(element.contents())(scope);
     },
@@ -70,4 +72,4 @@ oppia.directive('logicErrorCategoryEditor', function($compile, warningsData) {
       })
     }
   };
-});
+}]);

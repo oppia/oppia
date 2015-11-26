@@ -23,13 +23,32 @@ oppia.constant('PAGE_CONTEXT', {
   LEARNER: 'learner'
 });
 
+oppia.constant('EDITOR_TAB_CONTEXT', {
+  EDITOR: 'editor',
+  PREVIEW: 'preview'
+});
+
 oppia.factory('explorationContextService', [
-    '$window', 'PAGE_CONTEXT', function($window, PAGE_CONTEXT) {
+    '$window', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+    function($window, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
 
   var _pageContext = null;
   var _explorationId = null;
 
   return {
+    // Returns a string representing the current tab of the editor (either
+    // 'editor' or 'preview'), or null if the current tab is neither of these,
+    // or the current page is not the editor.
+    getEditorTabContext: function() {
+      var hash = $window.location.hash;
+      if (hash.indexOf('#/gui') === 0) {
+        return PAGE_CONTEXT.EDITOR;
+      } else if (hash.indexOf('#/preview')) {
+        return PAGE_CONTEXT.PREVIEW;
+      } else {
+        return null;
+      }
+    },
     // Returns a string representing the context of the current page.
     // This is either PAGE_CONTEXT.EDITOR or PAGE_CONTEXT.LEARNER.
     // If the current page is not one of these, an error is raised.

@@ -7,29 +7,29 @@
   <ul>
     <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
       <a href="/">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_home_black_48dp.png" class="oppia-sidebar-menu-icon">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
         Home
       </a>
     </li>
 
     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
       <a href="/about">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_help_black_48dp.png" class="oppia-sidebar-menu-icon">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
         About
       </a>
     </li>
 
     <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
       <a href="/participate">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_info_black_48dp.png" class="oppia-sidebar-menu-icon">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
         Participation Playbook
       </a>
     </li>
 
-    {% if SHOW_FORUM_PAGE %}
+    {% if SHOW_CUSTOM_PAGES %}
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png" class="oppia-sidebar-menu-icon">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
           Forum
         </a>
       </li>
@@ -44,6 +44,24 @@
         </a>
       </li>
     {% endfor %}
+
+    {% if SHOW_CUSTOM_PAGES %}
+      <hr>
+
+      <li>
+        <a href="/terms">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
+          Terms of Use
+        </a>
+      </li>
+
+      <li>
+        <a href="/privacy">
+          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
+          Privacy Policy
+        </a>
+      </li>
+    {% endif %}
   </ul>
 
   <div class="oppia-sidebar-footer">

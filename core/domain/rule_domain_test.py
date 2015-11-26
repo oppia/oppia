@@ -23,9 +23,9 @@ import os
 import pkgutil
 
 from core.domain import rule_domain
+from core.tests import test_utils
 from extensions.objects.models import objects
 import feconf
-import test_utils
 
 
 class FakeRule(rule_domain.Rule):
@@ -90,8 +90,11 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                 param_list = rule_domain.get_param_list(clazz.description)
 
                 for (param_name, param_obj_type) in param_list:
-                    # TODO(sll): Get rid of this special case.
-                    if param_obj_type.__name__ == 'NonnegativeInt':
+                    # TODO(sll): Get rid of these special cases.
+                    if param_obj_type.__name__ in [
+                            'NonnegativeInt', 'ListOfGraph',
+                            'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
+                            'SetOfNormalizedString']:
                         continue
 
                     self.assertTrue(

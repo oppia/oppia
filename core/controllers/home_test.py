@@ -18,7 +18,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import feedback_services
 from core.domain import rights_manager
-from core.domain import user_jobs
+from core.domain import user_jobs_continuous
 from core.tests import test_utils
 import feconf
 
@@ -99,27 +99,27 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PRIVATE)
+            rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLIC)
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
         self.logout()
 
     def test_collaborators_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
         self.set_admins([self.OWNER_EMAIL])
@@ -129,28 +129,28 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PRIVATE)
+            rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLIC)
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+            rights_manager.ACTIVITY_STATUS_PUBLICIZED)
 
         self.logout()
 
     def test_viewer_cannot_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        rights_manager.assign_role(
+        rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         self.set_admins([self.OWNER_EMAIL])
@@ -236,7 +236,7 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
         and that anonymous authors are handled correctly.
         """
         with self.swap(
-                user_jobs.DashboardRecentUpdatesAggregator,
+                user_jobs_continuous.DashboardRecentUpdatesAggregator,
                 'get_recent_notifications',
                 self._get_recent_notifications_mock_by_viewer):
             self.login(self.VIEWER_EMAIL)
@@ -248,7 +248,7 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
         with self.swap(
-                user_jobs.DashboardRecentUpdatesAggregator,
+                user_jobs_continuous.DashboardRecentUpdatesAggregator,
                 'get_recent_notifications',
                 self._get_recent_notifications_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)

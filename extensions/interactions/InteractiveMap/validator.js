@@ -31,7 +31,7 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
         customizationArgs.latitude.value > 90) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please pick a starting latitude between -90 and 90.'
+        message: 'Please pick a starting latitude between -90 and 90.'
       });
     }
 
@@ -39,7 +39,7 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
         customizationArgs.longitude.value > 180) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please pick a starting longitude between -180 and 180.'
+        message: 'Please pick a starting longitude between -180 and 180.'
       });
     }
 
@@ -50,7 +50,7 @@ oppia.filter('oppiaInteractiveInteractiveMapValidator', [
           if (ruleSpecs[j].inputs.d < 0) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
-              message: 'please ensure that rule ' + String(j + 1) +
+              message: 'Please ensure that rule ' + String(j + 1) +
                 ' in group ' + String(i + 1) + ' refers to a valid distance.'
             });
           }

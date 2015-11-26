@@ -38,7 +38,7 @@ describe('Embedding', function() {
 
     var playCountingExploration = function(version) {
       general.waitForSystem();
-      protractor.getInstance().waitForAngular();
+      browser.waitForAngular();
 
       player.expectContentToMatch(
         forms.toRichText((version === 1) ?
@@ -50,6 +50,7 @@ describe('Embedding', function() {
         forms.toRichText('Right! Why do you think it is 6?'));
       player.expectExplorationToNotBeOver();
       player.submitAnswer('TextInput', 'factorial');
+      player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
     };
 
@@ -71,27 +72,22 @@ describe('Embedding', function() {
     for (var i = 0; i < TEST_PAGES.length; i++) {
       // This is necessary as the pages are non-angular; we need xpaths below
       // for the same reason.
-      var driver = protractor.getInstance().driver;
+      var driver = browser.driver;
       driver.get(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE + TEST_PAGES[i]);
 
       // Test of standard loading (new version)
-      protractor.getInstance().switchTo().frame(
+      browser.switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-standard']/iframe")));
       playCountingExploration(2);
       browser.switchTo().defaultContent();
 
       // Test of deferred loading (old version)
-      var deferredElement = driver.findElement(by.xpath(
-        "//div[@class='protractor-test-deferred']"));
-      // Without the following line, protractor does not scroll down to the
-      // element in question.
-      general.scrollElementIntoView(deferredElement);
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-deferred']/oppia/div/button")).click();
-      protractor.getInstance().switchTo().frame(
+      browser.switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-deferred']/iframe")));
       playCountingExploration(1);
@@ -100,9 +96,6 @@ describe('Embedding', function() {
       // Tests of failed loading
       var missingIdElement = driver.findElement(
         by.xpath("//div[@class='protractor-test-missing-id']/div/span"));
-      // Without the following line, protractor does not scroll down to the
-      // element in question.
-      general.scrollElementIntoView(missingIdElement);
       expect(missingIdElement.getText()).toMatch(
         'This Oppia exploration could not be loaded because no oppia-id ' +
         'attribute was specified in the HTML tag.');
@@ -110,7 +103,7 @@ describe('Embedding', function() {
         by.xpath(
           "//div[@class='protractor-test-invalid-id-deferred']/oppia/div/button"
         )).click();
-      protractor.getInstance().sleep(LOADING_TIMEOUT);
+      browser.sleep(LOADING_TIMEOUT);
       expect(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")

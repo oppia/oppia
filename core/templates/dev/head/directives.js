@@ -24,11 +24,8 @@
 oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
     restrict: 'A',
-    scope: {
-      varToBind: '=angularHtmlBind'
-    },
     link: function(scope, elm, attrs) {
-      scope.$watch('varToBind', function(newValue, oldValue) {
+      scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {
         elm.html(newValue);
         $compile(elm.contents())(scope);
       });
@@ -90,8 +87,9 @@ oppia.directive('customPopover', ['$sce', function($sce) {
       $(elt).popover({
         trigger: 'hover',
         html: true,
-        content: $sce.getTrustedHtml('<pre class="oppia-pre-wrapped-text">'
-	  + attrs.popoverText + '</pre>'),
+        content: $sce.getTrustedHtml(
+          '<pre class="oppia-pre-wrapped-text">' + attrs.popoverText +
+          '</pre>'),
         placement: attrs.popoverPlacement
       });
     },
@@ -116,11 +114,17 @@ oppia.directive('customPopover', ['$sce', function($sce) {
 
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
-oppia.directive('focusOn', [function() {
+oppia.directive('focusOn', ['LABEL_FOR_CLEARING_FOCUS', function(LABEL_FOR_CLEARING_FOCUS) {
   return function(scope, elt, attrs) {
     scope.$on('focusOn', function(e, name) {
       if (name === attrs.focusOn) {
         elt[0].focus();
+      }
+
+      // If the purpose of the focus switch was to clear focus, blur the
+      // element.
+      if (name === LABEL_FOR_CLEARING_FOCUS) {
+        elt[0].blur();
       }
     });
   };

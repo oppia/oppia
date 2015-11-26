@@ -30,7 +30,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     if (!customizationArgs.imageAndRegions.value.imagePath) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please add an image for the learner to click on.'
+        message: 'Please add an image for the learner to click on.'
       });
     }
 
@@ -40,7 +40,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     if (customizationArgs.imageAndRegions.value.labeledRegions.length === 0) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
-        message: 'please specify at least one image region to click on.'
+        message: 'Please specify at least one image region to click on.'
       });
     }
 
@@ -53,7 +53,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: 'the image region strings should consist of characters from [A-Za-z0-9].'
+          message: 'The image region strings should consist of characters from [A-Za-z0-9].'
         });
       } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
         areAnyRegionStringsDuplicated = true;
@@ -65,13 +65,13 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
     if (areAnyRegionStringsEmpty) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the image region strings are nonempty.'
+        message: 'Please ensure the image region strings are nonempty.'
       });
     }
     if (areAnyRegionStringsDuplicated) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the image region strings are unique.'
+        message: 'Please ensure the image region strings are unique.'
       });
     }
 
@@ -89,7 +89,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
             warningsList.push({
             type: WARNING_TYPES.CRITICAL,
             message: (
-              'the region label \'' + label + '\' in rule ' + String(j + 1) +
+              'The region label \'' + label + '\' in rule ' + String(j + 1) +
               ' in group ' + String(i + 1) + ' is invalid.')
             });
           }
@@ -101,7 +101,7 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (
-          'please add a rule to cover what should happen if none of the ' +
+          'Please add a rule to cover what should happen if none of the ' +
           'given regions are clicked.')
       });
     }

@@ -17,7 +17,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import value_generators_domain
-import test_utils
+from core.tests import test_utils
 
 
 class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
@@ -32,4 +32,4 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
         all_generator_classes = (
             value_generators_domain.Registry.get_all_generator_classes())
-        self.assertEqual(len(all_generator_classes), 4)
+        self.assertEqual(len(all_generator_classes), 2)

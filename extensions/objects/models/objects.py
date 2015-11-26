@@ -81,17 +81,6 @@ class BaseObject(object):
             '%s.html' % cls.edit_html_filename))
 
 
-class Null(BaseObject):
-    """Class for a null object."""
-
-    description = 'A null object.'
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        return None
-
-
 class Boolean(BaseObject):
     """Class for booleans."""
 
@@ -176,6 +165,30 @@ class NonnegativeInt(BaseObject):
     }
 
 
+class CodeString(BaseObject):
+    """Code string class. This is like a normal string, but it should not
+    contain tab characters.
+    """
+
+    description = 'A code string.'
+    edit_html_filename = 'code_string_editor'
+    edit_js_filename = 'CodeStringEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'ui_config': {
+            'coding_mode': 'none',
+        },
+    }
+
+    @classmethod
+    def normalize(cls, raw):
+        if '\t' in raw:
+            raise TypeError(
+                'Unexpected tab characters in code string: %s' % raw)
+        return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
+
+
 class CodeEvaluation(BaseObject):
     """Evaluation result of programming code."""
 
@@ -199,6 +212,17 @@ class CodeEvaluation(BaseObject):
     }
 
 
+class ListOfCodeEvaluation(BaseObject):
+    """Class for lists of CodeEvaluations."""
+
+    description = 'A list of code and its evaluation results.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CodeEvaluation.SCHEMA
+    }
+
+
 class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
@@ -210,6 +234,17 @@ class CoordTwoDim(BaseObject):
         'type': 'list',
         'len': 2,
         'items': Real.SCHEMA,
+    }
+
+
+class ListOfCoordTwoDim(BaseObject):
+    """Class for lists of CoordTwoDims."""
+
+    description = 'A list of 2D coordinates.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': CoordTwoDim.SCHEMA
     }
 
 
@@ -253,6 +288,21 @@ class NormalizedString(BaseObject):
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'normalize_spaces'
+        }]
+    }
+
+
+class SetOfNormalizedString(BaseObject):
+    """Class for sets of NormalizedStrings."""
+
+    description = (
+        'A set (a list with unique elements) of whitespace-collapsed strings.')
+
+    SCHEMA = {
+        'type': 'list',
+        'items': NormalizedString.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }
 
@@ -519,6 +569,17 @@ class Graph(BaseObject):
         return raw
 
 
+class ListOfGraph(BaseObject):
+    """Class for lists of Graphs."""
+
+    description = 'A list of graphs.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Graph.SCHEMA
+    }
+
+
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
 
@@ -628,5 +689,36 @@ class ClickOnImage(BaseObject):
                 'type': 'list',
                 'items': UnicodeString.SCHEMA
             }
+        }]
+    }
+
+
+class ParameterName(BaseObject):
+    """Parameter name class.
+
+    Validation for this class is done only in the frontend.
+    """
+
+    description = 'A string representing a parameter name.'
+    edit_html_filename = 'parameter_name_editor'
+    edit_js_filename = 'ParameterNameEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+    }
+
+
+class SetOfHtmlString(BaseObject):
+    """A Set of Html Strings"""
+
+    description = "A list of Html strings."
+    edit_html_filename = 'set_of_html_string_editor'
+    edit_js_filename = 'SetOfHtmlStringEditor'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': Html.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }

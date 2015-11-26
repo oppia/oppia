@@ -17,8 +17,7 @@
 __author__ = 'Stephanie Federwisch'
 
 from core.domain import user_services
-
-import test_utils
+from core.tests import test_utils
 import utils
 
 

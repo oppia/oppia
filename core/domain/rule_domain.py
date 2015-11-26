@@ -30,6 +30,8 @@ import jinja_utils
 # TODO(sll): In the frontend, use the rule descriptions as the single source
 # of truth for the params.
 
+FUZZY_RULE_TYPE = 'FuzzyMatches'
+
 
 def get_obj_type_for_param_name(rule_class, param_name):
     """Gets the obj type for a given param name."""
@@ -97,6 +99,10 @@ def get_param_list(description):
     return param_list
 
 
+CERTAIN_TRUE_VALUE = 1.0
+CERTAIN_FALSE_VALUE = 0.0
+
+
 class Rule(object):
     """Abstract base class for a value object that represents a rule.
 
@@ -138,8 +144,22 @@ class Rule(object):
         pass
 
     def _evaluate(self, subject):
-        """Returns a boolean indicating the truth value of the evaluation."""
+        """Returns a normalized value between 0 and 1 indicating the truth value
+        of the evaluation, where 1.0 is certainly true and 0.0 is certainly
+        false. This is to be implemented in overridden classes.
+        """
         raise NotImplementedError
+
+    def _fuzzify_truth_value(self, bool_value):
+        """Returns a fuzzy truth value for a crisp true or false value. A crisp
+        value of true is represented by the fuzzy value of 1.0 and a crisp
+        value of false is represented by 0.0.
+        """
+        return CERTAIN_TRUE_VALUE if bool(bool_value) else CERTAIN_FALSE_VALUE
+
+    def _invert_fuzzy_truth_value(self, fuzzy_value):
+        """Performs a NOT operation on a fuzzy value."""
+        return CERTAIN_TRUE_VALUE - fuzzy_value
 
     def set_fs(self, fs):
         """Set an abstract file system to use with this rule."""
@@ -157,13 +177,13 @@ class Rule(object):
             subject: the thing to be evaluated.
 
         Returns:
-            bool: the result of the evaluation.
+            float: the result of the evaluation (between 0.0 and 1.0).
         """
         return self._evaluate(self.subject_type.normalize(subject))
 
 
 def evaluate_rule(rule_spec, answer_type, context_params, answer, fs):
-    """Evaluates a rule spec using context_params. Returns a boolean."""
+    """Evaluates a rule spec. Returns a float between 0.0 and 1.0."""
     all_rule_classes = get_rules_for_obj_type(answer_type)
     rule = next(r for r in all_rule_classes
                 if r.__name__ == rule_spec.rule_type)

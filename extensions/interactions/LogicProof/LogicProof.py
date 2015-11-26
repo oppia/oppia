@@ -28,6 +28,8 @@ class LogicProof(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['logic_proof', 'codemirror']
     answer_type = 'CheckedProof'
+    instructions = 'Construct a proof'
+    needs_summary = True
 
     _customization_arg_specs = [{
         'name': 'question',
