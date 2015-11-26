@@ -807,6 +807,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
+    # Update summary of changed exploration.
+    update_exploration_summary(exploration.id, committer_id=committer_id)
+
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
@@ -840,7 +843,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
-    create_exploration_summary(exploration.id)
+    create_exploration_summary(exploration.id, committer_id=committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -950,21 +953,32 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
-    # Update summary of changed exploration.
-    update_exploration_summary(exploration.id)
 
-
-def create_exploration_summary(exploration_id):
+def create_exploration_summary(exploration_id, committer_id=None):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(exploration)
+    # update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an exploration's content)
+    if committer_id is not None:
+        if committer_id not in feconf.SYSTEM_USER_IDS:
+            exp_summary.contributor_ids = [committer_id]
     save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(exploration_id):
+def update_exploration_summary(exploration_id, committer_id=None):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(exploration)
+    # update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an exploration's content)
+    if committer_id is not None:
+        if committer_id not in feconf.SYSTEM_USER_IDS:
+            contributor_id_set = set(exp_summary.contributor_ids)
+            contributor_id_set.add(committer_id)
+            exp_summary.contributor_ids = list(contributor_id_set)
     save_exploration_summary(exp_summary)
 
 
@@ -1014,6 +1028,7 @@ def save_exploration_summary(exp_summary):
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
+        contributor_ids=exp_summary.contributor_ids,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),

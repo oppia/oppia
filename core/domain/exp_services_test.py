@@ -525,6 +525,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         self.assertEqual(retrieved_exp_summary.title, 'A new title')
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
+        self.assertEqual(retrieved_exp_summary.contributor_ids, [self.OWNER_ID])
 
 
 class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
@@ -2137,7 +2138,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], [], self.EXPECTED_VERSION_2,
+                False, [self.ALBERT_ID], [], [], [self.ALBERT_ID],
+                self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
                 )}
@@ -2148,7 +2150,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version',
+                        'editor_ids', 'viewer_ids',
+                        'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
         for exp_id in actual_summaries.keys():
@@ -2159,13 +2162,16 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     def test_get_all_exploration_summaries(self):
         actual_summaries = exp_services.get_all_exploration_summaries()
 
+        print "Albert id: ", self.ALBERT_ID, "Bob id: ", self.BOB_ID
+
         expected_summaries = {
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], [], self.EXPECTED_VERSION_1,
+                False, [self.ALBERT_ID], [], [], [self.ALBERT_ID, self.BOB_ID],
+                self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
             ),
@@ -2174,7 +2180,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], [], self.EXPECTED_VERSION_2,
+                False, [self.ALBERT_ID], [], [], [self.ALBERT_ID],
+                self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
             )
@@ -2186,8 +2193,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version',
-                        'exploration_model_created_on',
+                        'editor_ids', 'viewer_ids', 'contributor_ids',
+                        'version', 'exploration_model_created_on',
                         'exploration_model_last_updated']
         for exp_id in actual_summaries.keys():
             for prop in simple_props:

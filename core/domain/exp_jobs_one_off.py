@@ -43,6 +43,9 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.
+
+        Note: contributor_ids field populated by
+        ExpSummariesContributorsOneOffJob.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
