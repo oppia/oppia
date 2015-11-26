@@ -527,7 +527,7 @@ oppia.factory('oppiaPlayerService', [
             params: learnerParamsService.getAllParams(),
             version: version,
             session_id: sessionId,
-            client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+            client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
             old_state_name: _currentStateName,
             answer_group_index: classificationResult.answerGroupIndex,
             rule_spec_index: classificationResult.ruleSpecIndex
