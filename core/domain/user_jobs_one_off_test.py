@@ -31,6 +31,108 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 
 
+class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off dashboard subscriptions job."""
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'c'
+    USER_D_EMAIL = 'd@example.com'
+    USER_D_USERNAME = 'd'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.UserContributionsOneOffJob.create_new()
+        user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+
+    def setUp(self):
+        super(UserContributionsOneOffJobTests, self).setUp()
+
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        """User A has no created OR edited, User B has one created, User 
+            C has one edited, User D edits an exploration previously
+            edited (check for no duplicates)."""
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
+
+
+        self.save_new_valid_exploration(
+                self.EXP_ID_1, self.user_b_id, end_state_name='End')
+
+        #generate an edit
+        exp_services.update_exploration(self.user_c_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+                }], 'Test edit')
+
+
+        self.save_new_valid_exploration(
+                self.EXP_ID_2, self.user_d_id, end_state_name='End')
+
+        exp_services.update_exploration(self.user_d_id, self.EXP_ID_2, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+                }], 'Test edit')
+
+    def test_null_case(self):
+        """Tests the case where user has no created or edited explorations."""
+
+        user_a_contributions_model = user_models.UserContributionsModel.get(
+            self.user_a_id)
+        self.assertEqual(user_a_contributions_model.created_explorations, [])
+        self.assertEqual(user_a_contributions_model.edited_explorations, [])
+        self._run_one_off_job()
+        self.assertEqual(user_a_contributions_model.created_explorations, [])
+        self.assertEqual(user_a_contributions_model.edited_explorations, [])
+
+    def test_created_exp(self):
+        """Tests the case where user has created (and therefore edited) 
+        an exploration."""
+
+        user_b_contributions_model = user_models.UserContributionsModel.get(
+            self.user_b_id)
+
+        self._run_one_off_job()
+
+        self.assertEqual(user_b_contributions_model.created_explorations[0], self.EXP_ID_1)
+        self.assertEqual(user_b_contributions_model.edited_explorations[0], self.EXP_ID_1)
+
+    def test_edited_exp(self):
+        """Tests the case where user has an edited exploration."""
+
+        user_c_contributions_model = user_models.UserContributionsModel.get(
+            self.user_c_id)
+        self._run_one_off_job()
+        self.assertEqual(user_c_contributions_model.edited_explorations[0],
+            self.EXP_ID_1)
+
+    def test_for_duplicates(self):
+        """Tests the case where user has an edited exploration, and edits
+        it again making sure it is not duplicated."""
+
+        user_d_contributions_model = user_models.UserContributionsModel.get(
+            self.user_d_id)
+        self.assertEqual(len(user_d_contributions_model.edited_explorations),
+            1) 
+
+
+
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
     EXP_ID_1 = 'exp_id_1'

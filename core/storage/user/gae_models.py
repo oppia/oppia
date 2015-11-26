@@ -72,9 +72,9 @@ class UserContributionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
     # IDs of explorations that this user has created.
-    created_explorations = ndb.StringProperty(repeated=True, indexed=True)
+    created_explorations = ndb.StringProperty(repeated=True, indexed=True, default=None)
     # IDs of explorations that this user has created.
-    edited_explorations = ndb.StringProperty(repeated=True, indexed=True)
+    edited_explorations = ndb.StringProperty(repeated=True, indexed=True, default=None)
 
 
 class UserEmailPreferencesModel(base_models.BaseModel):

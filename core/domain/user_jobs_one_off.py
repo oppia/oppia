@@ -31,7 +31,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationSnapchatMetadataModel]
+        return [exp_models.ExplorationSnapshotMetadataModel]
 
     @staticmethod
     def map(item):
@@ -47,19 +47,19 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
         created_explorations = []
         edited_explorations = []
 
-        for edit in version_and_exp_ids:
-            if edit.version_number == 1:
-                created_explorations.append(edit.exploration_id)
-            edited_explorations.append(edit.exploration_id)
+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]
 
-        if isinstance(UserContributionsModel.get(key), user_models.UserContributionsModel):
-            user_services.update_user_contributions(key, set(created_explorations),
-                set(edited_explorations))
+        for edit in edits:
+            edited_explorations.append(edit['exploration_id'])
+            if edit['version_number'] == '1':
+                created_explorations.append(edit['exploration_id'])
+
+        if isinstance(user_models.UserContributionsModel.get(key), user_models.UserContributionsModel):
+            user_services.update_user_contributions(key, list(set(created_explorations)),
+                list(set(edited_explorations)))
 
         else:                
-            user_contributions = user_services.create_user_contributions(key, set(created_explorations),
-                set(edited_explorations))
-      
+            user_contributions = user_services.create_user_contributions(key, list(set(created_explorations)), list(set(edited_explorations)))
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and

@@ -253,6 +253,7 @@ def _create_user(user_id, email):
         user_id, email,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
+    create_user_contributions(user_id, [], [])
     return user_settings
 
 
@@ -409,14 +410,14 @@ class UserContributions(object):
             raise utils.ValidationError('No user id specified.')
 
 
-def get_user_contributions(user_id):
+def get_user_contributions(user_id, strict=False):
     """Gets domain object representing the contributions for the given user_id.
 
     If the given user_id does not exist, returns None.
     """
-    model = user_models.UserContributionsModel.get(user_id)
+    model = user_models.UserContributionsModel.get(user_id, strict=False)
     if model is not None:
-        result = UserSettings(
+        result = UserContributions(
                     model.id, created_explorations=model.created_explorations,
                     edited_explorations=model.edited_explorations)
     else:
@@ -431,7 +432,7 @@ def create_user_contributions(user_id, created_explorations, edited_explorations
         raise Exception('User %s already exists.' % user_id)
     else:
         user_contributions = UserContributions(
-            user_id, created_explorations=created_explorations,
+            user_id=user_id, created_explorations=created_explorations, 
             edited_explorations=edited_explorations)
         _save_user_contributions(user_contributions)
     return user_contributions
@@ -459,22 +460,28 @@ def add_created_exploration(user_id, exploration_id):
     if user_contributions is None:
         raise Exception('User %s contributions does not exist.' % user_id)
 
-    user_contributions.created_explorations.add(exploration_id)
-    _save_user_contributions(user_contributions)
+    elif exploration_id not in user_contributions.created_explorations:
+        user_contributions.created_explorations.append(exploration_id)
+        user_contributions.created_explorations.sort()
+        _save_user_contributions(user_contributions)
 
 def add_edited_exploration(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of edited explorations."""
+
     user_contributions = get_user_contributions(user_id)
 
     if user_contributions is None:
         raise Exception('User %s contributions does not exist.' % user_id)
-    else:
-        user_contributions.edited_explorations.add(exploration_id)
+
+    elif exploration_id not in user_contributions.edited_explorations:
+        user_contributions.edited_explorations.append(exploration_id)
+        user_contributions.edited_explorations.sort()
         _save_user_contributions(user_contributions)
 
 def _save_user_contributions(user_contributions):
     """Commits a user contributions object to the datastore."""
+
     user_contributions.validate()
     user_models.UserContributionsModel(
         id=user_contributions.user_id,
