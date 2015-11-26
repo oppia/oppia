@@ -209,7 +209,7 @@ oppia.factory('stateTransitionService', [
         params: newParams,
         feedback_html: feedback,
         question_html: question
-      }
+      };
     }
   };
 }]);

@@ -24,11 +24,8 @@
 oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
     restrict: 'A',
-    scope: {
-      varToBind: '=angularHtmlBind'
-    },
     link: function(scope, elm, attrs) {
-      scope.$watch('varToBind', function(newValue, oldValue) {
+      scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {
         elm.html(newValue);
         $compile(elm.contents())(scope);
       });
