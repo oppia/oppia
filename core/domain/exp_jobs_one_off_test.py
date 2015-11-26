@@ -257,13 +257,11 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_EMAIL])
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        self.logout()
         job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -277,10 +275,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        self.login(self.ADMIN_EMAIL)
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
-        self.logout()
-        self.login(self.OWNER_EMAIL)
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)

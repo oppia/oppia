@@ -148,13 +148,13 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
     def test_contribution_msec_updates_on_published_explorations(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         self.init_state_name = exploration.init_state_name
-        rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.admin_id, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
         # updated first contribution times in msecs.
@@ -164,9 +164,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(
             self.admin_id, self.EXP_ID)
-        self.logout()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         exp_services.update_exploration(
@@ -182,7 +180,6 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
     def test_contribution_msec_does_not_update_until_exploration_is_published(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -194,8 +191,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that saving an exploration does not update first contribution
         # time.
-        self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
 
         # Test that commit to unpublished exploration does not update
         # contribution time.
@@ -206,32 +203,49 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }], '')
-        self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
 
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
             self.admin_id, self.EXP_ID, self.editor_id, 'editor')
-        self.logout()
-        self.login(self.EDITOR_EMAIL)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
             'cmd': 'rename_state',
             'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'new_state_name': u'¡Hola! αβγ',
             }], '')
-        self.logout()
-        self.assertIsNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
 
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
-        self.login(self.ADMIN_EMAIL)
-        rights_manager.publish_exploration(self.admin_id, self.EXP_ID)
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.admin_id, self.EXP_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
+
+    def test_contribution_msec_does_not_change_if_no_contribution_to_exploration(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.admin_id, end_state_name='End')
+        rights_manager.assign_role_for_exploration(
+            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.admin_id, self.EXP_ID)
+
+        # Test that contribution time is not given to an editor that has not
+        # contributed.
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_exploration_unpublished(self):
@@ -240,25 +254,22 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_EMAIL])
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         self.init_state_name = exploration.init_state_name
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        self.logout()
-        self.login(self.ADMIN_EMAIL)
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.owner_id, self.EXP_ID)
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
-        self.assertIsNotNone(user_services.get_user_settings(self.owner_id)
-            .first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.owner_id).first_contribution_msec)
 
     def test_contribution_msec_updates_on_published_collections(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         collection = self.save_new_valid_collection(
@@ -267,7 +278,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
 
-        rights_manager.publish_collection(self.admin_id, self.COL_ID)
+        collection_services.publish_collection_and_update_user_profiles(
+            self.admin_id, self.COL_ID)
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.
@@ -277,9 +289,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test editor of published collection has updated first contribution time.
         rights_manager.release_ownership_of_collection(self.admin_id,
             self.COL_ID)
-        self.logout()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         collection_services.update_collection(
@@ -289,12 +299,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'new_value': 'Some new title'
             }], 'Changed the title')
 
-        self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_update_until_collection_is_published(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         collection = self.save_new_valid_collection(
@@ -305,8 +314,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that saving a collection does not update first contribution
         # time.
-        self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
 
         # Test that commit to unpublished collection does not update
         # contribution time.
@@ -316,8 +325,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': 'title',
                 'new_value': 'Some new title'
             }], '')
-        self.assertIsNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
 
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
@@ -325,25 +334,45 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         rights_manager.assign_role_for_collection(
             self.admin_id, self.COL_ID, self.editor_id, 'editor')
-        self.logout()
-        self.login(self.EDITOR_EMAIL)
         collection_services.update_collection(
                 self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'category',
                 'new_value': 'Some new category'
             }], '')
-        self.logout()
-        self.assertIsNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
 
         # Test that after an collection is published, all contributors have
         # updated first contribution times.
-        self.login(self.ADMIN_EMAIL)
-        rights_manager.publish_collection(self.admin_id, self.COL_ID)
+        collection_services.publish_collection_and_update_user_profiles(
+            self.admin_id, self.COL_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
+
+    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        collection = self.save_new_valid_collection(
+            self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
+            category=self.COLLECTION_CATEGORY,
+            objective=self.COLLECTION_OBJECTIVE,
+            exploration_id=self.EXP_ID)
+        rights_manager.assign_role_for_collection(
+            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+        collection_services.publish_collection_and_update_user_profiles(
+            self.admin_id, self.COL_ID)
+
+        # Test that contribution time is not given to an editor that has not
+        # contributed.
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
+        self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_collection_unpublished(self):
@@ -352,7 +381,6 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_EMAIL])
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         collection = self.save_new_valid_collection(
@@ -360,12 +388,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID)
-        self.logout()
-        self.login(self.ADMIN_EMAIL)
+        collection_services.publish_collection_and_update_user_profiles(
+            self.owner_id, self.COL_ID)
         rights_manager.unpublish_collection(self.admin_id, self.COL_ID)
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.
-        self.assertIsNotNone(user_services.get_user_settings(self.owner_id)
-            .first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.owner_id).first_contribution_msec)

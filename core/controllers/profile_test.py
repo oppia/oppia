@@ -299,21 +299,21 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.EMAIL)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
-        self.assertEqual(response_dict['first_contribution_msec'], None)
+        self.assertIsNone(response_dict['first_contribution_msec'])
 
         # Update the first_contribution_msec to the current time in milliseconds.
-        current_time_in_msecs = utils.get_current_time_in_millisecs()
+        first_time_in_msecs = utils.get_current_time_in_millisecs()
         user_services.update_first_contribution_msec_if_not_set(
-            self.user_id, current_time_in_msecs)
+            self.user_id, first_time_in_msecs)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
             response_dict['first_contribution_msec'],
-            current_time_in_msecs)
+            first_time_in_msecs)
 
-        # Test that the contribution date is not change after the first time it
+        # Test that the contribution date is not changed after the first time it
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
         user_services.update_first_contribution_msec_if_not_set(
@@ -322,4 +322,4 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
             response_dict['first_contribution_msec'],
-            current_time_in_msecs)
+            first_time_in_msecs)

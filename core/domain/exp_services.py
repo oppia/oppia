@@ -927,6 +927,31 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
+def _get_contributor_ids_for_exploration(exp_id):
+    """Returns list of ids of contributers to an exploration."""
+    contributer_ids = []
+    exploration_snapshots = get_exploration_snapshots_metadata(exp_id)
+    for snapshot in exploration_snapshots:
+        if not snapshot['committer_id'] in contributer_ids:
+            contributer_ids.append(snapshot['committer_id'])
+    return contributer_ids
+
+
+def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+    """Publishes the exploration with publish_exploration() function in
+    rights_manager.py, as well as updates first_contribution_msec.
+
+    It is the responsibility of the caller to check that the exploration is
+    valid prior to publication.
+    """
+    rights_manager.publish_exploration(committer_id, exp_id)
+    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contributer_ids = _get_contributor_ids_for_exploration(exp_id)
+    for contributer in contributer_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            contributer, contribution_time_msec)
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
@@ -1153,7 +1178,7 @@ def load_demo(exploration_id):
         feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
         exploration_id, assets_list)
 
-    rights_manager.publish_exploration(
+    publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])

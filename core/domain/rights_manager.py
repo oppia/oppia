@@ -205,15 +205,17 @@ def _update_activity_summary(activity_type, activity_rights):
 
 def update_activity_first_published_msec(
         activity_type, activity_id, first_published_msec):
-    """Updates the first_published_msec field for an activity. Callers are
-    responsible for ensuring that this value is not already set before updating
-    it.
+    """Updates the first_published_msec field for an activity. This is only
+    called during the one-off job ExplorationFirstPublishedOneOffJob. Callers
+    are responsible for ensuring that this value is not already set before
+    updating it.
     """
     activity_rights = _get_activity_rights(activity_type, activity_id)
     activity_rights.first_published_msec = first_published_msec
     commit_cmds = [{
         'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'first_published': first_published_msec
+        'old_first_published_msec': None,
+        'new_first_published_msec': first_published_msec
     }]
     _save_activity_rights(
         feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
@@ -626,15 +628,18 @@ def _change_activity_status(
 
     if new_status != ACTIVITY_STATUS_PRIVATE:
         activity_rights.viewer_ids = []
-        # Change first_published_msec in activity rights if necessary.
-        if activity_rights.first_published_msec is None:
-            activity_rights.first_published_msec = (
-                utils.get_current_time_in_millisecs())
 
     _save_activity_rights(
         committer_id, activity_rights, activity_type, commit_message,
         commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
+
+    if new_status != ACTIVITY_STATUS_PRIVATE:
+        activity_rights.viewer_ids = []
+        # Change first_published_msec in activity rights if necessary.
+        if activity_rights.first_published_msec is None:
+            activity_rights.first_published_msec = (
+                utils.get_current_time_in_millisecs())
 
 
 def _publish_activity(committer_id, activity_id, activity_type):
@@ -647,17 +652,6 @@ def _publish_activity(committer_id, activity_id, activity_type):
     _change_activity_status(
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PUBLIC,
         '%s published.' % activity_type)
-
-    # Add contribution dates to the owners and editors. This assumes that the
-    # only people who could possibly make commits to the exploration are those
-    # listed explicitly as owners/editors of the exploration.
-    activity_rights = _get_activity_rights(activity_type, activity_id)
-    for owner_id in activity_rights.owner_ids:
-        user_services.update_first_contribution_msec_if_not_set(
-            owner_id, utils.get_current_time_in_millisecs())
-    for editor_id in activity_rights.editor_ids:
-        user_services.update_first_contribution_msec_if_not_set(
-            editor_id, utils.get_current_time_in_millisecs())
 
 
 def _unpublish_activity(committer_id, activity_id, activity_type):
@@ -770,7 +764,8 @@ def set_private_viewability_of_exploration(
 
 
 def publish_exploration(committer_id, exploration_id):
-    """Publish an exploration. Commits changes.
+    """This is called by the publish_exploration_and_update_user_profiles
+    function in exp_services.py. It publishes an exploration and commits changes.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
@@ -834,7 +829,9 @@ def release_ownership_of_collection(committer_id, collection_id):
 
 
 def publish_collection(committer_id, collection_id):
-    """Publish an collection. Commits changes.
+    """This is called by the publish_collection_and_update_user_profiles
+    function in collection_services.py. It publishes an collection and commits
+    changes.
 
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.
