@@ -83,7 +83,7 @@ var checkCommands = function(yargs, argv, numRequired) {
 };
 // There should atleast be minimum of two defined tasks,
 // one being the default task('.').
-checkCommands(yargs, argv, 2);
+checkCommands(yargs, argv, 1);
 
 var isMinificationNeeded = (argv.minify == 'True');
 var frontendDependencies = manifest.dependencies.frontend;
@@ -161,12 +161,8 @@ gulp.task('watch', function() {
   }
 });
 
-// This takes all default task which must be run when start.sh is started.
+// This task starts google app engine development server.
 // TODO(Barnabas Makonda): check if files are already generated and if so
 // do not build.
 gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
 
-// Gulp requires a default task to be defined and is executed if
-// no command/action/task is defined or whenever server is started.
-// Example: gulp [<args>]
-gulp.task('.', []);
