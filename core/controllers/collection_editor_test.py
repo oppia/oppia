@@ -79,10 +79,9 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
 
-
         # Check that it is possible to access a page with specific version number
         response = self.testapp.get(
-            '%s/%s?v=1' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID))
+            '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
      

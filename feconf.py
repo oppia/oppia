@@ -282,7 +282,6 @@ DEMO_COLLECTIONS = {
 
 # TODO(sll): Add all other URLs here.
 COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
-COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor/data'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'

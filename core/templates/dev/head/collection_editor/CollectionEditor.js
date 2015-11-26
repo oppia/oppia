@@ -19,10 +19,10 @@
  */
 
 oppia.constant(
-  'COLLECTION_EDITOR_DATA_URL', '/collection_editor/data/<collection_id>');
+  'COLLECTION_DATA_URL', '/collectionhandler/data/<collection_id>');
 
-oppia.controller('CollectionEditor', ['$scope', 'collectionEditorDataService', 'warningsData',
-	function($scope, collectionEditorDataService, warningsData){
+oppia.controller('CollectionEditor', ['$scope', 'CollectionDataService', 'warningsData',
+	function($scope, collectionDataService, warningsData){
 
   $scope.collection = null;
   $scope.collectionId = '';
@@ -38,13 +38,13 @@ oppia.controller('CollectionEditor', ['$scope', 'collectionEditorDataService', '
   }
 
   // Load the collection to be edited.
-  collectionEditorDataService.loadCollection(
-      $scope.collectionId, function(collection) {
-    $scope.collection = collection;
-    $scope.isCollectionLoaded = true;
-  }, function(error, collectionId) {
-    // TODO(mgowano): Handle not being able to load the collection.
-    warningsData.addWarning(
-      error || 'There was an error loading the collection.');
+  collectionDataService.loadCollection($scope.collectionId).then(
+    function(collection) {
+      $scope.collection = collection;
+      $scope.isCollectionLoaded = true;
+    }, function(error, collectionId) {
+      // TODO(mgowano): Handle not being able to load the collection.
+      warningsData.addWarning(
+        error || 'There was an error loading the collection.');
   });
 }]);

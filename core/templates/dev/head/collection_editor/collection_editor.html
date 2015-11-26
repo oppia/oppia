@@ -40,7 +40,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
-    {{ include_js_file('collection_editor/CollectionEditorDataService.js') }}
+    {{ include_js_file('domain/collection/CollectionDataService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}

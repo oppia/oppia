@@ -63,34 +63,3 @@ class CollectionEditorPage(CollectionEditorHandler):
         })
 
         self.render_template('collection_editor/collection_editor.html')
-
-
-class CollectionHandler(CollectionEditorHandler):
-    """Page with editor data for a single collection."""
-
-    PAGE_NAME_FOR_CSRF = 'collection_editor'
-
-    def _get_collection_data(self, collection_id, version=None):
-        """Returns a description of the given collection."""
-        try:
-            collection = collection_services.get_collection_by_id(collection_id, version=version)
-        except:
-            raise self.PageNotFoundException
-
-        collection_dict = {
-            'collection_id': collection.id,
-            'title': collection.title,
-            'category': collection.category,
-            'objective': collection.objective,
-            'nodes': [collection_node.to_dict() for collection_node in collection.nodes]
-        }
-        return collection_dict
-
-    def get(self, collection_id):
-        """Gets the data for the exploration overview page."""
-    
-        version = self.request.get('v', default_value=None)
-
-        self.values.update(
-            self._get_collection_data(collection_id, version=version))
-        self.render_json(self.values)
