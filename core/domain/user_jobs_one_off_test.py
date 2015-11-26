@@ -93,22 +93,19 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def test_null_case(self):
         """Tests the case where user has no created or edited explorations."""
 
-        user_a_contributions_model = user_models.UserContributionsModel.get(
-            self.user_a_id)
-        self.assertEqual(user_a_contributions_model.created_explorations, [])
-        self.assertEqual(user_a_contributions_model.edited_explorations, [])
         self._run_one_off_job()
-        self.assertEqual(user_a_contributions_model.created_explorations, [])
-        self.assertEqual(user_a_contributions_model.edited_explorations, [])
+        user_a_contributions_model = user_models.UserContributionsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_a_contributions_model, None)
 
     def test_created_exp(self):
         """Tests the case where user has created (and therefore edited) 
         an exploration."""
 
+        self._run_one_off_job()
+
         user_b_contributions_model = user_models.UserContributionsModel.get(
             self.user_b_id)
-
-        self._run_one_off_job()
 
         self.assertEqual(user_b_contributions_model.created_explorations[0], self.EXP_ID_1)
         self.assertEqual(user_b_contributions_model.edited_explorations[0], self.EXP_ID_1)
@@ -116,9 +113,9 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def test_edited_exp(self):
         """Tests the case where user has an edited exploration."""
 
+        self._run_one_off_job()
         user_c_contributions_model = user_models.UserContributionsModel.get(
             self.user_c_id)
-        self._run_one_off_job()
         self.assertEqual(user_c_contributions_model.edited_explorations[0],
             self.EXP_ID_1)
 
@@ -126,6 +123,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         """Tests the case where user has an edited exploration, and edits
         it again making sure it is not duplicated."""
 
+        self._run_one_off_job()
         user_d_contributions_model = user_models.UserContributionsModel.get(
             self.user_d_id)
         self.assertEqual(len(user_d_contributions_model.edited_explorations),

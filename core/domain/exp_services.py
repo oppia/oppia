@@ -853,6 +853,7 @@ def save_new_exploration(committer_id, exploration):
         'category': exploration.category,
     }])
     user_services.add_created_exploration(committer_id, exploration.id)
+    user_services.add_edited_exploration(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):

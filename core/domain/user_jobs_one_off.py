@@ -27,7 +27,7 @@ from core.platform import models
 
 class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for creating and populating UserContributionsModels for 
-    all registered users.
+    all registered users that have contributed.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -35,6 +35,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+
         split_id = item.id.split("-")
         yield (item.committer_id, {
             'version_number': split_id[1],
@@ -54,12 +55,13 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
             if edit['version_number'] == '1':
                 created_explorations.append(edit['exploration_id'])
 
-        if isinstance(user_models.UserContributionsModel.get(key), user_models.UserContributionsModel):
+
+        if user_services.get_user_contributions(key, strict=False) is not None:
             user_services.update_user_contributions(key, list(set(created_explorations)),
                 list(set(edited_explorations)))
 
-        else:                
-            user_contributions = user_services.create_user_contributions(key, list(set(created_explorations)), list(set(edited_explorations)))
+        else:        
+            user_services.create_user_contributions(key, list(set(created_explorations)), list(set(edited_explorations)))
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and

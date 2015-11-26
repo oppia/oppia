@@ -253,7 +253,7 @@ def _create_user(user_id, email):
         user_id, email,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
-    create_user_contributions(user_id, [], [])
+    #create_user_contributions(user_id, [], [])
     return user_settings
 
 
@@ -427,7 +427,7 @@ def get_user_contributions(user_id, strict=False):
 
 def create_user_contributions(user_id, created_explorations, edited_explorations):
     """Creates a new UserContributionsModel and returns the domain object."""
-    user_contributions = get_user_contributions(user_id)
+    user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions is not None:
         raise Exception('User %s already exists.' % user_id)
     else:
@@ -441,7 +441,7 @@ def create_user_contributions(user_id, created_explorations, edited_explorations
 def update_user_contributions(user_id, created_explorations, edited_explorations):
     """Updates an existing UserContributionsModel with new calculated contributions"""
     
-    user_contributions = get_user_contributions(user_id)
+    user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions is None:
         raise Exception('User %s contributions does not exist.' % user_id)
 
@@ -455,7 +455,7 @@ def add_created_exploration(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of created explorations."""
 
-    user_contributions = get_user_contributions(user_id)
+    user_contributions = get_user_contributions(user_id, strict=False)
 
     if user_contributions is None:
         raise Exception('User %s contributions does not exist.' % user_id)
@@ -469,7 +469,7 @@ def add_edited_exploration(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of edited explorations."""
 
-    user_contributions = get_user_contributions(user_id)
+    user_contributions = get_user_contributions(user_id, strict=False)
 
     if user_contributions is None:
         raise Exception('User %s contributions does not exist.' % user_id)

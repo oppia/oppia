@@ -66,6 +66,7 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
+
 class UserContributionsModel(base_models.BaseModel):
     """Tracks statistics for a particular user.
 
