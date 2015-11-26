@@ -81,8 +81,7 @@ var checkCommands = function(yargs, argv, numRequired) {
     process.exit();
   }
 };
-// There should atleast be minimum of two defined tasks,
-// one being the default task('.').
+// There should atleast be minimum of one defined task.
 checkCommands(yargs, argv, 1);
 
 var isMinificationNeeded = (argv.minify == 'True');
