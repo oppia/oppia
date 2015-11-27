@@ -71,12 +71,11 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        _VERSION_DELIMITER = '-'
         _COMMIT_TYPE_REVERT = 'revert'
         if (item.commit_type != _COMMIT_TYPE_REVERT and
             item.committer_id not in feconf.SYSTEM_USER_IDS):
                 snapshot_id = item.id
-                exp_id = snapshot_id[:snapshot_id.rfind(_VERSION_DELIMITER)]
+                exp_id = item.get_unversioned_instance_id()
                 yield (exp_id, item.committer_id)
 
     @staticmethod
