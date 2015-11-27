@@ -155,15 +155,22 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var noteChoicesElt = $element.find('.oppia-music-input-note-choices');
         var staffContainerElt = $element.find('.oppia-music-input-staff');
 
-        // Sets grid positions and initializes the view after staff has loaded.
-        setTimeout(function() {
-          $scope.init();
-        }, 1000);
+        // Staff has to be reinitialized every time that the staff is resized or
+        // displayed. The staffContainerElt and all subsequent measurements
+        // must be recalculated in order for the grid to work properly.
+        $scope.reinitStaff = function() {
+          $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
+          setTimeout(function() {
+            $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
+            $scope.init();
+          }, 20);
+        };
 
-        // When page is resized, all notes are removed from sequence and staff
-        // and then repainted in their new corresponding positions.
-        $(window).resize(function() {
-          $scope.init();
+        // When page is in the smaller one card format, reinitialize staff after
+        // the user navigates to the Interaction Panel. Otherwise the dimensions
+        // for the staff will be incorrectly calculated.
+        $scope.$on('showInteraction', function(event) {
+          $scope.reinitStaff();
         });
 
         // Creates draggable notes and droppable staff.
@@ -198,6 +205,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         initializeNoteSequence($scope.initialSequence);
         $scope.init();
+
+        // Sets grid positions, displays the staff and note,
+        // and then initializes the view after staff has loaded.
+        $(document).ready(function() {
+          $scope.reinitStaff();
+        });
 
         // Initial notes are are placed on the staff at the
         // start of the exploration and can be removed by the learner.

@@ -82,6 +82,7 @@
         RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
         /* A list of functions to be called when an exploration is completed. */
         POST_COMPLETION_HOOKS: [],
+        SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
 
@@ -113,7 +114,7 @@
                     <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <img src="/images/general/menu.png">
                     </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
@@ -242,13 +243,21 @@
         </div>
       </div>
 
-    {% include 'language_footer.html' %}
-    {% if DEV_MODE %}
-      <div class="oppia-dev-mode">
-        Development Mode
-      </div>
-    {% endif %}
+      {% include 'language_footer.html' %}
+      {% if DEV_MODE %}
+        <div class="oppia-dev-mode">
+          Development Mode
+        </div>
+      {% endif %}
 
+      {% if SITE_FEEDBACK_FORM_URL %}
+        <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
+           class="oppia-site-feedback oppia-transition-200">
+          <i class="material-icons md-18" style="vertical-align: middle;">&#xE87F;</i>
+            Site Feedback
+          </i>
+        </a>
+      {% endif %}
     {% endif %}
 
     {% include 'directives.html' %}

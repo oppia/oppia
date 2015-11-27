@@ -49,29 +49,15 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 30000,
+  allScriptsTimeout: 120000,
 
   // ----- What tests to run -----
   //
-  // Spec patterns are relative to the location of this config.
-  specs: [
-    'protractor/*.js'
-  ],
-
-  // Patterns to exclude.
-  exclude: [],
-
-  /*
-
-  // Alternatively, suites may be used. When run without a command line parameter,
-  // all suites will run. If run with --suite=smoke, only the patterns matched
-  // by that suite will run.
+  // When run without a command line parameter, all suites will run. If run
+  // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    smoke: 'spec/smoketests/*.js',
-    full: 'spec/*.js'
+    full: 'protractor/*.js'
   },
-
-  */
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -133,6 +119,12 @@ exports.config = {
       }));
     }
 
+    var SpecReporter = require('jasmine-spec-reporter');
+    jasmine.getEnv().addReporter(new SpecReporter({
+      displayStacktrace: 'all',
+      displaySpecDuration: true
+    }));
+
     // Set a wide enough window size for the navbar in the gallery to display
     // fully.
     browser.driver.manage().window().setSize(1200, 1000);
@@ -155,7 +147,7 @@ exports.config = {
   // Jasmine and Cucumber are fully supported as a test and assertion framework.
   // Mocha has limited beta support. You will need to include your own
   // assertion framework if working with mocha.
-  framework: 'jasmine',
+  framework: 'jasmine2',
 
   // ----- Options to be passed to minijasminenode -----
   //
@@ -170,7 +162,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 600000
+    defaultTimeoutInterval: 1200000
   },
 
   // ----- Options to be passed to mocha -----

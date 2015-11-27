@@ -19,7 +19,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-python scripts/install_third_party.py
+$PYTHON_CMD scripts/install_third_party.py
 
 # Check if the OS supports node.js installation; if not, return to the calling
 # script.
@@ -42,19 +42,19 @@ if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.33-darwin-x64
+      NODE_FILE_NAME=node-v4.2.1-darwin-x64
     else
-      NODE_FILE_NAME=node-v0.10.33-darwin-x86
+      NODE_FILE_NAME=node-v4.2.1-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.33-linux-x64
+      NODE_FILE_NAME=node-v4.2.1-linux-x64
     else
-      NODE_FILE_NAME=node-v0.10.33-linux-x86
+      NODE_FILE_NAME=node-v4.2.1-linux-x86
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v0.10.33/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -100,7 +100,7 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
     sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
-    python $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
+    $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
@@ -109,4 +109,55 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
+fi
+
+echo Checking whether node-jscs dependencies are installed
+if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
+  echo installing node-jscs
+  $NPM_INSTALL jscs@2.3.0
+fi
+
+# Note that numpy needs to be built after downloading. If you are having
+# trouble, please ensure that you have pip installed (see "Installing Oppia"
+# on the Oppia developers' wiki page).
+echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
+  echo Installing numpy
+  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
+fi
+
+echo Checking whether gulp is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp" ]; then
+  echo installing gulp
+  $NPM_INSTALL gulp@3.9.0
+fi
+
+echo Checking whether through2 is installed
+if [ ! -d "$NODE_MODULE_DIR/through2" ]; then
+  echo installing through2
+  $NPM_INSTALL through2@2.0.0
+fi
+
+echo Checking whether yargs is installed
+if [ ! -d "$NODE_MODULE_DIR/yargs" ]; then
+  echo installing yargs
+  $NPM_INSTALL yargs@3.29.0
+fi
+
+echo Checking whether gulp-concat is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp-concat" ]; then
+  echo installing gulp-concat
+  $NPM_INSTALL gulp-concat@2.6.0
+fi
+
+echo Checking whether gulp-minify-css is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp-minify-css" ]; then
+  echo installing gulp-minify-css
+  $NPM_INSTALL gulp-minify-css@1.2.1
+fi
+
+echo Checking whether gulp-util is installed
+if [ ! -d "$NODE_MODULE_DIR/gulp-util" ]; then
+  echo installing gulp-util
+  $NPM_INSTALL gulp-util@3.0.7
 fi

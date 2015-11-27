@@ -79,7 +79,7 @@ describe('Interaction validator', function() {
       var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please specify what Oppia should do in answer group 2.'
+        'message': 'Please specify what Oppia should do in answer group 2.'
       }]);
     });
 
@@ -98,7 +98,7 @@ describe('Interaction validator', function() {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please add feedback for the user if they are to return ' +
+        'message': 'Please add feedback for the user if they are to return ' +
           'to the same state again.'
       }]);
     });
@@ -120,13 +120,13 @@ describe('Interaction validator', function() {
         badAnswerGroups, badOutcome, currentState);
       expect(warnings).toEqual([{
           'type': WARNING_TYPES.ERROR,
-          'message': 'please specify what Oppia should do in answer group 2.'
+          'message': 'Please specify what Oppia should do in answer group 2.'
         }, {
           'type': WARNING_TYPES.ERROR,
-          'message': 'please specify what Oppia should do in answer group 3.'
+          'message': 'Please specify what Oppia should do in answer group 3.'
         }, {
           'type': WARNING_TYPES.ERROR,
-          'message': 'please add feedback for the user if they are to return ' +
+          'message': 'Please add feedback for the user if they are to return ' +
             'to the same state again.'
         }
       ]);
@@ -191,7 +191,7 @@ describe('Interaction validator', function() {
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'the button text should not be empty.'
+        'message': 'The button text should not be empty.'
       }]);
 
       expect(function() {
@@ -206,7 +206,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'only the default outcome is necessary for a continue ' +
+        'message': 'Only the default outcome is necessary for a continue ' +
           'interaction.'
       }]);
     });
@@ -216,7 +216,7 @@ describe('Interaction validator', function() {
       var warnings = validator(currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please specify what Oppia should do after the button is' +
+        'message': 'Please specify what Oppia should do after the button is' +
           ' clicked.'
       }]);
     });
@@ -251,11 +251,11 @@ describe('Interaction validator', function() {
         currentState, customizationArguments, answerGroups, badOutcome);
       expect(warnings).toEqual([{
           'type': WARNING_TYPES.ERROR,
-          'message': 'please make sure end exploration interactions do not ' +
+          'message': 'Please make sure end exploration interactions do not ' +
             'have any answer groups.'
         }, {
           'type': WARNING_TYPES.ERROR,
-          'message': 'please make sure end exploration interactions do not ' +
+          'message': 'Please make sure end exploration interactions do not ' +
             'have a default outcome.'
         }
       ]);
@@ -291,7 +291,7 @@ describe('Interaction validator', function() {
       var warnings = validator(currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'at most 8 explorations can be recommended.'
+        'message': 'At most 8 explorations can be recommended.'
       }]);
     });
   });
@@ -340,7 +340,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'note that only graphs with at most 50 nodes are supported.'
+        'message': 'Note that only graphs with at most 50 nodes are supported.'
       }]);
     });
 
@@ -352,7 +352,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'the learner cannot edit edge weights for an unweighted ' +
+        'message': 'The learner cannot edit edge weights for an unweighted ' +
           'graph.'
       }]);
     });
@@ -365,7 +365,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'the learner cannot edit vertex labels for an unlabeled ' +
+        'message': 'The learner cannot edit vertex labels for an unlabeled ' +
           'graph.'
       }]);
     });
@@ -420,7 +420,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please add an image for the learner to click on.'
+        'message': 'Please add an image for the learner to click on.'
       }]);
     });
 
@@ -433,7 +433,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure the image region strings are nonempty.'
+        'message': 'Please ensure the image region strings are nonempty.'
       }]);
 
       regions[0].label = 'SecondLabel';
@@ -442,7 +442,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure the image region strings are unique.'
+        'message': 'Please ensure the image region strings are unique.'
       }]);
 
       regions[0].label = '@';
@@ -451,7 +451,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'the image region strings should consist of characters ' +
+        'message': 'The image region strings should consist of characters ' +
           'from [A-Za-z0-9].'
       }]);
 
@@ -462,7 +462,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please specify at least one image region to click on.'
+        'message': 'Please specify at least one image region to click on.'
       }]);
     });
 
@@ -473,7 +473,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'the region label \'FakeLabel\' in rule 1 in group 1 is ' +
+        'message': 'The region label \'FakeLabel\' in rule 1 in group 1 is ' +
           'invalid.'
       }]);
     });
@@ -483,14 +483,14 @@ describe('Interaction validator', function() {
       var warnings = validator(currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please add a rule to cover what should happen if none of ' +
+        'message': 'Please add a rule to cover what should happen if none of ' +
           'the given regions are clicked.'
       }]);
       warnings = validator(
         currentState, customizationArguments, [], badOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please add a rule to cover what should happen if none of ' +
+        'message': 'Please add a rule to cover what should happen if none of ' +
           'the given regions are clicked.'
       }]);
     });
@@ -545,10 +545,10 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
           'type': WARNING_TYPES.CRITICAL,
-          'message': 'please pick a starting latitude between -90 and 90.'
+          'message': 'Please pick a starting latitude between -90 and 90.'
         }, {
           'type': WARNING_TYPES.CRITICAL,
-          'message': 'please pick a starting longitude between -180 and 180.'
+          'message': 'Please pick a starting longitude between -180 and 180.'
         }
       ]);
 
@@ -559,10 +559,10 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
           'type': WARNING_TYPES.CRITICAL,
-          'message': 'please pick a starting latitude between -90 and 90.'
+          'message': 'Please pick a starting latitude between -90 and 90.'
         }, {
           'type': WARNING_TYPES.CRITICAL,
-          'message': 'please pick a starting longitude between -180 and 180.'
+          'message': 'Please pick a starting longitude between -180 and 180.'
         }
       ]);
     });
@@ -576,11 +576,11 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
           'type': WARNING_TYPES.CRITICAL,
-          'message': 'please ensure that rule 1 in group 1 refers to a valid ' +
+          'message': 'Please ensure that rule 1 in group 1 refers to a valid ' +
             'distance.'
         }, {
           'type': WARNING_TYPES.CRITICAL,
-          'message': 'please ensure that rule 2 in group 1 refers to a valid ' +
+          'message': 'Please ensure that rule 2 in group 1 refers to a valid ' +
             'distance.'
         }
       ]);
@@ -635,7 +635,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure that the max allowed count is not less than the min count.'
+        'message': 'Please ensure that the max allowed count is not less than the min count.'
       }]);
     });
 
@@ -651,7 +651,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure that you have enough choices to reach the max count.'
+        'message': 'Please ensure that you have enough choices to reach the max count.'
       }]);
     });
 
@@ -668,7 +668,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure that you have enough choices to reach the min count.'
+        'message': 'Please ensure that you have enough choices to reach the min count.'
       }]);
     });
 
@@ -681,7 +681,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure the choices are nonempty.'
+        'message': 'Please ensure the choices are nonempty.'
       }]);
     });
 
@@ -694,7 +694,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure the choices are unique.'
+        'message': 'Please ensure the choices are unique.'
       }]);
     });
 
@@ -765,7 +765,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure the choices are nonempty.'
+        'message': 'Please ensure the choices are nonempty.'
       }]);
 
       customizationArguments.choices.value[0] = 'Option 2';
@@ -774,7 +774,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure the choices are unique.'
+        'message': 'Please ensure the choices are unique.'
       }]);
     });
 
@@ -786,7 +786,7 @@ describe('Interaction validator', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure rule 1 in group 1 refers to a valid choice.'
+        'message': 'Please ensure rule 1 in group 1 refers to a valid choice.'
       }]);
 
       goodAnswerGroups[0].rule_specs[0].inputs.x = 1;
@@ -797,7 +797,7 @@ describe('Interaction validator', function() {
       // duplicated in their input choice.
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.CRITICAL,
-        'message': 'please ensure rule 2 in group 1 is not equaling the same ' +
+        'message': 'Please ensure rule 2 in group 1 is not equaling the same ' +
           'multiple choice option as another rule.'
       }]);
     });
@@ -817,14 +817,14 @@ describe('Interaction validator', function() {
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please clarify the default outcome so it is less ' +
+        'message': 'Please clarify the default outcome so it is less ' +
           'confusing to the user.'
       }]);
       warnings = validator(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
         'type': WARNING_TYPES.ERROR,
-        'message': 'please clarify the default outcome so it is less ' +
+        'message': 'Please clarify the default outcome so it is less ' +
           'confusing to the user.'
       }]);
     });

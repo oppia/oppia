@@ -66,17 +66,21 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
 
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
+oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
+
 // Global utility methods.
 oppia.controller('Base', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
     '$translate', '$translatePartialLoader', 'warningsData', 'activeInputData',
+    'LABEL_FOR_CLEARING_FOCUS',
     function($scope, $http, $rootScope, $window, $timeout, $document, $log,
              $translate, $translatePartialLoader, warningsData,
-             activeInputData) {
+             activeInputData, LABEL_FOR_CLEARING_FOCUS) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
+  $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
   $translatePartialLoader.addPart('sidenav');
   $translatePartialLoader.addPart('topnav');

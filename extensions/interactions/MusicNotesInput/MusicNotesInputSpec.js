@@ -68,32 +68,37 @@ describe('MusicNotesInput interaction', function() {
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 71,
         offset: 0,
-        noteId: 'note_id_0'
+        noteId: 'note_id_0',
+        noteStart: {'num': 1, 'den': 1}
       });
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 71,
           offset: 0,
-          noteId: 'note_id_0'
+          noteId: 'note_id_0',
+          noteStart: {'num': 1, 'den': 1}
         }
       }]);
 
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 72,
         offset: 0,
-        noteId: 'note_id_1'
+        noteId: 'note_id_1',
+        noteStart: {'num': 1, 'den': 1}
       });
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 71,
           offset: 0,
-          noteId: 'note_id_0'
+          noteId: 'note_id_0',
+          noteStart: {'num': 1, 'den': 1}
         }
       }, {
         note: {
           baseNoteMidiNumber: 72,
           offset: 0,
-          noteId: 'note_id_1'
+          noteId: 'note_id_1',
+          noteStart: {'num': 1, 'den': 1}
         }
       }]);
     });
@@ -129,14 +134,16 @@ describe('MusicNotesInput interaction', function() {
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 81,
         offset: 0,
-        noteId: 'note_id_1'
+        noteId: 'note_id_1',
+        noteStart: {'num': 1, 'den': 1}
       });
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 81,
           offset: 0,
-          noteId: 'note_id_1'
+          noteId: 'note_id_1',
+          noteStart: {'num': 1, 'den': 1}
         }
       }]);
     });
@@ -148,14 +155,16 @@ describe('MusicNotesInput interaction', function() {
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 64,
         offset: 0,
-        noteId: 'note_id_0'
+        noteId: 'note_id_0',
+        noteStart: {'num': 1, 'den': 1}
       });
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_1');
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 64,
           offset: 0,
-          noteId: 'note_id_0'
+          noteId: 'note_id_0',
+          noteStart: {'num': 1, 'den': 1}
         }
       }]);
     });

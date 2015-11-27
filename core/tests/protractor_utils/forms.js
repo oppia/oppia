@@ -101,17 +101,17 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = function(elem) {
   // Set focus in the RTE.
-  elem.element(by.model('html')).click();
+  elem.all(by.model('html')).first().click();
 
   var _appendContentText = function(text) {
-    elem.element(by.model('html')).sendKeys(text);
+    elem.all(by.model('html')).first().sendKeys(text);
   };
   var _clickToolbarButton = function(buttonName) {
     elem.element(by.css('[name="' + buttonName + '"]')).click();
   };
   var _clearContent = function() {
-    expect(elem.element(by.model('html')).isPresent()).toBe(true);
-    elem.element(by.model('html')).clear();
+    expect(elem.all(by.model('html')).first().isPresent()).toBe(true);
+    elem.all(by.model('html')).first().clear();
   };
 
   return {
@@ -178,8 +178,8 @@ var RichTextEditor = function(elem) {
       general.waitForSystem();
 
       // Refocus back into the RTE.
-      elem.element(by.model('html')).click();
-      element(by.model('html')).sendKeys(protractor.Key.END);
+      elem.all(by.model('html')).first().click();
+      elem.all(by.model('html')).first().sendKeys(protractor.Key.END);
     },
   };
 };
@@ -253,40 +253,44 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 };
 
 var MultiSelectEditor = function(elem) {
-  return {
-    setValues: function(texts) {
-      // Open the dropdown menu.
-      elem.element(by.css('.dropdown-toggle')).click();
+  // This function checks that the options corresponding to the given texts
+  // have the expected class name, and then toggles those options accordingly.
+  var _toggleElementStatusesAndVerifyExpectedClass = function(
+      texts, expectedClassBeforeToggle) {
+    // Open the dropdown menu.
+    elem.element(by.css('.dropdown-toggle')).click();
 
-      // Clear all existing choices.
-      elem.element(by.css('.dropdown-menu'))
-          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
-        return selectedElem;
-      }).then(function(selectedElements) {
-        for (var i = selectedElements.length - 1; i >= 0; i--) {
-          selectedElements[i].click();
-        }
-
-        // Now select the new choices.
-        var selectedIndexes = [];
-        elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
-          return choiceElem.getText().then(function(choiceText) {
-            return texts.indexOf(choiceText) !== -1;
-          });
-        }).then(function(filteredElements) {
-          if (filteredElements.length !== texts.length) {
-            throw 'Could not select all elements. Values requested: ' + texts + '. ' +
-              'Found ' + filteredElements.length + ' matching elements.';
-          }
-
-          for (var i = 0; i < filteredElements.length; i++) {
-            filteredElements[i].click();
-          }
-
-          // Close the dropdown menu at the end.
-          elem.element(by.css('.dropdown-toggle')).click();
-        });
+    elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
+      return choiceElem.getText().then(function(choiceText) {
+        return texts.indexOf(choiceText) !== -1;
       });
+    }).then(function(filteredElements) {
+      if (filteredElements.length !== texts.length) {
+        throw (
+          'Could not toggle element selection. Values requested: ' + texts +
+          '. Found ' + filteredElements.length + ' matching elements.');
+      }
+
+      for (var i = 0; i < filteredElements.length; i++) {
+        // Check that, before toggling, the element is in the correct state.
+        expect(filteredElements[i].getAttribute('class')).toMatch(
+          expectedClassBeforeToggle);
+        filteredElements[i].click();
+      }
+
+      // Close the dropdown menu at the end.
+      elem.element(by.css('.dropdown-toggle')).click();
+    });
+  };
+
+  return {
+    selectValues: function(texts) {
+      _toggleElementStatusesAndVerifyExpectedClass(
+        texts, 'protractor-test-deselected');
+    },
+    deselectValues: function(texts) {
+      _toggleElementStatusesAndVerifyExpectedClass(
+        texts, 'protractor-test-selected');
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       // Open the dropdown menu.
@@ -478,12 +482,12 @@ var CodeMirrorChecker = function(elem) {
    */
   function _compareTextAndHighlightingFromLine(
       currentLineNumber, scrollTo, compareDict) {
-    // The general.scrollElementIntoView() function sometimes does not make
-    // codemirror load additional divs, so this is used to scroll the text in
-    // codemirror to a point scrollTo pixels from the top of the text or the
-    // bottom of the text if scrollTo is too large.
+    // This is used to scroll the text in codemirror to a point scrollTo pixels
+    // from the top of the text or the bottom of the text if scrollTo is too
+    // large.
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) + ");");
+    general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
           .then(function(lineNumber) {

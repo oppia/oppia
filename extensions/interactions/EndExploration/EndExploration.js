@@ -28,16 +28,21 @@ oppia.directive('oppiaInteractiveEndExploration', [
       templateUrl: 'interaction/EndExploration',
       controller: [
           '$scope', '$http', '$attrs', '$q', 'urlService',
-          'explorationContextService', 'PAGE_CONTEXT',
+          'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
           function(
             $scope, $http, $attrs, $q, urlService,
-            explorationContextService, PAGE_CONTEXT) {
+            explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
         $scope.isIframed = urlService.isIframed();
-        $scope.isInEditorPreviewMode = (
+        $scope.isInEditorPage = (
           explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+        $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
+          explorationContextService.getEditorTabContext() ===
+            EDITOR_TAB_CONTEXT.PREVIEW);
         $scope.invalidExpIds = [];
         $scope.recommendedExplorationIds = [];
         $scope.recommendedExplorationSummaries = [];
+        $scope.collectionId = GLOBALS.collectionId;
+        $scope.collectionTitle = GLOBALS.collectionTitle;
 
         var authorRecommendationsDeferred = $q.defer();
         var authorRecommendationsPromise = authorRecommendationsDeferred.promise;
@@ -57,7 +62,9 @@ oppia.directive('oppiaInteractiveEndExploration', [
               if (explorationSummary) {
                 authorRecommendedExplorationSummaries.push(explorationSummary);
               } else {
-                $scope.invalidExpIds.push(authorRecommendedExplorationIds[index]);
+                if ($scope.isInEditorPage) {
+                  $scope.invalidExpIds.push(authorRecommendedExplorationIds[index]);
+                }
                 authorRecommendedExplorationIds.splice(index, 1);
               }
             });
@@ -70,12 +77,15 @@ oppia.directive('oppiaInteractiveEndExploration', [
           authorRecommendationsDeferred.resolve();
         }
 
-        if (!$scope.isInEditorPreviewMode) {
+        if (!$scope.isInEditorPage) {
           authorRecommendationsPromise.then(function() {
             var explorationId = explorationContextService.getExplorationId();
-            $http({
-              method: 'GET',
-              url: '/explorehandler/recommendations/' + explorationId
+            var recommendationsUrlParams = {};
+            if ($scope.collectionId) {
+              recommendationsUrlParams.collection_id = $scope.collectionId;
+            }
+            $http.get('/explorehandler/recommendations/' + explorationId, {
+              params: recommendationsUrlParams
             }).success(function(data) {
               var allRecommendedExplorationIds = data.recommended_exp_ids;
               var systemRecommendedExplorationIds = [];
@@ -138,5 +148,26 @@ oppia.directive('oppiaShortResponseEndExploration', [
       scope: {},
       templateUrl: 'shortResponse/EndExploration'
     };
+  }
+]);
+
+oppia.directive('oppiaEndExplorationRecommendedExplorations', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {
+        recommendedExplorationIds: '=',
+        recommendedExplorationSummaries: '=',
+        collectionId: '='
+      },
+      templateUrl: 'interaction/EndExploration/RecommendedExplorations',
+      controller: ['$scope', function($scope) {
+        if ($scope.collectionId) {
+          $scope.collectionSuffix = '?collection_id=' + $scope.collectionId;
+        } else {
+          $scope.collectionSuffix = '';
+        }
+      }]
+    }
   }
 ]);

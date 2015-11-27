@@ -12,6 +12,8 @@
       GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
       GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
+      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+      GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
     </script>
   {% endif %}
 
@@ -22,10 +24,10 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCard">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
+      <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;">
-      <img src="/third_party/static/material-design-icons-1.0.1/ic_info_white_48dp.png" class="oppia-navbar-breadcrumb-icon">
+      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -60,6 +62,7 @@
 
   {% include 'components/exploration_embed_button.html' %}
   {% include 'components/ratings.html' %}
+  {% include 'components/profile_link.html' %}
 
   <script type="text/ng-template" id="popover/feedback">
     <feedback-popup></feedback-popup>
@@ -91,11 +94,11 @@
             <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
           </li>
           <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-            <img tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top"
-              src="/third_party/static/material-design-icons-1.0.1/ic_group_black_48dp.png">
+            <i class="material-icons" tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
             <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
               tooltip="<[ContributorUsername]>" tooltip-placement="top">
-              <img class="oppia-contributors-circle" ng-src="/images/avatar/user_mint_48px.png" alt="">
+              <profile-link-image username="ContributorUsername">
+              </profile-link-image>
             </li>
 
             <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
@@ -162,7 +165,7 @@
 
               <li>
                 <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="<['I18N_PLAYER_EMBED_TOOLTIP' | translate]>" tooltip-placement="top">
-                  <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
+                  <i class="material-icons md-18" style="color: black;">&#xE157;</i>
                 </a>
               </li>
             </ul>
@@ -174,7 +177,7 @@
         <h3 ng-if="failedLoadingData" translate="I18N_PLAYER_LOAD_ERROR"></h3>
       </div>
       <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
-        <img src="/third_party/static/material-design-icons-1.0.1/ic_close_white_48dp.png">
+        <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
       </button>
     </md-card>
   </script>
@@ -183,7 +186,7 @@
     <div style="min-width: 250px;">
       <div ng-show="!feedbackSubmitted">
         <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png">
+          <i class="material-icons md-18">&#xE5CD;</i>
         </button>
         <br>
 
@@ -216,8 +219,10 @@
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}
+    {{ include_js_file('player/AnswerClassificationService.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
+    {{ include_js_file('components/profileLink.js')}}
     {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>

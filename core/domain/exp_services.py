@@ -32,7 +32,6 @@ import pprint
 import StringIO
 import zipfile
 
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -396,7 +395,8 @@ def export_to_zip_file(exploration_id, version=None):
 def export_states_to_yaml(exploration_id, version=None, width=80):
     """Returns a python dictionary of the exploration, whose keys are state
     names and values are yaml strings representing the state contents with
-    lines wrapped at 'width' characters."""
+    lines wrapped at 'width' characters.
+    """
     exploration = get_exploration_by_id(exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
@@ -456,6 +456,9 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_FALLBACKS):
+                    state.update_interaction_fallbacks(change.new_value)
             elif change.cmd == exp_domain.CMD_ADD_GADGET:
                 exploration.add_gadget(change.gadget_dict, change.panel)
             elif change.cmd == exp_domain.CMD_RENAME_GADGET:
@@ -800,7 +803,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
-    event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
@@ -837,7 +839,6 @@ def _create_exploration(
         param_changes=exploration.param_change_dicts,
     )
     model.commit(committer_id, commit_message, commit_cmds)
-    event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     exploration.version += 1
     create_exploration_summary(exploration.id)
 
@@ -989,8 +990,7 @@ def compute_summary_of_exploration(exploration):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated
-    )
+        exploration_model_created_on, exploration_model_last_updated)
 
     return exp_summary
 

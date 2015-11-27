@@ -42,8 +42,10 @@ def require_user_id_else_redirect_to_homepage(handler):
     return test_login
 
 
-class ViewProfilePage(base.BaseHandler):
-    """The (view-only) profile page."""
+class ProfilePage(base.BaseHandler):
+    """The world-viewable profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'profile'
 
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
@@ -56,11 +58,33 @@ class ViewProfilePage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
-            'user_username': username,
-            'user_bio': user_settings.user_bio,
-            'user_pic_data_url': user_settings.profile_picture_data_url
+            'PROFILE_USERNAME': username,
         })
         self.render_template('profile/profile.html')
+
+
+class ProfileHandler(base.BaseHandler):
+    """Provides data for the profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'profile'
+
+    def get(self, username):
+        """Handles GET requests."""
+        if not username:
+            raise self.PageNotFoundException
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if not user_settings:
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'user_bio': user_settings.user_bio,
+            'first_contribution_datetime': (
+                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
+                if user_settings.first_contribution_datetime else None),
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+        })
+        self.render_json(self.values)
 
 
 class PreferencesPage(base.BaseHandler):
@@ -119,6 +143,8 @@ class PreferencesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
 
+        self.render_json({})
+
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
@@ -130,6 +156,20 @@ class ProfilePictureHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
             'profile_picture_data_url': user_settings.profile_picture_data_url
+        })
+        self.render_json(self.values)
+
+
+class ProfilePictureHandlerByUsername(base.BaseHandler):
+    """ Provides the dataURI of the profile picture of the specified user,
+    or None if no user picture is uploaded for the user with that ID."""
+    def get(self, username):
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.PageNotFoundException
+        user_settings = user_services.get_user_settings(user_id)
+        self.values.update({
+            'profile_picture_data_url_for_username': user_settings.profile_picture_data_url
         })
         self.render_json(self.values)
 

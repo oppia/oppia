@@ -115,9 +115,12 @@ describe('Gallery view', function() {
     // At the start, no categories are selected.
     gallery.expectCurrentCategorySelectionToBe([]);
 
+    // Reset the language selector.
+    gallery.deselectLanguages([LANGUAGE_ENGLISH]);
+
     testCases.forEach(function(testCase) {
-      gallery.setLanguages(testCase.languages);
-      gallery.setCategories(testCase.categories);
+      gallery.selectLanguages(testCase.languages);
+      gallery.selectCategories(testCase.categories);
 
       for (var explorationTitle in ALL_PUBLIC_EXPLORATION_TITLES) {
         if (testCase.expectVisible.indexOf(explorationTitle) !== -1) {
@@ -127,8 +130,8 @@ describe('Gallery view', function() {
         }
       }
 
-      gallery.setLanguages([]);
-      gallery.setCategories([]);
+      gallery.deselectLanguages(testCase.languages);
+      gallery.deselectCategories(testCase.categories);
     });
 
     // Private explorations are not shown in the gallery.

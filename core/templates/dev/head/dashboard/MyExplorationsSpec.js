@@ -24,19 +24,19 @@ describe('MyExplorations controller', function() {
   describe('MyExplorations', function() {
     var scope, ctrl, $httpBackend;
     var explorationsList = [{
-      id: 'private_exp_id',
       category: 'Private category',
-      status: 'private',
-      title: 'Private exploration',
+      id: 'private_exp_id',
       num_open_threads: 0,
-      num_total_threads: 0
+      num_total_threads: 0,
+      status: 'private',
+      title: 'Private exploration'
     }, {
-      id: 'featured_exp_id',
       category: 'Featured category',
-      status: 'publicized',
-      title: 'Featured exploration',
+      id: 'featured_exp_id',
       num_open_threads: 2,
-      num_total_threads: 3
+      num_total_threads: 3,
+      status: 'publicized',
+      title: 'Featured exploration'
     }];
 
     beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
@@ -49,11 +49,11 @@ describe('MyExplorations controller', function() {
       scope = $rootScope.$new();
       ctrl = $controller('MyExplorations', {
         $scope: scope,
-        warningsData: null,
         createExplorationButtonService: {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
-        }
+        },
+        warningsData: null
       });
     }));
 

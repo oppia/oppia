@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
@@ -200,7 +201,10 @@ urls = [
         galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
     get_redirect_route(
-        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
+        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
+    get_redirect_route(
+        r'/profilehandler/data/<username>', profile.ProfileHandler,
+        'profile_handler'),
     get_redirect_route(
         r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
@@ -209,6 +213,9 @@ urls = [
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
         'profle_picture_handler'),
+    get_redirect_route(
+        r'/preferenceshandler/profile_picture_by_username/<username>', profile.ProfilePictureHandlerByUsername,
+        'profile_picture_handler_by_username'),
     get_redirect_route(
         r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
     get_redirect_route(
@@ -325,6 +332,13 @@ urls = [
     get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
+        collection_viewer.CollectionPage, 'collection_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
+        collection_viewer.CollectionDataHandler, 'collection_data_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

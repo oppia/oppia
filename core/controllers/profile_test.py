@@ -16,10 +16,13 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
+
 from core.domain import exp_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class SignupTest(test_utils.GenericTestBase):
@@ -218,3 +221,95 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 user_services.get_email_preferences(self.EDITOR_ID),
                 {'can_receive_email_updates': False})
+
+
+class ProfileLinkTests(test_utils.GenericTestBase):
+
+    USERNAME = 'abc123'
+    EMAIL = 'abc123@gmail.com'
+    PROFILE_PIC_URL = '/preferenceshandler/profile_picture_by_username/'
+
+    def test_get_profile_picture_invalid_username(self):
+        response = self.testapp.get(
+            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME), expect_errors=True
+        )
+        self.assertEqual(response.status_int, 404)
+
+    def test_get_profile_picture_valid_username(self):
+        self.signup(self.EMAIL, self.USERNAME)
+        response_dict = self.get_json(
+            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
+        )
+        self.assertEqual(
+            response_dict['profile_picture_data_url_for_username'],
+            None)
+
+
+class ProfileDataHandlerTests(test_utils.GenericTestBase):
+
+    def test_profile_data_is_independent_of_currently_logged_in_user(self):
+        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'user_bio', 'data': 'My new editor bio'},
+            csrf_token=csrf_token)
+        self.logout()
+
+        self.signup(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'user_bio', 'data': 'My new viewer bio'},
+            csrf_token=csrf_token)
+        self.logout()
+
+        # Viewer looks at editor's profile page.
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json(
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+        self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.logout()
+
+        # Editor looks at their own profile page.
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_json(
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+        self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.logout()
+
+        # Looged-out user looks at editor's profile page/
+        response = self.get_json(
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+        self.assertEqual(response['user_bio'], 'My new editor bio')
+
+
+class FirstContributionDateTests(test_utils.GenericTestBase):
+
+    USERNAME = 'abc123'
+    EMAIL = 'abc123@gmail.com'
+
+    def test_contribution_datetime(self):
+        #Test the contribution date shows up correctly as nonexist.
+        self.signup(self.EMAIL, self.USERNAME)
+        self.login(self.EMAIL)
+        self.user_id = self.get_user_id_from_email(self.EMAIL)
+        response_dict = self.get_json(
+            '/profilehandler/data/%s' % self.USERNAME)
+        self.assertEqual(response_dict['first_contribution_datetime'], None)
+
+        #Update the first_contribution_datetime to the current datetime.
+        current_datetime = datetime.datetime.utcnow()
+        user_services.update_first_contribution_datetime(
+            self.user_id,current_datetime)
+
+        #Test the contribution date correctly changes to set date time.
+        response_dict = self.get_json(
+            '/profilehandler/data/%s' % self.USERNAME)
+        self.assertEqual(
+            response_dict['first_contribution_datetime'],
+            utils.get_time_in_millisecs(current_datetime))

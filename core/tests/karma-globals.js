@@ -16,7 +16,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var GLOBALS = {};
+var GLOBALS = {
+  INTERACTION_SPECS: {},
+  GADGET_SPECS: {},
+  PANEL_SPECS: {}
+};
 
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an

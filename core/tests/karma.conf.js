@@ -6,13 +6,13 @@ module.exports = function(config) {
       'core/tests/karma-globals.js',
       'third_party/static/jquery-2.1.1/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
-      'third_party/static/angularjs-1.3.13/angular.js',
-      'third_party/static/angularjs-1.3.13/angular-animate.js',
-      'third_party/static/angularjs-1.3.13/angular-aria.js',
-      'third_party/static/angularjs-1.3.13/angular-resource.js',
-      'third_party/static/angularjs-1.3.13/angular-sanitize.js',
-      'third_party/static/angularjs-1.3.13/angular-mocks.js',
-      'third_party/static/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.js',
+      'third_party/static/angularjs-1.4.7/angular.js',
+      'third_party/static/angularjs-1.4.7/angular-animate.js',
+      'third_party/static/angularjs-1.4.7/angular-aria.js',
+      'third_party/static/angularjs-1.4.7/angular-resource.js',
+      'third_party/static/angularjs-1.4.7/angular-sanitize.js',
+      'third_party/static/angularjs-1.4.7/angular-mocks.js',
+      'third_party/static/ui-bootstrap-0.13.4/ui-bootstrap-tpls-0.13.4.js',
       'third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
@@ -58,9 +58,12 @@ module.exports = function(config) {
       // accident, that directory will not have coverage statistics generated
       // for it, which is easily fixed.
       'core/templates/dev/head/admin/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/collection_player/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/css/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/dashboard/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/domain/collection/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/domain/utilities/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/error/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
@@ -90,6 +93,7 @@ module.exports = function(config) {
     browsers: ['Chrome_Travis'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
+    browserNoActivityTimeout: 60000,
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {

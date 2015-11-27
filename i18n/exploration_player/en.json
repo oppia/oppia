@@ -20,7 +20,7 @@
   "I18N_PLAYER_TAGS_TOOLTIP": "Tags",
   "I18N_PLAYER_EMBED_TOOLTIP": "Embed",
   "I18N_PLAYER_LEAVE_FEEDBACK_CARD": "Leave feedback for this card",
-  "I18N_PLAYER_PREVIOUS_RESPONSES": "Previous responses",
+  "I18N_PLAYER_PREVIOUS_RESPONSES": "Previous responses (<[previousResponses]>)",
   "I18N_PLAYER_CONTINUE_BUTTON": "Continue",
   "I18N_PLAYER_RATE_EXPLORATION": "Learned something new? How would you rate this exploration?",
   "I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Card #",
@@ -28,5 +28,8 @@
   "I18N_PLAYER_RECOMMEND_EXPLORATIONS_ERROR": "Error:",
   "I18N_PLAYER_RECOMMEND_EXPLORATIONS_WRONG_ID": "no published exploration found with ID <[expId]>",
   "I18N_PLAYER_RETURN_TO_GALLERY": "Return to gallery",
-  "I18N_PLAYER_RETURN_TO_EDITOR": "Return to editor"
+  "I18N_PLAYER_RETURN_TO_EDITOR": "Return to editor",
+  "I18N_PLAYER_RETURN_TO_COLLECTION": "Return to <[collectionTitle]>",
+  "I18N_PLAYER_FORWARD": "Forward",
+  "I18N_PLAYER_BACK": "Back"
 }

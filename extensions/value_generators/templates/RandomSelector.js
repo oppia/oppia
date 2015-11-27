@@ -17,7 +17,7 @@ oppia.directive('randomSelector', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return VALUE_GENERATOR_TEMPLATES_URL + scope.generatorId;
+        return '/value_generator_handler/' + scope.generatorId;
       };
       $compile(element.contents())(scope);
     },

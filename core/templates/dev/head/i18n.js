@@ -40,11 +40,7 @@ var defaultTranslations = {
   'I18N_SIDEBAR_ADDITIONAL_LINK_SITE_FEEDBACK': 'Site Feedback',
   'I18N_TOPNAV_SIGN_IN': 'Sign in',
   'I18N_SIGNUP_REGISTRATION': 'Registration',
-  'I18N_SIGNUP_LOADING': 'Loading',
-  'I18N_INTERACTIONS_PROOFS_QUESTION_STR_NO_ASSUMPTION': 'Prove <[target]>.',
-  'I18N_INTERACTIONS_PROOFS_QUESTION_STR_ASSUMPTIONS': 'Assuming <[assumptions]>; prove <[target]>.',
-  'I18N_INTERACTIONS_PROOFS_SUBMIT': 'Submit',
-  'I18N_INTERACTIONS_PROOFS_POSSIBLE_LINES': 'Possible lines',
+  'I18N_SIGNUP_LOADING': 'Loading'
 };
 
 oppia.constant('SUPPORTED_LANGUAGES', {
@@ -77,12 +73,21 @@ oppia.config([
     availableLanguageKeys.push(prop);
     availableLanguageKeysMap[prop + '*'] = prop;
   };
+  // TODO(mili): fix the FOUC with fallback language 'en' outside the gallery.
+  // 1 - To avoid FOUC in the gallery, a fallback language must be set with the
+  // defaultTranslations.
+  // 2 - After calling $translatePartialLoader.addPart(), for example in the
+  // interactions, the fallback language files are not loaded. Also, it
+  // generates FOUC.
+  // Because 1 and 2, I created a new "fallback language" until the problem is
+  // solved in a new release.
+  availableLanguageKeysMap['en_default'] = 'en_default';
   availableLanguageKeysMap['*'] = 'en';
   $translateProvider.registerAvailableLanguageKeys(
     availableLanguageKeys, availableLanguageKeysMap);
 
-  $translateProvider.translations('en', defaultTranslations);
-  $translateProvider.fallbackLanguage('en');
+  $translateProvider.translations('en_default', defaultTranslations);
+  $translateProvider.fallbackLanguage('en_default');
 
   $translateProvider.determinePreferredLanguage();
   $translateProvider.useCookieStorage();
