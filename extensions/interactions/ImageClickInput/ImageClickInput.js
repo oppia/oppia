@@ -27,8 +27,14 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/ImageClickInput',
-      controller: ['$scope', '$element', '$attrs',
-          function($scope, $element, $attrs) {
+      controller: ['$scope', '$element', '$attrs', '$translate',
+                   '$translatePartialLoader',
+          function($scope, $element, $attrs, $translate,
+                   $translatePartialLoader) {
+
+        $translatePartialLoader.addPart('interactions');
+        $translate.refresh();
+
         var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.imageAndRegionsWithValue);
         $scope.highlightRegionsOnHover =
