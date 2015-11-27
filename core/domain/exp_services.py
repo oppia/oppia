@@ -35,6 +35,7 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -851,6 +852,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+    user_services.add_created_exploration(committer_id, exploration.id)
+    user_services.add_edited_exploration(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -952,6 +955,7 @@ def update_exploration(
 
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id)
+    user_services.add_edited_exploration(committer_id, exploration_id)
 
 
 def create_exploration_summary(exploration_id):

@@ -34,7 +34,7 @@ MAX_USERNAME_LENGTH = 50
 class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
-            self, user_id, email, username=None, last_agreed_to_terms=None,
+            self, user_id, email, username=None, last_agreed_to_terms=None, 
             last_started_state_editor_tutorial=None,
             profile_picture_data_url=None, user_bio='',
             first_contribution_datetime=None,
@@ -223,6 +223,7 @@ def _save_user_settings(user_settings):
         user_bio=user_settings.user_bio,
         first_contribution_datetime=user_settings.first_contribution_datetime,
         preferred_language_codes=user_settings.preferred_language_codes,
+
     ).put()
 
 
@@ -251,6 +252,7 @@ def _create_user(user_id, email):
         user_id, email,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
+    create_user_contributions(user_id, [], [])
     return user_settings
 
 
@@ -388,3 +390,98 @@ def get_email_preferences(user_id):
             if email_preferences_model is None
             else email_preferences_model.site_updates)
     }
+
+
+class UserContributions(object):
+    """Value object representing a user's contributions."""
+    def __init__(
+            self, user_id, created_explorations, edited_explorations):
+        self.user_id = user_id
+        self.created_explorations = created_explorations
+        self.edited_explorations = edited_explorations
+
+    def validate(self):
+        if not isinstance(self.user_id, basestring):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+
+
+def get_user_contributions(user_id, strict=False):
+    """Gets domain object representing the contributions for the given user_id.
+
+    If the given user_id does not exist, returns None.
+    """
+    model = user_models.UserContributionsModel.get(user_id, strict=False)
+    if model is not None:
+        result = UserContributions(
+            model.id, model.created_explorations, model.edited_explorations)
+    else:
+        result = None
+    return result
+
+
+def create_user_contributions(user_id, created_explorations, edited_explorations):
+    """Creates a new UserContributionsModel and returns the domain object."""
+    user_contributions = get_user_contributions(user_id, strict=False)
+    if user_contributions is not None:
+        raise Exception('User %s already exists.' % user_id)
+    else:
+        user_contributions = UserContributions(
+            user_id, created_explorations, edited_explorations)
+        _save_user_contributions(user_contributions)
+    return user_contributions
+
+
+def update_user_contributions(user_id, created_explorations, edited_explorations):
+    """Updates an existing UserContributionsModel with new calculated contributions"""
+    
+    user_contributions = get_user_contributions(user_id, strict = False)
+    if not user_contributions:
+        raise Exception('User %s contributions does not exist.' % user_id)
+
+    user_contributions.created_explorations = created_explorations
+    user_contributions.edited_explorations = edited_explorations
+
+    _save_user_contributions(user_contributions)
+
+
+def add_created_exploration(user_id, exploration_id):
+    """Adds an exploration_id to a user_id's UserContributionsModel collection
+    of created explorations."""
+
+    user_contributions = get_user_contributions(user_id, strict=False)
+
+    if not user_contributions:
+        create_user_contributions(user_id, [exploration_id], [])
+    elif exploration_id not in user_contributions.created_explorations:
+        user_contributions.created_explorations.append(exploration_id)
+        user_contributions.created_explorations.sort()
+        _save_user_contributions(user_contributions)
+
+
+def add_edited_exploration(user_id, exploration_id):
+    """Adds an exploration_id to a user_id's UserContributionsModel collection
+    of edited explorations."""
+
+    user_contributions = get_user_contributions(user_id, strict=False)
+
+    if not user_contributions:
+        create_user_contributions(user_id, [], [exploration_id])
+
+    elif exploration_id not in user_contributions.edited_explorations:
+        user_contributions.edited_explorations.append(exploration_id)
+        user_contributions.edited_explorations.sort()
+        _save_user_contributions(user_contributions)
+
+
+def _save_user_contributions(user_contributions):
+    """Commits a user contributions object to the datastore."""
+
+    user_contributions.validate()
+    user_models.UserContributionsModel(
+        id=user_contributions.user_id,
+        created_explorations=user_contributions.created_explorations,
+        edited_explorations=user_contributions.edited_explorations,
+    ).put()
