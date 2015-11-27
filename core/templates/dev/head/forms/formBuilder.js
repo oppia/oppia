@@ -1197,8 +1197,13 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
     controller: [
-        '$scope', '$filter', '$timeout', 'parameterSpecsService', 'focusService',
-        function($scope, $filter, $timeout, parameterSpecsService, focusService) {
+        '$scope', '$filter', '$timeout', '$translate',
+        '$translatePartialLoader', 'parameterSpecsService', 'focusService',
+        function($scope, $filter, $timeout, $translate,
+          $translatePartialLoader, parameterSpecsService, focusService) {
+      $translatePartialLoader.addPart('form_builder');
+      $translate.refresh()
+
       $scope.hasLoaded = false;
       $scope.isUserCurrentlyTyping = false;
       $scope.hasFocusedAtLeastOnce = false;
@@ -1224,21 +1229,18 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       };
 
       // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-      $scope.getMinValue = function() {
-        for (var i = 0; i < $scope.validators().length; i++) {
-          if ($scope.validators()[i].id === 'is_at_least') {
-            return $scope.validators()[i].min_value;
+      validators = $scope.validators()
+      $scope.minValue = null;
+      $scope.maxValue = null;
+      if (validators) {
+        for (var i = 0; i < validators.length; i++) {
+          if (validators[i].id === 'is_at_least') {
+            $scope.minValue = validators[i].min_value;
+          } else if (validators[i].id === 'is_at_most') {
+            $scope.maxValue = validators[i].max_value;
           }
         }
-      };
-
-      $scope.getMaxValue = function() {
-        for (var i = 0; i < $scope.validators().length; i++) {
-          if ($scope.validators()[i].id === 'is_at_most') {
-            return $scope.validators()[i].max_value;
-          }
-        }
-      };
+      }
 
       $scope.onKeypress = function(evt) {
         if (evt.keyCode === 13) {

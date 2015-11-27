@@ -1,0 +1,6 @@
+{
+  "I18N_FORMS_TYPE_NUMBER": "Ingresa un número",
+  "I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL": "Por favor ingresa un número decimal válido.",
+  "I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Por favor ingresa un número que sea mayor o igual que <[minValue]>.",
+  "I18N_FORMS_TYPE_NUMBER_AT_MOST": "Por favor ingresa un número que sea menor o igual que <[maxValue]>."
+}
