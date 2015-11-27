@@ -25,6 +25,7 @@ from core.platform import models
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
 
+
 class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for creating and populating UserContributionsModels for 
     all registered users that have contributed.
@@ -39,7 +40,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
         if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
 
-            split_id = item.id.split("-")
+            split_id = item.id.rsplit("-")
             yield (item.committer_id, {
                 'version_number': split_id[1],
                 'exploration_id': split_id[0]
@@ -52,25 +53,27 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, version_and_exp_ids):
 
-        created_explorations = []
-        edited_explorations = []
+        created_explorations = set()
+        edited_explorations = set()
 
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
 
         for edit in edits:
             if edit is not None:
-                edited_explorations.append(edit['exploration_id'])
+                edited_explorations.add(edit['exploration_id'])
                 if edit['version_number'] == '1':
-                    created_explorations.append(edit['exploration_id'])
+                    created_explorations.add(edit['exploration_id'])
 
-        print edited_explorations
-        #update or create contributions model
         if user_services.get_user_contributions(key, strict=False) is not None:
-            user_services.update_user_contributions(key, list(set(created_explorations)),
-                list(set(edited_explorations)))
+            user_services.update_user_contributions(
+                key, list(created_explorations), list(
+                    edited_explorations))
 
         else:        
-            user_services.create_user_contributions(key, list(set(created_explorations)), list(set(edited_explorations)))
+            user_services.create_user_contributions(
+                key, list(created_explorations), list(
+                    edited_explorations))
+
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and

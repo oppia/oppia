@@ -58,9 +58,12 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         super(UserContributionsOneOffJobTests, self).setUp()
 
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        """User A has no created OR edited, User B has one created, User 
-            C has one edited, User D edits an exploration previously
-            edited (check for no duplicates)."""
+        #User A has no created or edited explorations 
+        #User B has one created exploration 
+        #User C has one edited exploration 
+        # User D has created an exploration and then edited it. 
+        #(This is used to check that there are no duplicate 
+        #entries in the contribution lists.)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
@@ -69,26 +72,23 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
 
-
         self.save_new_valid_exploration(
-                self.EXP_ID_1, self.user_b_id, end_state_name='End')
+            self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        #generate an edit
         exp_services.update_exploration(self.user_c_id, self.EXP_ID_1, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-                }], 'Test edit')
-
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+            }], 'Test edit')
 
         self.save_new_valid_exploration(
-                self.EXP_ID_2, self.user_d_id, end_state_name='End')
+            self.EXP_ID_2, self.user_d_id, end_state_name='End')
 
         exp_services.update_exploration(self.user_d_id, self.EXP_ID_2, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-                }], 'Test edit')
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+            }], 'Test edit')
 
     def test_null_case(self):
         """Tests the case where user has no created or edited explorations."""
@@ -109,8 +109,10 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_b_contributions_model = user_models.UserContributionsModel.get(
             self.user_b_id)
 
-        self.assertEqual(user_b_contributions_model.created_explorations[0], self.EXP_ID_1)
-        self.assertEqual(user_b_contributions_model.edited_explorations[0], self.EXP_ID_1)
+        self.assertEqual(
+            user_b_contributions_model.created_explorations[0], self.EXP_ID_1)
+        self.assertEqual(user_b_contributions_model.edited_explorations[0], 
+            self.EXP_ID_1)
 
     def test_edited_exp(self):
         """Tests the case where user has an edited exploration."""
@@ -118,8 +120,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
         user_c_contributions_model = user_models.UserContributionsModel.get(
             self.user_c_id)
-        self.assertEqual(user_c_contributions_model.edited_explorations[0],
-            self.EXP_ID_1)
+        self.assertEqual(
+            user_c_contributions_model.edited_explorations[0], self.EXP_ID_1)
 
     def test_for_duplicates(self):
         """Tests the case where user has an edited exploration, and edits
@@ -128,9 +130,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
         user_d_contributions_model = user_models.UserContributionsModel.get(
             self.user_d_id)
-        self.assertEqual(len(user_d_contributions_model.edited_explorations),
-            1) 
-
+        self.assertEqual(
+            len(user_d_contributions_model.edited_explorations), 1) 
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):

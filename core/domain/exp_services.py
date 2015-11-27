@@ -34,8 +34,8 @@ import zipfile
 
 from core.domain import exp_domain
 from core.domain import fs_domain
-from core.domain import user_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
