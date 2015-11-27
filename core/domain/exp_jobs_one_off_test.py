@@ -308,11 +308,10 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         super(ExpSummariesContributorsOneOffJobTest, self).setUp()
 
     def test_contributors_for_valid_contribution(self):
-        """ Test that if only one committ is made, that the contributor
+        """Test that if only one commit is made, that the contributor
         list consists of that contributor's user id.
         """
         self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.login(self.EMAIL_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
         exploration = self.save_new_valid_exploration(
@@ -326,12 +325,11 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             [self.user_a_id], exploration_summary.contributor_ids)
 
     def test_repeat_contributors(self):
-        """ Test that if the same user makes more than one commit that changes
+        """Test that if the same user makes more than one commit that changes
         the content of an exploration, the user is only represented once in the
         list of contributors for that exploration.
         """
         self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.login(self.EMAIL_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
         # have one user make two commits
@@ -356,12 +354,11 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             [self.user_a_id], exploration_summary.contributor_ids)
 
     def test_contributors_with_only_reverts_not_counted(self):
-        """ Test that contributors who have only done reverts do not
+        """Test that contributors who have only done reverts do not
         have their user id appear in the contributor list.
         """
         # sign up two users
         self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.login(self.EMAIL_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
         self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
@@ -388,6 +385,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.assertNotIn(self.user_b_id, exploration_summary.contributor_ids)
 
     def test_nonhuman_committers_not_counted(self):
+        """Test that only human committers are counted as contributors.
+        """
         # create a commit with the system user id
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
@@ -398,7 +397,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # check that the system id was not added to the exploration's
         # contributor id's
         exploration_summary = exp_services.compute_summary_of_exploration(exploration)
-        self.assertNotIn(feconf.SYSTEM_COMMITTER_ID,
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID,
             exploration_summary.contributor_ids)
 
         # create a commit with the migration bot user id
@@ -414,8 +414,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # check that the migration bot id was not added to the exploration's
         # contributor id's
         exploration_summary = exp_services.compute_summary_of_exploration(exploration)
-        self.assertNotIn(feconf.MIGRATION_BOT_USERNAME,
-            exploration_summary.contributor_ids)
+        self.assertNotIn(
+            feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):

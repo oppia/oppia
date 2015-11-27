@@ -957,32 +957,18 @@ def update_exploration(
 def create_exploration_summary(exploration_id, committer_id=None):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
-    # update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an exploration's content)
-    if committer_id is not None:
-        if committer_id not in feconf.SYSTEM_USER_IDS:
-            exp_summary.contributor_ids = [committer_id]
+    exp_summary = compute_summary_of_exploration(exploration, committer_id)
     save_exploration_summary(exp_summary)
 
 
 def update_exploration_summary(exploration_id, committer_id=None):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
-    # update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an exploration's content)
-    if committer_id is not None:
-        if committer_id not in feconf.SYSTEM_USER_IDS:
-            contributor_id_set = set(exp_summary.contributor_ids)
-            contributor_id_set.add(committer_id)
-            exp_summary.contributor_ids = list(contributor_id_set)
+    exp_summary = compute_summary_of_exploration(exploration, committer_id)
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration, committer_id=None):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
     """
@@ -995,6 +981,14 @@ def compute_summary_of_exploration(exploration):
     else:
         ratings = feconf.get_empty_ratings()
         contributor_ids = []
+
+    # update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an exploration's content)
+    if (committer_id is not None and
+        committer_id not in feconf.SYSTEM_USER_IDS):
+            if committer_id not in contributor_ids:
+                contributor_ids.append(committer_id)
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
