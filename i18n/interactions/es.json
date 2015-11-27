@@ -23,5 +23,14 @@
   "I18N_INTERACTIONS_PROOFS_CORRECT_ANSWERS": "Correcto: <[answer]>",
   "I18N_INTERACTIONS_PROOFS_INCORRECT_ANSWERS": "Incorrecto: <[answer]>",
   "I18N_INTERACTIONS_PROOFS_QUESTION_STR_NO_ASSUMPTION": "Probar <[target]>.",
-  "I18N_INTERACTIONS_PROOFS_QUESTION_STR_ASSUMPTIONS": "Asumiendo <[assumptions]>; probar <[target]>."
+  "I18N_INTERACTIONS_PROOFS_QUESTION_STR_ASSUMPTIONS": "Asumiendo <[assumptions]>; probar <[target]>.",
+  "I18N_INTERACTIONS_MUSIC_PLAY": "Reproducir",
+  "I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Reproducir secuencia objetivo",
+  "I18N_INTERACTIONS_MUSIC_SUBMIT": "Enviar",
+  "I18N_INTERACTIONS_MUSIC_CLEAR": "Limpiar",
+  "I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Este conjunto está vacío.)",
+  "I18N_INTERACTIONS_SET_INPUT_SUBMIT": "Enviar",
+  "I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "Ninguna respuesta fue dada.",
+  "I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Ups, parece que tu conjunto tiene duplicados!",
+  "I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Agregar elemento"
 }
