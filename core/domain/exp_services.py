@@ -841,7 +841,7 @@ def _create_exploration(
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
     create_exploration_summary(
-        exploration.id, contributor_id_to_add=committer_id)
+        exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -952,7 +952,7 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
     # Update summary of changed exploration.
     update_exploration_summary(
-        exploration.id, contributor_id_to_add=committer_id)
+        exploration.id, committer_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -1077,7 +1077,7 @@ def revert_exploration(
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
 
     # Update the exploration summary, but since this is just a revert do
-    # not add the committer of the revert to the list of contributors
+    # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
 
 
