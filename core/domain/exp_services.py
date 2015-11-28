@@ -807,9 +807,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration.version += 1
 
-    # Update summary of changed exploration.
-    update_exploration_summary(exploration.id, committer_id=committer_id)
-
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
@@ -952,6 +949,8 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
+    # Update summary of changed exploration.
+    update_exploration_summary(exploration.id, committer_id=committer_id)
 
 
 def create_exploration_summary(exploration_id, committer_id=None):
@@ -970,7 +969,8 @@ def update_exploration_summary(exploration_id, committer_id=None):
 
 def compute_summary_of_exploration(exploration, committer_id=None):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it.
+    domain object and return it. Committer_id will be added to the list
+    of contributors for the exploration if the id is not a system id.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
