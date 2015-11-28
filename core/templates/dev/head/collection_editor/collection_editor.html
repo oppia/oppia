@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block maintitle %}
+  Oppia Editor
+{% endblock maintitle %}
+
+{% block subtitle %}
+  {{ title }}
+{% endblock subtitle %}
+
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+  </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+
+  {{dependencies_html}}
+{% endblock header_js %}
+
+
+{% block content %}
+  <div ng-controller="CollectionEditor">
+    <div ng-if="isCollectionLoaded">
+      <p>title: <[collection.title]></p>
+      <p>category: <[collection.category]></p>
+      <p>objective: <[collection.objective]></p>
+    </div>
+  </div>
+{% endblock content %}
+
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('collection_editor/CollectionEditor.js') }}
+    {{ include_js_file('domain/collection/CollectionDataService.js') }}
+    {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
+  </script>
+{% endblock footer_js %}

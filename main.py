@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
@@ -314,6 +315,13 @@ urls = [
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
+
+    get_redirect_route(
+        r'/collection_editor/data/<collection_id>', collection_viewer.CollectionDataHandler,
+        'collection_editor_data_fetcher'),
+    get_redirect_route(
+        r'/collection_editor/create/<collection_id>',
+        collection_editor.CollectionEditorPage, 'collection_editor_page'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
