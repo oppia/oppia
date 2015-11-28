@@ -31,5 +31,6 @@
   "I18N_PLAYER_RETURN_TO_EDITOR": "Return to editor",
   "I18N_PLAYER_RETURN_TO_COLLECTION": "Return to <[collectionTitle]>",
   "I18N_PLAYER_FORWARD": "Forward",
-  "I18N_PLAYER_BACK": "Back"
+  "I18N_PLAYER_BACK": "Back",
+  "I18N_PLAYER_CONTINUE_NEXT_CARD": "Continue to next card"
 }

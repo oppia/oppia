@@ -29,5 +29,8 @@
   "I18N_PLAYER_RECOMMEND_EXPLORATIONS_WRONG_ID": "no hay exploraciones publicadas con id <[expId]>",
   "I18N_PLAYER_RETURN_TO_GALLERY": "Volver a la galería",
   "I18N_PLAYER_RETURN_TO_EDITOR": "Volver al editor",
-  "I18N_PLAYER_RETURN_TO_COLLECTION": "Volver a <[collectionTitle]>"
+  "I18N_PLAYER_RETURN_TO_COLLECTION": "Volver a <[collectionTitle]>",
+  "I18N_PLAYER_FORWARD": "Forward",
+  "I18N_PLAYER_BACK": "Back",
+  "I18N_PLAYER_CONTINUE_NEXT_CARD": "Continue to next card"
 }
