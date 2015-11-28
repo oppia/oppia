@@ -119,7 +119,8 @@ oppia.factory('searchService', [
 // Construct a translation id from a name and a prefix.
 // Ex: 'categories', 'art' -> 'I18N_GALLERY_CATEGORIES_ART'
 var _get_i18n_id = function(prefix, name) {
-  i18n_id = 'I18N_GALLERY_'+ prefix.toUpperCase() + '_' + name.toUpperCase().replace(' ', '_');
+  var i18n_id = ('I18N_GALLERY_' + prefix.toUpperCase() + '_' +
+    name.toUpperCase().replace(' ', '_'));
   return i18n_id;
 }
 
@@ -137,18 +138,18 @@ oppia.controller('Gallery', [
       ratingVisibilityService) {
 
   $translate('I18N_GALLERY_PAGE_TITLE', 'I18N_GALLERY_PAGE_SUBTITLE')
-   .then(function (translatedPageTitle) {
+    .then(function (translatedPageTitle) {
     $rootScope.pageTitle = translatedPageTitle;
   });
 
   $rootScope.$on('$translateChangeSuccess', function (event, data) {
-   $rootScope.pageTitle = ($translate.instant('I18N_GALLERY_PAGE_TITLE') +
-     ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
+    $rootScope.pageTitle = (
+      $translate.instant('I18N_GALLERY_PAGE_TITLE') +
+      ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
   });
 
   $translatePartialLoader.addPart('gallery');
   $translate.refresh();
-
 
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
@@ -340,10 +341,11 @@ oppia.controller('SearchBar', [
       for (var i = 0; i < selectedItems.length; i++) {
         translatedItems.push($translate.instant(selectedItems[i]));
       };
-      $scope.selectionDetails[itemsType].description = translatedItems.join(', ');
+      $scope.selectionDetails[itemsType].description = translatedItems.join(
+        ', ');
     } else {
-      $scope.selectionDetails[itemsType].description = ('I18N_GALLERY_ALL_' +
-        itemsName.toUpperCase() + '_SELECTED');
+      $scope.selectionDetails[itemsType].description = (
+        'I18N_GALLERY_ALL_' + itemsName.toUpperCase() + '_SELECTED');
     }
   };
 

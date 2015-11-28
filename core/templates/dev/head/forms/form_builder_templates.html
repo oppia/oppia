@@ -134,7 +134,7 @@
     <span ng-form="floatForm">
       <span ng-if="!expressionMode">
         <input type="text" ng-model="$parent.localValue" class="form-control"
-               name="floatValue" placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>" ng-disabled="isDisabled()"
+               name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>" ng-disabled="isDisabled()"
                require-is-float apply-validation="validators()"
                focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
                ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">

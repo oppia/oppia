@@ -87,7 +87,7 @@ oppia.controller('Base', [
   $translatePartialLoader.addPart('errors');
   // TODO(milit): Find a more appropiate place for this.
   $translatePartialLoader.addPart('exploration_player');
-  $translate.refresh()
+  $translate.refresh();
 
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';

@@ -137,10 +137,10 @@ var ensurePageHasNoTranslationIds = function(selector) {
     function(promiseValue) {
       // First remove all the attributes translate and variables that are
       // not displayed
-      var reTranslateAttr = new RegExp('translate="I18N_', 'g');
-      var reNgVariable = new RegExp('<\\[\'I18N_', 'g');
-      expect(promiseValue.replace(reTranslateAttr, '')
-        .replace(reNgVariable, '')).not.toContain('I18N');
+      var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+      var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+      expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+        .replace(REGEX_NG_VARIABLE, '')).not.toContain('I18N');
     });
 };
 
