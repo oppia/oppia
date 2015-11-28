@@ -416,8 +416,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.compute_summary_of_exploration(
-            exploration, None)
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
 

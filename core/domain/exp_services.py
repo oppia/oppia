@@ -840,8 +840,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
-    create_exploration_summary(
-        exploration.id, committer_id)
+    create_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -951,8 +950,7 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
     # Update summary of changed exploration.
-    update_exploration_summary(
-        exploration.id, committer_id)
+    update_exploration_summary(exploration.id, committer_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -991,7 +989,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     # defined as humans who have made a positive (i.e. not just
     # a revert) change to an exploration's content).
     if (contributor_id_to_add is not None and
-        contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
+                contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
             if contributor_id_to_add not in contributor_ids:
                 contributor_ids.append(contributor_id_to_add)
 
