@@ -74,7 +74,6 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
         _COMMIT_TYPE_REVERT = 'revert'
         if (item.commit_type != _COMMIT_TYPE_REVERT and
             item.committer_id not in feconf.SYSTEM_USER_IDS):
-                snapshot_id = item.id
                 exp_id = item.get_unversioned_instance_id()
                 yield (exp_id, item.committer_id)
 
@@ -96,9 +95,8 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            snapshot_id = item.id
             yield (
-                snapshot_id[:snapshot_id.rfind('-')],
+                item.get_unversioned_instance_id(),
                 utils.get_time_in_millisecs(item.created_on))
 
     @staticmethod
