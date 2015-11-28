@@ -60,8 +60,9 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     def reduce(exp_id, list_of_exps):
         pass
 
+
 class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job that finds the user id's of the contributors
+    """One-off job that finds the user ids of the contributors
     (defined as any human who has made a 'positive' -- i.e.
     non-revert-- commit) for each exploration.
     """
@@ -73,7 +74,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
     def map(item):
         _COMMIT_TYPE_REVERT = 'revert'
         if (item.commit_type != _COMMIT_TYPE_REVERT and
-            item.committer_id not in feconf.SYSTEM_USER_IDS):
+                    item.committer_id not in feconf.SYSTEM_USER_IDS):
                 exp_id = item.get_unversioned_instance_id()
                 yield (exp_id, item.committer_id)
 

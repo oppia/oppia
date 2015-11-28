@@ -508,16 +508,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
 
-        # change param spec
+        # Change param spec.
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'param_specs',
                 'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
-            }],
-            '')
+            }], '')
 
-        # change title and category
+        # Change title and category.
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
@@ -527,8 +526,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'category',
                 'new_value': 'A new category'
-            }],
-            'Change title and category')
+            }], 'Change title and category')
 
         retrieved_exp_summary = exp_services.get_exploration_summary_by_id(
             self.EXP_ID)
@@ -2119,7 +2117,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            }],'Changed title.')
+            }], 'Changed title.')
 
         exploration_2 = self.save_new_valid_exploration(
             self.EXP_ID_2, self.ALBERT_ID)
@@ -2129,14 +2127,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
-            }],'Changed title to Albert1 title.')
+            }], 'Changed title to Albert1 title.')
 
         exp_services.update_exploration(
             self.ALBERT_ID, self.EXP_ID_2, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
-            }],'Changed title to Albert2 title.')
+            }], 'Changed title to Albert2 title.')
 
         exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
 

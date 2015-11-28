@@ -332,7 +332,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
-        # have one user make two commits
+        # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.user_a_id, title='Original Title')
         exploration_model = exp_models.ExplorationModel.get(
@@ -341,7 +341,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_model.commit(
             self.user_a_id, 'Changed title.', [])
 
-        # Run the job to compute the contributor id's.
+        # Run the job to compute the contributor ids.
         job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -349,7 +349,6 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Verify that the length of the contributor list is one, and that
         # the list contains the user who made these commits.
         exploration_summary = exp_services.compute_summary_of_exploration(exploration)
-        self.assertEqual(len(exploration_summary.contributor_ids), 1)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
 
@@ -357,12 +356,12 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         """Test that contributors who have only done reverts do not
         have their user id appear in the contributor list.
         """
-        # sign up two users
+        # Sign up two users.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
         self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-        # have one user make two commits
+        # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.user_a_id, title='Original Title')
         exploration_model = exp_models.ExplorationModel.get(
@@ -374,7 +373,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Have the second user revert version 2 to version 1
         exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 2, 1)
 
-        # Run the job to compute the contributor id's.
+        # Run the job to compute the contributor ids.
         job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -382,37 +381,37 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Verify that the committer list does not contain the user
         # who only reverted.
         exploration_summary = exp_services.compute_summary_of_exploration(exploration)
-        self.assertNotIn(self.user_b_id, exploration_summary.contributor_ids)
+        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
 
     def test_nonhuman_committers_not_counted(self):
         """Test that only human committers are counted as contributors.
         """
-        # create a commit with the system user id
+        # Create a commit with the system user id.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
-        # Run the job to compute the contributor id's.
+        # Run the job to compute the contributor ids.
         job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
-        # check that the system id was not added to the exploration's
-        # contributor id's
+        # Check that the system id was not added to the exploration's
+        # contributor ids.
         exploration_summary = exp_services.compute_summary_of_exploration(exploration)
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID,
             exploration_summary.contributor_ids)
 
-        # create a commit with the migration bot user id
+        # Create a commit with the migration bot user id.
         exploration_model = exp_models.ExplorationModel.get(
             self.EXP_ID, strict=True, version=None)
         exploration_model.title = 'New title'
         exploration_model.commit(
             feconf.MIGRATION_BOT_USERNAME, 'Changed title.', [])
-        # Run the job to compute the contributor id's.
+        # Run the job to compute the contributor ids.
         job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
-        # check that the migration bot id was not added to the exploration's
-        # contributor id's
+        # Check that the migration bot id was not added to the exploration's
+        # contributor ids.
         exploration_summary = exp_services.compute_summary_of_exploration(exploration)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
