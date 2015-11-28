@@ -54,7 +54,7 @@ describe('MusicNotesInput interaction', function() {
 
     it('loads the music staff template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
-      expect(elt.html()).toContain('Play Target Sequence');
+      expect(elt.html()).toContain('I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE');
       expect(elt.html()).toContain('playCurrentSequence()');
     });
 

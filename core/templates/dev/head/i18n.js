@@ -30,6 +30,7 @@ var defaultTranslations = {
   'I18N_SIGNUP_PAGE_TITLE': 'Oppia',
   'I18N_GALLERY_SEARCH_PLACEHOLDER': 'What are you curious about?',
   'I18N_GALLERY_ALL_LANGUAGES': 'All Languages',
+  'I18N_GALLERY_LANGUAGES_EN': 'English',
   'I18N_GALLERY_ALL_CATEGORIES': 'All Categories',
   'I18N_GALLERY_CREATE_EXPLORATION': 'Create exploration',
   'I18N_SIDEBAR_HOME_LINK': 'Home',

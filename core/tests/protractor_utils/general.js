@@ -131,10 +131,10 @@ var expect404Error = function() {
 
 // Checks no untranslated values are shown inside the given selector.
 var ensurePageHasNoTranslationIds = function(selector) {
-  element(by.css('.oppia-base-container')).then(function(value) {
-    // The use of the InnerHTML is hacky, but is faster than checking each
-    // individual component that contains text.
-    value.getInnerHtml().then(function(promiseValue) {
+  // The use of the InnerHTML is hacky, but is faster than checking each
+  // individual component that contains text.
+  element(by.css('.oppia-base-container')).getInnerHtml().then(
+    function(promiseValue) {
       // First remove all the attributes translate and variables that are
       // not displayed
       var reTranslateAttr = new RegExp('translate="I18N_', 'g');
@@ -142,7 +142,6 @@ var ensurePageHasNoTranslationIds = function(selector) {
       expect(promiseValue.replace(reTranslateAttr, '')
         .replace(reNgVariable, '')).not.toContain('I18N');
     });
-  });
 };
 
 exports.waitForSystem = waitForSystem;
@@ -163,10 +162,5 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
-<<<<<<< HEAD
-
-exports.scrollElementIntoView = scrollElementIntoView;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
-=======
->>>>>>> upstream/develop

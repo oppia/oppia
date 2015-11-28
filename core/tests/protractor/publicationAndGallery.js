@@ -169,7 +169,7 @@ describe('Gallery view', function() {
     general.ensurePageHasNoTranslationIds();
 
     // Filter gallery explorations
-    gallery.setLanguages([LANGUAGE_FRANCAIS]);
+    gallery.selectLanguages([LANGUAGE_FRANCAIS]);
     general.ensurePageHasNoTranslationIds();
   });
 
