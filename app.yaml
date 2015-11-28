@@ -1,14 +1,9 @@
 application: oppiaserver
-version: 2-0-1
+version: 2-0-3
 runtime: python27
 api_version: 1
 threadsafe: false
 instance_class: F4
-
-env_variables:
-  DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
-  # Modify the 'version' field above to match this.
-  OPPIA_VERSION: '2.0.1'
 
 builtins:
 - appstats: on
@@ -17,11 +12,6 @@ builtins:
 
 inbound_services:
 - warmup
-
-admin_console:
-  pages:
-  - name: Oppia Admin Page
-    url: /admin
 
 handlers:
 - url: /favicon.ico
@@ -67,6 +57,13 @@ handlers:
   static_dir: i18n/
   secure: always
   http_headers:
+    Cache-Control: 'no-cache'
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  http_headers:
+  # TODO(Sean Lip): Add cache when system to break cache during
+  # new release is figured out.
     Cache-Control: 'no-cache'
 - url: /extensions/gadgets/(.*)/static/(.*)
   static_files: extensions/gadgets/\1/static/\2
@@ -114,5 +111,7 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
+- name: numpy
+  version: '1.6.1'
 - name: webapp2
   version: '2.5.2'

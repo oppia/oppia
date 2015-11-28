@@ -16,7 +16,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var GLOBALS = {};
+var GLOBALS = {
+  INTERACTION_SPECS: {},
+  GADGET_SPECS: {},
+  PANEL_SPECS: {}
+};
 
 GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER =  function($provide, $translateProvider) {
   $provide.factory('customLoader', function ($q) {

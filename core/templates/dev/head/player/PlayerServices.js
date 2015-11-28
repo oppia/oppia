@@ -86,40 +86,6 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   };
 }]);
 
-// A service that, given an answer, classifies it and returns the corresponding
-// answerGroup.
-oppia.factory('answerClassificationService', [
-    '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
-  var _USE_CLIENT_SIDE_CLASSIFICATION = false;
-
-  return {
-    // Returns a promise with the corresponding ruleSpec.
-    getMatchingClassificationResult: function(explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: learnerParamsService.getAllParams(),
-          answer: answer
-        });
-      }
-    },
-    getMatchingEditorClassificationResult: function(
-        explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        // TODO(bhenning): Figure out a long-term solution for determining what
-        // params should be passed to the batch classifier.
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: {},
-          answer: answer
-        });
-      }
-    },
-  };
-}]);
-
 // A service that provides a number of utility functions for JS used by
 // individual player skins.
 // Note that this service is used both in the learner and the editor views.
@@ -159,12 +125,17 @@ oppia.factory('oppiaPlayerService', [
   var sessionId = null;
   var _isLoggedIn = GLOBALS.userIsLoggedIn;
   var _exploration = null;
+  var _collection_id = GLOBALS.collectionId;
 
   learnerParamsService.init({});
   var stateHistory = [];
   var _currentStateName = null;
   var answerIsBeingProcessed = false;
   var _viewerHasEditingRights = false;
+
+  // The number of submissions made so far for this state. Incremented
+  // immediately after every submit event.
+  var _numSubmitsForThisState = 0;
 
   var _updateStatus = function(newParams, newStateName) {
     learnerParamsService.init(newParams);
@@ -191,6 +162,10 @@ oppia.factory('oppiaPlayerService', [
       oldStateName !== newStateName ||
       INTERACTION_SPECS[oldStateInteractionId].display_mode ===
         INTERACTION_DISPLAY_MODE_INLINE);
+
+    if (oldStateName !== newStateName) {
+      _numSubmitsForThisState = 0;
+    }
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -229,7 +204,8 @@ oppia.factory('oppiaPlayerService', [
           params: learnerParamsService.getAllParams(),
           session_id: sessionId,
           state_name: newStateName,
-          version: version
+          version: version,
+          collection_id: _collection_id,
         });
       }
     }
@@ -388,6 +364,7 @@ oppia.factory('oppiaPlayerService', [
       learnerParamsService.init({});
       stateHistory = [];
       _currentStateName = null;
+      _numSubmitsForThisState = 0;
 
       if (_editorPreviewMode) {
         if (_exploration) {
@@ -526,17 +503,20 @@ oppia.factory('oppiaPlayerService', [
           answer, currentInteraction.id, currentInteraction.customization_args);
       }
     },
-    submitAnswer: function(answer, successCallback, delayParamUpdates) {
+    submitAnswer: function(
+        answer, interactionRulesService, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
+
+      _numSubmitsForThisState++;
 
       answerIsBeingProcessed = true;
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
       answerClassificationService.getMatchingClassificationResult(
-        _explorationId, oldState, answer
-      ).success(function(classificationResult) {
+        _explorationId, oldState, answer, false, interactionRulesService
+      ).then(function(classificationResult) {
         var outcome = classificationResult.outcome;
 
         if (!_editorPreviewMode) {
@@ -547,8 +527,26 @@ oppia.factory('oppiaPlayerService', [
             params: learnerParamsService.getAllParams(),
             version: version,
             old_state_name: _currentStateName,
-            rule_spec_string: classificationResult.rule_spec_string
+            answer_group_index: classificationResult.answerGroupIndex,
+            rule_spec_index: classificationResult.ruleSpecIndex
           });
+        }
+
+        // If this is a return to the same state, and the resubmission trigger
+        // kicks in, replace the dest, feedback and param changes with that
+        // of the trigger.
+        if (outcome.dest === _currentStateName) {
+          for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
+            var fallback = oldState.interaction.fallbacks[i];
+            if (fallback.trigger.trigger_type == 'NthResubmission' &&
+                fallback.trigger.customization_args.num_submits.value ===
+                  _numSubmitsForThisState) {
+              outcome.dest = fallback.outcome.dest;
+              outcome.feedback = fallback.outcome.feedback;
+              outcome.param_changes = fallback.outcome.param_changes;
+              break;
+            }
+          }
         }
 
         var newStateName = outcome.dest;
@@ -559,7 +557,7 @@ oppia.factory('oppiaPlayerService', [
           outcome, _exploration.states[newStateName], answer);
 
         if (nextStateData) {
-          nextStateData['state_name'] = newStateName;
+          nextStateData.state_name = newStateName;
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
@@ -710,7 +708,7 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
         var popoverChildElt = null;
         for (var i = 0; i < 10; i++) {
           elt = elt.parent();
-          if (elt.attr('template')) {
+          if (!angular.isUndefined(elt.attr('popover-template-popup'))) {
             popoverChildElt = elt;
             break;
           }
@@ -771,9 +769,9 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
   };
 }]);
 
-oppia.controller('InformationCard', ['$scope', '$modal', function ($scope, $modal) {
+oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal) {
 
-  $scope.showInformationCard = function () {
+  $scope.showInformationCard = function() {
 
     var modalInstance = $modal.open({
       animation: true,

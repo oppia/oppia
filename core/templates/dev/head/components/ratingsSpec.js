@@ -18,17 +18,16 @@
  * @author Jacob Davis
  */
 
-
 describe('Ratings from value directive', function() {
   var elt, scope, $httpBackend, compiledElem, ctrlScope;
 
   beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
   beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
-  beforeEach(inject(function($rootScope, $compile, _$httpBackend_, _$templateCache_) {
+  beforeEach(inject(function(
+      $rootScope, $compile, _$httpBackend_, $templateCache) {
     $httpBackend = _$httpBackend_;
 
-    $templateCache = _$templateCache_;
     var templatesHtml = $templateCache.get(
       'core/templates/dev/head/components/ratings.html');
     $compile(templatesHtml)($rootScope);
@@ -36,7 +35,8 @@ describe('Ratings from value directive', function() {
 
     scope = $rootScope.$new();
     elt = angular.element(
-      '<rating-from-value rating-value="5" is-editable="true"></rating-from-value>');
+      '<rating-from-value rating-value="5" is-editable="true">' +
+      '</rating-from-value>');
     compiledElem = $compile(elt)(scope);
     scope.$digest();
     ctrlScope = elt.isolateScope();
@@ -86,17 +86,16 @@ describe('Ratings from value directive', function() {
   });
 });
 
-
 describe('Ratings from frequencies directive', function() {
   var elt, scope, $httpBackend, ctrlScope;
 
   beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
   beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
-  beforeEach(inject(function($rootScope, $compile, _$httpBackend_, _$templateCache_) {
+  beforeEach(inject(function(
+      $rootScope, $compile, _$httpBackend_, $templateCache) {
     $httpBackend = _$httpBackend_;
 
-    $templateCache = _$templateCache_;
     var templatesHtml = $templateCache.get(
       'core/templates/dev/head/components/ratings.html');
     $compile(templatesHtml)($rootScope);
@@ -112,19 +111,30 @@ describe('Ratings from frequencies directive', function() {
 
   it('should not show an average rating if there are too few ratings',
       function() {
-    expect(
-      ctrlScope.computeAverageRating({'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
-    ).toBe(undefined);
+    expect(ctrlScope.computeAverageRating({
+      '1': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0
+    })).toBe(undefined);
 
-    expect(
-      ctrlScope.computeAverageRating({'1': 0, '2': 1, '3': 1, '4': 0, '5': 0})
-    ).toBe(undefined);
+    expect(ctrlScope.computeAverageRating({
+      '1': 0,
+      '2': 1,
+      '3': 1,
+      '4': 0,
+      '5': 0
+    })).toBe(undefined);
   });
 
   it('should compute average ratings correctly', function() {
-    expect(
-      ctrlScope.computeAverageRating(
-        {'1': 6, '2': 3, '3': 8, '4': 12, '5': 11})
-    ).toBe(3.475);
+    expect(ctrlScope.computeAverageRating({
+      '1': 6,
+      '2': 3,
+      '3': 8,
+      '4': 12,
+      '5': 11
+    })).toBe(3.475);
   });
 });

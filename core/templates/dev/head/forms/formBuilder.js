@@ -820,7 +820,7 @@ oppia.directive('textAngularRte', [
       $scope.isCustomizationModalOpen = false;
       var toolbarOptions = [
         ['bold', 'italics', 'underline'],
-        ['ol', 'ul'],
+        ['ol', 'ul', 'pre'],
         []
       ];
 
@@ -1312,9 +1312,20 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
         var CODING_MODE_NONE = 'none';
 
         $scope.codemirrorOptions = {
-          lineNumbers: true,
-          indentWithTabs: true,
-        }
+          // Convert tabs to spaces.
+          extraKeys: {
+            Tab: function(cm) {
+              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+              cm.replaceSelection(spaces);
+              // Move the cursor to the end of the selection.
+              var endSelectionPos = cm.getDoc().getCursor('head');
+              cm.getDoc().setCursor(endSelectionPos);
+            }
+          },
+          indentWithTabs: false,
+          lineNumbers: true
+        };
+
         if ($scope.isDisabled()) {
           $scope.codemirrorOptions.readOnly = 'nocursor';
         }

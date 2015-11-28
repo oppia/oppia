@@ -17,11 +17,13 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('nonnegativeIntEditor', function($compile, warningsData) {
+oppia.directive('nonnegativeIntEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'NonnegativeInt';
+        return OBJECT_EDITOR_URL_PREFIX + 'NonnegativeInt';
       };
       $compile(element.contents())(scope);
     },
@@ -42,4 +44,4 @@ oppia.directive('nonnegativeIntEditor', function($compile, warningsData) {
       }
     }
   };
-});
+}]);

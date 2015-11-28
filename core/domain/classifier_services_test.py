@@ -16,9 +16,6 @@
 
 from core.domain import classifier_services
 from core.tests import test_utils
-import utils
-
-import numpy
 
 
 class StringClassifierUnitTests(test_utils.GenericTestBase):
@@ -44,17 +41,11 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.string_classifier.load_examples(self._EXAMPLES_TRAIN)
 
     def _validate_instance(self, string_classifier):
-        self.assertEquals('_alpha' in dir(self.string_classifier), True)
-        self.assertEquals('_beta' in dir(self.string_classifier), True)
-        self.assertEquals(
-            '_prediction_threshold' in
-            dir(self.string_classifier), True)
-        self.assertEquals(
-            '_training_iterations' in
-            dir(self.string_classifier), True)
-        self.assertEquals(
-            '_prediction_iterations' in
-            dir(self.string_classifier), True)
+        self.assertIn('_alpha', dir(self.string_classifier))
+        self.assertIn('_beta', dir(self.string_classifier))
+        self.assertIn('_prediction_threshold', dir(self.string_classifier))
+        self.assertIn('_training_iterations', dir(self.string_classifier))
+        self.assertIn('_prediction_iterations', dir(self.string_classifier))
 
         for d in xrange(self.string_classifier._num_docs):
             self.assertEquals(

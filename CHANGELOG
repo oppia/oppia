@@ -3,6 +3,93 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.0.3 (21 Nov 2015)
+--------------------
+Learner page:
+- Add help cards for Oppia's responses for supplemental interactions.
+- Increase width of cards without supplements.
+- Animate changes in card widths.
+- Change the 'Previous responses' heading to 'Previous answers'.
+
+Interactions:
+- Fix a bug where rule fields of type CodeString default to None instead of the empty string.
+
+Editor page:
+- Partially fix a bug where the save and publish buttons drop off the navbar on small screens.
+
+Rich-text editor components:
+- Fix a bug where images overspill their boundaries in Firefox.
+- Fix a bug that caused images to display inline; they should display as centered block elements instead.
+- Remove whitespace around links.
+
+Other pages:
+- Make the site feedback form more prominent.
+- Add a frontend learner view for collections.
+
+Infrastructure:
+- Reduce the time taken for backend tests by splitting up the jobs files.
+- Rename test scripts to run_backend_tests.sh, run_frontend_tests.sh and run_e2e_tests.sh.
+- Create a run_tests.sh script to run all of the tests.
+- Run all tests on deployment, instead of just the backend ones.
+
+
+v2.0.2 (8 Nov 2015)
+-------------------
+Learner page:
+* Add conversation bubbles to the conversation skin.
+* Remove the card-level feedback icon.
+* On mobile devices, do not autofocus form fields.
+* Center the progress dot tooltips on the progress dots.
+* Add a short delay to Oppia's response in order to better simulate a chat coversation.
+
+Interactions:
+* Add a new PencilCodeEditor interaction.
+* MusicNotesInput: Fix #987: make the interaction wait for the page to load before displaying.
+* InteractiveMap: Fix #966: make the interaction load correctly on small screens.
+* InteractiveMap: Remove the SensorNotRequired warning.
+* EndExploration: Remove the 'Return to Editor' button in editor preview mode.
+* TextInput, MultipleChoiceInput, SetInput: Adjust margins and icons.
+* MultipleChoiceInput: Fix an issue that was causing images to display incorrectly.
+
+Editor page:
+* Add functionality for gadgets.
+* Add functionality for fallbacks.
+* Add functionality for enabling advanced features (fallbacks, gadgets, parameters) from the Settings page.
+* Move the parameter editor into the state editor.
+* Use the avatars from the learner page in the editor page.
+* Fix a bug where the exploration is sometimes initialized wrongly in the preview tab.
+* Show state-specific warnings as tooltips in the exploration graph.
+* Redirect to the 'My Explorations' page after an exploration is deleted.
+* Improve the layout and wording of the buttons in the 'delete exploration' modal footer.
+
+Other pages:
+* Add links and avatars pointing to contributor profile pages.
+* Redesign the profile page.
+* Rephrase a point in the participation playbook for clarity.
+* Set an explicit timeout for the creation modal autofocus.
+* Remove the /editor_tutorial page, since it has already been moved to the Oppia GitHub page.
+* Add touch events for tooltips.
+* Use spaces instead of tabs in all codemirror form fields.
+* Allow the use of 'pre' tags in HTML fields.
+* Clarify the changelog for the terms page.
+
+Infrastructure:
+* Add a pre-commit script that lints JavaScript files.
+* Be more flexible in determining which Python binary to use.
+* Replace some frontend JS/CSS dependencies with their minified versions.
+* Remove some unneeded properties in app.yaml.
+* Update Angular to v1.4.7.
+* Update node to v4.2.1.
+* Update protractor to v2.5.0.
+* Update ui-bootstrap to v0.13.4.
+* Remove the material-design-icons and material-design-iconic-font dependencies, and replace them with the material-icons font import.
+* Improve the error message when the backend tests fail.
+* Split the Protractor tests into multiple files so that they parallelize better.
+* Change the default number of sharding instances for Protractor tests to 3.
+* When running Protractor tests, stop Selenium and Google App Engine from sending useless info logs to the terminal.
+* Fix various errors and warnings in the Protractor tests.
+
+
 v2.0.1 (13 Oct 2015)
 --------------------
 Sitewide changes:

@@ -21,10 +21,16 @@
 var editor = require('./editor.js');
 var forms = require('./forms.js');
 
-var setLanguages = function(languages) {
+var selectLanguages = function(languages) {
   forms.MultiSelectEditor(
     element(by.css('.protractor-test-gallery-language-selector'))
-  ).setValues(languages);
+  ).selectValues(languages);
+};
+
+var deselectLanguages = function(languages) {
+  forms.MultiSelectEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).deselectValues(languages);
 };
 
 var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
@@ -33,10 +39,16 @@ var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
   ).expectCurrentSelectionToBe(expectedLanguages);
 };
 
-var setCategories = function(categories) {
+var selectCategories = function(categories) {
   forms.MultiSelectEditor(
     element(by.css('.protractor-test-gallery-category-selector'))
-  ).setValues(categories);
+  ).selectValues(categories);
+};
+
+var deselectCategories = function(categories) {
+  forms.MultiSelectEditor(
+    element(by.css('.protractor-test-gallery-category-selector'))
+  ).deselectValues(categories);
 };
 
 var expectCurrentCategorySelectionToBe = function(expectedCategories) {
@@ -91,9 +103,11 @@ var getExplorationObjective = function(name) {
   });
 };
 
-exports.setLanguages = setLanguages;
+exports.selectLanguages = selectLanguages;
+exports.deselectLanguages = deselectLanguages;
 exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
-exports.setCategories = setCategories;
+exports.selectCategories = selectCategories;
+exports.deselectCategories = deselectCategories;
 exports.expectCurrentCategorySelectionToBe = expectCurrentCategorySelectionToBe;
 
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;

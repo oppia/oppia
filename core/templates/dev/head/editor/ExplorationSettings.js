@@ -24,13 +24,15 @@ oppia.controller('ExplorationSettings', [
     'explorationLanguageCodeService', 'explorationTagsService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
     'warningsData', 'explorationStatesService', 'explorationParamChangesService',
-    'explorationWarningsService', 'CATEGORY_LIST', function(
+    'explorationWarningsService', 'CATEGORY_LIST',
+    'explorationAdvancedFeaturesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
       warningsData, explorationStatesService, explorationParamChangesService,
-      explorationWarningsService, CATEGORY_LIST) {
+      explorationWarningsService, CATEGORY_LIST,
+      explorationAdvancedFeaturesService) {
 
   $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -43,7 +45,7 @@ oppia.controller('ExplorationSettings', [
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-  var GALLERY_PAGE_URL = '/gallery';
+  var MY_EXPLORATIONS_PAGE_URL = '/my_explorations';
   var EXPLORE_PAGE_PREFIX = '/explore/';
 
   $scope.getExplorePageUrl = function() {
@@ -134,10 +136,26 @@ oppia.controller('ExplorationSettings', [
     $rootScope.$broadcast('refreshGraph');
   };
 
-  $scope.saveExplorationParamChanges = function() {
-    explorationParamChangesService.saveDisplayedValue();
+  $scope.postSaveParamChangesHook = function() {
     explorationWarningsService.updateWarnings();
   };
+
+  /********************************************
+  * Methods for enabling advanced features.
+  ********************************************/
+  $scope.areParametersEnabled = (
+    explorationAdvancedFeaturesService.areParametersEnabled);
+  $scope.areGadgetsEnabled = (
+    explorationAdvancedFeaturesService.areGadgetsEnabled);
+  $scope.areFallbacksEnabled = (
+    explorationAdvancedFeaturesService.areFallbacksEnabled);
+
+  $scope.enableParameters = (
+    explorationAdvancedFeaturesService.enableParameters);
+  $scope.enableGadgets = (
+    explorationAdvancedFeaturesService.enableGadgets);
+  $scope.enableFallbacks = (
+    explorationAdvancedFeaturesService.enableFallbacks);
 
   /********************************************
   * Methods for rights management.
@@ -224,7 +242,7 @@ oppia.controller('ExplorationSettings', [
         deleteUrl += ('?role=' + role);
       }
       $http['delete'](deleteUrl).success(function(data) {
-        $window.location = GALLERY_PAGE_URL;
+        $window.location = MY_EXPLORATIONS_PAGE_URL;
       });
     });
   };

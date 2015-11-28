@@ -1,0 +1,29 @@
+<script type="text/ng-template" id="components/responseHeader">
+  <div class="oppia-response-header-block">
+    <div class="oppia-response-header">
+      <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
+        <[getShortSummary()]>
+      </span>
+      <span ng-if="isActive()">&nbsp;</span>
+    </div>
+
+    <span>→</span>
+    <span ng-if="!isOutcomeLooping() && !isCreatingNewState()"
+          ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
+      <[getOutcome().dest]>
+    </span>
+    <span ng-if="!isOutcomeLooping() && isCreatingNewState()">
+      <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
+      <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
+    </span>
+    <span ng-if="isOutcomeLooping()">
+      <em>(try again)</em>
+    </span>
+  </div>
+
+  <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
+        ng-if="editabilityService.isEditable() && getOnDeleteFn()"
+        ng-click="deleteResponse($event)">
+    <i class="material-icons md-18">&#xE5CD;</i>
+  </span>
+</script>

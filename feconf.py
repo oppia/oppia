@@ -218,10 +218,13 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'LogicProof',
         'NumericInput',
         'SetInput',
-    ]
+    ],
 }, {
     'name': 'Programming',
-    'interaction_ids': ['CodeRepl'],
+    'interaction_ids': [
+        'CodeRepl',
+        'PencilCodeEditor',
+    ],
 }, {
     'name': 'Music',
     'interaction_ids': [
@@ -273,11 +276,13 @@ DEMO_EXPLORATIONS = [
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
-DEMO_COLLECTIONS = [
-    'welcome_to_collections.yaml'
-]
+DEMO_COLLECTIONS = {
+    u'0': 'welcome_to_collections.yaml'
+}
 
 # TODO(sll): Add all other URLs here.
+COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
+COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -313,10 +318,6 @@ NAV_MODE_SIGNUP = 'signup'
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
-EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
-EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
-EVENT_TYPE_COLLECTION_CHANGE = 'collection_change'
-EVENT_TYPE_COLLECTION_STATUS_CHANGE = 'collection_status_change'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 # The values for these event types should be left as-is for backwards
@@ -338,7 +339,6 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
-SHOW_GADGETS_EDITOR = False
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 
 # Output formats of downloaded explorations.
@@ -483,3 +483,5 @@ ALL_LANGUAGE_CODES = [{
 # Defaults for topic similarities
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
+
+SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

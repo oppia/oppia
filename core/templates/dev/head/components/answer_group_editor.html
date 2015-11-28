@@ -1,160 +1,51 @@
-<div style="height: 100%;">
-  <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
-  <div ng-if="rules">
-    <strong>
-      If the learner's answer...
-    </strong>
-    <ul class="nav nav-stacked nav-pills" role="tablist" ng-model="rules">
-      <!-- An HTML element marked ui-sortable should contain only one element,
-      and this element should have an ng-repeat defined on it. See the
-      ui-sortable documentation for more details. -->
-      <!-- Note that adding "track by $index" here seems to mess up the final
-      index in the stop() event handler. -->
-      <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
-        <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
-          <div class="oppia-rule-header">
-            <span ng-if="$index > 0">or</span>
-            <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== activeRuleIndex">
-              <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
-            </span>
-            <span ng-if="getCurrentInteractionId() === 'MultipleChoiceInput'">
-              <span class="oppia-multiple-choice-rule" angular-html-bind="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices"></span>...
-            </span>
-          </div>
-        </a>
-        <span ng-if="rules.length > 1">
-          <img src="/third_party/static/material-design-icons-1.0.1/ic_close_black_48dp.png" ng-if="isEditable" class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer" ng-click="deleteRule($index)">
-        </span>
+<script type="text/ng-template" id="inline/answer_group_editor">
+  <div style="height: 100%;">
+    <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
+    <div ng-if="rules">
+      <strong>
+        If the learner's answer...
+      </strong>
+      <ul class="nav nav-stacked nav-pills" role="tablist" ng-model="rules">
+        <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
+          <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
+            <div class="oppia-rule-header">
+              <span ng-if="$index > 0">or</span>
+              <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== activeRuleIndex">
+                <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
+              </span>
+              <span ng-if="getCurrentInteractionId() === 'MultipleChoiceInput'">
+                <span class="oppia-multiple-choice-rule" angular-html-bind="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices"></span>...
+              </span>
+            </div>
+          </a>
+          <span ng-if="isEditable && rules.length > 1"
+                class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
+                ng-click="deleteRule($index)">
+            <i class="material-icons md-18">&#xE5CD;</i>
+          </span>
 
-        <div ng-if="activeRuleIndex === $index">
-          <div class="oppia-editor-card-section">
-            <div class="oppia-rule-body-container">
-              <rule-editor rule="rule" is-editable="isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="cancelActiveRuleEdit()" on-save-rule="saveRules()" class="protractor-test-answer-body">
-              </rule-editor>
+          <div ng-if="activeRuleIndex === $index">
+            <div class="oppia-editor-card-section">
+              <div class="oppia-rule-body-container">
+                <rule-editor rule="rule" is-editable="isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="cancelActiveRuleEdit()" on-save-rule="saveRules()" class="protractor-test-answer-body">
+                </rule-editor>
+              </div>
             </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
 
-    <button type="button" ng-if="isEditable" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="addNewRule()">
-      + Add Another Possible Answer
-    </button>
-  </div>
-
-  <br ng-if="rules">
-
-  <div ng-if="!feedbackEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Edit this response' : '']>">
-    <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
-      <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor" ng-if="isEditable" ng-click="openFeedbackEditor()">
-        </div>
-
-        <strong>Oppia tells the learner...</strong>
-        <div style="position: relative;">
-          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Feedback"></span>
-          <span ng-if="isSelfLoopWithNoFeedback(outcome)">
-            <span class="oppia-confusing-outcome-warning-text">
-              <span class="glyphicon glyphicon-warning-sign"></span>
-              Please give Oppia something useful to say here.
-            </span>
-          </span>
-          <span ng-if="!isSelfLoopWithNoFeedback(outcome) && outcome.feedback.length === 0" style="color: #888">
-            <em>Nothing</em>
-          </span>
-          <span ng-if="outcome.feedback.length > 0" style="word-wrap: break-word;">
-            <span angular-html-bind="outcome.feedback[0]"></span>
-          </span>
-        </div>
-      </div>
+      <button type="button" ng-if="isEditable" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="addNewRule()">
+        + Add Another Possible Answer
+      </button>
     </div>
-  </div>
 
-  <div ng-if="isEditable && feedbackEditorIsOpen">
-    <form role="form" class="form-inline protractor-test-edit-outcome-feedback" name="editAnswerGroupForm.editFeedbackForm">
-      <outcome-feedback-editor outcome="outcome">
-      </outcome-feedback-editor>
-    </form>
+    <br ng-if="rules">
 
-    <div class="oppia-rule-save-cancel-buttons">
-      <div class="pull-right">
-        <button type="button" class="btn btn-default" ng-click="cancelThisFeedbackEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-outcome-feedback" ng-disabled="editAnswerGroupForm.editFeedbackForm.$invalid" ng-click="saveThisFeedback()">Save Feedback</button>
-      </div>
-
-      <div style="clear: both;"></div>
-    </div>
-  </div>
-
-  <br>
-
-  <div ng-if="!destinationEditorIsOpen" style="height: 100%;" title="<[isEditable ? 'Change the destination card' : '']>">
-    <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button oppia-pre-avatar-oppia" ng-class="{'oppia-editable-section': isEditable}">
-      <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor" ng-if="isEditable" ng-click="openDestinationEditor()">
-        </div>
-
-        <div ng-if="outcome.dest !== getActiveStateName()">
-          <strong>And afterwards, directs the learner to...</strong>
-          <span ng-if="!isSelfLoop(outcome)" style="position: relative;">
-            <[outcome.dest]>
-          </span>
-          <span ng-if="isSelfLoop(outcome)" style="position: relative;">
-            (try again)
-          </span>
-          <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Destination"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div ng-if="isEditable && destinationEditorIsOpen">
-    <form role="form" class="form-inline protractor-test-edit-outcome-dest" name="editAnswerGroupForm.editDestForm" ng-submit="saveThisDestination()">
-      <outcome-destination-editor outcome="outcome">
-      </outcome-destination-editor>
-    </form>
-
-    <div class="oppia-rule-save-cancel-buttons">
-      <div class="pull-right">
-        <button type="button" class="btn btn-default protractor-test-cancel-outcome-dest" ng-click="cancelThisDestinationEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-outcome-dest" ng-disabled="editAnswerGroupForm.editDestForm.$invalid" ng-click="saveThisDestination()">Save Destination</button>
-      </div>
-
-      <div style="clear: both;"></div>
-    </div>
-  </div>
-</div>
-
-<script type="text/ng-template" id="rules/outcomeFeedbackEditor">
-  <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
-    <div class="oppia-rule-details-header">
-      <strong>Oppia tells the learner...</strong>
-    </div>
-    <span ng-if="feedback.length == 0">
-      <em>No feedback specified.</em>
-    </span>
-
-    <schema-based-editor schema="OUTCOME_FEEDBACK_SCHEMA" local-value="outcome.feedback[0]">
-    </schema-based-editor>
-  </div>
-</script>
-
-<script type="text/ng-template" id="rules/outcomeDestinationEditor">
-  <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
-    <div class="oppia-rule-details-header">
-      <strong>And afterwards, directs the learner to...</strong>
-    </div>
-    <div class="form-group" style="font-size: 1.1em;">
-      <span>
-        <select class="form-control" ng-model="outcome.dest" ng-options="choice.id as choice.text for choice in destChoices" style="width: 200px;" ng-change="onDestSelectorChange()">
-        </select>
-      </span>
-    </div>
-    <ng-form name="newStateNameForm">
-      <span ng-if="isCreatingNewState(outcome)">
-        <input type="text" focus-on="newStateNameInputField" name="newStateName" ng-model="outcome.newStateName" class="form-control protractor-test-add-state-input" tabindex="0" aria-invalid="false" ng-pattern="newStateNamePattern" required>
-      </span>
-      <p ng-show="newStateNameForm.newStateName.$error.pattern" class="help-block oppia-form-error" style="font-size: 0.85em;">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
-    </ng-form>
+    <outcome-editor is-editable="isEditable"
+                    on-save-dest="getOnSaveAnswerGroupDestFn()"
+                    on-save-feedback="getOnSaveAnswerGroupFeedbackFn()"
+                    outcome="outcome">
+    </outcome-editor>
   </div>
 </script>

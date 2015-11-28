@@ -2,20 +2,23 @@
   .code-repl-input-box {
     border: 1px solid #ccc;
   }
+  .code-repl-language {
+    float: right;
+    margin-top: 8px;
+  }
 </style>
 
 <script type="text/ng-template" id="interaction/CodeRepl">
   <div>
-    <div>
-      <em>Language: <[language]></em>
-    </div>
-    <br>
     <form ng-submit="runCode(code)">
       <div class="code-repl-input-box">
         <div ui-codemirror="{onLoad: initCodeEditor}">
         </div>
       </div>
       <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Run</md-button>
+      <span class="code-repl-language">
+        <em>Language: <[language]></em>
+      </span>
     </form>
   </div>
 </script>

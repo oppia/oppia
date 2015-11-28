@@ -71,6 +71,7 @@
         </li>
         <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
         <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
+            class="protractor-test-deselected"
             ng-if="!selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
             <span translate><[item.text]></span>
@@ -99,6 +100,7 @@
         </li>
         <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
         <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
+            class="protractor-test-deselected"
             ng-if="!selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
             <span translate><[item.text]></span>
@@ -250,6 +252,7 @@
   </div>
 
   {% include 'components/exploration_creation_button.html' %}
+  {% include 'components/exploration_summary_tile.html' %}
   {% include 'components/ratings.html' %}
 
   <script type="text/ng-template" id="modals/splashVideo">
@@ -265,6 +268,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('components/explorationCreationButton.js') }}
+    {{ include_js_file('components/explorationSummaryTile.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
     {{ include_js_file('components/ratings.js')}}
   </script>

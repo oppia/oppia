@@ -16,11 +16,13 @@
 // NOTE TO DEVELOPERS: This editor requires explorationParamSpecsService to be
 // available in the context in which it is used.
 
-oppia.directive('parameterNameEditor', function($compile, warningsData) {
+oppia.directive('parameterNameEditor', [
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_TEMPLATES_URL + 'ParameterName';
+        return OBJECT_EDITOR_URL_PREFIX + 'ParameterName';
       };
       $compile(element.contents())(scope);
     },
@@ -62,4 +64,4 @@ oppia.directive('parameterNameEditor', function($compile, warningsData) {
       });
     }]
   };
-});
+}]);
