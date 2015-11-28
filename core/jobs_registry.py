@@ -32,6 +32,7 @@ from core.domain import user_jobs_one_off
 ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
+    exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,

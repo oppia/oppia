@@ -149,7 +149,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.version,
+        exp_summary_model.contributor_ids, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
@@ -840,7 +840,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
-    create_exploration_summary(exploration.id)
+    create_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -949,36 +949,49 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
-
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id)
+    update_exploration_summary(exploration.id, committer_id)
 
 
-def create_exploration_summary(exploration_id):
+def create_exploration_summary(exploration_id, contributor_id_to_add):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(exploration_id):
+def update_exploration_summary(exploration_id, contributor_id_to_add):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration, contributor_id_to_add):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it.
+    domain object and return it. contributor_id_to_add will be added to
+    the list of contributors for the exploration if the argument is not
+    None and if the id is not a system id.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        contributor_ids = old_exp_summary.contributor_ids or []
     else:
         ratings = feconf.get_empty_ratings()
+        contributor_ids = []
+
+    # Update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an exploration's content).
+    if (contributor_id_to_add is not None and
+                contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
+            if contributor_id_to_add not in contributor_ids:
+                contributor_ids.append(contributor_id_to_add)
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -989,11 +1002,11 @@ def compute_summary_of_exploration(exploration):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated)
+        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated)
 
     return exp_summary
-
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
@@ -1012,6 +1025,7 @@ def save_exploration_summary(exp_summary):
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
+        contributor_ids=exp_summary.contributor_ids,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
@@ -1060,7 +1074,9 @@ def revert_exploration(
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
 
-    update_exploration_summary(exploration_id)
+    # Update the exploration summary, but since this is just a revert do
+    # not add the committer of the revert to the list of contributors.
+    update_exploration_summary(exploration_id, None)
 
 
 # Creation and deletion methods.
