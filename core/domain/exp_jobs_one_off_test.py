@@ -320,7 +320,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.compute_summary_of_exploration(exploration)
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
 
@@ -348,7 +349,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         # Verify that the length of the contributor list is one, and that
         # the list contains the user who made these commits.
-        exploration_summary = exp_services.compute_summary_of_exploration(exploration)
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
 
@@ -380,7 +382,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         # Verify that the committer list does not contain the user
         # who only reverted.
-        exploration_summary = exp_services.compute_summary_of_exploration(exploration)
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
         self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
 
     def test_nonhuman_committers_not_counted(self):
@@ -395,7 +398,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.compute_summary_of_exploration(exploration)
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID,
             exploration_summary.contributor_ids)
@@ -412,7 +416,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.compute_summary_of_exploration(exploration)
+        exploration_summary = exp_services.compute_summary_of_exploration(
+            exploration, None)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
 
@@ -542,7 +547,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(self.NEW_EXP_ID)
+        exp_services.create_exploration_summary(
+            self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.ALBERT_ID, self.NEW_EXP_ID)

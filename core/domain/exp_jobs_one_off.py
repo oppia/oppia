@@ -54,7 +54,8 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(exploration_model):
         if not exploration_model.deleted:
-            exp_services.create_exploration_summary(exploration_model.id)
+            exp_services.create_exploration_summary(
+                exploration_model.id, None)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):

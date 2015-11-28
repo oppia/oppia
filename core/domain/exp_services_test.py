@@ -2074,6 +2074,34 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertFalse(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.VIEWER_ID))
 
+    def test_contributors_not_updated_on_revert(self):
+        """Test that a user who only makes a revert on an exploration
+        is not counted in the list of that exploration's contributors.
+        """
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        # Have Albert create a new exploration.
+        exploration_1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.ALBERT_ID)
+        # Have Albert update that exploration.
+        exp_services.update_exploration(
+            self.ALBERT_ID, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        # Have Bob revert Albert's update.
+        exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 2, 1)
+
+        # Verify that only Albert (and not Bob, who has not made any non-
+        # revert changes) appears in the contributors list for this
+        # exploration.
+        exploration_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID_1)
+        self.assertEqual([self.ALBERT_ID], exploration_summary.contributor_ids)
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
