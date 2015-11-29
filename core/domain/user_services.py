@@ -36,7 +36,7 @@ class UserSettings(object):
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None,
-            profile_picture_data_url=None, user_bio='', subject_interests=[],
+            profile_picture_data_url=None, user_bio='', subject_interests=None,
             first_contribution_datetime=None,
             preferred_language_codes=None):
         self.user_id = user_id
@@ -47,7 +47,8 @@ class UserSettings(object):
             last_started_state_editor_tutorial)
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
-        self.subject_interests = subject_interests
+        self.subject_interests = (
+            subject_interests if subject_interests else [])
         self.first_contribution_datetime = first_contribution_datetime
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])

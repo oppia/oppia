@@ -37,7 +37,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
 
   $scope.saveSubjectInterests = function(subjectInterests) {
     _saveDataItem('subject_interests', subjectInterests)
-  }
+  };
 
   $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
     _saveDataItem('can_receive_email_updates', canReceiveEmailUpdates);

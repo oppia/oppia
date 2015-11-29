@@ -79,7 +79,7 @@ class ProfileHandler(base.BaseHandler):
 
         self.values.update({
             'user_bio': user_settings.user_bio,
-            'subject_interests': ", ".join(user_settings.subject_interests),
+            'subject_interests': user_settings.subject_interests,
             'first_contribution_datetime': (
                 utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
                 if user_settings.first_contribution_datetime else None),

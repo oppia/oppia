@@ -280,7 +280,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
-        self.assertEqual(response['subject_interests'], 'editor, editing')
+        self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
 
         # Editor looks at their own profile page.
@@ -288,14 +288,14 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
-        self.assertEqual(response['subject_interests'], 'editor, editing')
+        self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
 
         # Looged-out user looks at editor's profile page/
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
-        self.assertEqual(response['subject_interests'], 'editor, editing')
+        self.assertEqual(response['subject_interests'], ['editor', 'editing'])
 
 
 class FirstContributionDateTests(test_utils.GenericTestBase):

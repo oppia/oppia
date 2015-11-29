@@ -32,7 +32,7 @@ oppia.controller('Profile', [
     $http.get(profileDataUrl).success(function(data) {
       $rootScope.loadingMessage = '';
       $scope.userBio = data.user_bio;
-      $scope.subjectInterests = data.subject_interests;
+      $scope.subjectInterests = data.subject_interests.join(", ");
       $scope.firstContributionDatetime = data.first_contribution_datetime;
       $scope.profilePictureDataUrl = (
         data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
