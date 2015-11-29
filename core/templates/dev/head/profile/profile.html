@@ -41,6 +41,13 @@
               </span>
             </p>
             <p>
+              <span ng-if="subjectInterests">
+                Subject Interests: <[subjectInterests]></span>
+              <span ng-if="!subjectInterests">
+                Subject Interests:
+              </span>
+            </p>
+            <p>
               <span ng-if="firstContributionDatetime">
                 Contributing since
                 <[getLocaleDateString(firstContributionDatetime)]>

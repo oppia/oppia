@@ -35,6 +35,10 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
     _saveDataItem('user_bio', userBio);
   };
 
+  $scope.saveSubjectInterests = function(subjectInterests) {
+    _saveDataItem('subject_interests', subjectInterests)
+  }
+
   $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
     _saveDataItem('can_receive_email_updates', canReceiveEmailUpdates);
   };
@@ -112,6 +116,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
   $http.get(_PREFERENCES_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
+    $scope.subjectInterests = data.subject_interests;
     $scope.preferredLanguageCodes = data.preferred_language_codes;
     $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.canReceiveEmailUpdates = data.can_receive_email_updates;

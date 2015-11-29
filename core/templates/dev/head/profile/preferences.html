@@ -77,6 +77,28 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2">Subject Interests</label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <div ng-if="hasPageLoaded">
+                <select2-dropdown
+                  item="$parent.subjectInterests"
+                  tag-mode="true" allow-multiple-choices="true"
+                  invalid-search-term-message="Add a new subject interest (using lowercase letters and spaces)..."
+                  new-choice-regex="<[TAG_REGEX]>" width="100%"
+                  placeholder="Enter subject interests..."
+                  on-selection-change="saveSubjectInterests($parent.subjectInterests)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller">
+                  This field is optional. Anything you tag here is public and
+                  world-viewable.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2">Preferred Languages</label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <!--
