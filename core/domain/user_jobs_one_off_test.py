@@ -18,15 +18,23 @@
 
 __author__ = 'Sean Lip'
 
+import math
+
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
+from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_one_off
+from core.domain import stats_jobs_continuous
+from core.domain import event_services
+from core.domain import rating_services
+from core.domain import stats_jobs_continuous_test
 from core.platform import models
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+import feconf
+(user_models, stats_models) = models.Registry.import_models([models.NAMES.user, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 
@@ -377,3 +385,123 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+
+class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
+    """ Tests the calculation of a user's impact score from the
+    one-off UserImpactCalculationOneOffJob.
+    """
+
+    EXP_ID = 'exp_id_1'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    RATINGS_SCALER_CUTOFF = 10
+    RATING = 3
+    NUM_COMPLETIONS = 2
+
+    def _mock_get_statistics(self, exp_id, version):
+        return {
+            'complete_exploration_count': self.NUM_COMPLETIONS
+        }
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job after running the continuous
+        statistics aggregator for explorations to get the correct num
+        completion events."""
+        with self.swap(stats_jobs_continuous.StatisticsAggregator,
+                    'get_statistics', self._mock_get_statistics):
+                job_id = user_jobs_one_off.UserImpactCalculationOneOffJob.create_new()
+                user_jobs_one_off.UserImpactCalculationOneOffJob.enqueue(job_id)
+                self.process_and_flush_pending_tasks()
+
+    def test_user_with_no_explorations_has_no_impact(self):
+        """Test that a user who is not a contributor on any exploration
+        is not assigned an impact score by the UserImpactCalculationOneOffJob.
+        """
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertIsNone(user_stats_model)
+
+    def test_standard_user_impact_calculation(self):
+        """Test that a user who is a contributor on one exploration that:
+        - has a number of ratings for that exploration above the treshold
+        for the scaler for number of ratings
+        - has an average rating above the minimum average rating
+        - has a number of playthroughs > 1
+        is assigned the correct impact score by the
+        UserImpactCalculationOneOffJob.
+        """
+        # Sign up a user, have them create an exploration.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_a_id, self.exploration)
+        # Give this exploration as many ratings as necessary to avoid
+        # the scaler for number of ratings. Each user id needs to be unique
+        # since each user can only give an exploration one rating. The rating
+        # is greater than the minimum average rating.
+        #(TODO: is
+        # this a security loophole, that any user id can give an exploration
+        # a rating, regardless of whether or not they exist in the system?)
+        user_ids = ['user{}'.format(i) for i in range(
+            user_jobs_one_off.UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER_CUTOFF
+        )]
+        for user_id in user_ids:
+            rating_services.assign_rating_to_exploration(
+                user_id, self.EXP_ID, self.RATING
+            )
+        # Give this exploration more than one playthrough (so ln(num_completions != 0).
+        exp_version = 1
+        state = self.exploration.init_state_name
+        session_ids = ['session{}'.format(i) for i in range(self.NUM_COMPLETIONS)]
+        for session_id in session_ids:
+            event_services.StartExplorationEventHandler.record(
+                self.EXP_ID, exp_version, state, session_id, {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.CompleteExplorationEventHandler.record(
+                self.EXP_ID, exp_version, state, session_id, 27, {},
+                feconf.PLAY_TYPE_NORMAL)
+
+        expected_user_impact_score = round(
+            math.log(self.NUM_COMPLETIONS)*
+            (self.RATING - user_jobs_one_off.UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING)*
+            user_jobs_one_off.UserImpactCalculationOneOffJob.MULTIPLIER
+            )
+
+        # Verify that the impact score matches the expected.
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+
+    @classmethod
+    def _mock_get_zero_impact_score(cls, exploration_id):
+        return 0
+
+    @classmethod
+    def _mock_get_below_zero_impact_score(cls, exploration_id):
+        return -1
+
+    def test_only_yield_when_impact_greater_than_zero(self):
+        # Sign up a user, have them create an exploration.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        # Use mock impact scores to verify that map only yields when
+        # the impact score > 0.
+        exp_services.save_new_exploration(self.user_a_id, self.exploration)
+        with self.swap(user_jobs_one_off.UserImpactCalculationOneOffJob,
+                '_get_exp_impact_score',
+                self._mock_get_zero_impact_score):
+            results = user_jobs_one_off.UserImpactCalculationOneOffJob.map(
+                self.exploration)
+            self.assertIsNone(next(results, None))
+        with self.swap(user_jobs_one_off.UserImpactCalculationOneOffJob,
+                '_get_exp_impact_score',
+                self._mock_get_below_zero_impact_score):
+            results = user_jobs_one_off.UserImpactCalculationOneOffJob.map(
+                self.exploration)
+            self.assertIsNone(next(results, None))

@@ -15,14 +15,18 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
+import math
 
 from core import jobs
 from core.domain import subscription_services
 from core.platform import models
-(exp_models, collection_models, feedback_models, user_models) = (
+(exp_models, collection_models, feedback_models, user_models,
+    stats_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
-        models.NAMES.feedback, models.NAMES.user]))
+        models.NAMES.feedback, models.NAMES.user,
+        models.NAMES.statistics])
+    )
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
@@ -130,3 +134,89 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_exploration(key, item['id'])
             elif item['type'] == 'collection':
                 subscription_services.subscribe_to_collection(key, item['id'])
+
+
+class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
+    """ Calculates each user's impact score, where impact score is defined as:
+    Sum of (
+    ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
+    *(multiplier),
+    where multiplier = 10, and ratings_scaler is .1(number of ratings)
+    if there are < 10 ratings for that exploration.
+
+    Impact scores are calculated over explorations for which a user
+    is listed as a contributor.
+    """
+
+    MULTIPLIER = 10
+    MIN_AVERAGE_RATING = 2.5
+    NUM_RATINGS_SCALER_CUTOFF = 10
+    NUM_RATINGS_SCALER = .1
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def _get_exp_impact_score(cls, exploration_id):
+        from core.domain import rating_services
+        from core.domain import stats_jobs_continuous
+
+        # Get ratings and compute average rating score.
+        ratingFrequencies = rating_services.get_overall_ratings_for_exploration(
+            exploration_id)
+        totalNumber = 0
+        totalRating = 0.0
+        for rating, num_ratings in ratingFrequencies.iteritems():
+          totalRating += (int(rating) * num_ratings)
+          totalNumber += num_ratings
+        # Only divide by a non-zero number.
+        if totalNumber == 0:
+            return 0
+        average_rating = totalRating / totalNumber
+
+        # Get rating term to use in impact calculation.
+        rating_term = average_rating - UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING
+
+        # Get num_ratings_scaler.
+        if totalNumber < UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER_CUTOFF:
+            num_ratings_scaler = UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER*(totalNumber)
+        else:
+            num_ratings_scaler = 1
+
+        # Get number of completions/playthroughs.
+        num_completions = stats_jobs_continuous.StatisticsAggregator.get_statistics(
+            exploration_id, 'all')['complete_exploration_count']
+        # Only take the log of a non-zero number.
+        if num_completions <= 0:
+            return 0
+        num_completions_term = math.log(num_completions)
+
+        exploration_impact_score = (
+            rating_term*
+            num_completions_term*
+            num_ratings_scaler*
+            UserImpactCalculationOneOffJob.MULTIPLIER
+        )
+
+        return exploration_impact_score
+
+    @staticmethod
+    def map(item):
+        exploration_impact_score = UserImpactCalculationOneOffJob._get_exp_impact_score(item.id)
+
+        if exploration_impact_score > 0:
+            # Get exploration summary and contributor ids,
+            # yield for each contributor.
+            from core.domain import exp_services
+            exploration_summary = exp_services.get_exploration_summary_by_id(
+                item.id)
+            contributor_ids = exploration_summary.contributor_ids
+            for contributor_id in contributor_ids:
+                yield (contributor_id, exploration_impact_score)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        values = [ast.literal_eval(v) for v in stringified_values]
+        user_impact_score = int(round(sum(values)))
+        user_models.UserStatsModel(id=key, impact_score=user_impact_score).put()
