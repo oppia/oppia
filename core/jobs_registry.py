@@ -33,6 +33,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
+    exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,

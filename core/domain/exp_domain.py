@@ -2502,7 +2502,8 @@ class ExplorationSummary(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, tags, ratings, status,
                  community_owned, owner_ids, editor_ids,
-                 viewer_ids, version, exploration_model_created_on,
+                 viewer_ids, contributor_ids, version,
+                 exploration_model_created_on,
                  exploration_model_last_updated):
         """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing frequency counts. Note
@@ -2528,6 +2529,7 @@ class ExplorationSummary(object):
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
+        self.contributor_ids = contributor_ids
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
