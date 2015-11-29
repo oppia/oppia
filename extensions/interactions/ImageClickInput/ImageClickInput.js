@@ -22,7 +22,9 @@
 
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'oppiaHtmlEscaper', 'explorationContextService',
-  function($sce, oppiaHtmlEscaper, explorationContextService) {
+  'imageClickInputRulesService',
+  function($sce, oppiaHtmlEscaper, explorationContextService,
+           imageClickInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -78,10 +80,10 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           }
         };
         $scope.onClickImage = function(event) {
-          $scope.$parent.$parent.submitAnswer({
+          $scope.$parent.submitAnswer({
             clickPosition: [$scope.mouseX, $scope.mouseY],
             clickedRegions: $scope.currentlyHoveredRegions
-          });
+          }, imageClickInputRulesService);
         };
       }]
     };
@@ -122,3 +124,11 @@ oppia.directive('oppiaShortResponseImageClickInput', [
     };
   }
 ]);
+
+oppia.factory('imageClickInputRulesService', [function() {
+  return {
+    IsInRegion: function(answer, inputs) {
+      return answer.clickedRegions.indexOf(inputs.x) != -1;
+    }
+  };
+}]);
