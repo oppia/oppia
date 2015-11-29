@@ -1197,12 +1197,10 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
     controller: [
-        '$scope', '$filter', '$timeout', '$translate',
-        '$translatePartialLoader', 'parameterSpecsService', 'focusService',
-        function($scope, $filter, $timeout, $translate,
-          $translatePartialLoader, parameterSpecsService, focusService) {
-      $translatePartialLoader.addPart('form_builder');
-      $translate.refresh()
+        '$scope', '$filter', '$timeout', 'parameterSpecsService',
+        'focusService',
+        function($scope, $filter, $timeout, parameterSpecsService,
+          focusService) {
 
       $scope.hasLoaded = false;
       $scope.isUserCurrentlyTyping = false;

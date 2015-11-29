@@ -74,28 +74,21 @@ oppia.config([
     availableLanguageKeys.push(prop);
     availableLanguageKeysMap[prop + '*'] = prop;
   };
-  // TODO(mili): fix the FOUC with fallback language 'en' outside the gallery.
-  // 1 - To avoid FOUC in the gallery, a fallback language must be set with the
-  // defaultTranslations.
-  // 2 - After calling $translatePartialLoader.addPart(), for example in the
-  // interactions, the fallback language files are not loaded. Also, it
-  // generates FOUC.
-  // Because 1 and 2, I created a new "fallback language" until the problem is
-  // solved in a new release.
-  availableLanguageKeysMap['en_default'] = 'en_default';
   availableLanguageKeysMap['*'] = 'en';
   $translateProvider.registerAvailableLanguageKeys(
     availableLanguageKeys, availableLanguageKeysMap);
 
-  $translateProvider.translations('en_default', defaultTranslations);
-  $translateProvider.fallbackLanguage('en_default');
+  $translateProvider.translations('en', defaultTranslations);
+  $translateProvider.fallbackLanguage('en');
 
   $translateProvider.determinePreferredLanguage();
   $translateProvider.useCookieStorage();
 
-  $translateProvider.useLoader('$translatePartialLoader', {
-    urlTemplate: '/i18n/{part}/{lang}.json'
+  $translateProvider.useStaticFilesLoader({
+      prefix: '/i18n/locale-',
+      suffix: '.json'
   });
+  $translateProvider.preferredLanguage('en');
   // using strategy 'sanitize' does not support utf-8 encoding.
   // https://github.com/angular-translate/angular-translate/issues/1131
   $translateProvider.useSanitizeValueStrategy('sanitizeParameters');

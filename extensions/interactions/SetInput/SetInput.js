@@ -25,11 +25,7 @@ oppia.directive('oppiaInteractiveSetInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/SetInput',
-      controller: ['$scope', '$attrs', '$translate', '$translatePartialLoader',
-          function($scope, $attrs, $translate, $translatePartialLoader) {
-        $translatePartialLoader.addPart('interactions');
-        $translate.refresh()
-
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.schema = {
           type: 'list',
           items: {

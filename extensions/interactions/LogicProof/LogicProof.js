@@ -19,13 +19,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/LogicProof',
-      controller: ['$scope', '$attrs', '$modal', '$translate',
-          '$translatePartialLoader',
-          function($scope, $attrs, $modal, $translate,
-                   $translatePartialLoader) {
-        $translatePartialLoader.addPart('interactions');
-        $translate.refresh();
-
+      controller: ['$scope', '$attrs', '$modal',
+          function($scope, $attrs, $modal) {
         $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.questionWithValue);
 

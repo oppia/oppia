@@ -110,9 +110,6 @@ def download_and_unzip_files(
                 z.extractall(target_parent_dir)
 
         # Rename the target directory.
-        print os.path.join(target_parent_dir, zip_root_name)
-        print os.path.join(target_parent_dir, target_root_name)
-        print os.listdir(target_parent_dir)
         os.rename(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))

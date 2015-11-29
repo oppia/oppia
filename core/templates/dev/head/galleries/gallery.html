@@ -58,7 +58,7 @@
             class="protractor-test-selected"
             ng-if="selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
-            <span><[item.text | translate]></span>
+            <span translate="<[item.text]>"></span>
             <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -67,7 +67,7 @@
             class="protractor-test-deselected"
             ng-if="!selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
-            <span><[item.text | translate]></span>
+            <span translate="<[item.text]>"></span>
             <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -87,7 +87,7 @@
             class="protractor-test-selected"
             ng-if="selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <span><[item.text | translate]></span>
+            <span translate="<[item.text]>"></span>
             <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>
@@ -96,7 +96,7 @@
             class="protractor-test-deselected"
             ng-if="!selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <span><[item.text | translate]></span>
+            <span translate="<[item.text]>"></span>
             <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
           </a>
         </li>

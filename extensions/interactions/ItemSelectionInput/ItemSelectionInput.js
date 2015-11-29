@@ -26,11 +26,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/ItemSelectionInput',
-      controller: ['$scope', '$attrs', '$translate', '$translatePartialLoader',
-        function($scope, $attrs, $translate, $translatePartialLoader) {
-        $translatePartialLoader.addPart('interactions');
-        $translate.refresh();
-
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choicesWithValue);
         $scope.maxAllowableSelectionCount = $attrs.maxAllowableSelectionCountWithValue;
         $scope.minAllowableSelectionCount = $attrs.minAllowableSelectionCountWithValue;

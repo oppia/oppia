@@ -19,12 +19,10 @@
  */
 
 oppia.controller('Signup', [
-    '$scope', '$http', '$rootScope', '$modal', '$translate',
-    '$translatePartialLoader', 'warningsData', 'urlService',
-    'focusService',
+    '$scope', '$http', '$rootScope', '$modal', '$translate', 'warningsData',
+    'urlService', 'focusService',
     function($scope, $http, $rootScope, $modal, $translate,
-             $translatePartialLoader, warningsData, urlService,
-             focusService) {
+             warningsData, urlService, focusService) {
 
   $translate('I18N_SIGNUP_PAGE_TITLE', 'I18N_SIGNUP_PAGE_SUBTITLE')
    .then(function (translatedPageTitle) {
@@ -35,9 +33,6 @@ oppia.controller('Signup', [
    $rootScope.pageTitle = ($translate.instant('I18N_SIGNUP_PAGE_SUBTITLE') +
      ' - ' + $translate.instant('I18N_SIGNUP_PAGE_TITLE'));
   });
-
-  $translatePartialLoader.addPart('signup');
-  $translate.refresh();
 
   var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';

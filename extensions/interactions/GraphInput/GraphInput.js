@@ -187,21 +187,16 @@ oppia.directive('graphViz', function() {
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', '$translate',
-                 '$translatePartialLoader', 'focusService', 'graphDetailService',
-                 'GRAPH_INPUT_LEFT_MARGIN',
-    function($scope, $element, $attrs, $document, $translate,
-             $translatePartialLoader, focusService, graphDetailService,
-             GRAPH_INPUT_LEFT_MARGIN) {
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService',
+                 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+    function($scope, $element, $attrs, $document, focusService,
+             graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
         ADD_VERTEX: 2,
         DELETE: 3
       };
-
-      $translatePartialLoader.addPart('interactions');
-      $translate.refresh()
 
       // The current state of the UI and stuff like that
       $scope.state = {

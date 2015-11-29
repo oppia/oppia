@@ -126,16 +126,15 @@ var _get_i18n_id = function(prefix, name) {
 
 oppia.controller('Gallery', [
     '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-    '$translate', '$translatePartialLoader', 'createExplorationButtonService',
+    '$translate', 'createExplorationButtonService',
     'oppiaDatetimeFormatter', 'oppiaDebouncer',
     'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService',
     'ratingVisibilityService',
     function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      $translate, $translatePartialLoader,
-      createExplorationButtonService, oppiaDatetimeFormatter, oppiaDebouncer,
-      urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService,
-      ratingVisibilityService) {
+      $translate, createExplorationButtonService, oppiaDatetimeFormatter,
+      oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
+      searchService, ratingVisibilityService) {
 
   $translate('I18N_GALLERY_PAGE_TITLE', 'I18N_GALLERY_PAGE_SUBTITLE')
     .then(function (translatedPageTitle) {
@@ -147,9 +146,6 @@ oppia.controller('Gallery', [
       $translate.instant('I18N_GALLERY_PAGE_TITLE') +
       ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
   });
-
-  $translatePartialLoader.addPart('gallery');
-  $translate.refresh();
 
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');

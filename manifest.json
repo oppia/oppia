@@ -79,11 +79,11 @@
         "targetDirPrefix": "bower-angular-translate-",
         "rootDirPrefix": "bower-angular-translate-"
       },
-      "angularTranslateLoaderPartial": {
+      "angularTranslateLoader": {
         "version": "2.8.1",
-        "zipUrl": "https://github.com/angular-translate/bower-angular-translate-loader-partial/archive/2.8.1.zip",
-        "targetDirPrefix": "bower-angular-translate-loader-partial-",
-        "rootDirPrefix": "bower-angular-translate-loader-partial-"
+        "zipUrl": "https://github.com/angular-translate/bower-angular-translate-loader-static-files/archive/2.8.1.zip",
+        "targetDirPrefix": "bower-angular-translate-loader-static-files-",
+        "rootDirPrefix": "bower-angular-translate-loader-static-files-"
       },
       "angularCookiesRev": {
         "version": "1.4.0",
