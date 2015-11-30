@@ -149,3 +149,29 @@ if ! test_python_version $PYTHON_CMD; then
   fi
 fi
 export PYTHON_CMD
+
+# List all node modules that are currently installed. The "npm list" command is
+# slow, so we precompute this here and refer to it as needed.
+NPM_INSTALLED_MODULES="$($NPM_CMD list)"
+export NPM_INSTALLED_MODULES
+
+install_node_module() {
+  # Usage: install_node_module [module_name] [module_version]
+  #
+  # module_name: the name of the node module
+  # module_version: the expected version of the module
+
+  echo Checking whether $1 is installed
+  if [ ! -d "$NODE_MODULE_DIR/$1" ]; then
+    echo installing $1
+    $NPM_INSTALL $1@$2
+  else
+    if [[ $NPM_INSTALLED_MODULES != *"$1@$2"* ]]; then
+      echo Version of $1 does not match $2. Reinstalling $1...
+      $NPM_INSTALL $1@$2
+      # Regenerate the list of installed modules.
+      NPM_INSTALLED_MODULES="$($NPM_CMD list)"
+    fi
+  fi
+}
+export -f install_node_module
