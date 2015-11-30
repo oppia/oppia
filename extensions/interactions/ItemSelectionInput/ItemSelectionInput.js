@@ -21,7 +21,8 @@
  */
 
 oppia.directive('oppiaInteractiveItemSelectionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'itemSelectionInputRulesService', function(
+      oppiaHtmlEscaper, itemSelectionInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -65,7 +66,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
             return $scope.userSelections[obj];
           });
 
-          $scope.$parent.$parent.submitAnswer(answers, 'submit');
+          $scope.$parent.submitAnswer(answers, itemSelectionInputRulesService);
         };
       }]
     };
@@ -97,3 +98,23 @@ oppia.directive('oppiaShortResponseItemSelectionInput', [
     };
   }
 ]);
+
+oppia.factory('itemSelectionInputRulesService', [function() {
+  return {
+    Equals: function(answer, inputs) {
+      return answer.length == inputs.x.length && answer.every(function(val) {
+        return inputs.x.indexOf(val) != -1;
+      });
+    },
+    ContainsAtLeastOneOf: function(answer, inputs) {
+      return answer.some(function(val) {
+        return inputs.x.indexOf(val) != -1;
+      });
+    },
+    DoesNotContainAtLeastOneOf: function(answer, inputs) {
+      return inputs.x.some(function(val) {
+        return answer.indexOf(val) == -1;
+      });
+    }
+  };
+}]);
