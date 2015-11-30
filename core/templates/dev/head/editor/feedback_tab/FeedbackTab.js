@@ -89,13 +89,15 @@ oppia.controller('FeedbackTab', [
     });
   };
 
-  $scope.showSuggestionModal = function(suggestion) {
+  $scope.showSuggestionModal = function() {
     $modal.open({
       templateUrl: 'modals/editorViewSuggestion',
       backdrop: true,
+      scope: $scope,
+      size: 'lg',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.oldContent = suggestion.state_content.old_content;
-        $scope.newContent = suggestion.state_content.new_content;
+        $scope.oldContent = $scope.activeThread.suggestion.state_content.old_content;
+        $scope.newContent = $scope.activeThread.suggestion.state_content.new_content;
 
         $scope.accept = function() {
           $modalInstance.close({
@@ -114,7 +116,7 @@ oppia.controller('FeedbackTab', [
         };
       }]
     }).result.then(function(result) {
-      threadDataService.resolveSuggestion(suggestion.id, result.action);
+      threadDataService.resolveSuggestion($scope.activeThread.suggestion.suggestion.id, result.action);
     });
   };
 
@@ -161,8 +163,8 @@ oppia.controller('FeedbackTab', [
         state_name: null,
         status: 'NEW',
         state_content: {
-          old_content: 'Example exploration text',
-          new_content: 'Modified example exploration text'
+          old_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+          new_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum modified. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
         }
       },
       messages: [

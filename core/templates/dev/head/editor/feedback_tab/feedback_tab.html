@@ -93,7 +93,7 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <div style="white-space: pre-wrap;"><[m.text]></div>
-                  <button class="btn btn-primary" ng-if="activeThread.suggestion && $index==0" ng-click="showSuggestionModal(activeThread.suggestion)">
+                  <button class="btn btn-primary" ng-if="activeThread.suggestion && $index==0" ng-click="showSuggestionModal()">
                     View Suggestion
                   </button>
                 </div>
@@ -169,10 +169,20 @@
   </div>
 
   <div class="modal-body">
-    <strong>Current</strong>
-    <p><[ oldContent ]></p>
-    <strong>Proposed</strong>
-    <p><[ newContent ]></p>
+    <section style="width: 100%; height: 350px; padding: 10px;">
+      <div style="width: 49%; height: 100%; float: left;">
+        <strong>Current:</strong>
+        <div style="width:100%; height:100%; border:1px solid black; overflow: scroll;">
+          <p style="padding: 5px;"><[ oldContent ]></p>
+        </div>
+      </div>
+      <div style="width: 49%; height: 100%; float: right;">
+        <strong>Suggested:</strong>
+        <div style="width:100%; height:100%; border:1px solid black; overflow: scroll;">
+          <p style="padding: 5px;"><[ newContent ]></p>
+        </div>
+      </div>
+      </section>
   </div>
 
   <div class="modal-footer">
