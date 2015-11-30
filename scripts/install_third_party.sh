@@ -128,3 +128,5 @@ install_node_module gulp-concat 2.6.0
 install_node_module gulp-minify-css 1.2.1
 install_node_module gulp-util 3.0.7
 install_node_module jscs 2.3.0
+install_node_module gulp-sourcemaps 1.6.0
+install_node_module gulp-uglify 1.5.1
