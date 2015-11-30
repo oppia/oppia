@@ -25,8 +25,8 @@ oppia.directive('oppiaInteractiveTextInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/TextInput',
-      controller: ['$scope', '$attrs', 'focusService',
-          function($scope, $attrs, focusService) {
+      controller: ['$scope', '$attrs', 'focusService', 'textInputRulesService',
+          function($scope, $attrs, focusService, textInputRulesService) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
@@ -49,7 +49,7 @@ oppia.directive('oppiaInteractiveTextInput', [
             return;
           }
 
-          $scope.$parent.$parent.submitAnswer(answer);
+          $scope.$parent.submitAnswer(answer, textInputRulesService);
         };
       }]
     };
@@ -81,3 +81,21 @@ oppia.directive('oppiaShortResponseTextInput', [
     };
   }
 ]);
+
+oppia.factory('textInputRulesService', [function() {
+  return {
+    Equals: function(answer, inputs) {
+      return answer.toLowerCase() == inputs.x.toLowerCase();
+    },
+    CaseSensitiveEquals: function(answer, inputs) {
+      return answer == inputs.x;
+    },
+    StartsWith: function(answer, inputs) {
+      return answer.indexOf(inputs.x, 0) == 0;
+    },
+    Contains: function(answer, inputs) {
+      return answer.toLowerCase().indexOf(inputs.x.toLowerCase(), 0) != -1;
+    }
+
+  };
+}]);
