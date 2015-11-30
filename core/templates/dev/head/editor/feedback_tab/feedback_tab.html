@@ -187,7 +187,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger" ng-click="reject()">Reject</button>
-    <button class="btn btn-success" ng-click="accept()">Accept</button>
+    <button class="btn btn-danger" ng-click="reject()" ng-disabled="!(activeThread.suggestion.status == new)">Reject</button>
+    <button class="btn btn-success" ng-click="accept()" ng-disabled="!(activeThread.suggestion.status == new)">Accept</button>
   </div>
 </script>
