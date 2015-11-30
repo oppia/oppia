@@ -32,7 +32,6 @@ class UserSettingsModel(base_models.BaseModel):
     """
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
-
     # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
@@ -65,6 +64,22 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns a user model given a normalized username"""
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
+
+
+class UserContributionsModel(base_models.BaseModel):
+    """Tracks explorations created/edited for a particular user.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of explorations that this user has created 
+    # Includes subsequently deleted and private explorations.
+    created_explorations = ndb.StringProperty(repeated=True, 
+        indexed=True, default=None)
+    # IDs of explorations that this user has made a positive 
+    # (i.e. non-revert) commit to. 
+    # Includes subsequently deleted and private explorations.
+    edited_explorations = ndb.StringProperty(repeated=True, 
+        indexed=True, default=None)
 
 
 class UserEmailPreferencesModel(base_models.BaseModel):

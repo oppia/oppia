@@ -35,6 +35,7 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -851,6 +852,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+    user_services.add_created_exploration(committer_id, exploration.id)
+    user_services.add_edited_exploration(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -949,8 +952,10 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
+
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
+    user_services.add_edited_exploration(committer_id, exploration.id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -971,9 +976,14 @@ def update_exploration_summary(exploration_id, contributor_id_to_add):
 
 def compute_summary_of_exploration(exploration, contributor_id_to_add):
     """Create an ExplorationSummary domain object for a given Exploration
+<<<<<<< HEAD
+    domain object and return it. Committer_id will be added to the list
+    of contributors for the exploration if the id is not a system id.
+=======
     domain object and return it. contributor_id_to_add will be added to
     the list of contributors for the exploration if the argument is not
     None and if the id is not a system id.
+>>>>>>> upstream/develop
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)

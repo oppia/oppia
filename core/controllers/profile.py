@@ -18,6 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import rights_manager
 from core.domain import user_services
 import feconf
 import utils
@@ -53,6 +54,7 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
+
         if not user_settings:
             raise self.PageNotFoundException
 
@@ -76,15 +78,36 @@ class ProfileHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings_from_username(username)
         if not user_settings:
             raise self.PageNotFoundException
+        
+        user_contributions = user_services.get_user_contributions(
+            user_settings.user_id)
 
         self.values.update({
             'user_bio': user_settings.user_bio,
             'first_contribution_datetime': (
-                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
+                utils.get_time_in_millisecs(
+                    user_settings.first_contribution_datetime)
                 if user_settings.first_contribution_datetime else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'created_explorations_count': len(
+                user_contributions.created_explorations),
+            'edited_explorations_count': len(
+                user_contributions.edited_explorations)
+
         })
         self.render_json(self.values)
+
+    def get_public_contributions(list_explorations):
+        """Pass in created or edited explorations,
+        returns collection with only public explorations in list. 
+        """
+        public_explorations = []
+
+        for exploration_id in list_explorations:
+            if rights_manager.is_exploration_public(exploration):
+                public_explorations.append(exploration_id)
+
+        return public_explorations
 
 
 class PreferencesPage(base.BaseHandler):
@@ -169,7 +192,8 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
             raise self.PageNotFoundException
         user_settings = user_services.get_user_settings(user_id)
         self.values.update({
-            'profile_picture_data_url_for_username': user_settings.profile_picture_data_url
+            'profile_picture_data_url_for_username': 
+            user_settings.profile_picture_data_url
         })
         self.render_json(self.values)
 
