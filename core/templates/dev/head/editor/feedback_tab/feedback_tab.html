@@ -93,6 +93,9 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <div style="white-space: pre-wrap;"><[m.text]></div>
+                  <button class="btn btn-primary" ng-if="activeThread.suggestion && $index==0" ng-click="showSuggestionModal(activeThread.suggestion)">
+                    View Suggestion
+                  </button>
                 </div>
               </div>
             </td>
@@ -157,5 +160,24 @@
   <div class="modal-footer">
     <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/editorViewSuggestion">
+  <div class="modal-header">
+    <h3>Suggestion Review</h3>
+  </div>
+
+  <div class="modal-body">
+    <strong>Current</strong>
+    <p><[ oldContent ]></p>
+    <strong>Proposed</strong>
+    <p><[ newContent ]></p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger" ng-click="reject()">Reject</button>
+    <button class="btn btn-success" ng-click="accept()">Accept</button>
   </div>
 </script>

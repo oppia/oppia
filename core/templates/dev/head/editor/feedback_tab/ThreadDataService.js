@@ -24,6 +24,7 @@ oppia.factory('threadDataService', [
   var _expId = explorationData.explorationId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
   var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
+  var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -35,9 +36,66 @@ oppia.factory('threadDataService', [
 
   var _fetchThreads = function(successCallback) {
     // UI test code: http://pastebin.com/DhL4fGnm
+    // TEMPORARY CHANGES FOR DEBUGGING
+    /*
     var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
     var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
       params: {type: 'open'}
+    });
+    */
+    var mockFeedbackThreads = [
+      {
+        last_updated: 1441870501230.642,
+        original_author_username: 'test_author',
+        state_name: null,
+        status: 'open',
+        subject: 'example feedback',
+        summary: null,
+        threadId: 'abc1'
+      },
+      {
+        last_updated: 1441870501231.642,
+        original_author_username: 'test_author',
+        state_name: null,
+        status: 'open',
+        subject: 'example feedback',
+        summary: null,
+        threadId: 'abc2'
+      }
+    ];
+ 
+    var mockOpenSuggestionThreads = [
+      {
+        last_updated: 1441870501232.642,
+        original_author_username: 'test_author',
+        state_name: null,
+        status: 'open',
+        subject: 'example suggestion',
+        summary: null,
+        threadId: 'abc3',
+        suggestion_id: '1'
+      },
+      {
+        last_updated: 1441870501233.642,
+        original_author_username: 'test_author',
+        state_name: null,
+        status: 'open',
+        subject: 'example suggestion',
+        summary: null,
+        threadId: 'abc4',
+        suggestion_id: '2'
+      }
+    ];
+ 
+    var fPromise = $q(function(resolve, reject) {
+      setTimeout(function() {
+        resolve({ data: {threads: mockFeedbackThreads} });
+      }, 50);
+    });
+    var sPromise = $q(function(resolve, reject) {
+      setTimeout(function(){
+        resolve({ data: {threads: mockOpenSuggestionThreads} });
+      }, 50);
     });
 
     $q.all([fPromise, sPromise]).then(function(res) {
@@ -113,6 +171,11 @@ oppia.factory('threadDataService', [
         if (errorCallback) {
           errorCallback();
         }
+      });
+    },
+    resolveSuggestion: function(thread_id, action) {
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + thread_id, {
+        action: action
       });
     }
   };

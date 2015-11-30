@@ -87,6 +87,9 @@ describe('retrieving threads service', function() {
       threads: mockOpenSuggestionThreads
     });
 
+    httpBackend.whenGET('/threadhandler').respond({
+    });
+
     threadDataService.fetchThreads();
     httpBackend.flush();
 

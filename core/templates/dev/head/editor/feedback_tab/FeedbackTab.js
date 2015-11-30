@@ -89,6 +89,35 @@ oppia.controller('FeedbackTab', [
     });
   };
 
+  $scope.showSuggestionModal = function(suggestion) {
+    $modal.open({
+      templateUrl: 'modals/editorViewSuggestion',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.oldContent = suggestion.state_content.old_content;
+        $scope.newContent = suggestion.state_content.new_content;
+
+        $scope.accept = function() {
+          $modalInstance.close({
+            action: 'accept'
+          });
+        };
+
+        $scope.reject = function() {
+          $modalInstance.close({
+            action: 'reject'
+          });
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    }).result.then(function(result) {
+      threadDataService.resolveSuggestion(suggestion.id, result.action);
+    });
+  };
+
   $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
     if (threadId === null) {
       warningsData.addWarning('Cannot add message to thread with ID: null.');
@@ -117,6 +146,42 @@ oppia.controller('FeedbackTab', [
         break;
       }
     }
+
+    // DEBUG CODE. REMOVE BEFORE MERGE
+    $scope.activeThread = {
+      author_id: 'test_author',
+      state_name: null,
+      status: 'open',
+      subject: 'test thread',
+      suggestion: {
+        author_username: 'test_author',
+        id: 'abc3',
+        exp_id: 'bb2Vu54eVVl3',
+        exp_version: '1',
+        state_name: null,
+        status: 'NEW',
+        state_content: {
+          old_content: 'Example exploration text',
+          new_content: 'Modified example exploration text'
+        }
+      },
+      messages: [
+        {
+          message_id: '5',
+          author_username: 'test_author',
+          updated_status: '',
+          updated_subject: '',
+          text: 'Please review this suggestion. It will make your exploration much better.'
+        },
+        {
+          message_id: '6',
+          author_username: 'test_editor',
+          updated_status: '',
+          updated_subject: '',
+          text: 'OK, I will review this.'
+        }
+      ]
+    };
 
     $scope.tmpMessage.status = $scope.activeThread.status;
   };
