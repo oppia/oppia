@@ -63,7 +63,7 @@
           "angular-aria.min.js", "angular-aria.min.js.map"
         ],
         "jsFiles": [
-          "angular.js", "angular-animate.js", "angular-resource.js",
+          "angular-animate.js", "angular-resource.js",
           "angular-sanitize.js", "angular-aria.js"
         ]
       },
@@ -117,7 +117,8 @@
         "version": "2.0.4",
         "zipUrl": "https://github.com/hammerjs/hammer.js/archive/2.0.4.zip",
         "rootDirPrefix": "hammer.js-",
-        "targetDirPrefix": "hammer-js-"
+        "targetDirPrefix": "hammer-js-",
+        "jsFiles": ["hammer.js"]
       },
       "jquery": {
         "version": "2.1.1",
@@ -145,8 +146,7 @@
         "version": "2.4-latest",
         "zipUrl": "https://github.com/mathjax/MathJax/archive/v2.4-latest.zip",
         "rootDirPrefix": "MathJax-",
-        "targetDirPrefix": "MathJax-",
-        "jsFiles": ["MathJax.js?config=TeX-AMS-MML_HTMLorMML"]
+        "targetDirPrefix": "MathJax-"
       },
       "midiJs": {
         "version": "2ef687b47e5f478f1506b47238f3785d9ea8bd25",
@@ -167,8 +167,8 @@
         "zipUrl": "https://github.com/alexk111/ngImgCrop/archive/v0.3.2.zip",
         "rootDirPrefix": "ngImgCrop-",
         "targetDirPrefix": "ng-img-crop-",
-        "jsFiles": ["compile/minfied/ng-img-crop.js"],
-        "cssFiles": ["compile/minfied/ng-img-crop.css"]
+        "jsFiles": ["compile/minified/ng-img-crop.js"],
+        "cssFiles": ["compile/minified/ng-img-crop.css"]
       },
       "ngInfiniteScroll": {
         "version": "1.0.0",
@@ -192,7 +192,7 @@
         "zipUrl": "https://github.com/fraywing/textAngular/archive/v1.3.7.zip",
         "rootDirPrefix": "textAngular-",
         "targetDirPrefix": "textAngular-",
-        "jsFiles": ["src/textAngular.js"],
+        "jsFiles": ["src/textAngular.js", "src/textAngularSetup.js", "dist/textAngular-rangy.min.js"],
         "cssFiles": ["src/textAngular.css"]
       },
       "uiBootstrap": {
@@ -226,7 +226,8 @@
         "version": "0.1.1",
         "zipUrl": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip",
         "rootDirPrefix": "ui-utils-",
-        "targetDirPrefix": "ui-utils-"
+        "targetDirPrefix": "ui-utils-",
+        "jsFiles": ["ui-utils.js"]
       }
     },
     "oppiaTools": {
