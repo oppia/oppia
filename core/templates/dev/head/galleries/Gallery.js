@@ -264,12 +264,10 @@ oppia.controller('Gallery', [
 }]);
 
 oppia.controller('SearchBar', [
-    '$scope', '$rootScope', '$translate', '$translatePartialLoader',
-    'searchService', 'oppiaDebouncer', 'createExplorationButtonService',
-    'urlService', 'CATEGORY_LIST',
-    function($scope, $rootScope, $translate, $translatePartialLoader,
-      searchService, oppiaDebouncer, createExplorationButtonService,
-      urlService, CATEGORY_LIST) {
+    '$scope', '$rootScope', '$translate', 'searchService', 'oppiaDebouncer',
+    'createExplorationButtonService', 'urlService', 'CATEGORY_LIST',
+    function($scope, $rootScope, $translate, searchService, oppiaDebouncer,
+      createExplorationButtonService, urlService, CATEGORY_LIST) {
 
   $scope.searchIsLoading = false;
   $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
