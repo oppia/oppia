@@ -167,10 +167,6 @@ body {
     
 }
 
-.oppia-big-top-container {
-  margin-bottom: 70px;
-}
-
 .oppia-stat-container-top span {
   display: block;
 }
@@ -179,11 +175,11 @@ body {
   display: block;
 }
 
-.oppia-big-number {
+.oppia-stat-container-top .oppia-big-number {
   font-size: 50px;
 }
 
-.oppia-small-number {
+.oppia-stat-container .oppia-small-number {
   font-size: 25px;
 }
 

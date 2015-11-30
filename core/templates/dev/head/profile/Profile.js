@@ -30,12 +30,10 @@ oppia.controller('Profile', [
 
 //to be redefined to pull from the back end instead of 4.5s
 
-    $scope.userAverageRating = 4.5;
+    $scope.userImpact = 4.5;
     $scope.userPlaysOnCreatedExploration = 4.5;
     $scope.numUserCreatedExplorations = 4.5;
     $scope.numUserEditedExplorations = 4.5;
-    $scope.userFeedbackGiven = 4.5;
-    $scope.userFeedbackResponses = 4.5;
     $scope.userExplorationsLearned = 4.5;
     
     $scope.areRatingsShown = function(ratingFrequencies) {
