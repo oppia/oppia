@@ -577,13 +577,14 @@ def get_collection_snapshots_metadata(collection_id):
 
 
 def _get_contributor_ids_for_collection(col_id):
-    """Returns list of ids of contributers to a collection."""
+    """Returns list of ids of contributors to a collection."""
     contributor_ids = []
     collection_snapshots = get_collection_snapshots_metadata(col_id)
     for snapshot in collection_snapshots:
         if not snapshot['committer_id'] in contributor_ids:
             contributor_ids.append(snapshot['committer_id'])
     return contributor_ids
+
 
 def publish_collection_and_update_user_profiles(committer_id, col_id):
     """Publishes the collection with publish_collection() function in
@@ -598,6 +599,7 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
             contributor, contribution_time_msec)
+
 
 def update_collection(
         committer_id, collection_id, change_list, commit_message):

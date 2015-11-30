@@ -212,12 +212,12 @@ def update_activity_first_published_msec(
     updating it.
     """
     activity_rights = _get_activity_rights(activity_type, activity_id)
-    activity_rights.first_published_msec = first_published_msec
     commit_cmds = [{
         'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'old_first_published_msec': None,
+        'old_first_published_msec': activity_rights.first_published_msec,
         'new_first_published_msec': first_published_msec
     }]
+    activity_rights.first_published_msec = first_published_msec
     _save_activity_rights(
         feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
         'set first published time in msec', commit_cmds)
@@ -636,7 +636,6 @@ def _change_activity_status(
     _update_activity_summary(activity_type, activity_rights)
 
     if new_status != ACTIVITY_STATUS_PRIVATE:
-        activity_rights.viewer_ids = []
         # Change first_published_msec in activity rights if necessary.
         if activity_rights.first_published_msec is None:
             activity_rights.first_published_msec = (

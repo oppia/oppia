@@ -428,7 +428,6 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         super(OneOffReindexExplorationsJobTest, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         explorations = [exp_domain.Exploration.create_default_exploration(

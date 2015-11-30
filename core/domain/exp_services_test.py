@@ -1344,7 +1344,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_snapshots_metadata(self):
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
-        self.login(self.SECOND_EMAIL)
         self.second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
 
         v1_exploration = self.save_new_valid_exploration(

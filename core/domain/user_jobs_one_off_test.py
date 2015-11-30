@@ -442,8 +442,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.init_state_name = exploration.init_state_name
         exp_services.publish_exploration_and_update_user_profiles(
             self.owner_id, self.EXP_ID)
-        # User's first_contribution_msec is reset to None after publish_exploration
-        # sets it. This is to test that the one off job skips over the unpublished
+        # We now manually reset the user's first_contribution_msec to None.
+        # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
         user_services._update_first_contribution_msec(
             self.owner_id, None)

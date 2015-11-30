@@ -151,8 +151,7 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        snapshot_id = item.id
-        exp_id = snapshot_id[:snapshot_id.rfind('-')]
+        exp_id = item.get_unversioned_instance_id()
         exp_first_published_msec = rights_manager.get_exploration_rights(
             exp_id).first_published_msec
         # First contribution time in msec is only set from contributions to
