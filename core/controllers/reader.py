@@ -106,49 +106,46 @@ def classify(exp_id, state, answer, params):
     first rule best satisfied by the answer. Returns a dict with the following
     keys:
         'outcome': A dict representing the outcome of the answer group matched.
-        'rule_spec_string': A descriptive string representation of the rule
-            matched.
         'answer_group_index': An index into the answer groups list indicating
             which one was selected as the group which this answer belongs to.
             This is equal to the number of answer groups if the default outcome
             was matched.
-        'classification_certainty': A normalized value within the range of
-            [0, 1] representing at which confidence level the answer belongs in
-            the chosen answer group. A certainty of 1 means it is the best
-            possible match. A certainty of 0 means it is matched to the default
-            outcome.
+        'rule_spec_index': An index into the rule specs list of the matched
+            answer group which was selected that indicates which rule spec was
+            matched. This is equal to 0 if the default outcome is selected.
     When the default rule is matched, outcome is the default_outcome of the
-    state's interaction and the rule_spec_string is just 'Default.'
+    state's interaction.
     """
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
 
-    # Find the first group that satisfactorily matches the given answer. This is
-    # done by ORing (maximizing) all truth values of all rules over all answer
-    # groups. The group with the highest truth value is considered the best
-    # match.
+    # Find the first group that satisfactorily matches the given answer. This
+    # is done by ORing (maximizing) all truth values of all rules over all
+    # answer groups. The group with the highest truth value is considered the
+    # best match.
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
     best_matched_truth_value = 0.0
-    for (i, answer_group) in enumerate(state.interaction.answer_groups):
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exp_id))
         input_type = interaction_instance.answer_type
         ored_truth_value = 0.0
-        best_rule_spec = None
-        for rule_spec in answer_group.rule_specs:
+        best_rule_spec_index = None
+        for (rule_spec_index, rule_spec) in enumerate(answer_group.rule_specs):
             evaluated_truth_value = rule_domain.evaluate_rule(
                 rule_spec, input_type, params, normalized_answer, fs)
             if evaluated_truth_value > ored_truth_value:
                 ored_truth_value = evaluated_truth_value
-                best_rule_spec = rule_spec
+                best_rule_spec_index = rule_spec_index
         if ored_truth_value > best_matched_truth_value:
             best_matched_truth_value = ored_truth_value
-            best_matched_rule_spec = best_rule_spec
             best_matched_answer_group = answer_group
-            best_matched_answer_group_index = i
+            best_matched_answer_group_index = answer_group_index
+            best_matched_rule_spec_index = best_rule_spec_index
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
@@ -158,17 +155,14 @@ def classify(exp_id, state, answer, params):
             feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
         return {
             'outcome': best_matched_answer_group.outcome.to_dict(),
-            'rule_spec_string': (
-                best_matched_rule_spec.stringify_classified_rule()),
             'answer_group_index': best_matched_answer_group_index,
-            'classification_certainty': best_matched_truth_value
+            'rule_spec_index': best_matched_rule_spec_index,
         }
     elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
-            'rule_spec_string': exp_domain.DEFAULT_RULESPEC_STR,
             'answer_group_index': len(state.interaction.answer_groups),
-            'classification_certainty': 0.0
+            'rule_spec_index': 0
         }
 
     raise Exception('Something has seriously gone wrong with the exploration. '
@@ -321,12 +315,22 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
-        rule_spec_string = self.payload.get('rule_spec_string')
+        # The answer group and rule spec indexes, which will be used to get
+        # the rule spec string.
+        answer_group_index = self.payload.get('answer_group_index')
+        rule_spec_index = self.payload.get('rule_spec_index')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
-        exp_param_specs = exploration.param_specs
+
         old_interaction = exploration.states[old_state_name].interaction
+
+        if answer_group_index == len(old_interaction.answer_groups):
+            rule_spec_string = exp_domain.DEFAULT_RULESPEC_STR
+        else:
+            rule_spec_string = (
+                old_interaction.answer_groups[answer_group_index].rule_specs[
+                    rule_spec_index].stringify_classified_rule())
 
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -367,10 +371,11 @@ class StateHitEventHandler(base.BaseHandler):
 class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding classification result, which is a dict containing
-    two keys:
+    three keys:
         'outcome': A dict representing the outcome of the answer group matched.
-        'rule_spec_string': A descriptive string representation of the rule
-            matched.
+        'answer_group_index': The index of the matched answer group.
+        'rule_spec_index': The index of the matched rule spec in the matched
+            answer group.
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False

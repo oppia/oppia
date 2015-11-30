@@ -189,7 +189,8 @@ def _save_activity_rights(
 # TODO(msl): get rid of inline imports by refactoring code
 def _update_exploration_summary(activity_rights):
     from core.domain import exp_services
-    exp_services.update_exploration_summary(activity_rights.id)
+    exp_services.update_exploration_summary(
+        activity_rights.id, None)
 
 
 def _update_collection_summary(activity_rights):

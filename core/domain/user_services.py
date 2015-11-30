@@ -21,7 +21,6 @@ __author__ = 'Stephanie Federwisch'
 import datetime
 import logging
 import re
-from core.domain import rights_manager
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -405,19 +404,6 @@ class UserContributions(object):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-
-
-def get_public_contributions(list_explorations):
-    """Pass in created or edited explorations,
-    returns collection with only public explorations in list. 
-    """
-    public_explorations = []
-
-    for exploration_id in list_explorations:
-        if rights_manager.is_exploration_public(exploration):
-            public_explorations.append(exploration_id)
-
-    return public_explorations
 
 
 def get_user_contributions(user_id, strict=False):

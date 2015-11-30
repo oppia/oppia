@@ -508,16 +508,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
 
-        # change param spec
+        # Change param spec.
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'param_specs',
                 'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
-            }],
-            '')
+            }], '')
 
-        # change title and category
+        # Change title and category.
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
@@ -527,14 +526,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'category',
                 'new_value': 'A new category'
-            }],
-            'Change title and category')
+            }], 'Change title and category')
 
         retrieved_exp_summary = exp_services.get_exploration_summary_by_id(
             self.EXP_ID)
 
         self.assertEqual(retrieved_exp_summary.title, 'A new title')
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
+        self.assertEqual(retrieved_exp_summary.contributor_ids, [self.OWNER_ID])
 
 
 class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
@@ -2075,6 +2074,34 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertFalse(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.VIEWER_ID))
 
+    def test_contributors_not_updated_on_revert(self):
+        """Test that a user who only makes a revert on an exploration
+        is not counted in the list of that exploration's contributors.
+        """
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        # Have Albert create a new exploration.
+        exploration_1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.ALBERT_ID)
+        # Have Albert update that exploration.
+        exp_services.update_exploration(
+            self.ALBERT_ID, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        # Have Bob revert Albert's update.
+        exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 2, 1)
+
+        # Verify that only Albert (and not Bob, who has not made any non-
+        # revert changes) appears in the contributors list for this
+        # exploration.
+        exploration_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID_1)
+        self.assertEqual([self.ALBERT_ID], exploration_summary.contributor_ids)
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
@@ -2118,7 +2145,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            }],'Changed title.')
+            }], 'Changed title.')
 
         exploration_2 = self.save_new_valid_exploration(
             self.EXP_ID_2, self.ALBERT_ID)
@@ -2128,14 +2155,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
-            }],'Changed title to Albert1 title.')
+            }], 'Changed title to Albert1 title.')
 
         exp_services.update_exploration(
             self.ALBERT_ID, self.EXP_ID_2, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
-            }],'Changed title to Albert2 title.')
+            }], 'Changed title to Albert2 title.')
 
         exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
 
@@ -2155,7 +2182,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
+                False, [self.ALBERT_ID], [], [], [self.ALBERT_ID],
+                self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
                 )}
@@ -2166,7 +2194,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version',
+                        'editor_ids', 'viewer_ids',
+                        'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
         for exp_id in actual_summaries.keys():
@@ -2183,7 +2212,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
+                False, [self.ALBERT_ID], [], [], [self.ALBERT_ID, self.BOB_ID],
+                self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
             ),
@@ -2192,7 +2222,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
+                False, [self.ALBERT_ID], [], [], [self.ALBERT_ID],
+                self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
             )
@@ -2204,8 +2235,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version',
-                        'exploration_model_created_on',
+                        'editor_ids', 'viewer_ids', 'contributor_ids',
+                        'version', 'exploration_model_created_on',
                         'exploration_model_last_updated']
         for exp_id in actual_summaries.keys():
             for prop in simple_props:

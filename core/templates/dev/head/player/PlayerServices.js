@@ -86,40 +86,6 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   };
 }]);
 
-// A service that, given an answer, classifies it and returns the corresponding
-// answerGroup.
-oppia.factory('answerClassificationService', [
-    '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
-  var _USE_CLIENT_SIDE_CLASSIFICATION = false;
-
-  return {
-    // Returns a promise with the corresponding ruleSpec.
-    getMatchingClassificationResult: function(explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: learnerParamsService.getAllParams(),
-          answer: answer
-        });
-      }
-    },
-    getMatchingEditorClassificationResult: function(
-        explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        // TODO(bhenning): Figure out a long-term solution for determining what
-        // params should be passed to the batch classifier.
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: {},
-          answer: answer
-        });
-      }
-    },
-  };
-}]);
-
 // A service that provides a number of utility functions for JS used by
 // individual player skins.
 // Note that this service is used both in the learner and the editor views.
@@ -537,7 +503,8 @@ oppia.factory('oppiaPlayerService', [
           answer, currentInteraction.id, currentInteraction.customization_args);
       }
     },
-    submitAnswer: function(answer, successCallback, delayParamUpdates) {
+    submitAnswer: function(
+        answer, interactionRulesService, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -548,8 +515,8 @@ oppia.factory('oppiaPlayerService', [
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
       answerClassificationService.getMatchingClassificationResult(
-        _explorationId, oldState, answer
-      ).success(function(classificationResult) {
+        _explorationId, oldState, answer, false, interactionRulesService
+      ).then(function(classificationResult) {
         var outcome = classificationResult.outcome;
 
         if (!_editorPreviewMode) {
@@ -560,7 +527,8 @@ oppia.factory('oppiaPlayerService', [
             params: learnerParamsService.getAllParams(),
             version: version,
             old_state_name: _currentStateName,
-            rule_spec_string: classificationResult.rule_spec_string
+            answer_group_index: classificationResult.answerGroupIndex,
+            rule_spec_index: classificationResult.ruleSpecIndex
           });
         }
 
@@ -589,7 +557,7 @@ oppia.factory('oppiaPlayerService', [
           outcome, _exploration.states[newStateName], answer);
 
         if (nextStateData) {
-          nextStateData['state_name'] = newStateName;
+          nextStateData.state_name = newStateName;
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,

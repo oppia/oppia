@@ -18,6 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import rights_manager
 from core.domain import user_services
 import feconf
 import utils
@@ -95,6 +96,18 @@ class ProfileHandler(base.BaseHandler):
 
         })
         self.render_json(self.values)
+
+    def get_public_contributions(list_explorations):
+        """Pass in created or edited explorations,
+        returns collection with only public explorations in list. 
+        """
+        public_explorations = []
+
+        for exploration_id in list_explorations:
+            if rights_manager.is_exploration_public(exploration):
+                public_explorations.append(exploration_id)
+
+        return public_explorations
 
 
 class PreferencesPage(base.BaseHandler):
