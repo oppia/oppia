@@ -159,42 +159,6 @@ oppia.controller('FeedbackTab', [
       }
     }
 
-    // DEBUG CODE. REMOVE BEFORE MERGE
-    $scope.activeThread = {
-      author_id: 'test_author',
-      state_name: null,
-      status: 'open',
-      subject: 'test thread',
-      suggestion: {
-        author_username: 'test_author',
-        id: 'abc3',
-        exp_id: 'bb2Vu54eVVl3',
-        exp_version: '1',
-        state_name: null,
-        status: 'accepted',
-        state_content: {
-          old_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-          new_content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum modified. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        }
-      },
-      messages: [
-        {
-          message_id: '5',
-          author_username: 'test_author',
-          updated_status: '',
-          updated_subject: '',
-          text: 'Please review this suggestion. It will make your exploration much better.'
-        },
-        {
-          message_id: '6',
-          author_username: 'test_editor',
-          updated_status: '',
-          updated_subject: '',
-          text: 'OK, I will review this.'
-        }
-      ]
-    };
-
     $scope.tmpMessage.status = $scope.activeThread.status;
   };
 
