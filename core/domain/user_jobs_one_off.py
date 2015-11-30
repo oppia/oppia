@@ -177,6 +177,10 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
 
         # Get rating term to use in impact calculation.
         rating_term = average_rating - UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING
+        # Only explorations with an average rating greater than the minimum
+        # have an impact.
+        if rating_term <= 0:
+            return 0
 
         # Get num_ratings_scaler.
         if totalNumber < UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER_CUTOFF:

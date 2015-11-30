@@ -387,21 +387,44 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
 class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
-    """ Tests the calculation of a user's impact score from the
-    one-off UserImpactCalculationOneOffJob.
+    """ Tests the calculation of a user's impact score from the one-off
+    UserImpactCalculationOneOffJob.
     """
 
-    EXP_ID = 'exp_id_1'
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
-    RATINGS_SCALER_CUTOFF = 10
-    RATING = 3
-    NUM_COMPLETIONS = 2
+    # Constants imported from the oneoff job.
+    NUM_RATINGS_SCALER_CUTOFF = user_jobs_one_off.UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER_CUTOFF
+    NUM_RATINGS_SCALER = user_jobs_one_off.UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER
+    MIN_AVERAGE_RATING = user_jobs_one_off.UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING
+    MULTIPLIER = user_jobs_one_off.UserImpactCalculationOneOffJob.MULTIPLIER
+    # The impact score takes the ln of the number of completions as a factor,
+    # so the minimum number of completions to get a nonzero impact score
+    # is 2.
+    MIN_NUM_COMPLETIONS = 2
+    BELOW_MIN_RATING = int(math.ceil(MIN_AVERAGE_RATING - 1))
+    ABOVE_MIN_RATING = int(math.floor(MIN_AVERAGE_RATING + 1))
+
+    num_completions = {EXP_ID_1: 0, EXP_ID_2: 0}
 
     def _mock_get_statistics(self, exp_id, version):
-        return {
-            'complete_exploration_count': self.NUM_COMPLETIONS
+        curr_completions = {
+            self.EXP_ID_1:
+                {'complete_exploration_count': self.num_completions[self.EXP_ID_1]},
+            self.EXP_ID_2:
+                {'complete_exploration_count': self.num_completions[self.EXP_ID_2]},
         }
+        return curr_completions[exp_id]
+
+    @classmethod
+    def _mock_get_zero_impact_score(cls, exploration_id):
+        return 0
+
+    @classmethod
+    def _mock_get_below_zero_impact_score(cls, exploration_id):
+        return -1
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job after running the continuous
@@ -413,16 +436,13 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
                 user_jobs_one_off.UserImpactCalculationOneOffJob.enqueue(job_id)
                 self.process_and_flush_pending_tasks()
 
-    def test_user_with_no_explorations_has_no_impact(self):
-        """Test that a user who is not a contributor on any exploration
-        is not assigned an impact score by the UserImpactCalculationOneOffJob.
-        """
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self._run_one_off_job()
-        user_stats_model = user_models.UserStatsModel.get(
-            self.user_a_id, strict=False)
-        self.assertIsNone(user_stats_model)
+    def _run_exp_impact_calculation_and_assert_equals(
+            self, exploration_id, expected_impact):
+        with self.swap(stats_jobs_continuous.StatisticsAggregator,
+                    'get_statistics', self._mock_get_statistics):
+            self.assertEqual(expected_impact,
+                user_jobs_one_off.UserImpactCalculationOneOffJob._get_exp_impact_score(
+                exploration_id))
 
     def _sign_up_user(self, user_email, username):
         # Sign up a user, have them create an exploration.
@@ -447,21 +467,35 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
                 user_id, exp_id, rating
             )
 
-    def _complete_exploration(self, exp_id, num_completions):
+    def _complete_exploration(self, exploration, num_completions):
         """Log a completion of exploration with id exp_id num_completions
         times."""
         exp_version = 1
-        state = self.exploration.init_state_name
+        state = exploration.init_state_name
         session_ids = ['session{}'.format(i) for i in range(num_completions)]
         for session_id in session_ids:
             event_services.StartExplorationEventHandler.record(
-                exp_id, exp_version, state, session_id, {},
+                exploration.id, exp_version, state, session_id, {},
                 feconf.PLAY_TYPE_NORMAL)
             event_services.CompleteExplorationEventHandler.record(
-                exp_id, exp_version, state, session_id, 27, {},
+                exploration.id, exp_version, state, session_id, 27, {},
                 feconf.PLAY_TYPE_NORMAL)
+        # Set the number of completions, so mock can function
+        # correctly.
+        self.num_completions[exploration.id] = num_completions
 
-    def test_standard_user_impact_calculation(self):
+    def test_user_with_no_explorations_has_no_impact(self):
+        """Test that a user who is not a contributor on any exploration
+        is not assigned an impact score by the UserImpactCalculationOneOffJob.
+        """
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertIsNone(user_stats_model)
+
+    def test_standard_user_impact_calculation_one_exploration(self):
         """Test that a user who is a contributor on one exploration that:
         - has a number of ratings for that exploration above the treshold
         for the scaler for number of ratings
@@ -474,18 +508,19 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         self.user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.exploration = self._create_exploration(
-            self.EXP_ID, self.user_a_id)
+            self.EXP_ID_1, self.user_a_id)
         # Give this exploration as many ratings as necessary to avoid
         # the scaler for number of ratings.
         self._rate_exploration(
-            self.exploration.id, self.RATINGS_SCALER_CUTOFF, self.RATING)
-        # Give this exploration more than one playthrough (so ln(num_completions != 0).
-        self._complete_exploration(self.exploration.id, self.NUM_COMPLETIONS)
+            self.exploration.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        # Give this exploration more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
 
         expected_user_impact_score = round(
-            math.log(self.NUM_COMPLETIONS)*
-            (self.RATING - user_jobs_one_off.UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING)*
-            user_jobs_one_off.UserImpactCalculationOneOffJob.MULTIPLIER
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.MULTIPLIER
             )
 
         # Verify that the impact score matches the expected.
@@ -493,14 +528,45 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
+    def test_standard_user_impact_calculation_multiple_explorations(self):
+        """Test that a user who is a contributor on two explorations that:
+        - have a number of ratings for that exploration above the treshold
+        for the scaler for number of ratings
+        - have an average rating above the minimum average rating
+        - have a number of playthroughs > 1
+        is assigned the correct impact score by the
+        UserImpactCalculationOneOffJob.
+        """
+        # Sign up a user and have them create two explorations.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration_1 = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self.exploration_2 = self._create_exploration(
+            self.EXP_ID_2, self.user_a_id)
+        # Give these explorations as many ratings as necessary to avoid
+        # the scaler for number of ratings.
+        self._rate_exploration(
+            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        self._rate_exploration(
+            self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        # Give these explorations more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
+        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
 
-    @classmethod
-    def _mock_get_zero_impact_score(cls, exploration_id):
-        return 0
+        # The user impact score should be the rounded sum of these two impacts
+        # (2 * the same impact).
+        expected_user_impact_score = round(2*(
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.MULTIPLIER
+            ))
 
-    @classmethod
-    def _mock_get_below_zero_impact_score(cls, exploration_id):
-        return -1
+        # Verify that the impact score matches the expected.
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
     def test_only_yield_when_impact_greater_than_zero(self):
         """Tests that map only yields an impact score for an
@@ -509,7 +575,7 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         self.user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.exploration = self._create_exploration(
-            self.EXP_ID, self.user_a_id)
+            self.EXP_ID_1, self.user_a_id)
 
         # Use mock impact scores to verify that map only yields when
         # the impact score > 0.
@@ -527,3 +593,235 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
                 self.exploration)
             with self.assertRaises(StopIteration):
                 next(results)
+
+    def test_impact_for_exp_with_one_completion(self):
+        """Test that when an exploration has only one completion,
+        the impact returned from the impact function is 0.
+        """
+        # Sign up a user and have them create an exploration.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        # Give this exploration as many ratings as necessary to avoid
+        # the scaler for number of ratings.
+        self._rate_exploration(
+            self.exploration.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        # Complete the exploration once.
+        self._complete_exploration(self.exploration, 1)
+        # Verify that the impact calculated is 0.
+        self._run_exp_impact_calculation_and_assert_equals(
+            self.exploration.id, 0)
+
+    def test_impact_for_exp_with_no_ratings(self):
+        """Test that when an exploration has no ratings, the impact returned
+        from the impact function is 0.
+        """
+        # Sign up a user and have them create an exploration.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        # Give this exploration more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
+        # Verify that the impact calculated is 0.
+        self._run_exp_impact_calculation_and_assert_equals(
+            self.exploration.id, 0)
+
+    def test_impact_for_exp_with_avg_rating_not_greater_than_min(self):
+        """Test that an exploration has an average rating less than the
+        minimum average rating, the impact returned from the impact function
+        is 0.
+        """
+        # Sign up a user and have them create an exploration.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        # Give this exploration more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
+
+        # Rate this exploration once, with exactly the minimum average
+        # rating.
+        self._rate_exploration(self.exploration.id, 1, self.BELOW_MIN_RATING)
+        # Verify that the impact calculated is 0.
+        self._run_exp_impact_calculation_and_assert_equals(
+            self.exploration.id, 0)
+
+        # Rate this exploration again, dropping the average below the minimum.
+        self._rate_exploration(self.exploration.id, 1, self.BELOW_MIN_RATING)
+        # Verify that the impact calculated is still 0.
+        self._run_exp_impact_calculation_and_assert_equals(
+            self.exploration.id, 0)
+
+    def test_impact_with_ratings_scaler(self):
+        """Test that the ratings scaler is being properly applied in the
+        impact calculation.
+        """
+        # Sign up a user and have them create an exploration.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        # Give this exploration more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
+        # Rate this exploration only twice, but give rating above minimum
+        # average rating.
+        self._rate_exploration(
+            self.exploration.id, 2, self.ABOVE_MIN_RATING)
+
+        expected_exp_impact_score = (
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            (self.NUM_RATINGS_SCALER*2)*
+            self.MULTIPLIER
+        )
+        self._run_exp_impact_calculation_and_assert_equals(
+            self.exploration.id, expected_exp_impact_score)
+
+    def test_scaler_multiplier_independence(self):
+        """Test that when one exploration has less than 10 ratings,
+        the other exploration's impact score is not impacted.
+        """
+        # Sign up a user and have them create two explorations.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration_1 = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self.exploration_2 = self._create_exploration(
+            self.EXP_ID_2, self.user_a_id)
+        # Give one explorations as many ratings as necessary to avoid
+        # the scaler for number of ratings. Give the other only 1.
+        self._rate_exploration(
+            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        self._rate_exploration(
+            self.exploration_2.id, 1, self.ABOVE_MIN_RATING)
+        # Give these explorations more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
+        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
+
+        # Calculate the expected impact for each exploration.
+        exp_1_impact = (
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.MULTIPLIER
+        )
+        exp_2_impact = (
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.NUM_RATINGS_SCALER*
+            self.MULTIPLIER
+        )
+        # The user impact score should be the rounded sum of these two impacts.
+        expected_user_impact_score = round(exp_1_impact + exp_2_impact)
+
+        # Verify that the impact score matches the expected.
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+
+    def test_no_ratings_independence(self):
+        """Test that when one exploration has no ratings, the other exploration's
+        impact score is not impacted.
+        """
+        # Sign up a user and have them create two explorations.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration_1 = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self.exploration_2 = self._create_exploration(
+            self.EXP_ID_2, self.user_a_id)
+        # Give one exploration as many ratings as necessary to avoid
+        # the scaler for number of ratings. Don't give the other any ratings.
+        self._rate_exploration(
+            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        # Give these explorations more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
+        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
+        # We expect the second exploration to yield 0 (since it has no
+        # ratings), so the expected impact score is just the impact score for
+        # exploration 1.
+        expected_user_impact_score = round(
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.MULTIPLIER
+        )
+        # Verify that the impact score matches the expected.
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+
+    def test_min_avg_rating_independence(self):
+        """Test that when one exploration has less than the minimum average
+        rating, the other exploration's impact score is not impacted.
+        """
+        # Sign up a user and have them create two explorations.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration_1 = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self.exploration_2 = self._create_exploration(
+            self.EXP_ID_2, self.user_a_id)
+        # Give these explorations as many ratings as necessary to avoid
+        # the scaler for number of ratings. Rate one above the minimum,
+        # rate the other below.
+        self._rate_exploration(
+            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        self._rate_exploration(
+            self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF,
+                self.BELOW_MIN_RATING)
+        # Give these explorations more than one playthrough (so
+        # ln(num_completions != 0).
+        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
+        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
+        # We expect the second exploration to yield 0 (since its average rating
+        # is below the minimum), so the expected impact score is just the
+        # impact score for exploration 1.
+        expected_user_impact_score = round(
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.MULTIPLIER
+        )
+        # Verify that the impact score matches the expected.
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+
+    def test_num_completions_independence(self):
+        """Test that when one exploration has less than the minimum number
+        of completions, the other exploration's impact score is not impacted.
+        """
+        # Sign up a user and have them create two explorations.
+        self.user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.exploration_1 = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self.exploration_2 = self._create_exploration(
+            self.EXP_ID_2, self.user_a_id)
+        # Give these explorations as many ratings as necessary to avoid
+        # the scaler for number of ratings.
+        self._rate_exploration(
+            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        self._rate_exploration(
+            self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
+        # Give one exploration the minimum number of completions. Give the other
+        # only one.
+        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
+        self._complete_exploration(self.exploration_2, 1)
+        # We expect the second exploration to yield 0 (since its average rating
+        # is below the minimum), so the expected impact score is just the
+        # impact score for exploration 1.
+        expected_user_impact_score = round(
+            math.log(self.MIN_NUM_COMPLETIONS)*
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
+            self.MULTIPLIER
+        )
+        # Verify that the impact score matches the expected.
+        self._run_one_off_job()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
