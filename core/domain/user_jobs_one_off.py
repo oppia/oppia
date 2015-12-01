@@ -24,8 +24,7 @@ from core.platform import models
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
-        models.NAMES.feedback, models.NAMES.user])
-    )
+        models.NAMES.feedback, models.NAMES.user]))
 import utils
 
 

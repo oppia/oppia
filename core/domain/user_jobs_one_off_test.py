@@ -457,4 +457,3 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
-
