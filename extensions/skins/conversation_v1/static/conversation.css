@@ -127,6 +127,9 @@ html, body {
      card, plus a 12px margin between them.
   */
   max-width: 1420px;
+  padding-left: 6px;
+  padding-right: 6px;
+  position: relative;
 }
 
 .conversation-skin-help-card {
@@ -362,8 +365,8 @@ html, body {
 }
 
 .conversation-skin-right-card-container {
-  margin-left: 12px;
-  width: 1040px;
+  margin-left: 6px;
+  width: calc(100% - 380px);
 }
 
 div.conversation-skin-supplemental-card {
@@ -375,7 +378,6 @@ div.conversation-skin-supplemental-card {
   padding: 8px;
   position: relative;
   right: 0;
-  width: 1040px;
 }
 
 .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
