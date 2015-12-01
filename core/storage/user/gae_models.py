@@ -73,13 +73,13 @@ class UserContributionsModel(base_models.BaseModel):
     """
     # IDs of explorations that this user has created 
     # Includes subsequently deleted and private explorations.
-    created_explorations = ndb.StringProperty(repeated=True, 
-        indexed=True, default=None)
+    created_exploration_ids = ndb.StringProperty(
+        repeated=True, indexed=True, default=None)
     # IDs of explorations that this user has made a positive 
     # (i.e. non-revert) commit to. 
     # Includes subsequently deleted and private explorations.
-    edited_explorations = ndb.StringProperty(repeated=True, 
-        indexed=True, default=None)
+    edited_exploration_ids = ndb.StringProperty(
+        repeated=True, indexed=True, default=None)
 
 
 class UserEmailPreferencesModel(base_models.BaseModel):

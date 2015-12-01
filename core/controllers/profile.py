@@ -18,7 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import rights_manager
+from core.domain import exp_services
 from core.domain import user_services
 import feconf
 import utils
@@ -88,26 +88,15 @@ class ProfileHandler(base.BaseHandler):
                 utils.get_time_in_millisecs(
                     user_settings.first_contribution_datetime)
                 if user_settings.first_contribution_datetime else None),
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'profile_picture_data_url': 
+                user_settings.profile_picture_data_url,
             'created_explorations_count': len(
-                user_contributions.created_explorations),
+                user_contributions.created_exploration_ids),
             'edited_explorations_count': len(
-                user_contributions.edited_explorations)
+                user_contributions.edited_exploration_ids)
 
         })
         self.render_json(self.values)
-
-    def get_public_contributions(list_explorations):
-        """Pass in created or edited explorations,
-        returns collection with only public explorations in list. 
-        """
-        public_explorations = []
-
-        for exploration_id in list_explorations:
-            if rights_manager.is_exploration_public(exploration):
-                public_explorations.append(exploration_id)
-
-        return public_explorations
 
 
 class PreferencesPage(base.BaseHandler):
@@ -178,7 +167,8 @@ class ProfilePictureHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
-            'profile_picture_data_url': user_settings.profile_picture_data_url
+            'profile_picture_data_url': 
+                user_settings.profile_picture_data_url
         })
         self.render_json(self.values)
 
@@ -193,7 +183,7 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
         user_settings = user_services.get_user_settings(user_id)
         self.values.update({
             'profile_picture_data_url_for_username': 
-            user_settings.profile_picture_data_url
+                user_settings.profile_picture_data_url
         })
         self.render_json(self.values)
 

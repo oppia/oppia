@@ -237,6 +237,22 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
+def get_displayable_exploration_summaries_matching_ids(exploration_ids):
+        """Pass in list of exploration ids,
+        returns list with only existing, public explorations in list. 
+        """
+        displayable_exploration_summaries = []
+        exploration_summaries=get_exploration_summaries_matching_ids(
+            exploration_ids)
+
+        for exploration_summary in exploration_summaries:
+            if exploration_summary and exploration_summary.status == 'public':
+                displayable_exploration_summaries.append(
+                    exploration_summary)
+
+        return displayable_exploration_summaries
+
+
 def get_new_exploration_id():
     """Returns a new exploration id."""
     return exp_models.ExplorationModel.get_new_id('')
@@ -280,8 +296,7 @@ def get_exploration_titles_and_categories(exp_ids):
 
 
 def _get_exploration_summary_dicts_from_models(exp_summary_models):
-    """Given an iterable of ExpSummaryModel instances, create a dict containing
-    corresponding exploration summary domain objects, keyed by id.
+    """Given an iterable of ExpSummaryModel instances, create a dict y id.
     """
     exploration_summaries = [
         get_exploration_summary_from_model(exp_summary_model)
@@ -852,8 +867,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
-    user_services.add_created_exploration(committer_id, exploration.id)
-    user_services.add_edited_exploration(committer_id, exploration.id)
+    user_services.add_created_exploration_id(committer_id, exploration.id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -955,7 +970,7 @@ def update_exploration(
 
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
-    user_services.add_edited_exploration(committer_id, exploration.id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -976,14 +991,9 @@ def update_exploration_summary(exploration_id, contributor_id_to_add):
 
 def compute_summary_of_exploration(exploration, contributor_id_to_add):
     """Create an ExplorationSummary domain object for a given Exploration
-<<<<<<< HEAD
-    domain object and return it. Committer_id will be added to the list
-    of contributors for the exploration if the id is not a system id.
-=======
     domain object and return it. contributor_id_to_add will be added to
     the list of contributors for the exploration if the argument is not
     None and if the id is not a system id.
->>>>>>> upstream/develop
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)

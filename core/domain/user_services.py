@@ -21,6 +21,7 @@ __author__ = 'Stephanie Federwisch'
 import datetime
 import logging
 import re
+
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -393,15 +394,23 @@ def get_email_preferences(user_id):
 class UserContributions(object):
     """Value object representing a user's contributions."""
     def __init__(
-            self, user_id, created_explorations, edited_explorations):
+            self, user_id, created_exploration_ids, edited_exploration_ids):
         self.user_id = user_id
-        self.created_explorations = created_explorations
-        self.edited_explorations = edited_explorations
+        self.created_exploration_ids = created_exploration_ids
+        self.edited_exploration_ids = edited_exploration_ids
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
+        if not isinstance(self.created_exploration_ids, list):
+            raise utils.ValidationError(
+                'Expected created_exploration_ids to be a list, received %s' 
+            % self.created_exploration_ids)
+        if not isinstance(self.edited_exploration_ids, list):
+            raise utils.ValidationError(
+                'Expected edited_exploration_ids to be a list, received %s' 
+            % self.edited_exploration_ids)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
@@ -414,13 +423,13 @@ def get_user_contributions(user_id, strict=False):
     model = user_models.UserContributionsModel.get(user_id, strict=False)
     if model is not None:
         result = UserContributions(
-            model.id, model.created_explorations, model.edited_explorations)
+            model.id, model.created_exploration_ids, model.edited_exploration_ids)
     else:
         result = None
     return result
 
 
-def create_user_contributions(user_id, created_explorations, edited_explorations):
+def create_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
     """Creates a new UserContributionsModel and returns the domain object."""
     user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions:
@@ -428,25 +437,26 @@ def create_user_contributions(user_id, created_explorations, edited_explorations
             'User contributions model for user %s already exists.' % user_id)
     else:
         user_contributions = UserContributions(
-            user_id, created_explorations, edited_explorations)
+            user_id, created_exploration_ids, edited_exploration_ids)
         _save_user_contributions(user_contributions)
     return user_contributions
 
 
-def update_user_contributions(user_id, created_explorations, edited_explorations):
+def update_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
     """Updates an existing UserContributionsModel with new calculated contributions"""
     
     user_contributions = get_user_contributions(user_id, strict=False)
     if not user_contributions:
-        raise Exception('User %s contributions does not exist.' % user_id)
+        raise Exception(
+            'User contributions model for user %s does not exist.' % user_id)
 
-    user_contributions.created_explorations = created_explorations
-    user_contributions.edited_explorations = edited_explorations
+    user_contributions.created_exploration_ids = created_exploration_ids
+    user_contributions.edited_exploration_ids = edited_exploration_ids
 
     _save_user_contributions(user_contributions)
 
 
-def add_created_exploration(user_id, exploration_id):
+def add_created_exploration_id(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of created explorations."""
 
@@ -454,13 +464,13 @@ def add_created_exploration(user_id, exploration_id):
 
     if not user_contributions:
         create_user_contributions(user_id, [exploration_id], [])
-    elif exploration_id not in user_contributions.created_explorations:
-        user_contributions.created_explorations.append(exploration_id)
-        user_contributions.created_explorations.sort()
+    elif exploration_id not in user_contributions.created_exploration_ids:
+        user_contributions.created_exploration_ids.append(exploration_id)
+        user_contributions.created_exploration_ids.sort()
         _save_user_contributions(user_contributions)
 
 
-def add_edited_exploration(user_id, exploration_id):
+def add_edited_exploration_id(user_id, exploration_id):
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of edited explorations."""
 
@@ -469,9 +479,9 @@ def add_edited_exploration(user_id, exploration_id):
     if not user_contributions:
         create_user_contributions(user_id, [], [exploration_id])
 
-    elif exploration_id not in user_contributions.edited_explorations:
-        user_contributions.edited_explorations.append(exploration_id)
-        user_contributions.edited_explorations.sort()
+    elif exploration_id not in user_contributions.edited_exploration_ids:
+        user_contributions.edited_exploration_ids.append(exploration_id)
+        user_contributions.edited_exploration_ids.sort()
         _save_user_contributions(user_contributions)
 
 
@@ -481,6 +491,6 @@ def _save_user_contributions(user_contributions):
     user_contributions.validate()
     user_models.UserContributionsModel(
         id=user_contributions.user_id,
-        created_explorations=user_contributions.created_explorations,
-        edited_explorations=user_contributions.edited_explorations,
+        created_exploration_ids=user_contributions.created_exploration_ids,
+        edited_exploration_ids=user_contributions.edited_exploration_ids,
     ).put()

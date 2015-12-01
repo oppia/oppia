@@ -95,8 +95,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
         user_a_contributions_model = user_models.UserContributionsModel.get(
             self.user_a_id, strict=False)
-        self.assertEqual(user_a_contributions_model.created_explorations, [])
-        self.assertEqual(user_a_contributions_model.edited_explorations, [])
+        self.assertEqual(user_a_contributions_model.created_exploration_ids, [])
+        self.assertEqual(user_a_contributions_model.edited_exploration_ids, [])
 
     def test_created_exp(self):
         """Tests the case where user has created (and therefore edited) 
@@ -108,13 +108,9 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_b_id)
 
         self.assertEqual(
-            user_b_contributions_model.created_explorations, [self.EXP_ID_1])
+            user_b_contributions_model.created_exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_contributions_model.edited_explorations, [self.EXP_ID_1])
-        self.assertEqual(
-            len(user_b_contributions_model.created_explorations), 1)
-        self.assertEqual(
-            len(user_b_contributions_model.edited_explorations), 1)
+            user_b_contributions_model.edited_exploration_ids, [self.EXP_ID_1])
 
     def test_edited_exp(self):
         """Tests the case where user has an edited exploration."""
@@ -123,9 +119,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_c_contributions_model = user_models.UserContributionsModel.get(
             self.user_c_id)
         self.assertEqual(
-            user_c_contributions_model.edited_explorations, [self.EXP_ID_1])
-        self.assertEqual(
-            len(user_c_contributions_model.edited_explorations), 1)
+            user_c_contributions_model.edited_exploration_ids, [self.EXP_ID_1])
 
     def test_for_duplicates(self):
         """Tests the case where user has an edited exploration, and edits
@@ -135,7 +129,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_d_contributions_model = user_models.UserContributionsModel.get(
             self.user_d_id)
         self.assertEqual(
-            len(user_d_contributions_model.edited_explorations), 1) 
+            len(user_d_contributions_model.edited_exploration_ids), 1) 
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):

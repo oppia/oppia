@@ -325,7 +325,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
     def test_zero_count(self):
         # Check that the profile page for a user with no contributions shows
         # that they have 0 created/edited explorations.
-
         self.signup(self.EMAIL_A, self.USERNAME_A)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
@@ -333,8 +332,8 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['edited_explorations_count'], 0)
 
     def test_created_count(self):
-        # Check to see a user with 1 created explorations
-        # shows up as 1 created and edited on the profile page.
+        # Check that the profile page for a user who has created 
+        # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         self.save_new_valid_exploration(
@@ -345,8 +344,8 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['edited_explorations_count'], 1)
 
     def test_edited_count(self):
-        # Check to see a user with 1 edited exploration
-        # shows up as 1 edited on the profile page.
+        # Check that the profile page for a user who has created 
+        # a single exploration shows 0 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
