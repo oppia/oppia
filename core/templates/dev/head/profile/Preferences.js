@@ -36,43 +36,40 @@ oppia.controller('Preferences', [
     _saveDataItem('user_bio', userBio);
   };
 
-  $scope.changedAtLeastOnce = false;
+  $scope.subjectInterestsChangedAtLeastOnce = false;
   $scope.subjectInterestsWarningText = null;
-  $scope.TAG_REGEX = '^[a-z ]+$';
+  $scope.TAG_REGEX_STRING = '^[a-z ]+$';
 
   $scope.updateSubjectInterestsWarning = function(subjectInterests) {
-    var alpha = /^[A-Za-z]+$/;
+    var TAG_REGEX = new RegExp($scope.TAG_REGEX_STRING);
 
     if (subjectInterests instanceof Array) {
-      for (var i=0; i<subjectInterests.length; i++) {
+      for (var i = 0; i < subjectInterests.length; i++) {
         if (typeof subjectInterests[i] === 'string') {
-          console.log(subjectInterests[i]);
-          if (alpha.test(subjectInterests[i])) {
-            if ($scope.subjectInterestsWarningText == null) {
-              $scope.subjectInterestsWarningText = '';
-            }
-          } else {
+          if (!TAG_REGEX.test(subjectInterests[i])) {
             $scope.subjectInterestsWarningText = (
-            'Subject interests can only have alphabetic characters.');
+              'Subject interests can only have alphabetic characters.');
           }
         } else {
-          $scope.subjectInterestsWarningText = (
-            'Subject interests can only be inputted as words.');
+            $scope.subjectInterestsWarningText = (
+              'Subject interests can only be inputted as words.');
         }
       }
     } else {
-      $scope.subjectInterestsWarningText = (
-        'Subject interests are not entered as a list.');
+      console.error(
+        'Error: received bad value for subject interests. Expected list of ' +
+        'strings, got %s', subjectInterests);
+      throw Error('Error: received bad value for subject interests.');
     }
   };
 
   $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
     warningsData.clear();
-    $scope.changedAtLeastOnce = true;
+    $scope.subjectInterestsChangedAtLeastOnce = true;
     $scope.subjectInterestsWarningText = null;
-    $scope.updateSubjectInterestsWarning(subjectInterests)
-    if (!$scope.subjectInterestsWarningText) {
-      _saveDataItem('subject_interests', subjectInterests)
+    $scope.updateSubjectInterestsWarning(subjectInterests);
+    if ($scope.subjectInterestsWarningText == null) {
+      _saveDataItem('subject_interests', subjectInterests);
     }
   };
 
