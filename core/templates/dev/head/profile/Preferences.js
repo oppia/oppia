@@ -18,8 +18,9 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$timeout',
-    function($scope, $http, $rootScope, $modal, $timeout) {
+oppia.controller('Preferences', [
+    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'warningsData',
+    function($scope, $http, $rootScope, $modal, $timeout, warningsData) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -35,8 +36,44 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
     _saveDataItem('user_bio', userBio);
   };
 
-  $scope.saveSubjectInterests = function(subjectInterests) {
-    _saveDataItem('subject_interests', subjectInterests)
+  $scope.changedAtLeastOnce = false;
+  $scope.subjectInterestsWarningText = null;
+  $scope.TAG_REGEX = '^[a-z ]+$';
+
+  $scope.updateSubjectInterestsWarning = function(subjectInterests) {
+    var alpha = /^[A-Za-z]+$/;
+
+    if (subjectInterests instanceof Array) {
+      for (var i=0; i<subjectInterests.length; i++) {
+        if (typeof subjectInterests[i] === 'string') {
+          console.log(subjectInterests[i]);
+          if (alpha.test(subjectInterests[i])) {
+            if ($scope.subjectInterestsWarningText == null) {
+              $scope.subjectInterestsWarningText = '';
+            }
+          } else {
+            $scope.subjectInterestsWarningText = (
+            'Subject interests can only have alphabetic characters.');
+          }
+        } else {
+          $scope.subjectInterestsWarningText = (
+            'Subject interests can only be inputted as words.');
+        }
+      }
+    } else {
+      $scope.subjectInterestsWarningText = (
+        'Subject interests are not entered as a list.');
+    }
+  };
+
+  $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
+    warningsData.clear();
+    $scope.changedAtLeastOnce = true;
+    $scope.subjectInterestsWarningText = null;
+    $scope.updateSubjectInterestsWarning(subjectInterests)
+    if (!$scope.subjectInterestsWarningText) {
+      _saveDataItem('subject_interests', subjectInterests)
+    }
   };
 
   $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
