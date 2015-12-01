@@ -378,3 +378,11 @@ oppia.filter('truncateAndCapitalize', [function() {
     return input.charAt(0).toUpperCase() + input.slice(1);
   }
 }]);
+
+oppia.filter('removeDuplicatesInArray', [function() {
+  return function(input) {
+    return input.filter(function(val, pos) {
+      return input.indexOf(val) == pos;
+    });
+  };
+}]);
