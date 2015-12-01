@@ -255,6 +255,10 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             '/preferenceshandler/data',
             {'update_type': 'user_bio', 'data': 'My new editor bio'},
             csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'subject_interests', 'data': ['editor', 'editing']},
+            csrf_token=csrf_token)
         self.logout()
 
         self.signup(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
@@ -265,6 +269,10 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             '/preferenceshandler/data',
             {'update_type': 'user_bio', 'data': 'My new viewer bio'},
             csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'subject_interests', 'data': ['viewer', 'viewing']},
+            csrf_token=csrf_token)
         self.logout()
 
         # Viewer looks at editor's profile page.
@@ -272,6 +280,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
 
         # Editor looks at their own profile page.
@@ -279,12 +288,14 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
 
         # Looged-out user looks at editor's profile page/
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')
+        self.assertEqual(response['subject_interests'], ['editor', 'editing'])
 
 
 class FirstContributionDateTests(test_utils.GenericTestBase):

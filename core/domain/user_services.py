@@ -36,7 +36,7 @@ class UserSettings(object):
     def __init__(
             self, user_id, email, username=None,  last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None,
-            profile_picture_data_url=None, user_bio='',
+            profile_picture_data_url=None, user_bio='', subject_interests=None,
             first_contribution_msec=None,
             preferred_language_codes=None):
         self.user_id = user_id
@@ -47,6 +47,8 @@ class UserSettings(object):
             last_started_state_editor_tutorial)
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
+        self.subject_interests = (
+            subject_interests if subject_interests else [])
         self.first_contribution_msec = first_contribution_msec
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
@@ -191,6 +193,7 @@ def get_users_settings(user_ids):
                     model.last_started_state_editor_tutorial),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
+                subject_interests=model.subject_interests,
                 first_contribution_msec = model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes
             ))
@@ -221,6 +224,7 @@ def _save_user_settings(user_settings):
             user_settings.last_started_state_editor_tutorial),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
+        subject_interests=user_settings.subject_interests,
         first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
 
@@ -309,6 +313,12 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
 def update_user_bio(user_id, user_bio):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_subject_interests(user_id, subject_interests):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.subject_interests = subject_interests
     _save_user_settings(user_settings)
 
 
