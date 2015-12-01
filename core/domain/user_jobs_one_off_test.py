@@ -23,17 +23,17 @@ import math
 from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import stats_jobs_continuous
+from core.domain import stats_jobs_continuous_test
 from core.domain import subscription_services
 from core.domain import user_jobs_one_off
 from core.domain import user_services
-from core.domain import stats_jobs_continuous
-from core.domain import event_services
-from core.domain import rating_services
-from core.domain import stats_jobs_continuous_test
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -391,7 +391,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
 
-class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
+class UserImpactCalculationOneOffJobTest(test_utils.GenericTestBase):
     """ Tests the calculation of a user's impact score from the one-off
     UserImpactCalculationOneOffJob.
     """
@@ -400,7 +400,7 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
-    # Constants imported from the oneoff job.
+    # Constants imported from the one-off job.
     impact_one_off_job = user_jobs_one_off.UserImpactCalculationOneOffJob
     NUM_RATINGS_SCALER_CUTOFF = impact_one_off_job.NUM_RATINGS_SCALER_CUTOFF
     NUM_RATINGS_SCALER = impact_one_off_job.NUM_RATINGS_SCALER

@@ -112,8 +112,11 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     Sum of (
     ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
     *(multiplier),
-    where multiplier = 10, and ratings_scaler is .1(number of ratings)
+    where multiplier = 10, and ratings_scaler is .1 * (number of ratings)
     if there are < 10 ratings for that exploration.
+
+    The impact score is 0 for an exploration with 0 playthroughs or with an
+    average rating of less than 2.5.
 
     Impact scores are calculated over explorations for which a user
     is listed as a contributor. Keys for this model are user_ids.

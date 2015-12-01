@@ -18,8 +18,11 @@ import ast
 import math
 
 from core import jobs
+from core.domain import exp_services
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import stats_jobs_continuous
 from core.domain import user_services
 from core.platform import models
 (exp_models, collection_models, feedback_models, user_models,
@@ -144,8 +147,11 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
     Sum of (
     ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
     *(multiplier),
-    where multiplier = 10, and ratings_scaler is .1(number of ratings)
+    where multiplier = 10, and ratings_scaler is .1 * (number of ratings)
     if there are < 10 ratings for that exploration.
+
+    The impact score is 0 for an exploration with 0 playthroughs or with an
+    average rating of less than 2.5.
 
     Impact scores are calculated over explorations for which a user
     is listed as a contributor.
@@ -162,21 +168,18 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_exp_impact_score(cls, exploration_id):
-        from core.domain import rating_services
-        from core.domain import stats_jobs_continuous
-
         # Get ratings and compute average rating score.
         rating_frequencies = rating_services.get_overall_ratings_for_exploration(
             exploration_id)
-        total_number = 0
+        total_num_ratings = 0
         total_rating = 0.0
         for rating, num_ratings in rating_frequencies.iteritems():
             total_rating += (int(rating) * num_ratings)
-            total_number += num_ratings
+            total_num_ratings += num_ratings
         # Only divide by a non-zero number.
-        if total_number == 0:
+        if total_num_ratings == 0:
             return 0
-        average_rating = total_rating / total_number
+        average_rating = total_rating / total_num_ratings
 
         # Get rating term to use in impact calculation.
         rating_term = average_rating - cls.MIN_AVERAGE_RATING
@@ -186,23 +189,24 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
             return 0
 
         # Get num_ratings_scaler.
-        if total_number < cls.NUM_RATINGS_SCALER_CUTOFF:
-            num_ratings_scaler = cls.NUM_RATINGS_SCALER*(total_number)
+        if total_num_ratings < cls.NUM_RATINGS_SCALER_CUTOFF:
+            num_ratings_scaler = cls.NUM_RATINGS_SCALER * total_num_ratings
         else:
-            num_ratings_scaler = 1
+            num_ratings_scaler = 1.0
 
         # Get number of completions/playthroughs.
         num_completions = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-            exploration_id, 'all')['complete_exploration_count']
+            exploration_id,
+            stats_jobs_continuous.VERSION_ALL)['complete_exploration_count']
         # Only take the log of a non-zero number.
         if num_completions <= 0:
             return 0
         num_completions_term = math.log(num_completions)
 
         exploration_impact_score = (
-            rating_term*
-            num_completions_term*
-            num_ratings_scaler*
+            rating_term *
+            num_completions_term *
+            num_ratings_scaler *
             cls.MULTIPLIER
         )
 
@@ -216,7 +220,6 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
         if exploration_impact_score > 0:
             # Get exploration summary and contributor ids,
             # yield for each contributor.
-            from core.domain import exp_services
             exploration_summary = exp_services.get_exploration_summary_by_id(
                 item.id)
             contributor_ids = exploration_summary.contributor_ids
