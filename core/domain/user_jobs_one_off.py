@@ -163,28 +163,28 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
         from core.domain import stats_jobs_continuous
 
         # Get ratings and compute average rating score.
-        ratingFrequencies = rating_services.get_overall_ratings_for_exploration(
+        rating_frequencies = rating_services.get_overall_ratings_for_exploration(
             exploration_id)
-        totalNumber = 0
-        totalRating = 0.0
-        for rating, num_ratings in ratingFrequencies.iteritems():
-          totalRating += (int(rating) * num_ratings)
-          totalNumber += num_ratings
+        total_number = 0
+        total_rating = 0.0
+        for rating, num_ratings in rating_frequencies.iteritems():
+            total_rating += (int(rating) * num_ratings)
+            total_number += num_ratings
         # Only divide by a non-zero number.
-        if totalNumber == 0:
+        if total_number == 0:
             return 0
-        average_rating = totalRating / totalNumber
+        average_rating = total_rating / total_number
 
         # Get rating term to use in impact calculation.
-        rating_term = average_rating - UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING
+        rating_term = average_rating - cls.MIN_AVERAGE_RATING
         # Only explorations with an average rating greater than the minimum
         # have an impact.
         if rating_term <= 0:
             return 0
 
         # Get num_ratings_scaler.
-        if totalNumber < UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER_CUTOFF:
-            num_ratings_scaler = UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER*(totalNumber)
+        if total_number < cls.NUM_RATINGS_SCALER_CUTOFF:
+            num_ratings_scaler = cls.NUM_RATINGS_SCALER*(total_number)
         else:
             num_ratings_scaler = 1
 
@@ -200,14 +200,15 @@ class UserImpactCalculationOneOffJob(jobs.BaseMapReduceJobManager):
             rating_term*
             num_completions_term*
             num_ratings_scaler*
-            UserImpactCalculationOneOffJob.MULTIPLIER
+            cls.MULTIPLIER
         )
 
         return exploration_impact_score
 
     @staticmethod
     def map(item):
-        exploration_impact_score = UserImpactCalculationOneOffJob._get_exp_impact_score(item.id)
+        exploration_impact_score = (
+            UserImpactCalculationOneOffJob._get_exp_impact_score(item.id))
 
         if exploration_impact_score > 0:
             # Get exploration summary and contributor ids,

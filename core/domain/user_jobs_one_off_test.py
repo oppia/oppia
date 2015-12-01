@@ -386,6 +386,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
+
 class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
     """ Tests the calculation of a user's impact score from the one-off
     UserImpactCalculationOneOffJob.
@@ -410,13 +411,15 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
     num_completions = {EXP_ID_1: 0, EXP_ID_2: 0}
 
     def _mock_get_statistics(self, exp_id, version):
-        curr_completions = {
+        current_completions = {
             self.EXP_ID_1:
-                {'complete_exploration_count': self.num_completions[self.EXP_ID_1]},
+                {'complete_exploration_count':
+                    self.num_completions[self.EXP_ID_1]},
             self.EXP_ID_2:
-                {'complete_exploration_count': self.num_completions[self.EXP_ID_2]},
+                {'complete_exploration_count':
+                    self.num_completions[self.EXP_ID_2]},
         }
-        return curr_completions[exp_id]
+        return current_completions[exp_id]
 
     @classmethod
     def _mock_get_zero_impact_score(cls, exploration_id):
@@ -518,10 +521,9 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
 
         expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.MULTIPLIER
-            )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.MULTIPLIER)
 
         # Verify that the impact score matches the expected.
         self._run_one_off_job()
@@ -557,11 +559,10 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
 
         # The user impact score should be the rounded sum of these two impacts
         # (2 * the same impact).
-        expected_user_impact_score = round(2*(
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.MULTIPLIER
-            ))
+        expected_user_impact_score = round(2 * 
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.MULTIPLIER)
 
         # Verify that the impact score matches the expected.
         self._run_one_off_job()
@@ -674,11 +675,10 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
             self.exploration.id, 2, self.ABOVE_MIN_RATING)
 
         expected_exp_impact_score = (
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            (self.NUM_RATINGS_SCALER*2)*
-            self.MULTIPLIER
-        )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            (self.NUM_RATINGS_SCALER * 2) *
+            self.MULTIPLIER)
         self._run_exp_impact_calculation_and_assert_equals(
             self.exploration.id, expected_exp_impact_score)
 
@@ -706,16 +706,14 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
 
         # Calculate the expected impact for each exploration.
         exp_1_impact = (
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.MULTIPLIER
-        )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.MULTIPLIER)
         exp_2_impact = (
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.NUM_RATINGS_SCALER*
-            self.MULTIPLIER
-        )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.NUM_RATINGS_SCALER *
+            self.MULTIPLIER)
         # The user impact score should be the rounded sum of these two impacts.
         expected_user_impact_score = round(exp_1_impact + exp_2_impact)
 
@@ -747,10 +745,9 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         # ratings), so the expected impact score is just the impact score for
         # exploration 1.
         expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.MULTIPLIER
-        )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.MULTIPLIER)
         # Verify that the impact score matches the expected.
         self._run_one_off_job()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
@@ -783,10 +780,9 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         # is below the minimum), so the expected impact score is just the
         # impact score for exploration 1.
         expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.MULTIPLIER
-        )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.MULTIPLIER)
         # Verify that the impact score matches the expected.
         self._run_one_off_job()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
@@ -817,10 +813,9 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         # is below the minimum), so the expected impact score is just the
         # impact score for exploration 1.
         expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS)*
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING)*
-            self.MULTIPLIER
-        )
+            math.log(self.MIN_NUM_COMPLETIONS) *
+            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
+            self.MULTIPLIER)
         # Verify that the impact score matches the expected.
         self._run_one_off_job()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
