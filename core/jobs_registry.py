@@ -38,8 +38,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     stats_jobs_one_off.StatisticsAudit,
-    exp_jobs_one_off.ExplorationMigrationJobManager,
-    user_jobs_one_off.UserImpactCalculationOneOffJob]
+    exp_jobs_one_off.ExplorationMigrationJobManager]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
@@ -49,6 +48,7 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     exp_jobs_continuous.SearchRanker,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
+    user_jobs_continuous.UserImpactAggregator,
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     recommendations_jobs_continuous.ExplorationRecommendationsAggregator]
 
