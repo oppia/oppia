@@ -37,42 +37,15 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-
 # Install third party dependencies
 # TODO(sll): Make this work with fewer third-party dependencies.
 bash scripts/install_third_party.sh
 
-echo Checking whether karma is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
-  echo Installing karma
-  $NPM_INSTALL karma@0.12.16
-fi
-
-echo Checking whether karma-chrome-launcher is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-chrome-launcher" ]; then
-  echo Installing karma-chrome-launcher
-  $NPM_INSTALL karma-chrome-launcher@0.1.4
-fi
-
-echo Checking whether karma-jasmine is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-jasmine" ]; then
-  echo Installing karma-jasmine
-  # Install karma as well, in case people have an older version.
-  $NPM_INSTALL karma@0.12.16
-  $NPM_INSTALL karma-jasmine@0.1.0
-fi
-
-echo Checking whether karma-coverage is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-coverage" ]; then
-  echo Installing karma-coverage
-  $NPM_INSTALL karma-coverage@0.5.2
-fi
-
-echo Checking whether karma-ng-html2js-preprocessor is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-ng-html2js-preprocessor" ]; then
-  echo Installing karma-ng-html2js-preprocessor
-  $NPM_INSTALL karma-ng-html2js-preprocessor@0.1.0
-fi
+install_node_module karma 0.12.16
+install_node_module karma-jasmine 0.1.0
+install_node_module karma-coverage 0.5.2
+install_node_module karma-ng-html2js-preprocessor 0.1.0
+install_node_module karma-chrome-launcher 0.1.4
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
