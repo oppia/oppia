@@ -37,7 +37,7 @@ class UserSettings(object):
             self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None,
             profile_picture_data_url=None, user_bio='',
-            first_contribution_datetime=None,
+            first_contribution_msec=None,
             preferred_language_codes=None):
         self.user_id = user_id
         self.email = email
@@ -47,7 +47,7 @@ class UserSettings(object):
             last_started_state_editor_tutorial)
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
-        self.first_contribution_datetime = first_contribution_datetime
+        self.first_contribution_msec = first_contribution_msec
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
 
@@ -191,7 +191,7 @@ def get_users_settings(user_ids):
                     model.last_started_state_editor_tutorial),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
-                first_contribution_datetime = model.first_contribution_datetime,
+                first_contribution_msec = model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes
             ))
         else:
@@ -221,7 +221,7 @@ def _save_user_settings(user_settings):
             user_settings.last_started_state_editor_tutorial),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
-        first_contribution_datetime=user_settings.first_contribution_datetime,
+        first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
     ).put()
 
@@ -310,10 +310,17 @@ def update_user_bio(user_id, user_bio):
     _save_user_settings(user_settings)
 
 
-def update_first_contribution_datetime(user_id, first_contribution_datetime):
+def _update_first_contribution_msec(user_id, first_contribution_msec):
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.first_contribution_datetime = first_contribution_datetime
+    user_settings.first_contribution_msec = first_contribution_msec
     _save_user_settings(user_settings)
+
+
+def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
+    user_settings = get_user_settings(user_id, strict=True)
+    if user_settings.first_contribution_msec is None:
+        _update_first_contribution_msec(
+            user_id, first_contribution_msec)
 
 
 def update_preferred_language_codes(user_id, preferred_language_codes):

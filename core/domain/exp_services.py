@@ -35,6 +35,7 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -926,6 +927,21 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
+def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+    """Publishes the exploration with publish_exploration() function in
+    rights_manager.py, as well as updates first_contribution_msec.
+
+    It is the responsibility of the caller to check that the exploration is
+    valid prior to publication.
+    """
+    rights_manager.publish_exploration(committer_id, exp_id)
+    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
+    for contributor in contributor_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            contributor, contribution_time_msec)
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
@@ -951,6 +967,10 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
+
+    if not rights_manager.is_exploration_private(exploration.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
@@ -1164,7 +1184,7 @@ def load_demo(exploration_id):
         feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
         exploration_id, assets_list)
 
-    rights_manager.publish_exploration(
+    publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])

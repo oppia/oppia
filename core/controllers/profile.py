@@ -79,9 +79,9 @@ class ProfileHandler(base.BaseHandler):
 
         self.values.update({
             'user_bio': user_settings.user_bio,
-            'first_contribution_datetime': (
-                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
-                if user_settings.first_contribution_datetime else None),
+            'first_contribution_msec': (
+                user_settings.first_contribution_msec
+                if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
         })
         self.render_json(self.values)

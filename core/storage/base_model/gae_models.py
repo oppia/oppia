@@ -456,7 +456,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
 
-    # Get the instance id from the versioned id (see 
+    # Get the instance id from the versioned id (see
     # _get_snapshot_id in VersionedModel)
     def get_unversioned_instance_id(self):
         return self.id[:self.id.rfind(_VERSION_DELIMITER)]
@@ -470,8 +470,8 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
-    
-    # Get the instance id from the versioned id (see 
+
+    # Get the instance id from the versioned id (see
     # _get_snapshot_id in VersionedModel)
     def get_unversioned_instance_id(self):
         return self.id[:self.id.rfind(_VERSION_DELIMITER)]
