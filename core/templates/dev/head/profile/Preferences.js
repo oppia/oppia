@@ -48,11 +48,13 @@ oppia.controller('Preferences', [
         if (typeof subjectInterests[i] === 'string') {
           if (!TAG_REGEX.test(subjectInterests[i])) {
             $scope.subjectInterestsWarningText = (
-              'Subject interests can only have alphabetic characters.');
+              'Subject interests should use only lowercase letters.');
           }
         } else {
-            $scope.subjectInterestsWarningText = (
-              'Subject interests can only be inputted as words.');
+            console.error(
+              'Error: received bad value for a subject interest. Expected a ' +
+                'string, got %s', subjectInterests[i]);
+            throw Error('Error: received bad value for a subject interest.');
         }
       }
     } else {
