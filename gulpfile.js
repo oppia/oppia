@@ -92,38 +92,39 @@ var cssFilesPath = [];
 var jsFilesPath = [];
 var fontFolderPath = [];
 var cssBackgroundPath = [];
-var generatedCssTargetDir = path.join(
+var generatedTargetDir = path.join(
   'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev', 'css');
-var generatedJsTargetDir = path.join(
-  'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev', 'js');
+  isMinificationNeeded ? 'prod' : 'dev');
+var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
+var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
 for (var dependencyId in frontendDependencies) {
   var dependency = frontendDependencies[dependencyId];
   var dependencyDir = dependency.targetDirPrefix + dependency.version;
-  if (dependency.hasOwnProperty('cssFiles')) {
-    dependency.cssFiles.forEach(function(cssFiles) {
-      cssFilesPath.push(path.join(
-        'third_party', 'static', dependencyDir, cssFiles));
-    });
-  }
-  if (dependency.hasOwnProperty('jsFiles')) {
-    dependency.jsFiles.forEach(function(jsFiles) {
-      jsFilesPath.push(path.join(
-        'third_party', 'static', dependencyDir, jsFiles));
-    });
-  }
-  if (dependency.hasOwnProperty('fontsPath')) {
-    var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
-    fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
-      dependency.fontsPath, fontPrefix));
-  }
-  if (dependency.hasOwnProperty('cssBackgroundImage')) {
-    dependency.cssBackgroundImage.forEach(function(imagePath) {
-      cssBackgroundPath.push(path.join(
-        'third_party', 'static', dependencyDir, imagePath));
-    });
+  if (dependency.hasOwnProperty('bundle')) {
+    if (dependency.bundle.hasOwnProperty('css')) {
+      dependency.bundle.css.forEach(function(cssFiles) {
+        cssFilesPath.push(path.join(
+          'third_party', 'static', dependencyDir, cssFiles));
+      });
+    }
+    if (dependency.bundle.hasOwnProperty('js')) {
+      dependency.bundle.js.forEach(function(jsFiles) {
+        jsFilesPath.push(path.join(
+          'third_party', 'static', dependencyDir, jsFiles));
+      });
+    }
+    if (dependency.bundle.hasOwnProperty('fontsPath')) {
+      var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
+      fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
+        dependency.bundle.fontsPath, fontPrefix));
+    }
+    if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
+      dependency.bundle.cssBackgroundImage.forEach(function(imagePath) {
+        cssBackgroundPath.push(path.join(
+          'third_party', 'static', dependencyDir, imagePath));
+      });
+    }
   }
 }
 gulp.task('generateCss', function() {
@@ -138,6 +139,11 @@ gulp.task('generateJs', function() {
     .pipe(sourcemaps.init())
       .pipe(concat('third_party.js'))
       .pipe(isMinificationNeeded ? uglify() : gulpUtil.noop())
+    // This map a combined/minified file back to an unbuilt state,
+    // holds information about original files.
+    // When you query a certain line and column number in your generated JavaScript
+    // you can do a lookup in the source map which returns the original location.
+    // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(generatedJsTargetDir));
 });
@@ -168,13 +174,15 @@ gulp.task('gulpStartGae', function() {
 
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
-gulp.task('build', ['generateCss', 'copyFonts', 'copyCssBackgroundImages', 'generateJs']);
+gulp.task('build', [
+  'generateCss', 'copyFonts', 'copyCssBackgroundImages', 'generateJs']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
     gulp.watch('gulpfile.js', ['build']);
     gulp.watch(cssFilesPath, ['generateCss']);
+    gulp.watch(jsFilesPath, ['generateJs']);
     gulp.watch('manifest.json', ['build']);
     gulp.slurped = true;
   }
