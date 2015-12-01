@@ -111,7 +111,7 @@ body {
 }
 
 .oppia-profile-picture-fullsize {
-  height: 180px;
+  height: auto;
   width: 180px;
 }
 
@@ -2568,4 +2568,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-
