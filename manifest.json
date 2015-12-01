@@ -54,7 +54,8 @@
         "version": "1.4.7",
         "srcUrl": "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7",
         "targetDirPrefix": "angularjs-",
-        "files": ["angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
+        "files": [
+          "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
           "angular-animate.min.js", "angular-animate.min.js.map", "angular-resource.js",
           "angular-resource.min.js", "angular-resource.min.js.map", "angular-route.js",
           "angular-route.min.js", "angular-route.min.js.map", "angular-sanitize.js",
@@ -149,7 +150,7 @@
         "rootDirPrefix": "jqueryui-",
         "targetDirPrefix": "jqueryui-",
         "files": ["jquery-ui.min.js"],
-        "bundle":{
+        "bundle": {
           "js": ["jquery-ui.min.js"]
         }
       },
@@ -208,7 +209,8 @@
         "targetDirPrefix": "select2-",
         "bundle": {
           "css": ["select2.css"],
-          "cssBackgroundImage": ["select2.png", "select2x2.png", "select2-spinner.gif"],
+          "cssBackgroundImage": [
+            "select2.png", "select2x2.png", "select2-spinner.gif"],
           "js": ["select2.js"]
         }
       },
@@ -230,7 +232,7 @@
         "rootDirPrefix": "ui-bootstrap-",
         "targetDirPrefix": "ui-bootstrap-",
         "files": ["ui-bootstrap-tpls-0.13.4.js", "ui-bootstrap-tpls-0.13.4.min.js"],
-        "bundle":{
+        "bundle": {
           "js": ["ui-bootstrap-tpls-0.13.4.js"]
         }
       },
@@ -260,7 +262,7 @@
         "zipUrl": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip",
         "rootDirPrefix": "ui-utils-",
         "targetDirPrefix": "ui-utils-",
-        "bundle":{
+        "bundle": {
           "js": ["ui-utils.js"]
         }
       }
