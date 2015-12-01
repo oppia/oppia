@@ -47,6 +47,7 @@ class SetOfHtmlStringUnitTests(test_utils.GenericTestBase):
     def test_does_not_contain_rule(self):
         rule = set_of_html_string.DoesNotContainAtLeastOneOf(['a', 'b', 'c'])
 
+        self.assertTrue(rule.eval([]))
         self.assertTrue(rule.eval(['a']))
         self.assertTrue(rule.eval(['a', 'b']))
         self.assertTrue(rule.eval(['a', 'b', 'd']))

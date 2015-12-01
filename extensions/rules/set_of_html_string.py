@@ -37,7 +37,7 @@ class ContainsAtLeastOneOf(base.SetOfHtmlStringRule):
         return any([e in self.x for e in subject])
 
 
-# TODO(wxy): migrate the name of this rule to OmitesAtLeastOneOf
+# TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf
 class DoesNotContainAtLeastOneOf(base.SetOfHtmlStringRule):
     description = 'omits at least one of {{x|SetOfHtmlString}}'
     is_generic = False

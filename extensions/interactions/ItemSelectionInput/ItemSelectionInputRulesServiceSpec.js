@@ -29,6 +29,7 @@ describe('Item Selection rules service', function() {
   it('should have a correct \'equals\' rule', function() {
     var RULE_INPUT = {x: ['ab', 'c', 'e']};
     expect(isirs.Equals(['ab', 'c', 'e'], RULE_INPUT)).toBe(true);
+    expect(isirs.Equals(['ab', 'c', 'c', 'e'], RULE_INPUT)).toBe(true);
     expect(isirs.Equals(['c', 'e', 'ab'], RULE_INPUT)).toBe(true);
     expect(isirs.Equals(['c'], RULE_INPUT)).toBe(false);
     expect(isirs.Equals(['e'], RULE_INPUT)).toBe(false);
