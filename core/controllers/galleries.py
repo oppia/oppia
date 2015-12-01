@@ -262,6 +262,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
                 'thumbnail_image_url': exp_summary.thumbnail_image_url,
+                # TODO(sll): Replace these with per-exploration thumbnails.
+                'thumbnail_bg_color': '#05a69a',
             }) for exp_summary in exp_summaries]
         })
         self.render_json(self.values)
