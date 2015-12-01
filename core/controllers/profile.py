@@ -18,6 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import exp_services
 from core.domain import user_services
 import feconf
 import utils
@@ -81,6 +82,14 @@ class ProfileHandler(base.BaseHandler):
         user_contributions = user_services.get_user_contributions(
             user_settings.user_id)
 
+        created_exploration_summaries = (
+            exp_services.get_displayable_exploration_summaries_matching_ids(
+                user_contributions.created_exploration_ids))
+
+        edited_exploration_summaries = (
+            exp_services.get_displayable_exploration_summaries_matching_ids(
+                user_contributions.edited_exploration_ids))
+
         self.values.update({
             'user_bio': user_settings.user_bio,
             'first_contribution_msec': (
@@ -90,7 +99,9 @@ class ProfileHandler(base.BaseHandler):
             'created_explorations_count': len(
                 user_contributions.created_exploration_ids),
             'edited_explorations_count': len(
-                user_contributions.edited_exploration_ids)
+                user_contributions.edited_exploration_ids),
+            'created_exploration_summaries': created_exploration_summaries,
+            'edited_exploration_summaries': edited_exploration_summaries
         })
         self.render_json(self.values)
 
