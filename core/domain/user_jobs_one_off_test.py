@@ -401,10 +401,11 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     # Constants imported from the oneoff job.
-    NUM_RATINGS_SCALER_CUTOFF = user_jobs_one_off.UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER_CUTOFF
-    NUM_RATINGS_SCALER = user_jobs_one_off.UserImpactCalculationOneOffJob.NUM_RATINGS_SCALER
-    MIN_AVERAGE_RATING = user_jobs_one_off.UserImpactCalculationOneOffJob.MIN_AVERAGE_RATING
-    MULTIPLIER = user_jobs_one_off.UserImpactCalculationOneOffJob.MULTIPLIER
+    impact_one_off_job = user_jobs_one_off.UserImpactCalculationOneOffJob
+    NUM_RATINGS_SCALER_CUTOFF = impact_one_off_job.NUM_RATINGS_SCALER_CUTOFF
+    NUM_RATINGS_SCALER = impact_one_off_job.NUM_RATINGS_SCALER
+    MIN_AVERAGE_RATING = impact_one_off_job.MIN_AVERAGE_RATING
+    MULTIPLIER = impact_one_off_job.MULTIPLIER
     # The impact score takes the ln of the number of completions as a factor,
     # so the minimum number of completions to get a nonzero impact score
     # is 2.
@@ -439,8 +440,8 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         completion events."""
         with self.swap(stats_jobs_continuous.StatisticsAggregator,
                     'get_statistics', self._mock_get_statistics):
-                job_id = user_jobs_one_off.UserImpactCalculationOneOffJob.create_new()
-                user_jobs_one_off.UserImpactCalculationOneOffJob.enqueue(job_id)
+                job_id = self.impact_one_off_job.create_new()
+                self.impact_one_off_job.enqueue(job_id)
                 self.process_and_flush_pending_tasks()
 
     def _run_exp_impact_calculation_and_assert_equals(
@@ -448,7 +449,7 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
         with self.swap(stats_jobs_continuous.StatisticsAggregator,
                     'get_statistics', self._mock_get_statistics):
             self.assertEqual(expected_impact,
-                user_jobs_one_off.UserImpactCalculationOneOffJob._get_exp_impact_score(
+                self.impact_one_off_job._get_exp_impact_score(
                 exploration_id))
 
     def _sign_up_user(self, user_email, username):
@@ -584,18 +585,16 @@ class UserImpactScoreOneOffJobTest(test_utils.GenericTestBase):
 
         # Use mock impact scores to verify that map only yields when
         # the impact score > 0.
-        with self.swap(user_jobs_one_off.UserImpactCalculationOneOffJob,
+        with self.swap(self.impact_one_off_job,
                 '_get_exp_impact_score',
                 self._mock_get_zero_impact_score):
-            results = user_jobs_one_off.UserImpactCalculationOneOffJob.map(
-                self.exploration)
+            results = self.impact_one_off_job.map(self.exploration)
             with self.assertRaises(StopIteration):
                 next(results)
-        with self.swap(user_jobs_one_off.UserImpactCalculationOneOffJob,
+        with self.swap(self.impact_one_off_job,
                 '_get_exp_impact_score',
                 self._mock_get_below_zero_impact_score):
-            results = user_jobs_one_off.UserImpactCalculationOneOffJob.map(
-                self.exploration)
+            results = self.impact_one_off_job.map(self.exploration)
             with self.assertRaises(StopIteration):
                 next(results)
 
