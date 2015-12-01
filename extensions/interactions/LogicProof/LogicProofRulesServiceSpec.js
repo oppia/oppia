@@ -27,30 +27,30 @@ describe('Logic Proof rules service', function() {
   }));
 
   var CORRECT_EXAMPLE = {
-    'assumptions_string': 'p',
-    'target_string': 'q',
-    'proof_string': 'a proof',
-    'correct': true
+    assumptions_string: 'p',
+    target_string: 'q',
+    proof_string: 'a proof',
+    correct: true
   };
   var INCORRECT_EXAMPLE_PARSING = {
-    'assumptions_string': 'p',
-    'target_string': 'q',
-    'proof_string': 'a proof',
-    'correct': false,
-    'error_category': 'parsing',
-    'error_code': 'a code',
-    'error_message': 'a message',
-    'error_line_number': 3
+    assumptions_string: 'p',
+    target_string: 'q',
+    proof_string: 'a proof',
+    correct: false,
+    error_category: 'parsing',
+    error_code: 'a code',
+    error_message: 'a message',
+    error_line_number: 3
   };
   var INCORRECT_EXAMPLE_TYPING = {
-    'assumptions_string': 'p',
-    'target_string': 'q',
-    'proof_string': 'a proof',
-    'correct': false,
-    'error_category': 'typing',
-    'error_code': 'a code',
-    'error_message': 'a message',
-    'error_line_number': 4
+    assumptions_string: 'p',
+    target_string: 'q',
+    proof_string: 'a proof',
+    correct: false,
+    error_category: 'typing',
+    error_code: 'a code',
+    error_message: 'a message',
+    error_line_number: 4
   };
 
   it('should have a correct \'correct\' rule', function() {
