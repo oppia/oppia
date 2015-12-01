@@ -237,6 +237,22 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
+def get_displayable_exploration_summaries_matching_ids(exploration_ids):
+        """Pass in list of exploration ids,
+        returns list with only existing, public explorations in list. 
+        """
+        displayable_exploration_summaries = []
+        exploration_summaries=get_exploration_summaries_matching_ids(
+            exploration_ids)
+
+        for exploration_summary in exploration_summaries:
+            if exploration_summary and exploration_summary.status == 'public':
+                displayable_exploration_summaries.append(
+                    exploration_summary)
+
+        return displayable_exploration_summaries
+
+
 def get_new_exploration_id():
     """Returns a new exploration id."""
     return exp_models.ExplorationModel.get_new_id('')
@@ -852,6 +868,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+    user_services.add_created_exploration_id(committer_id, exploration.id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -967,7 +985,8 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
-
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
+    
     if not rights_manager.is_exploration_private(exploration.id):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())

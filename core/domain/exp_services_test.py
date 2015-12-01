@@ -2121,6 +2121,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
 
     EXPECTED_VERSION_1 = 4
     EXPECTED_VERSION_2 = 2
@@ -2137,6 +2138,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (6) Bob reverts Albert's last edit to EXP_ID_1.
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (7) Albert publishes EXP_ID_2.
+        - (8) Albert creates EXP_ID_3
+        - (9) Albert publishes EXP_ID_3
+        - (10) Albert deletes EXP_ID_3
         """
         super(ExplorationServicesUnitTests, self).setUp()
 
@@ -2179,6 +2183,28 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
 
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
+
+        exploration_3 = self.save_new_valid_exploration(
+            self.EXP_ID_3, self.ALBERT_ID)
+
+        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_3)
+
+        exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_3)
+
+    def test_get_displayable_exploration_summaries_matching_ids(self):
+        # A list of exp_id's are passed in:
+        # EXP_ID_1 -- private exploration
+        # EXP_ID_2 -- pubished exploration
+        # EXP_ID_3 -- deleted exploration
+        # Should only return [EXP_ID_2]
+
+        displayable_summaries = (
+            exp_services.get_displayable_exploration_summaries_matching_ids([
+                    self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
+
+        self.assertEqual(
+            displayable_summaries[0].id, self.EXP_ID_2)
+        self.assertEqual(len(displayable_summaries), 1)
 
     def test_get_non_private_exploration_summaries(self):
 

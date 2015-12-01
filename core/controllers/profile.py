@@ -53,6 +53,7 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
+
         if not user_settings:
             raise self.PageNotFoundException
 
@@ -77,12 +78,19 @@ class ProfileHandler(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
+        user_contributions = user_services.get_user_contributions(
+            user_settings.user_id)
+
         self.values.update({
             'user_bio': user_settings.user_bio,
             'first_contribution_msec': (
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'created_explorations_count': len(
+                user_contributions.created_exploration_ids),
+            'edited_explorations_count': len(
+                user_contributions.edited_exploration_ids)
         })
         self.render_json(self.values)
 
