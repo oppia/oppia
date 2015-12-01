@@ -33,7 +33,7 @@ oppia.controller('Profile', [
       $rootScope.loadingMessage = '';
       $scope.userBio = data.user_bio;
       $scope.subjectInterests = data.subject_interests.join(", ");
-      $scope.firstContributionDatetime = data.first_contribution_datetime;
+      $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (
         data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
       $rootScope.loadingMessage = '';

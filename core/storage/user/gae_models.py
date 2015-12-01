@@ -47,8 +47,9 @@ class UserSettingsModel(base_models.BaseModel):
     user_bio = ndb.TextProperty(indexed=False)
     # Subject interests specified by the user.
     subject_interests = ndb.StringProperty(repeated=True, indexed=True)
-    # When the user first contributed to Oppia. May be None.
-    first_contribution_datetime = ndb.DateTimeProperty(default=None)
+    # The time, in milliseconds, when the user first contributed to Oppia.
+    # May be None.
+    first_contribution_msec = ndb.FloatProperty(default=None)
     # Language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
