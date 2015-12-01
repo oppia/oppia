@@ -1317,6 +1317,9 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
 
+    SECOND_USERNAME = 'abc123'
+    SECOND_EMAIL = 'abc123@gmail.com'
+
     def test_get_last_updated_by_human_ms(self):
         original_timestamp = utils.get_current_time_in_millisecs()
 
@@ -1340,6 +1343,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             timestamp_after_first_edit)
 
     def test_get_exploration_snapshots_metadata(self):
+        self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
+        self.second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
+
         v1_exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID, end_state_name='End')
 
@@ -1420,7 +1426,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
             exp_services._save_exploration(
-                'committer_id_2', v1_exploration, '', [])
+                self.second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
         new_change_list = [{
@@ -1428,8 +1434,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'title',
             'new_value': 'New title'
         }]
+
         exp_services.update_exploration(
-            'committer_id_2', self.EXP_ID, new_change_list, 'Second commit.')
+            self.second_committer_id, self.EXP_ID, new_change_list, 'Second commit.')
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
@@ -1455,7 +1462,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         }, snapshots_metadata[1])
         self.assertDictContainsSubset({
             'commit_cmds': new_change_list,
-            'committer_id': 'committer_id_2',
+            'committer_id': self.second_committer_id,
             'commit_message': 'Second commit.',
             'commit_type': 'edit',
             'version_number': 3,
@@ -1465,6 +1472,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[2]['created_on_ms'])
 
     def test_versioning_with_add_and_delete_states(self):
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
 
@@ -1484,10 +1492,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exploration.add_states(['New state'])
         exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(
-            'committer_id_2', exploration, 'Added new state', [])
+            'second_committer_id', exploration, 'Added new state', [])
 
         commit_dict_3 = {
-            'committer_id': 'committer_id_2',
+            'committer_id': 'second_committer_id',
             'commit_message': 'Added new state',
             'version_number': 3,
         }
