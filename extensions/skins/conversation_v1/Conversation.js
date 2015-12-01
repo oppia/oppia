@@ -588,8 +588,9 @@ oppia.directive('conversationSkin', [function() {
       });
 
       $window.addEventListener('beforeunload', function(e) {
-        if (hasInteractedAtLeastOnce && !$scope.isOnFinalCard() &&
-            !$scope.isInPreviewMode) {
+        if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
+            !oppiaPlayerService.isStateTerminal(
+              $scope.transcript[$scope.transcript.length - 1].stateName)) {
           oppiaPlayerService.registerMaybeLeaveEvent();
           var confirmationMessage = (
             'If you navigate away from this page, your progress on the ' +
