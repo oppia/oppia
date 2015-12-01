@@ -53,14 +53,14 @@ oppia.controller('Preferences', [
         } else {
             console.error(
               'Error: received bad value for a subject interest. Expected a ' +
-                'string, got %s', subjectInterests[i]);
+                'string, got ', subjectInterests[i]);
             throw Error('Error: received bad value for a subject interest.');
         }
       }
     } else {
       console.error(
         'Error: received bad value for subject interests. Expected list of ' +
-        'strings, got %s', subjectInterests);
+        'strings, got ', subjectInterests);
       throw Error('Error: received bad value for subject interests.');
     }
   };
