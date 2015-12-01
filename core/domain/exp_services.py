@@ -296,7 +296,8 @@ def get_exploration_titles_and_categories(exp_ids):
 
 
 def _get_exploration_summary_dicts_from_models(exp_summary_models):
-    """Given an iterable of ExpSummaryModel instances, create a dict y id.
+    """Given an iterable of ExpSummaryModel instances, create a dict containing
+    corresponding exploration summary domain objects, keyed by id.
     """
     exploration_summaries = [
         get_exploration_summary_from_model(exp_summary_model)
