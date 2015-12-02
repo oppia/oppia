@@ -2202,6 +2202,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             exp_services.get_displayable_exploration_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
 
+        self.assertEqual(len(displayable_summaries[0]), 11)
         self.assertEqual(
             displayable_summaries[0]['id'], self.EXP_ID_2)
         self.assertEqual(
@@ -2222,8 +2223,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             displayable_summaries[0]['title'], 'Exploration 2 Albert title')
         self.assertEqual(
             displayable_summaries[0]['objective'], 'An objective')
-        self.assertEqual(
-            displayable_summaries[0].has_key('last_updated_msec'), True)
+        self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertEqual(len(displayable_summaries), 1)
 
     def test_get_non_private_exploration_summaries(self):
