@@ -118,7 +118,7 @@ echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
 
-  if ! type pip4 > /dev/null 2>&1 ; then
+  if ! type pip > /dev/null 2>&1 ; then
       echo ""
       echo "  Numpy is required for Oppia to operate properly, but pip wasn't found"
       echo "  on your local machine."
