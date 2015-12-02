@@ -29,7 +29,7 @@ oppia.directive('explorationSummaryTile', [function() {
       getNumViews: '&numViews',
       getObjective: '&objective',
       getStarRating: '&starRating',
-      getThumbnailImageUrl: '&thumbnailImageUrl',
+      getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
       // If this is not null, the new exploration opens in a new window when
       // the summary tile is clicked.

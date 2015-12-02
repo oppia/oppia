@@ -126,9 +126,10 @@ class CollectionDataHandler(base.BaseHandler):
                 'last_updated_msec': utils.get_time_in_millisecs(
                     summary.exploration_model_last_updated
                 ) if summary else None,
-                # TODO(sll): Replace these with per-exploration thumbnails.
-                'thumbnail_image_url': '/images/gallery/thumbnail.png',
-                'thumbnail_bg_color': '#05a69a',
+                # TODO(sll): Replace these with per-category thumbnails.
+                'thumbnail_icon_url': '/images/gallery/default_thumbnail_icon.svg',
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    summary.category),
             }
 
         self.values.update({
