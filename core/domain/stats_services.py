@@ -18,10 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import logging
-import sys
-import utils
-
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_registry
@@ -29,6 +25,10 @@ from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+
+import logging
+import sys
+import utils
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
@@ -248,9 +248,8 @@ def get_exploration_stats(exploration_id, exploration_version):
     }
 
 
-def record_answer(exploration_id, exploration_version, state_name,
-                  handler_name, rule_str, session_id, time_spent_in_sec,
-                  params, answer_value):
+def record_answer(exploration_id, exploration_version, state_name, rule_str,
+        session_id, time_spent_in_sec, params, answer_value):
     """Record an answer by storing it to the corresponding StateAnswers entity.
     """
     # Retrieve state_answers from storage
@@ -273,13 +272,14 @@ def record_answer(exploration_id, exploration_version, state_name,
         interaction_id = exploration.states[state_name].interaction.id
 
     # Construct answer_dict and validate it.
-    answer_dict = {'answer_value': answer_value,
-                   'time_spent_in_sec': time_spent_in_sec,
-                   'rule_str': rule_str,
-                   'session_id': session_id,
-                   'handler_name': handler_name,
-                   'interaction_id': interaction_id,
-                   'params': params}
+    answer_dict = {
+        'answer_value': answer_value,
+        'time_spent_in_sec': time_spent_in_sec,
+        'rule_str': rule_str,
+        'session_id': session_id,
+        'interaction_id': interaction_id,
+        'params': params
+    }
     _validate_answer(answer_dict)
 
     # Add answer to state_answers (or create a new one) and commit it.
@@ -367,11 +367,9 @@ def _validate_answer(answer_dict):
         if type(answer_dict['answer_value']) == str:
             logging.warning(
                 'answer_value is too big to be stored: %s ...' %
-            str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
-            answer_dict['answer_value'] = (
-            '%s%s ...' %
-            (CROPPED_PREFIX_STRING,
-            str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE])))
+                str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
+            answer_dict['answer_value'] = '%s%s ...' % (CROPPED_PREFIX_STRING,
+                str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
         else:
             logging.warning('answer_value is too big to be stored')
             answer_dict['answer_value'] = PLACEHOLDER_FOR_TOO_LARGE_NONSTRING

@@ -62,7 +62,7 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         state_name = exp.init_state_name
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, 'answer')
 
@@ -71,7 +71,7 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.answers, {'answer': 1})
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, 'answer')
 
@@ -91,15 +91,15 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
 
         # Submit three answers.
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, 'a1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, 'a2')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, 'a3')
 
@@ -163,12 +163,12 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 'eid', 1, exp.init_state_name, 'session_id_%s' % ind,
                 {}, feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, exp.init_state_name, 'submit',
+            'eid', 1, exp.init_state_name,
             self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
         for _ in range(2):
             event_services.AnswerSubmissionEventHandler.record(
-                'eid', 1, exp.init_state_name, 'submit',
+                'eid', 1, exp.init_state_name,
                 self.DEFAULT_RULESPEC_STR, self.DEFAULT_SESSION_ID,
                 self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '2')
         ModifiedStatisticsAggregator.start_computation()
@@ -195,7 +195,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             'eid', 1, state_name, 'session_id', {},
             feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, 'session_id', self.DEFAULT_TIME_SPENT,
             self.DEFAULT_PARAMS, '1')
         ModifiedStatisticsAggregator.start_computation()
@@ -227,7 +227,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         exp_services._save_exploration('fake@user.com', exp, '', [])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, exp.init_state_name, 'submit',
+            'eid', 1, exp.init_state_name,
             not_default_rule_spec_str, self.DEFAULT_SESSION_ID,
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
         self.assertEquals(stats_services.get_state_improvements('eid', 1), [])
@@ -254,7 +254,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         event_services.StateHitEventHandler.record(
             'eid', 1, state_name, 'session_id 3', {}, feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, 'session_id 3',
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
 
@@ -278,7 +278,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 'eid', 1, state_name, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
-                'eid', 1, state_name, 'submit',
+                'eid', 1, state_name,
                 self.DEFAULT_RULESPEC_STR, 'session_id',
                 self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
         with self.swap(
@@ -321,7 +321,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             'eid', 2, FIRST_STATE_NAME, 'session_id',
             {}, feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 2, FIRST_STATE_NAME, 'submit',
+            'eid', 2, FIRST_STATE_NAME,
             self.DEFAULT_RULESPEC_STR, 'session_id',
             self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
 
@@ -330,7 +330,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 'eid', 2, SECOND_STATE_NAME, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
-                'eid', 2, SECOND_STATE_NAME, 'submit',
+                'eid', 2, SECOND_STATE_NAME,
                 self.DEFAULT_RULESPEC_STR, 'session_id',
                 self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
         ModifiedStatisticsAggregator.start_computation()
@@ -355,7 +355,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 'eid', 1, FIRST_STATE_NAME, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
-                'eid', 1, FIRST_STATE_NAME, 'submit',
+                'eid', 1, FIRST_STATE_NAME,
                 self.DEFAULT_RULESPEC_STR, 'session_id',
                 self.DEFAULT_TIME_SPENT, self.DEFAULT_PARAMS, '1')
 
@@ -393,7 +393,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
                 'eid', state_name), {})
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, 'session', self.DEFAULT_TIME_SPENT,
             self.DEFAULT_PARAMS, 'a1')
         self.assertEquals(
@@ -401,7 +401,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
                 'eid', state_name), {'a1': 1})
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
+            'eid', 1, state_name,
             self.DEFAULT_RULESPEC_STR, 'session', self.DEFAULT_TIME_SPENT,
             self.DEFAULT_PARAMS, 'a1')
         self.assertEquals(

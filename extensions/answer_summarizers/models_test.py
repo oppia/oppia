@@ -81,9 +81,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # Record answers.
         for answer in dummy_answers_list:
             stats_services.record_answer(
-                exp_id, exp_version, state_name, 'test_handler',
-                DEFAULT_RULE_STR, answer['session_id'],
-                answer['time_spent_in_sec'], params,
+                exp_id, exp_version, state_name, DEFAULT_RULE_STR,
+                answer['session_id'], answer['time_spent_in_sec'], params,
                 answer['answer_value'])
 
         # Retrieve state answers from storage and get corresponding
@@ -272,9 +271,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # Record answers.
         for answer in answer_submission_queue:
             stats_services.record_answer(
-                exp_id, exp_version, state_name, 'test_handler',
-                DEFAULT_RULE_STR, answer['session_id'],
-                answer['time_spent_in_sec'], params,
+                exp_id, exp_version, state_name, DEFAULT_RULE_STR,
+                answer['session_id'], answer['time_spent_in_sec'], params,
                 answer['answer_value'])
 
         # Retrieve state answers from storage and get corresponding
@@ -338,9 +336,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
         answer = self._create_sample_answer('English', 2., 'sid1')
         stats_services.record_answer(
-            exp_id, exp_version, state_name, 'test_handler',
-            DEFAULT_RULE_STR, answer['session_id'],
-            answer['time_spent_in_sec'], params,
+            exp_id, exp_version, state_name, DEFAULT_RULE_STR,
+            answer['session_id'], answer['time_spent_in_sec'], params,
             answer['answer_value'])
 
         # Retrieve state answers from storage and get corresponding

@@ -310,8 +310,6 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
         answer = self.payload.get('answer')
-        # The answer handler (submit, click, etc.)
-        handler_name = self.payload.get('handler')
         # Parameters associated with the learner.
         old_params = self.payload.get('params', {})
         old_params['answer'] = answer
@@ -344,8 +342,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name, handler_name,
-            rule_spec_string, session_id, client_time_spent_in_secs, old_params,
+            exploration_id, version, old_state_name, rule_spec_string,
+            session_id, client_time_spent_in_secs, old_params,
             old_interaction_instance.get_stats_log_html(
                 old_interaction.customization_args, normalized_answer))
         self.render_json({})

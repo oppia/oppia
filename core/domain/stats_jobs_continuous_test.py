@@ -434,19 +434,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # add some answers
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, FIRST_STATE_NAME, 'submit',
+                exp_id, exp_version, FIRST_STATE_NAME,
                 self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
                 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, FIRST_STATE_NAME, 'submit',
+                exp_id, exp_version, FIRST_STATE_NAME,
                 self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
                 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, FIRST_STATE_NAME, 'submit',
+                exp_id, exp_version, FIRST_STATE_NAME,
                 self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
                 'answer2')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, SECOND_STATE_NAME, 'submit',
+                exp_id, exp_version, SECOND_STATE_NAME,
                 self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
                 'answer3')
 

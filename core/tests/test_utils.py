@@ -427,7 +427,7 @@ class TestBase(unittest.TestCase):
     def submit_answer(
             self, exploration_id, state_name, answer,
             params=None, exploration_version=None,
-            session_id='dummy_session_id', handler_name='dummy_handler',
+            session_id='dummy_session_id',
             rule_spec_string='Default',
             client_time_spent_in_secs=0.0):
         """Submits an answer as an exploration player and returns the
@@ -461,7 +461,6 @@ class TestBase(unittest.TestCase):
                 'params': params,
                 'version': exploration.version,
                 'session_id': session_id,
-                'handler_name': handler_name,
                 'client_time_spent_in_secs': client_time_spent_in_secs,
                 'old_state_name': state_name,
                 'answer_group_index': classify_result['answer_group_index'],

@@ -590,10 +590,10 @@ class StateAnswersModel(base_models.BaseModel):
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     """Store output of calculation performed on StateAnswers."""
 
-    exploration_id = ndb.StringProperty(indexed=True)
-    exploration_version = ndb.IntegerProperty(required=True)
-    state_name = ndb.StringProperty(indexed=True)
-    calculation_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
+    calculation_id = ndb.StringProperty(indexed=True, required=True)
     # Calculation output dict stored as JSON blob
     calculation_output = ndb.JsonProperty(indexed=False)
 

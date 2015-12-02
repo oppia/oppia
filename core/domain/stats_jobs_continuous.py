@@ -19,8 +19,12 @@ import collections
 import datetime
 
 from core import jobs
+from core.domain import calculation_registry
 from core.domain import exp_services
+from core.domain import interaction_registry
+from core.domain import stats_domain
 from core.platform import models
+
 import feconf
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
@@ -384,9 +388,6 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def map(item):
-        from core.domain import calculation_registry
-        from core.domain import interaction_registry
-
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
 
@@ -412,8 +413,9 @@ class InteractionAnswerSummariesMRJobManager(
 
 class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    num_starts = ndb.IntegerProperty(default=0)
-    num_completions = ndb.IntegerProperty(default=0)
+    # TODO(bhenning): Implement a real-time model for
+    # InteractionAnswerSummariesAggregator.
+    pass
 
 
 class InteractionAnswerSummariesAggregator(
@@ -423,8 +425,7 @@ class InteractionAnswerSummariesAggregator(
     """
     @classmethod
     def get_event_types_listened_to(cls):
-        return [
-            feconf.EVENT_TYPE_ANSWER_SUBMITTED]
+        return [feconf.EVENT_TYPE_ANSWER_SUBMITTED]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
@@ -439,11 +440,11 @@ class InteractionAnswerSummariesAggregator(
     def get_calc_output(
             cls, exploration_id, exploration_version, state_name,
             calculation_id):
+        """Get state answers calculation output domain object obtained from
+        StateAnswersCalcOutputModel instance stored in data store. This
+        aggregator does not have a real-time layer, which means the results
+        from this function may be out of date.
         """
-        Get state answers calculation output domain object obtained from
-        StateAnswersCalcOutputModel instance stored in data store.
-        """
-        from core.domain import stats_domain
         calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
         if calc_output_model:

@@ -65,7 +65,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
             return $scope.userSelections[obj];
           });
 
-          $scope.$parent.$parent.submitAnswer(answers, 'submit');
+          $scope.$parent.$parent.submitAnswer(answers);
         };
       }]
     };

@@ -47,8 +47,8 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.get_top_answers(2), [])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
-            self.DEFAULT_RULESPEC_STR, SESSION_ID, TIME_SPENT, PARAMS, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer1')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.DEFAULT_RULESPEC_STR)
@@ -58,11 +58,11 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.get_top_answers(2), [('answer1', 1)])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
-            self.DEFAULT_RULESPEC_STR, SESSION_ID, TIME_SPENT, PARAMS, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit', self.DEFAULT_RULESPEC_STR,
-            SESSION_ID, TIME_SPENT, PARAMS, 'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.DEFAULT_RULESPEC_STR)
@@ -74,11 +74,11 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             answer_log.get_top_answers(2), [('answer1', 2), ('answer2', 1)])
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit', self.DEFAULT_RULESPEC_STR,
-            SESSION_ID, TIME_SPENT, PARAMS, 'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer2')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit', self.DEFAULT_RULESPEC_STR,
-            SESSION_ID, TIME_SPENT, PARAMS, 'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.DEFAULT_RULESPEC_STR)
@@ -107,11 +107,11 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         state_name = exp.init_state_name
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit', self.DEFAULT_RULESPEC_STR,
-            SESSION_ID, TIME_SPENT, PARAMS, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit', rule_str,
-            SESSION_ID, TIME_SPENT, PARAMS, 'answer2')
+            'eid', 1, state_name, rule_str, SESSION_ID, TIME_SPENT, PARAMS,
+            'answer2')
 
         default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.DEFAULT_RULESPEC_STR)
@@ -138,14 +138,14 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.answers, {})
 
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
-            self.DEFAULT_RULESPEC_STR, SESSION_ID, TIME_SPENT, PARAMS, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
-            self.DEFAULT_RULESPEC_STR, SESSION_ID, TIME_SPENT, PARAMS, 'answer1')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, 'submit',
-            self.DEFAULT_RULESPEC_STR, SESSION_ID, TIME_SPENT, PARAMS, 'answer2')
+            'eid', 1, state_name, self.DEFAULT_RULESPEC_STR, SESSION_ID,
+            TIME_SPENT, PARAMS, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.DEFAULT_RULESPEC_STR)
@@ -200,52 +200,46 @@ class StateAnswersTests(test_utils.GenericTestBase):
 
         # answer is a string
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, FIRST_STATE_NAME, 'submit',
-            self.DEFAULT_RULESPEC_STR, 'sid1', TIME_SPENT, PARAMS, 'answer1')
+            'eid', exp_version, FIRST_STATE_NAME, self.DEFAULT_RULESPEC_STR,
+            'sid1', TIME_SPENT, PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, FIRST_STATE_NAME, 'submit',
-            self.DEFAULT_RULESPEC_STR, 'sid2', TIME_SPENT, PARAMS, 'answer1')
+            'eid', exp_version, FIRST_STATE_NAME, self.DEFAULT_RULESPEC_STR,
+            'sid2', TIME_SPENT, PARAMS, 'answer1')
         # answer is a dict
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, FIRST_STATE_NAME, 'submit',
-            self.DEFAULT_RULESPEC_STR, 'sid1', TIME_SPENT, PARAMS,
-            {'x': 1.0, 'y': 5.0})
+            'eid', exp_version, FIRST_STATE_NAME, self.DEFAULT_RULESPEC_STR,
+            'sid1', TIME_SPENT, PARAMS, {'x': 1.0, 'y': 5.0})
         # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, SECOND_STATE_NAME, 'submit',
-            self.DEFAULT_RULESPEC_STR, 'sid3', TIME_SPENT, PARAMS,
-            [2, 4, 8])
+            'eid', exp_version, SECOND_STATE_NAME, self.DEFAULT_RULESPEC_STR,
+            'sid3', TIME_SPENT, PARAMS, [2, 4, 8])
         # answer is a unicode string
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, SECOND_STATE_NAME, 'submit',
-            self.DEFAULT_RULESPEC_STR, 'sid4', TIME_SPENT, PARAMS,
-            self.UNICODE_TEST_STRING)
+            'eid', exp_version, SECOND_STATE_NAME, self.DEFAULT_RULESPEC_STR,
+            'sid4', TIME_SPENT, PARAMS, self.UNICODE_TEST_STRING)
 
-        expected_answers_list1 = [
-            {'handler_name': 'submit', 'answer_value': 'answer1',
-             'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid1', 'interaction_id': 'TextInput',
-             'params': {}},
-            {'handler_name': 'submit', 'answer_value': 'answer1',
-             'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid2', 'interaction_id': 'TextInput',
-             'params': {}},
-            {'handler_name': 'submit',
-             'answer_value': {'x': 1.0, 'y': 5.0},
-             'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid1', 'interaction_id': 'TextInput',
-             'params': {}}]
-        expected_answers_list2 = [
-            {'handler_name': 'submit',
-             'answer_value': [2, 4, 8],
-             'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid3', 'interaction_id': 'TextInput',
-             'params': {}},
-            {'handler_name': 'submit',
-             'answer_value': self.UNICODE_TEST_STRING,
-             'time_spent_in_sec': 5.0, 'rule_str': 'Default',
-             'session_id': 'sid4', 'interaction_id': 'TextInput',
-             'params': {}}]
+        expected_answers_list1 = [{
+            'answer_value': 'answer1', 'time_spent_in_sec': 5.0,
+            'rule_str': 'Default', 'session_id': 'sid1',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer_value': 'answer1', 'time_spent_in_sec': 5.0,
+            'rule_str': 'Default', 'session_id': 'sid2',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer_value': {'x': 1.0, 'y': 5.0}, 'time_spent_in_sec': 5.0,
+            'rule_str': 'Default', 'session_id': 'sid1',
+            'interaction_id': 'TextInput', 'params': {}
+        }]
+        expected_answers_list2 = [{
+            'answer_value': [2, 4, 8], 'time_spent_in_sec': 5.0,
+            'rule_str': 'Default', 'session_id': 'sid3',
+            'interaction_id': 'TextInput', 'params': {}
+        }, {
+            'answer_value': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
+            'rule_str': 'Default', 'session_id': 'sid4',
+            'interaction_id': 'TextInput', 'params': {}
+        }]
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, FIRST_STATE_NAME)
