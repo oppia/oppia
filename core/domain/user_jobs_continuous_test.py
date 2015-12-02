@@ -667,6 +667,10 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
     def _mock_get_below_zero_impact_score(cls, exploration_id):
         return -1
 
+    @classmethod
+    def _mock_get_positive_impact_score(cls, exploration_id):
+        return 1
+
     def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
@@ -817,18 +821,28 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
 
         # Use mock impact scores to verify that map only yields when
         # the impact score > 0.
-        with self.swap(self.impact_mr_job_manager,
+        # Should not yield when impact score < 0.
+        with self.swap(user_jobs_continuous.UserImpactMRJobManager,
                 '_get_exp_impact_score',
                 self._mock_get_zero_impact_score):
             results = self.impact_mr_job_manager.map(self.exploration)
             with self.assertRaises(StopIteration):
                 next(results)
-        with self.swap(self.impact_mr_job_manager,
+        with self.swap(user_jobs_continuous.UserImpactMRJobManager,
                 '_get_exp_impact_score',
                 self._mock_get_below_zero_impact_score):
             results = self.impact_mr_job_manager.map(self.exploration)
             with self.assertRaises(StopIteration):
                 next(results)
+        # Should yield one result when impact score > 0.
+        with self.swap(user_jobs_continuous.UserImpactMRJobManager,
+                '_get_exp_impact_score',
+                self._mock_get_positive_impact_score):
+            results = self.impact_mr_job_manager.map(self.exploration)
+            next(results)
+            with self.assertRaises(StopIteration):
+                next(results)
+
 
     def test_impact_for_exp_with_one_completion(self):
         """Test that when an exploration has only one completion,
