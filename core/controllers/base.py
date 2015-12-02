@@ -79,6 +79,16 @@ OBJECT_EDITORS_JS = config_domain.ComputedProperty(
     'JavaScript code for the object editors',
     obj_services.get_all_object_editor_js_templates)
 
+# EXPERIMENTAL
+ALLOWED_TEMPORARY_IDS_STRING = config_domain.ConfigProperty(
+    'allowed_temporary_ids_string', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
+    'Enter allowed temporary IDs here, one per line', 'tmpid1\ntmpid2')
+
 SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
     'sidebar_menu_additional_links', {
         'type': 'list',
@@ -401,6 +411,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
+            'ALLOWED_TEMPORARY_IDS': ALLOWED_TEMPORARY_IDS_STRING.value.split(),
             'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as

@@ -121,6 +121,9 @@ oppia.factory('oppiaPlayerService', [
   var _explorationLastUpdatedMsec = null;
   var _viewersCount = null;
 
+  // EXPERIMENTAL. State name for the initial login card.
+  var INITIAL_LOGIN_CARD_STATE_NAME = 'Initial login card'
+
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
     '/explorehandler/init/' + _explorationId + (version ? '?v=' + version : ''));
@@ -444,6 +447,9 @@ oppia.factory('oppiaPlayerService', [
         });
       }
     },
+    getInitialLoginCardStateName: function() {
+      return INITIAL_LOGIN_CARD_STATE_NAME;
+    },
     applyCachedParamUpdates: function() {
       if (_cachedUpdates !== null) {
         _updateStatus(_cachedUpdates.newParams, _cachedUpdates.newStateName);
@@ -493,6 +499,10 @@ oppia.factory('oppiaPlayerService', [
       }
     },
     getInteractionInstructions: function(stateName) {
+      if (stateName === INITIAL_LOGIN_CARD_STATE_NAME) {
+        return '';
+      }
+
       var interactionId = _exploration.states[stateName].interaction.id;
       if (!interactionId) {
         return '';
@@ -501,6 +511,10 @@ oppia.factory('oppiaPlayerService', [
       }
     },
     isInteractionInline: function(stateName) {
+      if (stateName === INITIAL_LOGIN_CARD_STATE_NAME) {
+        return true;
+      }
+
       var interactionId = _exploration.states[stateName].interaction.id;
       // Note that we treat a null interaction as an inline one, so that the
       // error message associated with it is displayed in the most compact way
@@ -607,9 +621,6 @@ oppia.factory('oppiaPlayerService', [
               break;
             }
           }
-        } else if (_transcript.length === 1 && !GLOBALS.TEMPORARY_ID) {
-          // This is the first correct answer to the first card.
-          GLOBALS.TEMPORARY_ID = answer;
         }
 
         var newStateName = outcome.dest;
