@@ -133,9 +133,11 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_d_contributions_model = user_models.UserContributionsModel.get(
             self.user_d_id)
         self.assertEqual(
-            len(user_d_contributions_model.edited_exploration_ids), 1) 
+            user_d_contributions_model.edited_exploration_ids, 
+            [self.EXP_ID_2]) 
         self.assertEqual(
-            len(user_d_contributions_model.created_exploration_ids), 1) 
+            user_d_contributions_model.created_exploration_ids,
+            [self.EXP_ID_2]) 
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
