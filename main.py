@@ -317,9 +317,6 @@ urls = [
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
 
     get_redirect_route(
-        r'/collection_editor/data/<collection_id>', collection_viewer.CollectionDataHandler,
-        'collection_editor_data_fetcher'),
-    get_redirect_route(
         r'/collection_editor/create/<collection_id>',
         collection_editor.CollectionEditorPage, 'collection_editor_page'),
 
