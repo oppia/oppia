@@ -57,42 +57,16 @@
               <md-content class="md-padding">
                 <h1 class="md-display-2">Statistics</h1>
                 <div class="oppia-stat-big-container big-top-container">
-                  <div class="oppia-stat-container-top">
-                    <span class="oppia-big-number" ng-if="userPlaysOnCreatedExploration"><[userPlaysOnCreatedExploration]></span>
-                    <span class="oppia-big-number" ng-if="!userPlaysOnCreatedExploration">
+                  <div ng-repeat="stat in userDisplayedStatistics" class="oppia-stat-container-top">
+                    <span class="oppia-big-number" ng-if="stat.number_value">
+                      <[stat.number_value]>
+                    </span>
+                    <span class="oppia-big-number" ng-if="!stat.number_value">
                       <em>0</em>
                     </span>
-                    <span>Total Plays on Created Explorations</span>
-                  </div>   
-                  <div class="oppia-stat-container-top">
-                    <span class="oppia-big-number" ng-if="userImpact"><[userImpact]></span>
-                    <span class="oppia-big-number" ng-if="!userImpact">
-                      <em>0</em>
+                    <span>
+                      <[stat.title]>
                     </span>
-                    <span>User Impact</span>
-                  </div>
-                </div>
-                <div class="oppia-stat-big-container">
-                  <div class="oppia-stat-container">
-                    <span class="oppia-small-number" ng-if="numUserCreatedExplorations"><[numUserCreatedExplorations]></span>
-                    <span class="oppia-small-number" ng-if="!numUserCreatedExplorations">
-                      <em>0</em>
-                    </span>
-                    <span>Created Explorations</span>
-                  </div>
-                  <div class="oppia-stat-container">
-                    <span class="oppia-small-number" ng-if="numUserEditedExplorations"><[numUserEditedExplorations]></span>
-                    <span class="oppia-small-number" ng-if="!numUserEditedExplorations`">
-                      <em>0</em>
-                    </span>
-                    <span>Edited Explorations</span>
-                  </div>
-                  <div class="oppia-stat-container">
-                    <span class="oppia-small-number" ng-if="userExplorationsLearned"><[userExplorationsLearned]></span>
-                    <span class="oppia-small-number" ng-if="!userExplorationsLearned">
-                      <em>0</em>
-                    </span>
-                    <span>Explorations Learned</span>
                   </div>
                 </div>
               </md-content>
@@ -100,57 +74,16 @@
             <md-tab label="Created Explorations">
               <md-content class="md-padding">
                 <h1 class="md-display-2">Created Explorations</h1>
-                <p>
-                  <span ng-if="userCreatedExplorations">
-                    <div ng-repeat="exploration in userCreatedExplorations">
-                      <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
-                        <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
-                          <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
-                                Edit
-                        </a>   
-                        <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
-                          <div class="oppia-gallery-tile-contents">
-                            <span class="oppia-gallery-tile-image-container"
-                              style="position: absolute;">
-                              <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
-                            </span>
-                            <div class="oppia-gallery-tile-details">
-                              <div class="oppia-gallery-tile-first-row">
-                                <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title"><[exploration.title]>
-                                </span>
-                                <span ng-if="exploration.objective" class="hidden-xs">
-                                  <span style="font-weight: bold;">&middot;</span>
-                                  <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective"><[exploration.objective | truncateAndCapitalize: 120]>
-                                  </span>
-                                </span>
-                              </div>
-                              <div class="oppia-gallery-tile-second-row">
-                                <span style="color: #888">
-                                  <strong><[exploration.category]></strong>
-                                  <span style="font-weight: bold;">&middot;</span>
-                              Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                                </span>
-                                <span ng-if="exploration.status === 'publicized'">
-                                  <span style="font-weight: bold;">&middot;</span>
-                                  <span style="color: #888">Featured</span>
-                                </span>
-                                <span ng-if="areRatingsShown(exploration.ratings)">
-                                  <span style="font-weight: bold;">&middot;</span>
-                                  <span class="oppia-gallery-tile-ratings" style="color: black;">
-                                    <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
-                                  </span>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                      </md-card>
-                    </div>
-                  </span>
-                  <span ng-if="!userCreatedExplorations">
-                    <em>This user hasn't created any explorations yet.</em>
-                  </span>
-                </p>    
+                <div ng-if="userCreatedExplorations">
+                  <div ng-repeat="exploration in userCreatedExplorations" class="oppia-profile-exploration-tile">
+                    <exploration-summary-tile exploration-id="exploration.id" exploration-title="exploration.title" last-updated-msec="exploration.last_updated" objective="exploration.objective" thumbnail-image-url="exploration.thumbnail_image_url">
+
+                    </exploration-summary-tile>
+                  </div>
+                </div>
+                <div ng-if="!userCreatedExplorations">
+                  <em>This user hasn't created any explorations yet.</em>
+                </div>
               </md-content>
             </md-tab>
             <md-tab label="Edited Explorations">
@@ -186,10 +119,6 @@
                                   <span style="font-weight: bold;">&middot;</span>
                               Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                                 </span>
-                                <span ng-if="exploration.status === 'publicized'">
-                                  <span style="font-weight: bold;">&middot;</span>
-                                  <span style="color: #888">Featured</span>
-                                </span>
                                 <span ng-if="areRatingsShown(exploration.ratings)">
                                   <span style="font-weight: bold;">&middot;</span>
                                   <span class="oppia-gallery-tile-ratings" style="color: black;">
@@ -216,6 +145,7 @@
   </div>
                               
 {% include 'components/ratings.html' %}
+{% include 'components/exploration_summary_tile.html' %}
 {% endblock %}
 
 
@@ -225,5 +155,6 @@
   <script>
     {{ include_js_file('profile/Profile.js') }}
     {{ include_js_file('components/ratings.js')}}
+    {{ include_js_file('components/explorationSummaryTile.js') }}
   </script>
 {% endblock footer_js %}

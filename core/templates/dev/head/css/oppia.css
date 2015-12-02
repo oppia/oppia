@@ -120,7 +120,7 @@ body {
 }
 
 .oppia-profile-tabs md-content {
-  background-color: white !important; 
+  background-color: white;
 }
 
 .oppia-profile-tabs md-content md-tabs {
@@ -140,10 +140,6 @@ body {
   background-color: #009688;
 }
 
-.oppia-profile-tabs md-tab-ink-bar {
-  background-color: black;
-}
-
 
 .oppia-profile-tabs md-tab-label {
   color: #ffffff;
@@ -151,12 +147,7 @@ body {
 
 .oppia-stat-container-top {
   display: inline-block;
-  width: 45%;
-}
-
-.oppia-stat-container {
-  display: inline-block;
-  width: 25%;
+  width: 30%;
 }
 
 .oppia-stat-big-container {
@@ -164,23 +155,14 @@ body {
   margin-bottom: 50px;
   text-align: center;
   width: 100%;
-    
 }
 
 .oppia-stat-container-top span {
   display: block;
 }
 
-.oppia-stat-container span {
-  display: block;
-}
-
 .oppia-stat-container-top .oppia-big-number {
   font-size: 50px;
-}
-
-.oppia-stat-container .oppia-small-number {
-  font-size: 25px;
 }
 
 /*
