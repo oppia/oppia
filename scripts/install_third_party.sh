@@ -114,6 +114,9 @@ fi
 # Note that numpy needs to be built after downloading. If you are having
 # trouble, please ensure that you have pip installed (see "Installing Oppia"
 # on the Oppia developers' wiki page).
+echo checking if pip is installed in /usr/bin or /usr/local/bin
+if [ ! -d "/usr/bin/pip" || "usr/local/bin/pip" ] ; then
+  echo You are missing pip install it by following the guide on the wiki page.
 echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
