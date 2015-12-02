@@ -457,7 +457,8 @@ class TestBase(unittest.TestCase):
                 'params': params,
                 'version': exploration.version,
                 'old_state_name': state_name,
-                'rule_spec_string': classify_result['rule_spec_string']
+                'answer_group_index': classify_result['answer_group_index'],
+                'rule_spec_index': classify_result['rule_spec_index']
             }
         )
 

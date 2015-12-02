@@ -28,6 +28,7 @@ from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 (job_models, exp_models,) = models.Registry.import_models([
    models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
@@ -187,6 +188,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.owner_ids,
                     exp_rights_model.editor_ids,
                     exp_rights_model.viewer_ids,
+                    [self.ADMIN_ID],
                     exploration.version,
                     exploration_model_created_on,
                     exploration_model_last_updated)
@@ -230,13 +232,192 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             simple_props = ['id', 'title', 'category', 'objective',
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
-                            'editor_ids', 'viewer_ids', 'version',
+                            'editor_ids', 'viewer_ids',
+                            'contributor_ids', 'version',
                             'exploration_model_created_on']
             for exp_id in actual_job_output:
                 for prop in simple_props:
                     self.assertEqual(
                         getattr(actual_job_output[exp_id], prop),
                         getattr(expected_job_output[exp_id], prop))
+
+
+class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(OneOffExplorationFirstPublishedJobTest, self).setUp()
+
+    def test_first_published_time_of_exploration_that_is_unpublished(self):
+        """This tests that, if an exploration is published, unpublished, and
+        then published again, the job uses the first publication time as the
+        value for first_published_msec.
+        """
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_EMAIL])
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        # Test to see whether first_published_msec was correctly updated.
+        exp_first_published = exploration_rights.first_published_msec
+        exp_rights_model = exp_models.ExplorationRightsModel.get(self.EXP_ID)
+        last_updated_time_msec = utils.get_time_in_millisecs(
+            exp_rights_model.last_updated)
+        self.assertLess(
+            exp_first_published, last_updated_time_msec)
+
+        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        job_id = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.create_new()
+        exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Test to see whether first_published_msec remains the same despite the
+        # republication.
+        exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertEqual(
+            exp_first_published, exploration_rights.first_published_msec)
+
+
+class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
+
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob]
+
+    EXP_ID = 'exp_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(ExpSummariesContributorsOneOffJobTest, self).setUp()
+
+    def test_contributors_for_valid_contribution(self):
+        """Test that if only one commit is made, that the contributor
+        list consists of that contributor's user id.
+        """
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id)
+        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual(
+            [self.user_a_id], exploration_summary.contributor_ids)
+
+    def test_repeat_contributors(self):
+        """Test that if the same user makes more than one commit that changes
+        the content of an exploration, the user is only represented once in the
+        list of contributors for that exploration.
+        """
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        # Have one user make two commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Original Title')
+        exploration_model = exp_models.ExplorationModel.get(
+            self.EXP_ID, strict=True, version=None)
+        exploration_model.title = 'New title'
+        exploration_model.commit(
+            self.user_a_id, 'Changed title.', [])
+
+        # Run the job to compute the contributor ids.
+        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify that the length of the contributor list is one, and that
+        # the list contains the user who made these commits.
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual(
+            [self.user_a_id], exploration_summary.contributor_ids)
+
+    def test_contributors_with_only_reverts_not_counted(self):
+        """Test that contributors who have only done reverts do not
+        have their user id appear in the contributor list.
+        """
+        # Sign up two users.
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+        # Have one user make two commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Original Title')
+        exploration_model = exp_models.ExplorationModel.get(
+            self.EXP_ID, strict=True, version=None)
+        exploration_model.title = 'New title'
+        exploration_model.commit(
+            self.user_a_id, 'Changed title.', [])
+
+        # Have the second user revert version 2 to version 1
+        exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 2, 1)
+
+        # Run the job to compute the contributor ids.
+        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify that the committer list does not contain the user
+        # who only reverted.
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
+
+    def test_nonhuman_committers_not_counted(self):
+        """Test that only human committers are counted as contributors.
+        """
+        # Create a commit with the system user id.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
+        # Run the job to compute the contributor ids.
+        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        # Check that the system id was not added to the exploration's
+        # contributor ids.
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID,
+            exploration_summary.contributor_ids)
+
+        # Create a commit with the migration bot user id.
+        exploration_model = exp_models.ExplorationModel.get(
+            self.EXP_ID, strict=True, version=None)
+        exploration_model.title = 'New title'
+        exploration_model.commit(
+            feconf.MIGRATION_BOT_USERNAME, 'Changed title.', [])
+        # Run the job to compute the contributor ids.
+        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        # Check that the migration bot id was not added to the exploration's
+        # contributor ids.
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertNotIn(
+            feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
@@ -246,13 +427,16 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
     def setUp(self):
         super(OneOffReindexExplorationsJobTest, self).setUp()
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s%s' % (self.EXP_ID, i), 'title %d' % i, 'category%d' % i)
             for i in xrange(5)]
 
         for exp in explorations:
-            exp_services.save_new_exploration('owner_id', exp)
-            rights_manager.publish_exploration('owner_id', exp.id)
+            exp_services.save_new_exploration(self.owner_id, exp)
+            rights_manager.publish_exploration(self.owner_id, exp.id)
 
         self.process_and_flush_pending_tasks()
 
@@ -364,7 +548,8 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(self.NEW_EXP_ID)
+        exp_services.create_exploration_summary(
+            self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.ALBERT_ID, self.NEW_EXP_ID)

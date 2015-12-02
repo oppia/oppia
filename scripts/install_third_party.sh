@@ -111,8 +111,20 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
 
-echo Checking whether node-jscs dependencies are installed
-if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
-  echo installing node-jscs
-  $NPM_INSTALL jscs@2.3.0
+# Note that numpy needs to be built after downloading. If you are having
+# trouble, please ensure that you have pip installed (see "Installing Oppia"
+# on the Oppia developers' wiki page).
+echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
+  echo Installing numpy
+  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
+
+# Install third-party node modules needed for the build process.
+install_node_module gulp 3.9.0
+install_node_module through2 2.0.0
+install_node_module yargs 3.29.0
+install_node_module gulp-concat 2.6.0
+install_node_module gulp-minify-css 1.2.1
+install_node_module gulp-util 3.0.7
+install_node_module jscs 2.3.0

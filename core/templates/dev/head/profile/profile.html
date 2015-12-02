@@ -40,10 +40,18 @@
                 <em>This user has not supplied a bio yet.</em>
               </span>
             </p>
+            <br>
             <p>
-              <span ng-if="firstContributionDatetime">
+              <span ng-if="subjectInterests">
+                Subject Interests: <[subjectInterests]></span>
+              <span ng-if="!subjectInterests">
+                Subject Interests: <em>none specified</em>
+              </span>
+            </p>
+            <p>
+              <span ng-if="firstContributionMsec">
                 Contributing since
-                <[getLocaleDateString(firstContributionDatetime)]>
+                <[getLocaleDateString(firstContributionMsec)]>
               </span>
             </p>
           </div>

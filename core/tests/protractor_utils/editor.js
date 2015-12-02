@@ -974,13 +974,32 @@ var _runFromHistoryTab = function(callbackFunction) {
 var _selectComparedVersions = function(v1, v2) {
   var v1Position = null;
   var v2Position = null;
-  element.all(by.css('.protractor-test-history-v1-selector')).first()
-      .getAttribute('value').then(function(versionNumber) {
+  element.all(by.css('.protractor-test-history-checkbox-selector')).count()
+      .then(function(versionNumber) {
+    if (v1 < 0) {
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+      'expected v1 to be >= 0');
+    }
+    if (v2 < 0) {
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+      'expected v2 to be >= 0');
+    }
+    // Check to ensure no negative indices are queried
+    if (v1 > versionNumber) {
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+      'expected v1 to be less than or equal to total number of saved revisions');
+    }
+    if (v2 > versionNumber) {
+      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+      'expected v2 be less than or equal to total number of saved revisions');
+    }
+
     v1Position = versionNumber - v1;
     v2Position = versionNumber - v2;
-    element.all(by.css('.protractor-test-history-v1-selector'))
+
+    element.all(by.css('.protractor-test-history-checkbox-selector'))
       .get(v1Position).click();
-    element.all(by.css('.protractor-test-history-v2-selector'))
+    element.all(by.css('.protractor-test-history-checkbox-selector'))
       .get(v2Position).click();
     browser.waitForAngular();
   });
@@ -1157,9 +1176,8 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
 var revertToVersion = function(version) {
   _runFromHistoryTab(function() {
     var versionPosition = null;
-    var elem = element.all(by.css(
-      '.protractor-test-history-v1-selector')).first();
-    elem.getAttribute('value').then(function(versionNumber) {
+    var elem = element.all(by.css('.protractor-test-history-checkbox-selector')).count()
+        .then(function(versionNumber) {
       // Note: there is no 'revert' link next to the current version
       versionPosition = versionNumber - version - 1;
       element.all(by.css('.protractor-test-revert-version'))

@@ -79,9 +79,10 @@ class ProfileHandler(base.BaseHandler):
 
         self.values.update({
             'user_bio': user_settings.user_bio,
-            'first_contribution_datetime': (
-                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
-                if user_settings.first_contribution_datetime else None),
+            'subject_interests': user_settings.subject_interests,
+            'first_contribution_msec': (
+                user_settings.first_contribution_msec
+                if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
         })
         self.render_json(self.values)
@@ -120,6 +121,7 @@ class PreferencesHandler(base.BaseHandler):
             'preferred_language_codes': user_settings.preferred_language_codes,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
+            'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': user_services.get_email_preferences(
                 self.user_id)['can_receive_email_updates'],
         })
@@ -133,6 +135,8 @@ class PreferencesHandler(base.BaseHandler):
 
         if update_type == 'user_bio':
             user_services.update_user_bio(self.user_id, data)
+        elif update_type == 'subject_interests':
+            user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'profile_picture_data_url':

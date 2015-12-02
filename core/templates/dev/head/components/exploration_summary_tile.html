@@ -7,6 +7,7 @@
     padding: 0;
     position: relative;
     text-align: left;
+    vertical-align: top;
     width: 240px;
   }
 
@@ -15,7 +16,7 @@
   .oppia-exploration-summary-tile a:active,
   .oppia-exploration-summary-tile a:visited {
     color: inherit;
-    text-decoration: none
+    text-decoration: none;
   }
 
   .oppia-exploration-summary-tile:hover {
@@ -29,14 +30,14 @@
   }
 
   .oppia-exploration-summary-tile .top-section {
-    background-color: rgba(0,150,136,1);
     height: 164px;
+    opacity: 1.0;
     position: relative;
     width: 100%;
   }
 
   .oppia-exploration-summary-tile:hover .top-section {
-    background-color: rgba(0,150,136,0.8);
+    opacity: 0.8;
   }
 
   .oppia-exploration-summary-tile,
@@ -49,7 +50,7 @@
     display: block;
     margin: 0 auto;
     height: 50px;
-    top: 24px;
+    top: 36px;
     position: relative;
   }
 
@@ -92,10 +93,10 @@
 
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-exploration-summary-tile">
-    <a ng-href="/explore/<[getId()]>">
-      <div class="top-section">
-        <img class="thumbnail-image" src="/images/gallery/arithmetic.svg">
-        <h2 class="exploration-title"><[getTitle()]></h2>
+    <a ng-href="<[explorationLink]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+      <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
+        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
+        <h2 class="exploration-title"><[getExplorationTitle()]></h2>
       </div>
 
       <div>
@@ -103,23 +104,22 @@
           <[getObjective() | truncateAndCapitalize: 95]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
-        <ul layout="row" class="metrics" layout-align="space-between center">
-          <li>
+        <ul layout="row" class="metrics pull-right" layout-align="space-between center">
+          <li ng-if="getStarRating()">
             <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
             </span>
             <span ng-if="explorationRatings === 0">Unrated</span>
             <span ng-if="explorationRatings !== 0"><[getStarRating()]></span>
           </li>
 
-          <li>
+          <li ng-if="getNumViews()">
             <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top">
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
 
           <li>
-            <span class="fa fa-clock-o fa-lg" tooltip="Last Updated" tooltip-placement="top">
-            </span>
+            <em>Last updated:</em>&nbsp;
             <[lastUpdatedDatetime]>
           </li>
         </ul>

@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-0-2
+version: 2-0-3
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -53,6 +53,13 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  http_headers:
+  # TODO(Sean Lip): Add cache when system to break cache during
+  # new release is figured out.
+    Cache-Control: 'no-cache'
 - url: /extensions/gadgets/(.*)/static/(.*)
   static_files: extensions/gadgets/\1/static/\2
   upload: extensions/gadgets/(.*)/static/(.*)
@@ -99,5 +106,7 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
+- name: numpy
+  version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
