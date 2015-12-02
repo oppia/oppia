@@ -2202,28 +2202,46 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             exp_services.get_displayable_exploration_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
 
-        self.assertEqual(len(displayable_summaries[0]), 11)
+        self.assertIn('id', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['id'], self.EXP_ID_2)
+
+        self.assertIn('status', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['status'], 
             rights_manager.ACTIVITY_STATUS_PUBLIC)
+
+        self.assertIn('community_owned', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['community_owned'], False)
+
+        self.assertIn('is_editable', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['is_editable'], True)
+        
+        self.assertIn('language_code', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['language_code'], 
             feconf.DEFAULT_LANGUAGE_CODE)
+        
+        self.assertIn('category', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['category'], 'A category')
+        
+        self.assertIn('ratings', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['ratings'], feconf.get_empty_ratings())
+        
+        self.assertIn('title', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['title'], 'Exploration 2 Albert title')
+        
+        self.assertIn('objective', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0]['objective'], 'An objective')
+
         self.assertIn('last_updated_msec', displayable_summaries[0])
+        
         self.assertEqual(len(displayable_summaries), 1)
 
     def test_get_non_private_exploration_summaries(self):
