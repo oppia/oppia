@@ -362,6 +362,14 @@ COLOR_SHARKFIN = 'sharkfin'
 COLOR_GUNMETAL = 'gunmetal'
 DEFAULT_COLOR = COLOR_TEAL
 
+COLORS_TO_HEX_VALUES = {
+    COLOR_TEAL: '#05a69a',
+    COLOR_SALMON: '#f35f55',
+    COLOR_SUNNYSIDE: '#f7a541',
+    COLOR_SHARKFIN: '#058ca6',
+    COLOR_GUNMETAL: '#607d8b',
+}
+
 # List of supported default categories. For now, each category has
 # a specific color associated with it.
 CATEGORIES_TO_COLORS = {
