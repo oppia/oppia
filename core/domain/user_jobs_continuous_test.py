@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 import math
+from collections import defaultdict
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -643,7 +644,9 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
     BELOW_MIN_RATING = int(math.ceil(MIN_AVERAGE_RATING - 1))
     ABOVE_MIN_RATING = int(math.floor(MIN_AVERAGE_RATING + 1))
 
-    num_completions = {EXP_ID_1: 0, EXP_ID_2: 0}
+    def setUp(self):
+        super(UserImpactAggregatorTest, self).setUp()
+        self.num_completions = defaultdict(int)
 
     def _mock_get_statistics(self, exp_id, version):
         current_completions = {
@@ -664,14 +667,14 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
     def _mock_get_below_zero_impact_score(cls, exploration_id):
         return -1
 
-    def _run_manager(self):
+    def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
         completion events."""
         with self.swap(stats_jobs_continuous.StatisticsAggregator,
                     'get_statistics', self._mock_get_statistics):
-                job_id = ModifiedUserImpactAggregator.start_computation()
-                self.process_and_flush_pending_tasks()
+            job_id = ModifiedUserImpactAggregator.start_computation()
+            self.process_and_flush_pending_tasks()
 
     def _run_exp_impact_calculation_and_assert_equals(
             self, exploration_id, expected_impact):
@@ -698,7 +701,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         """
         # Each user id needs to be unique since each user can only give an
         # exploration one rating.
-        user_ids = ['user{}'.format(i) for i in range(num_ratings)]
+        user_ids = ['user%d' % i for i in range(num_ratings)]
         for user_id in user_ids:
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, rating
@@ -709,7 +712,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         times."""
         exp_version = 1
         state = exploration.init_state_name
-        session_ids = ['session{}'.format(i) for i in range(num_completions)]
+        session_ids = ['session%d' % i for i in range(num_completions)]
         for session_id in session_ids:
             event_services.StartExplorationEventHandler.record(
                 exploration.id, exp_version, state, session_id, {},
@@ -719,7 +722,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
                 feconf.PLAY_TYPE_NORMAL)
         # Set the number of completions, so mock can function
         # correctly.
-        self.num_completions[exploration.id] = num_completions
+        self.num_completions[exploration.id] += num_completions
 
     def test_user_with_no_explorations_has_no_impact(self):
         """Test that a user who is not a contributor on any exploration
@@ -727,7 +730,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         """
         self.user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
             self.user_a_id, strict=False)
         self.assertIsNone(user_stats_model)
@@ -751,7 +754,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(
             self.exploration.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
         # Give this exploration more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
 
         expected_user_impact_score = round(
@@ -760,7 +763,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             self.MULTIPLIER)
 
         # Verify that the impact score matches the expected.
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
@@ -787,7 +790,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(
             self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
         # Give these explorations more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
         self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
 
@@ -799,7 +802,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             self.MULTIPLIER)
 
         # Verify that the impact score matches the expected.
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
@@ -856,7 +859,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self.exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
         # Give this exploration more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
         # Verify that the impact calculated is 0.
         self._run_exp_impact_calculation_and_assert_equals(
@@ -873,7 +876,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self.exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
         # Give this exploration more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
 
         # Rate this exploration once, with exactly the minimum average
@@ -899,7 +902,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self.exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
         # Give this exploration more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
         # Rate this exploration only twice, but give rating above minimum
         # average rating.
@@ -932,7 +935,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(
             self.exploration_2.id, 1, self.ABOVE_MIN_RATING)
         # Give these explorations more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
         self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
 
@@ -950,7 +953,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         expected_user_impact_score = round(exp_1_impact + exp_2_impact)
 
         # Verify that the impact score matches the expected.
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
@@ -970,7 +973,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(
             self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
         # Give these explorations more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
         self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
         # We expect the second exploration to yield 0 (since it has no
@@ -981,7 +984,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
             self.MULTIPLIER)
         # Verify that the impact score matches the expected.
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
@@ -1005,7 +1008,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF,
                 self.BELOW_MIN_RATING)
         # Give these explorations more than one playthrough (so
-        # ln(num_completions != 0).
+        # ln(num_completions) != 0.
         self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
         self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
         # We expect the second exploration to yield 0 (since its average rating
@@ -1016,7 +1019,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
             self.MULTIPLIER)
         # Verify that the impact score matches the expected.
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
 
@@ -1049,6 +1052,6 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
             self.MULTIPLIER)
         # Verify that the impact score matches the expected.
-        self._run_manager()
+        self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
