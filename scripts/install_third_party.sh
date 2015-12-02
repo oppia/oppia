@@ -126,11 +126,9 @@ if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
       echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
 
       if [ "${OS}" == "Darwin" ] ; then
-        echo "  https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
-      elif [ "${OS}" == "Linux" ] ; then
-        echo "  https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
       else
-        echo "  https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
       fi
 
       exit 1
