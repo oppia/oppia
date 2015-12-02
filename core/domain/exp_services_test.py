@@ -2200,10 +2200,10 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         displayable_summaries = (
             exp_services.get_displayable_exploration_summaries_matching_ids([
-                    self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
+                self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
 
         self.assertEqual(
-            displayable_summaries[0].id, self.EXP_ID_2)
+            displayable_summaries[0]['id'], self.EXP_ID_2)
         self.assertEqual(len(displayable_summaries), 1)
 
     def test_get_non_private_exploration_summaries(self):

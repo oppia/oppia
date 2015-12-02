@@ -34,7 +34,7 @@ MAX_USERNAME_LENGTH = 50
 class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
-            self, user_id, email, username=None,  last_agreed_to_terms=None,
+            self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None,
             profile_picture_data_url=None, user_bio='', subject_interests=None,
             first_contribution_msec=None,
@@ -431,6 +431,18 @@ class UserContributions(object):
             % self.edited_exploration_ids)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
+        for exploration_id in self.created_exploration_ids:
+            if not isinstance(exploration_id, basestring):
+                raise utils.ValidationError(
+                    '''Expected exploration_id in created_exploration_ids 
+                    to be a string, received %s''' % (
+                        exploration_id))
+        for exploration_id in self.edited_exploration_ids:
+            if not isinstance(exploration_id, basestring):
+                raise utils.ValidationError(
+                    '''Expected exploration_id in edited_exploration_ids
+                    to be a string, received %s''' % (
+                        exploration_id))
 
 
 def get_user_contributions(user_id, strict=False):

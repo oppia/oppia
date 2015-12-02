@@ -84,11 +84,13 @@ class ProfileHandler(base.BaseHandler):
 
         created_exploration_summaries = (
             exp_services.get_displayable_exploration_summaries_matching_ids(
-                user_contributions.created_exploration_ids))
-
+                user_contributions.created_exploration_ids,
+                user_settings.user_id))
+        
         edited_exploration_summaries = (
             exp_services.get_displayable_exploration_summaries_matching_ids(
-                user_contributions.edited_exploration_ids))
+                user_contributions.edited_exploration_ids,
+                user_settings.user_id))
 
         self.values.update({
             'user_bio': user_settings.user_bio,
@@ -97,10 +99,6 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'created_explorations_count': len(
-                user_contributions.created_exploration_ids),
-            'edited_explorations_count': len(
-                user_contributions.edited_exploration_ids),
             'created_exploration_summaries': created_exploration_summaries,
             'edited_exploration_summaries': edited_exploration_summaries
         })

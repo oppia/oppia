@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import datetime
 
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -344,28 +345,41 @@ class UserContributionsTests(test_utils.GenericTestBase):
     EMAIL_B = 'b@example.com'
     EXP_ID_1 = 'exp_id_1'
 
-    def test_zero_count(self):
+    def test_null_case(self):
         # Check that the profile page for a user with no contributions shows
         # that they have 0 created/edited explorations.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
-        self.assertEqual(response_dict['created_explorations_count'], 0)
-        self.assertEqual(response_dict['edited_explorations_count'], 0)
+        self.assertEqual(
+            response_dict['created_exploration_summaries'], [])
+        self.assertEqual(
+            response_dict['edited_exploration_summaries'], [])
 
-    def test_created_count(self):
+    def test_created(self):
         # Check that the profile page for a user who has created 
         # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_a_id, end_state_name='End')
+        rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
+
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
-        self.assertEqual(response_dict['created_explorations_count'], 1)
-        self.assertEqual(response_dict['edited_explorations_count'], 1)
 
-    def test_edited_count(self):
+        self.assertEqual(len(
+            response_dict['created_exploration_summaries']), 1)
+        self.assertEqual(len(
+            response_dict['edited_exploration_summaries']), 1)
+        self.assertEqual(
+            response_dict['created_exploration_summaries'][0]['id'], 
+        self.EXP_ID_1)
+        self.assertEqual(
+            response_dict['edited_exploration_summaries'][0]['id'], 
+        self.EXP_ID_1)
+
+    def test_edited(self):
         # Check that the profile page for a user who has created 
         # a single exploration shows 0 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
@@ -376,6 +390,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_a_id, end_state_name='End')
+        rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
 
         exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [{
             'cmd': 'edit_exploration_property',
@@ -385,5 +400,13 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
-        self.assertEqual(response_dict['created_explorations_count'], 0)
-        self.assertEqual(response_dict['edited_explorations_count'], 1)
+        self.assertEqual(len(
+            response_dict['created_exploration_summaries']), 0)
+        self.assertEqual(len(
+            response_dict['edited_exploration_summaries']), 1)
+        self.assertEqual(
+            response_dict['edited_exploration_summaries'][0]['id'], 
+        self.EXP_ID_1)
+        self.assertEqual(
+            response_dict['edited_exploration_summaries'][0]['objective'], 
+        'the objective')
