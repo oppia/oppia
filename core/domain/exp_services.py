@@ -267,7 +267,10 @@ def get_displayable_exploration_summary_dicts_matching_ids(
                 'objective': exploration_summary.objective,
                 'thumbnail_image_url': (
                     exploration_summary.thumbnail_image_url
-                )
+                ),
+                'thumbnail_icon_url': '/images/gallery/default_thumbnail_icon.svg',
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exploration_summary.category)
             })
 
     return displayable_exploration_summaries

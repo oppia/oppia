@@ -140,6 +140,10 @@ body {
   background-color: #009688;
 }
 
+md-tabs-ink-bar {
+ background: #cccccc !important; 
+ height: 3px;
+}
 
 .oppia-profile-tabs md-tab-label {
   color: #ffffff;
