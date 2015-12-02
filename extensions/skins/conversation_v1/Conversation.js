@@ -188,7 +188,6 @@ oppia.directive('conversationSkin', [function() {
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
       $scope.isIframed = urlService.isIframed();
       $rootScope.loadingMessage = 'Loading';
-      $scope.explorationCompleted = false;
       $scope.hasFullyLoaded = false;
 
       $scope.oppiaAvatarImageUrl = oppiaPlayerService.getOppiaAvatarImageUrl();
@@ -256,6 +255,11 @@ oppia.directive('conversationSkin', [function() {
             'Found a panel not corresponding to a tutor or interaction: ' +
             panelName);
         }
+      };
+
+      $scope.isOnFinalCard = function() {
+        return $scope.activeCard &&
+          oppiaPlayerService.isStateTerminal($scope.activeCard.stateName);
       };
 
       var isSupplementalCardNonempty = function(card) {
@@ -407,9 +411,6 @@ oppia.directive('conversationSkin', [function() {
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
           focusService.setFocusIfOnDesktop(_nextFocusLabel);
-
-          $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-            stateName);
         });
       };
 
@@ -517,8 +518,6 @@ oppia.directive('conversationSkin', [function() {
               }
             }
 
-            $scope.explorationCompleted = oppiaPlayerService.isStateTerminal(
-              newStateName);
             _answerIsBeingProcessed = false;
           }, millisecsLeftToWait);
         }, true);
@@ -589,8 +588,9 @@ oppia.directive('conversationSkin', [function() {
       });
 
       $window.addEventListener('beforeunload', function(e) {
-        if (hasInteractedAtLeastOnce && !$scope.explorationCompleted &&
-            !$scope.isInPreviewMode) {
+        if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
+            !oppiaPlayerService.isStateTerminal(
+              $scope.transcript[$scope.transcript.length - 1].stateName)) {
           oppiaPlayerService.registerMaybeLeaveEvent();
           var confirmationMessage = (
             'If you navigate away from this page, your progress on the ' +

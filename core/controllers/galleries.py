@@ -261,7 +261,12 @@ class ExplorationSummariesHandler(base.BaseHandler):
                     exp_summary.exploration_model_last_updated),
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
+                # TODO(sll): Deprecate thumbnail_image_url.
                 'thumbnail_image_url': exp_summary.thumbnail_image_url,
+                # TODO(sll): Replace these with per-category thumbnails.
+                'thumbnail_icon_url': '/images/gallery/default_thumbnail_icon.svg',
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exp_summary.category),
             }) for exp_summary in exp_summaries]
         })
         self.render_json(self.values)
