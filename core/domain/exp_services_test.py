@@ -2191,7 +2191,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_3)
 
-    def test_get_displayable_exploration_summaries_matching_ids(self):
+    def test_get_displayable_exploration_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration
         # EXP_ID_2 -- pubished exploration
@@ -2199,11 +2199,31 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         # Should only return [EXP_ID_2]
 
         displayable_summaries = (
-            exp_services.get_displayable_exploration_summaries_matching_ids([
-                self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
+            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
 
         self.assertEqual(
             displayable_summaries[0]['id'], self.EXP_ID_2)
+        self.assertEqual(
+            displayable_summaries[0]['status'], 
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
+        self.assertEqual(
+            displayable_summaries[0]['community_owned'], False)
+        self.assertEqual(
+            displayable_summaries[0]['is_editable'], True)
+        self.assertEqual(
+            displayable_summaries[0]['language_code'], 
+            feconf.DEFAULT_LANGUAGE_CODE)
+        self.assertEqual(
+            displayable_summaries[0]['category'], 'A category')
+        self.assertEqual(
+            displayable_summaries[0]['ratings'], feconf.get_empty_ratings())
+        self.assertEqual(
+            displayable_summaries[0]['title'], 'Exploration 2 Albert title')
+        self.assertEqual(
+            displayable_summaries[0]['objective'], 'An objective')
+        self.assertEqual(
+            displayable_summaries[0].has_key('last_updated_msec'), True)
         self.assertEqual(len(displayable_summaries), 1)
 
     def test_get_non_private_exploration_summaries(self):

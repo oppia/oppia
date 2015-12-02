@@ -352,9 +352,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
         self.assertEqual(
-            response_dict['created_exploration_summaries'], [])
+            response_dict['created_exploration_summary_dicts'], [])
         self.assertEqual(
-            response_dict['edited_exploration_summaries'], [])
+            response_dict['edited_exploration_summary_dicts'], [])
 
     def test_created(self):
         # Check that the profile page for a user who has created 
@@ -369,15 +369,15 @@ class UserContributionsTests(test_utils.GenericTestBase):
             '/profilehandler/data/%s' % self.USERNAME_A)
 
         self.assertEqual(len(
-            response_dict['created_exploration_summaries']), 1)
+            response_dict['created_exploration_summary_dicts']), 1)
         self.assertEqual(len(
-            response_dict['edited_exploration_summaries']), 1)
+            response_dict['edited_exploration_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['created_exploration_summaries'][0]['id'], 
-        self.EXP_ID_1)
+            response_dict['created_exploration_summary_dicts'][0]['id'], 
+            self.EXP_ID_1)
         self.assertEqual(
-            response_dict['edited_exploration_summaries'][0]['id'], 
-        self.EXP_ID_1)
+            response_dict['edited_exploration_summary_dicts'][0]['id'], 
+            self.EXP_ID_1)
 
     def test_edited(self):
         # Check that the profile page for a user who has created 
@@ -401,12 +401,12 @@ class UserContributionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
         self.assertEqual(len(
-            response_dict['created_exploration_summaries']), 0)
+            response_dict['created_exploration_summary_dicts']), 0)
         self.assertEqual(len(
-            response_dict['edited_exploration_summaries']), 1)
+            response_dict['edited_exploration_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['edited_exploration_summaries'][0]['id'], 
-        self.EXP_ID_1)
+            response_dict['edited_exploration_summary_dicts'][0]['id'], 
+            self.EXP_ID_1)
         self.assertEqual(
-            response_dict['edited_exploration_summaries'][0]['objective'], 
-        'the objective')
+            response_dict['edited_exploration_summary_dicts'][0]['objective'], 
+            'the objective')

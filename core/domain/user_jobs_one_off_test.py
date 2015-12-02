@@ -123,7 +123,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             user_c_contributions_model.created_exploration_ids, [])
         self.assertEqual(
             user_c_contributions_model.edited_exploration_ids, [self.EXP_ID_1])
-    
 
     def test_for_duplicates(self):
         """Tests the case where user has an edited exploration, and edits
@@ -228,7 +227,6 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_b_id)
         user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_c_id)
-
         self.assertEqual(user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(user_c_subscriptions_model.activity_ids, [])
         self.assertEqual(

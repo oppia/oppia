@@ -421,27 +421,29 @@ class UserContributions(object):
         if not isinstance(self.user_id, basestring):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+
         if not isinstance(self.created_exploration_ids, list):
             raise utils.ValidationError(
                 'Expected created_exploration_ids to be a list, received %s' 
-            % self.created_exploration_ids)
+            % self.created_exploration_ids)    
+        for exploration_id in self.created_exploration_ids:
+            if not isinstance(exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected exploration_id in created_exploration_ids '
+                    'to be a string, received %s' % (
+                        exploration_id))
+
         if not isinstance(self.edited_exploration_ids, list):
             raise utils.ValidationError(
                 'Expected edited_exploration_ids to be a list, received %s' 
             % self.edited_exploration_ids)
-        if not self.user_id:
-            raise utils.ValidationError('No user id specified.')
-        for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, basestring):
-                raise utils.ValidationError(
-                    '''Expected exploration_id in created_exploration_ids 
-                    to be a string, received %s''' % (
-                        exploration_id))
         for exploration_id in self.edited_exploration_ids:
             if not isinstance(exploration_id, basestring):
                 raise utils.ValidationError(
-                    '''Expected exploration_id in edited_exploration_ids
-                    to be a string, received %s''' % (
+                    'Expected exploration_id in edited_exploration_ids '
+                    'to be a string, received %s' % (
                         exploration_id))
 
 
@@ -473,7 +475,8 @@ def create_user_contributions(user_id, created_exploration_ids, edited_explorati
 
 
 def update_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
-    """Updates an existing UserContributionsModel with new calculated contributions"""
+    """Updates an existing UserContributionsModel with new calculated 
+    contributions"""
     
     user_contributions = get_user_contributions(user_id, strict=False)
     if not user_contributions:

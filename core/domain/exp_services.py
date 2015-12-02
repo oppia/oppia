@@ -237,8 +237,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
-def get_displayable_exploration_summaries_matching_ids(exploration_ids,
-    user_id):
+def get_displayable_exploration_summary_dicts_matching_ids(
+    exploration_ids, user_id):
     """Given a list of exploration ids, filters the list for 
     explorations that are currently non-private and not deleted, 
     and returns a list of dicts of the corresponding exploration summaries.
@@ -250,25 +250,25 @@ def get_displayable_exploration_summaries_matching_ids(exploration_ids,
     for exploration_summary in exploration_summaries:
         if exploration_summary and exploration_summary.status != (
             rights_manager.ACTIVITY_STATUS_PRIVATE):
-                displayable_exploration_summaries.append({
-                    'id': exploration_summary.id,
-                    'status': exploration_summary.status,
-                    'community_owned': exploration_summary.community_owned,
-                    'last_updated_msec': (
-                        utils.get_time_in_millisecs(
-                            exploration_summary.exploration_model_last_updated
-                            )),
-                    'is_editable': (
-                        is_exp_summary_editable(exploration_summary, user_id)),
-                    'language_code': exploration_summary.language_code,
-                    'category': exploration_summary.language_code,
-                    'ratings': exploration_summary.ratings,
-                    'title': exploration_summary.title,
-                    'objective': exploration_summary.objective,
-                    'thumbnail_image_url': (
-                        exploration_summary.thumbnail_image_url
-                    )
-                })
+            displayable_exploration_summaries.append({
+                'id': exploration_summary.id,
+                'status': exploration_summary.status,
+                'community_owned': exploration_summary.community_owned,
+                'last_updated_msec': (
+                    utils.get_time_in_millisecs(
+                        exploration_summary.exploration_model_last_updated
+                    )),
+                'is_editable': (
+                    is_exp_summary_editable(exploration_summary, user_id)),
+                'language_code': exploration_summary.language_code,
+                'category': exploration_summary.category,
+                'ratings': exploration_summary.ratings,
+                'title': exploration_summary.title,
+                'objective': exploration_summary.objective,
+                'thumbnail_image_url': (
+                    exploration_summary.thumbnail_image_url
+                )
+            })
 
     return displayable_exploration_summaries
 
