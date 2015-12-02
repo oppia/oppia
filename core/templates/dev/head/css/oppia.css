@@ -111,7 +111,7 @@ body {
 }
 
 .oppia-profile-picture-fullsize {
-  height: 180px;
+  height: auto;
   width: 180px;
 }
 
