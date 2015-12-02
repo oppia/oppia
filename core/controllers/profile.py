@@ -18,6 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import exp_services
 from core.domain import user_services
 import feconf
 import utils
@@ -53,6 +54,7 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
+
         if not user_settings:
             raise self.PageNotFoundException
 
@@ -77,6 +79,19 @@ class ProfileHandler(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
+        user_contributions = user_services.get_user_contributions(
+            user_settings.user_id)
+
+        created_exploration_summary_dicts = (
+            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
+                user_contributions.created_exploration_ids,
+                user_settings.user_id))
+        
+        edited_exploration_summary_dicts = (
+            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
+                user_contributions.edited_exploration_ids,
+                user_settings.user_id))
+
         self.values.update({
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -84,6 +99,10 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'created_exploration_summary_dicts': (
+                created_exploration_summary_dicts),
+            'edited_exploration_summary_dicts': (
+                edited_exploration_summary_dicts)
         })
         self.render_json(self.values)
 

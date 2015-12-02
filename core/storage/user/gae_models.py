@@ -70,6 +70,22 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
 
+class UserContributionsModel(base_models.BaseModel):
+    """Tracks explorations created/edited for a particular user.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of explorations that this user has created 
+    # Includes subsequently deleted and private explorations.
+    created_exploration_ids = ndb.StringProperty(
+        repeated=True, indexed=True, default=None)
+    # IDs of explorations that this user has made a positive 
+    # (i.e. non-revert) commit to. 
+    # Includes subsequently deleted and private explorations.
+    edited_exploration_ids = ndb.StringProperty(
+        repeated=True, indexed=True, default=None)
+
+
 class UserEmailPreferencesModel(base_models.BaseModel):
     """Email preferences for a particular user.
 

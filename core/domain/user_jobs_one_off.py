@@ -28,6 +28,46 @@ from core.platform import models
 import utils
 
 
+class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for creating and populating UserContributionsModels for 
+    all registered users that have contributed.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
+            split_id = item.id.rsplit('-')
+            yield (item.committer_id, {
+                'version_string': split_id[1],
+                'exploration_id': split_id[0]
+            })
+
+    @staticmethod
+    def reduce(key, version_and_exp_ids):
+
+        created_exploration_ids = set()
+        edited_exploration_ids = set()
+
+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]
+
+        for edit in edits:
+            edited_exploration_ids.add(edit['exploration_id'])
+            if edit['version_string'] == '1':
+                created_exploration_ids.add(edit['exploration_id'])
+
+        if user_services.get_user_contributions(key, strict=False) is not None:
+            user_services.update_user_contributions(
+                key, list(created_exploration_ids), list(
+                    edited_exploration_ids))
+        else:        
+            user_services.create_user_contributions(
+                key, list(created_exploration_ids), list(
+                    edited_exploration_ids))
+      
+
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
