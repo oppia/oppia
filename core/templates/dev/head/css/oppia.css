@@ -111,7 +111,8 @@ body {
 }
 
 .oppia-profile-picture-fullsize {
-  height: 180px;
+  /* This maintains the aspect ratio of the picture. */
+  height: auto;
   width: 180px;
 }
 
