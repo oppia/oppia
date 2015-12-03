@@ -116,14 +116,6 @@ describe('Ratings from frequencies directive', function() {
       '4': 0,
       '5': 0
     })).toBe(undefined);
-
-    expect(ctrlScope.computeAverageRating({
-      '1': 0,
-      '2': 1,
-      '3': 1,
-      '4': 0,
-      '5': 0
-    })).toBe(undefined);
   });
 
   it('should compute average ratings correctly', function() {
