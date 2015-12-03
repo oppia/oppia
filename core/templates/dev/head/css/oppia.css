@@ -126,15 +126,15 @@ body {
 
 .oppia-profile-tabs md-content md-tabs {
   background: #f6f6f6;
-  border: 1px solid #e1e1e1; 
+  border: 1px solid #e1e1e1;
 }
 
 .oppia-profile-tabs md-content md-tabs md-tabs-wrapper {
-  background: white; 
+  background: white;
 }
 
 .oppia-profile-tabs md-content h1:first-child {
-  margin-top: 0; 
+  margin-top: 0;
 }
 
 .oppia-profile-tabs md-tab {
@@ -142,7 +142,7 @@ body {
 }
 
 .oppia-profile-tabs md-tabs-ink-bar {
- background: #cccccc !important; 
+ background: #cccccc !important;
  height: 3px;
 }
 
@@ -766,7 +766,7 @@ textarea {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  max-width: 800px;
+  max-width: 850px;
   min-height: 500px;
   padding-bottom: 25px;
   padding-top: 56px;

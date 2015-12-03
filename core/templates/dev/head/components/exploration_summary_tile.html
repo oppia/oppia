@@ -110,12 +110,16 @@
           <[getObjective() | truncateAndCapitalize: 45]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
-        <ul layout="row" class="metrics pull-right" layout-align="space-between center">
-          <li ng-if="getStarRating()">
-            <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
+        <ul layout="row" class="metrics" layout-align="space-between center">
+          <li>
+            <span ng-if="!averageRating">
+              Unrated
             </span>
-            <span ng-if="explorationRatings === 0">Unrated</span>
-            <span ng-if="explorationRatings !== 0"><[getStarRating()]></span>
+            <span ng-if="averageRating">
+              <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
+              </span>
+              <[averageRating]>
+            </span>
           </li>
 
           <li ng-if="getNumViews()">
@@ -124,7 +128,7 @@
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
 
-          <li class="updated">
+          <li class="updated pull-right">
             <[lastUpdatedDatetime]>
           </li>
         </ul>
