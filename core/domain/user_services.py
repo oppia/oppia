@@ -36,7 +36,7 @@ class UserSettings(object):
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
             last_started_state_editor_tutorial=None,
-            profile_picture_data_url=None, user_bio='',
+            profile_picture_data_url=None, user_bio='', subject_interests=None,
             first_contribution_msec=None,
             preferred_language_codes=None):
         self.user_id = user_id
@@ -47,6 +47,8 @@ class UserSettings(object):
             last_started_state_editor_tutorial)
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
+        self.subject_interests = (
+            subject_interests if subject_interests else [])
         self.first_contribution_msec = first_contribution_msec
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
@@ -191,6 +193,7 @@ def get_users_settings(user_ids):
                     model.last_started_state_editor_tutorial),
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
+                subject_interests=model.subject_interests,
                 first_contribution_msec = model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes
             ))
@@ -221,8 +224,10 @@ def _save_user_settings(user_settings):
             user_settings.last_started_state_editor_tutorial),
         profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
+        subject_interests=user_settings.subject_interests,
         first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
+
     ).put()
 
 
@@ -251,6 +256,7 @@ def _create_user(user_id, email):
         user_id, email,
         preferred_language_codes=[feconf.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
+    create_user_contributions(user_id, [], [])
     return user_settings
 
 
@@ -307,6 +313,12 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
 def update_user_bio(user_id, user_bio):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_subject_interests(user_id, subject_interests):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.subject_interests = subject_interests
     _save_user_settings(user_settings)
 
 
@@ -395,3 +407,134 @@ def get_email_preferences(user_id):
             if email_preferences_model is None
             else email_preferences_model.site_updates)
     }
+
+
+class UserContributions(object):
+    """Value object representing a user's contributions."""
+    def __init__(
+            self, user_id, created_exploration_ids, edited_exploration_ids):
+        self.user_id = user_id
+        self.created_exploration_ids = created_exploration_ids
+        self.edited_exploration_ids = edited_exploration_ids
+
+    def validate(self):
+        if not isinstance(self.user_id, basestring):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+
+        if not isinstance(self.created_exploration_ids, list):
+            raise utils.ValidationError(
+                'Expected created_exploration_ids to be a list, received %s' 
+            % self.created_exploration_ids)    
+        for exploration_id in self.created_exploration_ids:
+            if not isinstance(exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected exploration_id in created_exploration_ids '
+                    'to be a string, received %s' % (
+                        exploration_id))
+
+        if not isinstance(self.edited_exploration_ids, list):
+            raise utils.ValidationError(
+                'Expected edited_exploration_ids to be a list, received %s' 
+            % self.edited_exploration_ids)
+        for exploration_id in self.edited_exploration_ids:
+            if not isinstance(exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected exploration_id in edited_exploration_ids '
+                    'to be a string, received %s' % (
+                        exploration_id))
+
+
+def get_user_contributions(user_id, strict=False):
+    """Gets domain object representing the contributions for the given user_id.
+
+    If the given user_id does not exist, returns None.
+    """
+    model = user_models.UserContributionsModel.get(user_id, strict=False)
+    if model is not None:
+        result = UserContributions(
+            model.id, model.created_exploration_ids, model.edited_exploration_ids)
+    else:
+        result = None
+    return result
+
+
+def create_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
+    """Creates a new UserContributionsModel and returns the domain object."""
+    user_contributions = get_user_contributions(user_id, strict=False)
+    if user_contributions:
+        raise Exception(
+            'User contributions model for user %s already exists.' % user_id)
+    else:
+        user_contributions = UserContributions(
+            user_id, created_exploration_ids, edited_exploration_ids)
+        _save_user_contributions(user_contributions)
+    return user_contributions
+
+
+def update_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
+    """Updates an existing UserContributionsModel with new calculated 
+    contributions"""
+    
+    user_contributions = get_user_contributions(user_id, strict=False)
+    if not user_contributions:
+        raise Exception(
+            'User contributions model for user %s does not exist.' % user_id)
+
+    user_contributions.created_exploration_ids = created_exploration_ids
+    user_contributions.edited_exploration_ids = edited_exploration_ids
+
+    _save_user_contributions(user_contributions)
+
+
+def add_created_exploration_id(user_id, exploration_id):
+    """Adds an exploration_id to a user_id's UserContributionsModel collection
+    of created explorations."""
+
+    user_contributions = get_user_contributions(user_id, strict=False)
+
+    if not user_contributions:
+        create_user_contributions(user_id, [exploration_id], [])
+    elif exploration_id not in user_contributions.created_exploration_ids:
+        user_contributions.created_exploration_ids.append(exploration_id)
+        user_contributions.created_exploration_ids.sort()
+        _save_user_contributions(user_contributions)
+
+
+def add_edited_exploration_id(user_id, exploration_id):
+    """Adds an exploration_id to a user_id's UserContributionsModel collection
+    of edited explorations."""
+
+    user_contributions = get_user_contributions(user_id, strict=False)
+
+    if not user_contributions:
+        create_user_contributions(user_id, [], [exploration_id])
+
+    elif exploration_id not in user_contributions.edited_exploration_ids:
+        user_contributions.edited_exploration_ids.append(exploration_id)
+        user_contributions.edited_exploration_ids.sort()
+        _save_user_contributions(user_contributions)
+
+
+def _save_user_contributions(user_contributions):
+    """Commits a user contributions object to the datastore."""
+
+    user_contributions.validate()
+    user_models.UserContributionsModel(
+        id=user_contributions.user_id,
+        created_exploration_ids=user_contributions.created_exploration_ids,
+        edited_exploration_ids=user_contributions.edited_exploration_ids,
+    ).put()
+    
+    
+def get_user_impact_score(user_id):
+    """Returns user impact score associated with user_id"""
+    
+    model = user_models.UserStatsModel.get(user_id, strict=False)
+    
+    if model:
+        return model.impact_score
+    else:
+        return 0

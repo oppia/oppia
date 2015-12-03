@@ -237,6 +237,45 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
+def get_displayable_exploration_summary_dicts_matching_ids(
+    exploration_ids, user_id):
+    """Given a list of exploration ids, filters the list for 
+    explorations that are currently non-private and not deleted, 
+    and returns a list of dicts of the corresponding exploration summaries.
+    """
+    displayable_exploration_summaries = []
+    exploration_summaries = get_exploration_summaries_matching_ids(
+        exploration_ids)
+
+    for exploration_summary in exploration_summaries:
+        if exploration_summary and exploration_summary.status != (
+            rights_manager.ACTIVITY_STATUS_PRIVATE):
+            displayable_exploration_summaries.append({
+                'id': exploration_summary.id,
+                'status': exploration_summary.status,
+                'community_owned': exploration_summary.community_owned,
+                'last_updated_msec': (
+                    utils.get_time_in_millisecs(
+                        exploration_summary.exploration_model_last_updated
+                    )),
+                'is_editable': (
+                    is_exp_summary_editable(exploration_summary, user_id)),
+                'language_code': exploration_summary.language_code,
+                'category': exploration_summary.category,
+                'ratings': exploration_summary.ratings,
+                'title': exploration_summary.title,
+                'objective': exploration_summary.objective,
+                'thumbnail_image_url': (
+                    exploration_summary.thumbnail_image_url
+                ),
+                'thumbnail_icon_url': '/images/gallery/default_thumbnail_icon.svg',
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exploration_summary.category)
+            })
+
+    return displayable_exploration_summaries
+
+
 def get_new_exploration_id():
     """Returns a new exploration id."""
     return exp_models.ExplorationModel.get_new_id('')
@@ -852,6 +891,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+    user_services.add_created_exploration_id(committer_id, exploration.id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -967,7 +1008,8 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
-
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
+    
     if not rights_manager.is_exploration_private(exploration.id):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
