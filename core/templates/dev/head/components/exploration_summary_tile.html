@@ -3,12 +3,13 @@
     background-color: #fff;
     cursor: pointer;
     display: inline-block;
-    height: 300px;
+    height: 240px;
+    margin-left: 0;
     padding: 0;
     position: relative;
     text-align: left;
     vertical-align: top;
-    width: 240px;
+    width: 200px;
   }
 
   .oppia-exploration-summary-tile a,
@@ -30,7 +31,7 @@
   }
 
   .oppia-exploration-summary-tile .top-section {
-    height: 164px;
+    height: 144px;
     opacity: 1.0;
     position: relative;
     width: 100%;
@@ -50,7 +51,7 @@
     display: block;
     margin: 0 auto;
     height: 50px;
-    top: 36px;
+    top: 24px;
     position: relative;
   }
 
@@ -58,7 +59,7 @@
     bottom: 0;
     color: white;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 1.1em;
+    font-size: 1em;
     line-height: 1.2em;
     margin: 12px;
     padding: 0;
@@ -66,10 +67,15 @@
   }
 
   .oppia-exploration-summary-tile .objective {
-    height: 100px;
+    height: 60px;
     font-family: Roboto;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    font-style: italic;
     padding: 12px;
+  }
+
+  .oppia-exploration-summary-tile .updated {
+    font-size: 0.8em;
   }
 
   .oppia-exploration-summary-tile .metrics {
@@ -101,7 +107,7 @@
 
       <div>
         <div class="objective">
-          <[getObjective() | truncateAndCapitalize: 95]>
+          <[getObjective() | truncateAndCapitalize: 45]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
         <ul layout="row" class="metrics pull-right" layout-align="space-between center">
@@ -118,8 +124,7 @@
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
 
-          <li>
-            <em>Last updated:</em>&nbsp;
+          <li class="updated">
             <[lastUpdatedDatetime]>
           </li>
         </ul>
