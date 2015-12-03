@@ -126,15 +126,15 @@ body {
 
 .oppia-profile-tabs md-content md-tabs {
   background: #f6f6f6;
-  border: 1px solid #e1e1e1; 
+  border: 1px solid #e1e1e1;
 }
 
 .oppia-profile-tabs md-content md-tabs md-tabs-wrapper {
-  background: white; 
+  background: white;
 }
 
 .oppia-profile-tabs md-content h1:first-child {
-  margin-top: 0; 
+  margin-top: 0;
 }
 
 .oppia-profile-tabs md-tab {
@@ -142,7 +142,7 @@ body {
 }
 
 .oppia-profile-tabs md-tabs-ink-bar {
- background: #cccccc !important; 
+ background: #cccccc !important;
  height: 3px;
 }
 
@@ -752,10 +752,6 @@ textarea {
   background-color: #eee;
 }
 
-.oppia-gallery-tiles-area {
-  background-color: #eee;
-}
-
 .oppia-gallery-tiles-introduction {
   font-size: 1.4em;
   padding-top: 40px;
@@ -870,12 +866,6 @@ md-card.oppia-gallery-tile {
 
 .oppia-create-exploration-label {
   margin-top: 5px;
-}
-
-
-
-.carousel-indicators {
-  margin-bottom: 120px;
 }
 
 .carousel-control .glyphicon-chevron-left,
@@ -1676,8 +1666,7 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-gallery-banner-container {
-  height: 700px;
-  position: fixed;
+  height: 550px;
   top: 56px;
   width: 100%;
   z-index: 0;
@@ -1686,7 +1675,7 @@ ul.oppia-dashboard-tiles {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 700px;
+  height: 550px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
@@ -1695,14 +1684,13 @@ ul.oppia-dashboard-tiles {
   font-size: 4em;
   position: absolute;
   text-align: center;
-  top: 155px;
+  top: 150px;
   width: 100%;
   z-index: 100;
 }
 @media(max-width: 468px) {
   .oppia-gallery-banner-content {
     font-size: 3em;
-    top: 100px;
   }
 }
 
@@ -1710,7 +1698,7 @@ ul.oppia-dashboard-tiles {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 2em;
-  padding-top: 250px;
+  padding-top: 196px;
 }
 @media(max-width: 468px) {
   .oppia-gallery-banner-tagline {
@@ -1730,7 +1718,6 @@ ul.oppia-dashboard-tiles {
   background-color: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.6em;
-  margin-top: 600px;
   padding-bottom: 45px;
   padding-left: 10px;
   padding-right: 10px;

@@ -122,7 +122,8 @@
 
   <style>
     html, body {
-      background-color: #eee;
+      background: url('/images/general/background.png') no-repeat center center fixed;
+      background-size: cover;
     }
   </style>
 {% endblock header_js %}
@@ -161,89 +162,83 @@
         {% endif %}
       </div>
 
-      <div class="oppia-gallery-tiles-area">
-        <div class="oppia-gallery-tiles-container">
-          <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
-            <em>
-              We don't have any explorations matching this query yet.
-            </em>
-            <br><br>
-            <div style="display: inline-block;">
-            <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-              {% if not has_fully_registered %}
-                <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
-              {% else %}
-                <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
-              {% endif %}
-            </div>
+      <div class="oppia-gallery-tiles-container">
+        <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
+          <em>
+            We don't have any explorations matching this query yet.
+          </em>
+          <br><br>
+          <div style="display: inline-block;">
+          <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+            {% if not has_fully_registered %}
+              <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
+            {% else %}
+              <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
+            {% endif %}
           </div>
+        </div>
 
-          <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
-            Dive into an exploration created by the community:
-          </div>
-
-          <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
-               infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
-            <div ng-repeat="exploration in allExplorationsInOrder track by $index">
-              <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
+        <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
+             infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+          <div ng-repeat="exploration in allExplorationsInOrder track by $index">
+            <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
+              <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
+                 ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
+                <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
+                      title="Edit this exploration"></span>
+                Edit
+              </a>
+              {% if is_moderator %}
                 <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
-                   ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
+                   ng-if="!exploration.is_editable && currentUserIsModerator"
+                   ng-href="/create/<[exploration.id]>">
                   <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                        title="Edit this exploration"></span>
-                  Edit
+                        title="Edit (as moderator)"></span>
+                  Edit (as moderator)
                 </a>
-                {% if is_moderator %}
-                  <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
-                     ng-if="!exploration.is_editable && currentUserIsModerator"
-                     ng-href="/create/<[exploration.id]>">
-                    <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                          title="Edit (as moderator)"></span>
-                    Edit (as moderator)
-                  </a>
-                {% endif %}
+              {% endif %}
 
-                <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
-                  <div class="oppia-gallery-tile-contents">
-                    <span class="oppia-gallery-tile-image-container"
-                          style="position: absolute;">
-                      <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
-                    </span>
+              <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+                <div class="oppia-gallery-tile-contents">
+                  <span class="oppia-gallery-tile-image-container"
+                        style="position: absolute;">
+                    <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
+                  </span>
 
-                    <div class="oppia-gallery-tile-details">
-                      <div class="oppia-gallery-tile-first-row">
-                        <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
-                          <[exploration.title]>
+                  <div class="oppia-gallery-tile-details">
+                    <div class="oppia-gallery-tile-first-row">
+                      <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+                        <[exploration.title]>
+                      </span>
+                      <span ng-if="exploration.objective" class="hidden-xs">
+                        <span style="font-weight: bold;">&middot;</span>
+                        <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
+                          <[exploration.objective | truncateAndCapitalize: 120]>
                         </span>
-                        <span ng-if="exploration.objective" class="hidden-xs">
-                          <span style="font-weight: bold;">&middot;</span>
-                          <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
-                            <[exploration.objective | truncateAndCapitalize: 120]>
-                          </span>
-                        </span>
-                      </div>
+                      </span>
+                    </div>
 
-                      <div class="oppia-gallery-tile-second-row">
-                        <span style="color: #888">
-                          <strong><[exploration.category]></strong>
-                          <span style="font-weight: bold;">&middot;</span>
-                          Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                    <div class="oppia-gallery-tile-second-row">
+                      <span style="color: #888">
+                        <strong><[exploration.category]></strong>
+                        <span style="font-weight: bold;">&middot;</span>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                      </span>
+                      <span ng-if="exploration.status === 'publicized'">
+                        <span style="font-weight: bold;">&middot;</span>
+                        <span style="color: #888">Featured</span>
+                      </span>
+                      <span ng-if="areRatingsShown(exploration.ratings)">
+                        <span style="font-weight: bold;">&middot;</span>
+                        <span class="oppia-gallery-tile-ratings" style="color: black;">
+                          <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
                         </span>
-                        <span ng-if="exploration.status === 'publicized'">
-                          <span style="font-weight: bold;">&middot;</span>
-                          <span style="color: #888">Featured</span>
-                        </span>
-                        <span ng-if="areRatingsShown(exploration.ratings)">
-                          <span style="font-weight: bold;">&middot;</span>
-                          <span class="oppia-gallery-tile-ratings" style="color: black;">
-                            <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
-                          </span>
-                        </span>
-                      </div>
+                      </span>
                     </div>
                   </div>
-                </a>
-              </md-card>
-            </div>
+                </div>
+              </a>
+            </md-card>
           </div>
         </div>
       </div>
