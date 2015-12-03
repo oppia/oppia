@@ -8,11 +8,12 @@ branches:
   - master
   - develop
 
+env:
+- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=false
+- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true REPORT_COVERAGE=false
+- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=true
+
 matrix:
-  env:
-  - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=false
-  - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true REPORT_COVERAGE=false
-  - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=true
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
   # optional.
