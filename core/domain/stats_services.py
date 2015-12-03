@@ -35,15 +35,6 @@ IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 
 
-def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
-    return {
-        answer: count for (answer, count) in
-        stats_domain.StateRuleAnswerLog.get(
-            exploration_id, state_name, exp_domain.DEFAULT_RULESPEC_STR
-        ).get_top_answers(3)
-    }
-
-
 def get_state_rules_stats(exploration_id, state_name):
     """Gets statistics for the answer groups and rules of this state.
 
@@ -55,7 +46,7 @@ def get_state_rules_stats(exploration_id, state_name):
     exploration = exp_services.get_exploration_by_id(exploration_id)
     state = exploration.states[state_name]
 
-    # TODO(bhenning): Everything is handler name submit; therefore, it is
+    # TODO(bhenning): Everything is handler name submit; therefore, this is
     # pointless and should be removed.
     _OLD_SUBMIT_HANDLER_NAME = 'submit'
     rule_keys = []
@@ -124,27 +115,29 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
     return results_list
 
 
+# TODO(bhenning): This needs to be thoroughly tested (similar to how the
+# unresolved answers getter was before). It would be preferred if this were
+# tested on a branch alongside these changes, then used to verify that these
+# changes to do not change the contract of the function.
 def get_top_state_rule_answers(
-        exploration_id, state_name, rule_str_list, top_answer_count_per_rule):
+        exploration_id, exploration_version, state_name, rule_str_list,
+        top_answer_count):
     """Returns a list of top answers (by submission frequency) submitted to the
     given state in the given exploration which were mapped to any of the rules
-    listed in 'rule_str_list'. The number of answers returned is the number of
-    rule spec strings based in multiplied by top_answer_count_per_rule.
+    listed in 'rule_str_list'.
     """
-    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        } for rule_str in rule_str_list])
-
-    all_top_answers = []
-    for answer_log in answer_logs:
-        top_answers = answer_log.get_top_answers(top_answer_count_per_rule)
-        all_top_answers += [
-            {'value': top_answer[0], 'count': top_answer[1]}
-            for top_answer in top_answers
-        ]
-    return all_top_answers
+    # TODO(bhenning): This should have a custom, continuous job (possibly as
+    # part of the summarizers framework) which goes through all answers, finds
+    # those which are not covered by hard rules or are not part of the training
+    # data of soft rules, rank them by their frequency, then output them. This
+    # output will have reasonably up-to-date answers which need to be resolved
+    # by creators.
+    job_result = stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+        exploration_id, exploration_version, state_name, 'AnswerFrequencies')
+    if job_result:
+        return job_result.calculation_output[:top_answer_count]
+    else:
+        return []
 
 
 def get_state_improvements(exploration_id, exploration_version):
@@ -230,7 +223,7 @@ def get_exploration_stats(exploration_id, exploration_version):
 
     return {
         'improvements': get_state_improvements(
-             exploration_id, exploration_version),
+            exploration_id, exploration_version),
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
         'num_starts': exp_stats['start_exploration_count'],
@@ -248,8 +241,9 @@ def get_exploration_stats(exploration_id, exploration_version):
     }
 
 
-def record_answer(exploration_id, exploration_version, state_name, rule_str,
-        session_id, time_spent_in_sec, params, answer_value):
+def record_answer(exploration_id, exploration_version, state_name,
+        answer_group_index, rule_spec_index, session_id, time_spent_in_sec,
+        params, normalized_answer):
     """Record an answer by storing it to the corresponding StateAnswers entity.
     """
     # Retrieve state_answers from storage
@@ -273,9 +267,10 @@ def record_answer(exploration_id, exploration_version, state_name, rule_str,
 
     # Construct answer_dict and validate it.
     answer_dict = {
-        'answer_value': answer_value,
+        'answer': normalized_answer,
         'time_spent_in_sec': time_spent_in_sec,
-        'rule_str': rule_str,
+        'answer_group_index': answer_group_index,
+        'rule_spec_index': rule_spec_index,
         'session_id': session_id,
         'interaction_id': interaction_id,
         'params': params
@@ -304,8 +299,9 @@ def _save_state_answers(state_answers):
 
 
 def get_state_answers(exploration_id, exploration_version, state_name):
-    """Get state answers domain object obtained from StateAnswersModel instance
-    stored in data store.
+    """Get a state answers domain object represented by a StateAnswersModel
+    instance stored in the data store and retrieved using the provided
+    exploration ID, version, and state name.
     """
     state_answers_model = stats_models.StateAnswersModel.get_model(
         exploration_id, exploration_version, state_name)
@@ -321,9 +317,8 @@ def get_state_answers(exploration_id, exploration_version, state_name):
 def _validate_answer(answer_dict):
     """Validate answer dicts. In particular, check the following:
 
-    - Minimum set of keys: 'answer_value', 'time_spent_in_sec',
-            'session_id'
-    - Check size of every answer_value
+    - Minimum set of keys: 'answer', 'time_spent_in_sec', 'session_id'
+    - Check size of every answer
     - Check time_spent_in_sec is non-negative
     """
 
@@ -331,15 +326,14 @@ def _validate_answer(answer_dict):
     # the right errors show up in the various cases.
 
     # Minimum set of keys required for answer_dicts in answers_list
-    REQUIRED_ANSWER_DICT_KEYS = ['answer_value', 'time_spent_in_sec',
-                                 'session_id']
+    REQUIRED_ANSWER_DICT_KEYS = ['answer', 'time_spent_in_sec', 'session_id']
 
     # There is a danger of data overflow if the answer log exceeds
     # 1 MB. Given 1000-5000 answers, each answer must be at most
     # 200-1000 bytes in size. We will address this later if it
     # happens regularly. At the moment, a ValidationError is raised if
     # an answer exceeds the maximum size.
-    MAX_BYTES_PER_ANSWER_VALUE = 500
+    MAX_BYTES_PER_ANSWER = 500
 
     # Prefix of strings that are cropped because they are too long.
     CROPPED_PREFIX_STRING = 'CROPPED: '
@@ -361,18 +355,18 @@ def _validate_answer(answer_dict):
             'answer_dict is missing required keys %s' % missing_keys)
 
     # check entries of answer_dict
-    if (sys.getsizeof(answer_dict['answer_value']) >
-            MAX_BYTES_PER_ANSWER_VALUE):
+    if (sys.getsizeof(answer_dict['answer']) >
+            MAX_BYTES_PER_ANSWER):
 
-        if type(answer_dict['answer_value']) == str:
+        if type(answer_dict['answer']) == str:
             logging.warning(
-                'answer_value is too big to be stored: %s ...' %
-                str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
-            answer_dict['answer_value'] = '%s%s ...' % (CROPPED_PREFIX_STRING,
-                str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
+                'answer is too big to be stored: %s ...' %
+                str(answer_dict['answer'][:MAX_BYTES_PER_ANSWER]))
+            answer_dict['answer'] = '%s%s ...' % (CROPPED_PREFIX_STRING,
+                str(answer_dict['answer'][:MAX_BYTES_PER_ANSWER]))
         else:
-            logging.warning('answer_value is too big to be stored')
-            answer_dict['answer_value'] = PLACEHOLDER_FOR_TOO_LARGE_NONSTRING
+            logging.warning('answer is too big to be stored')
+            answer_dict['answer'] = PLACEHOLDER_FOR_TOO_LARGE_NONSTRING
 
     if not isinstance(answer_dict['session_id'], basestring):
         raise utils.ValidationError(

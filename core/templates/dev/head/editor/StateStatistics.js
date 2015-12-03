@@ -28,17 +28,9 @@ oppia.controller('StateStatistics', [
       explorationStatesService, trainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
       trainingModalService, INTERACTION_SPECS) {
-  $scope.unresolvedAnswersList = [];
   $scope.isInteractionTrainable = false;
 
   $scope.initStateStatistics = function(data) {
-    // Do not show unresolved answers if the interaction has only one possible
-    // answer.
-    $scope.unresolvedAnswers = (
-      (data.interaction.id && !INTERACTION_SPECS[data.interaction.id].is_linear) ?
-      data.unresolved_answers : {});
-    $scope.generateUnresolvedAnswersList();
-
     $scope.isInteractionTrainable = (
       data.interaction.id &&
       INTERACTION_SPECS[data.interaction.id].is_trainable);
@@ -68,22 +60,6 @@ oppia.controller('StateStatistics', [
     var stateData = explorationStatesService.getState($scope.stateName);
     $scope.initStateStatistics(stateData);
   });
-
-  $scope.generateUnresolvedAnswersList = function() {
-    $scope.unresolvedAnswersList = [];
-    for (var answerItem in $scope.unresolvedAnswers) {
-      $scope.unresolvedAnswersList.push({
-        'answer': answerItem,
-        'count': $scope.unresolvedAnswers[answerItem]
-      });
-    }
-  };
-
-  $scope.deleteUnresolvedAnswer = function(answer) {
-    $scope.unresolvedAnswers[answer] = 0;
-    explorationData.resolveAnswers($scope.stateName, [answer]);
-    $scope.generateUnresolvedAnswersList();
-  };
 
   $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
     return trainingModalService.openTrainUnresolvedAnswerModal(

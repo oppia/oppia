@@ -51,6 +51,42 @@ visualization and calculation may look like this:
 """
 
 
+def _get_hashable_value(value):
+    """This function returns a hashable version of the input value. If the
+    value itself is hashable, it simply returns that value. If it's a list, it
+    will return a tuple with all of the list's elements converted to hashable
+    types. If it's a dictionary, it will first convert it to a list of pairs,
+    where the key and value of the pair are converted to hashable types, then
+    it will convert this list as any other list would be converted.
+    """
+    if isinstance(value, list):
+        # Avoid needlessly wrapping a single value in a tuple.
+        if len(value) == 1:
+            return _get_hashable_value(value[0])
+        return tuple([_get_hashable_value(elem) for elem in value])
+    elif isinstance(value, dict):
+        return _get_hashable_value(
+            [(_get_hashable_value(key), _get_hashable_value(value))
+            for (key, value) in value.iteritems()])
+    else:
+        return value
+
+
+def _count_answers(answer_values):
+    """Count an input list of answer objects using collections.Counter. This
+    returns a list of pairs with the first element being an answer object and
+    the second being the number of times it shows up in the input list.
+    """
+    hashable_answer_values = [
+        _get_hashable_value(answer) for answer in answer_values]
+    answer_frequencies = collections.Counter(hashable_answer_values)
+    return [
+        ([answer_values[idx]
+            for idx, val in enumerate(hashable_answer_values)
+            if val == hashable_answer][0], frequency)
+        for (hashable_answer, frequency) in answer_frequencies.most_common()]
+
+
 class BaseCalculation(object):
     """
     Base calculation class.
@@ -86,11 +122,10 @@ class AnswerFrequencies(BaseCalculation):
         """
 
         answer_values = [
-            answer_dict['answer_value']
-            for answer_dict  in state_answers.answers_list]
+            answer_dict['answer']
+            for answer_dict in state_answers.answers_list]
 
-        answer_counts_as_list_of_pairs = (
-            collections.Counter(answer_values).items())
+        answer_counts_as_list_of_pairs = _count_answers(answer_values)
 
         calculation_output = []
         for item in answer_counts_as_list_of_pairs:
@@ -119,13 +154,11 @@ class Top5AnswerFrequencies(BaseCalculation):
         """
 
         answer_values = [
-            answer_dict['answer_value']
+            answer_dict['answer']
             for answer_dict in state_answers.answers_list]
 
         top_5_answer_counts_as_list_of_pairs = (
-            sorted(collections.Counter(answer_values).items(),
-                   key=lambda x: x[1],
-                   reverse=True)[:5])
+            _count_answers(answer_values)[:5])
 
         calculation_output = []
         for item in top_5_answer_counts_as_list_of_pairs:
@@ -158,7 +191,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         # Get a list of stringified sets, e.g. [u"[u'abc', u'www']",
         # u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [
-            answer_dict['answer_value']
+            answer_dict['answer']
             for answer_dict in state_answers.answers_list]
 
         # For each stringified set, replace '[' and ']' by empty string,

@@ -285,9 +285,6 @@ urls = [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
-        editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
-    get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
         editor.UntrainedAnswersHandler, 'training_data_handler'),
     get_redirect_route(

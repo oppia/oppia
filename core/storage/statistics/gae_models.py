@@ -508,32 +508,6 @@ def process_submitted_answer(
         pass
 
 
-def resolve_answers(
-        exploration_id, state_name, rule_str, answers):
-    """Resolves selected answers for the given rule.
-
-    Args:
-        exploration_id: the exploration id
-        state_name: the state name
-        rule_str: a string representation of the rule
-        answers: a list of HTML string representations of the resolved answers
-    """
-    assert isinstance(answers, list)
-    answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, rule_str)
-
-    for answer in answers:
-        if answer not in answer_log.answers:
-            logging.error(
-                'Answer %s not found in answer log for rule %s of exploration '
-                '%s, state %s, handler %s' % (
-                    answer, rule_str, exploration_id, state_name,
-                    _OLD_SUBMIT_HANDLER_NAME))
-        else:
-            del answer_log.answers[answer]
-    answer_log.put()
-
-
 class StateAnswersModel(base_models.BaseModel):
     """Store all answers of a state.
 
@@ -624,7 +598,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     def get_model(cls, exploration_id, exploration_version, state_name,
                   calculation_id):
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name, calculation_id)
+            exploration_id, str(exploration_version), state_name,
+            calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
 

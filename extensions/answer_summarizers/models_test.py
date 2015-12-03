@@ -35,23 +35,22 @@ import utils
 class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     """Tests for answer summary calculations."""
 
-    def _create_sample_answer(
-            self, answer_value, time_spent_in_card, session_id):
+    def _create_sample_answer(self, answer, time_spent_in_card, session_id):
         return {
-            'answer_value': answer_value,
+            'answer': answer,
             'time_spent_in_sec': time_spent_in_card,
             'session_id': session_id
         }
 
     def _create_sample_answers(
-            self, repeated_answer_value, times_spent_in_card, session_ids,
+            self, repeated_answer, times_spent_in_card, session_ids,
             repeat_count):
         """This is similar to _create_sample_answer, except it repeats a single
         answer N times. It reuses times_spent_in_card and session_ids
         cyclically as it constructs the list of sample answers.
         """
         return [self._create_sample_answer(
-            repeated_answer_value,
+            repeated_answer,
             times_spent_in_card[i % len(times_spent_in_card)],
             session_ids[i % len(session_ids)]) for i in range(repeat_count)]
 
@@ -81,9 +80,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # Record answers.
         for answer in dummy_answers_list:
             stats_services.record_answer(
-                exp_id, exp_version, state_name, DEFAULT_RULE_STR,
-                answer['session_id'], answer['time_spent_in_sec'], params,
-                answer['answer_value'])
+                exp_id, exp_version, state_name, 0, 0, answer['session_id'],
+                answer['time_spent_in_sec'], params, answer['answer'])
 
         # Retrieve state answers from storage and get corresponding
         # StateAnswers domain object.
@@ -103,7 +101,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
             'AnswerFrequencies')
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
 
         # Expected answer counts (result of calculation)
         # TODO(msl): Include answers that were never clicked and received 0
@@ -223,57 +222,56 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'English']), 12)
+            if answer_submission['answer'] == 'English']), 12)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'French']), 9)
+            if answer_submission['answer'] == 'French']), 9)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Finnish']), 7)
+            if answer_submission['answer'] == 'Finnish']), 7)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Italian']), 4)
+            if answer_submission['answer'] == 'Italian']), 4)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Spanish']), 3)
+            if answer_submission['answer'] == 'Spanish']), 3)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Japanese']), 3)
+            if answer_submission['answer'] == 'Japanese']), 3)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Hungarian']), 2)
+            if answer_submission['answer'] == 'Hungarian']), 2)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Portuguese']), 1)
+            if answer_submission['answer'] == 'Portuguese']), 1)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'German']), 1)
+            if answer_submission['answer'] == 'German']), 1)
         self.assertEquals(len([
             answer_submission
             for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Gaelic']), 1)
+            if answer_submission['answer'] == 'Gaelic']), 1)
 
         # Finally, verify that all of the answers in the answer lists are
-        # represents in the submission queue (in case another answer is added to
-        # the answer list but not added to the queue).
+        # represents in the submission queue (in case another answer is added
+        # to the answer list but not added to the queue).
         self.assertEquals(len(set([
-            answer_submission['answer_value']
+            answer_submission['answer']
             for answer_submission in answer_submission_queue])), 10)
 
         # Record answers.
         for answer in answer_submission_queue:
             stats_services.record_answer(
-                exp_id, exp_version, state_name, DEFAULT_RULE_STR,
-                answer['session_id'], answer['time_spent_in_sec'], params,
-                answer['answer_value'])
+                exp_id, exp_version, state_name, 0, 0, answer['session_id'],
+                answer['time_spent_in_sec'], params, answer['answer'])
 
         # Retrieve state answers from storage and get corresponding
         # StateAnswers domain object.
@@ -293,7 +291,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
 
         # TODO(msl): Include answers that were never clicked and received 0
         # count from the calculation. This is useful to help creators identify
@@ -336,9 +335,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
         answer = self._create_sample_answer('English', 2., 'sid1')
         stats_services.record_answer(
-            exp_id, exp_version, state_name, DEFAULT_RULE_STR,
-            answer['session_id'], answer['time_spent_in_sec'], params,
-            answer['answer_value'])
+            exp_id, exp_version, state_name, 0, 0, answer['session_id'],
+            answer['time_spent_in_sec'], params, answer['answer'])
 
         # Retrieve state answers from storage and get corresponding
         # StateAnswers domain object.
@@ -358,7 +356,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
 
         expected_answer_counts = [{
             'answer': 'English',

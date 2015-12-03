@@ -77,35 +77,47 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
-            rule_spec_string, session_id, time_spent_in_secs, params, answer):
-        """Records an event when an answer triggers a rule."""
+            answer_group_index, rule_spec_index, session_id,
+            time_spent_in_secs, params, normalized_answer):
+        """Records an event when an answer triggers a rule. The answer recorded
+        here is a Python-representation of the actual answer submitted by the
+        user.
+        """
         # TODO(sll): Escape these args?
         # TODO(msl): remove old answer recording models.
 
         # In the old framework, answers are converted to unicode even when they
         # are not strings. This will be removed when migrating to the new
         # framework.
+
+        # TODO(bhenning): Remove this code. It is legacy code that records
+        # answers in the old data store such that they are usable with any
+        # legacy code still depending on the old data store (including tests).
+        """from core.domain import exp_services
+        from core.domain import interaction_registry
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, version=exploration_version)
+        old_interaction = exploration.states[state_name].interaction
+        old_interaction_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                old_interaction.id))
+        answer = old_interaction_instance.get_stats_log_html(
+                old_interaction.customization_args, normalized_answer)
+
+        if answer_group_index == len(old_interaction.answer_groups):
+            rule_spec_string = exp_domain.DEFAULT_RULESPEC_STR
+        else:
+            rule_spec_string = (
+                old_interaction.answer_groups[answer_group_index].rule_specs[
+                    rule_spec_index].stringify_classified_rule())
+
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
-            rule_spec_string, unicode(answer))
+            rule_spec_string, unicode(answer))"""
         stats_services.record_answer(
-            exploration_id, exploration_version, state_name, rule_spec_string,
-            session_id, time_spent_in_secs, params, answer)
-
-
-class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
-    """Event handler for recording resolving of answers triggering the default
-    rule."""
-
-    EVENT_TYPE = feconf.EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
-
-    @classmethod
-    def _handle_event(cls, exploration_id, state_name, answers):
-        """Resolves a list of answers for the default rule of this state."""
-        # TODO(sll): Escape these args?
-        stats_models.resolve_answers(
-            exploration_id, state_name,
-            exp_domain.DEFAULT_RULESPEC_STR, answers)
+            exploration_id, exploration_version, state_name,
+            answer_group_index, rule_spec_index, session_id,
+            time_spent_in_secs, params, normalized_answer)
 
 
 class StartExplorationEventHandler(BaseEventHandler):

@@ -58,7 +58,6 @@ NEW_STATE_TEMPLATE = {
     }],
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
-    'unresolved_answers': {},
 }
 
 
@@ -289,9 +288,6 @@ class ExplorationHandler(EditorHandler):
         states = {}
         for state_name in exploration.states:
             state_dict = exploration.states[state_name].to_dict()
-            state_dict['unresolved_answers'] = (
-                stats_services.get_top_unresolved_answers_for_default_rule(
-                    exploration_id, state_name))
             states[state_name] = state_dict
 
         editor_dict = {
@@ -486,31 +482,9 @@ class ExplorationRightsHandler(EditorHandler):
         })
 
 
-class ResolvedAnswersHandler(EditorHandler):
-    """Allows learners' answers for a state to be marked as resolved."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
-
-    @require_editor
-    def put(self, exploration_id, state_name):
-        """Marks learners' answers as resolved."""
-        resolved_answers = self.payload.get('resolved_answers')
-
-        if not isinstance(resolved_answers, list):
-            raise self.InvalidInputException(
-                'Expected a list of resolved answers; received %s.' %
-                resolved_answers)
-
-        if 'resolved_answers' in self.payload:
-            event_services.DefaultRuleAnswerResolutionEventHandler.record(
-                exploration_id, state_name, resolved_answers)
-
-        self.render_json({})
-
-
 class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
-    explicitly trained to respond to be an exploration author.
+    explicitly trained to respond to by an exploration author.
     """
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
@@ -547,7 +521,7 @@ class UntrainedAnswersHandler(EditorHandler):
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
-            exploration_id, state_name, [
+            exploration_id, exploration.version, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
             NUMBER_OF_TOP_ANSWERS_PER_RULE)
 

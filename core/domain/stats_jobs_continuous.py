@@ -441,15 +441,17 @@ class InteractionAnswerSummariesAggregator(
             cls, exploration_id, exploration_version, state_name,
             calculation_id):
         """Get state answers calculation output domain object obtained from
-        StateAnswersCalcOutputModel instance stored in data store. This
+        StateAnswersCalcOutputModel instance stored in the data store. This
         aggregator does not have a real-time layer, which means the results
-        from this function may be out of date.
+        from this function may be out of date. The calculation ID comes from
+        the name of the calculation class used to compute aggregate data from
+        submitted user answers.
         """
         calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
         if calc_output_model:
             return stats_domain.StateAnswersCalcOutput(
-                exploration_id, exploration_version, state_name, calculation_id,
-                calc_output_model.calculation_output)
+                exploration_id, exploration_version, state_name,
+                calculation_id, calc_output_model.calculation_output)
         else:
             return None

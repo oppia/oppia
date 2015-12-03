@@ -102,7 +102,6 @@ class EditorTest(BaseEditorControllerTest):
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-        new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
     def test_add_new_state_error_cases(self):
@@ -173,71 +172,6 @@ class EditorTest(BaseEditorControllerTest):
         response_dict = _put_and_expect_400_error(
             _get_payload('The\t\tB', CURRENT_VERSION))
         self.assertIn('Adjacent whitespace', response_dict['error'])
-
-        self.logout()
-
-    def test_resolved_answers_handler(self):
-        # In the reader perspective, submit the first multiple-choice answer,
-        # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
-        # TODO(sll): Use the ExplorationPlayer in reader_test for this.
-        exploration_dict = self.get_json(
-            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(
-            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
-
-        state_name = exploration_dict['exploration']['init_state_name']
-        result_dict = self.submit_answer('0', state_name, '0')
-
-        state_name = result_dict['state_name']
-        self.submit_answer('0', state_name, 'blah')
-        for _ in range(2):
-            self.submit_answer('0', state_name, 'blah2')
-        for _ in range(3):
-            self.submit_answer('0', state_name, 'blah3')
-
-        # Log in as an editor.
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
-        url = str('/createhandler/resolved_answers/0/%s' % state_name)
-
-        def _get_unresolved_answers():
-            return stats_domain.StateRuleAnswerLog.get(
-                '0', state_name, exp_domain.DEFAULT_RULESPEC_STR
-            ).answers
-
-        self.assertEqual(
-            _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
-
-        # An empty request should result in an error.
-        response_dict = self.put_json(
-            url, {'something_else': []}, csrf_token,
-            expect_errors=True, expected_status_int=400)
-        self.assertIn('Expected a list', response_dict['error'])
-
-        # A request of the wrong type should result in an error.
-        response_dict = self.put_json(
-            url, {'resolved_answers': 'this_is_a_string'}, csrf_token,
-            expect_errors=True, expected_status_int=400)
-        self.assertIn('Expected a list', response_dict['error'])
-
-        # Trying to remove an answer that wasn't submitted has no effect.
-        response_dict = self.put_json(
-            url, {'resolved_answers': ['not_submitted_answer']}, csrf_token)
-        self.assertEqual(
-            _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
-
-        # A successful request should remove the answer in question.
-        response_dict = self.put_json(
-            url, {'resolved_answers': ['blah']}, csrf_token)
-        self.assertEqual(
-            _get_unresolved_answers(), {'blah2': 2, 'blah3': 3})
-
-        # It is possible to remove more than one answer at a time.
-        response_dict = self.put_json(
-            url, {'resolved_answers': ['blah2', 'blah3']}, csrf_token)
-        self.assertEqual(_get_unresolved_answers(), {})
 
         self.logout()
 

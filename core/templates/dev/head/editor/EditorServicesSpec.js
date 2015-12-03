@@ -735,8 +735,7 @@ describe('New state template service', function() {
           },
           id: 'TextInput'
         },
-        param_changes: [],
-        unresolved_answers: {}
+        param_changes: []
       };
       nsts = $injector.get('newStateTemplateService');
     }));
@@ -763,8 +762,7 @@ describe('New state template service', function() {
           },
           id: 'TextInput'
         },
-        param_changes: [],
-        unresolved_answers: {}
+        param_changes: []
       });
     });
   });
