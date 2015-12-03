@@ -21,7 +21,8 @@
  */
 
 oppia.directive('oppiaInteractiveItemSelectionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'itemSelectionInputRulesService', function(
+      oppiaHtmlEscaper, itemSelectionInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -65,7 +66,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
             return $scope.userSelections[obj];
           });
 
-          $scope.$parent.$parent.submitAnswer(answers, 'submit');
+          $scope.$parent.submitAnswer(answers, itemSelectionInputRulesService);
         };
       }]
     };
@@ -97,3 +98,32 @@ oppia.directive('oppiaShortResponseItemSelectionInput', [
     };
   }
 ]);
+
+oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
+  return {
+    Equals: function(answer, inputs) {
+      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+      return normalizedAnswer.length == normalizedInput.length &&
+          normalizedAnswer.every(function(val) {
+        return normalizedInput.indexOf(val) != -1;
+      });
+    },
+    ContainsAtLeastOneOf: function(answer, inputs) {
+      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+      return normalizedAnswer.some(function(val) {
+        return normalizedInput.indexOf(val) != -1;
+      });
+    },
+    // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping in
+    // sync with the backend migration of the same rule.
+    DoesNotContainAtLeastOneOf: function(answer, inputs) {
+      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+      return normalizedInput.some(function(val) {
+        return normalizedAnswer.indexOf(val) == -1;
+      });
+    }
+  };
+}]);

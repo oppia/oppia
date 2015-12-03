@@ -1317,6 +1317,9 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
 
+    SECOND_USERNAME = 'abc123'
+    SECOND_EMAIL = 'abc123@gmail.com'
+
     def test_get_last_updated_by_human_ms(self):
         original_timestamp = utils.get_current_time_in_millisecs()
 
@@ -1340,6 +1343,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             timestamp_after_first_edit)
 
     def test_get_exploration_snapshots_metadata(self):
+        self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
+        self.second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
+
         v1_exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID, end_state_name='End')
 
@@ -1420,7 +1426,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
             exp_services._save_exploration(
-                'committer_id_2', v1_exploration, '', [])
+                self.second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
         new_change_list = [{
@@ -1428,8 +1434,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'property_name': 'title',
             'new_value': 'New title'
         }]
+
         exp_services.update_exploration(
-            'committer_id_2', self.EXP_ID, new_change_list, 'Second commit.')
+            self.second_committer_id, self.EXP_ID, new_change_list, 'Second commit.')
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
@@ -1455,7 +1462,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         }, snapshots_metadata[1])
         self.assertDictContainsSubset({
             'commit_cmds': new_change_list,
-            'committer_id': 'committer_id_2',
+            'committer_id': self.second_committer_id,
             'commit_message': 'Second commit.',
             'commit_type': 'edit',
             'version_number': 3,
@@ -1465,6 +1472,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[2]['created_on_ms'])
 
     def test_versioning_with_add_and_delete_states(self):
+
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID)
 
@@ -1484,10 +1492,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exploration.add_states(['New state'])
         exploration.states['New state'].update_interaction_id('TextInput')
         exp_services._save_exploration(
-            'committer_id_2', exploration, 'Added new state', [])
+            'second_committer_id', exploration, 'Added new state', [])
 
         commit_dict_3 = {
-            'committer_id': 'committer_id_2',
+            'committer_id': 'second_committer_id',
             'commit_message': 'Added new state',
             'version_number': 3,
         }
@@ -2113,6 +2121,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
 
     EXPECTED_VERSION_1 = 4
     EXPECTED_VERSION_2 = 2
@@ -2129,6 +2138,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (6) Bob reverts Albert's last edit to EXP_ID_1.
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (7) Albert publishes EXP_ID_2.
+        - (8) Albert creates EXP_ID_3
+        - (9) Albert publishes EXP_ID_3
+        - (10) Albert deletes EXP_ID_3
         """
         super(ExplorationServicesUnitTests, self).setUp()
 
@@ -2171,6 +2183,47 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
 
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
+
+        exploration_3 = self.save_new_valid_exploration(
+            self.EXP_ID_3, self.ALBERT_ID)
+
+        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_3)
+
+        exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_3)
+
+    def test_get_displayable_exploration_summary_dicts_matching_ids(self):
+        # A list of exp_id's are passed in:
+        # EXP_ID_1 -- private exploration
+        # EXP_ID_2 -- pubished exploration
+        # EXP_ID_3 -- deleted exploration
+        # Should only return [EXP_ID_2]
+
+        displayable_summaries = (
+            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
+
+        self.assertEqual(len(displayable_summaries), 1)
+        self.assertEqual(
+            displayable_summaries[0]['id'], self.EXP_ID_2)
+        self.assertEqual(
+            displayable_summaries[0]['status'], 
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
+        self.assertEqual(
+            displayable_summaries[0]['community_owned'], False)
+        self.assertEqual(
+            displayable_summaries[0]['is_editable'], True)
+        self.assertEqual(
+            displayable_summaries[0]['language_code'], 
+            feconf.DEFAULT_LANGUAGE_CODE)
+        self.assertEqual(
+            displayable_summaries[0]['category'], 'A category')
+        self.assertEqual(
+            displayable_summaries[0]['ratings'], feconf.get_empty_ratings())
+        self.assertEqual(
+            displayable_summaries[0]['title'], 'Exploration 2 Albert title')
+        self.assertEqual(
+            displayable_summaries[0]['objective'], 'An objective')
+        self.assertIn('last_updated_msec', displayable_summaries[0])
 
     def test_get_non_private_exploration_summaries(self):
 

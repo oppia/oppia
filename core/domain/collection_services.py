@@ -25,12 +25,14 @@ storage model to be changed without affecting this module and others above it.
 __author__ = 'Ben Henning'
 
 import copy
+import datetime
 import logging
 import os
 
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -574,6 +576,31 @@ def get_collection_snapshots_metadata(collection_id):
         collection_id, version_nums)
 
 
+def _get_contributor_ids_for_collection(col_id):
+    """Returns list of ids of contributors to a collection."""
+    contributor_ids = []
+    collection_snapshots = get_collection_snapshots_metadata(col_id)
+    for snapshot in collection_snapshots:
+        if not snapshot['committer_id'] in contributor_ids:
+            contributor_ids.append(snapshot['committer_id'])
+    return contributor_ids
+
+
+def publish_collection_and_update_user_profiles(committer_id, col_id):
+    """Publishes the collection with publish_collection() function in
+    rights_manager.py, as well as updates first_contribution_msec.
+
+    It is the responsibility of the caller to check that the collection is
+    valid prior to publication.
+    """
+    rights_manager.publish_collection(committer_id, col_id)
+    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contributor_ids = _get_contributor_ids_for_collection(col_id)
+    for contributor in contributor_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            contributor, contribution_time_msec)
+
+
 def update_collection(
         committer_id, collection_id, change_list, commit_message):
     """Update an collection. Commits changes.
@@ -599,6 +626,10 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id)
+
+    if not rights_manager.is_collection_private(collection.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
 def create_collection_summary(collection_id):
@@ -720,7 +751,7 @@ def load_demo(collection_id):
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
-    rights_manager.publish_collection(
+    publish_collection_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, collection_id)
 
     index_collections_given_ids([collection_id])

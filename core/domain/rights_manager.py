@@ -18,7 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-
 import logging
 
 from core.domain import config_domain
@@ -207,19 +206,21 @@ def _update_activity_summary(activity_type, activity_rights):
 
 def update_activity_first_published_msec(
         activity_type, activity_id, first_published_msec):
-    """Updates the first_published_msec field for an activity. Callers are
-    responsible for ensuring that this value is not already set before updating
-    it.
+    """Updates the first_published_msec field for an activity. This is only
+    called during the one-off job ExplorationFirstPublishedOneOffJob. Callers
+    are responsible for ensuring that this value is not already set before
+    updating it.
     """
     activity_rights = _get_activity_rights(activity_type, activity_id)
-    activity_rights.first_published_msec = first_published_msec
     commit_cmds = [{
         'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'first_published_msec': first_published_msec
+        'old_first_published_msec': activity_rights.first_published_msec,
+        'new_first_published_msec': first_published_msec
     }]
+    activity_rights.first_published_msec = first_published_msec
     _save_activity_rights(
         feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
-        'Set first_published_msec time', commit_cmds)
+        'set first published time in msec', commit_cmds)
 
 
 def create_new_exploration_rights(exploration_id, committer_id):
@@ -454,6 +455,7 @@ class Actor(object):
             return False
         if activity_rights.community_owned:
             return False
+
         return self.is_moderator()
 
     def can_modify_roles(self, activity_type, activity_id):
@@ -633,6 +635,12 @@ def _change_activity_status(
         commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
 
+    if new_status != ACTIVITY_STATUS_PRIVATE:
+        # Change first_published_msec in activity rights if necessary.
+        if activity_rights.first_published_msec is None:
+            activity_rights.first_published_msec = (
+                utils.get_current_time_in_millisecs())
+
 
 def _publish_activity(committer_id, activity_id, activity_type):
     if not Actor(committer_id).can_publish(activity_type, activity_id):
@@ -756,7 +764,8 @@ def set_private_viewability_of_exploration(
 
 
 def publish_exploration(committer_id, exploration_id):
-    """Publish an exploration. Commits changes.
+    """This is called by the publish_exploration_and_update_user_profiles
+    function in exp_services.py. It publishes an exploration and commits changes.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
@@ -820,7 +829,9 @@ def release_ownership_of_collection(committer_id, collection_id):
 
 
 def publish_collection(committer_id, collection_id):
-    """Publish an collection. Commits changes.
+    """This is called by the publish_collection_and_update_user_profiles
+    function in collection_services.py. It publishes an collection and commits
+    changes.
 
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.
