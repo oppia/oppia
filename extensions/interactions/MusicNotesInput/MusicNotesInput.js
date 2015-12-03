@@ -60,19 +60,19 @@ oppia.factory('musicPhrasePlayerService', ['$timeout', function($timeout) {
 
 // Gives the staff-lines human readable values.
 oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
-  'A5': 81,
-  'G5': 79,
-  'F5': 77,
-  'E5': 76,
-  'D5': 74,
-  'C5': 72,
-  'B4': 71,
-  'A4': 69,
-  'G4': 67,
-  'F4': 65,
-  'E4': 64,
-  'D4': 62,
-  'C4': 60
+  A5: 81,
+  G5: 79,
+  F5: 77,
+  E5: 76,
+  D5: 74,
+  C5: 72,
+  B4: 71,
+  A4: 69,
+  G4: 67,
+  F4: 65,
+  E4: 64,
+  D4: 62,
+  C4: 60
 });
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
@@ -911,7 +911,9 @@ oppia.factory('musicNotesInputRulesService', [
 
       var numWrongNotes = 0;
       userSequence.map(function(noteValue, index) {
-        if (noteValue != targetSequence[index]) numWrongNotes++;
+        if (noteValue != targetSequence[index]) {
+          numWrongNotes++;
+        }
       });
       return numWrongNotes <= inputs.k;
     },
@@ -934,7 +936,9 @@ oppia.factory('musicNotesInputRulesService', [
 
       var numWrongNotes = 0;
       userSequence.map(function(noteValue, index) {
-        if (targetSequence[index] + inputs.y != noteValue) numWrongNotes++;
+        if (targetSequence[index] + inputs.y != noteValue) {
+          numWrongNotes++;
+        }
       });
       return numWrongNotes <= inputs.k;
     }
