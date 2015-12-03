@@ -58,8 +58,28 @@ oppia.factory('musicPhrasePlayerService', ['$timeout', function($timeout) {
   };
 }]);
 
+// Gives the staff-lines human readable values.
+oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
+  'A5': 81,
+  'G5': 79,
+  'F5': 77,
+  'E5': 76,
+  'D5': 74,
+  'C5': 72,
+  'B4': 71,
+  'A4': 69,
+  'G4': 67,
+  'F4': 65,
+  'E4': 64,
+  'D4': 62,
+  'C4': 60
+});
+
 oppia.directive('oppiaInteractiveMusicNotesInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'NOTE_NAMES_TO_MIDI_VALUES',
+  'musicNotesInputRulesService',
+  function(oppiaHtmlEscaper, NOTE_NAMES_TO_MIDI_VALUES,
+      musicNotesInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -122,23 +142,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         var NOTES_ON_LINES = ['E4', 'G4', 'B4', 'D5', 'F5'];
         var LEDGER_LINE_NOTES = ['C4', 'A5'];
-
-        // Gives the staff-lines human readable values.
-        var NOTE_NAMES_TO_MIDI_VALUES = {
-          'A5': 81,
-          'G5': 79,
-          'F5': 77,
-          'E5': 76,
-          'D5': 74,
-          'C5': 72,
-          'B4': 71,
-          'A4': 69,
-          'G4': 67,
-          'F4': 65,
-          'E4': 64,
-          'D4': 62,
-          'C4': 60
-        };
 
         var verticalGridKeys = [
           81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60
@@ -731,7 +734,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               _convertNoteToReadableNote($scope.noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
-          $scope.$parent.$parent.submitAnswer(readableSequence);
+          $scope.$parent.submitAnswer(
+            readableSequence, musicNotesInputRulesService);
         };
 
 
@@ -868,3 +872,71 @@ oppia.directive('oppiaShortResponseMusicNotesInput', [
     };
   }
 ]);
+
+oppia.factory('musicNotesInputRulesService', [
+    'NOTE_NAMES_TO_MIDI_VALUES', function(NOTE_NAMES_TO_MIDI_VALUES) {
+  var _getMidiNoteValue = function(note) {
+    if (NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(note.readableNoteName)) {
+      return NOTE_NAMES_TO_MIDI_VALUES[note.readableNoteName];
+    } else {
+      throw new Error('Invalid music note ' + note);
+    }
+  };
+
+  var _convertSequenceToMidi = function(sequence) {
+    return sequence.map(function(note) {
+      return _getMidiNoteValue(note);
+    });
+  };
+
+  return {
+    Equals: function(answer, inputs) {
+      return angular.equals(_convertSequenceToMidi(answer),
+        _convertSequenceToMidi(inputs.x));
+    },
+    IsLongerThan: function(answer, inputs) {
+      return _convertSequenceToMidi(answer).length > inputs.x;
+    },
+    // TODO(wxy): validate that inputs.a <= inputs.b
+    HasLengthInclusivelyBetween: function(answer, inputs) {
+      var answerLength = _convertSequenceToMidi(answer).length;
+      return length >= inputs.a && length <= inputs.b;
+    },
+    IsEqualToExceptFor: function(answer, inputs) {
+      var targetSequence = _convertSequenceToMidi(inputs.x);
+      var userSequence = _convertSequenceToMidi(answer);
+      if (userSequence.length != targetSequence.length) {
+        return false;
+      }
+
+      var numWrongNotes = 0;
+      userSequence.map(function(noteValue, index) {
+        if (noteValue != targetSequence[index]) numWrongNotes++;
+      });
+      return numWrongNotes <= inputs.k;
+    },
+    IsTranspositionOf: function(answer, inputs) {
+      var targetSequence = _convertSequenceToMidi(inputs.x);
+      var userSequence = _convertSequenceToMidi(answer);
+      if (userSequence.length != targetSequence.length) {
+        return false;
+      }
+      return userSequence.every(function(noteValue, index) {
+        return targetSequence[index] + inputs.y == noteValue;
+      });
+    },
+    IsTranspositionOfExceptFor: function(answer, inputs) {
+      var targetSequence = _convertSequenceToMidi(inputs.x);
+      var userSequence = _convertSequenceToMidi(answer);
+      if (userSequence.length != targetSequence.length) {
+        return false;
+      }
+
+      var numWrongNotes = 0;
+      userSequence.map(function(noteValue, index) {
+        if (targetSequence[index] + inputs.y != noteValue) numWrongNotes++;
+      });
+      return numWrongNotes <= inputs.k;
+    }
+  };
+}]);
