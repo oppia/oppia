@@ -28,6 +28,7 @@ oppia.directive('explorationSummaryTile', [function() {
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getNumViews: '&numViews',
       getObjective: '&objective',
+      getCategory: '&category',
       getRatings: '&ratings',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
