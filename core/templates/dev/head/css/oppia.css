@@ -757,7 +757,7 @@ textarea {
 }
 
 .oppia-gallery-tiles-introduction {
-  font-size: 1.4em;
+  font-size: 1.6em;
   padding-top: 40px;
   padding-bottom: 40px;
 }
@@ -766,10 +766,11 @@ textarea {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  max-width: 850px;
+  max-width: 900px;
   min-height: 500px;
   padding-bottom: 25px;
   padding-top: 56px;
+  text-align:center;
 }
 
 md-card.oppia-gallery-tile {
