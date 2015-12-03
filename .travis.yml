@@ -8,10 +8,16 @@ branches:
   - master
   - develop
 
-env:
-  matrix:
-  - BACKEND_TEST=true JS_TEST=false
-  - BACKEND_TEST=false JS_TEST=true
+matrix:
+  env:
+  - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=false
+  - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true REPORT_COVERAGE=false
+  - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=true
+  allow_failures:
+  # The backend tests, with coverage, take too long to run, so we make this
+  # optional.
+  - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_COVERAGE=true
+  fast_finish: true
 
 notifications:
   email:
@@ -39,13 +45,15 @@ install:
 - rm gae-download.zip
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
-- if [[ $BACKEND_TEST == 'true' ]]; then bash -x scripts/install_third_party.sh; fi
+- if [[ $RUN_BACKEND_TESTS == 'true' ]]; then bash -x scripts/install_third_party.sh; fi
 
 script:
-- if [[ $BACKEND_TEST == 'true' ]]; then bash scripts/run_backend_tests.sh --generate_coverage_report;
+- if [[ $RUN_BACKEND_TESTS == 'true' -a $REPORT_COVERAGE == 'true' ]]; then bash scripts/run_backend_tests.sh --generate_coverage_report;
   fi
-- if [[ $JS_TEST == 'true' ]]; then bash -x scripts/run_frontend_tests.sh; fi
+- if [[ $RUN_BACKEND_TESTS == 'true' -a $REPORT_COVERAGE == 'false' ]]; then bash scripts/run_backend_tests.sh
+  fi
+- if [[ $RUN_FRONTEND_TESTS == 'true' ]]; then bash -x scripts/run_frontend_tests.sh; fi
 
 after_success:
-- if [[ $BACKEND_TEST == 'true' ]]; then codecov; fi
-- if [[ $JS_TEST == 'true' ]]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+- if [[ $RUN_BACKEND_TESTS == 'true' -a $REPORT_COVERAGE == 'true' ]]; then codecov; fi
+- if [[ $RUN_FRONTEND_TESTS == 'true' ]]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
