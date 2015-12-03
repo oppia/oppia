@@ -57,7 +57,7 @@ var manifest = require('./manifest.json');
 var minifyCss = require('gulp-minify-css');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
-var uglify = require('gulp-uglify');
+var minify = require('gulp-minify');
 
 var gaeDevserverPath = argv.gae_devserver_path;
 var params = {
@@ -138,7 +138,7 @@ gulp.task('generateJs', function() {
   gulp.src(jsFilesPath)
     .pipe(sourcemaps.init())
       .pipe(concat('third_party.js'))
-      .pipe(isMinificationNeeded ? uglify() : gulpUtil.noop())
+      .pipe(isMinificationNeeded ? minify() : gulpUtil.noop())
     // This map a combined/minified file back to an unbuilt state,
     // holds information about original files.
     // When you query a certain line and column number in your generated JavaScript
