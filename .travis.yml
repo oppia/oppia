@@ -43,17 +43,16 @@ install:
   -o gae-download.zip
 - unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
 - rm gae-download.zip
-# Travis aborts test run if nothing is printed back to STDOUT for some time.
-# -x is used to avoid that.
-- if [[ $RUN_BACKEND_TESTS == 'true' ]]; then bash -x scripts/install_third_party.sh; fi
 
 script:
-- if [[ $RUN_BACKEND_TESTS == 'true' -a $REPORT_COVERAGE == 'true' ]]; then bash scripts/run_backend_tests.sh --generate_coverage_report;
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report;
   fi
-- if [[ $RUN_BACKEND_TESTS == 'true' -a $REPORT_COVERAGE == 'false' ]]; then bash scripts/run_backend_tests.sh
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh
   fi
-- if [[ $RUN_FRONTEND_TESTS == 'true' ]]; then bash -x scripts/run_frontend_tests.sh; fi
+# Travis aborts test run if nothing is printed back to STDOUT for some time.
+# -x is used to avoid that.
+- if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh; fi
 
 after_success:
-- if [[ $RUN_BACKEND_TESTS == 'true' -a $REPORT_COVERAGE == 'true' ]]; then codecov; fi
-- if [[ $RUN_FRONTEND_TESTS == 'true' ]]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_COVERAGE == 'true' ]; then codecov; fi
+- if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
