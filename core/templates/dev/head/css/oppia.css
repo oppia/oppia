@@ -140,7 +140,7 @@ body {
   background-color: #009688;
 }
 
-md-tabs-ink-bar {
+.oppia-profile-tabs md-tabs-ink-bar {
  background: #cccccc !important; 
  height: 3px;
 }

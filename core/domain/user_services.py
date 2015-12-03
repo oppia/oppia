@@ -528,10 +528,11 @@ def _save_user_contributions(user_contributions):
         edited_exploration_ids=user_contributions.edited_exploration_ids,
     ).put()
     
+    
 def get_user_impact_score(user_id):
     """Returns user impact score associated with user_id"""
     
-    model = user_models.UserStatsModel.get(user_id, strict = False)
+    model = user_models.UserStatsModel.get(user_id, strict=False)
     
     if model:
         return model.impact_score
