@@ -138,7 +138,12 @@ gulp.task('generateJs', function() {
   gulp.src(jsFilesPath)
     .pipe(sourcemaps.init())
       .pipe(concat('third_party.js'))
-      .pipe(isMinificationNeeded ? minify() : gulpUtil.noop())
+      .pipe(isMinificationNeeded ? minify({
+        ext:{
+              src:'.js',
+              min:'.min.js'
+            }
+      }) : gulpUtil.noop())
     // This map a combined/minified file back to an unbuilt state,
     // holds information about original files.
     // When you query a certain line and column number in your generated JavaScript
