@@ -136,7 +136,7 @@ if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
       exit 1
   fi
 
-  pip install numpy==1.6.2 --target="$TOOLS_DIR/numpy-1.6.1"
+  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
 
 # Install third-party node modules needed for the build process.
