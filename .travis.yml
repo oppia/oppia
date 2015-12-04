@@ -29,6 +29,8 @@ notifications:
     on_failure: change
 
 before_install:
+- pip uninstall setuptools pip -y 
+- bash scripts/install-pip.sh
 - pip install codecov
 - export CHROME_BIN=chromium-browser
 - export DISPLAY=:99.0
