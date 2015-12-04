@@ -89,6 +89,7 @@ oppia.controller('FeedbackTab', [
     });
   };
 
+  // TODO(Allan): Implement ability to edit suggestions before applying.
   $scope.showSuggestionModal = function() {
     $modal.open({
       templateUrl: 'modals/editorViewSuggestion',
