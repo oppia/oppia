@@ -93,25 +93,31 @@ oppia.controller('FeedbackTab', [
     $modal.open({
       templateUrl: 'modals/editorViewSuggestion',
       backdrop: true,
-      scope: $scope,
       size: 'lg',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.oldContent = $scope.activeThread.suggestion.state_content.old_content;
-        $scope.newContent = $scope.activeThread.suggestion.state_content.new_content;
+      resolve: {
+        suggestion: function() {
+          return $scope.activeThread.suggestion;
+        }
+      },
+      controller: [
+        '$scope', '$modalInstance', 'suggestion',
+        function($scope, $modalInstance, suggestion) {
+        $scope.oldContent = suggestion.state_content.old_content;
+        $scope.newContent = suggestion.state_content.new_content;
 
-        $scope.accept = function() {
+        $scope.acceptSuggestion = function() {
           $modalInstance.close({
             action: 'accept'
           });
         };
 
-        $scope.reject = function() {
+        $scope.rejectSuggestion = function() {
           $modalInstance.close({
             action: 'reject'
           });
         };
 
-        $scope.cancel = function() {
+        $scope.cancelReview = function() {
           $modalInstance.dismiss('cancel');
         };
       }]
@@ -119,7 +125,7 @@ oppia.controller('FeedbackTab', [
       threadDataService.resolveSuggestion($scope.activeThread.suggestion.suggestion.id, result.action);
       // Update the status of the feedback thread.
       var msg, status;
-      if(result.action === 'accept') {
+      if (result.action === 'accept') {
         msg = 'Suggestion accepted.';
         status = 'fixed';
       } else {

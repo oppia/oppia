@@ -165,29 +165,29 @@
 
 <script type="text/ng-template" id="modals/editorViewSuggestion">
   <div class="modal-header">
-    <h3>Suggestion Review</h3>
+    <h3>Review Suggestion</h3>
   </div>
 
   <div class="modal-body">
-    <section style="width: 100%; height: 350px; padding: 10px;">
-      <div style="width: 49%; height: 100%; float: left;">
+    <section class="oppia-suggestion-review-container">
+      <div class="oppia-suggestion-review-panel-container" style="float: left;">
         <strong>Current:</strong>
-        <div style="width:100%; height:100%; border:1px solid black; overflow: scroll;">
+        <div class="oppia-suggestion-review-panel">
           <p style="padding: 5px;"><[ oldContent ]></p>
         </div>
       </div>
-      <div style="width: 49%; height: 100%; float: right;">
+      <div class="oppia-suggestion-review-panel-container" style="float: right;">
         <strong>Suggested:</strong>
-        <div style="width:100%; height:100%; border:1px solid black; overflow: scroll;">
+        <div class="oppia-suggestion-review-panel">
           <p style="padding: 5px;"><[ newContent ]></p>
         </div>
       </div>
-      </section>
+    </section>
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger" ng-click="reject()" ng-disabled="!(activeThread.suggestion.status == new)">Reject</button>
-    <button class="btn btn-success" ng-click="accept()" ng-disabled="!(activeThread.suggestion.status == new)">Accept</button>
+    <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!(activeThread.suggestion.status == 'new')">Reject</button>
+    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!(activeThread.suggestion.status == 'new')">Accept</button>
   </div>
 </script>
