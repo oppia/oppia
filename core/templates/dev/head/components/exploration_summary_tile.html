@@ -85,10 +85,6 @@
     padding: 12px;
   }
 
-  .oppia-exploration-summary-tile .updated {
-    font-size: 0.8em;
-  }
-
   .oppia-exploration-summary-tile .metrics {
     height: 30px;
     margin: 0 12px;
@@ -96,7 +92,7 @@
   }
 
   .oppia-exploration-summary-tile .metrics li {
-    font-size: 0.85em;
+    font-size: 0.75em;
     list-style-type: none;
     text-align: center;
   }
@@ -123,9 +119,6 @@
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
-            <span ng-if="!averageRating">
-              Unrated
-            </span>
             <span ng-if="averageRating">
               <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
               </span>
