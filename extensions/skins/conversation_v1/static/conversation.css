@@ -19,7 +19,7 @@
   mode.
 */
 html, body {
-  background: url('/images/general/background.png') no-repeat center center fixed;
+  background: url('/images/general/background.jpg') no-repeat center center fixed;
   background-color: #eee;
   color: rgba(0,0,0,0.87);
   font-family: 'Roboto', Arial, sans-serif;
