@@ -123,7 +123,8 @@ oppia.controller('FeedbackTab', [
         };
       }]
     }).result.then(function(result) {
-      threadDataService.resolveSuggestion($scope.activeThread.suggestion.suggestion.id, result.action);
+      threadDataService.resolveSuggestion(
+        $scope.activeThread.suggestion.suggestion.id, result.action);
       // Update the status of the feedback thread.
       var msg, status;
       if (result.action === 'accept') {
