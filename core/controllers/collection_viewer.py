@@ -122,7 +122,9 @@ class CollectionDataHandler(base.BaseHandler):
             collection_node['exploration'] = {
                 'id': collection_node['exploration_id'],
                 'title': summary.title if summary else None,
+                'category': summary.category if summary else None,
                 'objective': summary.objective if summary else None,
+                'ratings': summary.ratings if summary else None,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     summary.exploration_model_last_updated
                 ) if summary else None,

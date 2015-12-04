@@ -89,6 +89,8 @@
                       exploration-title="expl.title"
                       last-updated-msec="expl.last_updated_msec"
                       objective="expl.objective"
+                      category="expl.category"
+                      ratings="expl.ratings"
                       thumbnail-icon-url="expl.thumbnail_icon_url"
                       thumbnail-bg-color="expl.thumbnail_bg_color">
                   </exploration-summary-tile>
@@ -107,6 +109,8 @@
                       exploration-title="expl.title"
                       last-updated-msec="expl.last_updated_msec"
                       objective="expl.objective"
+                      category="expl.category"
+                      ratings="expl.ratings"
                       thumbnail-icon-url="expl.thumbnail_icon_url"
                       thumbnail-bg-color="expl.thumbnail_bg_color">
                   </exploration-summary-tile>
@@ -122,15 +126,11 @@
       </div>
     </div>
   </div>
-                              
-{% include 'components/ratings.html' %}
-{% include 'components/exploration_summary_tile.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('profile/Profile.js') }}
-    {{ include_js_file('components/ratings.js')}}
   </script>
 {% endblock footer_js %}

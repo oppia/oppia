@@ -180,10 +180,6 @@ oppia.controller('Gallery', [
     }
   });
 
-  $scope.areRatingsShown = function(ratingFrequencies) {
-    return ratingVisibilityService.areRatingsShown(ratingFrequencies);
-  };
-
   // SEARCH FUNCTIONALITY
 
   $scope.allExplorationsInOrder = [];
