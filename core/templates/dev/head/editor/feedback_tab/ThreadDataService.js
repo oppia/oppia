@@ -24,6 +24,7 @@ oppia.factory('threadDataService', [
   var _expId = explorationData.explorationId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
   var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
+  var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -113,6 +114,11 @@ oppia.factory('threadDataService', [
         if (errorCallback) {
           errorCallback();
         }
+      });
+    },
+    resolveSuggestion: function(thread_id, action) {
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + thread_id, {
+        action: action
       });
     }
   };
