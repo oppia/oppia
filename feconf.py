@@ -35,6 +35,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -68,7 +69,7 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
-GALLERY_PAGE_SIZE = 10
+GALLERY_PAGE_SIZE = 24
 
 # The default number of commits to show on a page in the exploration history
 # tab.
@@ -392,6 +393,14 @@ COLOR_SHARKFIN = 'sharkfin'
 COLOR_GUNMETAL = 'gunmetal'
 DEFAULT_COLOR = COLOR_TEAL
 
+COLORS_TO_HEX_VALUES = {
+    COLOR_TEAL: '#05a69a',
+    COLOR_SALMON: '#f35f55',
+    COLOR_SUNNYSIDE: '#f7a541',
+    COLOR_SHARKFIN: '#058ca6',
+    COLOR_GUNMETAL: '#607d8b',
+}
+
 # List of supported default categories. For now, each category has
 # a specific color associated with it.
 CATEGORIES_TO_COLORS = {
@@ -515,3 +524,4 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
+SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

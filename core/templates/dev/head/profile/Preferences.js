@@ -18,8 +18,9 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$timeout',
-    function($scope, $http, $rootScope, $modal, $timeout) {
+oppia.controller('Preferences', [
+    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'warningsData',
+    function($scope, $http, $rootScope, $modal, $timeout, warningsData) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -33,6 +34,45 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
 
   $scope.saveUserBio = function(userBio) {
     _saveDataItem('user_bio', userBio);
+  };
+
+  $scope.subjectInterestsChangedAtLeastOnce = false;
+  $scope.subjectInterestsWarningText = null;
+  $scope.TAG_REGEX_STRING = '^[a-z ]+$';
+
+  $scope.updateSubjectInterestsWarning = function(subjectInterests) {
+    var TAG_REGEX = new RegExp($scope.TAG_REGEX_STRING);
+
+    if (subjectInterests instanceof Array) {
+      for (var i = 0; i < subjectInterests.length; i++) {
+        if (typeof subjectInterests[i] === 'string') {
+          if (!TAG_REGEX.test(subjectInterests[i])) {
+            $scope.subjectInterestsWarningText = (
+              'Subject interests should use only lowercase letters.');
+          }
+        } else {
+            console.error(
+              'Error: received bad value for a subject interest. Expected a ' +
+                'string, got ', subjectInterests[i]);
+            throw Error('Error: received bad value for a subject interest.');
+        }
+      }
+    } else {
+      console.error(
+        'Error: received bad value for subject interests. Expected list of ' +
+        'strings, got ', subjectInterests);
+      throw Error('Error: received bad value for subject interests.');
+    }
+  };
+
+  $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
+    warningsData.clear();
+    $scope.subjectInterestsChangedAtLeastOnce = true;
+    $scope.subjectInterestsWarningText = null;
+    $scope.updateSubjectInterestsWarning(subjectInterests);
+    if ($scope.subjectInterestsWarningText == null) {
+      _saveDataItem('subject_interests', subjectInterests);
+    }
   };
 
   $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
@@ -112,6 +152,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
   $http.get(_PREFERENCES_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
+    $scope.subjectInterests = data.subject_interests;
     $scope.preferredLanguageCodes = data.preferred_language_codes;
     $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.canReceiveEmailUpdates = data.can_receive_email_updates;

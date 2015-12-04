@@ -435,7 +435,7 @@ class ExplorationRightsHandler(EditorHandler):
                 except utils.ValidationError as e:
                     raise self.InvalidInputException(e)
 
-                rights_manager.publish_exploration(
+                exp_services.publish_exploration_and_update_user_profiles(
                     self.user_id, exploration_id)
                 exp_services.index_explorations_given_ids([exploration_id])
             else:

@@ -111,53 +111,39 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
 
-echo Checking whether node-jscs dependencies are installed
-if [ ! -d "$NODE_MODULE_DIR/jscs" ]; then
-  echo installing node-jscs
-  $NPM_INSTALL jscs@2.3.0
-fi
-
 # Note that numpy needs to be built after downloading. If you are having
 # trouble, please ensure that you have pip installed (see "Installing Oppia"
 # on the Oppia developers' wiki page).
 echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
+
+  if ! type pip > /dev/null 2>&1 ; then
+      echo ""
+      echo "  Numpy is required for Oppia to operate properly, but pip wasn't found"
+      echo "  on your local machine."
+      echo ""
+      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
+
+      if [ "${OS}" == "Darwin" ] ; then
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
+      else
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+      fi
+
+      exit 1
+  fi
+
   pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
 
-echo Checking whether gulp is installed
-if [ ! -d "$NODE_MODULE_DIR/gulp" ]; then
-  echo installing gulp
-  $NPM_INSTALL gulp@3.9.0
-fi
-
-echo Checking whether through2 is installed
-if [ ! -d "$NODE_MODULE_DIR/through2" ]; then
-  echo installing through2
-  $NPM_INSTALL through2@2.0.0
-fi
-
-echo Checking whether yargs is installed
-if [ ! -d "$NODE_MODULE_DIR/yargs" ]; then
-  echo installing yargs
-  $NPM_INSTALL yargs@3.29.0
-fi
-
-echo Checking whether gulp-concat is installed
-if [ ! -d "$NODE_MODULE_DIR/gulp-concat" ]; then
-  echo installing gulp-concat
-  $NPM_INSTALL gulp-concat@2.6.0
-fi
-
-echo Checking whether gulp-minify-css is installed
-if [ ! -d "$NODE_MODULE_DIR/gulp-minify-css" ]; then
-  echo installing gulp-minify-css
-  $NPM_INSTALL gulp-minify-css@1.2.1
-fi
-
-echo Checking whether gulp-util is installed
-if [ ! -d "$NODE_MODULE_DIR/gulp-util" ]; then
-  echo installing gulp-util
-  $NPM_INSTALL gulp-util@3.0.7
-fi
+# Install third-party node modules needed for the build process.
+install_node_module gulp 3.9.0
+install_node_module through2 2.0.0
+install_node_module yargs 3.29.0
+install_node_module gulp-concat 2.6.0
+install_node_module gulp-minify-css 1.2.1
+install_node_module gulp-util 3.0.7
+install_node_module jscs 2.3.0
+install_node_module gulp-sourcemaps 1.6.0
+install_node_module gulp-minify 0.0.5

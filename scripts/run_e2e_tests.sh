@@ -72,48 +72,12 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # Install third party dependencies
 bash scripts/install_third_party.sh
 
-echo Checking whether karma is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
-  echo Installing karma
-  $NPM_INSTALL karma@0.12.16
-fi
-
-echo Checking whether karma-jasmine is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-jasmine" ]; then
-  echo Installing karma-jasmine
-  # Install karma as well, in case people have an older version.
-  $NPM_INSTALL karma@0.12.16
-  $NPM_INSTALL karma-jasmine@0.1.0
-fi
-
-echo Checking whether karma-ng-html2js-preprocessor is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-ng-html2js-preprocessor" ]; then
-  echo Installing karma-ng-html2js-preprocessor
-  $NPM_INSTALL karma-ng-html2js-preprocessor@0.1.0
-fi
-
-echo Checking whether Protractor is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
-  echo Installing Protractor
-  $NPM_INSTALL protractor@2.5.0
-fi
-PROTRACTOR_VERSION=$($NPM_CMD list protractor)
-if [[ $PROTRACTOR_VERSION != *"2.5.0"* ]]; then
-  echo Changing Protractor version to 2.5.0.
-  $NPM_INSTALL protractor@2.5.0
-fi
-
-echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
-  echo Installing Protractor screenshot reporter
-  $NPM_INSTALL protractor-screenshot-reporter@0.0.5
-fi
-
-echo Checking whether Jasmine spec reporter is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/jasmine-spec-reporter" ]; then
-  echo Installing Jasmine spec reporter
-  $NPM_INSTALL jasmine-spec-reporter@2.2.2
-fi
+install_node_module karma 0.12.16
+install_node_module karma-jasmine 0.1.0
+install_node_module karma-ng-html2js-preprocessor 0.1.0
+install_node_module protractor 2.5.0
+install_node_module protractor-screenshot-reporter 0.0.5
+install_node_module jasmine-spec-reporter 2.2.2
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update
 

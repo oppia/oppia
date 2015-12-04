@@ -21,6 +21,8 @@ import os
 import sys
 import time
 
+import feconf
+
 # Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
 # The number of lines to record for an RPC stacktrace.
@@ -77,9 +79,15 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
-    os.path.abspath(os.path.join(
-        ROOT_PATH, '..', 'oppia_tools', 'numpy-1.6.1')),
 ]
+
+# In the GAE production environment, numpy is automatically provided, and
+# trying to access a path outside the oppia/ directory will lead to an error.
+# So, we only add numpy to the system path in development mode.
+if feconf.DEV_MODE:
+    THIRD_PARTY_LIBS.append(
+        os.path.abspath(os.path.join(
+            ROOT_PATH, '..', 'oppia_tools', 'numpy-1.6.1')))
 
 for lib_path in THIRD_PARTY_LIBS:
     if not os.path.isdir(lib_path):

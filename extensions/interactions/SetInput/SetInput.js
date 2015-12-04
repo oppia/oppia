@@ -25,7 +25,8 @@ oppia.directive('oppiaInteractiveSetInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/SetInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'setInputRulesService', function(
+          $scope, $attrs, setInputRulesService) {
         $scope.schema = {
           type: 'list',
           items: {
@@ -55,7 +56,7 @@ oppia.directive('oppiaInteractiveSetInput', [
               'Oops, it looks like your set has duplicates!');
           } else {
             $scope.errorMessage = '';
-            $scope.$parent.$parent.submitAnswer(answer);
+            $scope.$parent.submitAnswer(answer, setInputRulesService);
           }
         };
       }]
@@ -90,3 +91,43 @@ oppia.directive('oppiaShortResponseSetInput', [
     };
   }
 ]);
+
+oppia.factory('setInputRulesService', [function() {
+  return {
+    Equals: function(answer, inputs) {
+      return answer.length == inputs.x.length && inputs.x.every(function(val) {
+        return answer.indexOf(val) >= 0;
+      });
+    },
+    IsSubsetOf: function(answer, inputs) {
+      return answer.length < inputs.x.length && answer.every(function(val) {
+        return inputs.x.indexOf(val) >= 0;
+      });
+    },
+    IsSupersetOf: function(answer, inputs) {
+      return answer.length > inputs.x.length && inputs.x.every(function(val) {
+        return answer.indexOf(val) >= 0;
+      });
+    },
+    HasElementsIn: function(answer, inputs) {
+      return inputs.x.some(function(val) {
+        return answer.indexOf(val) >= 0;
+      });
+    },
+    HasElementsNotIn: function(answer, inputs) {
+      return answer.some(function(val) {
+        return inputs.x.indexOf(val) == -1;
+      });
+    },
+    OmitsElementsIn: function(answer, inputs) {
+      return inputs.x.some(function(val) {
+        return answer.indexOf(val) == -1;
+      });
+    },
+    IsDisjointFrom: function(answer, inputs) {
+      return inputs.x.every(function(val) {
+        return answer.indexOf(val) == -1;
+      });
+    }
+  };
+}]);
