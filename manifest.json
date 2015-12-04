@@ -151,7 +151,7 @@
         "targetDirPrefix": "jqueryui-",
         "files": ["jquery-ui.min.js"],
         "bundle": {
-          "js": ["jquery-ui.min.js"]
+          "js": []
         }
       },
       "jqueryThemes": {
