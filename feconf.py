@@ -172,13 +172,16 @@ VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
         'email_config': 'publicize_exploration_email_html_body',
         'email_subject_fn': (
-            lambda exp_title: 'Featuring "%s" in the gallery' % exp_title),
+            lambda exp_title: (
+                'Your Oppia exploration "%s" has been featured!' % exp_title)),
         'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
     },
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
-            lambda exp_title: 'Unpublishing "%s"' % exp_title),
+            lambda exp_title: (
+                'Your Oppia exploration "%s" has been unpublished' % exp_title)
+        ),
         'email_intent': 'unpublish_exploration',
     },
 }

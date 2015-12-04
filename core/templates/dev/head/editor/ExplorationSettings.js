@@ -251,7 +251,8 @@ oppia.controller('ExplorationSettings', [
     warningsData.clear();
 
     $http.get('/moderatorhandler/email_draft/' + action).then(function(response) {
-      // An empty draft email body indicates that no email will be sent.
+      // If the draft email body is empty, email functionality will not be
+      // exposed to the mdoerator.
       var draftEmailBody = response.data.draft_email_body;
 
       $modal.open({
@@ -271,7 +272,10 @@ oppia.controller('ExplorationSettings', [
 
           if ($scope.willEmailBeSent) {
             $scope.EMAIL_BODY_SCHEMA = {
-              type: 'html'
+              type: 'unicode',
+              ui_config: {
+                rows: 20
+              }
             };
           }
 

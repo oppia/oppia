@@ -22,7 +22,6 @@ import zipfile
 
 from core.controllers import editor
 from core.domain import config_services
-from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -1102,9 +1101,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].cc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
                 messages[0].subject,
-                'Featuring "My Exploration" in the gallery')
+                'Your Oppia exploration "My Exploration" has been featured!')
             self.assertEqual(messages[0].body.decode(), (
                 'Hi %s,\n\n'
                 '%s\n\n'
@@ -1162,8 +1162,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].cc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
-                messages[0].subject, 'Unpublishing "My Exploration"')
+                messages[0].subject,
+                'Your Oppia exploration "My Exploration" has been unpublished')
             self.assertEqual(messages[0].body.decode(), (
                 'Hi %s,\n\n'
                 '%s\n\n'

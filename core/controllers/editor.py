@@ -489,8 +489,8 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
     @base.require_moderator
     def put(self, exploration_id):
-        """Updates the editing rights for the given exploration, and sends an
-        email to all its owners.
+        """Updates the publication status of the given exploration, and sends
+        an email to all its owners.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         action = self.payload.get('action')

@@ -65,11 +65,10 @@ EMAIL_FOOTER = config_domain.ConfigProperty(
     'HTML and include an unsubscribe link.)',
     'You can unsubscribe from these emails from the '
     '<a href="https://www.example.com">Preferences</a> page.')
-# NOTE TO DEVELOPERS: the relevant emails will not be sent if any of these
-# placeholders are left unmodified. If this policy changes, this should be
-# documented in the wiki.
+
 _PLACEHOLDER_SUBJECT = 'THIS IS A PLACEHOLDER.'
 _PLACEHOLDER_HTML_BODY = 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
+
 SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
     'signup_email_content', EMAIL_CONTENT_SCHEMA,
     'Content of email sent after a new user signs up. (The email body should '
@@ -81,15 +80,18 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
     })
 PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Content of email sent after an exploration is publicized by a moderator. '
-    'These emails are only sent if the functionality is enabled in feconf.py.',
-    _PLACEHOLDER_HTML_BODY)
+    'Default content for the email sent after an exploration is publicized by '
+    'a moderator. These emails are only sent if the functionality is enabled '
+    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'Email body (do not include "Hi [username]" or "Thanks, [your username]"; '
+    'these will be added automatically).')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Content of email sent after an exploration is unpublished by a '
-    'moderator. These emails are only sent if the functionality is enabled in '
-    'feconf.py.',
-    _PLACEHOLDER_HTML_BODY)
+    'Default content for the email sent after an exploration is unpublished by '
+    'a moderator. These emails are only sent if the functionality is enabled '
+    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'Email body (do not include "Hi [username]" or "Thanks, [your username]"; '
+    'these will be added automatically).')
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -119,7 +121,8 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 
 def _send_email(
-        recipient_id, sender_id, intent, email_subject, email_html_body):
+        recipient_id, sender_id, intent, email_subject, email_html_body,
+        cc_admin=False):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -148,7 +151,7 @@ def _send_email(
             EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
         email_services.send_mail(
             sender_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body)
+            cleaned_plaintext_body, cleaned_html_body, cc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -196,12 +199,7 @@ def _get_email_config(intent):
 def get_draft_moderator_action_email(intent):
     """Returns a draft of the text of the body for an email sent immediately
     following a moderator action.
-
-    If feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to False, returns None.
     """
-    if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-        return None
-
     require_moderator_email_prereqs_are_satisfied(intent)
     return _get_email_config(intent).value
 
@@ -217,13 +215,6 @@ def require_moderator_email_prereqs_are_satisfied(intent):
         raise Exception(
             'For moderator emails to be sent, please ensure that '
             'CAN_SEND_EMAILS_TO_USERS is set to True.')
-
-    email_config = _get_email_config(intent)
-    if email_config.value == email_config.default_value:
-        raise Exception(
-            'Please ensure that the value for the admin config property '
-            '%s is set, before allowing moderator emails for %s to be '
-            'sent.' % (intent, email_config.name))
 
 
 def send_moderator_action_email(
@@ -245,4 +236,5 @@ def send_moderator_action_email(
             recipient_user_settings.username, email_body,
             sender_user_settings.username, EMAIL_FOOTER.value))
     _send_email(
-        recipient_id, sender_id, intent, email_subject, full_email_content)
+        recipient_id, sender_id, intent, email_subject, full_email_content,
+        cc_admin=True)
