@@ -141,7 +141,7 @@
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
         "bundle": {
-          "js": ["jquery.js"]
+          "js": []
         }
       },
       "jqueryUI": {
