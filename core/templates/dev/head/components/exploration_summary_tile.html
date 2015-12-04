@@ -112,11 +112,11 @@
     <a ng-href="<[explorationLink]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="exploration-title"><[getExplorationTitle()]></h2>
+        <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
       </div>
 
       <div>
-        <div class="objective">
+        <div class="objective protractor-test-exp-summary-tile-objective">
           <[getObjective() | truncateAndCapitalize: 45]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
