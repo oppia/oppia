@@ -1384,8 +1384,8 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-        if not any([self.language_code == lc['code']
-                    for lc in feconf.ALL_LANGUAGE_CODES]):
+        if not any( self.language_code == lc['code']
+                    for lc in feconf.ALL_LANGUAGE_CODES):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 

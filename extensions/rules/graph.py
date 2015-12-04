@@ -45,10 +45,9 @@ def _is_isomorphic(graph1, graph2):
     num_vertices = len(graph2['vertices'])
     for perm in itertools.permutations(range(num_vertices)):
         # Test matching labels
-        if graph1['isLabeled'] and any([
-                graph2['vertices'][i]['label'] !=
+        if graph1['isLabeled'] and any( graph2['vertices'][i]['label'] !=
                 graph1['vertices'][perm[i]]['label']
-                for i in xrange(num_vertices)]):
+                for i in xrange(num_vertices)):
             continue
 
         # Test isomorphism
