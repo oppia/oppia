@@ -752,10 +752,6 @@ textarea {
   background-color: #eee;
 }
 
-.oppia-gallery-tiles-area {
-  background-color: #eee;
-}
-
 .oppia-gallery-tiles-introduction {
   font-size: 1.6em;
   padding-top: 40px;
@@ -1678,6 +1674,7 @@ ul.oppia-dashboard-tiles {
 
 .oppia-gallery-banner-container {
   height: 700px;
+  overflow: hidden;
   position: fixed;
   top: 56px;
   width: 100%;

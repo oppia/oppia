@@ -126,13 +126,15 @@ oppia.controller('Gallery', [
       urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService,
       ratingVisibilityService) {
 
+
   $window.addEventListener('scroll', function() {
     var oppiaBanner = $('.oppia-gallery-banner-container');
     var oppiaTagline = $('.oppia-gallery-banner-tagline');
-    var bannerVanishRate = oppiaBanner.height();
-    var taglineVanishRate = oppiaBanner.height() * 0.3;
+    var oppiaBannerHeight = 700;
+    var taglineVanishRate = oppiaBannerHeight * 0.3;
 
-    oppiaBanner.css({'opacity': (bannerVanishRate - $(window).scrollTop()) / bannerVanishRate});
+    oppiaBanner.css({'opacity': (oppiaBannerHeight - $(window).scrollTop()) / oppiaBannerHeight,
+                     'height': oppiaBannerHeight - $(window).scrollTop()});
     oppiaTagline.css({'opacity': (taglineVanishRate - $(window).scrollTop()) / taglineVanishRate});
   });
 
