@@ -305,9 +305,6 @@ oppia.factory('oppiaPlayerService', [
       _explorationContributorUsernames = data.rights.owner_names.concat(
         data.rights.editor_names);
       deferredContributors.resolve(data);
-    }).error(function(data) {
-      deferredContributors.reject(data);
-      $log.error('There was an error loading the exploration information.');
     });
 
     // This is needed to get exploration snapshots.
@@ -316,9 +313,6 @@ oppia.factory('oppiaPlayerService', [
       // Only get last published changes/get changes from the last snapshot.
       _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
       deferredSnapshots.resolve(data);
-    }).error(function(data) {
-      deferredSnapshots.reject(data);
-      $log.error('There was an error loading the exploration history');
     });
 
     // This is needed to get statistics of the exprolation.
@@ -326,9 +320,6 @@ oppia.factory('oppiaPlayerService', [
       // Only get number of viewers who started an exploration.
       _viewersCount = data.num_starts;
       deferredStatistics.resolve(_viewersCount);
-    }).error(function(data) {
-      deferredStatistics.reject(data);
-      $log.error('There was an error loading the exploration statistics');
     });
 
    return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
@@ -387,9 +378,6 @@ oppia.factory('oppiaPlayerService', [
           messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
             explorationVersion: version
           });
-        }).error(function(data) {
-          warningsData.addWarning(
-            data.error || 'There was an error loading the exploration.');
         });
       }
     },
