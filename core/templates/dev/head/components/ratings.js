@@ -23,7 +23,7 @@
 oppia.factory('ratingVisibilityService', [function() {
   return {
     areRatingsShown: function(ratingFrequencies) {
-      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 3;
+      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
 
       var totalNumber = 0;
       for (var value in ratingFrequencies) {
