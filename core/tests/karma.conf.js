@@ -7,6 +7,7 @@ module.exports = function(config) {
       'third_party/static/jquery-2.1.1/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.4.7/angular.js',
+      'third_party/static/angularjs-1.4.7/angular-mocks.js',
       'third_party/static/angularjs-1.4.7/angular-animate.js',
       'third_party/static/angularjs-1.4.7/angular-aria.js',
       'third_party/static/angularjs-1.4.7/angular-resource.js',
@@ -26,6 +27,7 @@ module.exports = function(config) {
       'third_party/static/textAngular-1.3.7/src/textAngularSetup.js',
       // 'third_party/static/textAngular-1.3.7/src/textAngular-sanitize.js',
       'third_party/static/textAngular-1.3.7/dist/textAngular-rangy.min.js',
+      'third_party/static/math-expressions-762ffd/build/math-expressions.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
