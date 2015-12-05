@@ -219,8 +219,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'LogicProof',
         'NumericInput',
         'SetInput',
-        'MathExpressionInput',
-    ]
+    ],
 }, {
     'name': 'Programming',
     'interaction_ids': [

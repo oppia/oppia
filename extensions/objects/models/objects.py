@@ -722,20 +722,3 @@ class SetOfHtmlString(BaseObject):
             'id': 'is_uniquified'
         }]
     }
-
-
-class MathExpression(BaseObject):
-    """Math expression class."""
-
-    description = 'A math expression.'
-
-    SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'ascii',
-            'schema': UnicodeString.SCHEMA,
-        }, {
-            'name': 'latex',
-            'schema': UnicodeString.SCHEMA,
-        }]
-    }

@@ -24,9 +24,7 @@ __author__ = 'Sean Lip'
 DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
     'codemirror': ['ui.codemirror'],
     'google_maps': ['ui.map'],
-    'guppy': [],
     'logic_proof': [],
-    'math_expressions': [],
     'midijs': [],
     'pencilcode': [],
     'skulpt': [],

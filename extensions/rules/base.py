@@ -28,10 +28,6 @@ class CoordTwoDimRule(rule_domain.Rule):
     subject_type = objects.CoordTwoDim
 
 
-class MathExpressionRule(rule_domain.Rule):
-    subject_type = objects.MathExpression
-
-
 class MusicPhraseRule(rule_domain.Rule):
     subject_type = objects.MusicPhrase
 
