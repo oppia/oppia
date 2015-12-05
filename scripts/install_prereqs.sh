@@ -18,4 +18,6 @@ if [[ ${OS} == "Darwin" ]]; then
   sudo easy_install pip
 elif [[ ${OS} == "Linux" ]]; then
   sudo apt-get install curl python-setuptools git python-dev python-pip
+else
+  echo "Please see the wiki for installing oppia on Windows : https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
 fi
