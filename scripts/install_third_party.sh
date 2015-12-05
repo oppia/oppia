@@ -123,6 +123,7 @@ if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
       echo "  Numpy is required for Oppia to operate properly, but pip wasn't found"
       echo "  on your local machine."
       echo ""
+      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
 
       if [ "${OS}" == "Darwin" ] ; then
         echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
