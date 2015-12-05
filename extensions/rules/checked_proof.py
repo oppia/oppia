@@ -20,24 +20,14 @@ __author__ = 'Jacob Davis'
 
 from extensions.rules import base
 
+
 class Correct(base.CheckedProofRule):
     description = 'is correct'
-
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(subject.get('correct'))
 
 
 class NotCorrect(base.CheckedProofRule):
     description = 'is not correct'
 
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(not subject.get('correct'))
-
 
 class NotCorrectByCategory(base.CheckedProofRule):
     description = 'is not correct due to {{c|LogicErrorCategory}}'
-
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value((
-            not subject.get('correct')) and (
-            subject.get('error_category') == self.c))
