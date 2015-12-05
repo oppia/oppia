@@ -168,6 +168,10 @@ EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 
 MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
+DEFAULT_SALUTATION_HTML_FN = (
+    lambda recipient_username: 'Hi %s,' % recipient_username)
+DEFAULT_SIGNOFF_HTML_FN = (
+    lambda sender_username: 'Thanks,<br>%s' % sender_username),
 
 VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
@@ -176,6 +180,8 @@ VALID_MODERATOR_ACTIONS = {
             lambda exp_title: (
                 'Your Oppia exploration "%s" has been featured!' % exp_title)),
         'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
+        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
+        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
     },
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
@@ -184,6 +190,8 @@ VALID_MODERATOR_ACTIONS = {
                 'Your Oppia exploration "%s" has been unpublished' % exp_title)
         ),
         'email_intent': 'unpublish_exploration',
+        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
+        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
     },
 }
 

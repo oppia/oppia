@@ -83,15 +83,14 @@ PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'Default content for the email sent after an exploration is publicized by '
     'a moderator. These emails are only sent if the functionality is enabled '
     'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Email body (do not include "Hi [username]" or "Thanks, [your username]"; '
-    'these will be added automatically).')
+    'Congratulations, your exploration has been featured in the gallery!')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
     'Default content for the email sent after an exploration is unpublished by '
     'a moderator. These emails are only sent if the functionality is enabled '
     'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Email body (do not include "Hi [username]" or "Thanks, [your username]"; '
-    'these will be added automatically).')
+    'I\'m writing to inform you that I have unpublished the above '
+    'exploration.')
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -226,15 +225,21 @@ def send_moderator_action_email(
     to users (i.e. feconf.CAN_SEND_EMAILS_TO_USERS is True).
     """
     require_moderator_email_prereqs_are_satisfied(intent)
+    email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
 
     recipient_user_settings = user_services.get_user_settings(recipient_id)
     sender_user_settings = user_services.get_user_settings(sender_id)
     email_subject = feconf.VALID_MODERATOR_ACTIONS[intent]['email_subject_fn'](
         exploration_title)
+    email_salutation_html = email_config['email_salutation_html_fn'](
+        recipient_user_settings.username)
+    email_signoff_html = email_config['email_signoff_html_fn'](
+        sender_user_settings.username)
+
     full_email_content = (
-        'Hi %s,<br><br>%s<br><br>Thanks,<br>%s<br><br>%s' % (
-            recipient_user_settings.username, email_body,
-            sender_user_settings.username, EMAIL_FOOTER.value))
+        '%s<br><br>%s<br><br>%s<br><br>%s' % (
+            email_salutation_html, email_body, email_signoff_html,
+            EMAIL_FOOTER.value))
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
         cc_admin=True)
