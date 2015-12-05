@@ -7,7 +7,23 @@
     <div style="color: red;" ng-repeat="expId in invalidExpIds">
       <strong>Error:</strong> no published exploration found with ID '<[expId]>'
     </div>
-    <oppia-end-exploration-recommended-explorations recommended-exploration-ids="recommendedExplorationIds" recommended-exploration-summaries="recommendedExplorationSummaries" collection-id="collectionId"></oppia-end-exploration-recommended-explorations>
+
+    <div layout="row" layout-wrap>
+      <div ng-repeat="expId in recommendedExplorationIds track by $index">
+        <exploration-summary-tile ng-if="recommendedExplorationSummaries[$index]"
+                                  collection-id="collectionId"
+                                  exploration-id="expId"
+                                  exploration-title="recommendedExplorationSummaries[$index].title"
+                                  last-updated-msec="recommendedExplorationSummaries[$index].last_updated"
+                                  objective="recommendedExplorationSummaries[$index].objective"
+                                  category=" recommendedExplorationSummaries[$index].category"
+                                  ratings="recommendedExplorationSummaries[$index].ratings"
+                                  thumbnail-icon-url="recommendedExplorationSummaries[$index].thumbnail_icon_url"
+                                  thumbnail-bg-color="recommendedExplorationSummaries[$index].thumbnail_bg_color"
+                                  ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
+        </exploration-summary-tile>
+      </div>
+    </div>
   </div>
 
   <div ng-if="!isIframed && !isInEditorPreviewMode && recommendedExplorationIds.length === 0 && (!isInEditorPage || invalidExpIds.length === 0)">
@@ -28,17 +44,4 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/EndExploration">
-</script>
-
-<script type="text/ng-template" id="interaction/EndExploration/RecommendedExplorations">
-  <div layout="row" layout-wrap>
-    <md-card class="oppia-end-exploration-recommendation-card" ng-repeat="expId in recommendedExplorationIds track by $index">
-      <a ng-href="/explore/<[expId]><[collectionSuffix]>" target="<[isIframed ? '_blank' : '_self']>" ng-if="recommendedExplorationSummaries[$index]">
-        <img class="oppia-end-exploration-recommendation-image" ng-src="<[recommendedExplorationSummaries[$index].thumbnail_image_url]>">
-        <div class="oppia-end-exploration-recommendation-title">
-          <[recommendedExplorationSummaries[$index].title]>
-        </div>
-      </a>
-    </md-card>
-  </div>
 </script>

@@ -99,11 +99,8 @@
 
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
-
-            Note also that explorationCompleted gets set on the penultimate
-            card after the learner has submitted the final answer.
           -->
-          <div ng-if="(!waitingForOppiaFeedback || !activeCard.interactionIsInline) && ((activeCard.interactionHtml && !waitingForContinueButtonClick) || (waitingForContinueButtonClick && !helpCardHasContinueButton)) && (!explorationCompleted || !isIframed || (waitingForContinueButtonClick && !helpCardHasContinueButton)) && currentProgressDotIndex === transcript.length - 1">
+          <div ng-if="(!waitingForOppiaFeedback || !activeCard.interactionIsInline) && ((activeCard.interactionHtml && !waitingForContinueButtonClick) || (waitingForContinueButtonClick && !helpCardHasContinueButton)) && (!isOnFinalCard() || !isIframed || (waitingForContinueButtonClick && !helpCardHasContinueButton)) && currentProgressDotIndex === transcript.length - 1">
             <div class="conversation-skin-inline-interaction">
               <div ng-if="waitingForContinueButtonClick && !helpCardHasContinueButton">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
@@ -173,7 +170,7 @@
                       current-state-name="activeCard.stateName">
   </oppia-gadget-panel>
 
-  <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1"
+  <div ng-if="isOnFinalCard() && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1"
        class="conversation-skin-final-ratings">
 
     <div style="color: #eee; margin-bottom: 20px;">

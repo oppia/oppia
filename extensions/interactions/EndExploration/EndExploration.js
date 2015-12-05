@@ -150,24 +150,3 @@ oppia.directive('oppiaShortResponseEndExploration', [
     };
   }
 ]);
-
-oppia.directive('oppiaEndExplorationRecommendedExplorations', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        recommendedExplorationIds: '=',
-        recommendedExplorationSummaries: '=',
-        collectionId: '='
-      },
-      templateUrl: 'interaction/EndExploration/RecommendedExplorations',
-      controller: ['$scope', function($scope) {
-        if ($scope.collectionId) {
-          $scope.collectionSuffix = '?collection_id=' + $scope.collectionId;
-        } else {
-          $scope.collectionSuffix = '';
-        }
-      }]
-    }
-  }
-]);

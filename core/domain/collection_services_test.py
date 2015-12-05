@@ -955,7 +955,13 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
     """Test methods relating to collection snapshots."""
 
+    SECOND_USERNAME = 'abc123'
+    SECOND_EMAIL = 'abc123@gmail.com'
+
     def test_get_collection_snapshots_metadata(self):
+        self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
+        self.second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
+
         v1_collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
 
@@ -1039,7 +1045,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         # Using the old version of the collection should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
             collection_services._save_collection(
-                'committer_id_2', v1_collection, '',
+                self.second_committer_id, v1_collection, '',
                 _get_collection_change_list('title', ''))
 
         # Another person modifies the collection.
@@ -1049,7 +1055,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             'new_value': 'New title'
         }]
         collection_services.update_collection(
-            'committer_id_2', self.COLLECTION_ID, new_change_list,
+            self.second_committer_id, self.COLLECTION_ID, new_change_list,
             'Second commit.')
 
         snapshots_metadata = (
@@ -1077,7 +1083,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         }, snapshots_metadata[1])
         self.assertDictContainsSubset({
             'commit_cmds': new_change_list,
-            'committer_id': 'committer_id_2',
+            'committer_id': self.second_committer_id,
             'commit_message': 'Second commit.',
             'commit_type': 'edit',
             'version_number': 3,
@@ -1349,7 +1355,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[0])
+            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[-1])
 
     def test_paging(self):
         all_commits, cursor, more = (

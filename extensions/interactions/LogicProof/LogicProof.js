@@ -19,8 +19,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/LogicProof',
-      controller: ['$scope', '$attrs', '$modal',
-          function($scope, $attrs, $modal) {
+      controller: ['$scope', '$attrs', '$modal', 'logicProofRulesService',
+          function($scope, $attrs, $modal, logicProofRulesService) {
         $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.questionWithValue);
 
@@ -188,7 +188,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             submission.displayed_proof = $scope.displayProof(
               $scope.proofString);
           }
-          $scope.$parent.$parent.submitAnswer(submission);
+          $scope.$parent.submitAnswer(submission, logicProofRulesService);
         };
 
         $scope.showHelp = function() {
@@ -234,3 +234,17 @@ oppia.directive('oppiaShortResponseLogicProof', [
     };
   }
 ]);
+
+oppia.factory('logicProofRulesService', [function() {
+  return {
+    Correct: function(answer, inputs) {
+      return answer.correct;
+    },
+    NotCorrect: function(answer, inputs) {
+      return !answer.correct;
+    },
+    NotCorrectByCategory: function(answer, inputs) {
+      return !answer.correct && answer.error_category === inputs.c;
+    }
+  };
+}]);

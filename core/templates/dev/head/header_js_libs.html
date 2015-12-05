@@ -2,26 +2,14 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <![endif]-->
 <!--[if gte IE 9]><!-->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
+<!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because they need to be at the header. Including
+bundled js at the header will block rendering.-->
+  <script src="/third_party/static/jquery-2.1.1/jquery.min.js">
   </script>
 <!--<![endif]-->
-<script>
-  window.jQuery || document.write(
-    '<script src="/third_party/static/jquery-2.1.1/jquery.min.js">\x3C/script>');
+<script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js">
 </script>
-
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script>
-  window.jQuery.ui || document.write(
-    '<script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js">\x3C/script>');
-</script>
-
-<script src="/third_party/static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
-<script src="/third_party/static/angularjs-1.4.7/angular.js"></script>
-<script src="/third_party/static/angularjs-1.4.7/angular-aria.min.js"></script>
-<script src="/third_party/static/ui-bootstrap-0.13.4/ui-bootstrap-tpls-0.13.4.min.js"></script>
-<script src="/third_party/static/ng-joyride-0.1.11/ng-joyride.js"></script>
-<script src="/third_party/static/select2-3.5.1/select2.min.js"></script>
+<script src="/third_party/static/angularjs-1.4.7/angular.min.js"></script>
 
 <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
 <script type="text/x-mathjax-config">
@@ -35,13 +23,3 @@
   MathJax.Hub.Configured();
 </script>
 <script src="/third_party/static/MathJax-2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<script src="/third_party/static/ui-sortable-0.12.6/src/sortable.js"></script>
-
-<script src="/third_party/static/hammer-js-2.0.4/hammer.js"></script>
-<script src="/third_party/static/bower-material-0.6.0-rc1/angular-material.min.js"></script>
-
-<script src="/third_party/static/ng-img-crop-0.3.2/compile/minified/ng-img-crop.js"></script>
-
-<!-- This is used in Google Maps and for form validation. -->
-<script src="/third_party/static/ui-utils-0.1.1/ui-utils.min.js"></script>

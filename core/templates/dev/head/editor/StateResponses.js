@@ -448,8 +448,8 @@ oppia.controller('StateResponses', [
                 answer, stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento));
 
-            answerClassificationService.getMatchingEditorClassificationResult(
-              _explorationId, _state, answer).success(
+            answerClassificationService.getMatchingClassificationResult(
+              _explorationId, _state, answer, true).success(
                   function(classificationResult) {
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
@@ -463,12 +463,15 @@ oppia.controller('StateResponses', [
                 $scope.trainingDataFeedback = feedback;
                 $scope.trainingDataOutcomeDest = dest;
 
-                if (classificationResult.rule_spec_string !== DEFAULT_RULE_NAME &&
-                    classificationResult.rule_spec_string !== FUZZY_RULE_TYPE) {
+                var answerGroupIndex = classificationResult.answerGroupIndex;
+                var ruleSpecIndex = classificationResult.ruleSpecIndex;
+                if (answerGroupIndex !== _state.interaction.answer_groups.length &&
+                    _state.interaction.answer_groups[answerGroupIndex].rule_specs[
+                      ruleSpecIndex].rule_type !== FUZZY_RULE_TYPE) {
                   $scope.classification.answerGroupIndex = -1;
                 } else {
                   $scope.classification.answerGroupIndex = (
-                    classificationResult.answer_group_index);
+                    classificationResult.answerGroupIndex);
                 }
               });
           };

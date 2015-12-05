@@ -61,7 +61,7 @@ var expectCurrentCategorySelectionToBe = function(expectedCategories) {
 var _getExplorationElements = function(name) {
   return element.all(by.css('.protractor-test-gallery-tile')).filter(
       function(tile, index) {
-    return tile.element(by.css('.protractor-test-gallery-tile-title')).
+    return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
         getText().then(function(tileTitle) {
       return (tileTitle === name);
     });
@@ -85,20 +85,13 @@ var playExploration = function(name) {
     if (elems.length === 0) {
       throw 'Could not find exploration tile with name ' + name;
     }
-    elems[0].element(by.css('.protractor-test-gallery-tile-title')).click();
+    elems[0].element(by.css('.protractor-test-exp-summary-tile-title')).click();
   });
-};
-
-var editExploration = function(name) {
-  _getExplorationElements(name).then(function(elems) {
-    elems[0].element(by.css('.protractor-test-edit-exploration')).click();
-  });
-  editor.exitTutorialIfNecessary();
 };
 
 var getExplorationObjective = function(name) {
   return _getExplorationElements(name).then(function(elems) {
-    return elems[0].element(by.css('.protractor-test-exploration-objective')).
+    return elems[0].element(by.css('.protractor-test-exp-summary-tile-objective')).
       getText();
   });
 };
@@ -113,5 +106,4 @@ exports.expectCurrentCategorySelectionToBe = expectCurrentCategorySelectionToBe;
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;
 exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;
-exports.editExploration = editExploration;
 exports.getExplorationObjective = getExplorationObjective;
