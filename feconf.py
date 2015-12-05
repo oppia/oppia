@@ -275,7 +275,6 @@ DEMO_EXPLORATIONS = [
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
-    ('string_classifier.yaml', 'Testing String Classifier', 'Test'),
 ]
 
 DEMO_COLLECTIONS = {

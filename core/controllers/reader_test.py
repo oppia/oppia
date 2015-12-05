@@ -16,6 +16,8 @@
 
 __author__ = 'Sean Lip'
 
+import os
+
 from core.controllers import reader
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -23,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import param_domain
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -267,10 +270,18 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
         self._init_classify_inputs('16')
 
     def _init_classify_inputs(self, exploration_id):
-        exploration = exp_services.load_demo(exploration_id)
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content,
+            'Testing String Classifier', 'Test',
+            exploration_id, assets_list)
 
         self.EXP_ID = exploration_id
-        self.EXP_STATE = exploration.states['Home']
+        self.EXP_STATE = (
+            exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _get_classiying_rule_type(self, answer):
         response = reader.classify(
