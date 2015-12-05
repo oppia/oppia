@@ -60,6 +60,11 @@ if [ ! -d "$NODE_PATH" ]; then
   rm node-download.tgz
 fi
 
+# List all node modules that are currently installed. The "npm list" command is
+# slow, so we precompute this here and refer to it as needed.
+NPM_INSTALLED_MODULES="$($NPM_CMD list)"
+export NPM_INSTALLED_MODULES
+
 # Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
 #
 #   http://blog.npmjs.org/post/78085451721
