@@ -298,6 +298,7 @@ textarea {
   bottom: 40px;
   color: white;
   left: 0;
+  opacity: 0.7;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
