@@ -362,6 +362,7 @@ COLOR_SHARKFIN = 'sharkfin'
 # Science
 COLOR_GUNMETAL = 'gunmetal'
 DEFAULT_COLOR = COLOR_TEAL
+DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 
 COLORS_TO_HEX_VALUES = {
     COLOR_TEAL: '#05a69a',
@@ -372,7 +373,8 @@ COLORS_TO_HEX_VALUES = {
 }
 
 # List of supported default categories. For now, each category has
-# a specific color associated with it.
+# a specific color associated with it. Each category also has a thumbnail icon
+# whose filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
     'Architecture': COLOR_SUNNYSIDE,
     'Art': COLOR_SUNNYSIDE,
