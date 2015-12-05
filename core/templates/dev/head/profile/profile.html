@@ -10,6 +10,12 @@
     GLOBALS.PROFILE_USERNAME = JSON.parse(
       '{{PROFILE_USERNAME|js_string}}');
   </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -25,46 +31,53 @@
 
 {% block content %}
   <div class="oppia-profile-container" ng-controller="Profile">
-    <div class="container">
+    <md-card class="oppia-page-card">
       <div class="row">
-        <div class="form-group">
-          <div class="col-lg-2 col-md-3 col-sm-3">
-            <img ng-src="<[profilePictureDataUrl]>"
-                 class="img-thumbnail oppia-profile-picture-fullsize">
-          </div>
-          <div class="col-lg-8 col-md-7 col-sm-7">
-            <h1 class="oppia-profile-username"><strong>{{PROFILE_USERNAME}}</strong></h1>
-            <p>
-              <span ng-if="userBio"><[userBio]></span>
-              <span ng-if="!userBio">
-                <em>This user has not supplied a bio yet.</em>
+        <div class="col-lg-3 col-md-3 col-sm-3">
+          <img ng-src="<[profilePictureDataUrl]>"
+               class="img-thumbnail oppia-profile-picture-fullsize">
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-9">
+          <h1 class="oppia-profile-username"><strong>{{PROFILE_USERNAME}}</strong></h1>
+          <p>
+            <span ng-if="userBio"><[userBio]></span>
+            <span ng-if="!userBio">
+              <em>This user has not supplied a bio yet.</em>
+            </span>
+          </p>
+
+          <br>
+
+          <p>
+            Interests:
+            <span ng-if="subjectInterests.length > 0">
+              <span ng-repeat="interest in subjectInterests track by $index">
+                <span class="oppia-profile-subject-interest">
+                  <[interest]>
+                </span>
               </span>
-            </p>
-            <br>
-            <p>
-              <span ng-if="subjectInterests">
-                Subject Interests: <[subjectInterests]>
-              </span>
-              <span ng-if="!subjectInterests">
-                Subject Interests: <em>none specified</em>
-              </span>
-            </p>
-            <p>
-              <span ng-if="firstContributionMsec">
-                Contributing since
-                <[getLocaleDateString(firstContributionMsec)]>
-              </span>
-            </p>
-          </div>
+            </span>
+            <span ng-if="!subjectInterests.length === 0">
+              <em>none specified</em>
+            </span>
+          </p>
+
+          <br>
+
+          <p ng-if="firstContributionMsec" style="font-size: 0.9em; color: #888">
+            Contributing since:
+            <[getLocaleDateString(firstContributionMsec)]>
+          </p>
         </div>
       </div>
+    </md-card>
+
+    <div>
       <div ng-cloak class="oppia-profile-tabs">
         <md-content>
-          <br>
           <md-tabs md-dynamic-height md-border-bottom>
             <md-tab label="Statistics">
               <md-content class="md-padding">
-                <h1 class="md-display-2">Statistics</h1>
                 <div class="oppia-stat-big-container big-top-container">
                   <div ng-repeat="stat in userDisplayedStatistics" class="oppia-stat-container-top">
                     <span class="oppia-big-number" ng-if="stat.number_value">
@@ -82,40 +95,34 @@
             </md-tab>
             <md-tab label="Created Explorations">
               <md-content class="md-padding">
-                <h1 class="md-display-2">Created Explorations</h1>
-                <div ng-if="userCreatedExplorations">
-                  <exploration-summary-tile ng-repeat="expl in userCreatedExplorations"
-                      exploration-id="expl.id"
-                      exploration-title="expl.title"
-                      last-updated-msec="expl.last_updated_msec"
-                      objective="expl.objective"
-                      category="expl.category"
-                      ratings="expl.ratings"
-                      thumbnail-icon-url="expl.thumbnail_icon_url"
-                      thumbnail-bg-color="expl.thumbnail_bg_color">
-                  </exploration-summary-tile>
-                </div>
-                <div ng-if="!userCreatedExplorations">
+                <exploration-summary-tile ng-repeat="expl in userCreatedExplorations"
+                    exploration-id="expl.id"
+                    exploration-title="expl.title"
+                    last-updated-msec="expl.last_updated_msec"
+                    objective="expl.objective"
+                    category="expl.category"
+                    ratings="expl.ratings"
+                    thumbnail-icon-url="expl.thumbnail_icon_url"
+                    thumbnail-bg-color="expl.thumbnail_bg_color">
+                </exploration-summary-tile>
+                <div ng-if="userCreatedExplorations.length === 0">
                   <em>This user hasn't created any explorations yet.</em>
                 </div>
               </md-content>
             </md-tab>
             <md-tab label="Edited Explorations">
               <md-content class="md-padding">
-                <h1 class="md-display-2">Edited Explorations</h1>
-                <div ng-if="userEditedExplorations">
-                  <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
-                      exploration-id="expl.id"
-                      exploration-title="expl.title"
-                      last-updated-msec="expl.last_updated_msec"
-                      objective="expl.objective"
-                      category="expl.category"
-                      ratings="expl.ratings"
-                      thumbnail-icon-url="expl.thumbnail_icon_url"
-                      thumbnail-bg-color="expl.thumbnail_bg_color">
-                  </exploration-summary-tile>
-                </div>
-                <div ng-if="!userEditedExplorations">
+                <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
+                    exploration-id="expl.id"
+                    exploration-title="expl.title"
+                    last-updated-msec="expl.last_updated_msec"
+                    objective="expl.objective"
+                    category="expl.category"
+                    ratings="expl.ratings"
+                    thumbnail-icon-url="expl.thumbnail_icon_url"
+                    thumbnail-bg-color="expl.thumbnail_bg_color">
+                </exploration-summary-tile>
+                <div ng-if="userEditedExplorations.length === 0">
                   <em>This user hasn't edited any explorations yet.</em>
                 </div>
                 </p>

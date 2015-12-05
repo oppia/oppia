@@ -104,16 +104,32 @@ body {
   width: 100%;
 }
 
-/* Special settings for world-viewable profile page*/
-.oppia-profile-container {
+.oppia-profile-container, .oppia-dashboard-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 60px;
   margin-bottom: 30px;
+}
+
+.oppia-profile-subject-interest {
+  background-color: rgba(0, 150, 136, 0.85);
+  border-radius: .25em;
+  color: #fff;
+  display: inline;
+  font-size: 0.75em;
+  line-height: 1;
+  margin: 0 2px;
+  padding: .3em .35em .3em .5em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
 }
 
 .oppia-profile-picture-fullsize {
   /* This maintains the aspect ratio of the picture. */
   height: auto;
-  width: 180px;
+  max-width: 100%;
 }
 
 .oppia-profile-username {
@@ -139,11 +155,18 @@ body {
 
 .oppia-profile-tabs md-tab {
   background-color: #009688;
+  border: 1px solid #707b7a;
 }
 
 .oppia-profile-tabs md-tabs-ink-bar {
- background: #cccccc !important;
- height: 3px;
+  background: #cccccc !important;
+  /* Without this, the ink bar does not show up on initial load. */
+  /* TODO(sll): Find a better fix for this. The current fix has an
+    ink bar that is too large on small-width screens.
+  */
+  display: block !important;
+  height: 8px;
+  width: 266px;
 }
 
 .oppia-profile-tabs md-tab-label {
@@ -2123,14 +2146,6 @@ div#ng-curtain {
 }
 .oppia-page-card li {
   margin-bottom: 10px;
-}
-
-.oppia-dashboard-container {
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 60px;
-  margin-bottom: 30px;
 }
 
 .oppia-notifications-dashboard-card {
