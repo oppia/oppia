@@ -597,6 +597,11 @@ textarea {
   display: block;
 }
 
+.oppia-top-right-menu-item-separator {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
 .oppia-share-dropdown-menu {
   min-width: 30px;
   width: 46px;
