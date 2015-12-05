@@ -34,7 +34,7 @@ class ContainsAtLeastOneOf(base.SetOfHtmlStringRule):
     is_generic = False
 
     def _evaluate(self, subject):
-        return any( e in self.x for e in subject)
+        return any([e in self.x for e in subject])
 
 
 # TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf
@@ -43,4 +43,4 @@ class DoesNotContainAtLeastOneOf(base.SetOfHtmlStringRule):
     is_generic = False
 
     def _evaluate(self, subject):
-        return any( e not in subject for e in self.x)
+        return any([e not in subject for e in self.x])

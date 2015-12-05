@@ -201,7 +201,7 @@ def _get_all_test_targets(test_path=None):
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
     for root in os.listdir(base_path):
-        if any( s in root for s in ['.git', 'third_party', 'core/tests']):
+        if any([s in root for s in ['.git', 'third_party', 'core/tests']]):
             continue
         if root.endswith('_test.py'):
             result.append(_convert_to_test_target(

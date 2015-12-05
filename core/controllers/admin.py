@@ -100,8 +100,9 @@ class AdminPage(base.BaseHandler):
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
         for job in unfinished_job_data:
-            job['can_be_canceled'] = job['is_cancelable'] and any( klass.__name__ == job['job_type']
-                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS)
+            job['can_be_canceled'] = job['is_cancelable'] and any([
+                klass.__name__ == job['job_type']
+                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS])
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])

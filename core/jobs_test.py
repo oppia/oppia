@@ -558,8 +558,9 @@ class JobRegistryTests(test_utils.GenericTestBase):
             # that are added to this list.
             ALLOWED_BASE_BATCH_JOB_CLASSES = [
                 jobs.BaseMapReduceJobManagerForContinuousComputations]
-            self.assertTrue(any(issubclass(klass._get_batch_job_manager_class(), superclass)
-                for superclass in ALLOWED_BASE_BATCH_JOB_CLASSES))
+            self.assertTrue(any([
+                issubclass(klass._get_batch_job_manager_class(), superclass)
+                for superclass in ALLOWED_BASE_BATCH_JOB_CLASSES]))
 
 
 class JobQueriesTests(test_utils.GenericTestBase):

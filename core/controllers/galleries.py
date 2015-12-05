@@ -243,7 +243,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
-        if (not isinstance(exp_ids, list) or not all( isinstance(exp_id, basestring) for exp_id in exp_ids)):
+        if (not isinstance(exp_ids, list) or not all([
+                isinstance(exp_id, basestring) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         exp_summaries = exp_services.get_exploration_summaries_matching_ids(

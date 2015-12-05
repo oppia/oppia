@@ -106,7 +106,7 @@ def parse_string(string, params, autoescape=True):
         raise Exception('Unable to parse string with Jinja: %s' % string)
 
     variables = meta.find_undeclared_variables(parsed_string)
-    if any( var not in params for var in variables):
+    if any([var not in params for var in variables]):
         logging.info('Cannot parse %s fully using %s', string, params)
 
     try:

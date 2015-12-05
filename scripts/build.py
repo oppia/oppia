@@ -89,7 +89,7 @@ process_third_party_libs()
 
 
 for root in os.listdir(os.path.join(os.getcwd())):
-    if any( s in root for s in ['.git', 'third_party', 'extensions']):
+    if any([s in root for s in ['.git', 'third_party', 'extensions']]):
         continue
 
     print('Processing %s' % os.path.join(os.getcwd(), root))
