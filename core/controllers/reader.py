@@ -170,8 +170,8 @@ def classify(exp_id, state, answer, params):
     if best_matched_answer_group is None:
         for (answer_group_index, answer_group) in enumerate(
                 state.interaction.answer_groups):
-            fuzzy_rule_spec_index, fuzzy_rule_spec =
-                answer_group.get_fuzzy_rule_spec()
+            fuzzy_rule_spec_index, fuzzy_rule_spec = (
+                answer_group.get_fuzzy_rule_spec())
             if fuzzy_rule_spec is not None:
                 evaluated_truth_value = rule_domain.evaluate_rule(
                     fuzzy_rule_spec, input_type, params, normalized_answer, fs)
@@ -191,8 +191,8 @@ def classify(exp_id, state, answer, params):
         training_examples = [[doc, []] for doc in
             state.interaction.confirmed_unclassified_answers]
         for (answer_group_index, answer_group) in enumerate(state.interaction.answer_groups):
-            fuzzy_rule_spec_index, fuzzy_rule_spec =
-                answer_group.get_fuzzy_rule_spec()
+            fuzzy_rule_spec_index, fuzzy_rule_spec = (
+                answer_group.get_fuzzy_rule_spec())
             if fuzzy_rule_spec is not None:
                 training_examples.extend(
                     [[doc, [str(answer_group_index)]] for doc in
@@ -226,7 +226,7 @@ def classify(exp_id, state, answer, params):
             'outcome': best_matched_answer_group.outcome.to_dict(),
             'answer_group_index': best_matched_answer_group_index,
             'classification_certainty': best_matched_truth_value,
-            'matched_rule_type': matched_rule_type
+            'matched_rule_type': matched_rule_type,
             'rule_spec_index': best_matched_rule_spec_index,
         }
     elif state.interaction.default_outcome is not None:
@@ -234,7 +234,7 @@ def classify(exp_id, state, answer, params):
             'outcome': state.interaction.default_outcome.to_dict(),
             'answer_group_index': len(state.interaction.answer_groups),
             'classification_certainty': 0.0,
-            'matched_rule_type': matched_rule_type
+            'matched_rule_type': matched_rule_type,
             'rule_spec_index': 0
         }
 

@@ -165,25 +165,27 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         """
         self.init_player(
             '16', 'Testing String Classifier', 'do you think three things can')
-        self.submit_and_compare('Because you can arrange each colour '
-            'systematically and there are two permutations of each colour',
-            'Detected permutation', 'do you think three things can')
-        self.submit_and_compare('Because these are the number of '
-            'combinations...', 'Detected combination',
+        self.submit_and_compare(
+            'Because you can arrange each colour systematically and there are '
+            'two permutations of each colour', 'Detected permutation',
             'do you think three things can')
-        self.submit_and_compare('First ball can be of any color among three '
-            '(for that we have three ways), after the first ball has been '
-            'selected two balls are there of remaining two colors. Now second '
-            'ball can be selected of any color among the remaining two (for '
-            'that there are two ways), now the remaining ball is the last '
-            'ball of remaining color (for that we have only one way). Now we '
-            'have to multiply the ways because the events were independent. '
+        self.submit_and_compare(
+            'Because these are the number of combinations...',
+            'Detected combination', 'do you think three things can')
+        self.submit_and_compare(
+            'First ball can be of any color among three (for that we have '
+            'three ways), after the first ball has been selected two balls '
+            'are there of remaining two colors. Now second ball can be '
+            'selected of any color among the remaining two (for that there '
+            'are two ways), now the remaining ball is the last ball of '
+            'remaining color (for that we have only one way). Now we have to '
+            'multiply the ways because the events were independent. '
             'Eventually we get the answer as 3*2*1=6.',
             'Detected factorial', 'do you think three things can')
-        self.submit_and_compare('Ryb rby etc',
-            'Detected listing', 'do you think three things can')
-        self.submit_and_compare('doont know',
-            'Detected unsure', 'do you think three things can')
+        self.submit_and_compare(
+            'Ryb rby etc', 'Detected listing', 'do you think three things can')
+        self.submit_and_compare(
+            'doont know', 'Detected unsure', 'do you think three things can')
 
     def test_string_classifier_classification(self):
         """Tests the string classifier exploration with responses that
@@ -192,15 +194,19 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.init_player(
             '16', 'Testing String Classifier', 'do you think three things can')
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.submit_and_compare('it\'s a permutation of 3 elements',
-                'Detected permutation', 'do you think three things can')
-            self.submit_and_compare('There are 3 options for the first ball, '
-                'and 2 for the remaining two. So 3*2=6.', 'Detected '
-                'factorial', 'do you think three things can')
-            self.submit_and_compare('abc acb bac bca cbb cba',
-                'Detected listing', 'do you think three things can')
-            self.submit_and_compare('dunno, just guessed',
-                'Detected unsure', 'do you think three things can')
+            self.submit_and_compare(
+                'it\'s a permutation of 3 elements', 'Detected permutation',
+                'do you think three things can')
+            self.submit_and_compare(
+                'There are 3 options for the first ball, and 2 for the '
+                'remaining two. So 3*2=6.', 'Detected factorial',
+                'do you think three things can')
+            self.submit_and_compare(
+                'abc acb bac bca cbb cba', 'Detected listing',
+                'do you think three things can')
+            self.submit_and_compare(
+                'dunno, just guessed', 'Detected unsure',
+                'do you think three things can')
 
     def test_binary_search(self):
         """Test the binary search (lazy magician) exploration."""
@@ -253,96 +259,91 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
 
     Since the end to end tests cover correct classification,
     ReaderClassifyTests is only checking which of the hard/soft/classifier
-    rules triggered on an input.
+    rules is classified on input.
     """
 
     def setUp(self):
         super(ReaderClassifyTests, self).setUp()
-        self.init_classify_inputs('16')
+        self._init_classify_inputs('16')
 
-    def init_classify_inputs(self, exploration_id):
-        exp_services.delete_demo(exploration_id)
-        exp_services.load_demo(exploration_id)
+    def _init_classify_inputs(self, exploration_id):
+        exploration = exp_services.load_demo(exploration_id)
 
         self.EXP_ID = exploration_id
-        self.EXP_STATE = (
-            exp_services.get_exploration_by_id(exploration_id).states['Home'])
+        self.EXP_STATE = exploration.states['Home']
 
-    def determine_triggering_rule(self, answer):
-        response = reader.classify(self.EXP_ID, self.EXP_STATE, answer,
-            {'answer': answer})
+    def _get_classiying_rule_type(self, answer):
+        response = reader.classify(
+            self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
         return response['matched_rule_type']
 
-    def test_hard_triggers(self):
-        """All these responses trigger the hard classifier.
+    def test_hard_rule_classification(self):
+        """All of these responses are classified by the hard classifier.
 
-        Note: Any response beginning with 'hardrule' is a hard rule
-        triggering.
+        Note: Any response beginning with 'hardrule' will result in
+        reader.classify selecting a hard rule.
         """
         self.assertEquals(
-            self.determine_triggering_rule('permutations'),
+            self._get_classiying_rule_type('permutations'),
             'hard')
         self.assertEquals(
-            self.determine_triggering_rule('hardrule0'),
+            self._get_classiying_rule_type('hardrule0'),
             'hard')
         self.assertEquals(
-            self.determine_triggering_rule('hardrule3'),
+            self._get_classiying_rule_type('hardrule3'),
             'hard')
         self.assertEquals(
-            self.determine_triggering_rule('hardrule1254'),
+            self._get_classiying_rule_type('hardrule1254'),
             'hard')
         self.assertEquals(
-            self.determine_triggering_rule('exit'),
+            self._get_classiying_rule_type('exit'),
             'hard')
 
-    def test_soft_triggers(self):
+    def test_soft_rule_classification(self):
         """All these responses trigger the soft classifier."""
         self.assertEquals(
-            self.determine_triggering_rule('Combination 3 x 2 x 1'),
+            self._get_classiying_rule_type('Combination 3 x 2 x 1'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('bcse combinations'),
+            self._get_classiying_rule_type('bcse combinations'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('Because the answer is 3!'),
+            self._get_classiying_rule_type('Because the answer is 3!'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('3 balls time two time one'),
+            self._get_classiying_rule_type('3 balls time two time one'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('try all possible combinations'),
+            self._get_classiying_rule_type('try all possible combinations'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('rby, ryb, bry, byr, ybr, yrb'),
+            self._get_classiying_rule_type('rby, ryb, bry, byr, ybr, yrb'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('I dunno!'),
+            self._get_classiying_rule_type('I dunno!'),
             'soft')
         self.assertEquals(
-            self.determine_triggering_rule('I guessed.'),
+            self._get_classiying_rule_type('I guessed.'),
             'soft')
 
-    def test_classify_triggers(self):
+    def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
             self.assertEquals(
-                self.determine_triggering_rule('it\'s a permutation of 3 '
-                    'elements'),
-                'classifier'
-                )
+                self._get_classiying_rule_type(
+                    'it\'s a permutation of 3 elements'),
+                'classifier')
             self.assertEquals(
-                self.determine_triggering_rule('There are 3 options for the '
-                    'first ball, and 2 for the remaining two. So 3*2=6.'),
-                'classifier'
-                )
+                self._get_classiying_rule_type(
+                    'There are 3 options for the first ball, and 2 for the '
+                    'remaining two. So 3*2=6.'),
+                'classifier')
             self.assertEquals(
-                self.determine_triggering_rule('abc acb bac bca cbb cba'),
-                'classifier'
-                )
+                self._get_classiying_rule_type('abc acb bac bca cbb cba'),
+                'classifier')
             self.assertEquals(
-                self.determine_triggering_rule('dunno, just guessed'),
-                'classifier'
-                )
+                self._get_classiying_rule_type('dunno, just guessed'),
+                'classifier')
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
