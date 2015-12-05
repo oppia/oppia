@@ -24,52 +24,26 @@ from extensions.rules import base
 class Equals(base.RealRule):
     description = 'is equal to {{x|Real}}'
 
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(subject == self.x)
-
 
 class IsLessThan(base.RealRule):
     description = 'is less than {{x|Real}}'
-
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(subject < self.x)
 
 
 class IsGreaterThan(base.RealRule):
     description = 'is greater than {{x|Real}}'
 
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(subject > self.x)
-
 
 class IsLessThanOrEqualTo(base.RealRule):
     description = 'is less than or equal to {{x|Real}}'
-
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(subject <= self.x)
 
 
 class IsGreaterThanOrEqualTo(base.RealRule):
     description = 'is greater than or equal to {{x|Real}}'
 
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(subject >= self.x)
-
 
 class IsInclusivelyBetween(base.RealRule):
     description = 'is between {{a|Real}} and {{b|Real}}, inclusive'
 
-    def _validate_params(self):
-        assert self.a <= self.b
-
-    def _evaluate(self, subject):
-        return self._fuzzify_truth_value(self.a <= subject <= self.b)
-
 
 class IsWithinTolerance(base.RealRule):
     description = 'is within {{tol|Real}} of {{x|Real}}'
-
-    def _evaluate(self, subject):
-        return IsInclusivelyBetween(
-            self.x - self.tol, self.x + self.tol
-        )._evaluate(subject)
