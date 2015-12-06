@@ -58,7 +58,6 @@ install:
 # Needed for e2e tests to work. See https://github.com/nodejs/nan/issues/435
 - export CXX=g++-4.8
 - $CXX --version
-- npm i
 
 script:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
