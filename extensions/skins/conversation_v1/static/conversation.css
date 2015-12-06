@@ -362,15 +362,19 @@ html, body {
 }
 
 div.conversation-skin-supplemental-card {
-  background-color: #fff;
-  box-shadow: none;
-  border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
-  padding: 8px;
   position: relative;
   right: 0;
   width: 600px;
+}
+
+.conversation-skin-supplemental-interaction-container {
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: none;
+  margin-bottom: 8px;
+  padding: 8px;
 }
 
 .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
