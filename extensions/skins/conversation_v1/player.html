@@ -115,7 +115,7 @@
                        angular-html-bind="activeCard.interactionHtml">
                   </div>
                 </div>
-                <div ng-if="!activeCard.interactionIsInline"
+                <div ng-if="!activeCard.interactionIsInline && canWindowFitTwoCards()"
                      ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
                      ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
                      style="opacity: 0.8;">
@@ -123,6 +123,15 @@
                     (<[activeCard.interactionInstructions]>)
                     <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
                   </button>
+		</div>
+		<div ng-if="!activeCard.interactionIsInline && !canWindowFitTwoCards()"
+                     ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
+                     ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
+                     style="opacity: 0.8;">
+                  <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button">
+                    (<[activeCard.interactionInstructions]>)
+                    <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+                  </md-button>
                 </div>
               </div>
             </div>
