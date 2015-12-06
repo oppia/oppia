@@ -7,7 +7,6 @@ module.exports = function(config) {
       'third_party/static/jquery-2.1.1/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.4.7/angular.js',
-      'third_party/static/angularjs-1.4.7/angular-mocks.js',
       'third_party/static/angularjs-1.4.7/angular-animate.js',
       'third_party/static/angularjs-1.4.7/angular-aria.js',
       'third_party/static/angularjs-1.4.7/angular-resource.js',

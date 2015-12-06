@@ -18,10 +18,29 @@
  */
 
 oppia.filter('oppiaInteractiveMathExpressionInputValidator', [
-    'baseInteractionValidationService', function(baseInteractionValidationService) {
+    'baseInteractionValidationService', 'WARNING_TYPES',
+    function(baseInteractionValidationService, WARNING_TYPES) {
   // Returns a list of warnings.
   return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    return baseInteractionValidationService.getAllOutcomeWarnings(
+    var warningsList = baseInteractionValidationService.getAllOutcomeWarnings(
       answerGroups, defaultOutcome, stateName);
+
+    // Check that each rule has a valid math expression.
+    for (var i = 0; i < answerGroups.length; i++) {
+      var ruleSpecs = answerGroups[i].rule_specs;
+      for (var j = 0; j < ruleSpecs.length; j++) {
+        try {
+          MathExpression.fromText(ruleSpecs[j].inputs.x);
+        } catch (e) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'The math expression used in rule ' + String(j + 1) +
+              ' in group ' + String(i + 1) + ' is invalid.')
+          });
+        }
+      }
+    }
+    return warningsList;
   };
 }]);

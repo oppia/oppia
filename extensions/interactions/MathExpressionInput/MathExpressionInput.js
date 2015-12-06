@@ -51,22 +51,38 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           });
 
           guppyInstance.done_callback = function() {
-            submitAnswerForEvaluation();
+            $scope.submitAnswer();
           };
 
-          var submitAnswerForEvaluation = function() {
-            var answer = {
-              ascii: Guppy.instances[guppyDivId].get_content('calc'),
-              latex: Guppy.instances[guppyDivId].get_content('latex')
-            };
+          var answer = {
+            ascii: '',
+            latex: ''
+          };
 
-            if (answer !== undefined && answer !== null) {
-              $scope.$parent.submitAnswer(
-                answer, mathExpressionInputRulesService);
+          $scope.isCurrentAnswerValid = function() {
+            var asciiAnswer = Guppy.instances[guppyDivId].get_content('calc');
+
+            try {
+              MathExpression.fromText(answer.ascii);
+            } catch (e) {
+              return false;
             }
+
+            return true;
           };
 
-          $scope.submitAnswer = submitAnswerForEvaluation;
+          $scope.submitAnswer = function() {
+            answer.ascii = Guppy.instances[guppyDivId].get_content('calc');
+            answer.latex = Guppy.instances[guppyDivId].get_content('latex');
+
+            if (answer === undefined || answer === null ||
+                !$scope.isCurrentAnswerValid()) {
+              return;
+            }
+
+            $scope.$parent.submitAnswer(
+              answer, mathExpressionInputRulesService);
+          };
         }
       ]
     };
