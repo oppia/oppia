@@ -8,26 +8,23 @@
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, softwar
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Configuration for JavaScript library dependencies."""
-
-__author__ = 'Sean Lip'
+from extensions.interactions import base
 
 
-# A dict mapping dependency ids to the Angular module names they
-# should insert when the Angular app is first initialized.
-DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
-    'codemirror': ['ui.codemirror'],
-    'google_maps': ['ui.map'],
-    'guppy': [],
-    'logic_proof': [],
-    'math_expressions': [],
-    'midijs': [],
-    'pencilcode': [],
-    'skulpt': [],
-}
+class MathExpressionInput(base.BaseInteraction):
+    """Interaction for math expression input."""
+
+    name = 'Math Expression Input'
+    description = 'Allows learners to enter mathematical expressions.'
+    display_mode = base.DISPLAY_MODE_INLINE
+    is_trainable = False
+    _dependency_ids = ['guppy', 'math_expressions']
+    answer_type = 'MathExpression'
+
+    _customization_arg_specs = []
