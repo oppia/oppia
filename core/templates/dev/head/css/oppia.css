@@ -104,33 +104,72 @@ body {
   width: 100%;
 }
 
-/* Special settings for world-viewable profile page*/
-.oppia-profile-container {
+.oppia-profile-container, .oppia-dashboard-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 60px;
   margin-bottom: 30px;
 }
 
+.oppia-profile-top-card {
+  background-color: #fff;
+  margin: 0 0 24px 0;
+  padding: 24px;
+}
+
+.oppia-profile-subject-interest-container {
+  font-weight: bold;
+  margin-top: 16px;
+}
+
+.oppia-profile-subject-interest {
+  background-color: rgba(0, 150, 136, 0.85);
+  border-radius: .25em;
+  color: #fff;
+  display: inline;
+  font-size: 0.75em;
+  line-height: 1;
+  margin: 0 2px;
+  padding: .3em .35em .3em .5em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.oppia-profile-no-interests-text {
+  color: #888;
+  font-weight: normal;
+}
+
 .oppia-profile-picture-fullsize {
   /* This maintains the aspect ratio of the picture. */
+  border-radius: 4px;
   height: auto;
-  width: 180px;
+  margin-bottom: 12px;
+  max-width: 180px;
+  width: 100%;
 }
 
 .oppia-profile-username {
-  margin-top: 15px;
+  margin-top: 4px;
 }
 
-.oppia-profile-tabs md-content {
-  background-color: white;
+.oppia-profile-first-contributed {
+  color: #888;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 16px;
 }
 
-.oppia-profile-tabs md-content md-tabs {
-  background: #f6f6f6;
-  border: 1px solid #e1e1e1;
+.oppia-profile-tabs {
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
 }
 
-.oppia-profile-tabs md-content md-tabs md-tabs-wrapper {
-  background: white;
+.oppia-profile-tabs-content {
+  padding: 24px 24px 48px 24px;
 }
 
 .oppia-profile-tabs md-content h1:first-child {
@@ -139,11 +178,22 @@ body {
 
 .oppia-profile-tabs md-tab {
   background-color: #009688;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.oppia-profile-tabs md-tabs.md-default-theme md-tab:focus {
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .oppia-profile-tabs md-tabs-ink-bar {
- background: #cccccc !important;
- height: 3px;
+  background: #0D47A1 !important;
+  /* Without this, the ink bar does not show up on initial load. */
+  /* TODO(sll): Find a better fix for this. The current fix has an
+    ink bar that is too large on small-width screens.
+  */
+  display: block !important;
+  height: 6px;
+  width: 266px;
 }
 
 .oppia-profile-tabs md-tab-label {
@@ -157,7 +207,6 @@ body {
 
 .oppia-stat-big-container {
   display: block;
-  margin-bottom: 50px;
   text-align: center;
   width: 100%;
 }
@@ -167,7 +216,24 @@ body {
 }
 
 .oppia-stat-container-top .oppia-big-number {
-  font-size: 50px;
+  font-size: 48px;
+}
+
+.oppia-profile-explorations-container {
+  margin: 0 auto;
+  width: 644px;
+}
+
+@media (max-width: 656px) {
+  .oppia-profile-explorations-container {
+    width: 428px;
+  }
+}
+
+@media (max-width: 460px) {
+  .oppia-profile-explorations-container {
+    width: 208px;
+  }
 }
 
 /*
@@ -2140,14 +2206,6 @@ div#ng-curtain {
 }
 .oppia-page-card li {
   margin-bottom: 10px;
-}
-
-.oppia-dashboard-container {
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 60px;
-  margin-bottom: 30px;
 }
 
 .oppia-notifications-dashboard-card {
