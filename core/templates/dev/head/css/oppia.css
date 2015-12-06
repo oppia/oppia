@@ -137,6 +137,11 @@ body {
   white-space: nowrap;
 }
 
+.oppia-profile-no-interests-text {
+  color: #888;
+  font-weight: normal;
+}
+
 .oppia-profile-picture-fullsize {
   /* This maintains the aspect ratio of the picture. */
   border-radius: 4px;

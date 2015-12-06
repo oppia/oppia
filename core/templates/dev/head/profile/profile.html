@@ -55,7 +55,7 @@
                 </span>
               </span>
             </span>
-            <span ng-if="!subjectInterests.length === 0">
+            <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
               <em>none specified</em>
             </span>
           </p>
@@ -124,7 +124,6 @@
               <div ng-if="userEditedExplorations.length === 0">
                 <em>This user hasn't edited any explorations yet.</em>
               </div>
-              </p>
             </md-content>
           </md-tab>
         </md-tabs>
