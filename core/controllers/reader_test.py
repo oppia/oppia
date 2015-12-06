@@ -21,6 +21,8 @@ import os
 from core.controllers import reader
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import param_domain
 from core.tests import test_utils
@@ -162,55 +164,6 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             'Finnish', 'Yes! Oppia is the Finnish word for learn.',
             'What is the value of')
 
-    def test_soft_classification(self):
-        """Tests the string classifier exploration with responses that
-        trigger soft rules.
-        """
-        self.init_player(
-            '16', 'Testing String Classifier', 'do you think three things can')
-        self.submit_and_compare(
-            'Because you can arrange each colour systematically and there are '
-            'two permutations of each colour', 'Detected permutation',
-            'do you think three things can')
-        self.submit_and_compare(
-            'Because these are the number of combinations...',
-            'Detected combination', 'do you think three things can')
-        self.submit_and_compare(
-            'First ball can be of any color among three (for that we have '
-            'three ways), after the first ball has been selected two balls '
-            'are there of remaining two colors. Now second ball can be '
-            'selected of any color among the remaining two (for that there '
-            'are two ways), now the remaining ball is the last ball of '
-            'remaining color (for that we have only one way). Now we have to '
-            'multiply the ways because the events were independent. '
-            'Eventually we get the answer as 3*2*1=6.',
-            'Detected factorial', 'do you think three things can')
-        self.submit_and_compare(
-            'Ryb rby etc', 'Detected listing', 'do you think three things can')
-        self.submit_and_compare(
-            'doont know', 'Detected unsure', 'do you think three things can')
-
-    def test_string_classifier_classification(self):
-        """Tests the string classifier exploration with responses that
-        trigger the string classifier.
-        """
-        self.init_player(
-            '16', 'Testing String Classifier', 'do you think three things can')
-        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.submit_and_compare(
-                'it\'s a permutation of 3 elements', 'Detected permutation',
-                'do you think three things can')
-            self.submit_and_compare(
-                'There are 3 options for the first ball, and 2 for the '
-                'remaining two. So 3*2=6.', 'Detected factorial',
-                'do you think three things can')
-            self.submit_and_compare(
-                'abc acb bac bca cbb cba', 'Detected listing',
-                'do you think three things can')
-            self.submit_and_compare(
-                'dunno, just guessed', 'Detected unsure',
-                'do you think three things can')
-
     def test_binary_search(self):
         """Test the binary search (lazy magician) exploration."""
         self.init_player(
@@ -284,9 +237,38 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _get_classiying_rule_type(self, answer):
-        response = reader.classify(
-            self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
-        return response['matched_rule_type']
+        interaction_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.EXP_STATE.interaction.id))
+        normalized_answer = interaction_instance.normalize_answer(answer)
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        input_type = interaction_instance.answer_type
+
+        response = reader.classify_hard_rule(
+            self.EXP_STATE, {'answer': answer},
+            input_type, normalized_answer, fs)
+
+        if response is not None:
+            return 'hard'
+        else:
+            response = reader.classify_soft_rule(
+                self.EXP_STATE, {'answer': answer},
+                input_type, normalized_answer, fs)
+
+        if not (feconf.ENABLE_STRING_CLASSIFIER and response is None):
+            return 'soft'
+        else:
+            response = reader.classify_string_classifier_rule(
+                self.EXP_STATE, {'answer': answer},
+                input_type, normalized_answer, fs)
+
+        if response is not None:
+            return 'classifier'
+
+        # Note: this should not happen for the existing test cases
+        return None
 
     def test_hard_rule_classification(self):
         """All of these responses are classified by the hard classifier.

@@ -110,5 +110,3 @@ libraries:
   version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
-- name: numpy
-  version: '1.6.1'

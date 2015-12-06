@@ -565,14 +565,14 @@ class AnswerGroup(object):
 
         self.outcome.validate()
 
-    def get_fuzzy_rule_spec(self):
-        """Will return the answer group's fuzzy rule with its index, or a tuple
-        of (None, None) if it doesn't exist.
+    def get_fuzzy_rule_index(self):
+        """Will return the answer group's fuzzy rule index, or None if it
+        doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
             if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
-                return (rule_spec_index, rule_spec)
-        return (None, None)
+                return rule_spec_index
+        return None
 
 
 class TriggerInstance(object):
