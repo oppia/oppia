@@ -6,12 +6,12 @@
     <defs></defs>
     <g id="Gallery-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
         <g id="Mathematics" sketch:type="MSArtboardGroup" font-weight="normal" font-family="Minion Pro" fill="#FFFFFF" sketch:alignment="middle">
-            <g id="x-+-2" sketch:type="MSLayerGroup" transform="translate(10.000000, 3.000000)">
-                <text id="x" sketch:type="MSTextLayer" font-size="48">
-                    <tspan x="0.672" y="35">x</tspan>
+            <g id="x-+-2" sketch:type="MSLayerGroup" transform="translate(9.000000, 3.000000)">
+                <text id="x" sketch:type="MSTextLayer" font-size="48" font-style="italic">
+                    <tspan x="0.648" y="35">x</tspan>
                 </text>
-                <text id="2" sketch:type="MSTextLayer" font-size="16">
-                    <tspan x="25.66" y="15">2</tspan>
+                <text id="2" sketch:type="MSTextLayer" font-size="18">
+                    <tspan x="26.18" y="16">2</tspan>
                 </text>
             </g>
         </g>
