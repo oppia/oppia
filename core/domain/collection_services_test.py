@@ -663,6 +663,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
+        self.assertEqual(retrieved_collection_summary.contributor_ids, [self.OWNER_ID])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
