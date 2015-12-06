@@ -29,6 +29,16 @@ notifications:
     on_success: change
     on_failure: change
 
+# This section is needed for e2e tests to work -- it seems to be a problem with
+# nan, which is needed when installing selenium-webdriver.
+# See https://github.com/nodejs/nan/issues/435
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+
 before_install:
 - pip install codecov
 - export CHROME_BIN=chromium-browser
@@ -45,6 +55,10 @@ install:
   -o gae-download.zip
 - unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
 - rm gae-download.zip
+# Needed for e2e tests to work. See https://github.com/nodejs/nan/issues/435
+- export CXX=g++-4.8
+- $CXX --version
+- npm i
 
 script:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
