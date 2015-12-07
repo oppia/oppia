@@ -39,10 +39,9 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
-            split_id = item.id.rsplit('-')
             yield (item.committer_id, {
-                'version_string': split_id[1],
-                'exploration_id': split_id[0]
+                'exploration_id': item.get_unversioned_instance_id(),
+                'version_string': item.get_version_string(),
             })
 
     @staticmethod

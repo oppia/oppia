@@ -44,8 +44,8 @@ oppia.directive('explorationSummaryTile', [function() {
           oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec()));
 
-        $scope.averageRating = ratingComputationService.computeAverageRating(
-          $scope.getRatings());
+        $scope.averageRating = (
+          ratingComputationService.computeAverageRating($scope.getRatings()));
 
         $scope.explorationLink = '/explore/' + $scope.getExplorationId();
         if ($scope.getCollectionId()) {

@@ -171,7 +171,7 @@ MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
 DEFAULT_SIGNOFF_HTML_FN = (
-    lambda sender_username: 'Thanks,<br>%s' % sender_username)
+    lambda sender_username: 'Thanks!<br>%s (Oppia moderator)' % sender_username)
 
 VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {

@@ -18,7 +18,6 @@ __author__ = 'Sean Lip'
 
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
-import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -461,6 +460,9 @@ class BaseSnapshotMetadataModel(BaseModel):
     def get_unversioned_instance_id(self):
         return self.id[:self.id.rfind(_VERSION_DELIMITER)]
 
+    def get_version_string(self):
+        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+
 
 class BaseSnapshotContentModel(BaseModel):
     """Base class for snapshot content classes.
@@ -475,6 +477,9 @@ class BaseSnapshotContentModel(BaseModel):
     # _get_snapshot_id in VersionedModel)
     def get_unversioned_instance_id(self):
         return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+
+    def get_version_string(self):
+        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
 
 
 class BaseMapReduceBatchResultsModel(BaseModel):

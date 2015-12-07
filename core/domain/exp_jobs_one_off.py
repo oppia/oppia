@@ -81,9 +81,11 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(exp_id, committer_id_list):
-        committer_ids = set(committer_id_list)
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
-        exp_summary_model.contributor_ids = list(committer_ids)
+        if exp_summary_model is None:
+            return
+
+        exp_summary_model.contributor_ids = list(set(committer_id_list))
         exp_summary_model.put()
 
 
