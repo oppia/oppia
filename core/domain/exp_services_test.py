@@ -2149,8 +2149,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        exploration_1 = self.save_new_valid_exploration(
-            self.EXP_ID_1, self.ALBERT_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.ALBERT_ID)
 
         exp_services.update_exploration(
             self.BOB_ID, self.EXP_ID_1, [{
@@ -2159,8 +2158,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
 
-        exploration_2 = self.save_new_valid_exploration(
-            self.EXP_ID_2, self.ALBERT_ID)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.ALBERT_ID)
 
         exp_services.update_exploration(
             self.ALBERT_ID, self.EXP_ID_1, [{
@@ -2184,14 +2182,11 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
 
-        exploration_3 = self.save_new_valid_exploration(
-            self.EXP_ID_3, self.ALBERT_ID)
-
+        self.save_new_valid_exploration(self.EXP_ID_3, self.ALBERT_ID)
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_3)
-
         exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_3)
 
-    def test_get_displayable_exploration_summary_dicts_matching_ids(self):
+    def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration
         # EXP_ID_2 -- pubished exploration
@@ -2199,21 +2194,21 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         # Should only return [EXP_ID_2]
 
         displayable_summaries = (
-            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
+            exp_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
 
         self.assertEqual(len(displayable_summaries), 1)
         self.assertEqual(
             displayable_summaries[0]['id'], self.EXP_ID_2)
         self.assertEqual(
-            displayable_summaries[0]['status'], 
+            displayable_summaries[0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
         self.assertEqual(
             displayable_summaries[0]['community_owned'], False)
         self.assertEqual(
             displayable_summaries[0]['is_editable'], True)
         self.assertEqual(
-            displayable_summaries[0]['language_code'], 
+            displayable_summaries[0]['language_code'],
             feconf.DEFAULT_LANGUAGE_CODE)
         self.assertEqual(
             displayable_summaries[0]['category'], 'A category')
