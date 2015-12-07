@@ -1660,12 +1660,12 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.ALBERT_ID, self.COLLECTION_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
         # Verify that only Albert and Bob are listed as contributors for the
-        # exploration.
+        # collection.
         collection_summary = collection_services.get_collection_summary_by_id(
             self.COLLECTION_ID)
-        self.assertEqual(collection_summary.contributor_ids,
+        self.assertEqual(
+            collection_summary.contributor_ids,
             [self.ALBERT_ID, self.BOB_ID])
-
 
 
 class CollectionSummaryGetTests(CollectionServicesUnitTests):
