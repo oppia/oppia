@@ -373,7 +373,7 @@
 
         {% if can_publicize %}
           <p ng-show="explorationRightsService.isPublic()">
-            <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+            <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Mark "featured"
               <span ng-if="currentUserIsAdmin">(as admin)</span>
               <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
@@ -383,7 +383,7 @@
 
         {% if can_unpublicize %}
           <p ng-show="explorationRightsService.isPublicized()">
-            <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+            <button type="button" class="btn btn-default" ng-click="unpublicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Remove "featured" status
               <span ng-if="currentUserIsAdmin">(as admin)</span>
               <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
@@ -393,7 +393,7 @@
 
         {% if can_unpublish %}
           <p ng-show="explorationRightsService.isPublic()">
-            <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
+            <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Unpublish
               <span ng-if="currentUserIsAdmin">(as admin)</span>
               <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
@@ -474,6 +474,43 @@
   <div class="modal-footer">
     <button class="btn btn-success" ng-click="transfer()">Transfer Ownership</button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/takeModeratorAction">
+  <div class="modal-header">
+    <h3 ng-if="action === 'unpublish_exploration'">Unpublish exploration (as moderator)</h3>
+    <h3 ng-if="action === 'publicize_exploration'">Feature exploration (as moderator)</h3>
+  </div>
+
+  <div class="modal-body">
+    <p ng-if="action === 'unpublish_exploration'">
+      You are about to unpublish this exploration.
+    </p>
+    <p ng-if="action === 'publicize_exploration'">
+      You are about to feature this exploration in the gallery.
+    </p>
+
+    <div ng-if="willEmailBeSent">
+      <br>
+      <p>
+        Doing so will send the following email to all exploration owners;
+        please edit it as needed. (NB: do not include a salutation or a
+        signoff -- the text "Hi [username]" and "Thanks, [your username]" will
+        be auto-added.)
+      </p>
+
+      <schema-based-editor schema="EMAIL_BODY_SCHEMA" local-value="$parent.emailBody">
+      </schema-based-editor>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success" ng-click="reallyTakeAction()">
+      <span ng-if="action === 'unpublish_exploration'">Unpublish Exploration</span>
+      <span ng-if="action === 'publicize_exploration'">Feature Exploration</span>
+    </button>
   </div>
 </script>
 

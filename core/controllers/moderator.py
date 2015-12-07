@@ -19,6 +19,7 @@ __author__ = 'yanamal@google.com (Yana Malysheva)'
 import logging
 
 from core.controllers import base
+from core.domain import email_manager
 from core.domain import user_services
 
 
@@ -48,4 +49,16 @@ class UserServiceHandler(base.BaseHandler):
 
         self.render_json({
             'user_email': user_services.get_email_from_username(username),
+        })
+
+
+class EmailDraftHandler(base.BaseHandler):
+    """Provide default email templates for moderator emails."""
+
+    @base.require_moderator
+    def get(self, action):
+        """Handles GET requests."""
+        self.render_json({
+            'draft_email_body': (
+                email_manager.get_draft_moderator_action_email(action)),
         })

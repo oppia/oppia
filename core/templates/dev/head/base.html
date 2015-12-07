@@ -161,6 +161,12 @@
                             </a>
                             <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                                  <strong>{{username}}</strong>
+                                </a>
+                              </li>
+                              <hr class="oppia-top-right-menu-item-separator">
+                              <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
                                   My Explorations
                                 </a>
@@ -191,6 +197,7 @@
                                   </a>
                                 </li>
                               {% endif %}
+                              <hr class="oppia-top-right-menu-item-separator">
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
                               </li>
@@ -240,7 +247,7 @@
 
       {% if DEV_MODE %}
         <div class="oppia-dev-mode">
-          Development Mode
+          Dev Mode
         </div>
       {% endif %}
 
@@ -257,6 +264,8 @@
     {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
+    {% include 'components/exploration_summary_tile.html' %}
+    {% include 'components/ratings.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -272,6 +281,8 @@
       {{ include_js_file('/expressions/evaluator.js') }}
       {{ include_js_file('/expressions/parser.js') }}
       {{ include_js_file('components/objectEditor.js') }}
+      {{ include_js_file('components/ratings.js')}}
+      {{ include_js_file('components/explorationSummaryTile.js') }}
       {{ OBJECT_EDITORS_JS }}
     </script>
 

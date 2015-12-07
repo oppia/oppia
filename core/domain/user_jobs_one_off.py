@@ -17,12 +17,55 @@
 import ast
 
 from core import jobs
+from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import user_services
 from core.platform import models
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
+import utils
+
+
+class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for creating and populating UserContributionsModels for
+    all registered users that have contributed.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
+            split_id = item.id.rsplit('-')
+            yield (item.committer_id, {
+                'version_string': split_id[1],
+                'exploration_id': split_id[0]
+            })
+
+    @staticmethod
+    def reduce(key, version_and_exp_ids):
+
+        created_exploration_ids = set()
+        edited_exploration_ids = set()
+
+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]
+
+        for edit in edits:
+            edited_exploration_ids.add(edit['exploration_id'])
+            if edit['version_string'] == '1':
+                created_exploration_ids.add(edit['exploration_id'])
+
+        if user_services.get_user_contributions(key, strict=False) is not None:
+            user_services.update_user_contributions(
+                key, list(created_exploration_ids), list(
+                    edited_exploration_ids))
+        else:
+            user_services.create_user_contributions(
+                key, list(created_exploration_ids), list(
+                    edited_exploration_ids))
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
@@ -130,3 +173,41 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_exploration(key, item['id'])
             elif item['type'] == 'collection':
                 subscription_services.subscribe_to_collection(key, item['id'])
+
+
+class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that updates first contribution time in milliseconds for
+    current users. This job makes the assumption that once an exploration is
+    published, it remains published. This job is not completely precise in that
+    (1) we ignore explorations that have been published in the past but are now
+    unpublished, and (2) commits that were made during an interim unpublished
+    period are counted against the first publication date instead of the second
+    publication date.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(item):
+        exp_id = item.get_unversioned_instance_id()
+        exp_first_published_msec = rights_manager.get_exploration_rights(
+            exp_id).first_published_msec
+        # First contribution time in msec is only set from contributions to
+        # explorations that are currently published.
+        if not rights_manager.is_exploration_private(exp_id):
+            created_on_msec = utils.get_time_in_millisecs(item.created_on)
+            yield (
+                item.committer_id,
+                max(exp_first_published_msec, created_on_msec)
+            )
+
+    @staticmethod
+    def reduce(user_id, stringified_commit_times_msec):
+        commit_times_msec = [
+            ast.literal_eval(commit_time_string) for
+            commit_time_string in stringified_commit_times_msec]
+        first_contribution_msec = min(commit_times_msec)
+        user_services.update_first_contribution_msec_if_not_set(
+            user_id, first_contribution_msec)

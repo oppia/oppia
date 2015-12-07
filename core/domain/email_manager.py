@@ -36,6 +36,13 @@ import feconf
 # Stub for logging.error(), so that it can be swapped out in tests.
 log_new_error = logging.error
 
+EMAIL_HTML_BODY_SCHEMA = {
+    'type': 'unicode',
+    'ui_config': {
+        'rows': 20,
+    }
+}
+
 EMAIL_CONTENT_SCHEMA = {
     'type': 'dict',
     'properties': [{
@@ -45,12 +52,7 @@ EMAIL_CONTENT_SCHEMA = {
         },
     }, {
         'name': 'html_body',
-        'schema': {
-            'type': 'unicode',
-            'ui_config': {
-                'rows': 20,
-            }
-        }
+        'schema': EMAIL_HTML_BODY_SCHEMA,
     }],
 }
 
@@ -63,31 +65,44 @@ EMAIL_FOOTER = config_domain.ConfigProperty(
     'HTML and include an unsubscribe link.)',
     'You can unsubscribe from these emails from the '
     '<a href="https://www.example.com">Preferences</a> page.')
-# NOTE TO DEVELOPERS: post-signup emails will not be sent if this placeholder
-# is left unmodified. If this policy changes, this should be documented in the
-# wiki.
+
+_PLACEHOLDER_SUBJECT = 'THIS IS A PLACEHOLDER.'
+_PLACEHOLDER_HTML_BODY = 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
+
 SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
     'signup_email_content', EMAIL_CONTENT_SCHEMA,
     'Content of email sent after a new user signs up. (The email body should '
     'be written with HTML and not include a salutation or footer.) These '
     'emails are only sent if the functionality is enabled in feconf.py.',
     {
-        'subject': 'THIS IS A PLACEHOLDER.',
-        'html_body': 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.',
+        'subject': _PLACEHOLDER_SUBJECT,
+        'html_body': _PLACEHOLDER_HTML_BODY,
     })
-
+PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
+    'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
+    'Default content for the email sent after an exploration is publicized by '
+    'a moderator. These emails are only sent if the functionality is enabled '
+    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'Congratulations, your exploration has been featured in the gallery!')
+UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
+    'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
+    'Default content for the email sent after an exploration is unpublished by '
+    'a moderator. These emails are only sent if the functionality is enabled '
+    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'I\'m writing to inform you that I have unpublished the above '
+    'exploration.')
 
 SENDER_VALIDATORS = {
-    email_models.INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    email_models.INTENT_DAILY_BATCH: (
+    feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
+        lambda x: rights_manager.Actor(x).is_moderator()),
+    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
+        lambda x: rights_manager.Actor(x).is_moderator()),
+    feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    email_models.INTENT_MARKETING: (
+    feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
-    email_models.INTENT_PUBLICIZE_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
-    email_models.INTENT_UNPUBLISH_EXPLORATION: (
-        lambda x: rights_manager.Actor(x).is_moderator()),
-    email_models.INTENT_DELETE_EXPLORATION: (
+    feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
 }
 
@@ -105,7 +120,8 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 
 def _send_email(
-        recipient_id, sender_id, intent, email_subject, email_html_body):
+        recipient_id, sender_id, intent, email_subject, email_html_body,
+        cc_admin=False):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -134,7 +150,7 @@ def _send_email(
             EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
         email_services.send_mail(
             sender_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body)
+            cleaned_plaintext_body, cleaned_html_body, cc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -164,5 +180,66 @@ def send_post_signup_email(user_id):
         EMAIL_FOOTER.value)
 
     _send_email(
-        user_id, feconf.SYSTEM_COMMITTER_ID, email_models.INTENT_SIGNUP,
+        user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
         email_subject, email_body)
+
+
+def require_valid_intent(intent):
+    if intent not in feconf.VALID_MODERATOR_ACTIONS:
+        raise Exception('Unrecognized email intent: %s' % intent)
+
+
+def _get_email_config(intent):
+    require_valid_intent(intent)
+    return config_domain.Registry.get_config_property(
+        feconf.VALID_MODERATOR_ACTIONS[intent]['email_config'])
+
+
+def get_draft_moderator_action_email(intent):
+    """Returns a draft of the text of the body for an email sent immediately
+    following a moderator action.
+    """
+    require_moderator_email_prereqs_are_satisfied(intent)
+    return _get_email_config(intent).value
+
+
+def require_moderator_email_prereqs_are_satisfied(intent):
+    """Raises an exception if, for any reason, moderator emails cannot be sent.
+    """
+    if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+        raise Exception(
+            'For moderator emails to be sent, please ensure that '
+            'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.')
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        raise Exception(
+            'For moderator emails to be sent, please ensure that '
+            'CAN_SEND_EMAILS_TO_USERS is set to True.')
+
+
+def send_moderator_action_email(
+        sender_id, recipient_id, intent, exploration_title, email_body):
+    """Sends a email immediately following a moderator action (publicize,
+    unpublish, delete) to the given user.
+
+    The caller is responsible for ensuring that emails are allowed to be sent
+    to users (i.e. feconf.CAN_SEND_EMAILS_TO_USERS is True).
+    """
+    require_moderator_email_prereqs_are_satisfied(intent)
+    email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    sender_user_settings = user_services.get_user_settings(sender_id)
+    email_subject = feconf.VALID_MODERATOR_ACTIONS[intent]['email_subject_fn'](
+        exploration_title)
+    email_salutation_html = email_config['email_salutation_html_fn'](
+        recipient_user_settings.username)
+    email_signoff_html = email_config['email_signoff_html_fn'](
+        sender_user_settings.username)
+
+    full_email_content = (
+        '%s<br><br>%s<br><br>%s<br><br>%s' % (
+            email_salutation_html, email_body, email_signoff_html,
+            EMAIL_FOOTER.value))
+    _send_email(
+        recipient_id, sender_id, intent, email_subject, full_email_content,
+        cc_admin=True)
