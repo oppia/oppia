@@ -96,6 +96,22 @@ var getExplorationObjective = function(name) {
   });
 };
 
+var expectExplorationRatingToBeDisplayed = function(name) {
+  _getExplorationElements(name).then(function(elems) {
+    elems[0].element(by.css('.fa-star')).isDisplayed().then(function(displayed) {
+      expect(displayed).toBe(true);
+    });
+  });
+};
+
+var expectExplorationRatingToBeNotDisplayed = function(name) {
+  _getExplorationElements(name).then(function(elems) {
+    elems[0].all(by.css('.fa-star')).then(function(items) {
+      expect(items.length).toBe(0);
+    });
+  });
+};
+
 exports.selectLanguages = selectLanguages;
 exports.deselectLanguages = deselectLanguages;
 exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
@@ -107,3 +123,6 @@ exports.expectExplorationToBeVisible = expectExplorationToBeVisible;
 exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;
 exports.getExplorationObjective = getExplorationObjective;
+
+exports.expectExplorationRatingToBeDisplayed = expectExplorationRatingToBeDisplayed
+exports.expectExplorationRatingToBeNotDisplayed = expectExplorationRatingToBeNotDisplayed

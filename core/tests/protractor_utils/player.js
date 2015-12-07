@@ -110,6 +110,10 @@ var clickThroughToNextCard = function(interactionId, answerData) {
   element(by.css('.protractor-test-continue-to-next-card-button')).click();
 };
 
+var reviewExploration = function(stars) {
+  element(by.repeater('star in stars').row(stars - 1)).click();
+};
+
 var expectExplorationToBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
@@ -135,6 +139,7 @@ exports.expectInvisibleGadget = expectInvisibleGadget;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
 exports.clickThroughToNextCard = clickThroughToNextCard;
+exports.reviewExploration = reviewExploration;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
