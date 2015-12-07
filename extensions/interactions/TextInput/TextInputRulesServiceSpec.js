@@ -34,6 +34,7 @@ describe('Text Input rules service', function() {
     expect(tirs.Equals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('ABC def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('abc DeF', RULE_INPUT)).toBe(true);
+    expect(tirs.Equals(' abc   DeF ', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('', RULE_INPUT)).toBe(false);
     expect(tirs.Equals('abc', RULE_INPUT)).toBe(false);
   });
@@ -47,13 +48,17 @@ describe('Text Input rules service', function() {
     expect(tirs.FuzzyEquals('abcd def', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc defg', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('aBC DEfg', RULE_INPUT)).toBe(true);
+    expect(tirs.FuzzyEquals('aabc def', RULE_INPUT)).toBe(true);
+    expect(tirs.FuzzyEquals(' aBC  DEfg  ', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
+
   });
 
   it('should have a correct \'case sensitive equals\' rule', function() {
     expect(tirs.CaseSensitiveEquals('abc def', RULE_INPUT)).toBe(true);
+    expect(tirs.CaseSensitiveEquals('abc   def ', RULE_INPUT)).toBe(true);
     expect(tirs.CaseSensitiveEquals('ABC def', RULE_INPUT)).toBe(false);
     expect(tirs.CaseSensitiveEquals('abc DeF', RULE_INPUT)).toBe(false);
     expect(tirs.CaseSensitiveEquals('', RULE_INPUT)).toBe(false);
@@ -61,6 +66,7 @@ describe('Text Input rules service', function() {
   });
 
   it('should have a correct \'starts with\' rule', function() {
+    expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc defghi', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('ABC DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc def', RULE_INPUT)).toBe(true);
@@ -69,6 +75,7 @@ describe('Text Input rules service', function() {
   });
 
   it('should have a correct \'contains\' rule', function() {
+    expect(tirs.Contains(' abc  def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('ghabc defjk', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('GHABC DEFJK', RULE_INPUT)).toBe(true);
