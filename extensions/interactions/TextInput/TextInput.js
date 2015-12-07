@@ -97,17 +97,17 @@ oppia.factory('textInputRulesService', ['$filter', function($filter) {
       var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
       var inputString = normalizedInput.toLowerCase();
 
-      if(inputString == answerString) return true;
+      if (inputString == answerString) { return true; }
       var editDistance = [];
-      for(var i = 0; i <= inputString.length; i++){
+      for (var i = 0; i <= inputString.length; i++) {
         editDistance.push([i]);
       }
-      for(var j = 1; j <= answerString.length; j++){
+      for (var j = 1; j <= answerString.length; j++) {
         editDistance[0].push(j);
       }
-      for(var i = 1; i <= inputString.length; i++){
-        for(var j = 1; j <= answerString.length; j++){
-          if(inputString.charAt(i-1) == answerString.charAt(j-1)){
+      for (var i = 1; i <= inputString.length; i++) {
+        for (var j = 1; j <= answerString.length; j++) {
+          if (inputString.charAt(i-1) == answerString.charAt(j-1)) {
             editDistance[i][j] = editDistance[i-1][j-1];
           } else {
             editDistance[i][j] = Math.min(editDistance[i-1][j-1],

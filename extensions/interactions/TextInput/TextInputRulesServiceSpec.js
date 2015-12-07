@@ -83,6 +83,4 @@ describe('Text Input rules service', function() {
     expect(tirs.Contains('fabcd', RULE_INPUT)).toBe(false);
     expect(tirs.Contains('ab', RULE_INPUT)).toBe(false);
   });
-
-
 });
