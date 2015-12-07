@@ -9,9 +9,10 @@ branches:
   - develop
 
 env:
-- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=true
+- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=false RUN_E2E_TESTS=true
+- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=false RUN_E2E_TESTS=false
+- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true REPORT_BACKEND_COVERAGE=false RUN_E2E_TESTS=false
+- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=true RUN_E2E_TESTS=false
 
 matrix:
   allow_failures:
@@ -27,6 +28,16 @@ notifications:
     - henning.benmax@gmail.com
     on_success: change
     on_failure: change
+
+# This section is needed for e2e tests to work -- it seems to be a problem with
+# nan, which is needed when installing selenium-webdriver.
+# See https://github.com/nodejs/nan/issues/435
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
 
 before_install:
 - pip install codecov
@@ -44,6 +55,9 @@ install:
   -o gae-download.zip
 - unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
 - rm gae-download.zip
+# Needed for e2e tests to work. See https://github.com/nodejs/nan/issues/435
+- export CXX=g++-4.8
+- $CXX --version
 
 script:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
@@ -51,6 +65,7 @@ script:
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh; fi
+- if [ $RUN_E2E_TESTS == 'true' ]; then bash -x scripts/run_e2e_tests.sh; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
