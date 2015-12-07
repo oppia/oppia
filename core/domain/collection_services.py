@@ -656,7 +656,7 @@ def get_summary_of_collection(collection, contributor_id_to_add):
 
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an exploration's content).
+    # a revert) change to an collection's content).
     if collection_summary_model:
         contributor_ids = collection_summary_model.contributor_ids
     else:
