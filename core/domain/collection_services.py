@@ -576,17 +576,6 @@ def get_collection_snapshots_metadata(collection_id):
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
 
-
-def _get_contributor_ids_for_collection(col_id):
-    """Returns list of ids of contributors to a collection."""
-    contributor_ids = []
-    collection_snapshots = get_collection_snapshots_metadata(col_id)
-    for snapshot in collection_snapshots:
-        if not snapshot['committer_id'] in contributor_ids:
-            contributor_ids.append(snapshot['committer_id'])
-    return contributor_ids
-
-
 def publish_collection_and_update_user_profiles(committer_id, col_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
@@ -596,7 +585,8 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
     """
     rights_manager.publish_collection(committer_id, col_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
-    contributor_ids = _get_contributor_ids_for_collection(col_id)
+    collection_summary = get_collection_summary_by_id(col_id)
+    contributor_ids = collection_summary.contributor_ids
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
             contributor, contribution_time_msec)
