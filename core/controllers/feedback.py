@@ -17,6 +17,7 @@
 __author__ = 'kashida@google.com (Koji Ashida)'
 
 from core.controllers import base
+from core.controllers import editor
 from core.domain import exp_services
 from core.domain import feedback_services
 
@@ -59,12 +60,11 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):
         self.values.update({
-            'messages': feedback_services.get_messages(".".join((
-                exploration_id, thread_id)))})
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
-        if suggestion is not None:
-            self.values.update({
-                'suggestion': suggestion})
+            'messages': feedback_services.get_messages(
+                exploration_id, thread_id)})
+        self.values.update(
+            {'suggestion': feedback_services.get_suggestion(
+                exploration_id, thread_id)})
         self.render_json(self.values)
 
     @base.require_user
@@ -76,7 +76,7 @@ class ThreadHandler(base.BaseHandler):
                 'Text for the message must be specified.')
 
         feedback_services.create_message(
-            ".".join((exploration_id, thread_id)),
+            '.'.join((exploration_id, thread_id)),
             self.user_id,
             updated_status,
             self.payload.get('updated_subject'),
@@ -137,20 +137,22 @@ class SuggestionActionHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
     ACCEPT_ACTION = 'accept'
-    REJECT_ACTION = 'reject'    
+    REJECT_ACTION = 'reject'
 
-    @base.require_user
+    @editor.require_editor
     def put(self, exploration_id, thread_id):
         action = self.payload.get('action')
-        if action.lower() == self.ACCEPT_ACTION.lower():
+        if action == self.ACCEPT_ACTION:
             exp_services.accept_suggestion(
                 self.user_id,
-                self.payload.get('change_list'),
                 thread_id,
                 exploration_id,
                 self.payload.get('commit_message'))
-        elif action.lower() == self.REJECT_ACTION.lower():
+        elif action == self.REJECT_ACTION:
              exp_services.reject_suggestion(thread_id, exploration_id)
+        else:
+            raise self.InvalidInputException('Invalid action.')
+
         self.render_json(self.values)
 
 
@@ -162,18 +164,28 @@ class SuggestionListHandler(base.BaseHandler):
     CLOSED_LIST_TYPE = 'closed'
     ALL_LIST_TYPE = 'all'
 
+    def _string_to_bool(self, str):
+        if str == 'true':
+            return True
+        if str == 'false':
+            return False
+
     @base.require_user
-    def get(self, exploration_id, list_type, has_suggestion):
+    def get(self, exploration_id):
         threads = None
-        if list_type.lower() == self.OPEN_LIST_TYPE.lower():
+        list_type = self.request.get('list_type')
+        has_suggestion = self.request.get('has_suggestion')
+        if list_type == self.OPEN_LIST_TYPE:
             threads = feedback_services.get_open_threads(
-                exploration_id, has_suggestion)
-        elif list_type.lower() == self.CLOSED_LIST_TYPE.lower():
+                exploration_id, self._string_to_bool(has_suggestion))
+        elif list_type == self.CLOSED_LIST_TYPE:
             threads = feedback_services.get_closed_threads(
-                exploration_id, has_suggestion)
-        elif list_type.lower() == self.ALL_LIST_TYPE.lower():
+                exploration_id, self._string_to_bool(has_suggestion))
+        elif list_type == self.ALL_LIST_TYPE:
             threads = feedback_services.get_all_suggestion_threads(
                 exploration_id)
+        else:
+            raise self.InvalidInputException('Invalid list type.')
          
         self.values.update({'threads': threads})
         self.render_json(self.values)

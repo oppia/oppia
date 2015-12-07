@@ -2906,9 +2906,25 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             '.'.join([self.EXP_ID2, self.THREAD_ID1]))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
+    def test_accept_suggestion_actioned_suggestion(self):
+        exception_message = 'Suggestion has already been accepted/rejected'
+        with self.swap(exp_services, '_is_suggestion_actioned',
+                       self._return_true):
+            with self.assertRaisesRegexp(Exception, exception_message):
+                exp_services.accept_suggestion(
+                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2,
+                    self.COMMIT_MESSAGE)
+
     def test_reject_suggestion(self):
         exp_services.reject_suggestion(self.THREAD_ID1, self.EXP_ID2)
         thread = feedback_models.FeedbackThreadModel.get(
             '.'.join([self.EXP_ID2, self.THREAD_ID1]))
         self.assertEqual(thread.status,
                          feedback_models.STATUS_CHOICES_IGNORED)
+
+    def test_reject_actioned_suggestion(self):
+        exception_message = 'Suggestion has already been accepted/rejected'
+        with self.swap(exp_services, '_is_suggestion_actioned',
+                       self._return_true):
+            with self.assertRaisesRegexp(Exception, exception_message):
+                exp_services.reject_suggestion(self.THREAD_ID1, self.EXP_ID2)

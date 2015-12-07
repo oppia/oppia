@@ -336,7 +336,7 @@ urls = [
             feconf.SUGGESTION_ACTION_URL_PREFIX,
         feedback.SuggestionActionHandler, 'suggestion_action_handler'),
     get_redirect_route(
-        r'%s/<exploration_id>/<list_type>/<has_suggestion>' %
+        r'%s/<exploration_id>' %
             feconf.SUGGESTION_LIST_URL_PREFIX,
         feedback.SuggestionListHandler, 'suggestion_list_handler'),
 

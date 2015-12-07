@@ -41,7 +41,8 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         # The rest of the thread id should not have any full stops.
         self.assertNotIn('.', thread_id[len(EXP_ID) + 1:])
 
-        messages = feedback_services.get_messages(threadlist[0]['thread_id'])
+        messages = feedback_services.get_messages(
+            EXP_ID, threadlist[0]['thread_id'].split('.')[1])
         self.assertEqual(len(messages), 1)
         message_id = messages[0]['message_id']
         self.assertTrue(isinstance(message_id, int))
