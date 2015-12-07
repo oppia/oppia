@@ -97,7 +97,9 @@ oppia.factory('textInputRulesService', ['$filter', function($filter) {
       var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
       var inputString = normalizedInput.toLowerCase();
 
-      if (inputString == answerString) { return true; }
+      if (inputString == answerString) {
+        return true;
+      }
       var editDistance = [];
       for (var i = 0; i <= inputString.length; i++) {
         editDistance.push([i]);
