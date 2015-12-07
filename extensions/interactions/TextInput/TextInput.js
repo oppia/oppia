@@ -83,14 +83,20 @@ oppia.directive('oppiaShortResponseTextInput', [
   }
 ]);
 
-oppia.factory('textInputRulesService', [function() {
+oppia.factory('textInputRulesService', ['$filter', function($filter) {
   return {
     Equals: function(answer, inputs) {
-      return answer.toLowerCase() == inputs.x.toLowerCase();
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer.toLowerCase() == normalizedInput.toLowerCase();
     },
     FuzzyEquals: function(answer, inputs) {
-      var inputString = inputs.x.toLowerCase();
-      var answerString = answer.toLowerCase();
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var answerString = normalizedAnswer.toLowerCase();
+
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      var inputString = normalizedInput.toLowerCase();
+
       if(inputString == answerString) return true;
       var d = [];
       for(var i = 0; i <= inputString.length; i++){
@@ -111,13 +117,21 @@ oppia.factory('textInputRulesService', [function() {
       return d[inputs.x.length][answer.length] == 1;
     },
     CaseSensitiveEquals: function(answer, inputs) {
-      return answer == inputs.x;
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer == normalizedInput;
     },
     StartsWith: function(answer, inputs) {
-      return answer.toLowerCase().indexOf(inputs.x.toLowerCase()) == 0;
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer.toLowerCase().indexOf(
+        normalizedInput.toLowerCase()) == 0;
     },
     Contains: function(answer, inputs) {
-      return answer.toLowerCase().indexOf(inputs.x.toLowerCase()) != -1;
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer.toLowerCase().indexOf(
+        normalizedInput.toLowerCase()) != -1;
     }
   };
 }]);
