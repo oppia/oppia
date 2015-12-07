@@ -192,8 +192,13 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         exp_id = item.get_unversioned_instance_id()
-        exp_first_published_msec = rights_manager.get_exploration_rights(
-            exp_id).first_published_msec
+
+        exp_rights = rights_manager.get_exploration_rights(
+            exp_id, strict=False)
+        if exp_rights is None:
+            return
+
+        exp_first_published_msec = exp_rights.first_published_msec
         # First contribution time in msec is only set from contributions to
         # explorations that are currently published.
         if not rights_manager.is_exploration_private(exp_id):

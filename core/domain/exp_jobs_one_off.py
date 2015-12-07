@@ -105,6 +105,11 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(exp_id, stringified_commit_times_msecs):
+        exploration_rights = rights_manager.get_exploration_rights(
+            exp_id, strict=False)
+        if exploration_rights is None:
+            return
+
         commit_times_msecs = [
             ast.literal_eval(commit_time_string) for
             commit_time_string in stringified_commit_times_msecs]
