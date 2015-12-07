@@ -63,7 +63,7 @@ EMAIL_FOOTER = config_domain.ConfigProperty(
     'email_footer', {'type': 'unicode', 'ui_config': {'rows': 5}},
     'The footer to append to all outgoing emails. (This should be written in '
     'HTML and include an unsubscribe link.)',
-    'You can unsubscribe from these emails from the '
+    'You can change your email preferences via the '
     '<a href="https://www.example.com">Preferences</a> page.')
 
 _PLACEHOLDER_SUBJECT = 'THIS IS A PLACEHOLDER.'
@@ -121,7 +121,7 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        cc_admin=False):
+        bcc_admin=False):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -150,7 +150,7 @@ def _send_email(
             EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
         email_services.send_mail(
             sender_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, cc_admin)
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -197,10 +197,14 @@ def _get_email_config(intent):
 
 def get_draft_moderator_action_email(intent):
     """Returns a draft of the text of the body for an email sent immediately
-    following a moderator action.
+    following a moderator action. An empty body is a signal to the frontend
+    that no email will be sent.
     """
-    require_moderator_email_prereqs_are_satisfied(intent)
-    return _get_email_config(intent).value
+    try:
+        require_moderator_email_prereqs_are_satisfied(intent)
+        return _get_email_config(intent).value
+    except Exception:
+        return ''
 
 
 def require_moderator_email_prereqs_are_satisfied(intent):
@@ -242,4 +246,4 @@ def send_moderator_action_email(
             EMAIL_FOOTER.value))
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
-        cc_admin=True)
+        bcc_admin=True)

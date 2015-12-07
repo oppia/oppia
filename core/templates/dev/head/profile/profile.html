@@ -75,11 +75,8 @@
             <md-content class="oppia-profile-tabs-content">
               <div class="oppia-stat-big-container big-top-container">
                 <div ng-repeat="stat in userDisplayedStatistics" class="oppia-stat-container-top">
-                  <span class="oppia-big-number" ng-if="stat.number_value">
-                    <[stat.number_value]>
-                  </span>
-                  <span class="oppia-big-number" ng-if="!stat.number_value">
-                    0
+                  <span class="oppia-big-number" popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+                    <[stat.value || 0]>
                   </span>
                   <span>
                     <[stat.title]>

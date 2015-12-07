@@ -16,8 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-import datetime
-
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
@@ -357,7 +355,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             response_dict['edited_exploration_summary_dicts'], [])
 
     def test_created(self):
-        # Check that the profile page for a user who has created 
+        # Check that the profile page for a user who has created
         # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
@@ -373,14 +371,14 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(len(
             response_dict['edited_exploration_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['created_exploration_summary_dicts'][0]['id'], 
+            response_dict['created_exploration_summary_dicts'][0]['id'],
             self.EXP_ID_1)
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'][0]['id'], 
+            response_dict['edited_exploration_summary_dicts'][0]['id'],
             self.EXP_ID_1)
 
     def test_edited(self):
-        # Check that the profile page for a user who has created 
+        # Check that the profile page for a user who has created
         # a single exploration shows 0 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
@@ -405,8 +403,8 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(len(
             response_dict['edited_exploration_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'][0]['id'], 
+            response_dict['edited_exploration_summary_dicts'][0]['id'],
             self.EXP_ID_1)
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'][0]['objective'], 
+            response_dict['edited_exploration_summary_dicts'][0]['objective'],
             'the objective')

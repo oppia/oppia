@@ -237,8 +237,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
-def get_displayable_exploration_summary_dicts_matching_ids(
-    exploration_ids, user_id):
+def get_displayable_exp_summary_dicts_matching_ids(
+        exploration_ids, user_id):
     """Given a list of exploration ids, filters the list for
     explorations that are currently non-private and not deleted,
     and returns a list of dicts of the corresponding exploration summaries.
