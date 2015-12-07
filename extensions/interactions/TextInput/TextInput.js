@@ -49,7 +49,8 @@ oppia.directive('oppiaInteractiveTextInput', [
             return;
           }
 
-          $scope.$parent.submitAnswer(answer, textInputRulesService);
+          $scope.$parent.submitAnswer(
+            answer, textInputRulesService);
         };
       }]
     };
@@ -87,15 +88,38 @@ oppia.factory('textInputRulesService', [function() {
     Equals: function(answer, inputs) {
       return answer.toLowerCase() == inputs.x.toLowerCase();
     },
+    FuzzyEquals: function(answer, inputs) {
+      if(answer.toLowerCase() == inputs.x.toLowerCase()) {
+        return true;
+      }
+      else {
+        var d = [];
+        for(var i = 0; i <= inputs.x.length; i++){
+          d.push([i]);
+        }
+        for(var j = 0; j <= answer.length; j++){
+          d[0].push(j);
+        }
+        for(i = 1; i <= inputs.x.length; i++){
+          for(j = 1; j <= answer.length; j++){
+            if(inputs.x.charAt(i-1) == answer.charAt(j-1)){
+              d[i][j] = d[i-1][j-1];
+            } else {
+              d[i][j] = Math.min(d[i-1][j-1], d[i][j-1], d[i-1][j]) + 1;
+            }
+          }
+        }
+        return d[inputs.x.length][answer.length] == 1;
+      }
+    },
     CaseSensitiveEquals: function(answer, inputs) {
       return answer == inputs.x;
     },
     StartsWith: function(answer, inputs) {
-      return answer.indexOf(inputs.x, 0) == 0;
+      return answer.toLowerCase().indexOf(inputs.x.toLowerCase()) == 0;
     },
     Contains: function(answer, inputs) {
-      return answer.toLowerCase().indexOf(inputs.x.toLowerCase(), 0) != -1;
+      return answer.toLowerCase().indexOf(inputs.x.toLowerCase()) != -1;
     }
-
   };
 }]);
