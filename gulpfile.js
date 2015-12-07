@@ -56,13 +56,16 @@ var gulpUtil = require('gulp-util');
 var manifest = require('./manifest.json');
 var minifyCss = require('gulp-minify-css');
 var path = require('path');
+var sourcemaps = require('gulp-sourcemaps');
+var minify = require('gulp-minify');
 
 var gaeDevserverPath = argv.gae_devserver_path;
 var params = {
   admin_host: '0.0.0.0',
   admin_port: 8000,
   host: '0.0.0.0',
-  port: 8181
+  port: 8181,
+  skip_sdk_update_check: true
 };
 if (argv.clear_datastore) {
   params.clear_datastore = true;
@@ -87,31 +90,42 @@ checkCommands(yargs, argv, 1);
 var isMinificationNeeded = (argv.minify == 'True');
 var frontendDependencies = manifest.dependencies.frontend;
 var cssFilesPath = [];
+var jsFilesPath = [];
 var fontFolderPath = [];
 var cssBackgroundPath = [];
-var generatedCssTargetDir = path.join(
+var generatedTargetDir = path.join(
   'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev', 'css');
+  isMinificationNeeded ? 'prod' : 'dev');
+var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
+var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
 for (var dependencyId in frontendDependencies) {
   var dependency = frontendDependencies[dependencyId];
   var dependencyDir = dependency.targetDirPrefix + dependency.version;
-  if (dependency.hasOwnProperty('cssFiles')) {
-    dependency.cssFiles.forEach(function(cssFiles) {
-      cssFilesPath.push(path.join(
-        'third_party', 'static', dependencyDir, cssFiles));
-    });
-  }
-  if (dependency.hasOwnProperty('fontsPath')) {
-    var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
-    fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
-      dependency.fontsPath, fontPrefix));
-  }
-  if (dependency.hasOwnProperty('cssBackgroundImage')) {
-    dependency.cssBackgroundImage.forEach(function(imagePath) {
-      cssBackgroundPath.push(path.join(
-        'third_party', 'static', dependencyDir, imagePath));
-    });
+  if (dependency.hasOwnProperty('bundle')) {
+    if (dependency.bundle.hasOwnProperty('css')) {
+      dependency.bundle.css.forEach(function(cssFiles) {
+        cssFilesPath.push(path.join(
+          'third_party', 'static', dependencyDir, cssFiles));
+      });
+    }
+    if (dependency.bundle.hasOwnProperty('js')) {
+      dependency.bundle.js.forEach(function(jsFiles) {
+        jsFilesPath.push(path.join(
+          'third_party', 'static', dependencyDir, jsFiles));
+      });
+    }
+    if (dependency.bundle.hasOwnProperty('fontsPath')) {
+      var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
+      fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
+        dependency.bundle.fontsPath, fontPrefix));
+    }
+    if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
+      dependency.bundle.cssBackgroundImage.forEach(function(imagePath) {
+        cssBackgroundPath.push(path.join(
+          'third_party', 'static', dependencyDir, imagePath));
+      });
+    }
   }
 }
 gulp.task('generateCss', function() {
@@ -121,6 +135,24 @@ gulp.task('generateCss', function() {
     .pipe(gulp.dest(generatedCssTargetDir));
 });
 
+gulp.task('generateJs', function() {
+  gulp.src(jsFilesPath)
+    .pipe(sourcemaps.init())
+      .pipe(concat('third_party.js'))
+      .pipe(isMinificationNeeded ? minify({
+        ext:{
+              src:'.js',
+              min:'.min.js'
+            }
+      }) : gulpUtil.noop())
+    // This map a combined/minified file back to an unbuilt state,
+    // holds information about original files.
+    // When you query a certain line and column number in your generated JavaScript
+    // you can do a lookup in the source map which returns the original location.
+    // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(generatedJsTargetDir));
+});
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
 gulp.task('copyFonts', function() {
@@ -130,7 +162,7 @@ gulp.task('copyFonts', function() {
       isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
 });
 
-// This is a task which copies background image used by css
+// This is a task which copies background image used by css.
 // TODO(Barnabas) find a way of removing this task.
 // It is a bit of a hack,
 // because it depends on the relative location of the CSS background images
@@ -148,13 +180,15 @@ gulp.task('gulpStartGae', function() {
 
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
-gulp.task('build', ['generateCss', 'copyFonts', 'copyCssBackgroundImages']);
+gulp.task('build', [
+  'generateCss', 'copyFonts', 'copyCssBackgroundImages', 'generateJs']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
     gulp.watch('gulpfile.js', ['build']);
     gulp.watch(cssFilesPath, ['generateCss']);
+    gulp.watch(jsFilesPath, ['generateJs']);
     gulp.watch('manifest.json', ['build']);
     gulp.slurped = true;
   }
@@ -164,4 +198,3 @@ gulp.task('watch', function() {
 // TODO(Barnabas Makonda): check if files are already generated and if so
 // do not build.
 gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
-

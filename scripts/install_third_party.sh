@@ -21,50 +21,16 @@ source $(dirname $0)/setup.sh || exit 1
 echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
-# Check if the OS supports node.js installation; if not, return to the calling
-# script.
-if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
-  echo ""
-  echo "  WARNING: Unsupported OS for installation of node.js."
-  echo "  If you are running this script on Windows, see the instructions"
-  echo "  here regarding installation of node.js:"
-  echo ""
-  echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
-  echo ""
-  echo "  STATUS: Installation completed except for node.js. Exiting."
-  echo ""
-  exit 0
-fi
-
-# If the OS supports it, download and install node.js.
-echo Checking if node.js is installed in $TOOLS_DIR
-if [ ! -d "$NODE_PATH" ]; then
-  echo Installing Node.js
-  if [ ${OS} == "Darwin" ]; then
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-darwin-x64
-    else
-      NODE_FILE_NAME=node-v4.2.1-darwin-x86
-    fi
-  elif [ ${OS} == "Linux" ]; then
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-linux-x64
-    else
-      NODE_FILE_NAME=node-v4.2.1-linux-x86
-    fi
-  fi
-
-  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
-  tar xzf node-download.tgz --directory $TOOLS_DIR
-  mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
-  rm node-download.tgz
-fi
-
-# Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
-#
-#   http://blog.npmjs.org/post/78085451721
-#
-$NPM_CMD config set ca ""
+# Install third-party node modules needed for the build process.
+install_node_module gulp 3.9.0
+install_node_module through2 2.0.0
+install_node_module yargs 3.29.0
+install_node_module gulp-concat 2.6.0
+install_node_module gulp-minify-css 1.2.1
+install_node_module gulp-util 3.0.7
+install_node_module jscs 2.3.0
+install_node_module gulp-sourcemaps 1.6.0
+install_node_module gulp-minify 0.0.5
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -74,7 +40,6 @@ $NPM_CMD config set ca ""
 # Note that skulpt.py will issue a warning saying its dist command will not
 # work properly without GitPython, but it does actually work due to the
 # patches.
-
 echo Checking whether Skulpt is installed in third_party
 if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   if [ ! -d "$TOOLS_DIR/skulpt-0.10.0" ]; then
@@ -117,14 +82,22 @@ fi
 echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
+
+  if ! type pip > /dev/null 2>&1 ; then
+      echo ""
+      echo "  Numpy is required for Oppia to operate properly, but pip wasn't found"
+      echo "  on your local machine."
+      echo ""
+      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
+
+      if [ "${OS}" == "Darwin" ] ; then
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
+      else
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+      fi
+
+      exit 1
+  fi
+
   pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
-
-# Install third-party node modules needed for the build process.
-install_node_module gulp 3.9.0
-install_node_module through2 2.0.0
-install_node_module yargs 3.29.0
-install_node_module gulp-concat 2.6.0
-install_node_module gulp-minify-css 1.2.1
-install_node_module gulp-util 3.0.7
-install_node_module jscs 2.3.0

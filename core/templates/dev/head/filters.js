@@ -369,13 +369,28 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
   };
 }]);
 
+// Note that this filter does not truncate at the middle of a word.
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {
-    input = input.trim();
-    if(input.length > maxNumberOfCharacters) {
-      input = input.substring(0, maxNumberOfCharacters) + '...';
+    var words = input.trim().match(/\S+/g);
+
+    // Capitalize the first word and add it to the result.
+    var result = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+
+    // Add the remaining words to the result until the character limit is
+    // reached.
+    for (var i = 1; i < words.length; i++) {
+      if (!maxNumberOfCharacters ||
+          result.length + 1 + words[i].length <= maxNumberOfCharacters) {
+        result += ' ';
+        result += words[i];
+      } else {
+        result += '...';
+        break;
+      }
     }
-    return input.charAt(0).toUpperCase() + input.slice(1);
+
+    return result;
   }
 }]);
 
