@@ -25,24 +25,56 @@ from extensions.rules import base
 class Equals(base.NormalizedStringRule):
     description = 'is equal to {{x|NormalizedString}}'
 
+    def _evaluate(self, subject):
+        return self._fuzzify_truth_value(subject.lower() == self.x.lower())
+
 
 class CaseSensitiveEquals(base.NormalizedStringRule):
     description = (
         'is equal to {{x|NormalizedString}}, taking case into account')
 
+    def _evaluate(self, subject):
+        return self._fuzzify_truth_value(subject == self.x)
+
 
 class StartsWith(base.NormalizedStringRule):
     description = 'starts with {{x|NormalizedString}}'
 
+    def _evaluate(self, subject):
+        return self._fuzzify_truth_value(
+            subject.lower().startswith(self.x.lower()))
+
 
 class Contains(base.NormalizedStringRule):
     description = 'contains {{x|NormalizedString}}'
+
+    def _evaluate(self, subject):
+        return self._fuzzify_truth_value(
+            subject.lower().find(self.x.lower()) != -1)
 
 
 class FuzzyEquals(base.NormalizedStringRule):
     description = (
         'is equal to {{x|NormalizedString}}, misspelled by at most '
         'one character')
+
+    def _evaluate(self, subject):
+        if subject.lower() == self.x.lower():
+            return rule_domain.CERTAIN_TRUE_VALUE
+
+        oneago = None
+        thisrow = range(1, len(self.x) + 1) + [0]
+        for i in range(len(subject)):
+            twoago, oneago, thisrow = (
+                oneago, thisrow, [0] * len(self.x) + [i + 1])
+
+            for j in range(len(self.x)):
+                delcost = oneago[j] + 1
+                addcost = thisrow[j - 1] + 1
+                subcost = oneago[j - 1] + (subject[i] != self.x[j])
+                thisrow[j] = min(delcost, addcost, subcost)
+
+        return self._fuzzify_truth_value(thisrow[len(self.x) - 1] == 1)
 
 
 class FuzzyMatches(base.NormalizedStringRule):
