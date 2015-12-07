@@ -105,8 +105,8 @@ oppia.factory('textInputRulesService', ['$filter', function($filter) {
       for(var j = 1; j <= answerString.length; j++){
         editDistance[0].push(j);
       }
-      for(i = 1; i <= inputString.length; i++){
-        for(j = 1; j <= answerString.length; j++){
+      for(var i = 1; i <= inputString.length; i++){
+        for(var j = 1; j <= answerString.length; j++){
           if(inputString.charAt(i-1) == answerString.charAt(j-1)){
             editDistance[i][j] = editDistance[i-1][j-1];
           } else {
