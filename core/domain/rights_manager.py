@@ -394,8 +394,6 @@ class Actor(object):
     def can_edit(self, activity_type, activity_id):
         # TODO(sll): Add a check here for whether a user is banned or not,
         # rather than having this check in the controller.
-        print activity_type
-        print activity_id
         activity_rights = _get_activity_rights(activity_type, activity_id)
         if activity_rights is None:
             return False

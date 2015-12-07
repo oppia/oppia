@@ -144,13 +144,15 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID3, 'author_id', 3, 'state_name', {'old_content': {}})
-        suggestion = feedback_services.get_suggestion(
-            self.EXP_ID3, self.THREAD_ID1)
+        with self.swap(user_services, 'get_username',
+                       self._get_username): 
+            suggestion = feedback_services.get_suggestion(
+                self.EXP_ID3, self.THREAD_ID1)
         thread = feedback_models.FeedbackThreadModel.get(
             '.'.join([self.EXP_ID3, self.THREAD_ID1]))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
         self.assertEqual(suggestion['exploration_id'], self.EXP_ID3)
-        self.assertEqual(suggestion['author_id'], 'author_id')
+        self.assertEqual(suggestion['author_id'], 'user123')
         self.assertEqual(suggestion['exploration_version'], 3)
         self.assertEqual(suggestion['state_name'], 'state_name')
         self.assertEqual(suggestion['state_content'], {'old_content': {}})

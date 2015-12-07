@@ -214,7 +214,7 @@ def _get_suggestion_dict_from_model_instance(suggestion):
         return suggestion
     return {
         'id': suggestion.id,
-        'author_id': suggestion.author_id,
+        'author_id': user_services.get_username(suggestion.author_id),
         'exploration_id': suggestion.exploration_id,
         'exploration_version': suggestion.exploration_version,
         'state_name': suggestion.state_name,

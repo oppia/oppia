@@ -2887,10 +2887,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             with self.swap(exp_services, 'update_exploration',
                            self._check_commit_message):
                 with self.swap(user_services, 'get_human_readable_user_ids',
-                               self. _get_username_):
-                    exp_services.accept_suggestion(
-                        'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1,
-                        self.COMMIT_MESSAGE)
+                               self._get_username_):
+                    with self.swap(user_services, 'get_username',   
+                                   self._get_username_): 
+                        exp_services.accept_suggestion(
+                            'user_id', self.THREAD_ID1, self.EXP_ID1,
+                            self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             '.'.join([self.EXP_ID1, self.THREAD_ID1]))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
@@ -2900,7 +2902,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                        self._return_false):
             with self.assertRaisesRegexp(Exception, 'Suggestion Invalid'):
                 exp_services.accept_suggestion(
-                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2,
+                    'user_id', self.THREAD_ID1, self.EXP_ID2,
                     self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             '.'.join([self.EXP_ID2, self.THREAD_ID1]))
@@ -2912,7 +2914,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                        self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
-                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2,
+                    'user_id', self.THREAD_ID1, self.EXP_ID2,
                     self.COMMIT_MESSAGE)
 
     def test_reject_suggestion(self):

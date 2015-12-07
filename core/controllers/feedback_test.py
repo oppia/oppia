@@ -254,8 +254,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         NEW_EXP_ID = 'new_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             NEW_EXP_ID, 'A title', 'A category')
-        exp_services.save_new_exploration(self.EDITOR_ID, exploration)
-        rights_manager.publish_exploration(self.EDITOR_ID, NEW_EXP_ID)
+        exp_services.save_new_exploration(self.editor_id, exploration)
+        rights_manager.publish_exploration(self.editor_id, NEW_EXP_ID)
 
         response = self.testapp.get('/create/%s' % NEW_EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
