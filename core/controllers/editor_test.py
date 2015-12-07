@@ -1102,7 +1102,8 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
-            self.assertEqual(messages[0].cc, feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertFalse(hasattr(messages[0], 'cc'))
+            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been featured!')
@@ -1111,7 +1112,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '%s\n\n'
                 'Thanks,\n'
                 '%s\n\n'
-                'You can unsubscribe from these emails from the Preferences '
+                'You can change your email preferences via the Preferences '
                 'page.' % (
                     self.EDITOR_USERNAME,
                     NEW_EMAIL_BODY,
@@ -1121,7 +1122,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '%s<br><br>'
                 'Thanks,<br>'
                 '%s<br><br>'
-                'You can unsubscribe from these emails from the '
+                'You can change your email preferences via the '
                 '<a href="https://www.example.com">Preferences</a> page.' % (
                     self.EDITOR_USERNAME,
                     NEW_EMAIL_BODY,
@@ -1163,7 +1164,8 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
-            self.assertEqual(messages[0].cc, feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertFalse(hasattr(messages[0], 'cc'))
+            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been unpublished')
@@ -1172,7 +1174,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '%s\n\n'
                 'Thanks,\n'
                 '%s\n\n'
-                'You can unsubscribe from these emails from the Preferences '
+                'You can change your email preferences via the Preferences '
                 'page.' % (
                     self.EDITOR_USERNAME,
                     NEW_EMAIL_BODY,
@@ -1182,7 +1184,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 '%s<br><br>'
                 'Thanks,<br>'
                 '%s<br><br>'
-                'You can unsubscribe from these emails from the '
+                'You can change your email preferences via the '
                 '<a href="https://www.example.com">Preferences</a> page.' % (
                     self.EDITOR_USERNAME,
                     NEW_EMAIL_BODY,
