@@ -22,7 +22,6 @@ if [ "$SETUP_DONE" ]; then
   echo 'Environment setup completed.'
   return 0
 fi
-export SETUP_DONE=true
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -90,6 +89,51 @@ fi
 
 export NPM_INSTALL="$NPM_CMD install"
 
+# Node is a requirement for all installation scripts. Here, we check if the OS
+# supports node.js installation; if not, we exit with an error.
+if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
+  echo ""
+  echo "  WARNING: Unsupported OS for installation of node.js."
+  echo "  If you are running this script on Windows, see the instructions"
+  echo "  here regarding installation of node.js:"
+  echo ""
+  echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
+  echo ""
+  echo "  STATUS: Installation completed except for node.js. Exiting."
+  echo ""
+  return 1
+fi
+
+# Download and install node.js.
+echo Checking if node.js is installed in $TOOLS_DIR
+if [ ! -d "$NODE_PATH" ]; then
+  echo Installing Node.js
+  if [ ${OS} == "Darwin" ]; then
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      NODE_FILE_NAME=node-v4.2.1-darwin-x64
+    else
+      NODE_FILE_NAME=node-v4.2.1-darwin-x86
+    fi
+  elif [ ${OS} == "Linux" ]; then
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      NODE_FILE_NAME=node-v4.2.1-linux-x64
+    else
+      NODE_FILE_NAME=node-v4.2.1-linux-x86
+    fi
+  fi
+
+  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  tar xzf node-download.tgz --directory $TOOLS_DIR
+  mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
+  rm node-download.tgz
+fi
+
+# Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
+#
+#   http://blog.npmjs.org/post/78085451721
+#
+$NPM_CMD config set ca ""
+
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [[ $TRAVIS == 'true' ]]; then
   export CHROME_BIN="chromium-browser"
@@ -145,15 +189,17 @@ if ! test_python_version $PYTHON_CMD; then
         echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
     fi
     # Exit when no suitable Python environment can be found.
-    exit 1
+    return 1
   fi
 fi
 export PYTHON_CMD
 
 # List all node modules that are currently installed. The "npm list" command is
 # slow, so we precompute this here and refer to it as needed.
+echo "Generating list of installed node modules..."
 NPM_INSTALLED_MODULES="$($NPM_CMD list)"
 export NPM_INSTALLED_MODULES
+echo "done."
 
 install_node_module() {
   # Usage: install_node_module [module_name] [module_version]
@@ -175,3 +221,5 @@ install_node_module() {
   fi
 }
 export -f install_node_module
+
+export SETUP_DONE=true

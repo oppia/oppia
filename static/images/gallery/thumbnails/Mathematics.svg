@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4.3 (16044) - http://www.bohemiancoding.com/sketch -->
+    <title>Mathematics</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Gallery-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Mathematics" sketch:type="MSArtboardGroup" font-weight="normal" font-family="Minion Pro" fill="#FFFFFF" sketch:alignment="middle">
+            <g id="x-+-2" sketch:type="MSLayerGroup" transform="translate(9.000000, 3.000000)">
+                <text id="x" sketch:type="MSTextLayer" font-size="48" font-style="italic">
+                    <tspan x="0.648" y="35">x</tspan>
+                </text>
+                <text id="2" sketch:type="MSTextLayer" font-size="18">
+                    <tspan x="26.18" y="16">2</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>

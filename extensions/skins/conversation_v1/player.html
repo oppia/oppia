@@ -119,10 +119,20 @@
                      ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
                      ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
                      style="opacity: 0.8;">
-                  <button style="background: inherit; border: none;">
-                    (<[activeCard.interactionInstructions]>)
-                    <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-                  </button>
+
+                  <div ng-if="canWindowFitTwoCards()">
+                    <button style="background: inherit; border: none;">
+                      <[activeCard.interactionInstructions]>
+                      <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+                    </button>
+                  </div>
+
+                  <div ng-if="!canWindowFitTwoCards()">
+                    <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button">
+                      <[activeCard.interactionInstructions]>
+                      <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+                    </md-button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -136,34 +146,44 @@
         <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
              class="conversation-skin-supplemental-card">
 
-          <div class="conversation-skin-help-card" ng-if="helpCardHtml">
-            <img class="conversation-skin-oppia-avatar"
-                 ng-src="<[oppiaAvatarImageUrl]>" alt="">
-            <button type="button" class="conversation-skin-close-help-card-button"
-                    ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
-              <i class="material-icons md-18">&#xE5CD;</i>
-            </button>
-            <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
+          <div class="conversation-skin-supplemental-interaction-container">
+            <div class="conversation-skin-help-card" ng-if="helpCardHtml">
+              <img class="conversation-skin-oppia-avatar"
+                   ng-src="<[oppiaAvatarImageUrl]>" alt="">
+              <button type="button" class="conversation-skin-close-help-card-button"
+                      ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+                <i class="material-icons md-18">&#xE5CD;</i>
+              </button>
+              <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
+              </div>
+              <br>
+              <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                 focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                 ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)"
+                 ng-if="helpCardHasContinueButton"
+                 style="margin-top: 12px;">
+                Continue to next card
+              </md-button>
             </div>
-            <br>
-            <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-               focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-               ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)"
-               ng-if="helpCardHasContinueButton"
-               style="margin-top: 12px;">
-              Continue to next card
-            </md-button>
+
+            <div ng-if="!activeCard.interactionIsInline">
+              <div class="protractor-test-conversation-input"
+                   angular-html-bind="transcript[currentProgressDotIndex].interactionHtml">
+              </div>
+            </div>
           </div>
 
-          <div ng-if="!activeCard.interactionIsInline">
-            <div class="protractor-test-conversation-input"
-                 angular-html-bind="transcript[currentProgressDotIndex].interactionHtml">
-            </div>
+          <div ng-if="!canWindowFitTwoCards()">
+            <md-button class="oppia-learner-continue-button" ng-click="setVisiblePanel(PANEL_TUTOR)">
+              <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C4;</i>
+              Instructions
+            </md-button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 
   <oppia-gadget-panel panel-contents="gadgetPanelsContents.bottom"
                       class="conversation-skin-bottom-gadget-panel"

@@ -1563,6 +1563,7 @@ oppia.factory('explorationWarningsService', [
       STATE_ERROR_MESSAGES, FUZZY_RULE_TYPE) {
     var _warningsList = [];
     var stateWarnings = {};
+    var hasCriticalStateWarning = false;
 
     var _getStatesWithoutInteractionIds = function() {
       var statesWithoutInteractionIds = [];
@@ -1887,16 +1888,42 @@ oppia.factory('explorationWarningsService', [
     var _updateWarningsList = function() {
       _warningsList = [];
       stateWarnings = {};
+      hasCriticalStateWarning = false;
 
       graphDataService.recompute();
       var _graphData = graphDataService.getGraphData();
+
+      var _states = explorationStatesService.getStates();
+      for (var stateName in _states) {
+        var interaction = _states[stateName].interaction;
+        if (interaction.id) {
+          var validatorName = (
+            'oppiaInteractive' + _states[stateName].interaction.id +
+            'Validator');
+          var interactionWarnings = $filter(validatorName)(
+            stateName, interaction.customization_args,
+            interaction.answer_groups, interaction.default_outcome);
+
+          for (var j = 0; j < interactionWarnings.length; j++) {
+            if (stateWarnings.hasOwnProperty(stateName)) {
+              stateWarnings[stateName].push(interactionWarnings[j].message);
+            } else {
+              stateWarnings[stateName] = [interactionWarnings[j].message];
+            }
+
+            if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
+              hasCriticalStateWarning = true;
+            }
+          }
+        }
+      }
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
         stateWithoutInteractionIds) {
         if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
           stateWarnings[stateWithoutInteractionIds].push(
-              STATE_ERROR_MESSAGES.ADD_INTERACTION);
+            STATE_ERROR_MESSAGES.ADD_INTERACTION);
         } else {
           stateWarnings[stateWithoutInteractionIds] = [
             STATE_ERROR_MESSAGES.ADD_INTERACTION];
@@ -1941,27 +1968,6 @@ oppia.factory('explorationWarningsService', [
 
         _warningsList = _warningsList.concat(_verifyParameters(
           [_graphData.initStateId], _graphData.nodes, _graphData.links));
-      }
-
-      var _states = explorationStatesService.getStates();
-      for (var stateName in _states) {
-        var interaction = _states[stateName].interaction;
-        if (interaction.id) {
-          var validatorName = (
-            'oppiaInteractive' + _states[stateName].interaction.id +
-            'Validator');
-          var interactionWarnings = $filter(validatorName)(
-            stateName, interaction.customization_args,
-            interaction.answer_groups, interaction.default_outcome);
-
-          for (var j = 0; j < interactionWarnings.length; j++) {
-            if (stateWarnings.hasOwnProperty(stateName)) {
-              stateWarnings[stateName].push(interactionWarnings[j].message);
-            } else {
-              stateWarnings[stateName] = [interactionWarnings[j].message];
-            }
-          }
-        }
       }
 
       if (!explorationObjectiveService.displayed) {
@@ -2011,7 +2017,7 @@ oppia.factory('explorationWarningsService', [
         return _warningsList;
       },
       hasCriticalWarnings: function() {
-        return _warningsList.some(function(warning) {
+        return hasCriticalStateWarning || _warningsList.some(function(warning) {
           return warning.type === WARNING_TYPES.CRITICAL;
         });
       },

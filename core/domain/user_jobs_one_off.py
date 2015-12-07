@@ -29,7 +29,7 @@ import utils
 
 
 class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for creating and populating UserContributionsModels for 
+    """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
     @classmethod
@@ -62,11 +62,11 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
             user_services.update_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
-        else:        
+        else:
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
-      
+
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and

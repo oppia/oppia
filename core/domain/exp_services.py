@@ -239,8 +239,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
 def get_displayable_exploration_summary_dicts_matching_ids(
     exploration_ids, user_id):
-    """Given a list of exploration ids, filters the list for 
-    explorations that are currently non-private and not deleted, 
+    """Given a list of exploration ids, filters the list for
+    explorations that are currently non-private and not deleted,
     and returns a list of dicts of the corresponding exploration summaries.
     """
     displayable_exploration_summaries = []
@@ -268,7 +268,8 @@ def get_displayable_exploration_summary_dicts_matching_ids(
                 'thumbnail_image_url': (
                     exploration_summary.thumbnail_image_url
                 ),
-                'thumbnail_icon_url': '/images/gallery/default_thumbnail_icon.svg',
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    exploration_summary.category),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
                     exploration_summary.category)
             })
@@ -1009,7 +1010,7 @@ def update_exploration(
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
-    
+
     if not rights_manager.is_exploration_private(exploration.id):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())

@@ -40,7 +40,7 @@
             <label class="col-lg-2 col-md-2 col-sm-2">Username</label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               {% if username %}
-                {{username}}
+                <a href="/profile/{{username}}">{{username}}</a>
               {% else %}
                 <em>Not yet selected</em>
               {% endif %}
@@ -50,7 +50,7 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2"></label>
+            <label class="col-lg-2 col-md-2 col-sm-2">Picture</label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="oppia-editable-section" title="Change profile picture" style="height: 150px; width: 150px">
                 <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
@@ -92,8 +92,7 @@
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller">
-                This field is optional. Anything you write here is public and
-                world-viewable.
+                E.g.: mathematics, computer science, art, ...
               </span>
               <div style="height: 18px; width: 550px;">
                 <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="changedAtLeastOnce">

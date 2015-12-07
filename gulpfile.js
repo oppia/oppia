@@ -64,7 +64,8 @@ var params = {
   admin_host: '0.0.0.0',
   admin_port: 8000,
   host: '0.0.0.0',
-  port: 8181
+  port: 8181,
+  skip_sdk_update_check: true
 };
 if (argv.clear_datastore) {
   params.clear_datastore = true;

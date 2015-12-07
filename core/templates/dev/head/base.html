@@ -161,6 +161,12 @@
                             </a>
                             <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                                  <strong>{{username}}</strong>
+                                </a>
+                              </li>
+                              <hr class="oppia-top-right-menu-item-separator">
+                              <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
                                   My Explorations
                                 </a>
@@ -191,6 +197,7 @@
                                   </a>
                                 </li>
                               {% endif %}
+                              <hr class="oppia-top-right-menu-item-separator">
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
                               </li>
@@ -240,7 +247,7 @@
 
       {% if DEV_MODE %}
         <div class="oppia-dev-mode">
-          Development Mode
+          Dev Mode
         </div>
       {% endif %}
 

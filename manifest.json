@@ -125,6 +125,12 @@
           "fontsPath": "fonts"
         }
       },
+      "guppy": {
+        "version": "0.0.2",
+        "zipUrl": "https://github.com/daniel3735928559/guppy/archive/v0.0.2.zip",
+        "rootDirPrefix": "guppy-",
+        "targetDirPrefix": "guppy-"
+      },
       "hammerJs": {
         "version": "2.0.4",
         "zipUrl": "https://github.com/hammerjs/hammer.js/archive/2.0.4.zip",
@@ -141,7 +147,7 @@
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
         "bundle": {
-          "js": ["jquery.js"]
+          "js": []
         }
       },
       "jqueryUI": {
@@ -151,7 +157,7 @@
         "targetDirPrefix": "jqueryui-",
         "files": ["jquery-ui.min.js"],
         "bundle": {
-          "js": ["jquery-ui.min.js"]
+          "js": []
         }
       },
       "jqueryThemes": {
@@ -159,6 +165,12 @@
         "zipUrl": "http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip",
         "rootDirPrefix": "jquery-ui-themes-",
         "targetDirPrefix": "jquery-ui-themes-"
+      },
+      "mathExpressions": {
+        "version": "762ffd0effea1525b21a882624074322fa7aad26",
+        "zipUrl": "https://github.com/kisonecat/math-expressions/archive/762ffd0effea1525b21a882624074322fa7aad26.zip",
+        "rootDirPrefix": "math-expressions-",
+        "targetDir": "math-expressions-762ffd"
       },
       "mathJax": {
         "version": "2.4-latest",
