@@ -197,10 +197,14 @@ def _get_email_config(intent):
 
 def get_draft_moderator_action_email(intent):
     """Returns a draft of the text of the body for an email sent immediately
-    following a moderator action.
+    following a moderator action. An empty body is a signal to the frontend
+    that no email will be sent.
     """
-    require_moderator_email_prereqs_are_satisfied(intent)
-    return _get_email_config(intent).value
+    try:
+        require_moderator_email_prereqs_are_satisfied(intent)
+        return _get_email_config(intent).value
+    except Exception:
+        return ''
 
 
 def require_moderator_email_prereqs_are_satisfied(intent):
