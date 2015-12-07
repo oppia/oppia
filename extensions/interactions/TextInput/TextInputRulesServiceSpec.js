@@ -46,7 +46,7 @@ describe('Text Input rules service', function() {
     expect(tirs.FuzzyEquals('cbc def', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abcd def', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc defg', RULE_INPUT)).toBe(true);
-    expect(tirs.FuzzyEquals('abc defg', RULE_INPUT)).toBe(true);
+    expect(tirs.FuzzyEquals('aBC DEfg', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
