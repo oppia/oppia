@@ -49,7 +49,8 @@ def send_mail_to_admin(subject, body):
 
 
 def send_mail(
-        sender_email, recipient_email, subject, plaintext_body, html_body):
+        sender_email, recipient_email, subject, plaintext_body, html_body,
+        cc_admin=False):
     """Sends an email. The client is responsible for recording any audit logs.
 
     In general this function should only be called from
@@ -63,6 +64,7 @@ def send_mail(
       - plaintext_body: str. The plaintext body of the email.
       - html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
+      - cc_admin: bool. Whether to cc feconf.ADMIN_EMAIL_ADDRESS on the email.
 
     Raises:
       Exception: if the configuration in feconf.py forbids emails from being
@@ -81,6 +83,13 @@ def send_mail(
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
 
-    mail.send_mail(
-        sender_email, recipient_email, subject, plaintext_body, html=html_body)
+    if cc_admin:
+        mail.send_mail(
+            sender_email, recipient_email, subject, plaintext_body,
+            html=html_body, cc=[feconf.ADMIN_EMAIL_ADDRESS])
+    else:
+        mail.send_mail(
+            sender_email, recipient_email, subject, plaintext_body,
+            html=html_body)
+
     counters.EMAILS_SENT.inc()

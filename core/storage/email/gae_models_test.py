@@ -21,6 +21,7 @@ import datetime
 from core.platform import models
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 from core.tests import test_utils
+import feconf
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
@@ -29,7 +30,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
     def test_sent_email_model_instances_are_read_only(self):
         email_models.SentEmailModel.create(
             'recipient_id', 'recipient@email.com', 'sender_id',
-            'sender@email.com', email_models.INTENT_SIGNUP,
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body', datetime.datetime.utcnow())
 
         model = email_models.SentEmailModel.get_all().fetch()[0]
