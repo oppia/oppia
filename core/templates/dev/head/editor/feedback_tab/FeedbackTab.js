@@ -89,6 +89,55 @@ oppia.controller('FeedbackTab', [
     });
   };
 
+  // TODO(Allan): Implement ability to edit suggestions before applying.
+  $scope.showSuggestionModal = function() {
+    $modal.open({
+      templateUrl: 'modals/editorViewSuggestion',
+      backdrop: true,
+      size: 'lg',
+      resolve: {
+        suggestion: function() {
+          return $scope.activeThread.suggestion;
+        }
+      },
+      controller: [
+        '$scope', '$modalInstance', 'suggestion',
+        function($scope, $modalInstance, suggestion) {
+        $scope.oldContent = suggestion.state_content.old_content;
+        $scope.newContent = suggestion.state_content.new_content;
+
+        $scope.acceptSuggestion = function() {
+          $modalInstance.close({
+            action: 'accept'
+          });
+        };
+
+        $scope.rejectSuggestion = function() {
+          $modalInstance.close({
+            action: 'reject'
+          });
+        };
+
+        $scope.cancelReview = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    }).result.then(function(result) {
+      threadDataService.resolveSuggestion(
+        $scope.activeThread.suggestion.suggestion.id, result.action);
+      // Update the status of the feedback thread.
+      var msg, status;
+      if (result.action === 'accept') {
+        msg = 'Suggestion accepted.';
+        status = 'fixed';
+      } else {
+        msg = 'Suggestion rejected.';
+        status = 'not_actionable';
+      }
+      $scope.addNewMessage($scope.activeThread.thread_id, msg, status);
+    });
+  };
+
   $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
     if (threadId === null) {
       warningsData.addWarning('Cannot add message to thread with ID: null.');

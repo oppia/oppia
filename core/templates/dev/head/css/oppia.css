@@ -2438,3 +2438,19 @@ md-card.preview-conversation-skin-supplemental-card {
   position: relative;
 }
 
+.oppia-suggestion-review-container {
+  width: 100%;
+  height: 350px;
+  padding: 10px;
+}
+
+.oppia-suggestion-review-panel-container {
+  width: 49%;
+  height: 100%;
+}
+.oppia-suggestion-review-panel {
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+  overflow: scroll;
+}
