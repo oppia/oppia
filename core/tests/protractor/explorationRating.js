@@ -29,7 +29,7 @@ describe('Gallery view', function() {
   var EXPLORATION_SILMARILS = 'silmarils';
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
-  var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
+  var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
 
   it('should display ratings on exploration when minimum ratings have been submitted', function() {
     users.createUser('rating@example.com', 'Rating');
