@@ -26,7 +26,7 @@ var gallery = require('../protractor_utils/gallery.js');
 var forms = require('../protractor_utils/forms.js');
 
 describe('Gallery view', function() {
-  var EXPLORATION_SILMARILS = 'silmarils';
+  var EXPLORATION_RATINGTEST = 'RatingTest';
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
   var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
@@ -36,7 +36,7 @@ describe('Gallery view', function() {
     // Create an test exploration
     users.login('rating@example.com');
     workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
+      EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
       'hold the light of the two trees', LANGUAGE_ENGLISH);
     users.logout();
 
@@ -48,8 +48,8 @@ describe('Gallery view', function() {
       users.login(userEmail);
       browser.get(general.GALLERY_URL_SUFFIX);
       
-      gallery.playExploration(EXPLORATION_SILMARILS);
-      player.expectExplorationNameToBe('silmarils');
+      gallery.playExploration(EXPLORATION_RATINGTEST);
+      player.expectExplorationNameToBe('RatingTest');
       player.submitAnswer('Continue');
       player.reviewExploration(4);
 
@@ -57,24 +57,24 @@ describe('Gallery view', function() {
     }
 
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToBeNotDisplayed(EXPLORATION_SILMARILS);
+    gallery.expectExplorationRatingToBeNotDisplayed(EXPLORATION_RATINGTEST);
 
     var userEmail = 'Display@example.com';
     var username = 'Display';
     users.createUser(userEmail, username);
     users.login(userEmail);
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.playExploration(EXPLORATION_SILMARILS);
-    player.expectExplorationNameToBe('silmarils');
+    gallery.playExploration(EXPLORATION_RATINGTEST);
+    player.expectExplorationNameToBe('RatingTest');
     player.submitAnswer('Continue');
     player.reviewExploration(4);
 
     users.logout();
 
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToEqual(EXPLORATION_SILMARILS, '4.0');
+    gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
-    gallery.playExploration(EXPLORATION_SILMARILS);
+    gallery.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationRatingOnInformationCardToEqual('4');
   });
   afterEach(function() {

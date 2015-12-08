@@ -107,7 +107,7 @@ var expectExplorationRatingToEqual = function(name, ratingValue) {
 
 var expectExplorationRatingToBeNotDisplayed = function(name) {
   _getExplorationElements(name).then(function(elems) {
-    elems[0].all(by.css('.fa-star')).then(function(items) {
+    elems[0].all(by.css('.protractor-test-exp-summary-tile-rating')).then(function(items) {
       expect(items.length).toBe(0);
     });
   });
