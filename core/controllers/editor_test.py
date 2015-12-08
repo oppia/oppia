@@ -1006,7 +1006,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             'Default unpublishing email body')
 
     def test_error_cases_for_email_sending(self):
-        with self.swap(feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True):
+        with self.swap(
+                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            ), self.swap(
+                feconf, 'CAN_SEND_EMAILS_TO_USERS', False):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
