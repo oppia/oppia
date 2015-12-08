@@ -27,15 +27,14 @@ var forms = require('../protractor_utils/forms.js');
 
 describe('Gallery view', function() {
   var EXPLORATION_SILMARILS = 'silmarils';
-  var EXPLORATION_VINGILOT = 'Vingilot';
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
-  var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
+  var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 5;
 
-  it('shouldnot display ratings on exploration when submitted rating is less than minimum number', function() {
-    users.createUser('feanor@exmple.com', 'Feanor');
+  it('should display ratings on exploration when minimum ratings have been submitted', function() {
+    users.createUser('rating@example.com', 'Rating');
     // Create an test exploration
-    users.login('feanor@exmple.com');
+    users.login('rating@example.com');
     workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
       'hold the light of the two trees', LANGUAGE_ENGLISH);
@@ -47,8 +46,8 @@ describe('Gallery view', function() {
       var username = 'NoDisplay' + i;
       users.createUser(userEmail, username);
       users.login(userEmail);
-      browser.get('/gallery');
-      general.waitForSystem();
+      browser.get(general.GALLERY_URL_SUFFIX);
+      
       gallery.playExploration(EXPLORATION_SILMARILS);
       player.expectExplorationNameToBe('silmarils');
       player.submitAnswer('Continue');
@@ -56,35 +55,27 @@ describe('Gallery view', function() {
 
       users.logout();
     }
-    browser.get('/gallery');
-    gallery.expectExplorationRatingToBeNotDisplayed(EXPLORATION_SILMARILS);
-  });
 
-  it('should display ratings when minimum rating is submitted', function() {
-    // Create an test exploration
-    users.login('feanor@exmple.com');
-    workflow.createAndPublishExploration(
-      EXPLORATION_VINGILOT, CATEGORY_BUSINESS,
-      'seek the aid of the Valar', LANGUAGE_ENGLISH);
+    browser.get(general.GALLERY_URL_SUFFIX);
+    gallery.expectExplorationRatingToBeNotDisplayed(EXPLORATION_SILMARILS);
+
+    var userEmail = 'Display@example.com';
+    var username = 'Display';
+    users.createUser(userEmail, username);
+    users.login(userEmail);
+    browser.get(general.GALLERY_URL_SUFFIX);
+    gallery.playExploration(EXPLORATION_SILMARILS);
+    player.expectExplorationNameToBe('silmarils');
+    player.submitAnswer('Continue');
+    player.reviewExploration(4);
+
     users.logout();
 
-    // Create test users, play exploration and review them after completion
-    for (var i = 0; i < MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS; i++) {
-      var userEmail = 'Display' + i + '@example.com';
-      var username = 'Display' + i;
-      users.createUser(userEmail, username);
-      users.login(userEmail);
-      browser.get('/gallery');
-      general.waitForSystem();
-      gallery.playExploration(EXPLORATION_VINGILOT);
-      player.expectExplorationNameToBe('Vingilot');
-      player.submitAnswer('Continue');
-      player.reviewExploration(4);
+    browser.get(general.GALLERY_URL_SUFFIX);
+    gallery.expectExplorationRatingToEqual(EXPLORATION_SILMARILS, '4.0');
 
-      users.logout();
-    }
-    browser.get('/gallery');
-    gallery.expectExplorationRatingToBeDisplayed(EXPLORATION_VINGILOT);
+    gallery.playExploration(EXPLORATION_SILMARILS);
+    player.expectExplorationRatingOnInformationCardToEqual('4');
   });
   afterEach(function() {
     general.checkForConsoleErrors([]);

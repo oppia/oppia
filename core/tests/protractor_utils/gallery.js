@@ -96,10 +96,11 @@ var getExplorationObjective = function(name) {
   });
 };
 
-var expectExplorationRatingToBeDisplayed = function(name) {
+var expectExplorationRatingToEqual = function(name, ratingValue) {
   _getExplorationElements(name).then(function(elems) {
-    elems[0].element(by.css('.fa-star')).isDisplayed().then(function(displayed) {
-      expect(displayed).toBe(true);
+    elems[0].element(by.css('.protractor-test-exp-summary-tile-rating')).
+      getText().then(function(value) {
+        expect(value).toBe(ratingValue);
     });
   });
 };
@@ -124,5 +125,5 @@ exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;
 exports.getExplorationObjective = getExplorationObjective;
 
-exports.expectExplorationRatingToBeDisplayed = expectExplorationRatingToBeDisplayed
-exports.expectExplorationRatingToBeNotDisplayed = expectExplorationRatingToBeNotDisplayed
+exports.expectExplorationRatingToEqual = expectExplorationRatingToEqual;
+exports.expectExplorationRatingToBeNotDisplayed = expectExplorationRatingToBeNotDisplayed;
