@@ -88,7 +88,6 @@ oppia.factory('searchService', [
         searchQuery + _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
-
       $http.get(queryUrl).success(function(data) {
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
@@ -103,12 +102,9 @@ oppia.factory('searchService', [
       }
     },
     loadMoreData: function(successCallback) {
-      // When a new query is sent, wait for it to return before attempting to
-      // fetch more results.
+      // If a new query is still being sent, do not fetch more results.
       if (_isCurrentlyFetchingResults) {
-        $timeout(function() {
-          this.loadMoreData(successCallback);
-        }, 3000);
+        return;
       }
 
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
@@ -118,8 +114,10 @@ oppia.factory('searchService', [
         queryUrl += '&cursor=' + _searchCursor;
       }
 
+      _isCurrentlyFetchingResults = true;
       $http.get(queryUrl).success(function(data) {
         _searchCursor = data.search_cursor;
+        _isCurrentlyFetchingResults = false;
         if (successCallback) {
           successCallback(data, hasPageFinishedLoading());
         }
