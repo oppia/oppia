@@ -677,7 +677,6 @@ oppia.directive('conversationSkin', [function() {
 
       $window.addEventListener('scroll', function() {
         fadeDotsOnScroll();
-        fixSupplementOnScroll();
       });
 
       var fadeDotsOnScroll = function() {
@@ -686,16 +685,6 @@ oppia.directive('conversationSkin', [function() {
         var newOpacity = Math.max(
           (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
         progressDots.css({opacity: newOpacity});
-      };
-
-      var fixSupplementOnScroll = function() {
-        var supplementCard = $('div.conversation-skin-supplemental-card');
-        var topMargin = $('.navbar-container').height() - 20;
-        if ($(window).scrollTop() > topMargin) {
-          supplementCard.addClass('conversation-skin-supplemental-card-fixed');
-        } else {
-          supplementCard.removeClass('conversation-skin-supplemental-card-fixed');
-        }
       };
 
       $scope.canWindowFitTwoCards = function() {
