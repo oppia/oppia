@@ -35,46 +35,6 @@ IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 
 
-def get_state_rules_stats(exploration_id, state_name):
-    """Gets statistics for the answer groups and rules of this state.
-
-    Returns:
-        A dict, keyed by the string '{HANDLER_NAME}.{RULE_STR}', whose
-        values are the corresponding stats_domain.StateRuleAnswerLog
-        instances.
-    """
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    state = exploration.states[state_name]
-
-    # TODO(bhenning): Everything is handler name submit; therefore, this is
-    # pointless and should be removed.
-    _OLD_SUBMIT_HANDLER_NAME = 'submit'
-    rule_keys = []
-    for group in state.interaction.answer_groups:
-        for rule in group.rule_specs:
-            rule_keys.append((
-                _OLD_SUBMIT_HANDLER_NAME, rule.stringify_classified_rule()))
-
-    if state.interaction.default_outcome:
-        rule_keys.append((
-            _OLD_SUBMIT_HANDLER_NAME, exp_domain.DEFAULT_RULESPEC_STR))
-
-    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_key[1]
-        } for rule_key in rule_keys])
-
-    results = {}
-    for ind, answer_log in enumerate(answer_logs):
-        results['.'.join(rule_keys[ind])] = {
-            'answers': answer_log.get_top_answers(5),
-            'rule_hits': answer_log.total_answer_count
-        }
-
-    return results
-
-
 def get_visualizations_info(exploration_id, exploration_version, state_name):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
@@ -140,6 +100,8 @@ def get_top_state_rule_answers(
         return []
 
 
+# TODO(bhenning): This needs to be migrated to the frontend. It should also
+# have a answer summarizer calculation associated with it.
 def get_state_improvements(exploration_id, exploration_version):
     """Returns a list of dicts, each representing a suggestion for improvement
     to a particular state.

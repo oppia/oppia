@@ -482,32 +482,6 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                     feconf.DEFAULT_QUERY_LIMIT)]
 
 
-def process_submitted_answer(
-        exploration_id, exploration_version, state_name,
-        rule_spec_string, answer):
-    """Adds an answer to the answer log for the rule it hits.
-
-    Args:
-        exploration_id: the exploration id
-        state_name: the state name
-        answer: an HTML string representation of the answer
-    """
-    # Add answer to StateRuleAnswerLogModel
-    answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, rule_spec_string)
-    if answer in answer_log.answers:
-        answer_log.answers[answer] += 1
-    else:
-        answer_log.answers[answer] = 1
-
-    # This may fail due to answer_log.answers being larger than 1 MB in size.
-    try:
-        answer_log.put()
-    except Exception as e:
-        logging.error(e)
-        pass
-
-
 class StateAnswersModel(base_models.BaseModel):
     """Store all answers of a state.
 

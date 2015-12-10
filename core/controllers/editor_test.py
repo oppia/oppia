@@ -20,11 +20,13 @@ import os
 import StringIO
 import zipfile
 
+from core import jobs_registry
 from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
+from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.tests import test_utils
@@ -64,6 +66,10 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 
 class EditorTest(BaseEditorControllerTest):
+
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator
+    ]
 
     def setUp(self):
         super(EditorTest, self).setUp()
@@ -202,7 +208,7 @@ class EditorTest(BaseEditorControllerTest):
                 exploration_dict['exploration']['states'][state_name][
                     'interaction']['id'], 'TextInput')
 
-            # Input happy since there is an explicit rule checking for that.
+            # Input happy since there is a hard rule checking for that.
             result_dict = self.submit_answer('15', state_name, 'happy')
 
             # Input text not at all similar to happy (default outcome).
@@ -215,6 +221,16 @@ class EditorTest(BaseEditorControllerTest):
             # Input joyful: this is not training data but will be classified
             # under the fuzzy rule.
             self.submit_answer('15', state_name, 'joyful')
+
+            # Perform answer summarization on the summarized answers.
+            with self.swap(
+                    jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                    self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+                # Run job on exploration with answers
+                stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation()
+                self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+                self.process_and_flush_pending_tasks()
+                self.assertEqual(self.count_jobs_in_taskqueue(), 0)
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)

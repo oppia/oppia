@@ -389,7 +389,6 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         ModifiedInteractionAnswerSummariesAggregator]
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
 
     def _record_start(self, exp_id, exp_version, state_name, session_id):
         event_services.StartExplorationEventHandler.record(
@@ -434,21 +433,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # add some answers
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, FIRST_STATE_NAME,
-                self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
-                'answer1')
+                exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
+                'session1', time_spent, params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, FIRST_STATE_NAME,
-                self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
-                'answer1')
+                exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
+                'session2', time_spent, params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, FIRST_STATE_NAME,
-                self.DEFAULT_RULESPEC_STR, 'session1', time_spent, params,
-                'answer2')
+                exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
+                'session1', time_spent, params, 'answer2')
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, exp_version, SECOND_STATE_NAME,
-                self.DEFAULT_RULESPEC_STR, 'session2', time_spent, params,
-                'answer3')
+                exp_id, exp_version, SECOND_STATE_NAME, 0, 0,
+                'session2', time_spent, params, 'answer3')
 
             # Run job on exploration with answers
             ModifiedInteractionAnswerSummariesAggregator.start_computation()

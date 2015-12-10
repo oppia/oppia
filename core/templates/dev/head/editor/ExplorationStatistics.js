@@ -128,49 +128,18 @@ oppia.controller('ExplorationStatistics', [
           improvementType: function() {
             return improvementType;
           },
-          rulesStats: function() {
-            return response.data.rules_stats;
-          },
           visualizationsInfo: function() {
             return response.data.visualizations_info;
           }
         },
         controller: [
           '$scope', '$modalInstance', '$filter', 'stateName', 'oppiaHtmlEscaper',
-          'stateStats', 'improvementType', 'rulesStats', 'visualizationsInfo', function(
+          'stateStats', 'improvementType', 'visualizationsInfo', function(
              $scope, $modalInstance, $filter, stateName, oppiaHtmlEscaper,
-             stateStats, improvementType, rulesStats, visualizationsInfo) {
+             stateStats, improvementType, visualizationsInfo) {
           $scope.stateName = stateName;
           $scope.stateStats = stateStats;
           $scope.improvementType = improvementType;
-          $scope.rulesStats = rulesStats;
-
-          $scope.getNumTimesString = function(numberOfTimes) {
-            var suffix = (numberOfTimes == 1 ? ' time' : ' times');
-            return numberOfTimes + suffix;
-          };
-
-          $scope.getHumanReadableRuleName = function(ruleName) {
-            return ruleName.substring('submit.'.length);
-          };
-
-          $scope.isEmpty = function(obj) {
-            for (var property in obj) {
-              if (obj.hasOwnProperty(property)) {
-                return false;
-              }
-            }
-            return true;
-          };
-
-          $scope.doesAnswerExist = function() {
-            for (var rule in $scope.rulesStats) {
-              if ($scope.rulesStats[rule].answers.length > 0) {
-                return true;
-              }
-            }
-            return false;
-          };
 
           var _getVisualizationsHtml = function() {
             var htmlSnippets = [];

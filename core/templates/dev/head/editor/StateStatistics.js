@@ -41,7 +41,8 @@ oppia.controller('StateStatistics', [
       $scope.trainingDataButtonContentsList = [];
 
       var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
-      var trainingDataCounts = trainingDataService.getTrainingDataCounts();
+      var trainingDataFrequencies = (
+        trainingDataService.getTrainingDataFrequencies());
       for (var i = 0; i < trainingDataAnswers.length; i++) {
         var answerHtml = (
           oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
@@ -49,7 +50,7 @@ oppia.controller('StateStatistics', [
             stateCustomizationArgsService.savedMemento));
         $scope.trainingDataButtonContentsList.push({
           'answerHtml': answerHtml,
-          'count': trainingDataCounts[i]
+          'frequency': trainingDataFrequencies[i]
         });
       }
     });

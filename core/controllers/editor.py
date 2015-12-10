@@ -535,8 +535,8 @@ class UntrainedAnswersHandler(EditorHandler):
             try:
                 # Normalize the answers.
                 for answer in answers:
-                    answer['value'] = interaction_instance.normalize_answer(
-                        answer['value'])
+                    answer['answer'] = interaction_instance.normalize_answer(
+                        answer['answer'])
 
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
@@ -556,7 +556,7 @@ class UntrainedAnswersHandler(EditorHandler):
 
                 unhandled_answers = [
                     answer for answer in answers
-                    if answer['value'] not in trained_answers
+                    if answer['answer'] not in trained_answers
                 ]
             except Exception as e:
                 logging.warning(
@@ -745,8 +745,6 @@ class StateRulesStatsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'rules_stats': stats_services.get_state_rules_stats(
-                exploration_id, state_name),
             'visualizations_info': stats_services.get_visualizations_info(
                 exploration_id, current_version, state_name),
         })
