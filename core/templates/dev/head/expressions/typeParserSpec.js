@@ -54,7 +54,12 @@ describe('Expression type parser service', function() {
       ['boolTrue == boolFalse', 'UnicodeString'],
       ['strNull != strXYZ', 'UnicodeString'],
       ['if boolFalse then 8 else numZero', 'Real'],
-      ['if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError],
+      ['if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError,
+       'ExprWrongArgTypeError: Type Real does not match expected type ' +
+       'UnicodeString'],
+      ['strXYZ * 2', ests.ExprWrongArgTypeError,
+       'ExprWrongArgTypeError: Type UnicodeString does not match expected ' +
+       'type Real'],
       ['num100_001 / 0', 'Real'],
       ['abs(-3)', 'Real'],
       ['pow(num100_001, numZero)', 'Real'],
@@ -62,6 +67,9 @@ describe('Expression type parser service', function() {
     ].forEach(function(test) {
       var expression = test[0];
       var expected = test[1];
+      if (test.length > 2) {
+        var errorString = test[2];
+      }
 
       // 'expected' should be either a JavaScript primitive value that would be
       // the result of evaluation 'expression', or an exception that is
@@ -96,6 +104,11 @@ describe('Expression type parser service', function() {
         if (!(e instanceof expected)) {
           // Wrong or unexpected exception.
           recordFailure(undefined, e);
+        } else {
+          if (errorString !== e.toString()) {
+            // Wrong error string.
+            recordFailure(errorString, e.toString());
+          }
         }
       }
       expect(failed).toBe(false);

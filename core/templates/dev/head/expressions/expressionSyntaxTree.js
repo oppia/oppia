@@ -52,6 +52,10 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
       ExprWrongArgTypeError.prototype.constructor = ExprWrongArgTypeError;
       ExprWrongArgTypeError.prototype.name = 'ExprWrongArgTypeError';
       ExprWrongArgTypeError.prototype.toString = function() {
+        if (this.arg == null) {
+          return this.name + ': Type ' + this.actualType +
+          ' does not match expected type ' + this.expectedType;
+        }
         return this.name + ': ' + this.arg + ' has type ' + this.actualType +
           ' which does not match expected type ' + this.expectedType;
       };
@@ -101,8 +105,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
       var _verifyArgsHaveType = function(args, expectedType) {
         for (var i = 0; i < args.length; i++) {
           if (args[i] != expectedType) {
-            throw new ExprWrongArgTypeError(
-              originalValue, typeof originalValue, expectedType);
+            throw new ExprWrongArgTypeError(null, args[i], expectedType);
           }
         }
         return true;
@@ -110,7 +113,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
 
       var _verifyArgsHaveSameType = function(arg1, arg2) {
         if (arg1 != arg2) {
-          throw new ExprWrongArgTypeError(arg1, arg1, arg2);
+          throw new ExprWrongArgTypeError(null, arg1, arg2);
         }
         return true;
       };
@@ -176,18 +179,22 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
       //   parameter name. Also, to prevent future explorations using it,
       //   modify feconf.INVALID_PARAMETER_NAMES accordingly.
       // TODO(kashida): Document all operators input and output contracts.
+      // Arguments:
+      // args: the values that need to be evaluated by these operators
+      // envs: for getType(): a mapping of variable names to their types
+      //       for eval(): a mapping of variable names to their values
 
       var system = {
         '#': {
-          type: function(args, envs) {
-            return lookupEnvs(args + '', envs);
+          getType: function(args, envs) {
+            return lookupEnvs(args, envs);
           },
           eval: function(args, envs) {
-            return lookupEnvs(args[0] + '', envs);
+            return lookupEnvs(args[0], envs);
           }
         },
         '+': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 1, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -200,7 +207,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '-': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 1, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -213,7 +220,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '*': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -225,7 +232,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '/': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -237,7 +244,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '%': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -249,7 +256,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '<=': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'UnicodeString';
@@ -261,7 +268,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '>=': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'UnicodeString';
@@ -273,7 +280,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '<': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'UnicodeString';
@@ -285,7 +292,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '>': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'UnicodeString';
@@ -297,7 +304,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '!': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 1);
             _verifyArgsHaveType(args, 'UnicodeString');
             return 'UnicodeString';
@@ -308,7 +315,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '==': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             return 'UnicodeString';
           },
@@ -318,7 +325,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '!=': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             return 'UnicodeString';
           },
@@ -328,7 +335,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '&&': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'UnicodeString');
             return 'UnicodeString';
@@ -340,7 +347,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '||': {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'UnicodeString');
             return 'UnicodeString';
@@ -352,7 +359,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         if: {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 3);
             _verifyArgsHaveType([args[0]], 'UnicodeString');
             _verifyArgsHaveSameType(args[1], args[2]);
@@ -365,7 +372,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         floor: {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 1);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -377,7 +384,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         pow: {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -389,7 +396,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         log: {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 2);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';
@@ -401,7 +408,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         abs: {
-          type: function(args, envs) {
+          getType: function(args, envs) {
             verifyNumArgs(args, 1);
             _verifyArgsHaveType(args, 'Real');
             return 'Real';

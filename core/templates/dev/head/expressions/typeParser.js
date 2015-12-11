@@ -37,17 +37,18 @@ oppia.factory('expressionTypeParserService', ['$log',
           }
 
           // Now the first element should be a function name.
-          var op = expressionSyntaxTreeService.lookupEnvs(parsed[0], envs).type;
+          var getType = expressionSyntaxTreeService.lookupEnvs(
+            parsed[0], envs).getType;
 
           if (parsed[0] == '#') {
-            return op(parsed[1], envs);
+            return getType(parsed[1], envs);
           }
 
           // Evaluate rest of the elements, i.e. the arguments.
           var args = parsed.slice(1).map(function(item) {
             return evaluate(item, envs);
           });
-          return op(args, envs);
+          return getType(args, envs);
         }
 
         // This should be a terminal node with the actual value.
