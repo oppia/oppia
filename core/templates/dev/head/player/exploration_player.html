@@ -12,6 +12,8 @@
       GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
       GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
+      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+      GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
     </script>
   {% endif %}
 
@@ -22,7 +24,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCard">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span class="oppia-exploration-title protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
+      <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
     <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
@@ -59,7 +61,6 @@
   {% endif %}
 
   {% include 'components/exploration_embed_button.html' %}
-  {% include 'components/ratings.html' %}
   {% include 'components/profile_link.html' %}
 
   <script type="text/ng-template" id="popover/feedback">
@@ -79,7 +80,7 @@
         <p ng-if="!explorationDescription">No objective specified.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
-            <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top"></span>
+            <span class="fa fa-star fa-lg" tooltip="Average Rating" tooltip-placement="top"></span>
             <span ng-if="explorationRatings === 0">Unrated</span>
             <span ng-if="explorationRatings !== 0"><[explorationRatings]></span>
           </li>
@@ -220,10 +221,10 @@
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}
+    {{ include_js_file('player/AnswerClassificationService.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/profileLink.js')}}
-    {{ include_js_file('components/ratings.js')}}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 

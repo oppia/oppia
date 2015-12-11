@@ -86,40 +86,6 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   };
 }]);
 
-// A service that, given an answer, classifies it and returns the corresponding
-// answerGroup.
-oppia.factory('answerClassificationService', [
-    '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
-  var _USE_CLIENT_SIDE_CLASSIFICATION = false;
-
-  return {
-    // Returns a promise with the corresponding ruleSpec.
-    getMatchingClassificationResult: function(explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: learnerParamsService.getAllParams(),
-          answer: answer
-        });
-      }
-    },
-    getMatchingEditorClassificationResult: function(
-        explorationId, oldState, answer) {
-      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
-        // TODO(bhenning): Figure out a long-term solution for determining what
-        // params should be passed to the batch classifier.
-        var classifyUrl = '/explorehandler/classify/' + explorationId;
-        return $http.post(classifyUrl, {
-          old_state: oldState,
-          params: {},
-          answer: answer
-        });
-      }
-    },
-  };
-}]);
-
 // A service that provides a number of utility functions for JS used by
 // individual player skins.
 // Note that this service is used both in the learner and the editor views.
@@ -152,6 +118,7 @@ oppia.factory('oppiaPlayerService', [
   var _explorationContributorUsernames = [];
   var _explorationLastUpdatedMsec = null;
   var _viewersCount = null;
+  var _currentRatings = {};
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
@@ -159,6 +126,7 @@ oppia.factory('oppiaPlayerService', [
   var sessionId = null;
   var _isLoggedIn = GLOBALS.userIsLoggedIn;
   var _exploration = null;
+  var _collection_id = GLOBALS.collectionId;
 
   learnerParamsService.init({});
   var stateHistory = [];
@@ -237,7 +205,8 @@ oppia.factory('oppiaPlayerService', [
           params: learnerParamsService.getAllParams(),
           session_id: sessionId,
           state_name: newStateName,
-          version: version
+          version: version,
+          collection_id: _collection_id,
         });
       }
     }
@@ -318,53 +287,36 @@ oppia.factory('oppiaPlayerService', [
 
   var _loadInitialInformationCardData = function() {
 
-    // TODO(sll): move these three handlers into a separate exp_metadata.py controller.
-    var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
-    var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
+    // TODO(sll): move this and the summary handlers into a separate
+    // exp_metadata.py controller.
     var infoCardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
 
     var deferredContributors = $q.defer();
     var deferredStatistics = $q.defer();
-    var deferredSnapshots = $q.defer();
 
-    // This is needed to get exploration objective/goal, contributors
-    // and exploration tags.
-    $http.get(infoCardDataUrl).success(function(data) {
-      _explorationObjective = data.objective;
-      _explorationTags = data.tags;
-      // TODO(sll): in the backend, compute the actual contributors
-      // based on the list of commits to the exploration.
-      _explorationContributorUsernames = data.rights.owner_names.concat(
-        data.rights.editor_names);
+    $http({
+      method: 'GET',
+      url: '/explorationsummarieshandler/data',
+      params: {
+        stringified_exp_ids: JSON.stringify([_explorationId])
+      }
+    }).success(function(data) {
+      _explorationObjective = data.summaries[0].objective;
+      _explorationTags = data.summaries[0].tags;
+      _currentRatings = data.summaries[0].ratings;
+      _explorationContributorUsernames = data.summaries[0].contributor_names;
+      _explorationLastUpdatedMsec = data.summaries[0].last_updated;
       deferredContributors.resolve(data);
-    }).error(function(data) {
-      deferredContributors.reject(data);
-      $log.error('There was an error loading the exploration information.');
     });
 
-    // This is needed to get exploration snapshots.
-    $http.get(infoCardSnapshotsUrl).success(function(data) {
-      var data = data.snapshots;
-      // Only get last published changes/get changes from the last snapshot.
-      _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
-      deferredSnapshots.resolve(data);
-    }).error(function(data) {
-      deferredSnapshots.reject(data);
-      $log.error('There was an error loading the exploration history');
-    });
-
-    // This is needed to get statistics of the exprolation.
+    // This is needed to get statistics of the exploration.
     $http.get(infoCardStatisticsUrl).success(function(data) {
-      // Only get number of viewers who started an exploration.
       _viewersCount = data.num_starts;
       deferredStatistics.resolve(_viewersCount);
-    }).error(function(data) {
-      deferredStatistics.reject(data);
-      $log.error('There was an error loading the exploration statistics');
     });
 
-   return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
-      deferredContributors.promise]);
+    return $q.all([
+      deferredStatistics.promise, deferredContributors.promise]);
   };
 
   return {
@@ -419,9 +371,6 @@ oppia.factory('oppiaPlayerService', [
           messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
             explorationVersion: version
           });
-        }).error(function(data) {
-          warningsData.addWarning(
-            data.error || 'There was an error loading the exploration.');
         });
       }
     },
@@ -436,6 +385,7 @@ oppia.factory('oppiaPlayerService', [
     },
     getInformationCardData: function() {
       var informationCardData = {
+        currentRatings: _currentRatings,
         explorationTags: _explorationTags,
         infoCardImageUrl: _infoCardImageUrl,
         explorationObjective: _explorationObjective,
@@ -535,7 +485,8 @@ oppia.factory('oppiaPlayerService', [
           answer, currentInteraction.id, currentInteraction.customization_args);
       }
     },
-    submitAnswer: function(answer, successCallback, delayParamUpdates) {
+    submitAnswer: function(
+        answer, interactionRulesService, successCallback, delayParamUpdates) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -546,8 +497,8 @@ oppia.factory('oppiaPlayerService', [
       var oldState = angular.copy(_exploration.states[_currentStateName]);
 
       answerClassificationService.getMatchingClassificationResult(
-        _explorationId, oldState, answer
-      ).success(function(classificationResult) {
+        _explorationId, oldState, answer, false, interactionRulesService
+      ).then(function(classificationResult) {
         var outcome = classificationResult.outcome;
 
         if (!_editorPreviewMode) {
@@ -558,7 +509,8 @@ oppia.factory('oppiaPlayerService', [
             params: learnerParamsService.getAllParams(),
             version: version,
             old_state_name: _currentStateName,
-            rule_spec_string: classificationResult.rule_spec_string
+            answer_group_index: classificationResult.answerGroupIndex,
+            rule_spec_index: classificationResult.ruleSpecIndex
           });
         }
 
@@ -587,7 +539,7 @@ oppia.factory('oppiaPlayerService', [
           outcome, _exploration.states[newStateName], answer);
 
         if (nextStateData) {
-          nextStateData['state_name'] = newStateName;
+          nextStateData.state_name = newStateName;
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
@@ -810,10 +762,10 @@ oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal
       controller: [
          '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService',
          'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService',
-         'oppiaDatetimeFormatter',
+         'oppiaDatetimeFormatter', 'ratingComputationService',
          function ($scope, $http, $modal, $modalInstance, oppiaPlayerService,
                    ratingService, oppiaHtmlEscaper, embedExplorationButtonService,
-                   oppiaDatetimeFormatter) {
+                   oppiaDatetimeFormatter, ratingComputationService) {
 
         var _informationCardData = oppiaPlayerService.getInformationCardData();
         $scope.serverName = window.location.protocol + '//' + window.location.host;
@@ -828,8 +780,8 @@ oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal
         $scope.infoCardBackgroundImageCss = {
           'background-image': 'url('+ _informationCardData.infoCardImageUrl + ')'
         };
-        $scope.explorationRatings = ratingService.getUserRating() !== null ?
-                                    ratingService.getUserRating() : 0;
+        $scope.explorationRatings = ratingComputationService.computeAverageRating(
+          _informationCardData.currentRatings) || 'Unrated';
 
         var _explorationTagsSummary = function(arrayOfTags) {
           var _tagsToBeShown =[];
@@ -846,7 +798,8 @@ oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal
             tagsInTooltip: _tagsInTooltip
           };
         };
-        $scope.explorationTags = _explorationTagsSummary(_informationCardData.explorationTags);
+        $scope.explorationTags = _explorationTagsSummary(
+          _informationCardData.explorationTags);
         $scope.explorationDescription = _informationCardData.explorationObjective;
         $scope.explorationContributorUsernames = _informationCardData.explorationContributorUsernames;
         $scope.explorationLastUpdatedMsec = _informationCardData.explorationLastUpdatedMsec;

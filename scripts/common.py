@@ -23,10 +23,23 @@ def ensure_directory_exists(d):
         os.makedirs(d)
 
 
-def require_cwd_to_be_oppia():
-    """Ensures that the current working directory ends in 'oppia'."""
-    if not os.getcwd().endswith('oppia'):
-        raise Exception('Please run this script from the oppia/ directory.')
+def require_cwd_to_be_oppia(allow_deploy_dir=False):
+    """Ensures that the current working directory ends in 'oppia'.
+
+    If allow_deploy_dir is True, this also allows the cwd to be a directory
+    called 'deploy-*' which is a sibling of the oppia/ directory.
+    """
+    is_oppia_dir = os.getcwd().endswith('oppia')
+
+    current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
+    is_deploy_dir = (
+        current_dirname.startswith('deploy-') and
+        os.path.isdir(os.path.join(os.getcwd(), '..', 'oppia')))
+
+    if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
+        return
+
+    raise Exception('Please run this script from the oppia/ directory.')
 
 
 class CD(object):

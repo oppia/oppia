@@ -32,10 +32,10 @@ import pprint
 import StringIO
 import zipfile
 
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -150,7 +150,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.version,
+        exp_summary_model.contributor_ids, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
@@ -235,6 +235,46 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     result.update(db_results_dict)
     return result
+
+
+def get_displayable_exp_summary_dicts_matching_ids(
+        exploration_ids, user_id):
+    """Given a list of exploration ids, filters the list for
+    explorations that are currently non-private and not deleted,
+    and returns a list of dicts of the corresponding exploration summaries.
+    """
+    displayable_exploration_summaries = []
+    exploration_summaries = get_exploration_summaries_matching_ids(
+        exploration_ids)
+
+    for exploration_summary in exploration_summaries:
+        if exploration_summary and exploration_summary.status != (
+            rights_manager.ACTIVITY_STATUS_PRIVATE):
+            displayable_exploration_summaries.append({
+                'id': exploration_summary.id,
+                'status': exploration_summary.status,
+                'community_owned': exploration_summary.community_owned,
+                'last_updated_msec': (
+                    utils.get_time_in_millisecs(
+                        exploration_summary.exploration_model_last_updated
+                    )),
+                'is_editable': (
+                    is_exp_summary_editable(exploration_summary, user_id)),
+                'language_code': exploration_summary.language_code,
+                'category': exploration_summary.category,
+                'ratings': exploration_summary.ratings,
+                'title': exploration_summary.title,
+                'objective': exploration_summary.objective,
+                'thumbnail_image_url': (
+                    exploration_summary.thumbnail_image_url
+                ),
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    exploration_summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exploration_summary.category)
+            })
+
+    return displayable_exploration_summaries
 
 
 def get_new_exploration_id():
@@ -396,7 +436,8 @@ def export_to_zip_file(exploration_id, version=None):
 def export_states_to_yaml(exploration_id, version=None, width=80):
     """Returns a python dictionary of the exploration, whose keys are state
     names and values are yaml strings representing the state contents with
-    lines wrapped at 'width' characters."""
+    lines wrapped at 'width' characters.
+    """
     exploration = get_exploration_by_id(exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
@@ -803,7 +844,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
-    event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
@@ -840,9 +880,8 @@ def _create_exploration(
         param_changes=exploration.param_change_dicts,
     )
     model.commit(committer_id, commit_message, commit_cmds)
-    event_services.ExplorationContentChangeEventHandler.record(exploration.id)
     exploration.version += 1
-    create_exploration_summary(exploration.id)
+    create_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -853,6 +892,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+    user_services.add_created_exploration_id(committer_id, exploration.id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -928,6 +969,21 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
+def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+    """Publishes the exploration with publish_exploration() function in
+    rights_manager.py, as well as updates first_contribution_msec.
+
+    It is the responsibility of the caller to check that the exploration is
+    valid prior to publication.
+    """
+    rights_manager.publish_exploration(committer_id, exp_id)
+    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
+    for contributor in contributor_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            contributor, contribution_time_msec)
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
@@ -951,36 +1007,54 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
-
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id)
+    update_exploration_summary(exploration.id, committer_id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
+
+    if not rights_manager.is_exploration_private(exploration.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_exploration_summary(exploration_id):
+def create_exploration_summary(exploration_id, contributor_id_to_add):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(exploration_id):
+def update_exploration_summary(exploration_id, contributor_id_to_add):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration, contributor_id_to_add):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it.
+    domain object and return it. contributor_id_to_add will be added to
+    the list of contributors for the exploration if the argument is not
+    None and if the id is not a system id.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        contributor_ids = old_exp_summary.contributor_ids or []
     else:
         ratings = feconf.get_empty_ratings()
+        contributor_ids = []
+
+    # Update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an exploration's content).
+    if (contributor_id_to_add is not None and
+                contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
+            if contributor_id_to_add not in contributor_ids:
+                contributor_ids.append(contributor_id_to_add)
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -991,12 +1065,11 @@ def compute_summary_of_exploration(exploration):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated
-    )
+        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated)
 
     return exp_summary
-
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
@@ -1015,6 +1088,7 @@ def save_exploration_summary(exp_summary):
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
+        contributor_ids=exp_summary.contributor_ids,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
@@ -1063,7 +1137,9 @@ def revert_exploration(
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
 
-    update_exploration_summary(exploration_id)
+    # Update the exploration summary, but since this is just a revert do
+    # not add the committer of the revert to the list of contributors.
+    update_exploration_summary(exploration_id, None)
 
 
 # Creation and deletion methods.
@@ -1151,7 +1227,7 @@ def load_demo(exploration_id):
         feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
         exploration_id, assets_list)
 
-    rights_manager.publish_exploration(
+    publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])

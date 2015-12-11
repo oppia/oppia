@@ -107,8 +107,9 @@ describe('Ratings from frequencies directive', function() {
     ctrlScope = elt.isolateScope();
   }));
 
-  it('should not show an average rating if there are too few ratings',
+  it('should show an average rating only if there are enough individual ratings',
       function() {
+    // Don't show an average rating if there are too few ratings.
     expect(ctrlScope.computeAverageRating({
       '1': 0,
       '2': 0,
@@ -117,13 +118,23 @@ describe('Ratings from frequencies directive', function() {
       '5': 0
     })).toBe(undefined);
 
+    // Show an average rating once the minimum is reached.
     expect(ctrlScope.computeAverageRating({
-      '1': 0,
-      '2': 1,
-      '3': 1,
+      '1': 1,
+      '2': 0,
+      '3': 0,
       '4': 0,
       '5': 0
-    })).toBe(undefined);
+    })).toBe(1.0);
+
+    // Continue showing an average rating if additional ratings are added.
+    expect(ctrlScope.computeAverageRating({
+      '1': 1,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 1
+    })).toBe(3.0);
   });
 
   it('should compute average ratings correctly', function() {

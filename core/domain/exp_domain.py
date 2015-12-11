@@ -2442,7 +2442,8 @@ class Exploration(object):
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
-        necessary information to represent the exploration."""
+        necessary information to represent the exploration.
+        """
         return copy.deepcopy({
             'id': self.id,
             'title': self.title,
@@ -2464,7 +2465,8 @@ class Exploration(object):
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the
-        learner view."""
+        learner view.
+        """
         return {
             'init_state_name': self.init_state_name,
             'param_changes': self.param_change_dicts,
@@ -2500,7 +2502,8 @@ class ExplorationSummary(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, tags, ratings, status,
                  community_owned, owner_ids, editor_ids,
-                 viewer_ids, version, exploration_model_created_on,
+                 viewer_ids, contributor_ids, version,
+                 exploration_model_created_on,
                  exploration_model_last_updated):
         """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing frequency counts. Note
@@ -2526,6 +2529,7 @@ class ExplorationSummary(object):
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
+        self.contributor_ids = contributor_ids
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated

@@ -22,7 +22,6 @@ if [ "$SETUP_DONE" ]; then
   echo 'Environment setup completed.'
   return 0
 fi
-export SETUP_DONE=true
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -47,8 +46,11 @@ export NO_SKULPT
 export remaining_params
 
 EXPECTED_PWD='oppia'
-if [ ${PWD##*/} != $EXPECTED_PWD ]; then
-  echo This script should be run from the oppia/ root folder.
+# The second option allows this script to also be run from deployment folders.
+if [[ ${PWD##*/} != $EXPECTED_PWD ]] && [[ ${PWD##*/} != deploy-* ]]; then
+  echo ""
+  echo "  WARNING   This script should be run from the oppia/ root folder."
+  echo ""
   return 1
 fi
 
@@ -86,6 +88,51 @@ else
 fi
 
 export NPM_INSTALL="$NPM_CMD install"
+
+# Node is a requirement for all installation scripts. Here, we check if the OS
+# supports node.js installation; if not, we exit with an error.
+if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
+  echo ""
+  echo "  WARNING: Unsupported OS for installation of node.js."
+  echo "  If you are running this script on Windows, see the instructions"
+  echo "  here regarding installation of node.js:"
+  echo ""
+  echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29"
+  echo ""
+  echo "  STATUS: Installation completed except for node.js. Exiting."
+  echo ""
+  return 1
+fi
+
+# Download and install node.js.
+echo Checking if node.js is installed in $TOOLS_DIR
+if [ ! -d "$NODE_PATH" ]; then
+  echo Installing Node.js
+  if [ ${OS} == "Darwin" ]; then
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      NODE_FILE_NAME=node-v4.2.1-darwin-x64
+    else
+      NODE_FILE_NAME=node-v4.2.1-darwin-x86
+    fi
+  elif [ ${OS} == "Linux" ]; then
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      NODE_FILE_NAME=node-v4.2.1-linux-x64
+    else
+      NODE_FILE_NAME=node-v4.2.1-linux-x86
+    fi
+  fi
+
+  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  tar xzf node-download.tgz --directory $TOOLS_DIR
+  mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
+  rm node-download.tgz
+fi
+
+# Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
+#
+#   http://blog.npmjs.org/post/78085451721
+#
+$NPM_CMD config set ca ""
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [[ $TRAVIS == 'true' ]]; then
@@ -142,7 +189,37 @@ if ! test_python_version $PYTHON_CMD; then
         echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
     fi
     # Exit when no suitable Python environment can be found.
-    exit 1
+    return 1
   fi
 fi
 export PYTHON_CMD
+
+# List all node modules that are currently installed. The "npm list" command is
+# slow, so we precompute this here and refer to it as needed.
+echo "Generating list of installed node modules..."
+NPM_INSTALLED_MODULES="$($NPM_CMD list)"
+export NPM_INSTALLED_MODULES
+echo "done."
+
+install_node_module() {
+  # Usage: install_node_module [module_name] [module_version]
+  #
+  # module_name: the name of the node module
+  # module_version: the expected version of the module
+
+  echo Checking whether $1 is installed
+  if [ ! -d "$NODE_MODULE_DIR/$1" ]; then
+    echo installing $1
+    $NPM_INSTALL $1@$2
+  else
+    if [[ $NPM_INSTALLED_MODULES != *"$1@$2"* ]]; then
+      echo Version of $1 does not match $2. Reinstalling $1...
+      $NPM_INSTALL $1@$2
+      # Regenerate the list of installed modules.
+      NPM_INSTALLED_MODULES="$($NPM_CMD list)"
+    fi
+  fi
+}
+export -f install_node_module
+
+export SETUP_DONE=true

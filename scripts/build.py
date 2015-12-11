@@ -18,6 +18,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 
 HEAD_DIR = 'core/templates/dev/head/'
 OUT_DIR = 'core/templates/prod/head/'
@@ -62,9 +63,30 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
+def process_third_party_libs():
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    node_path = os.path.join(
+        parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
+    gulp_path = os.path.join(
+        parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
+    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True']
+    proc = subprocess.Popen(
+        gulp_build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    gulp_stdout, gulp_stderr = proc.communicate()
+    if gulp_stdout:
+        print gulp_stdout
+    if gulp_stderr:
+        print 'Gulp build process failed.Exiting'
+        print '----------------------------------------'
+        print gulp_stderr
+        sys.exit(1)
+
+
 # Script starts here.
 ensure_directory_exists(OUT_DIR)
 shutil.rmtree(OUT_DIR)
+process_third_party_libs()
+
 
 for root in os.listdir(os.path.join(os.getcwd())):
     if any([s in root for s in ['.git', 'third_party', 'extensions']]):

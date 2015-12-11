@@ -113,23 +113,22 @@ class GalleryHandler(base.BaseHandler):
             exp_services.get_exploration_summaries_matching_query(
                 query_string, cursor=search_cursor))
 
-        # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
-        # individual lookups. Note that this will depend on user_id.
         explorations_list = [{
             'id': exp_summary.id,
             'title': exp_summary.title,
             'category': exp_summary.category,
             'objective': exp_summary.objective,
             'language_code': exp_summary.language_code,
-            'last_updated': utils.get_time_in_millisecs(
+            'last_updated_msec': utils.get_time_in_millisecs(
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
+            'ratings': exp_summary.ratings,
             'community_owned': exp_summary.community_owned,
-            'thumbnail_image_url': exp_summary.thumbnail_image_url,
-            'is_editable': exp_services.is_exp_summary_editable(
-                exp_summary,
-                user_id=self.user_id),
-            'ratings': exp_summary.ratings
+            # TODO(sll): Replace these with per-category thumbnails.
+            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                exp_summary.category),
+            'thumbnail_bg_color': utils.get_hex_color_for_category(
+                exp_summary.category),
         } for exp_summary in exp_summaries_list]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
@@ -260,8 +259,16 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 'last_updated': utils.get_time_in_millisecs(
                     exp_summary.exploration_model_last_updated),
                 'status': exp_summary.status,
+                'ratings': exp_summary.ratings,
                 'community_owned': exp_summary.community_owned,
-                'thumbnail_image_url': exp_summary.thumbnail_image_url,
+                'contributor_names': user_services.get_human_readable_user_ids(
+                    exp_summary.contributor_ids),
+                'tags': exp_summary.tags,
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        exp_summary.category)),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exp_summary.category),
             }) for exp_summary in exp_summaries]
         })
         self.render_json(self.values)

@@ -317,6 +317,10 @@ def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
 
+def generate_new_session_id():
+    return generate_random_string(24)
+
+
 def vfs_construct_path(a, *p):
     """Mimics behavior of os.path.join on Posix machines."""
     path = a
@@ -397,3 +401,37 @@ def require_valid_name(name, name_type):
         if c in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' % (c, name_type, name))
+
+
+def capitalize_string(s):
+    """Converts the first character of a string to its uppercase equivalent (if
+    it's a letter), and returns the result.
+    """
+    # This guards against empty strings.
+    if s:
+        return s[0].upper() + s[1:]
+    else:
+        return s
+
+
+def get_info_card_url_for_category(category):
+    info_card_color = (
+        feconf.CATEGORIES_TO_COLORS[category] if
+        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
+    return (
+        '/images/gallery/exploration_background_%s_large.png' %
+        info_card_color)
+
+
+def get_hex_color_for_category(category):
+    color = (feconf.CATEGORIES_TO_COLORS[category] if
+        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
+    return feconf.COLORS_TO_HEX_VALUES[color]
+
+
+def get_thumbnail_icon_url_for_category(category):
+    icon_name = (
+        category if category in feconf.DEFAULT_CATEGORIES
+        else feconf.DEFAULT_THUMBNAIL_ICON)
+    # Remove all spaces from the string.
+    return '/images/gallery/thumbnails/%s.svg' % icon_name.replace(' ', '')

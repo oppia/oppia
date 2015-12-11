@@ -27,7 +27,8 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
-(collection_models,) = models.Registry.import_models([models.NAMES.collection])
+(collection_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.user])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 from core.tests import test_utils
@@ -114,6 +115,184 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                         'title': 'TitleA'
                     }
                 })
+
+
+class CollectionProgressUnitTests(CollectionServicesUnitTests):
+    """Tests functions which deal with any progress a user has made within a
+    collection, including query and recording methods related to explorations
+    which are played in the context of the collection.
+    """
+
+    COL_ID_0 = '0_collection_id'
+    COL_ID_1 = '1_collection_id'
+    EXP_ID_0 = '0_exploration_id'
+    EXP_ID_1 = '1_exploration_id'
+    EXP_ID_2 = '2_exploration_id'
+
+    def _get_progress_model(self, user_id, collection_id):
+        return user_models.CollectionProgressModel.get(user_id, collection_id)
+
+    def _record_completion(self, user_id, collection_id, exploration_id):
+        collection_services.record_played_exploration_in_collection_context(
+            user_id, collection_id, exploration_id)
+
+    def setUp(self):
+        super(CollectionProgressUnitTests, self).setUp()
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            self.COL_ID_0, self.OWNER_ID, exploration_id=self.EXP_ID_0)
+
+        # Create another two explorations and add them to the collection.
+        for exp_id in [self.EXP_ID_1, self.EXP_ID_2]:
+            self.save_new_valid_exploration(exp_id, self.OWNER_ID)
+            collection_services.update_collection(
+                self.OWNER_ID, self.COL_ID_0, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': exp_id
+                }], 'Added new exploration')
+
+    def test_get_completed_exploration_ids(self):
+        # There should be no exception if the user or collection do not exist;
+        # it should also return an empty list in both of these situations.
+        self.assertEqual(collection_services.get_completed_exploration_ids(
+            'Fake', self.COL_ID_0), [])
+        self.assertEqual(collection_services.get_completed_exploration_ids(
+            self.OWNER_ID, 'Fake'), [])
+
+        # If no model exists, there should be no completed exploration IDs.
+        self.assertIsNone(
+            self._get_progress_model(self.OWNER_ID, self.COL_ID_0))
+        self.assertEqual(collection_services.get_completed_exploration_ids(
+            self.OWNER_ID, self.COL_ID_0), [])
+
+        # If the first exploration is completed, it should be reported.
+        self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
+        self.assertIsNotNone(
+            self._get_progress_model(self.OWNER_ID, self.COL_ID_0))
+        self.assertEqual(collection_services.get_completed_exploration_ids(
+            self.OWNER_ID, self.COL_ID_0), [self.EXP_ID_0])
+
+        # If all explorations are completed, all of them should be reported.
+        # Also, they should be reported in the order they were completed.
+        self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_2)
+        self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_1)
+        self.assertEqual(
+            collection_services.get_completed_exploration_ids(
+                self.OWNER_ID, self.COL_ID_0),
+            [self.EXP_ID_0, self.EXP_ID_2, self.EXP_ID_1])
+
+    def test_get_next_exploration_ids_to_complete_by_user(self):
+        # This is an integration test depending on
+        # get_completed_exploration_ids and logic interal to collection_domain
+        # which is tested in isolation in collection_domain_test.
+
+        # Setup the connection graph. The user must complete the first
+        # exploration before they can do the third.
+        collection_services.update_collection(
+            self.OWNER_ID, self.COL_ID_0,
+                [{
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                    'exploration_id': self.EXP_ID_0,
+                    'property_name': 'acquired_skills',
+                    'new_value': ['0_exp_skill']
+                }, {
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                    'exploration_id': self.EXP_ID_2,
+                    'property_name': 'prerequisite_skills',
+                    'new_value': ['0_exp_skill']
+                }], 'Updated exp 2 to require exp 0 before being playable')
+
+        # If the user doesn't exist, assume they haven't made any progress on
+        # the collection. This means the initial explorations should be
+        # suggested.
+        self.assertEqual(
+            collection_services.get_next_exploration_ids_to_complete_by_user(
+                'Fake', self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+
+        # There should be an exception if the collection does not exist.
+        with self.assertRaises(Exception):
+            collection_services.get_next_exploration_ids_to_complete_by_user(
+                self.OWNER_ID, 'Fake')
+
+        # If the user hasn't made any progress in the collection yet, only the
+        # initial explorations should be suggested.
+        self.assertEqual(
+            collection_services.get_collection_by_id(
+                self.COL_ID_0).init_exploration_ids,
+            [self.EXP_ID_0, self.EXP_ID_1])
+        self.assertEqual(
+            collection_services.get_next_exploration_ids_to_complete_by_user(
+                self.OWNER_ID, self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+
+        # If the user completes the first exploration, a new one should be
+        # recommended and the old one should no longer be recommended.
+        self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
+        self.assertEqual(
+            collection_services.get_next_exploration_ids_to_complete_by_user(
+                self.OWNER_ID, self.COL_ID_0), [self.EXP_ID_1, self.EXP_ID_2])
+
+        # Completing all of the explorations should yield no other explorations
+        # to suggest.
+        self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_1)
+        self._record_completion(self.OWNER_ID, self.COL_ID_0, self.EXP_ID_2)
+        self.assertEqual(
+            collection_services.get_next_exploration_ids_to_complete_by_user(
+                self.OWNER_ID, self.COL_ID_0), [])
+
+    def test_record_played_exploration_in_collection_context(self):
+        # Ensure that exploration played within the context of a collection are
+        # recorded correctly. This test actually validates both
+        # test_get_completed_exploration_ids and
+        # test_get_next_exploration_ids_to_complete_by_user.
+
+        # By default, no completion model should exist for a given user and
+        # collection.
+        completion_model = self._get_progress_model(
+            self.OWNER_ID, self.COL_ID_0)
+        self.assertIsNone(completion_model)
+
+        # If the user 'completes an exploration', the model should record it.
+        collection_services.record_played_exploration_in_collection_context(
+            self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
+
+        completion_model = self._get_progress_model(
+            self.OWNER_ID, self.COL_ID_0)
+        self.assertIsNotNone(completion_model)
+        self.assertEqual(completion_model.completed_explorations, [
+            self.EXP_ID_0])
+
+        # If the same exploration is completed again within the context of this
+        # collection, it should not be duplicated.
+        collection_services.record_played_exploration_in_collection_context(
+            self.OWNER_ID, self.COL_ID_0, self.EXP_ID_0)
+        completion_model = self._get_progress_model(
+            self.OWNER_ID, self.COL_ID_0)
+        self.assertEqual(completion_model.completed_explorations, [
+            self.EXP_ID_0])
+
+        # If the same exploration and another are completed within the context
+        # of a different collection, it shouldn't affect this one.
+        self.save_new_default_collection(self.COL_ID_1, self.OWNER_ID)
+        collection_services.record_played_exploration_in_collection_context(
+            self.OWNER_ID, self.COL_ID_1, self.EXP_ID_0)
+        collection_services.record_played_exploration_in_collection_context(
+            self.OWNER_ID, self.COL_ID_1, self.EXP_ID_1)
+        completion_model = self._get_progress_model(
+            self.OWNER_ID, self.COL_ID_0)
+        self.assertEqual(completion_model.completed_explorations, [
+            self.EXP_ID_0])
+
+        # If two more explorations are completed, they are recorded in the
+        # order they are completed.
+        collection_services.record_played_exploration_in_collection_context(
+            self.OWNER_ID, self.COL_ID_0, self.EXP_ID_2)
+        collection_services.record_played_exploration_in_collection_context(
+            self.OWNER_ID, self.COL_ID_0, self.EXP_ID_1)
+        completion_model = self._get_progress_model(
+            self.OWNER_ID, self.COL_ID_0)
+        self.assertEqual(completion_model.completed_explorations, [
+            self.EXP_ID_0, self.EXP_ID_2, self.EXP_ID_1])
 
 
 class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
@@ -484,6 +663,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
+        self.assertEqual(retrieved_collection_summary.contributor_ids, [self.OWNER_ID])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
@@ -499,10 +679,9 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
         self.assertGreaterEqual(
             len(feconf.DEMO_COLLECTIONS), 1,
             msg='There must be at least one demo collection.')
-        for ind in range(len(feconf.DEMO_COLLECTIONS)):
+        for collection_id in feconf.DEMO_COLLECTIONS:
             start_time = datetime.datetime.utcnow()
 
-            collection_id = str(ind)
             collection_services.load_demo(collection_id)
             collection = collection_services.get_collection_by_id(
                 collection_id)
@@ -518,8 +697,8 @@ class LoadingAndDeletionOfCollectionDemosTest(CollectionServicesUnitTests):
             collection_models.CollectionModel.get_collection_count(),
             len(feconf.DEMO_COLLECTIONS))
 
-        for ind in range(len(feconf.DEMO_COLLECTIONS)):
-            collection_services.delete_demo(str(ind))
+        for collection_id in feconf.DEMO_COLLECTIONS:
+            collection_services.delete_demo(collection_id)
         self.assertEqual(
             collection_models.CollectionModel.get_collection_count(), 0)
 
@@ -777,7 +956,13 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
     """Test methods relating to collection snapshots."""
 
+    SECOND_USERNAME = 'abc123'
+    SECOND_EMAIL = 'abc123@gmail.com'
+
     def test_get_collection_snapshots_metadata(self):
+        self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
+        self.second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
+
         v1_collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
 
@@ -861,7 +1046,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         # Using the old version of the collection should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
             collection_services._save_collection(
-                'committer_id_2', v1_collection, '',
+                self.second_committer_id, v1_collection, '',
                 _get_collection_change_list('title', ''))
 
         # Another person modifies the collection.
@@ -871,7 +1056,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             'new_value': 'New title'
         }]
         collection_services.update_collection(
-            'committer_id_2', self.COLLECTION_ID, new_change_list,
+            self.second_committer_id, self.COLLECTION_ID, new_change_list,
             'Second commit.')
 
         snapshots_metadata = (
@@ -899,7 +1084,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         }, snapshots_metadata[1])
         self.assertDictContainsSubset({
             'commit_cmds': new_change_list,
-            'committer_id': 'committer_id_2',
+            'committer_id': self.second_committer_id,
             'commit_message': 'Second commit.',
             'commit_type': 'edit',
             'version_number': 3,
@@ -1171,7 +1356,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[0])
+            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[-1])
 
     def test_paging(self):
         all_commits, cursor, more = (
@@ -1407,61 +1592,6 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             _BASE_SEARCH_RANK + 30)
 
 
-class CollectionChangedEventsTests(CollectionServicesUnitTests):
-
-    def test_collection_contents_change_event_triggers(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, collection_id):
-            recorded_ids.append(collection_id)
-
-        record_event_swap = self.swap(
-            event_services.CollectionContentChangeEventHandler,
-            'record',
-            mock_record)
-
-        with record_event_swap:
-            self.save_new_valid_collection(self.COLLECTION_ID, self.OWNER_ID)
-            collection_services.update_collection(
-                self.OWNER_ID, self.COLLECTION_ID,
-                _get_collection_change_list('title', 'Title'), '')
-
-        self.assertEqual(
-            recorded_ids, [self.COLLECTION_ID, self.COLLECTION_ID])
-
-    def test_collection_status_change_event(self):
-        recorded_ids = []
-
-        @classmethod
-        def mock_record(cls, collection_id):
-            recorded_ids.append(collection_id)
-
-        record_event_swap = self.swap(
-            event_services.CollectionStatusChangeEventHandler,
-            'record', mock_record)
-
-        with record_event_swap:
-            self.save_new_default_collection(self.COLLECTION_ID, self.OWNER_ID)
-            rights_manager.create_new_collection_rights(
-                self.COLLECTION_ID, self.OWNER_ID)
-            rights_manager.publish_collection(
-                self.OWNER_ID, self.COLLECTION_ID)
-            rights_manager.publicize_collection(
-                self.user_id_admin, self.COLLECTION_ID)
-            rights_manager.unpublicize_collection(
-                self.user_id_admin, self.COLLECTION_ID)
-            rights_manager.unpublish_collection(
-                self.user_id_admin, self.COLLECTION_ID)
-
-        # There are only 4 CollectionStatusChangeEvents fired because
-        # create_new_collection_rights does not fire a
-        # CollectionStatusChangeEvent.
-        self.assertEqual(recorded_ids, [
-            self.COLLECTION_ID, self.COLLECTION_ID,
-            self.COLLECTION_ID, self.COLLECTION_ID])
-
-
 class CollectionSummaryTests(CollectionServicesUnitTests):
     """Test collection summaries."""
 
@@ -1503,6 +1633,39 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             collection_summary, user_id=self.EDITOR_ID))
         self.assertFalse(collection_services.is_collection_summary_editable(
             collection_summary, user_id=self.VIEWER_ID))
+
+    def test_contributor_ids(self):
+        # Sign up two users.
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        # Have Albert create a collection.
+        collection = self.save_new_valid_collection(
+            self.COLLECTION_ID, self.ALBERT_ID)
+        # Have Bob edit the collection.
+        changelist_cmds = [{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }]
+        collection_services.update_collection(
+            self.BOB_ID, self.COLLECTION_ID, changelist_cmds,
+            'Changed title to Bob title.')
+        # Albert adds an owner and an editor.
+        rights_manager.assign_role_for_collection(
+            self.ALBERT_ID, self.COLLECTION_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
+        rights_manager.assign_role_for_collection(
+            self.ALBERT_ID, self.COLLECTION_ID, self.EDITOR_ID,
+            rights_manager.ROLE_EDITOR)
+        # Verify that only Albert and Bob are listed as contributors for the
+        # collection.
+        collection_summary = collection_services.get_collection_summary_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(
+            collection_summary.contributor_ids,
+            [self.ALBERT_ID, self.BOB_ID])
 
 
 class CollectionSummaryGetTests(CollectionServicesUnitTests):

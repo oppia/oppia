@@ -25,15 +25,17 @@ storage model to be changed without affecting this module and others above it.
 __author__ = 'Ben Henning'
 
 import copy
+import datetime
 import logging
 import os
 
 from core.domain import collection_domain
-from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
-(collection_models,) = models.Registry.import_models([models.NAMES.collection])
+(collection_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 import feconf
@@ -127,6 +129,7 @@ def get_collection_summary_from_model(collection_summary_model):
         collection_summary_model.owner_ids,
         collection_summary_model.editor_ids,
         collection_summary_model.viewer_ids,
+        collection_summary_model.contributor_ids,
         collection_summary_model.version,
         collection_summary_model.collection_model_created_on,
         collection_summary_model.collection_model_last_updated
@@ -254,6 +257,58 @@ def get_collection_titles_and_categories(collection_ids):
                 'category': collection.category,
             }
     return result
+
+
+def get_completed_exploration_ids(user_id, collection_id):
+    """Returns a list of explorations the user has completed within the context
+    of the provided collection. Returns an empty list if the user has not yet
+    completed any explorations within the collection. Note that this function
+    will also return an empty list if either the collection and/or user do not
+    exist.
+
+    A progress model isn't added until the first exploration of a collection is
+    completed, so, if a model is missing, there isn't enough information to
+    infer whether that means the collection doesn't exist, the user doesn't
+    exist, or if they just haven't mdae any progress in that collection yet.
+    Thus, we just assume the user and collection exist for the sake of this
+    call, so it returns an empty list, indicating that no progress has yet been
+    made.
+    """
+    progress_model = user_models.CollectionProgressModel.get(
+        user_id, collection_id)
+    return progress_model.completed_explorations if progress_model else []
+
+
+def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
+    """Returns a list of exploration IDs in the specified collection that the
+    given user has not yet attempted and has the prerequisite skills to play.
+
+    Returns the collection's initial explorations if the user has yet to
+    complete any explorations within the collection. Returns an empty list if
+    the user has completed all of the explorations within the collection.
+
+    See collection_domain.Collection.get_next_exploration_ids for more
+    information.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+
+    collection = get_collection_by_id(collection_id)
+    if completed_exploration_ids:
+        return collection.get_next_exploration_ids(completed_exploration_ids)
+    else:
+        # The user has yet to complete any explorations inside the collection.
+        return collection.init_exploration_ids
+
+
+def record_played_exploration_in_collection_context(
+        user_id, collection_id, exploration_id):
+    progress_model = user_models.CollectionProgressModel.get_or_create(
+        user_id, collection_id)
+
+    if exploration_id not in progress_model.completed_explorations:
+        progress_model.completed_explorations.append(exploration_id)
+        progress_model.put()
 
 
 def _get_collection_summary_dicts_from_models(collection_summary_models):
@@ -428,7 +483,6 @@ def _save_collection(committer_id, collection, commit_message, change_list):
 
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
-    event_services.CollectionContentChangeEventHandler.record(collection.id)
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -455,9 +509,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         ],
     )
     model.commit(committer_id, commit_message, commit_cmds)
-    event_services.CollectionContentChangeEventHandler.record(collection.id)
     collection.version += 1
-    create_collection_summary(collection.id)
+    create_collection_summary(collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -523,6 +576,21 @@ def get_collection_snapshots_metadata(collection_id):
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
 
+def publish_collection_and_update_user_profiles(committer_id, col_id):
+    """Publishes the collection with publish_collection() function in
+    rights_manager.py, as well as updates first_contribution_msec.
+
+    It is the responsibility of the caller to check that the collection is
+    valid prior to publication.
+    """
+    rights_manager.publish_collection(committer_id, col_id)
+    contribution_time_msec = utils.get_current_time_in_millisecs()
+    collection_summary = get_collection_summary_by_id(col_id)
+    contributor_ids = collection_summary.contributor_ids
+    for contributor in contributor_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            contributor, contribution_time_msec)
+
 
 def update_collection(
         committer_id, collection_id, change_list, commit_message):
@@ -548,22 +616,26 @@ def update_collection(
 
     collection = apply_change_list(collection_id, change_list)
     _save_collection(committer_id, collection, commit_message, change_list)
-    update_collection_summary(collection.id)
+    update_collection_summary(collection.id, committer_id)
+
+    if not rights_manager.is_collection_private(collection.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_collection_summary(collection_id):
+def create_collection_summary(collection_id, contributor_id_to_add):
     """Create summary of a collection and store in datastore."""
     collection = get_collection_by_id(collection_id)
-    collection_summary = get_summary_of_collection(collection)
+    collection_summary = get_summary_of_collection(collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
-def update_collection_summary(collection_id):
+def update_collection_summary(collection_id, contributor_id_to_add):
     """Update the summary of an collection."""
-    create_collection_summary(collection_id)
+    create_collection_summary(collection_id, contributor_id_to_add)
 
 
-def get_summary_of_collection(collection):
+def get_summary_of_collection(collection, contributor_id_to_add):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
     """
@@ -571,6 +643,18 @@ def get_summary_of_collection(collection):
         collection.id)
     collection_summary_model = (
         collection_models.CollectionSummaryModel.get_by_id(collection.id))
+
+    # Update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an collection's content).
+    if collection_summary_model:
+        contributor_ids = collection_summary_model.contributor_ids
+    else:
+        contributor_ids = []
+    if (contributor_id_to_add is not None and
+                contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
+            if contributor_id_to_add not in contributor_ids:
+                contributor_ids.append(contributor_id_to_add)
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
@@ -580,6 +664,7 @@ def get_summary_of_collection(collection):
         collection.objective, collection_rights.status,
         collection_rights.community_owned, collection_rights.owner_ids,
         collection_rights.editor_ids, collection_rights.viewer_ids,
+        contributor_ids,
         collection.version, collection_model_created_on,
         collection_model_last_updated
     )
@@ -601,6 +686,7 @@ def save_collection_summary(collection_summary):
         owner_ids=collection_summary.owner_ids,
         editor_ids=collection_summary.editor_ids,
         viewer_ids=collection_summary.viewer_ids,
+        contributor_ids=collection_summary.contributor_ids,
         version=collection_summary.version,
         collection_model_last_updated=(
             collection_summary.collection_model_last_updated),
@@ -635,7 +721,7 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
 
 def delete_demo(collection_id):
     """Deletes a single demo collection."""
-    if not (0 <= int(collection_id) < len(feconf.DEMO_COLLECTIONS)):
+    if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)
 
     collection = get_collection_by_id(collection_id, strict=False)
@@ -660,7 +746,7 @@ def load_demo(collection_id):
 
     demo_filepath = os.path.join(
         feconf.SAMPLE_COLLECTIONS_DIR,
-        feconf.DEMO_COLLECTIONS[int(collection_id)])
+        feconf.DEMO_COLLECTIONS[collection_id])
 
     if demo_filepath.endswith('yaml'):
         yaml_content = utils.get_file_contents(demo_filepath)
@@ -670,7 +756,7 @@ def load_demo(collection_id):
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
-    rights_manager.publish_collection(
+    publish_collection_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, collection_id)
 
     index_collections_given_ids([collection_id])

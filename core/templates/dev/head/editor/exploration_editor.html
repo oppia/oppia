@@ -116,7 +116,7 @@
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom" tooltip-append-to-body="true" ng-click="selectFeedbackTab()">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
@@ -141,9 +141,9 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish to Gallery">&#xE2C3;</i>
-          <span class="hidden-sm hidden-xs">Publish to Gallery</span>
+          <span class="oppia-save-publish-button-label">Publish to Gallery</span>
         </button>
       </div>
     </li>
@@ -154,14 +154,14 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
-              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Draft">&#xE161;</i>
-              <span class="hidden-sm hidden-xs">Save Draft</span>
+              <span class="oppia-save-publish-button-label">Save Draft</span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish Changes">&#xE2C3;</i>
-              <span class="hidden-sm hidden-xs">Publish Changes</span>
+              <span class="oppia-save-publish-button-label">Publish Changes</span>
             </span>
             <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
           </span>
@@ -426,6 +426,7 @@
     {{ include_js_file('editor/GadgetValidationService.js') }}
     {{ include_js_file('editor/GadgetEditor.js') }}
     {{ include_js_file('editor/StateInteraction.js') }}
+    {{ include_js_file('player/AnswerClassificationService.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/ruleEditor.js') }}

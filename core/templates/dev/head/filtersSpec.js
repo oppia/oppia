@@ -229,22 +229,35 @@ describe('Testing filters', function() {
 
   }));
 
-  it('should capitalize first letter and truncate string', inject(function($filter) {
+  it('should capitalize first letter and truncate string at a word break', inject(function($filter) {
     var filter = $filter('truncateAndCapitalize');
 
-    expect(filter('remove New line', 4)).toEqual('Remo...');
+    // The first word always appears in the result.
+    expect(filter('  remove new Line', 4)).toEqual('Remove...');
+    expect(filter('remove New line', 4)).toEqual('Remove...');
+
+    expect(filter('remove New line', 6)).toEqual('Remove...');
+
+    expect(filter('  remove new Line', 10)).toEqual('Remove new...');
+    expect(filter('remove New line', 10)).toEqual('Remove New...');
+
+    expect(filter('  remove new Line', 15)).toEqual('Remove new Line');
+    expect(filter('remove New line', 15)).toEqual('Remove New line');
+
+    // Strings starting with digits are not affected by the capitalization.
+    expect(filter(' 123456 a bc d', 12)).toEqual('123456 a bc...');
+
     // If the maximum number of characters is not specified, return
-    // the whole objective with the first letter capitalized.
+    // the whole input string with the first letter capitalized.
     expect(filter('capitalize first letter and truncate')).toEqual('Capitalize first letter and truncate');
     expect(filter('a single sentence with more than twenty one characters', 21)).toEqual(
-      'A single sentence wit...');
+      'A single sentence...');
 
     expect(filter('a single sentence with more than twenty one characters and all will be shown')).toEqual(
       'A single sentence with more than twenty one characters and all will be shown');
-    expect(filter('remove New line', 6)).toEqual('Remove...');
+
     // If maximum characters is greater than objective length
     // return whole objective.
     expect(filter('please do not test empty string', 100)).toEqual('Please do not test empty string');
-
   }));
 });

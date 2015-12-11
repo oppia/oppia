@@ -140,6 +140,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     # by anyone who has the URL. If the collection is not private, this
     # setting is ignored.
     viewable_if_private = ndb.BooleanProperty(indexed=True, default=False)
+    # Time, in milliseconds, when the collection was first published.
+    first_published_msec = ndb.FloatProperty(indexed=True, default=None)
 
     # The publication status of this collection.
     status = ndb.StringProperty(
@@ -309,6 +311,9 @@ class CollectionSummaryModel(base_models.BaseModel):
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who have contributed (humans who have made a
+    # positive (not just a revert) change to the collection's content)
+    contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()

@@ -56,7 +56,8 @@ describe('Gallery view', function() {
 
     users.login('varda@example.com');
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.editExploration(EXPLORATION_VINGILOT);
+    gallery.playExploration(EXPLORATION_VINGILOT);
+    general.moveToEditor();
     // Moderators can edit explorations and mark them as featured.
     editor.setLanguage(LANGUAGE_FRANCAIS);
     editor.saveChanges('change language');
