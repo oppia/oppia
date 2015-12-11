@@ -138,6 +138,21 @@ oppia.factory('interactiveMapRulesService', function() {
     NotWithin: function(answer, inputs) {
       var actualDistance = _haversineDistance(inputs.p, answer);
       return actualDistance > inputs.d;
+    },
+    FuzzyMatches: function(answer, inputs) {
+      // Returns true if answer is within FUZZY_RADIUS of any of the training
+      // points.
+
+      var FUZZY_RADIUS = 5;
+
+      if (inputs.training_data.length === 0) {
+        return false;
+      }
+      return inputs.training_data.some(function(point) {
+        if (_haversineDistance(answer, point) <= FUZZY_RADIUS) {
+          return true;
+        }
+      });
     }
   };
 });
