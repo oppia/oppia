@@ -21,7 +21,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'interactiveMapRulesService', function(
+  oppiaHtmlEscaper, interactiveMapRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -62,7 +63,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             position: ll
           }));
 
-          $scope.$parent.$parent.submitAnswer([ll.lat(), ll.lng()]);
+          $scope.$parent.submitAnswer(
+            [ll.lat(), ll.lng()], interactiveMapRulesService);
         };
 
         refreshMap();
@@ -108,3 +110,34 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
     };
   }
 ]);
+
+oppia.factory('interactiveMapRulesService', function() {
+  var RADIUS_OF_EARTH = 6371.0;
+  var _degreesToRadians = function(angle) {
+    return angle / 180 * Math.PI;
+  };
+  var _haversineDistance = function(point1, point2) {
+    var latitude1 = _degreesToRadians(point1[0]);
+    var latitude2 = _degreesToRadians(point2[0]);
+    latitudeDifference = _degreesToRadians(point2[0] - point1[0]);
+    longitudeDifference = _degreesToRadians(point2[1] - point1[1]);
+
+    // Use the haversine formula
+    haversineOfCentralAngle = Math.pow(Math.sin(latitudeDifference / 2), 2) +
+      Math.cos(latitude1) * Math.cos(latitude2) *
+      Math.pow(Math.sin(longitudeDifference / 2), 2);
+
+    return RADIUS_OF_EARTH * 2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
+  };
+
+  return {
+    Within: function(answer, inputs) {
+      var actualDistance = _haversineDistance(inputs.p, answer);
+      return actualDistance <= inputs.d;
+    },
+    NotWithin: function(answer, inputs) {
+      var actualDistance = _haversineDistance(inputs.p, answer);
+      return actualDistance > inputs.d;
+    }
+  };
+});
