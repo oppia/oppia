@@ -31,3 +31,8 @@ class NotWithin(base.CoordTwoDimRule):
 
 class FuzzyMatches(base.CoordTwoDimRule):
     description = 'is similar to {{training_data|ListOfCoordTwoDim}}'
+    # TODO(wxy): Create a better classifier for this interaction. Currently,
+    # the frontend implementation of this rule returns a booleen value,
+    # checking if the answer is close to any point in the training data.
+    # If this fails, the answer should then go to a backend classifier that
+    # picks the answer group with the best matching answer group.
