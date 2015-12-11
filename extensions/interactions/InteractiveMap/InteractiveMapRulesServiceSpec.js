@@ -26,10 +26,10 @@ describe('Numeric Input service', function() {
     imrs = $injector.get('interactiveMapRulesService');
   }));
 
-  var RADIUS_OF_EARTH = 6371.0;
-  var QUARTER_CIRCUMFERENCE = 0.5 * Math.PI * RADIUS_OF_EARTH;
-  var HALF_CIRCUMFERENCE = 2 * QUARTER_CIRCUMFERENCE;
-  var DELTA = 5;
+  var RADIUS_OF_EARTH_KM = 6371.0;
+  var QUARTER_CIRCUMFERENCE_KM = 0.5 * Math.PI * RADIUS_OF_EARTH_KM;
+  var HALF_CIRCUMFERENCE_KM = 2 * QUARTER_CIRCUMFERENCE_KM;
+  var DELTA_KM = 5;
   var NORTH_POLE = [90, 0];
   var SOUTH_POLE = [-90, 0];
   var EQUATOR_ORIGIN = [0, 0];
@@ -37,35 +37,35 @@ describe('Numeric Input service', function() {
   it('should have a correct \'within\' rule', function() {
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, 180],
-      d: HALF_CIRCUMFERENCE + DELTA
+      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(true);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE + DELTA
+      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(true);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE + DELTA
+      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(true);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, -180],
-      d: HALF_CIRCUMFERENCE + DELTA
+      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(true);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, 180],
-      d: HALF_CIRCUMFERENCE - DELTA
+      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(false);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE - DELTA
+      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(false);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE - DELTA
+      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(false);
     expect(imrs.Within(EQUATOR_ORIGIN, {
       p: [0, -180],
-      d: HALF_CIRCUMFERENCE - DELTA
+      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(false);
     expect(imrs.Within(NORTH_POLE, {
       p: [90, 180],
@@ -104,35 +104,35 @@ describe('Numeric Input service', function() {
   it('should have a correct \'not within\' rule', function() {
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, 180],
-      d: HALF_CIRCUMFERENCE + DELTA
+      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(false);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE + DELTA
+      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(false);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE + DELTA
+      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(false);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, -180],
-      d: HALF_CIRCUMFERENCE + DELTA
+      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
     })).toBe(false);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, 180],
-      d: HALF_CIRCUMFERENCE - DELTA
+      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(true);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE - DELTA
+      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(true);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE - DELTA
+      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(true);
     expect(imrs.NotWithin(EQUATOR_ORIGIN, {
       p: [0, -180],
-      d: HALF_CIRCUMFERENCE - DELTA
+      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
     })).toBe(true);
     expect(imrs.NotWithin(NORTH_POLE, {
       p: [90, 180],
