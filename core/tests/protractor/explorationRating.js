@@ -47,17 +47,16 @@ describe('Gallery view', function() {
       users.createUser(userEmail, username);
       users.login(userEmail);
       browser.get(general.GALLERY_URL_SUFFIX);
-      
       gallery.playExploration(EXPLORATION_RATINGTEST);
       player.expectExplorationNameToBe('RatingTest');
       player.submitAnswer('Continue');
-      player.reviewExploration(4);
+      player.rateExploration(4);
 
       users.logout();
     }
 
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToBeNotDisplayed(EXPLORATION_RATINGTEST);
+    gallery.expectExplorationRatingToBeHidden(EXPLORATION_RATINGTEST);
 
     var userEmail = 'Display@example.com';
     var username = 'Display';
@@ -67,7 +66,7 @@ describe('Gallery view', function() {
     gallery.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationNameToBe('RatingTest');
     player.submitAnswer('Continue');
-    player.reviewExploration(4);
+    player.rateExploration(4);
 
     users.logout();
 

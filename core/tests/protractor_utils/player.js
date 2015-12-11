@@ -110,7 +110,7 @@ var clickThroughToNextCard = function(interactionId, answerData) {
   element(by.css('.protractor-test-continue-to-next-card-button')).click();
 };
 
-var reviewExploration = function(ratingValue) {
+var rateExploration = function(ratingValue) {
   element.all(by.css('.protractor-test-rating-star')).then(function(elements) {
     elements[ratingValue - 1].click();
   });
@@ -149,7 +149,7 @@ exports.expectInvisibleGadget = expectInvisibleGadget;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
 exports.clickThroughToNextCard = clickThroughToNextCard;
-exports.reviewExploration = reviewExploration;
+exports.rateExploration = rateExploration;
 exports.expectExplorationRatingOnInformationCardToEqual = expectExplorationRatingOnInformationCardToEqual;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
