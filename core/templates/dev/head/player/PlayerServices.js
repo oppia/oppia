@@ -103,15 +103,18 @@ oppia.factory('oppiaPlayerService', [
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
+    'playerTranscriptService',
     function(
       $http, $rootScope, $modal, $filter, $q, $log, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       answerClassificationService, stateTransitionService,
       extensionTagAssemblerService, INTERACTION_SPECS,
       INTERACTION_DISPLAY_MODE_INLINE, explorationContextService,
-      PAGE_CONTEXT, oppiaExplorationHtmlFormatterService) {
+      PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
+      playerTranscriptService) {
   var _explorationId = explorationContextService.getExplorationId();
-  var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+  var _editorPreviewMode = (
+    explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
   var _infoCardImageUrl = null;
   var _explorationObjective = null;
   var _explorationTags = [];
@@ -129,44 +132,25 @@ oppia.factory('oppiaPlayerService', [
   var _collection_id = GLOBALS.collectionId;
 
   learnerParamsService.init({});
-  var stateHistory = [];
-  var _currentStateName = null;
   var answerIsBeingProcessed = false;
   var _viewerHasEditingRights = false;
 
-  // The number of submissions made so far for this state. Incremented
-  // immediately after every submit event.
-  var _numSubmitsForThisState = 0;
-
   var _updateStatus = function(newParams, newStateName) {
     learnerParamsService.init(newParams);
-
-    _currentStateName = newStateName;
-    stateHistory.push(_currentStateName);
   };
 
   var _stopwatch = stopwatchProviderService.getInstance();
 
-  // When this is not null, it is an object with keys 'newParams' and
-  // 'newStateName'.
-  var _cachedUpdates = null;
-
-  // If delayParamUpdates is true, the parameters will need to be updated
-  // manually by calling applyCachedParamUpdates().
   var _onStateTransitionProcessed = function(
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
-      successCallback, delayParamUpdates) {
-    var oldStateName = _currentStateName;
+      successCallback) {
+    var oldStateName = playerTranscriptService.getLastStateName();
     var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
 
     var refreshInteraction = (
       oldStateName !== newStateName ||
       INTERACTION_SPECS[oldStateInteractionId].display_mode ===
         INTERACTION_DISPLAY_MODE_INLINE);
-
-    if (oldStateName !== newStateName) {
-      _numSubmitsForThisState = 0;
-    }
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -183,7 +167,7 @@ oppia.factory('oppiaPlayerService', [
       // Broadcast information about the state transition to listeners.
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
         explorationVersion: version,
-        oldStateName: _currentStateName,
+        oldStateName: playerTranscriptService.getLastStateName(),
         jsonAnswer: JSON.stringify(answer),
         newStateName: newStateName,
         paramValues: learnerParamsService.getAllParams()
@@ -211,21 +195,13 @@ oppia.factory('oppiaPlayerService', [
       }
     }
 
-    if (!delayParamUpdates) {
-      _updateStatus(newParams, newStateName);
-    } else {
-      _cachedUpdates = {
-        newParams: angular.copy(newParams),
-        newStateName: angular.copy(newStateName)
-      };
-    }
-
     _stopwatch.resetStopwatch();
 
     var newStateData = _exploration.states[newStateName];
     $rootScope.$broadcast('playerStateChange');
     successCallback(
-      newStateName, refreshInteraction, newFeedbackHtml, newQuestionHtml);
+      newStateName, refreshInteraction, newFeedbackHtml, newQuestionHtml,
+      newParams);
   };
 
   var _registerMaybeLeaveEvent = function(stateName) {
@@ -238,13 +214,6 @@ oppia.factory('oppiaPlayerService', [
       state_name: stateName,
       version: version
     });
-  };
-
-  var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
-    _stopwatch.resetStopwatch();
-    _updateStatus(newParams, initStateName);
-    $rootScope.$broadcast('playerStateChange');
-    callback(initStateName, initHtml);
   };
 
   // This should only be called when _exploration is non-null.
@@ -277,9 +246,10 @@ oppia.factory('oppiaPlayerService', [
         });
       }
 
-      _onInitialStateProcessed(
-        initStateName, initStateData.question_html, initStateData.params,
-        successCallback);
+      _stopwatch.resetStopwatch();
+      $rootScope.$broadcast('playerStateChange');
+      successCallback(
+        initStateName, initStateData.question_html, initStateData.params);
     } else {
       warningsData.addWarning('Expression parsing error.');
     }
@@ -344,11 +314,8 @@ oppia.factory('oppiaPlayerService', [
      */
     init: function(successCallback) {
       answerIsBeingProcessed = false;
-      _cachedUpdates = null;
       learnerParamsService.init({});
-      stateHistory = [];
-      _currentStateName = null;
-      _numSubmitsForThisState = 0;
+      playerTranscriptService.init();
 
       if (_editorPreviewMode) {
         if (_exploration) {
@@ -374,17 +341,11 @@ oppia.factory('oppiaPlayerService', [
         });
       }
     },
-    applyCachedParamUpdates: function() {
-      if (_cachedUpdates !== null) {
-        _updateStatus(_cachedUpdates.newParams, _cachedUpdates.newStateName);
-        _cachedUpdates = null;
-      }
-    },
     getExplorationId: function() {
       return _explorationId;
     },
     getInformationCardData: function() {
-      var informationCardData = {
+      return {
         currentRatings: _currentRatings,
         explorationTags: _explorationTags,
         infoCardImageUrl: _infoCardImageUrl,
@@ -393,14 +354,9 @@ oppia.factory('oppiaPlayerService', [
         explorationContributorUsernames : _explorationContributorUsernames,
         viewersCount: _viewersCount
       };
-
-      return informationCardData;
     },
     getExplorationTitle: function() {
       return _exploration.title;
-    },
-    getCurrentStateName: function() {
-      return _currentStateName;
     },
     getInteractionHtml: function(stateName, labelForFocusTarget) {
       return oppiaExplorationHtmlFormatterService.getInteractionHtml(
@@ -430,6 +386,9 @@ oppia.factory('oppiaPlayerService', [
       } else {
         return INTERACTION_SPECS[interactionId].instructions;
       }
+    },
+    getInteraction: function(stateName) {
+      return _exploration.states[stateName].interaction;
     },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
@@ -465,36 +424,14 @@ oppia.factory('oppiaPlayerService', [
     isInPreviewMode: function() {
       return !!_editorPreviewMode;
     },
-    getAnswerAsHtml: function(answer) {
-      var currentInteraction = _exploration.states[
-        _currentStateName].interaction;
-      return oppiaExplorationHtmlFormatterService.getAnswerHtml(
-        answer, currentInteraction.id, currentInteraction.customization_args);
-    },
-    getShortAnswerAsHtml: function(answer) {
-      // Returns a HTML string representing a short summary of the answer, or
-      // null if the answer does not have to be summarized.
-      var currentInteraction = _exploration.states[
-        _currentStateName].interaction;
-
-      if (!currentInteraction.id ||
-          !INTERACTION_SPECS[currentInteraction.id].needs_summary) {
-        return null;
-      } else {
-        return oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-          answer, currentInteraction.id, currentInteraction.customization_args);
-      }
-    },
-    submitAnswer: function(
-        answer, interactionRulesService, successCallback, delayParamUpdates) {
+    submitAnswer: function(answer, interactionRulesService, successCallback) {
       if (answerIsBeingProcessed) {
         return;
       }
 
-      _numSubmitsForThisState++;
-
       answerIsBeingProcessed = true;
-      var oldState = angular.copy(_exploration.states[_currentStateName]);
+      var oldState = angular.copy(
+        _exploration.states[playerTranscriptService.getLastStateName()]);
 
       answerClassificationService.getMatchingClassificationResult(
         _explorationId, oldState, answer, false, interactionRulesService
@@ -508,7 +445,7 @@ oppia.factory('oppiaPlayerService', [
             answer: answer,
             params: learnerParamsService.getAllParams(),
             version: version,
-            old_state_name: _currentStateName,
+            old_state_name: playerTranscriptService.getLastStateName(),
             answer_group_index: classificationResult.answerGroupIndex,
             rule_spec_index: classificationResult.ruleSpecIndex
           });
@@ -517,12 +454,12 @@ oppia.factory('oppiaPlayerService', [
         // If this is a return to the same state, and the resubmission trigger
         // kicks in, replace the dest, feedback and param changes with that
         // of the trigger.
-        if (outcome.dest === _currentStateName) {
+        if (outcome.dest === playerTranscriptService.getLastStateName()) {
           for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
             var fallback = oldState.interaction.fallbacks[i];
             if (fallback.trigger.trigger_type == 'NthResubmission' &&
                 fallback.trigger.customization_args.num_submits.value ===
-                  _numSubmitsForThisState) {
+                  playerTranscriptService.getNumSubmitsForLastCard()) {
               outcome.dest = fallback.outcome.dest;
               outcome.feedback = fallback.outcome.feedback;
               outcome.param_changes = fallback.outcome.param_changes;
@@ -544,7 +481,7 @@ oppia.factory('oppiaPlayerService', [
           _onStateTransitionProcessed(
             nextStateData.state_name, nextStateData.params,
             nextStateData.question_html, nextStateData.feedback_html,
-            answer, successCallback, delayParamUpdates);
+            answer, successCallback);
         } else {
           answerIsBeingProcessed = false;
           warningsData.addWarning('Expression parsing error.');
@@ -555,7 +492,7 @@ oppia.factory('oppiaPlayerService', [
       return answerIsBeingProcessed;
     },
     registerMaybeLeaveEvent: function() {
-      _registerMaybeLeaveEvent(stateHistory[stateHistory.length - 1]);
+      _registerMaybeLeaveEvent(playerTranscriptService.getLastStateName());
     },
     // Returns a promise for the user profile picture, or the default image if
     // user is not logged in or has not uploaded a profile picture, or the
