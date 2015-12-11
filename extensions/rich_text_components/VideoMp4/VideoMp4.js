@@ -26,8 +26,13 @@ oppia.directive('oppiaNoninteractiveVideoMp4', [
       scope: {},
       templateUrl: 'richTextComponent/VideoMp4',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        // Chrome has a bug where HTML5 videos sometimes stay pending for a
+        // long time. The randomParameter used here applies the fix in
+        // http://stackoverflow.com/a/18858057.
+        var randomParameter = new Date().getMilliseconds();
         $scope.videoUrl = $sce.trustAsResourceUrl(
-          oppiaHtmlEscaper.escapedJsonToObj($attrs.videoUrlWithValue));
+          oppiaHtmlEscaper.escapedJsonToObj($attrs.videoUrlWithValue) +
+          '?t=' + randomParameter);
       }]
     };
   }
