@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import os
 
 from core.controllers import reader
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -237,38 +238,28 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _get_classiying_rule_type(self, answer):
-        interaction_instance = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.EXP_STATE.interaction.id))
-        normalized_answer = interaction_instance.normalize_answer(answer)
+        string_classifier_ctor = classifier_services.StringClassifier.__init__
+        string_classifier_ctor_counter = test_utils.CallCounter(
+            string_classifier_ctor)
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.EXP_ID))
-        input_type = interaction_instance.answer_type
+        with self.swap(
+            classifier_services.StringClassifier,
+            '__init__', string_classifier_ctor_counter):
+            response = reader.classify(
+                self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
 
-        response = reader.classify_hard_rule(
-            self.EXP_STATE, {'answer': answer},
-            input_type, normalized_answer, fs)
+        answer_group_index = response['answer_group_index']
+        rule_spec_index = response['rule_spec_index']
+        answer_groups = self.EXP_STATE.interaction.answer_groups
+        if answer_group_index == len(answer_groups):
+            return 'default'
 
-        if response is not None:
-            return 'hard'
-        else:
-            response = reader.classify_soft_rule(
-                self.EXP_STATE, {'answer': answer},
-                input_type, normalized_answer, fs)
-
-        if not (feconf.ENABLE_STRING_CLASSIFIER and response is None):
-            return 'soft'
-        else:
-            response = reader.classify_string_classifier_rule(
-                self.EXP_STATE, {'answer': answer},
-                input_type, normalized_answer, fs)
-
-        if response is not None:
-            return 'classifier'
-
-        # Note: this should not happen for the existing test cases
-        return None
+        answer_group = answer_groups[answer_group_index]
+        if answer_group.get_fuzzy_rule_index() == rule_spec_index:
+            return (
+                'classifier'
+                if string_classifier_ctor_counter.times_called > 0 else 'soft')
+        return 'hard'
 
     def test_hard_rule_classification(self):
         """All of these responses are classified by the hard classifier.
