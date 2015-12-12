@@ -144,6 +144,12 @@ oppia.factory('interactiveMapRulesService', function() {
       // Returns true if answer is within FUZZY_RADIUS of any of the training
       // points.
 
+      // TODO(wxy): Create a better classifier for this interaction. Currently,
+      // the frontend implementation of this rule returns a boolean value,
+      // checking if the answer is close to any point in the training data.
+      // If this fails, the answer should then go to a backend classifier that
+      // picks the answer group with the best matching answer group.
+
       var FUZZY_RADIUS_KM = 5;
 
       if (inputs.training_data.length === 0) {
