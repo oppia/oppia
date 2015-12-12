@@ -182,6 +182,9 @@ def classify_string_classifier_rule(
     best_matched_rule_spec_index = None
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
+    if state.interaction.id != 'TextInput':
+        return None
+
     sc = classifier_services.StringClassifier()
     training_examples = [[doc, []] for doc in
         state.interaction.confirmed_unclassified_answers]
@@ -221,6 +224,8 @@ def classify_string_classifier_rule(
             }
         else:
             return None
+
+    return None
 
 
 # TODO(bhenning): Add more tests for classification, such as testing multiple
