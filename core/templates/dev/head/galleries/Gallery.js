@@ -79,18 +79,22 @@ oppia.factory('searchService', [
     return _searchCursor === null;
   };
 
+  var _isCurrentlyFetchingResults = false;
+
   return {
     // Note that an empty query results in all explorations being shown.
     executeSearchQuery: function(searchQuery, selectedCategories, selectedLanguageCodes, successCallback) {
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
         searchQuery + _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
 
+      _isCurrentlyFetchingResults = true;
       $http.get(queryUrl).success(function(data) {
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
         $rootScope.$broadcast('refreshGalleryData', data, hasPageFinishedLoading());
+        _isCurrentlyFetchingResults = false;
       });
 
       if (successCallback) {
@@ -98,6 +102,11 @@ oppia.factory('searchService', [
       }
     },
     loadMoreData: function(successCallback) {
+      // If a new query is still being sent, do not fetch more results.
+      if (_isCurrentlyFetchingResults) {
+        return;
+      }
+
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
         _lastQuery + _getSuffixForQuery(_lastSelectedCategories, _lastSelectedLanguageCodes));
 
@@ -105,8 +114,10 @@ oppia.factory('searchService', [
         queryUrl += '&cursor=' + _searchCursor;
       }
 
+      _isCurrentlyFetchingResults = true;
       $http.get(queryUrl).success(function(data) {
         _searchCursor = data.search_cursor;
+        _isCurrentlyFetchingResults = false;
         if (successCallback) {
           successCallback(data, hasPageFinishedLoading());
         }

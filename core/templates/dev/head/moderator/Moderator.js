@@ -21,16 +21,6 @@
 oppia.controller('Moderator', [
     '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
     function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
-  $scope.submitUserEmailRequest = function(username) {
-    $scope.username = username;
-    $scope.lastSubmittedUsername = username;
-    $http.post(
-      '/moderatorhandler/user_services', {username: username}
-    ).success(function(data) {
-      $scope.userEmail = data.user_email;
-    });
-  };
-
   $scope.getDatetimeAsString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);

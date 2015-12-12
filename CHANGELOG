@@ -3,6 +3,54 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.1.0 (7 Dec 2015)
+-------------------
+Learner page:
+* Fix #1164: on narrow viewports with supplemental interactions, add buttons to the bottom of both cards to make it easier to navigate to the card that isn't currently showing.
+* Fix #1083: prevent the rating form from showing up before the learner has reached the final card of the exploration.
+* Fix some errors in the display of the average rating, contributor list, and last-updated time in the exploration information card.
+* Make the 'blackboard' background file size much smaller, in order to reduce loading times.
+* Fix a bug that caused the window to judder when the feedback link in the navbar was hovered over.
+
+Gallery page:
+* Redesign the gallery using smaller tiles and new images. Increase the number of tiles loaded at a time from 10 to 24.
+* Remove the video from the front page, and the "Dive into an exploration" heading. Replace both of these with a blurb directing users to the About page.
+* Show rating information in the exploration summary tiles if at least one rating is received (rather than waiting for there to be at least three ratings).
+
+Profile page:
+* Fully redesign the profile page, adding a first-contributed date, a field for subject interests, an impact score, and a list of created/edited explorations.
+* Add links to the profile page from both the Preferences page and the top-right menu.
+* Add new backend jobs to compute a user impact score, the list of contributors to each exploration, the list of explorations created or edited by a user, the first contribution date of a user, and the first date on which an exploration was published.
+
+Interactions:
+* Create a new interaction for inputting and evaluating math expressions.
+* Build a framework for evaluating learner answers in the frontend, and migrate the following interactions: ImageClickInput, ItemSelectionInput, LogicProof, MusicNotesInput, NumericInput and SetInput.
+* EndExploration: Change the displayed name from 'End Conversation' to 'End Exploration'.
+* EndExploration: Use the new summary tiles to display exploration recommendations.
+* ItemSelectionInput: Fix a bug in the implementation of the "DoesNotContainAtLeastOneOf" rule.
+* LogicProof: Extend the timeout for the frontend tests which checks the interaction's evaluation speed, since these tests occasionally fail on slow machines.
+
+Editor page:
+* Allow moderators to send emails when unpublishing or featuring explorations.
+* Prevent an exploration from being saved if there are critical interaction validation errors.
+* Restyle the history page to use checkboxes instead of radio buttons.
+* Fix a bug that prevented the title of a state from showing up when the corresponding node in the exploration graph was hovered over.
+
+Other pages:
+* Remove some unnecessary warnings that were triggered when a user moved to another page while there was a pending HTTP request.
+* Fix an issue where the site feedback link at the bottom left was blocking content on small screens.
+* Update the text on the privacy page for clarity.
+* Make the 'development mode' indicator a bit less obtrusive.
+
+Infrastructure
+* Rewrite the installation scripts using gulp and a manifest, and add tasks for bundling JS and CSS dependencies in order to reduce the number of backend requests on page load.
+* Check that versions of installed node modules are correct when running the setup scripts; if not, download the correct version of the module.
+* Fix #1170: Check if pip is present on the developer's machine, and output an error message if it isn't.
+* Automatically install a local copy of the numpy dependency.
+* Skip the App Engine SDK update check at startup.
+* Speed up Travis-CI runs by making the coverage report for backend tests optional.
+
+
 v2.0.3 (21 Nov 2015)
 --------------------
 Learner page:

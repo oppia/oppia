@@ -118,6 +118,7 @@ oppia.factory('oppiaPlayerService', [
   var _explorationContributorUsernames = [];
   var _explorationLastUpdatedMsec = null;
   var _viewersCount = null;
+  var _currentRatings = {};
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
@@ -286,44 +287,36 @@ oppia.factory('oppiaPlayerService', [
 
   var _loadInitialInformationCardData = function() {
 
-    // TODO(sll): move these three handlers into a separate exp_metadata.py controller.
-    var infoCardDataUrl = '/createhandler/data/' +  _explorationId;
-    var infoCardSnapshotsUrl = '/createhandler/snapshots/' +  _explorationId;
+    // TODO(sll): move this and the summary handlers into a separate
+    // exp_metadata.py controller.
     var infoCardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
 
     var deferredContributors = $q.defer();
     var deferredStatistics = $q.defer();
-    var deferredSnapshots = $q.defer();
 
-    // This is needed to get exploration objective/goal, contributors
-    // and exploration tags.
-    $http.get(infoCardDataUrl).success(function(data) {
-      _explorationObjective = data.objective;
-      _explorationTags = data.tags;
-      // TODO(sll): in the backend, compute the actual contributors
-      // based on the list of commits to the exploration.
-      _explorationContributorUsernames = data.rights.owner_names.concat(
-        data.rights.editor_names);
+    $http({
+      method: 'GET',
+      url: '/explorationsummarieshandler/data',
+      params: {
+        stringified_exp_ids: JSON.stringify([_explorationId])
+      }
+    }).success(function(data) {
+      _explorationObjective = data.summaries[0].objective;
+      _explorationTags = data.summaries[0].tags;
+      _currentRatings = data.summaries[0].ratings;
+      _explorationContributorUsernames = data.summaries[0].contributor_names;
+      _explorationLastUpdatedMsec = data.summaries[0].last_updated;
       deferredContributors.resolve(data);
     });
 
-    // This is needed to get exploration snapshots.
-    $http.get(infoCardSnapshotsUrl).success(function(data) {
-      var data = data.snapshots;
-      // Only get last published changes/get changes from the last snapshot.
-      _explorationLastUpdatedMsec = data[data.length - 1].created_on_ms;
-      deferredSnapshots.resolve(data);
-    });
-
-    // This is needed to get statistics of the exprolation.
+    // This is needed to get statistics of the exploration.
     $http.get(infoCardStatisticsUrl).success(function(data) {
-      // Only get number of viewers who started an exploration.
       _viewersCount = data.num_starts;
       deferredStatistics.resolve(_viewersCount);
     });
 
-   return $q.all([deferredStatistics.promise, deferredSnapshots.promise,
-      deferredContributors.promise]);
+    return $q.all([
+      deferredStatistics.promise, deferredContributors.promise]);
   };
 
   return {
@@ -392,6 +385,7 @@ oppia.factory('oppiaPlayerService', [
     },
     getInformationCardData: function() {
       var informationCardData = {
+        currentRatings: _currentRatings,
         explorationTags: _explorationTags,
         infoCardImageUrl: _infoCardImageUrl,
         explorationObjective: _explorationObjective,
@@ -768,10 +762,10 @@ oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal
       controller: [
          '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService',
          'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService',
-         'oppiaDatetimeFormatter',
+         'oppiaDatetimeFormatter', 'ratingComputationService',
          function ($scope, $http, $modal, $modalInstance, oppiaPlayerService,
                    ratingService, oppiaHtmlEscaper, embedExplorationButtonService,
-                   oppiaDatetimeFormatter) {
+                   oppiaDatetimeFormatter, ratingComputationService) {
 
         var _informationCardData = oppiaPlayerService.getInformationCardData();
         $scope.serverName = window.location.protocol + '//' + window.location.host;
@@ -786,8 +780,8 @@ oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal
         $scope.infoCardBackgroundImageCss = {
           'background-image': 'url('+ _informationCardData.infoCardImageUrl + ')'
         };
-        $scope.explorationRatings = ratingService.getUserRating() !== null ?
-                                    ratingService.getUserRating() : 0;
+        $scope.explorationRatings = ratingComputationService.computeAverageRating(
+          _informationCardData.currentRatings) || 'Unrated';
 
         var _explorationTagsSummary = function(arrayOfTags) {
           var _tagsToBeShown =[];
@@ -804,7 +798,8 @@ oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal
             tagsInTooltip: _tagsInTooltip
           };
         };
-        $scope.explorationTags = _explorationTagsSummary(_informationCardData.explorationTags);
+        $scope.explorationTags = _explorationTagsSummary(
+          _informationCardData.explorationTags);
         $scope.explorationDescription = _informationCardData.explorationObjective;
         $scope.explorationContributorUsernames = _informationCardData.explorationContributorUsernames;
         $scope.explorationLastUpdatedMsec = _informationCardData.explorationLastUpdatedMsec;

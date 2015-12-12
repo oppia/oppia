@@ -78,6 +78,8 @@ var createAndPublishExploration = function(name, category, objective, language) 
 var markExplorationAsFeatured = function() {
   editor.runFromSettingsTab(function() {
     element(by.css('.protractor-test-mark-exploration-featured')).click();
+    general.waitForSystem();
+    element(by.css('.protractor-test-feature-exploration-button')).click();
   });
 };
 

@@ -30,24 +30,27 @@ oppia.controller('Profile', [
 
     $scope.areRatingsShown = function(ratingFrequencies) {
       return ratingVisibilityService.areRatingsShown(ratingFrequencies);
-    }; 
+    };
 
     $rootScope.loadingMessage = 'Loading';
     $http.get(profileDataUrl).success(function(data) {
       $rootScope.loadingMessage = '';
       $scope.userBio = data.user_bio;
       $scope.userDisplayedStatistics = [{
-        number_value: data.user_impact_score,
-        title: 'User Impact Score'
+        title: 'User Impact Score',
+        value: data.user_impact_score,
+        helpText: (
+          'A rough measure of the impact of explorations created by this user. ' +
+          'Better ratings and more playthroughs improve this score.')
       }, {
-        number_value: data.created_exploration_summary_dicts.length,
-        title: 'Created Explorations'
+        title: 'Created Explorations',
+        value: data.created_exploration_summary_dicts.length
       }, {
-        number_value: data.edited_exploration_summary_dicts.length,
-        title: 'Edited Explorations'
+        title: 'Edited Explorations',
+        value: data.edited_exploration_summary_dicts.length
       }];
       $scope.userCreatedExplorations = data.created_exploration_summary_dicts;
-      $scope.userEditedExplorations = data.edited_exploration_summary_dicts;    
+      $scope.userEditedExplorations = data.edited_exploration_summary_dicts;
       $scope.subjectInterests = data.subject_interests;
       $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (

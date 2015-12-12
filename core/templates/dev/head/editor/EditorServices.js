@@ -447,6 +447,24 @@ oppia.factory('explorationRightsService', [
           data.rights.cloned_from, data.rights.community_owned,
           data.rights.viewable_if_private);
       });
+    },
+    saveModeratorChangeToBackend: function(action, emailBody) {
+      var that = this;
+
+      var explorationModeratorRightsUrl = (
+        '/createhandler/moderatorrights/' + explorationData.explorationId);
+      $http.put(explorationModeratorRightsUrl, {
+        action: action,
+        email_body: emailBody,
+        version: explorationData.data.version
+      }).success(function(data) {
+        warningsData.clear();
+        that.init(
+          data.rights.owner_names, data.rights.editor_names,
+          data.rights.viewer_names, data.rights.status,
+          data.rights.cloned_from, data.rights.community_owned,
+          data.rights.viewable_if_private);
+      });
     }
   };
 }]);

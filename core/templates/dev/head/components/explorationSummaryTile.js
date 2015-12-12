@@ -40,18 +40,23 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'ratingComputationService',
       function($scope, oppiaDatetimeFormatter, ratingComputationService) {
-        $scope.lastUpdatedDatetime = (
-          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-            $scope.getLastUpdatedMsec()));
+        $scope.getLastUpdatedDatetime = function() {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            $scope.getLastUpdatedMsec())
+        };
 
-        $scope.averageRating = ratingComputationService.computeAverageRating(
-          $scope.getRatings());
+        $scope.getAverageRating = function() {
+          return ratingComputationService.computeAverageRating(
+            $scope.getRatings());
+        };
 
-        $scope.explorationLink = '/explore/' + $scope.getExplorationId();
-        if ($scope.getCollectionId()) {
-          $scope.explorationLink += (
-            '?collection_id=' + $scope.getCollectionId());
-        }
+        $scope.getExplorationLink = function() {
+          var result = '/explore/' + $scope.getExplorationId();
+          if ($scope.getCollectionId()) {
+            result += ('?collection_id=' + $scope.getCollectionId());
+          }
+          return result;
+        };
       }
     ]
   };

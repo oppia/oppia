@@ -261,8 +261,9 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 'status': exp_summary.status,
                 'ratings': exp_summary.ratings,
                 'community_owned': exp_summary.community_owned,
-                # TODO(sll): Deprecate thumbnail_image_url.
-                'thumbnail_image_url': exp_summary.thumbnail_image_url,
+                'contributor_names': user_services.get_human_readable_user_ids(
+                    exp_summary.contributor_ids),
+                'tags': exp_summary.tags,
                 'thumbnail_icon_url': (
                     utils.get_thumbnail_icon_url_for_category(
                         exp_summary.category)),
