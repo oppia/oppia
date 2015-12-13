@@ -182,9 +182,6 @@ def classify_string_classifier_rule(
     best_matched_rule_spec_index = None
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
-    if state.interaction.id != 'TextInput':
-        return None
-
     sc = classifier_services.StringClassifier()
     training_examples = [[doc, []] for doc in
         state.interaction.confirmed_unclassified_answers]
@@ -264,7 +261,8 @@ def classify(exp_id, state, answer, params):
     if response is None:
         response = classify_soft_rule(
             state, params, input_type, normalized_answer, fs)
-    if feconf.ENABLE_STRING_CLASSIFIER and response is None:
+    if (interaction_instance.is_string_classifier_trainable and
+        feconf.ENABLE_STRING_CLASSIFIER and response is None):
         response = classify_string_classifier_rule(
             state, params, input_type, normalized_answer, fs)
 
