@@ -106,7 +106,7 @@
 
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-exploration-summary-tile">
-    <a ng-href="<[explorationLink]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
@@ -119,10 +119,10 @@
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
-            <span ng-if="averageRating" class="protractor-test-exp-summary-tile-rating">
+            <span ng-if="getAverageRating()" class="protractor-test-exp-summary-tile-rating">
               <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
               </span>
-              <[averageRating | number:1]>
+              <[getAverageRating() | number:1]>
             </span>
           </li>
 
@@ -133,7 +133,7 @@
           </li>
 
           <li class="updated pull-right">
-            <[lastUpdatedDatetime]>
+            <[getLastUpdatedDatetime()]>
           </li>
         </ul>
       </div>

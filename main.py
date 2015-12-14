@@ -228,9 +228,6 @@ urls = [
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
-        r'/moderatorhandler/user_services',
-        moderator.UserServiceHandler, 'moderator_user_service_handler'),
-    get_redirect_route(
         r'/moderatorhandler/email_draft/<action>',
         moderator.EmailDraftHandler, 'moderator_action_email_draft'),
 
