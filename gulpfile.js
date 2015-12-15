@@ -18,6 +18,7 @@
  * @author barnabasmakonda@gmail.com (Barnabas Makonda)
  */
 
+var fs = require('fs');
 var yargs = require('yargs');
 var argv = yargs
   .usage('Usage: $0 <command> [<options>]')
@@ -75,6 +76,22 @@ if (argv.enable_sendmail) {
   params.enable_sendmail = argv.enable_sendmail;
 }
 
+
+// Check if path to the file to be minified and/or concatenated does exist.
+// If not, raise a warning and terminate the program.
+// This will help to check spelling errors in manifest.json.
+var requiresFilesExists = function(filesPath) {
+  var nofilePathError = true;
+  filesPath.forEach(function(filePath) {
+    if (!fs.lstatSync(filePath).isFile()) {
+      console.log(filePath + ' is not a directory, check spelling');
+      nofilePathError = false;
+      process.exit();
+    }
+  });
+  return nofilePathError;
+}
+
 // Check if there are enough commands/actions/tasks to run gulp.
 var checkCommands = function(yargs, argv, numRequired) {
   if (argv._.length < numRequired) {
@@ -129,29 +146,33 @@ for (var dependencyId in frontendDependencies) {
   }
 }
 gulp.task('generateCss', function() {
-  gulp.src(cssFilesPath)
-    .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
-    .pipe(concat('third_party.css'))
-    .pipe(gulp.dest(generatedCssTargetDir));
+  if (requiresFilesExists(cssFilesPath)) {
+    gulp.src(cssFilesPath)
+      .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
+      .pipe(concat('third_party.css'))
+      .pipe(gulp.dest(generatedCssTargetDir));
+  }
 });
 
 gulp.task('generateJs', function() {
-  gulp.src(jsFilesPath)
-    .pipe(sourcemaps.init())
-      .pipe(concat('third_party.js'))
-      .pipe(isMinificationNeeded ? minify({
-        ext:{
-              src:'.js',
-              min:'.min.js'
-            }
-      }) : gulpUtil.noop())
-    // This map a combined/minified file back to an unbuilt state,
-    // holds information about original files.
-    // When you query a certain line and column number in your generated JavaScript
-    // you can do a lookup in the source map which returns the original location.
-    // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(generatedJsTargetDir));
+  if (requiresFilesExists(jsFilesPath)) {
+    gulp.src(jsFilesPath)
+      .pipe(sourcemaps.init())
+        .pipe(concat('third_party.js'))
+        .pipe(isMinificationNeeded ? minify({
+          ext:{
+                src:'.js',
+                min:'.min.js'
+              }
+        }) : gulpUtil.noop())
+      // This map a combined/minified file back to an unbuilt state,
+      // holds information about original files.
+      // When you query a certain line and column number in your generated JavaScript
+      // you can do a lookup in the source map which returns the original location.
+      // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(generatedJsTargetDir));
+  }
 });
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
@@ -169,8 +190,10 @@ gulp.task('copyFonts', function() {
 // of a third-party library with respect to the CSS file that uses them.
 // The currently-affected libraries include select2.css.
 gulp.task('copyCssBackgroundImages', function() {
-  gulp.src(cssBackgroundPath)
-    .pipe(gulp.dest(generatedCssTargetDir));
+  if (requiresFilesExists(cssBackgroundPath)) {
+    gulp.src(cssBackgroundPath)
+      .pipe(gulp.dest(generatedCssTargetDir));
+  }
 });
 
 gulp.task('gulpStartGae', function() {

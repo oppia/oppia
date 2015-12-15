@@ -20,6 +20,7 @@ import json
 import os
 import shutil
 import StringIO
+import sys
 import tarfile
 import urllib
 import urllib2
@@ -44,6 +45,30 @@ TARGET_DOWNLOAD_DIRS = {
     'backend': THIRD_PARTY_DIR,
     'oppiaTools': TOOLS_DIR
 }
+
+_DOWNLOAD_FORMAT_ZIP = 'zip'
+_DOWNLOAD_FORMAT_TAR = 'tar'
+_DOWNLOAD_FORMAT_FILES = 'files'
+
+DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
+        'zip': {
+            'mandatory_keys': ['version', 'url', 'downloadFormat'],
+            'optional_key_pairs': [
+                ['rootDir', 'rootDirPrefix'], ['targetDir', 'targetDirPrefix']]
+            },
+        'files': {
+            'mandatory_keys': [
+                'version', 'url', 'files',
+                'targetDirPrefix','downloadFormat'],
+            'optional_key_pairs': []
+            },
+        'tar': {
+            'mandatory_keys': [
+                'version', 'url', 'tarRootDirPrefix',
+                'targetDirPrefix', 'downloadFormat'],
+            'optional_key_pairs': []
+            }
+        }
 
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
@@ -165,20 +190,76 @@ def return_json(source_url):
     return json.loads(response)
 
 
-def download_manifest_files(source_url):
-    """This download all files to the required folders
+def test_manifest_syntax(dependency_type, dependency_dict):
+    """This checks syntax of the manifest.json dependencies.
+
+    Display warning message when there is an error and terminate the program.
     Args:
-      source_url: the URL fof the json file.
+      dependency_type: dependency download format.
+      dependency_dict: manifest.json dependency dict
+    """
+    keys = dependency_dict.keys()
+    mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+        dependency_type]['mandatory_keys']
+    optional_key_pairs= DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+        dependency_type]['optional_key_pairs']
+    for key in mandatory_keys:
+        if key not in keys:
+            print '------------------------------------------'
+            print 'There is syntax error in this dependency'
+            print dependency_dict
+            print 'This key is missing or misspelled: "%s".' % key
+            print 'Exiting'
+            sys.exit()
+    if optional_key_pairs:
+        for optional_keys in optional_key_pairs:
+            if not any([True for key in optional_keys if key in keys]):
+                print '------------------------------------------'
+                print 'There is syntax error in this dependency'
+                print  dependency_dict
+                print 'This key is missing or misspelled: "%s".' % key
+                print 'Exiting'
+                sys.exit()
+    dependency_url = dependency_dict['url']
+    is_zip_file_format = dependency_type == _DOWNLOAD_FORMAT_ZIP
+    if (dependency_url.endswith('.zip') and not is_zip_file_format  or 
+        is_zip_file_format and not dependency_url.endswith('.zip')):
+            print '------------------------------------------'
+            print 'There is syntax error in this dependency'
+            print  dependency_dict
+            print 'This url  %s is invalid for %s file format.' % (
+                dependency_url, dependency_type)
+            print 'Exiting.'
+
+
+
+def validate_manifest(source_url):
+    """This validates syntax of the manifest.json
+    Args:
+      source_url: the url to the json file.
     """
     manifest_data = return_json(source_url)
     dependencies = manifest_data['dependencies']
-    for data in dependencies:
-        dependency = dependencies[data]
-        for dependency_id in dependency:
-            dependency_contents = dependency[dependency_id]
-            if 'srcUrl' in dependency_contents:
-                DEPENDENCY_REV = dependency_contents['version']
-                DEPENDENCY_URL = dependency_contents['srcUrl']
+    for data, dependency in dependencies.items():
+        for dependency_id,dependency_contents in dependency.items():
+            DOWNLOAD_FORMAT = dependency_contents['downloadFormat']
+            test_manifest_syntax(DOWNLOAD_FORMAT, dependency_contents)
+
+
+def download_manifest_files(source_url):
+    """This download all files to the required folders
+    Args:
+      source_url: the URL to the json file.
+    """
+    validate_manifest(source_url)
+    manifest_data = return_json(source_url)
+    dependencies = manifest_data['dependencies']
+    for data, dependency in dependencies.items():
+        for dependency_id,dependency_contents in dependency.items():
+            DEPENDENCY_REV = dependency_contents['version']
+            DEPENDENCY_URL = dependency_contents['url']
+            DOWNLOAD_FORMAT = dependency_contents['downloadFormat']
+            if DOWNLOAD_FORMAT == _DOWNLOAD_FORMAT_FILES:
                 DEPENDENCY_FILES = dependency_contents['files']
                 TARGET_DIRNAME = (
                     dependency_contents['targetDirPrefix'] + DEPENDENCY_REV)
@@ -186,16 +267,14 @@ def download_manifest_files(source_url):
                     TARGET_DOWNLOAD_DIRS[data], TARGET_DIRNAME)
                 download_files(DEPENDENCY_URL, DEPENDENCY_DST, DEPENDENCY_FILES)
 
-            elif 'zipUrl' in dependency_contents:
-                DEPENDENCY_REV = dependency_contents['version']
-                DEPENDENCY_URL = dependency_contents['zipUrl']
-                if 'rootDir' in dependency_contents:
+            elif DOWNLOAD_FORMAT == _DOWNLOAD_FORMAT_ZIP:
+                if 'rootDir' in dependency_contents.keys():
                     DEPENDENCY_ZIP_ROOT_NAME = dependency_contents['rootDir']
                 else:
                     DEPENDENCY_ZIP_ROOT_NAME = (
                         dependency_contents['rootDirPrefix'] + DEPENDENCY_REV)
 
-                if 'targetDir' in dependency_contents:
+                if 'targetDir' in dependency_contents.keys():
                     DEPENDENCY_TARGET_ROOT_NAME = (
                         dependency_contents['targetDir'])
                 else:
@@ -205,9 +284,7 @@ def download_manifest_files(source_url):
                     DEPENDENCY_URL, TARGET_DOWNLOAD_DIRS[data],
                     DEPENDENCY_ZIP_ROOT_NAME, DEPENDENCY_TARGET_ROOT_NAME)
 
-            elif 'tarUrl' in dependency_contents:
-                DEPENDENCY_REV = dependency_contents['version']
-                DEPENDENCY_URL = dependency_contents['tarUrl']
+            elif DOWNLOAD_FORMAT == _DOWNLOAD_FORMAT_TAR:
                 DEPENDENCY_TAR_ROOT_NAME = (
                     dependency_contents['tarRootDirPrefix'] + DEPENDENCY_REV)
                 DEPENDENCY_TARGET_ROOT_NAME = (
