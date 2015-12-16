@@ -80,8 +80,8 @@ if (argv.enable_sendmail) {
 // Check if path to the file to be minified and/or concatenated does exist.
 // If not, raise a warning and terminate the program.
 // This will help to check spelling errors in manifest.json.
-var requireFilesExists = function(filesPath) {
-  filesPath.forEach(function(filePath) {
+var requireFilesExists = function(filePaths) {
+  filePaths.forEach(function(filePath) {
     if (!fs.lstatSync(filePath).isFile()) {
       console.log(filePath + ' is not a valid filepath, check spelling');
       nofilePathError = false;
