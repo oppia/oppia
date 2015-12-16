@@ -119,7 +119,7 @@
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
-            <span ng-if="getAverageRating()">
+            <span ng-if="getAverageRating()" class="protractor-test-exp-summary-tile-rating">
               <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
               </span>
               <[getAverageRating() | number:1]>
