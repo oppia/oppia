@@ -80,11 +80,10 @@ if (argv.enable_sendmail) {
 // Check if path to the file to be minified and/or concatenated does exist.
 // If not, raise a warning and terminate the program.
 // This will help to check spelling errors in manifest.json.
-var requireFilesExists = function(filePaths) {
+var requireFilesExist = function(filePaths) {
   filePaths.forEach(function(filePath) {
     if (!fs.lstatSync(filePath).isFile()) {
       console.log(filePath + ' is not a valid filepath, check spelling');
-      nofilePathError = false;
       process.exit();
     }
   });
@@ -114,37 +113,41 @@ var generatedTargetDir = path.join(
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
-for (var dependencyId in frontendDependencies) {
-  var dependency = frontendDependencies[dependencyId];
-  var dependencyDir = dependency.targetDirPrefix + dependency.version;
-  if (dependency.hasOwnProperty('bundle')) {
-    if (dependency.bundle.hasOwnProperty('css')) {
-      dependency.bundle.css.forEach(function(cssFiles) {
-        cssFilesPath.push(path.join(
-          'third_party', 'static', dependencyDir, cssFiles));
-      });
-    }
-    if (dependency.bundle.hasOwnProperty('js')) {
-      dependency.bundle.js.forEach(function(jsFiles) {
-        jsFilesPath.push(path.join(
-          'third_party', 'static', dependencyDir, jsFiles));
-      });
-    }
-    if (dependency.bundle.hasOwnProperty('fontsPath')) {
-      var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
-      fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
-        dependency.bundle.fontsPath, fontPrefix));
-    }
-    if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
-      dependency.bundle.cssBackgroundImage.forEach(function(imagePath) {
-        cssBackgroundFilepaths.push(path.join(
-          'third_party', 'static', dependencyDir, imagePath));
-      });
+
+gulp.task('collectFilesPath', function() {
+  for (var dependencyId in frontendDependencies) {
+    var dependency = frontendDependencies[dependencyId];
+    var dependencyDir = dependency.targetDirPrefix + dependency.version;
+    if (dependency.hasOwnProperty('bundle')) {
+      if (dependency.bundle.hasOwnProperty('css')) {
+        dependency.bundle.css.forEach(function(cssFiles) {
+          cssFilesPath.push(path.join(
+            'third_party', 'static', dependencyDir, cssFiles));
+        });
+      }
+      if (dependency.bundle.hasOwnProperty('js')) {
+        dependency.bundle.js.forEach(function(jsFiles) {
+          jsFilesPath.push(path.join(
+            'third_party', 'static', dependencyDir, jsFiles));
+        });
+      }
+      if (dependency.bundle.hasOwnProperty('fontsPath')) {
+        var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
+        fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
+          dependency.bundle.fontsPath, fontPrefix));
+      }
+      if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
+        dependency.bundle.cssBackgroundImage.forEach(function(imagePath) {
+          cssBackgroundFilepaths.push(path.join(
+            'third_party', 'static', dependencyDir, imagePath));
+        });
+      }
     }
   }
-}
+});
+
 gulp.task('generateCss', function() {
-  requireFilesExists(cssFilesPath);
+  requireFilesExist(cssFilesPath);
   gulp.src(cssFilesPath)
     .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
     .pipe(concat('third_party.css'))
@@ -152,7 +155,7 @@ gulp.task('generateCss', function() {
 });
 
 gulp.task('generateJs', function() {
-  requireFilesExists(jsFilesPath);
+  requireFilesExist(jsFilesPath);
   gulp.src(jsFilesPath)
     .pipe(sourcemaps.init())
       .pipe(concat('third_party.js'))
@@ -186,7 +189,7 @@ gulp.task('copyFonts', function() {
 // of a third-party library with respect to the CSS file that uses them.
 // The currently-affected libraries include select2.css.
 gulp.task('copyCssBackgroundImages', function() {
-  requireFilesExists(cssBackgroundFilepaths);
+  requireFilesExist(cssBackgroundFilepaths);
   gulp.src(cssBackgroundFilepaths)
     .pipe(gulp.dest(generatedCssTargetDir));
 });
@@ -199,7 +202,8 @@ gulp.task('gulpStartGae', function() {
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
 gulp.task('build', [
-  'generateCss', 'copyFonts', 'copyCssBackgroundImages', 'generateJs']);
+  'collectFilesPath', 'generateCss', 'copyFonts',
+  'copyCssBackgroundImages', 'generateJs']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {

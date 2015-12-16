@@ -51,24 +51,24 @@ _DOWNLOAD_FORMAT_TAR = 'tar'
 _DOWNLOAD_FORMAT_FILES = 'files'
 
 DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
-        'zip': {
-            'mandatory_keys': ['version', 'url', 'downloadFormat'],
-            'optional_key_pairs': [
-                ['rootDir', 'rootDirPrefix'], ['targetDir', 'targetDirPrefix']]
-            },
-        'files': {
-            'mandatory_keys': [
-                'version', 'url', 'files',
-                'targetDirPrefix', 'downloadFormat'],
-            'optional_key_pairs': []
-            },
-        'tar': {
-            'mandatory_keys': [
-                'version', 'url', 'tarRootDirPrefix',
-                'targetDirPrefix', 'downloadFormat'],
-            'optional_key_pairs': []
-            }
-        }
+    'zip': {
+        'mandatory_keys': ['version', 'url', 'downloadFormat'],
+        'optional_key_pairs': [
+            ['rootDir', 'rootDirPrefix'], ['targetDir', 'targetDirPrefix']]
+    },
+    'files': {
+        'mandatory_keys': [
+            'version', 'url', 'files',
+            'targetDirPrefix', 'downloadFormat'],
+        'optional_key_pairs': []
+    },
+    'tar': {
+        'mandatory_keys': [
+            'version', 'url', 'tarRootDirPrefix',
+            'targetDirPrefix', 'downloadFormat'],
+        'optional_key_pairs': []
+    }
+}
 
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
@@ -201,7 +201,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
     keys = dependency_dict.keys()
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['mandatory_keys']
-    # Optional keys requires atleast one member of the pair
+    # Optional keys requires exactly one member of the pair
     # to be available as a key in the dependency_dict
     optional_key_pairs= DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['optional_key_pairs']
@@ -250,7 +250,7 @@ def validate_manifest(source_url):
     manifest_data = return_json(source_url)
     dependencies = manifest_data['dependencies']
     for _, dependency in dependencies.items():
-        for dependency_id,dependency_contents in dependency.items():
+        for dependency_id, dependency_contents in dependency.items():
             download_format = dependency_contents['downloadFormat']
             test_manifest_syntax(download_format, dependency_contents)
 
