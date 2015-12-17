@@ -103,9 +103,9 @@ checkCommands(yargs, argv, 1);
 
 var isMinificationNeeded = (argv.minify == 'True');
 var frontendDependencies = manifest.dependencies.frontend;
-var cssFilesPath = [];
-var jsFilesPath = [];
-var fontFolderPath = [];
+var cssFilePaths = [];
+var jsFilePaths = [];
+var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
 var generatedTargetDir = path.join(
   'third_party', 'generated',
@@ -114,26 +114,26 @@ var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
 
-gulp.task('collectFilesPath', function() {
+gulp.task('collectDependencyFilepaths', function() {
   for (var dependencyId in frontendDependencies) {
     var dependency = frontendDependencies[dependencyId];
     var dependencyDir = dependency.targetDirPrefix + dependency.version;
     if (dependency.hasOwnProperty('bundle')) {
       if (dependency.bundle.hasOwnProperty('css')) {
         dependency.bundle.css.forEach(function(cssFiles) {
-          cssFilesPath.push(path.join(
+          cssFilePaths.push(path.join(
             'third_party', 'static', dependencyDir, cssFiles));
         });
       }
       if (dependency.bundle.hasOwnProperty('js')) {
         dependency.bundle.js.forEach(function(jsFiles) {
-          jsFilesPath.push(path.join(
+          jsFilePaths.push(path.join(
             'third_party', 'static', dependencyDir, jsFiles));
         });
       }
       if (dependency.bundle.hasOwnProperty('fontsPath')) {
         var fontPrefix = '*.{eot,woff2,ttf,woff,eof,svg}';
-        fontFolderPath.push(path.join('third_party', 'static', dependencyDir,
+        fontFolderPaths.push(path.join('third_party', 'static', dependencyDir,
           dependency.bundle.fontsPath, fontPrefix));
       }
       if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
@@ -147,16 +147,16 @@ gulp.task('collectFilesPath', function() {
 });
 
 gulp.task('generateCss', function() {
-  requireFilesExist(cssFilesPath);
-  gulp.src(cssFilesPath)
+  requireFilesExist(cssFilePaths);
+  gulp.src(cssFilePaths)
     .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
     .pipe(concat('third_party.css'))
     .pipe(gulp.dest(generatedCssTargetDir));
 });
 
 gulp.task('generateJs', function() {
-  requireFilesExist(jsFilesPath);
-  gulp.src(jsFilesPath)
+  requireFilesExist(jsFilePaths);
+  gulp.src(jsFilePaths)
     .pipe(sourcemaps.init())
       .pipe(concat('third_party.js'))
       .pipe(isMinificationNeeded ? minify({
@@ -176,7 +176,7 @@ gulp.task('generateJs', function() {
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
 gulp.task('copyFonts', function() {
-  gulp.src(fontFolderPath)
+  gulp.src(fontFolderPaths)
     .pipe(gulp.dest(path.join(
       'third_party', 'generated',
       isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
@@ -202,15 +202,15 @@ gulp.task('gulpStartGae', function() {
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
 gulp.task('build', [
-  'collectFilesPath', 'generateCss', 'copyFonts',
+  'collectDependencyFilepaths', 'generateCss', 'copyFonts',
   'copyCssBackgroundImages', 'generateJs']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
     gulp.watch('gulpfile.js', ['build']);
-    gulp.watch(cssFilesPath, ['generateCss']);
-    gulp.watch(jsFilesPath, ['generateJs']);
+    gulp.watch(cssFilePaths, ['generateCss']);
+    gulp.watch(jsFilePaths, ['generateJs']);
     gulp.watch('manifest.json', ['build']);
     gulp.slurped = true;
   }

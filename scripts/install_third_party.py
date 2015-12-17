@@ -179,14 +179,14 @@ def get_file_contents(filepath, mode='r'):
         return f.read().decode('utf-8')
 
 
-def return_json(source_url):
+def return_json(filepath):
     """Return json object when provided url
     Args:
-        source_url: the URL of the json file.
+        filepath: the path to the json file.
     Return:
         a parsed json objects
     """
-    response = get_file_contents(source_url)
+    response = get_file_contents(filepath)
     return json.loads(response)
 
 
@@ -212,16 +212,18 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             print dependency_dict
             print 'This key is missing or misspelled: "%s".' % key
             print 'Exiting'
-            sys.exit()
+            sys.exit(1)
     if optional_key_pairs:
         for optional_keys in optional_key_pairs:
-            if not any([True for key in optional_keys if key in keys]):
+            optional_keys_in_dict =[
+                key for key in optional_keys if key in keys]
+            if not len(optional_keys_in_dict) == 1:
                 print '------------------------------------------'
                 print 'There is syntax error in this dependency'
                 print dependency_dict
-                print 'This key is missing or misspelled: "%s".' % key
+                print 'Only one of these keys pair must be used: "%s".' % str(optional_keys)
                 print 'Exiting'
-                sys.exit()
+                sys.exit(1)
 
     # Checks the validity of the URL corresponding to the file format.
     dependency_url = dependency_dict['url']
@@ -239,15 +241,15 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             print 'This url  %s is invalid for %s file format.' % (
                 dependency_url, dependency_type)
             print 'Exiting.'
+            sys.exit(1)
 
 
-
-def validate_manifest(source_url):
+def validate_manifest(filepath):
     """This validates syntax of the manifest.json
     Args:
-      source_url: the URL to the json file.
+      filepath: the path to the json file.
     """
-    manifest_data = return_json(source_url)
+    manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
     for _, dependency in dependencies.items():
         for dependency_id, dependency_contents in dependency.items():
@@ -255,13 +257,13 @@ def validate_manifest(source_url):
             test_manifest_syntax(download_format, dependency_contents)
 
 
-def download_manifest_files(source_url):
+def download_manifest_files(filepath):
     """This download all files to the required folders
     Args:
-      source_url: the URL to the json file.
+      filepath: the path to the json file.
     """
-    validate_manifest(source_url)
-    manifest_data = return_json(source_url)
+    validate_manifest(filepath)
+    manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
     for data, dependency in dependencies.items():
         for dependency_id, dependency_contents in dependency.items():
