@@ -77,8 +77,8 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
-            answer_group_index, rule_spec_index, session_id,
-            time_spent_in_secs, params, normalized_answer):
+            answer_group_index, rule_spec_index, classification_categorization,
+            session_id, time_spent_in_secs, params, normalized_answer):
         """Records an event when an answer triggers a rule. The answer recorded
         here is a Python-representation of the actual answer submitted by the
         user.
@@ -86,8 +86,8 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         # TODO(sll): Escape these args?
         stats_services.record_answer(
             exploration_id, exploration_version, state_name,
-            answer_group_index, rule_spec_index, session_id,
-            time_spent_in_secs, params, normalized_answer)
+            answer_group_index, rule_spec_index, classification_categorization,
+            session_id, time_spent_in_secs, params, normalized_answer)
 
 
 class StartExplorationEventHandler(BaseEventHandler):

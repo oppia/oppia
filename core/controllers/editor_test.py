@@ -184,7 +184,7 @@ class EditorTest(BaseEditorControllerTest):
     def test_untrained_answers_handler(self):
         with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
             def _create_answer(value, count=1):
-                return {'value': value, 'count': count}
+                return {'answer': value, 'frequency': count}
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
@@ -245,7 +245,7 @@ class EditorTest(BaseEditorControllerTest):
             response_dict = self.get_json(url)
             self.assertEqual(
                 response_dict['unhandled_answers'],
-                _create_training_data('joyful', 'sad'))
+                _create_training_data('sad', 'joyful'))
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.

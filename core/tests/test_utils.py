@@ -464,7 +464,9 @@ class TestBase(unittest.TestCase):
                 'client_time_spent_in_secs': client_time_spent_in_secs,
                 'old_state_name': state_name,
                 'answer_group_index': classify_result['answer_group_index'],
-                'rule_spec_index': classify_result['rule_spec_index']
+                'rule_spec_index': classify_result['rule_spec_index'],
+                'classification_categorization': (
+                    classify_result['classification_categorization'])
             }
         )
 

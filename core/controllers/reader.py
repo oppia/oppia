@@ -151,18 +151,23 @@ def classify(exp_id, state, answer, params):
     # meets this requirement, then the default 'group' automatically matches
     # resulting in the outcome of the answer being the default outcome of the
     # state.
+    # TODO(bhenning): Add soft and classifier classifications.
     if (best_matched_truth_value >=
             feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
         return {
             'outcome': best_matched_answer_group.outcome.to_dict(),
             'answer_group_index': best_matched_answer_group_index,
             'rule_spec_index': best_matched_rule_spec_index,
+            'classification_categorization': (
+                exp_domain.HARD_RULE_CLASSIFICATION),
         }
     elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
             'answer_group_index': len(state.interaction.answer_groups),
-            'rule_spec_index': 0
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
         }
 
     raise Exception('Something has seriously gone wrong with the exploration. '
@@ -321,6 +326,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         # the rule spec string.
         answer_group_index = self.payload.get('answer_group_index')
         rule_spec_index = self.payload.get('rule_spec_index')
+        classification_categorization = self.payload.get(
+            'classification_categorization')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
@@ -339,8 +346,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
 
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name, answer_group_index,
-            rule_spec_index, session_id, client_time_spent_in_secs, params,
-            normalized_answer)
+            rule_spec_index, classification_categorization, session_id,
+            client_time_spent_in_secs, params, normalized_answer)
         self.render_json({})
 
 

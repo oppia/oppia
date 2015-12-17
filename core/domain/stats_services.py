@@ -26,6 +26,7 @@ from core.domain import stats_jobs_continuous
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
+import itertools
 import logging
 import sys
 import utils
@@ -81,10 +82,15 @@ def get_visualizations_info(exploration_id, state_name):
 # tested on a branch alongside these changes, then used to verify that these
 # changes to do not change the contract of the function.
 def get_top_state_rule_answers(
-        exploration_id, state_name, rule_str_list, top_answer_count):
+        exploration_id, state_name, classify_category_list,
+        top_answer_count_per_category):
     """Returns a list of top answers (by submission frequency) submitted to the
-    given state in the given exploration which were mapped to any of the rules
-    listed in 'rule_str_list'.
+    given state in the given exploration which were mapped to any of the rule
+    classification categories listed in 'classify_category_list'.
+
+    NOTE TO DEVELOPERS: Classification categories are stored upon answer
+    submission, so the answers returned by this function may be stale and not
+    evaluate in the same way as they did upon submission.
     """
     # TODO(bhenning): This should have a custom, continuous job (possibly as
     # part of the summarizers framework) which goes through all answers, finds
@@ -92,10 +98,14 @@ def get_top_state_rule_answers(
     # data of soft rules, rank them by their frequency, then output them. This
     # output will have reasonably up-to-date answers which need to be resolved
     # by creators.
-    job_result = stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-        exploration_id, state_name, 'AnswerFrequencies')
+    job_result = (
+        stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+            exploration_id, state_name, 'TopAnswersByCategorization'))
     if job_result:
-        return job_result.calculation_output[:top_answer_count]
+        calc_output = job_result.calculation_output
+        return list(itertools.chain.from_iterable(
+            calc_output[category][:top_answer_count_per_category]
+            for category in classify_category_list if category in calc_output))
     else:
         return []
 
@@ -205,8 +215,8 @@ def get_exploration_stats(exploration_id, exploration_version):
 
 # TODO(bhenning): Test this.
 def record_answer(exploration_id, exploration_version, state_name,
-        answer_group_index, rule_spec_index, session_id, time_spent_in_sec,
-        params, normalized_answer):
+        answer_group_index, rule_spec_index, classification_categorization,
+        session_id, time_spent_in_sec, params, normalized_answer):
     """Record an answer by storing it to the corresponding StateAnswers entity.
     """
     # Retrieve state_answers from storage
@@ -234,6 +244,7 @@ def record_answer(exploration_id, exploration_version, state_name,
         'time_spent_in_sec': time_spent_in_sec,
         'answer_group_index': answer_group_index,
         'rule_spec_index': rule_spec_index,
+        'classification_categorization': classification_categorization,
         'session_id': session_id,
         'interaction_id': interaction_id,
         'params': params

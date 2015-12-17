@@ -22,6 +22,7 @@ import collections
 import copy
 import os
 
+from core.domain import exp_domain
 from core.domain import stats_domain
 import feconf
 import schema_utils
@@ -72,16 +73,17 @@ def _get_hashable_value(value):
         return value
 
 
-def _count_answers(answer_values):
+def _count_answers(answer_dicts_list):
     """Count an input list of answer objects using collections.Counter. This
     returns a list of pairs with the first element being an answer object and
     the second being the number of times it shows up in the input list.
     """
     hashable_answer_values = [
-        _get_hashable_value(answer) for answer in answer_values]
+        _get_hashable_value(answer_dict['answer'])
+        for answer_dict in answer_dicts_list]
     answer_frequencies = collections.Counter(hashable_answer_values)
     return [
-        ([answer_values[idx]
+        ([answer_dicts_list[idx]
             for idx, val in enumerate(hashable_answer_values)
             if val == hashable_answer][0], frequency)
         for (hashable_answer, frequency) in answer_frequencies.most_common()]
@@ -120,17 +122,13 @@ class AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-
-        answer_values = [
-            answer_dict['answer']
-            for answer_dict in state_answers_dict['answers_list']]
-
-        answer_counts_as_list_of_pairs = _count_answers(answer_values)
+        answer_counts_as_list_of_pairs = _count_answers(
+            state_answers_dict['answers_list'])
 
         calculation_output = []
         for item in answer_counts_as_list_of_pairs:
             calculation_output.append({
-                'answer': item[0],
+                'answer': item[0]['answer'],
                 'frequency': item[1],
             })
 
@@ -152,18 +150,13 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-
-        answer_values = [
-            answer_dict['answer']
-            for answer_dict in state_answers_dict['answers_list']]
-
         top_5_answer_counts_as_list_of_pairs = (
-            _count_answers(answer_values)[:5])
+            _count_answers(state_answers_dict['answers_list'])[:5])
 
         calculation_output = []
         for item in top_5_answer_counts_as_list_of_pairs:
             calculation_output.append({
-                'answer': item[0],
+                'answer': item[0]['answer'],
                 'frequency': item[1],
             })
 
@@ -187,7 +180,6 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-
         # Get a list of stringified sets, e.g. [u"[u'abc', u'www']",
         # u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [
@@ -223,6 +215,54 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                 'answer': item[0],
                 'frequency': item[1],
             })
+
+        return stats_domain.StateAnswersCalcOutput(
+            state_answers_dict['exploration_id'],
+            state_answers_dict['exploration_version'],
+            state_answers_dict['state_name'],
+            self.id,
+            calculation_output)
+
+
+class TopAnswersByCategorization(BaseCalculation):
+    """Calculation for the top answers by both frequency and respective
+    categorizations. The output from this calculation is one list for each
+    classification category, where each list is a ranked list of answers, by
+    frequency.
+    """
+    def calculate_from_state_answers_dict(self, state_answers_dict):
+        """Computes the number of occurrences of each answer, split into groups
+        based on the number of classification categories.
+
+        This method is run from within the context of a MapReduce job.
+        """
+        top_answer_counts_as_list_of_pairs = _count_answers(
+            state_answers_dict['answers_list'])
+
+        calculation_output = {
+            exp_domain.HARD_RULE_CLASSIFICATION: [],
+            exp_domain.SOFT_RULE_CLASSIFICATION: [],
+            exp_domain.DEFAULT_OUTCOME_CLASSIFICATION: [],
+        }
+        for item in top_answer_counts_as_list_of_pairs:
+            answer_dict = item[0]
+            classify_category = answer_dict['classification_categorization']
+            if classify_category not in calculation_output:
+                raise Exception(
+                    'Cannot aggregate answer with unknown rule classification '
+                    'category: %s' % classify_category)
+            calculation_output[classify_category].append({
+                'answer': answer_dict['answer'],
+                'frequency': item[1]
+            })
+
+        # Remove empty lists if no answers match within those categories.
+        if not calculation_output[exp_domain.HARD_RULE_CLASSIFICATION]:
+            del calculation_output[exp_domain.HARD_RULE_CLASSIFICATION]
+        if not calculation_output[exp_domain.SOFT_RULE_CLASSIFICATION]:
+            del calculation_output[exp_domain.SOFT_RULE_CLASSIFICATION]
+        if not calculation_output[exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]:
+            del calculation_output[exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],

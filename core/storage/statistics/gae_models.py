@@ -488,6 +488,10 @@ class StateAnswersModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME].
     """
+    # This value should be updated in the event of any answers_list schema
+    # change.
+    CURRENT_SCHEMA_VERSION = 1
+
     # Explicitly store exploration id, exploration version and state name
     # so we can easily do queries on them.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
@@ -498,6 +502,11 @@ class StateAnswersModel(base_models.BaseModel):
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_services.record_answer.
     answers_list = ndb.JsonProperty(repeated=True, indexed=False)
+    # The version of the answers_list currently supported by Oppia. If the
+    # internal JSON structure of answers_list changes, CURRENT_SCHEMA_VERSION
+    # in this class needs to be incremented.
+    schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_SCHEMA_VERSION)
 
     @classmethod
     def get_model(cls, exploration_id, exploration_version, state_name):

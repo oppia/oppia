@@ -18,9 +18,17 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
+ // TODO(bhenning): Find a better place for these constants.
+
+oppia.constant('HARD_RULE_CLASSIFICATION', 'hard_rule')
+oppia.constant('SOFT_RULE_CLASSIFICATION', 'soft_rule')
+oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
+
 oppia.factory('answerClassificationService', [
-    '$http', '$q', 'learnerParamsService', function(
-      $http, $q, learnerParamsService) {
+    '$http', '$q', 'learnerParamsService', 'HARD_RULE_CLASSIFICATION',
+    'DEFAULT_OUTCOME_CLASSIFICATION', function(
+      $http, $q, learnerParamsService, HARD_RULE_CLASSIFICATION,
+      DEFAULT_OUTCOME_CLASSIFICATION) {
 
   /**
    * Finds the first answer group with a rule that returns true. This should be
@@ -44,6 +52,7 @@ oppia.factory('answerClassificationService', [
   var classifyAnswer = function(
       answer, answerGroups, defaultOutcome, interactionRulesService) {
     // Find the first group that contains a rule which returns true
+    // TODO(bhenning): Implement soft and classifier classifications.
     for (var i = 0; i < answerGroups.length; i++) {
       for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
         var ruleSpec = answerGroups[i].rule_specs[j];
@@ -51,7 +60,8 @@ oppia.factory('answerClassificationService', [
           return {
             outcome: answerGroups[i].outcome,
             answerGroupIndex: i,
-            ruleSpecIndex: j
+            ruleSpecIndex: j,
+            classificationCategorization: HARD_RULE_CLASSIFICATION
           };
         }
       }
@@ -63,7 +73,8 @@ oppia.factory('answerClassificationService', [
       return {
         outcome: defaultOutcome,
         answerGroupIndex: answerGroups.length,
-        ruleSpecIndex: 0
+        ruleSpecIndex: 0,
+        classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
       };
     } else {
       warningsData.addWarning('No default outcome found.');
@@ -116,7 +127,8 @@ oppia.factory('answerClassificationService', [
           deferred.resolve({
             outcome: result.outcome,
             ruleSpecIndex: result.rule_spec_index,
-            answerGroupIndex: result.answer_group_index
+            answerGroupIndex: result.answer_group_index,
+            classificationCategorization: result.classification_categorization
           });
         });
       }

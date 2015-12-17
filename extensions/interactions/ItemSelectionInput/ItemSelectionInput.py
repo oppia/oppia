@@ -66,3 +66,5 @@ class ItemSelectionInput(base.BaseInteraction):
         },
         'default_value': ['Sample item answer'],
     }]
+
+    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

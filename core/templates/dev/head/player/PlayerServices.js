@@ -530,7 +530,9 @@ oppia.factory('oppiaPlayerService', [
             client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
             old_state_name: _currentStateName,
             answer_group_index: classificationResult.answerGroupIndex,
-            rule_spec_index: classificationResult.ruleSpecIndex
+            rule_spec_index: classificationResult.ruleSpecIndex,
+            classification_categorization: (
+              classificationResult.classificationCategorization)
           });
         }
 

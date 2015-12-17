@@ -35,11 +35,14 @@ import utils
 class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     """Tests for answer summary calculations."""
 
-    def _create_sample_answer(self, answer, time_spent_in_card, session_id):
+    def _create_sample_answer(
+            self, answer, time_spent_in_card, session_id,
+            classify_category=exp_domain.HARD_RULE_CLASSIFICATION):
         return {
             'answer': answer,
             'time_spent_in_sec': time_spent_in_card,
-            'session_id': session_id
+            'session_id': session_id,
+            'classification_categorization': classify_category,
         }
 
     def _create_sample_answers(
@@ -329,3 +332,136 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     def test_frequency_commonly_submitted_elements_calculation(self):
         # TODO(msl): Implement this test.
         pass
+
+    def test_top_answers_by_categorization(self):
+        """Test top answers are recorded based on both their frequency and
+        classification categorization.
+        """
+        calculation_instance = (
+            calculation_registry.Registry.get_calculation_by_id(
+                'TopAnswersByCategorization'))
+
+        # Verify an empty calculation produces the right calculation ID, as
+        # well as an empty result.
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'State',
+            'interaction_id': 'TextInput',
+            'answers_list': []
+        }
+
+        actual_state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
+
+        self.assertEquals(
+            actual_state_answers_calc_output.calculation_id,
+            'TopAnswersByCategorization')
+
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+        self.assertEquals(actual_calc_output, {})
+
+        # Only submitting a hard rule should result in only one returned
+        # category.
+        dummy_answers_list = [
+            self._create_sample_answer('Hard A', 0., 'sid1',
+                exp_domain.HARD_RULE_CLASSIFICATION),
+        ]
+        state_answers_dict['answers_list'] = dummy_answers_list
+
+        actual_state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+
+        self.assertEquals(actual_calc_output, {
+            'hard_rule': [{
+                'answer': 'Hard A',
+                'frequency': 1
+            }]
+        })
+
+        # Multiple categories of answers should be identified and properly
+        # aggregated.
+        dummy_answers_list = [
+            self._create_sample_answer('Hard A', 0., 'sid1',
+                exp_domain.HARD_RULE_CLASSIFICATION),
+            self._create_sample_answer('Hard B', 0., 'sid1',
+                exp_domain.HARD_RULE_CLASSIFICATION),
+            self._create_sample_answer('Hard A', 0., 'sid1',
+                exp_domain.HARD_RULE_CLASSIFICATION),
+            self._create_sample_answer('Soft A', 0., 'sid1',
+                exp_domain.SOFT_RULE_CLASSIFICATION),
+            self._create_sample_answer('Soft B', 0., 'sid1',
+                exp_domain.SOFT_RULE_CLASSIFICATION),
+            self._create_sample_answer('Soft B', 0., 'sid1',
+                exp_domain.SOFT_RULE_CLASSIFICATION),
+            self._create_sample_answer('Default C', 0., 'sid1',
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            self._create_sample_answer('Default C', 0., 'sid1',
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            self._create_sample_answer('Default B', 0., 'sid1',
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+        ]
+        state_answers_dict['answers_list'] = dummy_answers_list
+
+        actual_state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+
+        self.assertEquals(actual_calc_output, {
+            'hard_rule': [{
+                'answer': 'Hard A',
+                'frequency': 2
+            }, {
+                'answer': 'Hard B',
+                'frequency': 1
+            }],
+            'soft_rule': [{
+                'answer': 'Soft B',
+                'frequency': 2
+            }, {
+                'answer': 'Soft A',
+                'frequency': 1
+            }],
+            'default_outcome': [{
+                'answer': 'Default C',
+                'frequency': 2
+            }, {
+                'answer': 'Default B',
+                'frequency': 1
+            }]
+        })
+
+    def test_top_answers_by_categorization_cannot_classify_invalid_category(self):
+        """The TopAnswersByCategorization calculation cannot use answers with
+        unknown categorizations. It will throw an exception in these
+        situations.
+        """
+        calculation_instance = (
+            calculation_registry.Registry.get_calculation_by_id(
+                'TopAnswersByCategorization'))
+
+        # Create an answer with an unknown classification category.
+        dummy_answers_list = [
+            self._create_sample_answer('Hard A', 0., 'sid1',
+                classify_category='unknown_category'),
+        ]
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'State',
+            'interaction_id': 'TextInput',
+            'answers_list': dummy_answers_list
+        }
+
+        with self.assertRaisesRegexp(
+                Exception, 'Cannot aggregate answer with unknown rule'):
+            actual_state_answers_calc_output = (
+                calculation_instance.calculate_from_state_answers_dict(
+                    state_answers_dict))

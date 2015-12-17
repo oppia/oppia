@@ -391,7 +391,6 @@ class InteractionAnswerSummariesMRJobManager(
     def map(item):
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
-
             state_answers_dict = {
                 'exploration_id': item.exploration_id,
                 'exploration_version': item.exploration_version,
@@ -440,13 +439,9 @@ class InteractionAnswerSummariesMRJobManager(
         # well as pointing out a possible solution which may consume less
         # memory.
 
-        # All visualizations desired for the interaction.
-        visualizations = (
-            interaction_registry.Registry.get_interaction_by_id(
-                interaction_id).answer_visualizations)
-
         # Get all desired calculations for the current interaction id.
-        calc_ids = set(viz.calculation_id for viz in visualizations)
+        calc_ids = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).answer_calculation_ids
         calculations = [
             calculation_registry.Registry.get_calculation_by_id(calc_id)
             for calc_id in calc_ids]

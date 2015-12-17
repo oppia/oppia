@@ -89,6 +89,13 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
 
+# These are categories to which answers may be classified. These values should
+# not be changed because they are persisted in the data store within answer
+# logs.
+HARD_RULE_CLASSIFICATION = 'hard_rule'
+SOFT_RULE_CLASSIFICATION = 'soft_rule'
+DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
+
 
 def _get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
