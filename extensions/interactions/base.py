@@ -123,7 +123,8 @@ class BaseInteraction(object):
         result = []
         for spec in self._answer_visualization_specs:
             factory_cls = (
-                visualization_registry.Registry.get_visualization_class(spec['id']))
+                visualization_registry.Registry.get_visualization_class(
+                    spec['id']))
             result.append(factory_cls(spec['calculation_id'], spec['options']))
         return result
 
@@ -146,15 +147,6 @@ class BaseInteraction(object):
         else:
             return obj_services.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
-
-    @property
-    def _stats_log_template(self):
-        """The template for reader responses in the stats log."""
-        try:
-            return utils.get_file_contents(os.path.join(
-                feconf.INTERACTIONS_DIR, self.id, 'stats_response.html'))
-        except IOError:
-            return '{{answer}}'
 
     @property
     def html_body(self):
@@ -220,20 +212,3 @@ class BaseInteraction(object):
                 r for r in self.rules if r.__name__ == rule_name)
         except StopIteration:
             raise Exception('Could not find rule with name %s' % rule_name)
-
-    def get_stats_log_html(self, state_customization_args, answer):
-        """Gets the HTML for recording a learner's response in the stats log.
-
-        Returns an HTML string.
-        """
-        customization_args = {
-            ca_spec.name: (
-                state_customization_args[ca_spec.name]['value']
-                if ca_spec.name in state_customization_args
-                else ca_spec.default_value
-            ) for ca_spec in self.customization_arg_specs
-        }
-        customization_args['answer'] = answer
-
-        return jinja_utils.parse_string(
-            self._stats_log_template, customization_args, autoescape=False)

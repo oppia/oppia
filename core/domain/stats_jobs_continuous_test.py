@@ -136,7 +136,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             state_hit_counts = (
                 stats_jobs_continuous.StatisticsAggregator.get_statistics(
                     exp_id,
-                    stats_jobs_continuous._VERSION_ALL)['state_hit_counts'])
+                    stats_jobs_continuous.VERSION_ALL)['state_hit_counts'])
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
             self.assertEqual(
@@ -456,7 +456,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of first state and check it
             calc_output_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-                    exp_id, exp_version, FIRST_STATE_NAME, calc_id))
+                    exp_id, FIRST_STATE_NAME, calc_id, exp_version))
             self.assertEqual(
                 'AnswerFrequencies', calc_output_domain_object.calculation_id)
 
@@ -476,7 +476,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # get job output of second state and check it
             calc_output_domain_object = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-                    exp_id, exp_version, SECOND_STATE_NAME, calc_id))
+                    exp_id, SECOND_STATE_NAME, calc_id, exp_version))
 
             self.assertEqual(
                 'AnswerFrequencies', calc_output_domain_object.calculation_id)
@@ -489,3 +489,227 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             }]
 
             self.assertEqual(calculation_output, expected_calculation_output)
+
+
+    def test_answers_across_multiple_exploration_versions(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+
+            # Setup example exploration.
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            FIRST_STATE_NAME = exp.init_state_name
+            SECOND_STATE_NAME = 'State 2'
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': FIRST_STATE_NAME,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': SECOND_STATE_NAME,
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': SECOND_STATE_NAME,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }], 'Add new state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            # Add an answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
+                'session1', time_spent, params, 'answer1')
+
+            # Run the answers aggregation job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            calc_id = 'AnswerFrequencies'
+
+            # Check the output of the job.
+            calc_output_first_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, calc_id,
+                    exploration_version='2'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, calc_id,
+                    exploration_version=None))
+
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_first_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+
+            calculation_output_first = (
+                calc_output_first_domain_object.calculation_output)
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+
+            expected_calculation_output_first_answer = [{
+                'answer': 'answer1',
+                'frequency': 1
+            }]
+
+            self.assertEqual(
+                calculation_output_first,
+                expected_calculation_output_first_answer)
+            self.assertEqual(
+                calculation_output_all,
+                expected_calculation_output_first_answer)
+
+            # Try modifying the exploration and adding another answer.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'third state',
+            }], 'Adding yet another state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            self.assertNotEqual(exp.version, exp_version)
+
+            # Submit another answer.
+            exp_version = exp.version
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
+                'session2', time_spent, params, 'answer1')
+
+            # Run the aggregator again.
+            ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # Extract the output from the job.
+            calc_output_first_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, calc_id,
+                    exploration_version='2'))
+            calc_output_second_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, calc_id,
+                    exploration_version='3'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, calc_id,
+                    exploration_version=None))
+
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_first_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_second_domain_object.calculation_id)
+            self.assertEqual(
+                'AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+
+            calculation_output_first = (
+                calc_output_first_domain_object.calculation_output)
+            calculation_output_second = (
+                calc_output_second_domain_object.calculation_output)
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+
+            # The output for version 2 of the exploration should be the same,
+            # but the total combined output should include both answers. Also,
+            # the output for version 3 should only include the second answer.
+            expected_calculation_output_second_answer = [{
+                'answer': 'answer1',
+                'frequency': 1
+            }]
+            expected_calculation_output_all_answers = [{
+                'answer': 'answer1',
+                'frequency': 2
+            }]
+
+            self.assertEqual(
+                calculation_output_first,
+                expected_calculation_output_first_answer)
+            self.assertEqual(
+                calculation_output_second,
+                expected_calculation_output_second_answer)
+            self.assertEqual(
+                calculation_output_all,
+                expected_calculation_output_all_answers)
+
+    def test_multiple_computations_in_one_job(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+
+            # setup example exploration
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            FIRST_STATE_NAME = exp.init_state_name
+            SECOND_STATE_NAME = 'State 2'
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': FIRST_STATE_NAME,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput',
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': SECOND_STATE_NAME,
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': SECOND_STATE_NAME,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput',
+            }], 'Add new state')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            # Add an answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
+                'session1', time_spent, params, 'answer1')
+
+            # Run the aggregator job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+            # Retrieve outputs for all of the computations running on this
+            # interaction.
+            answer_frequencies_calc_output_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, 'AnswerFrequencies'))
+            self.assertEqual(
+                'AnswerFrequencies',
+                answer_frequencies_calc_output_domain_object.calculation_id)
+
+            top5_answer_frequencies_calc_output_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+                    exp_id, FIRST_STATE_NAME, 'Top5AnswerFrequencies'))
+            self.assertEqual(
+                'Top5AnswerFrequencies',
+                top5_answer_frequencies_calc_output_domain_object.calculation_id)
+
+            calculation_output_first = (
+                answer_frequencies_calc_output_domain_object.calculation_output)
+            calculation_output_second = (
+                top5_answer_frequencies_calc_output_domain_object.calculation_output)
+
+            expected_calculation_output = [{
+                'answer': 'answer1',
+                'frequency': 1
+            }]
+
+            self.assertEqual(
+                calculation_output_first, expected_calculation_output)
+            self.assertEqual(
+                calculation_output_second, expected_calculation_output)

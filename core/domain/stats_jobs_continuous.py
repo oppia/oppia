@@ -16,7 +16,9 @@
 
 import ast
 import collections
+import copy
 import datetime
+import itertools
 
 from core import jobs
 from core.domain import calculation_registry
@@ -35,7 +37,7 @@ import utils
 from google.appengine.ext import ndb
 
 # Counts contributions from all versions.
-_VERSION_ALL = 'all'
+VERSION_ALL = 'all'
 # Indicates that no version has been specified.
 _VERSION_NONE = 'none'
 # This date represents the date we stopped using StateCounterModel.
@@ -212,7 +214,7 @@ class StatisticsMRJobManager(
                 yield (
                     '%s:%s' % (exploration_id, _VERSION_NONE),
                     value)
-                yield ('%s:%s' % (exploration_id, _VERSION_ALL), value)
+                yield ('%s:%s' % (exploration_id, VERSION_ALL), value)
             else:
                 version = _VERSION_NONE
                 if item.exploration_version is not None:
@@ -228,7 +230,7 @@ class StatisticsMRJobManager(
                     'version': version}
 
                 yield ('%s:%s' % (item.exploration_id, version), value)
-                yield ('%s:%s' % (item.exploration_id, _VERSION_ALL), value)
+                yield ('%s:%s' % (item.exploration_id, VERSION_ALL), value)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -246,7 +248,7 @@ class StatisticsMRJobManager(
                     current_version -= 1
                     exploration = exp_models.ExplorationModel.get_version(
                         exp_id, current_version)
-            elif version == _VERSION_ALL:
+            elif version == VERSION_ALL:
                 exploration = exp_services.get_exploration_by_id(exp_id)
             else:
                 exploration = exp_services.get_exploration_by_id(
@@ -373,10 +375,9 @@ class StatisticsMRJobManager(
 
 class InteractionAnswerSummariesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """
-    Job to calculate interaction view statistics, e.g. most frequent
-    answers of multiple-choice interactions. Iterate over StateAnswer
-    objects and create StateAnswersCalcOutput objects.
+    """Job to calculate interaction view statistics, e.g. most frequent answers
+    of multiple-choice interactions. Iterate over StateAnswer objects and
+    create StateAnswersCalcOutput objects.
     """
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -391,24 +392,72 @@ class InteractionAnswerSummariesMRJobManager(
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
 
-            # All visualizations desired for the interaction.
-            visualizations = interaction_registry.Registry.get_interaction_by_id(
-                item.interaction_id).answer_visualizations
+            state_answers_dict = {
+                'exploration_id': item.exploration_id,
+                'exploration_version': item.exploration_version,
+                'state_name': item.state_name,
+                'interaction_id': item.interaction_id,
+                'answers_list': copy.deepcopy(item.answers_list)
+            }
 
-            # Get all desired calculations for the current state interaction id.
-            calc_ids = list(set(viz.calculation_id for viz in visualizations))
-            calculations = [
-                calculation_registry.Registry.get_calculation_by_id(calc_id)
-                for calc_id in calc_ids]
+            # Output answers submitted to the exploration for this exp version.
+            yield ('%s:%s:%s' % (
+                item.exploration_id, item.exploration_version,
+                item.state_name), state_answers_dict)
 
-            # Perform each calculation, and store the output.
-            for calc in calculations:
-                calc_output = calc.calculate_from_state_answers_entity(item)
-                calc_output.save()
+            # Output the same set of answers independent of the version. This
+            # allows the reduce step to aggregate answers across all
+            # exploration versions.
+            state_answers_dict['exploration_version'] = VERSION_ALL
+            yield ('%s:%s:%s' % (
+                item.exploration_id, VERSION_ALL,
+                item.state_name), state_answers_dict)
 
     @staticmethod
-    def reduce(id, state_answers_model):
-        pass
+    def reduce(key, stringified_state_answers_list):
+        exploration_id, exploration_version, state_name = key.split(':')
+        interaction_id = ast.literal_eval(
+            stringified_state_answers_list[0])['interaction_id']
+
+        # Collapse the list of answers into a single answer dict. This
+        # aggregates across multiple answers if the key ends with VERSION_ALL.
+        combined_state_answers = {
+            'exploration_id': exploration_id,
+            'exploration_version': exploration_version,
+            'state_name': state_name,
+            'interaction_id': interaction_id,
+            'answers_list': list(itertools.chain.from_iterable(
+                ast.literal_eval(state_answers)['answers_list']
+                for state_answers in stringified_state_answers_list))
+        }
+
+        # NOTE TO DEVELOPERS: 'answers_list' above is being converted into a
+        # list. This means ALL answers will be placed into memory at this
+        # point. This is needed because 'answers_list' is iterated multiple
+        # times by different computations. The iterable could also be tee'd,
+        # but that also can take significant memory. Adding this note here in
+        # case it leads to significant memory consumption in the future, as
+        # well as pointing out a possible solution which may consume less
+        # memory.
+
+        # All visualizations desired for the interaction.
+        visualizations = (
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id).answer_visualizations)
+
+        # Get all desired calculations for the current interaction id.
+        calc_ids = set(viz.calculation_id for viz in visualizations)
+        calculations = [
+            calculation_registry.Registry.get_calculation_by_id(calc_id)
+            for calc_id in calc_ids]
+
+        # Perform each calculation, and store the output.
+        counter = 0
+        for calc in calculations:
+            calc_output = calc.calculate_from_state_answers_dict(
+                combined_state_answers)
+            counter = counter + 1
+            calc_output.save()
 
 
 class InteractionAnswerSummariesRealtimeModel(
@@ -438,15 +487,21 @@ class InteractionAnswerSummariesAggregator(
     # Public query methods.
     @classmethod
     def get_calc_output(
-            cls, exploration_id, exploration_version, state_name,
-            calculation_id):
+            cls, exploration_id, state_name, calculation_id,
+            exploration_version=None):
         """Get state answers calculation output domain object obtained from
         StateAnswersCalcOutputModel instance stored in the data store. This
         aggregator does not have a real-time layer, which means the results
         from this function may be out of date. The calculation ID comes from
         the name of the calculation class used to compute aggregate data from
         submitted user answers.
+
+        If 'exploration_version' is None, this will return aggregated output
+        for all versions of the specified state and exploration.
         """
+        if not exploration_version:
+            exploration_version = VERSION_ALL
+
         calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
         if calc_output_model:

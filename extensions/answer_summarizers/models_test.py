@@ -58,13 +58,6 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         """For multiple choice interactions, test if the most common answers
         are calculated correctly for interaction answer views.
         """
-        exp_id = '0'
-        exp_version = 1
-        state_name = 'Welcome!'
-        params = {}
-        DEFAULT_RULE_STR = exp_domain.DEFAULT_RULESPEC_STR
-        exp_services.load_demo(exp_id)
-
         # Some answers.
         dummy_answers_list = [
             self._create_sample_answer('First choice', 4., 'sid1'),
@@ -77,26 +70,22 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             self._create_sample_answer('First choice', 20., 'sid3')
         ]
 
-        # Record answers.
-        for answer in dummy_answers_list:
-            stats_services.record_answer(
-                exp_id, exp_version, state_name, 0, 0, answer['session_id'],
-                answer['time_spent_in_sec'], params, answer['answer'])
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'Welcome!',
+            'interaction_id': 'MultipleChoiceInput',
+            'answers_list': dummy_answers_list
+        }
 
-        # Retrieve state answers from storage and get corresponding
-        # StateAnswers domain object.
-        state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id, 'MultipleChoiceInput')
-
-        # Calculate answer counts. Input is dummy StateAnswersModel entity,
-        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        # Calculate answer counts. Input a state answers dict as the continuous
+        # job does in order to retrieve calculation results.
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
                 'AnswerFrequencies'))
         actual_state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_entity(
-                state_answers))
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
 
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
@@ -126,13 +115,6 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     def test_top5_answer_frequencies_calculation(self):
         """Ensure the top 5 most frequent answers are submitted for TextInput.
         """
-        exp_id = '0'
-        exp_version = 1
-        state_name = 'What language'
-        params = {}
-        DEFAULT_RULE_STR = exp_domain.DEFAULT_RULESPEC_STR
-        exp_services.load_demo(exp_id)
-
         # Since this test is looking for the top 5 answers, it will submit ten
         # different answers with varying frequency:
         #   English (12 times), French (9), Finnish (7), Italian (4),
@@ -164,7 +146,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # This is a combined list of answers generated above. This list is a
         # special selection of answers from the generated lists such that
         # answers are submitted in varying orders and times.
-        answer_submission_queue = [
+        answer_list = [
             all_answer_lists['french'][0],
             all_answer_lists['finnish'][4],
             all_answer_lists['english'][11],
@@ -215,49 +197,39 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         total_answer_count = sum([
             len(all_answer_lists[list_name])
             for list_name in all_answer_lists])
-        self.assertEquals(total_answer_count, len(answer_submission_queue))
+        self.assertEquals(total_answer_count, len(answer_list))
 
         # Verify the frequencies of answers in the submission queue. This is
         # another quick check to protect changes to this test.
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'English']), 12)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'French']), 9)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Finnish']), 7)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Italian']), 4)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Spanish']), 3)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Japanese']), 3)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Hungarian']), 2)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Portuguese']), 1)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'German']), 1)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
+            answer_submission for answer_submission in answer_list
             if answer_submission['answer'] == 'Gaelic']), 1)
 
         # Finally, verify that all of the answers in the answer lists are
@@ -265,28 +237,24 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # to the answer list but not added to the queue).
         self.assertEquals(len(set([
             answer_submission['answer']
-            for answer_submission in answer_submission_queue])), 10)
+            for answer_submission in answer_list])), 10)
 
-        # Record answers.
-        for answer in answer_submission_queue:
-            stats_services.record_answer(
-                exp_id, exp_version, state_name, 0, 0, answer['session_id'],
-                answer['time_spent_in_sec'], params, answer['answer'])
+        # Construct the answers dict.
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'What language',
+            'interaction_id': 'TextInput',
+            'answers_list': answer_list
+        }
 
-        # Retrieve state answers from storage and get corresponding
-        # StateAnswers domain object.
-        state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id, 'TextInput')
-
-        # Calculate answer counts. Input is dummy StateAnswersModel entity,
-        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        # Calculate answer counts..
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
                 'Top5AnswerFrequencies'))
         actual_state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_entity(
-                state_answers))
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
 
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
@@ -326,32 +294,23 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         """Verify the top 5 answer frequencies calculation still works if only
         one answer is submitted.
         """
-        exp_id = '0'
-        exp_version = 1
-        state_name = 'What language'
-        params = {}
-        DEFAULT_RULE_STR = exp_domain.DEFAULT_RULESPEC_STR
-        exp_services.load_demo(exp_id)
-
         answer = self._create_sample_answer('English', 2., 'sid1')
-        stats_services.record_answer(
-            exp_id, exp_version, state_name, 0, 0, answer['session_id'],
-            answer['time_spent_in_sec'], params, answer['answer'])
 
-        # Retrieve state answers from storage and get corresponding
-        # StateAnswers domain object.
-        state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id, 'TextInput')
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'What language',
+            'interaction_id': 'TextInput',
+            'answers_list': [answer],
+        }
 
-        # Calculate answer counts. Input is dummy StateAnswersModel entity,
-        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        # Calculate answer counts.
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
                 'Top5AnswerFrequencies'))
         actual_state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_entity(
-                state_answers))
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
 
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,

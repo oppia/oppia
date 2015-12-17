@@ -35,7 +35,8 @@ IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 
 
-def get_visualizations_info(exploration_id, exploration_version, state_name):
+# TODO(bhenning): Test.
+def get_visualizations_info(exploration_id, state_name):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
     """
@@ -46,8 +47,8 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
     visualizations = interaction_registry.Registry.get_interaction_by_id(
         exploration.states[state_name].interaction.id).answer_visualizations
 
-    calculation_ids = list(set([
-        visualization.calculation_id for visualization in visualizations]))
+    calculation_ids = set([
+        visualization.calculation_id for visualization in visualizations])
 
     calculation_ids_to_outputs = {}
     for calculation_id in calculation_ids:
@@ -55,7 +56,7 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
         # state.
         calc_output_domain_object = (
             stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-                exploration_id, exploration_version, state_name, calculation_id))
+                exploration_id, state_name, calculation_id))
 
         # If the calculation job has not yet been run for this state, we simply
         # exclude the corresponding visualization results.
@@ -80,8 +81,7 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
 # tested on a branch alongside these changes, then used to verify that these
 # changes to do not change the contract of the function.
 def get_top_state_rule_answers(
-        exploration_id, exploration_version, state_name, rule_str_list,
-        top_answer_count):
+        exploration_id, state_name, rule_str_list, top_answer_count):
     """Returns a list of top answers (by submission frequency) submitted to the
     given state in the given exploration which were mapped to any of the rules
     listed in 'rule_str_list'.
@@ -93,7 +93,7 @@ def get_top_state_rule_answers(
     # output will have reasonably up-to-date answers which need to be resolved
     # by creators.
     job_result = stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-        exploration_id, exploration_version, state_name, 'AnswerFrequencies')
+        exploration_id, state_name, 'AnswerFrequencies')
     if job_result:
         return job_result.calculation_output[:top_answer_count]
     else:
@@ -203,6 +203,7 @@ def get_exploration_stats(exploration_id, exploration_version):
     }
 
 
+# TODO(bhenning): Test this.
 def record_answer(exploration_id, exploration_version, state_name,
         answer_group_index, rule_spec_index, session_id, time_spent_in_sec,
         params, normalized_answer):
@@ -260,6 +261,7 @@ def _save_state_answers(state_answers):
     state_answers_model.save()
 
 
+# TODO(bhenning): Test this.
 def get_state_answers(exploration_id, exploration_version, state_name):
     """Get a state answers domain object represented by a StateAnswersModel
     instance stored in the data store and retrieved using the provided

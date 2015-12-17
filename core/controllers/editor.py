@@ -521,7 +521,7 @@ class UntrainedAnswersHandler(EditorHandler):
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
-            exploration_id, exploration.version, state_name, [
+            exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
             NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
@@ -734,7 +734,6 @@ class StateRulesStatsHandler(EditorHandler):
         """Handles GET requests."""
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
-            current_version = exploration.version
         except:
             raise self.PageNotFoundException
 
@@ -746,7 +745,7 @@ class StateRulesStatsHandler(EditorHandler):
 
         self.render_json({
             'visualizations_info': stats_services.get_visualizations_info(
-                exploration_id, current_version, state_name),
+                exploration_id, state_name),
         })
 
 

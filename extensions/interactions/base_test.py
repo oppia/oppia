@@ -185,18 +185,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # html file, a JS file, a validator.js file,  a directory named
             # 'static' that contains (at least) a .png thumbnail file,
             # (optionally) a JS test spec file, (optionally) a JS test spec
-            # file for rules, (optionally) a stats_response.html file and
-            # (optionally) a protractor.js file.
+            # file for rules, and (optionally) a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(os.path.isfile(
-                    os.path.join(interaction_dir, 'stats_response.html')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(

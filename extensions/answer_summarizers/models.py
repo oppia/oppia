@@ -99,7 +99,7 @@ class BaseCalculation(object):
     def id(self):
         return self.__class__.__name__
 
-    def calculate_from_state_answers_entity(self, state_answers):
+    def calculate_from_state_answers_dict(self, state_answers_dict):
         """Perform calculation on a single StateAnswers entity. This is run
         in the context of a batch MapReduce job.
 
@@ -107,14 +107,14 @@ class BaseCalculation(object):
         """
         raise NotImplementedError(
             'Subclasses of BaseCalculation should implement the '
-            'calculate_from_state_answers_entity(state_answers) method.')
+            'calculate_from_state_answers_dict(state_answers_dict) method.')
 
 
 class AnswerFrequencies(BaseCalculation):
     """Calculation for answers' frequencies (how often each answer was
     submitted).
     """
-    def calculate_from_state_answers_entity(self, state_answers):
+    def calculate_from_state_answers_dict(self, state_answers_dict):
         """Computes the number of occurrences of each answer, and returns a
         list of dicts; each dict has keys 'answer' and 'frequency'.
 
@@ -123,7 +123,7 @@ class AnswerFrequencies(BaseCalculation):
 
         answer_values = [
             answer_dict['answer']
-            for answer_dict in state_answers.answers_list]
+            for answer_dict in state_answers_dict['answers_list']]
 
         answer_counts_as_list_of_pairs = _count_answers(answer_values)
 
@@ -135,9 +135,9 @@ class AnswerFrequencies(BaseCalculation):
             })
 
         return stats_domain.StateAnswersCalcOutput(
-            state_answers.exploration_id,
-            state_answers.exploration_version,
-            state_answers.state_name,
+            state_answers_dict['exploration_id'],
+            state_answers_dict['exploration_version'],
+            state_answers_dict['state_name'],
             self.id,
             calculation_output)
 
@@ -145,7 +145,7 @@ class AnswerFrequencies(BaseCalculation):
 class Top5AnswerFrequencies(BaseCalculation):
     """Calculation for the top 5 answers, by frequency."""
 
-    def calculate_from_state_answers_entity(self, state_answers):
+    def calculate_from_state_answers_dict(self, state_answers_dict):
         """Computes the number of occurrences of each answer, keeping only
         the top 5 answers, and returns a list of dicts; each dict has keys
         'answer' and 'frequency'.
@@ -155,7 +155,7 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         answer_values = [
             answer_dict['answer']
-            for answer_dict in state_answers.answers_list]
+            for answer_dict in state_answers_dict['answers_list']]
 
         top_5_answer_counts_as_list_of_pairs = (
             _count_answers(answer_values)[:5])
@@ -168,9 +168,9 @@ class Top5AnswerFrequencies(BaseCalculation):
             })
 
         return stats_domain.StateAnswersCalcOutput(
-            state_answers.exploration_id,
-            state_answers.exploration_version,
-            state_answers.state_name,
+            state_answers_dict['exploration_id'],
+            state_answers_dict['exploration_version'],
+            state_answers_dict['state_name'],
             self.id,
             calculation_output)
 
@@ -180,7 +180,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
     among multiple set answers (such as of type SetOfUnicodeString).
     """
 
-    def calculate_from_state_answers_entity(self, state_answers):
+    def calculate_from_state_answers_dict(self, state_answers_dict):
         """Computes the number of occurrences of each element across
         all given answers, keeping only the top 10 elements. Returns a
         list of dicts; each dict has keys 'element' and 'frequency'.
@@ -192,7 +192,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         # u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [
             answer_dict['answer']
-            for answer_dict in state_answers.answers_list]
+            for answer_dict in state_answers_dict['answers_list']]
 
         # For each stringified set, replace '[' and ']' by empty string,
         # and split at commas ', ' to convert string to set.
@@ -225,9 +225,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             })
 
         return stats_domain.StateAnswersCalcOutput(
-            state_answers.exploration_id,
-            state_answers.exploration_version,
-            state_answers.state_name,
+            state_answers_dict['exploration_id'],
+            state_answers_dict['exploration_version'],
+            state_answers_dict['state_name'],
             self.id,
             calculation_output)
-
