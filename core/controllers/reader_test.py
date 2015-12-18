@@ -243,7 +243,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             string_classifier_ctor)
 
         with self.swap(
-            classifier_services.StringClassifier,
+                classifier_services.StringClassifier,
             '__init__', string_classifier_ctor_counter):
             response = reader.classify(
                 self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
@@ -257,8 +257,9 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
         answer_group = answer_groups[answer_group_index]
         if answer_group.get_fuzzy_rule_index() == rule_spec_index:
             return (
-                'classifier'
-                if string_classifier_ctor_counter.times_called > 0 else 'soft')
+                'soft'
+                if string_classifier_ctor_counter.times_called == 0
+                else 'classifier')
         return 'hard'
 
     def test_hard_rule_classification(self):

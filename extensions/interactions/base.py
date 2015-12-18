@@ -84,6 +84,7 @@ class BaseInteraction(object):
     # Whether this interaction supports training and fuzzy classification.
     is_trainable = False
     # Whether this interaction supports the string classifier.
+    # TODO: remove once classifier_services is generalized.
     is_string_classifier_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
