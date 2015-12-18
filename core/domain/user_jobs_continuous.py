@@ -361,6 +361,9 @@ class UserImpactMRJobManager(
 
     @staticmethod
     def map(item):
+        if item.deleted:
+            return
+
         exploration_impact_score = (
             UserImpactMRJobManager._get_exp_impact_score(item.id))
 

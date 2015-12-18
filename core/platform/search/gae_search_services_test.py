@@ -25,8 +25,6 @@ from google.appengine.api import search
 from core.platform.search import gae_search_services
 from core.tests import test_utils
 
-import feconf
-
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
     """Test inserting documents into search indexes"""
@@ -179,7 +177,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             add_docs_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
-        with put_ctx, add_docs_ctx, assert_raises_ctx as cm:
+        with put_ctx, add_docs_ctx, assert_raises_ctx:
             gae_search_services.add_documents_to_index([doc], 'my_index', 42)
 
         self.assertEqual(add_docs_counter.times_called, 42)

@@ -79,18 +79,20 @@ class ProfileHandler(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
+        created_exploration_summary_dicts = []
+        edited_exploration_summary_dicts = []
+
         user_contributions = user_services.get_user_contributions(
             user_settings.user_id)
-
-        created_exploration_summary_dicts = (
-            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
-                user_contributions.created_exploration_ids,
-                user_settings.user_id))
-        
-        edited_exploration_summary_dicts = (
-            exp_services.get_displayable_exploration_summary_dicts_matching_ids(
-                user_contributions.edited_exploration_ids,
-                user_settings.user_id))
+        if user_contributions:
+            created_exploration_summary_dicts = (
+                exp_services.get_displayable_exp_summary_dicts_matching_ids(
+                    user_contributions.created_exploration_ids,
+                    user_settings.user_id))
+            edited_exploration_summary_dicts = (
+                exp_services.get_displayable_exp_summary_dicts_matching_ids(
+                    user_contributions.edited_exploration_ids,
+                    user_settings.user_id))
 
         self.values.update({
             'user_bio': user_settings.user_bio,
@@ -99,6 +101,8 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'user_impact_score':user_services.get_user_impact_score(
+                user_settings.user_id),
             'created_exploration_summary_dicts': (
                 created_exploration_summary_dicts),
             'edited_exploration_summary_dicts': (

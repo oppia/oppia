@@ -87,10 +87,10 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
           var label = ruleSpecs[j].inputs.x;
           if (seenRegionStrings.indexOf(label) === -1) {
             warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'The region label \'' + label + '\' in rule ' + String(j + 1) +
-              ' in group ' + String(i + 1) + ' is invalid.')
+              type: WARNING_TYPES.CRITICAL,
+              message: (
+                'The region label \'' + label + '\' in rule ' + String(j + 1) +
+                ' in group ' + String(i + 1) + ' is invalid.')
             });
           }
         }

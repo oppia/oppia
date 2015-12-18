@@ -229,8 +229,8 @@ urls = [
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
-        r'/moderatorhandler/user_services',
-        moderator.UserServiceHandler, 'moderator_user_service_handler'),
+        r'/moderatorhandler/email_draft/<action>',
+        moderator.EmailDraftHandler, 'moderator_action_email_draft'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
@@ -300,6 +300,10 @@ urls = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler, 'exploration_rights_handler'),
+    get_redirect_route(
+        r'/createhandler/moderatorrights/<exploration_id>',
+        editor.ExplorationModeratorRightsHandler,
+        'exploration_moderator_rights_handler'),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),

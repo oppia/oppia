@@ -23,7 +23,7 @@
 oppia.factory('ratingVisibilityService', [function() {
   return {
     areRatingsShown: function(ratingFrequencies) {
-      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 3;
+      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
 
       var totalNumber = 0;
       for (var value in ratingFrequencies) {
@@ -113,7 +113,32 @@ oppia.directive('ratingFromValue', [function() {
   };
 }]);
 
-oppia.directive('ratingFromFrequencies', [function() {
+oppia.factory('ratingComputationService', [
+    'ratingVisibilityService', function(ratingVisibilityService) {
+  return {
+    computeAverageRating: function(ratingFrequencies) {
+      if (!ratingVisibilityService.areRatingsShown(ratingFrequencies)) {
+        return undefined;
+      } else {
+        var totalNumber = 0;
+        var totalValue = 0.0;
+        for (var value in ratingFrequencies) {
+          totalValue += value * ratingFrequencies[value];
+          totalNumber += ratingFrequencies[value];
+        }
+
+        if (totalNumber === 0) {
+          return undefined;
+        }
+
+        return totalValue / totalNumber;
+      }
+    }
+  };
+}]);
+
+oppia.directive('ratingFromFrequencies', [
+    'ratingComputationService', function(ratingComputationService) {
   return {
     restrict: 'E',
     scope: {
@@ -126,19 +151,8 @@ oppia.directive('ratingFromFrequencies', [function() {
     controller: [
       '$scope', 'ratingVisibilityService',
       function($scope, ratingVisibilityService) {
-        $scope.computeAverageRating = function(ratingFrequencies) {
-          if (!ratingVisibilityService.areRatingsShown(ratingFrequencies)) {
-            return undefined;
-          } else {
-            var totalNumber = 0;
-            var totalValue = 0.0;
-            for (var value in ratingFrequencies) {
-              totalValue += value * ratingFrequencies[value];
-              totalNumber += ratingFrequencies[value];
-            }
-            return totalValue / totalNumber;
-          }
-        };
+        $scope.computeAverageRating = (
+          ratingComputationService.computeAverageRating);
 
         $scope.ratingValue = $scope.computeAverageRating(
           $scope.ratingFrequencies());

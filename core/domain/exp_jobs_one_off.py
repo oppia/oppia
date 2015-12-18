@@ -81,9 +81,11 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(exp_id, committer_id_list):
-        committer_ids = set(committer_id_list)
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
-        exp_summary_model.contributor_ids = list(committer_ids)
+        if exp_summary_model is None:
+            return
+
+        exp_summary_model.contributor_ids = list(set(committer_id_list))
         exp_summary_model.put()
 
 
@@ -105,6 +107,11 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(exp_id, stringified_commit_times_msecs):
+        exploration_rights = rights_manager.get_exploration_rights(
+            exp_id, strict=False)
+        if exploration_rights is None:
+            return
+
         commit_times_msecs = [
             ast.literal_eval(commit_time_string) for
             commit_time_string in stringified_commit_times_msecs]
