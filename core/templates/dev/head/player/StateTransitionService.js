@@ -31,10 +31,10 @@
 //   processUnicode('abc{{a}}', [{}]) returns null.
 //   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns '<button></button>'.
 oppia.factory('expressionInterpolationService', [
-    '$filter', 'expressionParserService',
+    '$filter', 'expressionParserService', 'expressionSyntaxTreeService',
     'expressionEvaluatorService', 'oppiaHtmlEscaper',
-    function($filter, expressionParserService, expressionEvaluatorService,
-             oppiaHtmlEscaper) {
+    function($filter, expressionParserService, expressionSyntaxTreeService,
+             expressionEvaluatorService, oppiaHtmlEscaper) {
   return {
     // This method should only be used if its result would immediately be
     // displayed on the screen without passing through further computation.
@@ -54,7 +54,7 @@ oppia.factory('expressionInterpolationService', [
           var EXPRESSION_ERROR_TAG = (
             '<oppia-expression-error-tag></oppia-expression-error-tag>');
           if ((e instanceof expressionParserService.SyntaxError) ||
-              (e instanceof expressionEvaluatorService.ExpressionError)) {
+              (e instanceof expressionSyntaxTreeService.ExpressionError)) {
             return EXPRESSION_ERROR_TAG;
           }
           throw e;
@@ -73,7 +73,7 @@ oppia.factory('expressionInterpolationService', [
         });
       } catch (e) {
         if ((e instanceof expressionParserService.SyntaxError) ||
-            (e instanceof expressionEvaluatorService.ExpressionError)) {
+            (e instanceof expressionSyntaxTreeService.ExpressionError)) {
           return null;
         }
         throw e;
@@ -88,7 +88,7 @@ oppia.factory('expressionInterpolationService', [
         // Trim the '{{' and '}}'.
         matches[i] = matches[i].substring(2, matches[i].length - 2);
 
-        var params = expressionEvaluatorService.getParamsUsedInExpression(
+        var params = expressionSyntaxTreeService.getParamsUsedInExpression(
           $filter('convertHtmlToUnicode')(matches[i]));
 
         for (var j = 0; j < params.length; j++) {
@@ -179,7 +179,7 @@ oppia.factory('stateTransitionService', [
       return {
         params: newParams,
         question_html: question
-      }
+      };
     },
     // Returns null when failed to evaluate.
     getNextStateData: function(outcome, newState, answer) {

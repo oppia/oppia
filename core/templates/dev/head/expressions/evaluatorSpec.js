@@ -20,6 +20,7 @@ describe('Expression evaluator service', function() {
   beforeEach(inject(function($injector) {
     ees = $injector.get('expressionEvaluatorService');
     eps = $injector.get('expressionParserService');
+    ests = $injector.get('expressionSyntaxTreeService');
   }));
 
   var ENVS = [
@@ -29,8 +30,8 @@ describe('Expression evaluator service', function() {
       strXYZ: 'XYZ',
       num100_001: 100.001,
       boolFalse: false,
-      strNull: '',
-    },
+      strNull: ''
+    }
   ];
 
   it('should get params used in expressions', function() {
@@ -52,24 +53,25 @@ describe('Expression evaluator service', function() {
       ['100 < num100_001 && 1 > num100_001', ['num100_001']],
       ['boolTrue == boolFalse', ['boolFalse', 'boolTrue']],
       ['strNull != strXYZ', ['strNull', 'strXYZ']],
-      ['if boolFalse then boolTrue else numZero', ['boolFalse', 'boolTrue', 'numZero']],
+      ['if boolFalse then boolTrue else numZero',
+         ['boolFalse', 'boolTrue', 'numZero']],
       ['num100_001 / 0', ['num100_001']],
       ['abs(-3)', []],
       ['pow(num100_001, numZero)', ['num100_001', 'numZero']],
       ['log(9, 3)', []],
-      ['numZero + numOne', ['numOne', 'numZero']],
+      ['numZero + numOne', ['numOne', 'numZero']]
     ].forEach(function(test) {
       var expression = test[0];
       var expectedParams = test[1];
 
-      var parsed = typeof(expression) == 'string' ?
+      var parsed = typeof (expression) == 'string' ?
           eps.parse(expression) : expression;
-      var parsed_json = JSON.stringify(parsed);
+      var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
       var recordFailure = function(params, exception) {
         console.error('input           : ' + expression);
-        console.error('parsed          : ' + parsed_json);
+        console.error('parsed          : ' + parsedJson);
         console.error('expected        : ' + JSON.stringify(expectedParams));
         if (params !== undefined) {
           console.error('evaluated       : ' + params);
@@ -77,10 +79,10 @@ describe('Expression evaluator service', function() {
           console.error('exception       : ' + exception);
         }
         failed = true;
-      }
+      };
 
       try {
-        var params = ees.getParamsUsedInExpression(expression);
+        var params = ests.getParamsUsedInExpression(expression);
         if (!angular.equals(params, expectedParams)) {
           recordFailure(params, undefined);
         }
@@ -113,28 +115,27 @@ describe('Expression evaluator service', function() {
       ['abs(-3)', 3],
       ['pow(num100_001, numZero)', 1],
       ['log(9, 3)', 2],
-      ['numZero + numOne', ees.ExprUndefinedVarError],
-      [['+', 10, 20, 30], ees.ExprWrongNumArgsError],
-      [['==', true], ees.ExprWrongNumArgsError],
-      [['+', 'abc', 1], ees.ExprWrongArgTypeError],
-
+      ['numZero + numOne', ests.ExprUndefinedVarError],
+      [['+', 10, 20, 30], ests.ExprWrongNumArgsError],
+      [['==', true], ests.ExprWrongNumArgsError],
+      [['+', 'abc', 1], ests.ExprWrongArgTypeError]
     ].forEach(function(test) {
       var expression = test[0];
       var expected = test[1];
 
-      // 'expected' should be either a JavaScript primitive value that would be the
-      // result of evaluation 'expression', or an exception that is expected to be
-      // thrown.
+      // 'expected' should be either a JavaScript primitive value that would
+      // be the result of evaluation 'expression', or an exception that is
+      // expected to be thrown.
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
-      var parsed = typeof(expression) == 'string' ?
+      var parsed = typeof (expression) == 'string' ?
           eps.parse(expression) : expression;
-      var parsed_json = JSON.stringify(parsed);
+      var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
       var recordFailure = function(result, exception) {
         console.error('input     : ' + expression);
-        console.error('parsed    : ' + parsed_json);
+        console.error('parsed    : ' + parsedJson);
         if (result !== undefined) {
           console.error('evaluated : ' + result);
           console.error('expected  : ' + expected);
@@ -144,10 +145,10 @@ describe('Expression evaluator service', function() {
           console.error('expected  : (exception)');
         }
         failed = true;
-      }
+      };
 
       try {
-        var evaled = ees.evaluateParseTree(parsed, ENVS);
+        var evaled = ests.evaluateParseTree(parsed, ENVS, ees.evaluate);
         if (expected instanceof Error || evaled !== expected) {
           recordFailure(evaled, undefined);
         }
@@ -159,7 +160,7 @@ describe('Expression evaluator service', function() {
       }
       expect(failed).toBe(false);
 
-      if (typeof(expression) != 'string') {
+      if (typeof (expression) != 'string') {
         return;
       }
 
