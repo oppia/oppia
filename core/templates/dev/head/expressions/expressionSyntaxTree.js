@@ -88,7 +88,7 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
         return _findParams(parsed);
       };
 
-      // Checks if the args array has the expectedNum number of elements an
+      // Checks if the args array has the expectedNum number of elements and
       // throws an error if not. If optional expectedMax is specified, it
       // verifies the number of args is in [expectedNum, expectedMax] range
       // inclusive.
@@ -102,18 +102,18 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
         throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
       };
 
-      var _verifyArgsHaveType = function(args, expectedType) {
-        for (var i = 0; i < args.length; i++) {
-          if (args[i] != expectedType) {
-            throw new ExprWrongArgTypeError(null, args[i], expectedType);
+      var _verifyArgTypesMatchExpectedType = function(argTypes, expectedType) {
+        for (var i = 0; i < argTypes.length; i++) {
+          if (argTypes[i] != expectedType) {
+            throw new ExprWrongArgTypeError(null, argTypes[i], expectedType);
           }
         }
         return true;
       };
 
-      var _verifyArgsHaveSameType = function(arg1, arg2) {
-        if (arg1 != arg2) {
-          throw new ExprWrongArgTypeError(null, arg1, arg2);
+      var _verifyArgTypesMatch = function(argType1, argType2) {
+        if (argType1 != argType2) {
+          throw new ExprWrongArgTypeError(null, argType1, argType2);
         }
         return true;
       };
@@ -180,26 +180,17 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
       //   modify feconf.INVALID_PARAMETER_NAMES accordingly.
       // TODO(kashida): Document all operators input and output contracts.
       // Arguments:
-      // args: the values that need to be evaluated by these operators
-      // envs: for getType(): a mapping of variable names to their types
-      //       for eval(): a mapping of variable names to their values
+      // args: for getType(): list of types of the evalutated sub-expression
+      //         for eval(): list of values of the evaluated sub-expression
 
       var system = {
-        '#': {
-          getType: function(args, envs) {
-            return lookupEnvs(args, envs);
-          },
-          eval: function(args, envs) {
-            return lookupEnvs(args[0], envs);
-          }
-        },
         '+': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 1, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 1, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs.length == 1 ? numericArgs[0] :
@@ -207,12 +198,12 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '-': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 1, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 1, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs.length == 1 ? -numericArgs[0] :
@@ -220,200 +211,200 @@ oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
           }
         },
         '*': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] * numericArgs[1];
           }
         },
         '/': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] / numericArgs[1];
           }
         },
         '%': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] % numericArgs[1];
           }
         },
         '<=': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] <= numericArgs[1];
           }
         },
         '>=': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] >= numericArgs[1];
           }
         },
         '<': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] < numericArgs[1];
           }
         },
         '>': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return numericArgs[0] > numericArgs[1];
           }
         },
         '!': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 1);
-            _verifyArgsHaveType(args, 'UnicodeString');
+            _verifyArgTypesMatchExpectedType(args, 'UnicodeString');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 1);
             return !args[0];
           }
         },
         '==': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             return args[0] == args[1];
           }
         },
         '!=': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             return args[0] != args[1];
           }
         },
         '&&': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'UnicodeString');
+            _verifyArgTypesMatchExpectedType(args, 'UnicodeString');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             // TODO(kashida): Make this short-circuit.
             verifyNumArgs(args, 2);
             return Boolean(args[0] && args[1]);
           }
         },
         '||': {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'UnicodeString');
+            _verifyArgTypesMatchExpectedType(args, 'UnicodeString');
             return 'UnicodeString';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             // TODO(kashida): Make this short-circuit.
             verifyNumArgs(args, 2);
             return Boolean(args[0] || args[1]);
           }
         },
         if: {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 3);
-            _verifyArgsHaveType([args[0]], 'UnicodeString');
-            _verifyArgsHaveSameType(args[1], args[2]);
+            _verifyArgTypesMatchExpectedType([args[0]], 'UnicodeString');
+            _verifyArgTypesMatch(args[1], args[2]);
             return args[1];
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             // TODO(kashida): Make this short-circuit.
             verifyNumArgs(args, 3);
             return args[0] ? args[1] : args[2];
           }
         },
         floor: {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 1);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 1);
             var numericArgs = _coerceAllArgsToNumber(args);
             return Math.floor(numericArgs[0]);
           }
         },
         pow: {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return Math.pow(args[0], args[1]);
           }
         },
         log: {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 2);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 2);
             var numericArgs = _coerceAllArgsToNumber(args);
             return Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
           }
         },
         abs: {
-          getType: function(args, envs) {
+          getType: function(args) {
             verifyNumArgs(args, 1);
-            _verifyArgsHaveType(args, 'Real');
+            _verifyArgTypesMatchExpectedType(args, 'Real');
             return 'Real';
           },
-          eval: function(args, envs) {
+          eval: function(args) {
             verifyNumArgs(args, 1);
             var numericArgs = _coerceAllArgsToNumber(args);
             return Math.abs(numericArgs[0]);

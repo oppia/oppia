@@ -83,6 +83,10 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
           throw 'Parser generated an intermediate node with zero children';
         }
 
+        if (parsed[0] == '#') {
+          return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
+        }
+
         // Now the first element should be a function name.
         var op = expressionSyntaxTreeService.lookupEnvs(parsed[0], envs).eval;
 
@@ -90,7 +94,7 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
         var args = parsed.slice(1).map(function(item) {
           return evaluate(item, envs);
         });
-        return op(args, envs);
+        return op(args);
       }
 
       // This should be a terminal node with the actual value.
