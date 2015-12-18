@@ -21,7 +21,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'interactiveMapRulesService', function(
+  oppiaHtmlEscaper, interactiveMapRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -62,7 +63,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             position: ll
           }));
 
-          $scope.$parent.$parent.submitAnswer([ll.lat(), ll.lng()]);
+          $scope.$parent.submitAnswer(
+            [ll.lat(), ll.lng()], interactiveMapRulesService);
         };
 
         refreshMap();
@@ -108,3 +110,54 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
     };
   }
 ]);
+
+oppia.factory('interactiveMapRulesService', function() {
+  var RADIUS_OF_EARTH_KM = 6371.0;
+  var degreesToRadians = function(angle) {
+    return angle / 180 * Math.PI;
+  };
+  var getDistanceInKm = function(point1, point2) {
+    var latitude1 = degreesToRadians(point1[0]);
+    var latitude2 = degreesToRadians(point2[0]);
+    latitudeDifference = degreesToRadians(point2[0] - point1[0]);
+    longitudeDifference = degreesToRadians(point2[1] - point1[1]);
+
+    // Use the haversine formula
+    haversineOfCentralAngle = Math.pow(Math.sin(latitudeDifference / 2), 2) +
+      Math.cos(latitude1) * Math.cos(latitude2) *
+      Math.pow(Math.sin(longitudeDifference / 2), 2);
+
+    return RADIUS_OF_EARTH_KM *
+      2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
+  };
+
+  return {
+    Within: function(answer, inputs) {
+      var actualDistance = getDistanceInKm(inputs.p, answer);
+      return actualDistance <= inputs.d;
+    },
+    NotWithin: function(answer, inputs) {
+      var actualDistance = getDistanceInKm(inputs.p, answer);
+      return actualDistance > inputs.d;
+    },
+    FuzzyMatches: function(answer, inputs) {
+      // Returns true if answer is within FUZZY_RADIUS of any of the training
+      // points.
+
+      // TODO(wxy): Create a better classifier for this interaction. Currently,
+      // the frontend implementation of this rule returns a boolean value,
+      // checking if the answer is close to any point in the training data.
+      // If this fails, the answer should then go to a backend classifier that
+      // picks the answer group with the best matching answer group.
+
+      var FUZZY_RADIUS_KM = 5;
+
+      if (inputs.training_data.length === 0) {
+        return false;
+      }
+      return inputs.training_data.some(function(point) {
+        return (getDistanceInKm(answer, point) <= FUZZY_RADIUS_KM);
+      });
+    }
+  };
+});
