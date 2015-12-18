@@ -96,6 +96,23 @@ var getExplorationObjective = function(name) {
   });
 };
 
+var expectExplorationRatingToEqual = function(name, ratingValue) {
+  _getExplorationElements(name).then(function(elems) {
+    elems[0].element(by.css('.protractor-test-exp-summary-tile-rating')).
+      getText().then(function(value) {
+        expect(value).toBe(ratingValue);
+    });
+  });
+};
+
+var expectExplorationRatingToBeHidden = function(name) {
+  _getExplorationElements(name).then(function(elems) {
+    elems[0].all(by.css('.protractor-test-exp-summary-tile-rating')).then(function(items) {
+      expect(items.length).toBe(0);
+    });
+  });
+};
+
 exports.selectLanguages = selectLanguages;
 exports.deselectLanguages = deselectLanguages;
 exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
@@ -107,3 +124,6 @@ exports.expectExplorationToBeVisible = expectExplorationToBeVisible;
 exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;
 exports.getExplorationObjective = getExplorationObjective;
+
+exports.expectExplorationRatingToEqual = expectExplorationRatingToEqual;
+exports.expectExplorationRatingToBeHidden = expectExplorationRatingToBeHidden;

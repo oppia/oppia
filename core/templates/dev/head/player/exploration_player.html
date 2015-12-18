@@ -26,7 +26,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
+    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
@@ -79,7 +79,7 @@
         </p>
         <p ng-if="!explorationDescription">No objective specified.</p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
-          <li>
+          <li class="protractor-test-info-card-rating">
             <span class="fa fa-star fa-lg" tooltip="Average Rating" tooltip-placement="top"></span>
             <span ng-if="explorationRatings === 0">Unrated</span>
             <span ng-if="explorationRatings !== 0"><[explorationRatings]></span>

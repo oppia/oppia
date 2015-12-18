@@ -110,6 +110,20 @@ var clickThroughToNextCard = function(interactionId, answerData) {
   element(by.css('.protractor-test-continue-to-next-card-button')).click();
 };
 
+var rateExploration = function(ratingValue) {
+  element.all(by.css('.protractor-test-rating-star')).then(function(elements) {
+    elements[ratingValue - 1].click();
+  });
+};
+
+var expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
+  element(by.css('.protractor-test-exploration-info-icon')).click();
+  element(by.css('.protractor-test-info-card-rating')).getText().
+    then(function(value) {
+      expect(value).toBe(ratingValue);
+    });
+};
+
 var expectExplorationToBeOver = function() {
   expect(
     element.all(by.css('.protractor-test-conversation-content')).last().getText()
@@ -135,6 +149,8 @@ exports.expectInvisibleGadget = expectInvisibleGadget;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
 exports.clickThroughToNextCard = clickThroughToNextCard;
+exports.rateExploration = rateExploration;
+exports.expectExplorationRatingOnInformationCardToEqual = expectExplorationRatingOnInformationCardToEqual;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
