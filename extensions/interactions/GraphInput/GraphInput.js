@@ -564,7 +564,7 @@ oppia.directive('graphViz', function() {
 oppia.factory('graphInputRulesService', [function() {
   var isIsomophic = function(graph1, graph2) {
     if (graph1.vertices.length != graph2.vertices.length) {
-      return true;
+      return false;
     }
 
     var constructAdjacencyMatrix = function(graph) {
@@ -606,6 +606,7 @@ oppia.factory('graphInputRulesService', [function() {
       permutation[pivot] = permutation[successor];
       permutation[successor] = tmp;
       permutation = permutation.concat(permutation.splice(pivot + 1).reverse());
+      return permutation;
     };
 
     // Check against every permutation of vectices.
@@ -615,29 +616,32 @@ oppia.factory('graphInputRulesService', [function() {
     for (var i = 0; i < numVertices; i++) {
       permutation.push(i);
     }
-    do {
-      if (graph1.isLabeled && graph1.vertices.any(function(vertex, index) {
-        return vertex.label != graph2.vertices[permutation[index]].label;
+    while (permutation !== null) {
+      var foundIsomorphism = true;
+      if (graph1.isLabeled && graph2.vertices.some(function(vertex, index) {
+        return vertex.label != graph1.vertices[permutation[index]].label;
       })) {
-        continue;
+        foundIsomorphism = false;
       }
 
-      var foundIsomorphism = true;
-      for (var i = 0; i < numVertices; i++) {
-        for (var j = 0; j < numVertices; j++) {
-          if (adj1[permutation[i]][permutation[j]] != adj2[i][j]) {
-            foundIsomorphism = false;
+      if (foundIsomorphism) {
+        for (var i = 0; i < numVertices; i++) {
+          for (var j = 0; j < numVertices; j++) {
+            if (adj1[permutation[i]][permutation[j]] != adj2[i][j]) {
+              foundIsomorphism = false;
+              break;
+            }
+          }
+          if (!foundIsomorphism) {
             break;
           }
-        }
-        if (!foundIsomorphism) {
-          break;
         }
       }
       if (foundIsomorphism) {
         return true;
       }
-    } while (nextPermutation(permutation));
+      permutation = nextPermutation(permutation);
+    }
     return false;
   };
 
@@ -646,7 +650,7 @@ oppia.factory('graphInputRulesService', [function() {
       return isIsomophic(answer, inputs.g);
     },
     FuzzyMatches: function(answer, inputs) {
-      return inputs.training_data.any(function(trainingGraph) {
+      return inputs.training_data.some(function(trainingGraph) {
         return isIsomophic(answer, trainingGraph);
       });
     }
