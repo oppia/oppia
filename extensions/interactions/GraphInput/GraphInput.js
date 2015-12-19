@@ -640,11 +640,12 @@ oppia.factory('graphInputRulesService', [
       permutation.push(i);
     }
     while (permutation !== null) {
-      var foundIsomorphism = true;
-      if ((!(graph1.isLabeled || graph2.isLabeled) ||
-          graph2.vertices.every(function(vertex, index) {
-            return vertex.label == graph1.vertices[permutation[index]].label;
-          })) && graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
+      var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
+        graph2.vertices.every(function(vertex, index) {
+          return vertex.label == graph1.vertices[permutation[index]].label;
+        });
+      if (doLabelsMatch &&
+          graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
           adj1, adj2, permutation)) {
         return true;
       }
