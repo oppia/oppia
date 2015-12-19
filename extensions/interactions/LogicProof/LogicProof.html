@@ -18,9 +18,10 @@
         <textarea ng-trim="false" rows="10"></textarea>
       </div>
     </div>
-    <button class="btn btn-default" ng-click="submitProof()">Submit</button>
+    <!-- The onclick for proof submission is added in the javascript -->
+    <button class="btn btn-default logic-proof-submit">Submit</button>
     <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
-    <p class="logic-proof-mistake-message"> <[proofError]>  </p>
+    <p class="logic-proof-mistake-message"> <[mistakeMessage]>  </p>
   </div>
 </script>
 
