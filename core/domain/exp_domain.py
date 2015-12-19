@@ -2398,14 +2398,13 @@ class Exploration(object):
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version <=
+        if (initial_schema_version <=
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Expecting a title and category to be provided for an '
-                'exploration encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version >= 10, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
@@ -2414,15 +2413,17 @@ class Exploration(object):
     def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string. This is
         for importing explorations using YAML schema version 9 or earlier.
-
-        NOTE: For schema versions 10 and later, the title/category are
-        specified within the yaml file, and the passed-in 'title' and
-        'category' arguments are ignored.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
+
+        if (initial_schema_version >
+                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+            raise Exception(
+                'Expected a YAML version <= 9, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)

@@ -1168,11 +1168,30 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, title, category, exploration_id,
         assets_list):
+    """Note that the title and category will be ignored if the YAML
+    schema version is greater than
+    exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION,
+    since in that case there will already be a title and category present in
+    the YAML schema.
+    """
     if assets_list is None:
         assets_list = []
 
-    exploration = exp_domain.Exploration.from_untitled_yaml(
-        exploration_id, title, category, yaml_content)
+    yaml_dict = utils.dict_from_yaml(yaml_content)
+    if 'schema_version' not in yaml_dict:
+        raise Exception('Invalid YAML file: missing schema version')
+    exp_schema_version = yaml_dict['schema_version']
+
+    if (exp_schema_version <=
+            exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+        # The schema of the YAML file for older explorations did not include
+        # a title and a category; these need to be manually specified.
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            exploration_id, title, category, yaml_content)
+    else:
+        exploration = exp_domain.Exploration.from_yaml(
+            exploration_id, yaml_content)
+
     commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
