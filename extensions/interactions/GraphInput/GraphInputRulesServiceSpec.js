@@ -26,6 +26,134 @@ describe('Graph Input service', function() {
     girs = $injector.get('graphInputRulesService');
   }));
 
+  describe('graph utilities', function() {
+    var utils = null;
+    beforeEach(inject(function($injector) {
+      utils = $injector.get('graphUtilsService');
+    }));
+
+    it('should construct an adjacency matrix from a graph', function() {
+      expect(utils.constructAdjacencyMatrix({
+        vertices: [
+          {label: 'a', x: 1.0, y: 1.0},
+          {label: 'b', x: 2.0, y: 2.0},
+          {label: 'c', x: 3.0, y: 3.0}
+        ],
+        edges: [
+          {src: 0, dst: 1, weight: 1},
+          {src: 1, dst: 2, weight: 2}
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: true
+      })).toEqual([
+        [null, 1, null],
+        [1, null, 2],
+        [null, 2, null]
+      ]);
+      expect(utils.constructAdjacencyMatrix({
+        vertices: [
+          {label: 'a', x: 1.0, y: 1.0},
+          {label: 'b', x: 2.0, y: 2.0},
+          {label: 'c', x: 3.0, y: 3.0}
+        ],
+        edges: [
+          {src: 0, dst: 1, weight: 1},
+          {src: 1, dst: 2, weight: 2}
+        ],
+        isDirected: false,
+        isWeighted: false,
+        isLabeled: true
+      })).toEqual([
+        [null, 1, null],
+        [1, null, 1],
+        [null, 1, null]
+      ]);
+    });
+
+    it('should find the next lexicographical permutation', function() {
+      var permutation = [0, 1, 2, 3];
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([0, 1, 3, 2]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([0, 2, 1, 3]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([0, 2, 3, 1]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([0, 3, 1, 2]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([0, 3, 2, 1]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([1, 0, 2, 3]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([1, 0, 3, 2]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([1, 2, 0, 3]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([1, 2, 3, 0]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([1, 3, 0, 2]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([1, 3, 2, 0]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([2, 0, 1, 3]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([2, 0, 3, 1]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([2, 1, 0, 3]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([2, 1, 3, 0]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([2, 3, 0, 1]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([2, 3, 1, 0]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([3, 0, 1, 2]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([3, 0, 2, 1]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([3, 1, 0, 2]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([3, 1, 2, 0]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([3, 2, 0, 1]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toEqual([3, 2, 1, 0]);
+      permutation = utils.nextPermutation(permutation);
+      expect(permutation).toBe(null);
+    });
+
+    it('should compare adjacency matrices with a permutation', function() {
+      expect(utils.areAdjacencyMatricesEqualWithPermutation([
+        [null, 1, 1],
+        [2, null, 1],
+        [1, 1, null]
+      ], [
+        [null, 1, 1],
+        [2, null, 1],
+        [1, 1, null]
+      ], [0, 1, 2])).toBe(true);
+      expect(utils.areAdjacencyMatricesEqualWithPermutation([
+        [null, 1, 1],
+        [2, null, 1],
+        [1, 1, null]
+      ], [
+        [null, 1, null],
+        [2, null, 1],
+        [1, 1, null]
+      ], [0, 1, 2])).toBe(false);
+      expect(utils.areAdjacencyMatricesEqualWithPermutation([
+        [null, 1, 2],
+        [2, null, 1],
+        [1, 1, null]
+      ], [
+        [null, 1, 1],
+        [2, null, 1],
+        [1, 2, null]
+      ], [2, 0, 1])).toBe(true);
+    });
+  });
+
   describe('\'is isomorphic to\' rule', function() {
     var emptyGraph = function() {
       return {

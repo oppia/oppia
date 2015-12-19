@@ -561,17 +561,17 @@ oppia.directive('graphViz', function() {
   };
 });
 
-oppia.factory('graphInputRulesService', [function() {
-  var isIsomophic = function(graph1, graph2) {
-    if (graph1.vertices.length != graph2.vertices.length) {
-      return false;
-    }
-
-    var constructAdjacencyMatrix = function(graph) {
+oppia.factory('graphUtilsService', [function() {
+  return {
+    constructAdjacencyMatrix: function(graph) {
       var adjMatrix = [];
-      graph.vertices.map(function() {
-        adjMatrix.push([]);
-      });
+      for (var i = 0; i < graph.vertices.length; i++) {
+        var adjMatrixRow = [];
+        for (var j = 0; j < graph.vertices.length; j++) {
+          adjMatrixRow.push(null);
+        }
+        adjMatrix.push(adjMatrixRow);
+      }
       graph.edges.map(function(edge) {
         var weight = graph.isWeighted ? edge.weight : 1;
         adjMatrix[edge.src][edge.dst] = weight;
@@ -580,16 +580,12 @@ oppia.factory('graphInputRulesService', [function() {
         }
       });
       return adjMatrix;
-    };
+    },
+    nextPermutation: function(permutation) {
+      // Generates (in place) the next lexicographical permutation.
+      // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
 
-    var adj1 = constructAdjacencyMatrix(graph1);
-    var adj2 = constructAdjacencyMatrix(graph2);
-
-    var nextPermutation = function(permutation) {
-      // Generates (in place) the next lexicographical permuation.
-      // permutation is a permutation of [0...permutation.length]
-
-      // Find the pivot and successor
+      // Find the pivot to longest decreasing suffix and successor
       var pivot = null;
       var successor = null;
       permutation.reduce(function(previousValue, currentValue, currentIndex) {
@@ -601,16 +597,43 @@ oppia.factory('graphInputRulesService', [function() {
         }
         return currentValue;
       });
-      if (pivot === null) return null;
+
+      if (pivot === null) {
+        return null;
+      }
+
+      // swap the pivot and successor and reverse the suffix
       var tmp = permutation[pivot];
       permutation[pivot] = permutation[successor];
       permutation[successor] = tmp;
       permutation = permutation.concat(permutation.splice(pivot + 1).reverse());
       return permutation;
-    };
+    },
+    areAdjacencyMatricesEqualWithPermutation: function(adj1, adj2, permutation) {
+      var numVertices = adj1.length;
+      for (var i = 0; i < numVertices; i++) {
+        for (var j = 0; j < numVertices; j++) {
+          if (adj1[permutation[i]][permutation[j]] != adj2[i][j]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  };
+}]);
+
+oppia.factory('graphInputRulesService', [
+    'graphUtilsService', function(graphUtilsService) {
+  var IsIsomorphic = function(graph1, graph2) {
+    if (graph1.vertices.length != graph2.vertices.length) {
+      return false;
+    }
+
+    var adj1 = graphUtilsService.constructAdjacencyMatrix(graph1);
+    var adj2 = graphUtilsService.constructAdjacencyMatrix(graph2);
 
     // Check against every permutation of vectices.
-    // The new index of vertex i in graph2 is permutation[i].
     var numVertices = graph2.vertices.length;
     var permutation = [];
     for (var i = 0; i < numVertices; i++) {
@@ -618,40 +641,25 @@ oppia.factory('graphInputRulesService', [function() {
     }
     while (permutation !== null) {
       var foundIsomorphism = true;
-      if (graph1.isLabeled && graph2.vertices.some(function(vertex, index) {
-        return vertex.label != graph1.vertices[permutation[index]].label;
-      })) {
-        foundIsomorphism = false;
-      }
-
-      if (foundIsomorphism) {
-        for (var i = 0; i < numVertices; i++) {
-          for (var j = 0; j < numVertices; j++) {
-            if (adj1[permutation[i]][permutation[j]] != adj2[i][j]) {
-              foundIsomorphism = false;
-              break;
-            }
-          }
-          if (!foundIsomorphism) {
-            break;
-          }
-        }
-      }
-      if (foundIsomorphism) {
+      if ((!(graph1.isLabeled || graph2.isLabeled) ||
+          graph2.vertices.every(function(vertex, index) {
+            return vertex.label == graph1.vertices[permutation[index]].label;
+          })) && graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
+          adj1, adj2, permutation)) {
         return true;
       }
-      permutation = nextPermutation(permutation);
+      permutation = graphUtilsService.nextPermutation(permutation);
     }
     return false;
   };
 
   return {
     IsIsomorphicTo: function(answer, inputs) {
-      return isIsomophic(answer, inputs.g);
+      return IsIsomorphic(answer, inputs.g);
     },
     FuzzyMatches: function(answer, inputs) {
       return inputs.training_data.some(function(trainingGraph) {
-        return isIsomophic(answer, trainingGraph);
+        return IsIsomorphic(answer, trainingGraph);
       });
     }
   };
