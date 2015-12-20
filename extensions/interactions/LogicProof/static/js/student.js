@@ -996,10 +996,10 @@ var logicProofStudent = (function() {
   var buildProof = function(proofString, questionInstance) {
     var lineStrings = proofString.split('\n');
     // Ignore blank lines at the end
-    lastLineNum = lineStrings.length - 1
+    var lastLineNum = lineStrings.length - 1;
     while (lastLineNum > 0 &&
         lineStrings[lastLineNum].replace(/ /g, '').length === 0) {
-      lastLineNum--
+      lastLineNum--;
     }
 
     var builtLines = [];
