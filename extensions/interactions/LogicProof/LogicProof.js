@@ -19,8 +19,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/LogicProof',
-      controller: ['$scope', '$attrs', '$modal', '$element', 'logicProofRulesService',
-          function($scope, $attrs, $modal, $element, logicProofRulesService) {
+      controller: ['$scope', '$attrs', '$modal', 'logicProofRulesService',
+          function($scope, $attrs, $modal, logicProofRulesService) {
         $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.questionWithValue);
 
@@ -47,7 +47,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
           logicProofData.BASE_STUDENT_LANGUAGE,
           ['variable', 'constant', 'prefix_function']
         );
-        $scope.questionData.language.operators = $scope.typing[0].operators;
+
+        $scope.operators = $scope.typing[0].operators;
+
 
         $scope.displayExpression = function(expression) {
           return logicProofShared.displayExpression(
@@ -60,18 +62,19 @@ oppia.directive('oppiaInteractiveLogicProof', [
         };
 
         if ($scope.questionData.assumptions.length <= 1) {
-          $scope.assumptionsString = $scope.displayExpressionArray(
-            $scope.questionData.assumptions);
+          $scope.assumptionsString = logicProofShared.displayExpressionArray(
+            $scope.questionData.assumptions, $scope.operators);
         } else {
-          $scope.assumptionsString = $scope.displayExpressionArray(
+          $scope.assumptionsString = logicProofShared.displayExpressionArray(
             $scope.questionData.assumptions.slice(
-              0, $scope.questionData.assumptions.length - 1)
-            ) + ' and ' + $scope.displayExpression(
-              $scope.questionData.assumptions[
-                $scope.questionData.assumptions.length - 1]);
+              0, $scope.questionData.assumptions.length - 1),
+            $scope.operators
+          ) + ' and ' + logicProofShared.displayExpression(
+            $scope.questionData.assumptions[
+              $scope.questionData.assumptions.length - 1], $scope.operators);
         }
-        $scope.targetString = $scope.displayExpression(
-          $scope.questionData.results[0]);
+        $scope.targetString = logicProofShared.displayExpression(
+          $scope.questionData.results[0], $scope.operators);
         $scope.questionString = ($scope.assumptionsString === '') ?
             'Prove ' + $scope.targetString + '.':
             'Assuming ' + (
