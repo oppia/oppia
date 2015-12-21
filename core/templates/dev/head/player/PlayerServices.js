@@ -103,7 +103,7 @@ oppia.factory('oppiaPlayerService', [
     'extensionTagAssemblerService', 'INTERACTION_SPECS',
     'INTERACTION_DISPLAY_MODE_INLINE', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
-    'playerTranscriptService',
+    'playerTranscriptService', 'Exploration',
     function(
       $http, $rootScope, $modal, $filter, $q, $log, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
@@ -111,7 +111,7 @@ oppia.factory('oppiaPlayerService', [
       extensionTagAssemblerService, INTERACTION_SPECS,
       INTERACTION_DISPLAY_MODE_INLINE, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
-      playerTranscriptService) {
+      playerTranscriptService, Exploration) {
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (
     explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -128,7 +128,7 @@ oppia.factory('oppiaPlayerService', [
     '/explorehandler/init/' + _explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
   var _isLoggedIn = GLOBALS.userIsLoggedIn;
-  var _exploration = null;
+  var exploration = null;
   var _collection_id = GLOBALS.collectionId;
 
   learnerParamsService.init({});
@@ -145,7 +145,7 @@ oppia.factory('oppiaPlayerService', [
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
       successCallback) {
     var oldStateName = playerTranscriptService.getLastStateName();
-    var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
+    var oldStateInteractionId = exploration.getInteractionId(oldStateName);
 
     var refreshInteraction = (
       oldStateName !== newStateName ||
@@ -175,8 +175,7 @@ oppia.factory('oppiaPlayerService', [
 
       // If the new state contains a terminal interaction, record a completion
       // event, and inform the parent page that a completion has happened.
-      if (INTERACTION_SPECS[
-            _exploration.states[newStateName].interaction.id].is_terminal) {
+      if (exploration.isStateTerminal(newStateName)) {
         messengerService.sendMessage(messengerService.EXPLORATION_COMPLETED, {
           explorationVersion: version,
           paramValues: learnerParamsService.getAllParams()
@@ -197,31 +196,17 @@ oppia.factory('oppiaPlayerService', [
 
     _stopwatch.resetStopwatch();
 
-    var newStateData = _exploration.states[newStateName];
     $rootScope.$broadcast('playerStateChange');
     successCallback(
       newStateName, refreshInteraction, newFeedbackHtml, newQuestionHtml,
       newParams);
   };
 
-  var _registerMaybeLeaveEvent = function(stateName) {
-    var maybeLeaveExplorationUrl = (
-      '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
-    $http.post(maybeLeaveExplorationUrl, {
-      client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
-      params: learnerParamsService.getAllParams(),
-      session_id: sessionId,
-      state_name: stateName,
-      version: version
-    });
-  };
-
-  // This should only be called when _exploration is non-null.
+  // This should only be called when 'exploration' is non-null.
   var _loadInitialState = function(successCallback) {
-    var initStateName = _exploration.init_state_name;
     var initStateData = stateTransitionService.getInitStateData(
-      _exploration.param_specs, _exploration.param_changes,
-      _exploration.states[initStateName]);
+      exploration.paramSpecs, exploration.paramChanges,
+      exploration.getInitialState());
 
     if (initStateData) {
       if (!_editorPreviewMode) {
@@ -231,7 +216,7 @@ oppia.factory('oppiaPlayerService', [
         $http.post(startExplorationEventHandlerUrl, {
           params: initStateData.params,
           session_id: sessionId,
-          state_name: initStateName,
+          state_name: exploration.initStateName,
           version: version
         });
 
@@ -240,7 +225,7 @@ oppia.factory('oppiaPlayerService', [
         $http.post(stateHitEventHandlerUrl, {
           client_time_spent_in_secs: 0.0,
           exploration_version: version,
-          new_state_name: initStateName,
+          new_state_name: exploration.initStateName,
           old_params: initStateData.params,
           session_id: sessionId
         });
@@ -249,7 +234,7 @@ oppia.factory('oppiaPlayerService', [
       _stopwatch.resetStopwatch();
       $rootScope.$broadcast('playerStateChange');
       successCallback(
-        initStateName, initStateData.question_html, initStateData.params);
+        exploration, initStateData.question_html, initStateData.params);
     } else {
       warningsData.addWarning('Expression parsing error.');
     }
@@ -291,9 +276,9 @@ oppia.factory('oppiaPlayerService', [
 
   return {
     // This should only be used in editor preview mode.
-    populateExploration: function(exploration) {
+    populateExploration: function(explorationData) {
       if (_editorPreviewMode) {
-        _exploration = exploration;
+        exploration = Exploration.create(explorationData);
       } else {
         throw 'Error: cannot populate exploration in learner mode.';
       }
@@ -318,16 +303,15 @@ oppia.factory('oppiaPlayerService', [
       playerTranscriptService.init();
 
       if (_editorPreviewMode) {
-        if (_exploration) {
-          _infoCardImageUrl = (
-            '/images/gallery/exploration_background_' +
-            (GLOBALS.CATEGORIES_TO_COLORS[_exploration.category] || 'teal') +
-            '_large.png');
+        if (exploration) {
           _loadInitialState(successCallback);
+        } else {
+          warningsData.addWarning(
+            'Could not initialize exploration, because it was not yet populated.');
         }
       } else {
         $http.get(explorationDataUrl).success(function(data) {
-          _exploration = data.exploration;
+          exploration = Exploration.create(data.exploration);
           _infoCardImageUrl = data.info_card_image_url;
           version = data.version,
           sessionId = data.session_id;
@@ -356,54 +340,16 @@ oppia.factory('oppiaPlayerService', [
       };
     },
     getExplorationTitle: function() {
-      return _exploration.title;
+      return exploration.title;
     },
     getInteractionHtml: function(stateName, labelForFocusTarget) {
       return oppiaExplorationHtmlFormatterService.getInteractionHtml(
-        _exploration.states[stateName].interaction.id,
-        _exploration.states[stateName].interaction.customization_args,
+        exploration.getInteractionId(stateName),
+        exploration.getInteractionCustomizationArgs(stateName),
         labelForFocusTarget);
     },
-    getGadgetPanelsContents: function() {
-      return angular.copy(_exploration.skin_customizations.panels_contents);
-    },
-    getInteractionThumbnailSrc: function(stateName) {
-      // TODO(sll): unify this with the 'choose interaction' modal in
-      // state_editor_interaction.html.
-      var interactionId = _exploration.states[stateName].interaction.id;
-      if (!interactionId) {
-        return '';
-      } else {
-        return (
-          '/extensions/interactions/' + interactionId + '/static/' +
-          interactionId + '.png');
-      }
-    },
-    getInteractionInstructions: function(stateName) {
-      var interactionId = _exploration.states[stateName].interaction.id;
-      if (!interactionId) {
-        return '';
-      } else {
-        return INTERACTION_SPECS[interactionId].instructions;
-      }
-    },
     getInteraction: function(stateName) {
-      return _exploration.states[stateName].interaction;
-    },
-    isInteractionInline: function(stateName) {
-      var interactionId = _exploration.states[stateName].interaction.id;
-      // Note that we treat a null interaction as an inline one, so that the
-      // error message associated with it is displayed in the most compact way
-      // possible in the learner view.
-      return (
-        !interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
-          INTERACTION_DISPLAY_MODE_INLINE);
-    },
-    isStateTerminal: function(stateName) {
-      return stateName && _exploration.states[stateName].interaction.id &&
-        INTERACTION_SPECS[
-          _exploration.states[stateName].interaction.id].is_terminal;
+      return exploration.getInteraction(stateName);
     },
     getRandomSuffix: function() {
       // This is a bit of a hack. When a refresh to a $scope variable happens,
@@ -430,8 +376,8 @@ oppia.factory('oppiaPlayerService', [
       }
 
       answerIsBeingProcessed = true;
-      var oldState = angular.copy(
-        _exploration.states[playerTranscriptService.getLastStateName()]);
+      var oldState = exploration.getState(
+        playerTranscriptService.getLastStateName());
 
       answerClassificationService.getMatchingClassificationResult(
         _explorationId, oldState, answer, false, interactionRulesService
@@ -473,7 +419,7 @@ oppia.factory('oppiaPlayerService', [
         // Compute the data for the next state. This may be null if there are
         // malformed expressions.
         var nextStateData = stateTransitionService.getNextStateData(
-          outcome, _exploration.states[newStateName], answer);
+          outcome, exploration.getState(newStateName), answer);
 
         if (nextStateData) {
           nextStateData.state_name = newStateName;
@@ -492,7 +438,17 @@ oppia.factory('oppiaPlayerService', [
       return answerIsBeingProcessed;
     },
     registerMaybeLeaveEvent: function() {
-      _registerMaybeLeaveEvent(playerTranscriptService.getLastStateName());
+      var stateName = playerTranscriptService.getLastStateName();
+      var maybeLeaveExplorationUrl = (
+        '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
+
+      $http.post(maybeLeaveExplorationUrl, {
+        client_time_spent_in_secs: _stopwatch.getTimeInSecs(),
+        params: learnerParamsService.getAllParams(),
+        session_id: sessionId,
+        state_name: stateName,
+        version: version
+      });
     },
     // Returns a promise for the user profile picture, or the default image if
     // user is not logged in or has not uploaded a profile picture, or the
