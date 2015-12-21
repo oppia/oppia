@@ -245,7 +245,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
 
         with self.swap(
                 classifier_services.StringClassifier,
-            '__init__', string_classifier_predict_counter):
+            'predict_label_for_doc', string_classifier_predict_counter):
             response = reader.classify(
                 self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
 
