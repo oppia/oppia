@@ -1076,14 +1076,12 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
                 'exp4', 'State1:\n(\nInvalid yaml')
 
         with self.assertRaisesRegexp(
-                Exception, 'Expecting a title and category to be provided '
-                'for an exploration encoded in the YAML version:'):
+                Exception, 'Expected a YAML version >= 10, received: 9'):
             exp_domain.Exploration.from_yaml(
                 'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
-                Exception, 'No title or category need to be provided for an '
-                'exploration encoded in the YAML version:'):
+                Exception, 'Expected a YAML version <= 9'):
             exp_domain.Exploration.from_untitled_yaml(
                 'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
 
