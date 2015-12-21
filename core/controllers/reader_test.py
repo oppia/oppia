@@ -238,13 +238,14 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _get_classiying_rule_type(self, answer):
-        string_classifier_ctor = classifier_services.StringClassifier.__init__
-        string_classifier_ctor_counter = test_utils.CallCounter(
-            string_classifier_ctor)
+        string_classifier_predict = (
+            classifier_services.StringClassifier.predict_label_for_doc)
+        string_classifier_predict_counter = test_utils.CallCounter(
+            string_classifier_predict)
 
         with self.swap(
                 classifier_services.StringClassifier,
-            '__init__', string_classifier_ctor_counter):
+            '__init__', string_classifier_predict_counter):
             response = reader.classify(
                 self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
 
@@ -258,7 +259,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
         if answer_group.get_fuzzy_rule_index() == rule_spec_index:
             return (
                 'soft'
-                if string_classifier_ctor_counter.times_called == 0
+                if string_classifier_predict_counter.times_called == 0
                 else 'classifier')
         return 'hard'
 
