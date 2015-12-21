@@ -1045,7 +1045,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
                 'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
-                Exception, 'Expected a YAML version <= 9, received: '):
+                Exception, 'Expected a YAML version <= 9'):
             exp_domain.Exploration.from_untitled_yaml(
                 'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
 
