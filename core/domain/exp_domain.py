@@ -2325,8 +2325,8 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content, title=None,
-            category=None):
+    def _migrate_to_latest_yaml_version(
+            cls, yaml_content, title=None, category=None):
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -2398,14 +2398,13 @@ class Exploration(object):
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version <=
+        if (initial_schema_version <=
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Expecting a title and category to be provided for an '
-                'exploration encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version >= 10, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
@@ -2418,14 +2417,13 @@ class Exploration(object):
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version >
+        if (initial_schema_version >
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'No title or category need to be provided for an exploration '
-                'encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version <= 9, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
