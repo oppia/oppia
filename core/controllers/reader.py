@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.controllers import base
+from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -97,6 +98,133 @@ def require_playable(handler):
     return test_can_play
 
 
+def classify_hard_rule(state, params, input_type, normalized_answer, fs):
+    """Find the first hard rule that matches."""
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        ored_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+        best_rule_spec = None
+        for (rule_spec_index, rule_spec) in enumerate(
+                answer_group.rule_specs):
+            if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
+                evaluated_truth_value = rule_domain.evaluate_rule(
+                    rule_spec, input_type, params, normalized_answer, fs)
+                if evaluated_truth_value > ored_truth_value:
+                    ored_truth_value = evaluated_truth_value
+                    best_rule_spec_index = rule_spec_index
+                    best_rule_spec = rule_spec
+        if ored_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+            best_matched_truth_value = ored_truth_value
+            best_matched_answer_group = answer_group
+            best_matched_answer_group_index = answer_group_index
+            best_matched_rule_spec_index = best_rule_spec_index
+            return {
+                'outcome': best_matched_answer_group.outcome.to_dict(),
+                'answer_group_index': best_matched_answer_group_index,
+                'classification_certainty': best_matched_truth_value,
+                'rule_spec_index': best_matched_rule_spec_index,
+            }
+
+    return None
+
+
+def classify_soft_rule(state, params, input_type, normalized_answer, fs):
+    """Find the maximum soft rule that matches. This is done by ORing
+    (maximizing) all truth values of all rules over all answer groups. The
+    group with the highest truth value is considered the best match.
+    """
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
+        if fuzzy_rule_spec_index is not None:
+            fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
+        else:
+            fuzzy_rule_spec = None
+        if fuzzy_rule_spec is not None:
+            evaluated_truth_value = rule_domain.evaluate_rule(
+                fuzzy_rule_spec, input_type, params, normalized_answer, fs)
+            if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+                best_matched_truth_value = evaluated_truth_value
+                best_matched_rule_spec = fuzzy_rule_spec
+                best_matched_rule_spec_index = fuzzy_rule_spec_index
+                best_matched_answer_group = answer_group
+                best_matched_answer_group_index = answer_group_index
+                return {
+                    'outcome': best_matched_answer_group.outcome.to_dict(),
+                    'answer_group_index': best_matched_answer_group_index,
+                    'classification_certainty': best_matched_truth_value,
+                    'rule_spec_index': best_matched_rule_spec_index,
+                }
+
+    return None
+
+
+def classify_string_classifier_rule(
+    state, params, input_type, normalized_answer, fs):
+    """Run the classifier if no prediction has been made yet. Currently this
+    is behind a development flag.
+    """
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+
+    sc = classifier_services.StringClassifier()
+    training_examples = [[doc, []] for doc in
+        state.interaction.confirmed_unclassified_answers]
+    for (answer_group_index, answer_group) in enumerate(
+        state.interaction.answer_groups):
+        fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
+        if fuzzy_rule_spec_index is not None:
+            fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
+        else:
+            fuzzy_rule_spec = None
+        if fuzzy_rule_spec is not None:
+            training_examples.extend(
+                [[doc, [str(answer_group_index)]] for doc in
+                fuzzy_rule_spec.inputs['training_data']])
+    if len(training_examples) > 0:
+        sc.load_examples(training_examples)
+        doc_ids = sc.add_examples_for_predicting([normalized_answer])
+        predicted_label = sc.predict_label_for_doc(doc_ids[0])
+        if (predicted_label !=
+                classifier_services.StringClassifier.DEFAULT_LABEL):
+            predicted_answer_group_index = int(predicted_label)
+            predicted_answer_group = state.interaction.answer_groups[
+                predicted_answer_group_index]
+            best_matched_truth_value = rule_domain.CERTAIN_TRUE_VALUE
+            for rule_spec in answer_group.rule_specs:
+                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                    best_matched_rule_spec = fuzzy_rule_spec
+                    best_matched_rule_spec_index = fuzzy_rule_spec_index
+                    break
+            best_matched_answer_group = predicted_answer_group
+            best_matched_answer_group_index = predicted_answer_group_index
+            return {
+                'outcome': best_matched_answer_group.outcome.to_dict(),
+                'answer_group_index': best_matched_answer_group_index,
+                'classification_certainty': best_matched_truth_value,
+                'rule_spec_index': best_matched_rule_spec_index,
+            }
+        else:
+            return None
+
+    return None
+
+
 # TODO(bhenning): Add more tests for classification, such as testing multiple
 # rule specs over multiple answer groups and making sure the best match over all
 # those rules is picked.
@@ -110,6 +238,11 @@ def classify(exp_id, state, answer, params):
             which one was selected as the group which this answer belongs to.
             This is equal to the number of answer groups if the default outcome
             was matched.
+        'classification_certainty': A normalized value within the range of
+            [0, 1] representing at which confidence level the answer belongs in
+            the chosen answer group. A certainty of 1 means it is the best
+            possible match. A certainty of 0 means it is matched to the default
+            outcome.
         'rule_spec_index': An index into the rule specs list of the matched
             answer group which was selected that indicates which rule spec was
             matched. This is equal to 0 if the default outcome is selected.
@@ -120,48 +253,31 @@ def classify(exp_id, state, answer, params):
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
 
-    # Find the first group that satisfactorily matches the given answer. This
-    # is done by ORing (maximizing) all truth values of all rules over all
-    # answer groups. The group with the highest truth value is considered the
-    # best match.
-    best_matched_answer_group = None
-    best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec_index = None
-    best_matched_truth_value = 0.0
-    for (answer_group_index, answer_group) in enumerate(
-            state.interaction.answer_groups):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exp_id))
-        input_type = interaction_instance.answer_type
-        ored_truth_value = 0.0
-        best_rule_spec_index = None
-        for (rule_spec_index, rule_spec) in enumerate(answer_group.rule_specs):
-            evaluated_truth_value = rule_domain.evaluate_rule(
-                rule_spec, input_type, params, normalized_answer, fs)
-            if evaluated_truth_value > ored_truth_value:
-                ored_truth_value = evaluated_truth_value
-                best_rule_spec_index = rule_spec_index
-        if ored_truth_value > best_matched_truth_value:
-            best_matched_truth_value = ored_truth_value
-            best_matched_answer_group = answer_group
-            best_matched_answer_group_index = answer_group_index
-            best_matched_rule_spec_index = best_rule_spec_index
+    fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
+    input_type = interaction_instance.answer_type
+
+    response = classify_hard_rule(
+        state, params, input_type, normalized_answer, fs)
+    if response is None:
+        response = classify_soft_rule(
+            state, params, input_type, normalized_answer, fs)
+    if (interaction_instance.is_string_classifier_trainable and
+        feconf.ENABLE_STRING_CLASSIFIER and response is None):
+        response = classify_string_classifier_rule(
+            state, params, input_type, normalized_answer, fs)
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
     # resulting in the outcome of the answer being the default outcome of the
     # state.
-    if (best_matched_truth_value >=
+    if (response is not None and response['classification_certainty'] >=
             feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
-        return {
-            'outcome': best_matched_answer_group.outcome.to_dict(),
-            'answer_group_index': best_matched_answer_group_index,
-            'rule_spec_index': best_matched_rule_spec_index,
-        }
+        return response
     elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
             'answer_group_index': len(state.interaction.answer_groups),
+            'classification_certainty': 0.0,
             'rule_spec_index': 0
         }
 
