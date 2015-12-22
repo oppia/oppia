@@ -41,6 +41,21 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # TODO(sll): Make this work with fewer third-party dependencies.
 bash scripts/install_third_party.sh
 
+#build so as to have minified js and css
+echo ""
+echo "  Runing build task with concatenation only "
+echo ""
+
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+
+echo ""
+echo "  Runing build task with concatenation and minification"
+echo ""
+echo "  It will take a sometimes to finish"
+echo ""
+
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
+
 install_node_module karma 0.12.16
 install_node_module karma-jasmine 0.1.0
 install_node_module karma-coverage 0.5.2
@@ -55,6 +70,16 @@ echo ""
 echo "  on your filesystem."
 echo ""
 
+echo ""
+echo "  Runing test in development environment"
+echo ""
+
 $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
+
+echo ""
+echo "  Runing test in production environment"
+echo ""
+
+$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js minify
 
 echo Done!
