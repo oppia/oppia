@@ -382,14 +382,13 @@ oppia.directive('conversationSkin', [function() {
         var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
           playerTranscriptService.getLastCard());
 
-        if ($scope.canWindowFitTwoCards() && !previousSupplementalCardIsNonempty &&
-            nextSupplementalCardIsNonempty) {
+        if (totalNumCards > 1 && $scope.canWindowFitTwoCards() && 
+          !previousSupplementalCardIsNonempty && nextSupplementalCardIsNonempty) {
           animateToTwoCards(function() {
             $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
           });
-        } else if (
-            $scope.canWindowFitTwoCards() && previousSupplementalCardIsNonempty &&
-            !nextSupplementalCardIsNonempty) {
+        } else if (totalNumCards > 1 && $scope.canWindowFitTwoCards() && 
+          previousSupplementalCardIsNonempty && !nextSupplementalCardIsNonempty) {
           animateToOneCard(function() {
             $scope.currentProgressDotIndex = $scope.numProgressDots - 1;
           });
