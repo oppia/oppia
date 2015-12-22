@@ -633,6 +633,8 @@ oppia.factory('graphInputRulesService', [
     var adj1 = graphUtilsService.constructAdjacencyMatrix(graph1);
     var adj2 = graphUtilsService.constructAdjacencyMatrix(graph2);
 
+    // Check that for every vertex from the first graph there is a vertex in the
+    // second graph with the same sum of weights of outgoing edges
     var degrees1 = adj1.map(function(value) {
       return value.reduce(function(prev, cur) {
         return prev + cur;
