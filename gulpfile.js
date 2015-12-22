@@ -29,9 +29,7 @@ var argv = yargs
         .usage('Usage: $0 build [--minify]')
         .option('minify', {
           describe: 'Whether to minify third-party dependencies'
-        })
-        .demand(['minify'])
-        .argv;
+        }).argv;
     })
   .command('start_devserver', 'start GAE development server',
     function(yargs) {
