@@ -51,8 +51,6 @@ $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
 echo ""
 echo "  Runing build task with concatenation and minification"
 echo ""
-echo "  It will take a sometimes to finish"
-echo ""
 
 $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
 
