@@ -11,9 +11,12 @@
 
   <div>
     <div id="map_canvas" ui-map="map" ui-options="mapOptions"
-         style="width: 100%; height: 400px; max-width: 600px; max-height: 400px; margin: auto"
-         ui-event="{'map-click': 'registerClick($event, $params)'}">
+         style="width: 100%; height: 400px; max-width: 600px; max-height: 400px; margin: auto">
     </div>
+    <md-button class="md-raised" style="margin-top: 10px; margin-bottom: 10px;"
+               aria-label="Submit" ng-click="submitAnswer()" >
+          Submit
+    </md-button>
   </div>
 </script>
 
