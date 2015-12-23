@@ -48,33 +48,22 @@ oppia.directive('oppiaInteractiveLogicProof', [
           ['variable', 'constant', 'prefix_function']
         );
 
-        $scope.operators = $scope.typing[0].operators;
-
-
-        $scope.displayExpression = function(expression) {
-          return logicProofShared.displayExpression(
-            expression, $scope.questionData.language.operators);
-        };
-
-        $scope.displayExpressionArray = function(array) {
-          return logicProofShared.displayExpressionArray(
-            array, $scope.questionData.language.operators);
-        };
+        var operators = $scope.typing[0].operators;
 
         if ($scope.questionData.assumptions.length <= 1) {
           $scope.assumptionsString = logicProofShared.displayExpressionArray(
-            $scope.questionData.assumptions, $scope.operators);
+            $scope.questionData.assumptions, operators);
         } else {
           $scope.assumptionsString = logicProofShared.displayExpressionArray(
             $scope.questionData.assumptions.slice(
-              0, $scope.questionData.assumptions.length - 1),
-            $scope.operators
+              0, $scope.questionData.assumptions.length - 1
+            ), operators
           ) + ' and ' + logicProofShared.displayExpression(
             $scope.questionData.assumptions[
-              $scope.questionData.assumptions.length - 1], $scope.operators);
+              $scope.questionData.assumptions.length - 1], operators);
         }
         $scope.targetString = logicProofShared.displayExpression(
-          $scope.questionData.results[0], $scope.operators);
+          $scope.questionData.results[0], operators);
         $scope.questionString = ($scope.assumptionsString === '') ?
             'Prove ' + $scope.targetString + '.':
             'Assuming ' + (
@@ -137,6 +126,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           $scope.editor = editor;
         };
 
+        // This performs simple error checks that are done as the student types
+        // rather than waiting for the proof to be submitted.
         $scope.checkForBasicErrors = function() {
           if (!$scope.messageIsSticky) {
             $scope.clearMessage();
@@ -150,26 +141,27 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.messageIsSticky = false;
           }
           // NOTE: this line is necessary to force angular to refresh the
-          // displayed mistakeMessage.
+          // displayed errorMessage.
           $scope.$apply();
         };
 
         $scope.clearMessage = function() {
-          if ($scope.mistakeMark) {
-            $scope.mistakeMark.clear();
+          if ($scope.errorMark) {
+            $scope.errorMark.clear();
           }
-          $scope.mistakeMessage = '';
+          $scope.errorMessage = '';
         }
 
         $scope.showMessage = function(message, lineNum) {
-          $scope.mistakeMessage = $scope.renderMessage(message, lineNum);
-          $scope.mistakeMark = $scope.editor.doc.markText(
+          $scope.errorMessage = $scope.constructDisplayedMessage(
+            message, lineNum);
+          $scope.errorMark = $scope.editor.doc.markText(
             {line: lineNum, ch: 0},
             {line: lineNum, ch: 100},
             {className: 'logic-proof-erroneous-line'});
         };
 
-        $scope.renderMessage = function(message, lineNum) {
+        $scope.constructDisplayedMessage = function(message, lineNum) {
           return 'line ' + (lineNum + 1) + ': ' + message;
         };
 
@@ -215,7 +207,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             submission.error_message = err.message;
             submission.error_line_number = err.line;
             submission.displayed_message =
-              $scope.renderMessage(err.message, err.line);
+              $scope.constructDisplayedMessage(err.message, err.line);
             submission.displayed_proof =
               $scope.displayProof($scope.proofString, err.line);
 

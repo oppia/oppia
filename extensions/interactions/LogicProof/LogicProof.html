@@ -5,7 +5,7 @@
   .logic-proof-erroneous-line {
     font-weight: bold;
   }
-  .logic-proof-mistake-message {
+  .logic-proof-error-message {
     color: red;
   }
 </style>
@@ -20,7 +20,7 @@
     </div>
     <button class="btn btn-default" ng-click="submitProof()">Submit</button>
     <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
-    <p class="logic-proof-mistake-message"> <[mistakeMessage]>  </p>
+    <p class="logic-proof-error-message"> <[errorMessage]>  </p>
   </div>
 </script>
 
@@ -35,7 +35,7 @@
       <div>
         <pre><[answer.displayed_proof[0]]><div class="logic-proof-erroneous-line"><[answer.displayed_proof[1]]></div><[answer.displayed_proof[2]]></pre>
       </div>
-      <p class="logic-proof-mistake-message"><[answer.displayed_message]></p>
+      <p class="logic-proof-error-message"><[answer.displayed_message]></p>
     </div>
   </div>
 </script>
