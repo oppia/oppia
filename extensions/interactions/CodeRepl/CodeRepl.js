@@ -176,28 +176,36 @@ oppia.factory('codeReplNormalizationService', [function() {
           0: 0,
       };
 
+      console.log('a');
+
       var codeLines = removeTrailingWhitespace(codeString).split('\n');
       var normalizedCodeLines = [];
       codeLines.forEach(function(line) {
+        console.log('b');
         if (removeLeadingWhitespace(line).startsWith('#')) {
           return;
         }
+        console.log('c');
         line = removeTrailingWhitespace(line);
         if (!line) {
           return;
         }
 
         var numSpaces = line.length - removeLeadingWhitespace(line).length;
+        console.log('d');
 
         var maxNumSpaces = Object.keys(numSpaceToDesiredIndentLevel).reduce(
           function(max, key) {
             return Math.max(key, max);
           }, -Infinity);
+        console.log('e');
         if (numSpaces > maxNumSpaces) {
           // Add a new indentation level
           numSpaceToDesiredIndentLevel[numSpaces] =
             Object.keys(numSpaceToDesiredIndentLevel).length;
         }
+
+        console.log('f');
 
         // This is set when the indentation level of the current line does not
         // start a new scope, and also does not match any previous indentation
@@ -209,6 +217,8 @@ oppia.factory('codeReplNormalizationService', [function() {
           !numSpaceToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
           numSpaces < maxNumSpaces;
 
+        console.log('g');
+
         // Clear all existing indentation levels to the right of this one.
         for (var key in numSpaceToDesiredIndentLevel) {
           if (key > numSpaces) {
@@ -216,12 +226,16 @@ oppia.factory('codeReplNormalizationService', [function() {
           }
         }
 
+        console.log('h');
+
         if (isShortfallLine) {
           numSpaces = Object.keys(numSpaceToDesiredIndentLevel).reduce(
             function(max, key) {
               return Math.max(numSpaceToDesiredIndentLevel[key], max);
             }, -Infinity);
         }
+
+        console.log('i');
 
         var normalizedLine = '';
         for (var i = 0; i < numSpaceToDesiredIndentLevel[numSpaces]; i++) {
