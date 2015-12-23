@@ -29,7 +29,8 @@ class ThreadListHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         self.values.update({
-            'threads': feedback_services.get_threadlist(exploration_id)})
+            'threads': feedback_services.get_all_threads(
+                exploration_id, False)})
         self.render_json(self.values)
 
     @base.require_user
@@ -62,8 +63,8 @@ class ThreadHandler(base.BaseHandler):
         self.values.update({
             'messages': feedback_services.get_messages(
                 exploration_id, thread_id)})
-        self.values.update(
-            {'suggestion': feedback_services.get_suggestion(
+        self.values.update({
+            'suggestion': feedback_services.get_suggestion(
                 exploration_id, thread_id)})
         self.render_json(self.values)
 
@@ -76,7 +77,8 @@ class ThreadHandler(base.BaseHandler):
                 'Text for the message must be specified.')
 
         feedback_services.create_message(
-            '.'.join((exploration_id, thread_id)),
+            exploration_id,
+            thread_id,
             self.user_id,
             updated_status,
             self.payload.get('updated_subject'),
@@ -136,20 +138,21 @@ class SuggestionActionHandler(base.BaseHandler):
     """"Handles actions performed on threads with suggestions."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
-    ACCEPT_ACTION = 'accept'
-    REJECT_ACTION = 'reject'
+    _ACCEPT_ACTION = 'accept'
+    _REJECT_ACTION = 'reject'
 
     @editor.require_editor
     def put(self, exploration_id, thread_id):
         action = self.payload.get('action')
-        if action == self.ACCEPT_ACTION:
+        if action == self._ACCEPT_ACTION:
             exp_services.accept_suggestion(
                 self.user_id,
                 thread_id,
                 exploration_id,
                 self.payload.get('commit_message'))
-        elif action == self.REJECT_ACTION:
-             exp_services.reject_suggestion(thread_id, exploration_id)
+        elif action == self._REJECT_ACTION:
+             exp_services.reject_suggestion(
+                 self.user_id, thread_id, exploration_id)
         else:
             raise self.InvalidInputException('Invalid action.')
 
@@ -160,30 +163,36 @@ class SuggestionListHandler(base.BaseHandler):
     """Handles operations relating to list of threads with suggestions."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
-    OPEN_LIST_TYPE = 'open'
-    CLOSED_LIST_TYPE = 'closed'
-    ALL_LIST_TYPE = 'all'
+    _LIST_TYPE_OPEN = 'open'
+    _LIST_TYPE_CLOSED = 'closed'
+    _LIST_TYPE_ALL = 'all'
 
-    def _string_to_bool(self, str):
-        if str == 'true':
+    def _string_to_bool(self, has_suggestion):
+        if has_suggestion == 'true':
             return True
-        if str == 'false':
+        elif has_suggestion == 'false':
             return False
+        else:
+            return None
 
     @base.require_user
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
-        has_suggestion = self.request.get('has_suggestion')
-        if list_type == self.OPEN_LIST_TYPE:
+        has_suggestion = self._string_to_bool(
+            self.request.get('has_suggestion'))
+        if has_suggestion is None:
+            raise self.InvalidInputException(
+                'Invalid value for has_suggestion.')
+        if list_type == self._LIST_TYPE_OPEN:
             threads = feedback_services.get_open_threads(
-                exploration_id, self._string_to_bool(has_suggestion))
-        elif list_type == self.CLOSED_LIST_TYPE:
+                exploration_id, has_suggestion)
+        elif list_type == self._LIST_TYPE_CLOSED:
             threads = feedback_services.get_closed_threads(
-                exploration_id, self._string_to_bool(has_suggestion))
-        elif list_type == self.ALL_LIST_TYPE:
-            threads = feedback_services.get_all_suggestion_threads(
-                exploration_id)
+                exploration_id, has_suggestion)
+        elif list_type == self._LIST_TYPE_ALL:
+            threads = feedback_services.get_all_threads(
+                exploration_id, has_suggestion)
         else:
             raise self.InvalidInputException('Invalid list type.')
          

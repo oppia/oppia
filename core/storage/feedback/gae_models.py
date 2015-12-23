@@ -86,7 +86,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             'New thread id generator is producing too many collisions.')
 
     @classmethod
-    def _generate_id(cls, exploration_id, thread_id):
+    def generate_full_thread_id(cls, exploration_id, thread_id):
         return '.'.join([exploration_id, thread_id])
 
     @classmethod
@@ -96,7 +96,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         Throws an exception if a thread with the given exploration ID and
         thread ID combination exists already.
         """
-        instance_id = cls._generate_id(exploration_id, thread_id)
+        instance_id = cls.generate_full_thread_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
             raise Exception('Feedback thread ID conflict on create.')
         return cls(id=instance_id)
@@ -107,7 +107,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Returns None if the thread is not found or is already deleted.
         """
-        return cls.get_by_id(cls._generate_id(exploration_id, thread_id))
+        return cls.get_by_id(cls.generate_full_thread_id(
+            exploration_id, thread_id))
 
     @classmethod
     def get_threads(cls, exploration_id):
@@ -154,8 +155,8 @@ class FeedbackMessageModel(base_models.BaseModel):
     text = ndb.StringProperty(indexed=False)
 
     @classmethod
-    def _generate_id(cls, thread_id, message_id):
-        return '.'.join([thread_id, str(message_id)])
+    def _generate_id(cls, exploration_id, thread_id, message_id):
+        return '.'.join([exploration_id, thread_id, str(message_id)])
 
     @property
     def exploration_id(self):
@@ -165,19 +166,20 @@ class FeedbackMessageModel(base_models.BaseModel):
         return FeedbackThreadModel.get_by_id(self.thread_id).subject
 
     @classmethod
-    def create(cls, thread_id, message_id):
+    def create(cls, exploration_id, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
 
         Throws an exception if a message with the given thread ID and message
         ID combination exists already.
         """
-        instance_id = cls._generate_id(thread_id, message_id)
+        instance_id = cls._generate_id(
+            exploration_id, thread_id, message_id)
         if cls.get_by_id(instance_id):
             raise Exception('Feedback message ID conflict on create.')
         return cls(id=instance_id)
 
     @classmethod
-    def get(cls, thread_id, message_id, strict=True):
+    def get(cls, exploration_id, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID.
 
         If the message id is valid and it is not marked as deleted, returns the
@@ -185,31 +187,37 @@ class FeedbackMessageModel(base_models.BaseModel):
         - if strict is True, raises EntityNotFoundError
         - if strict is False, returns None.
         """
-        instance_id = cls._generate_id(thread_id, message_id)
+        instance_id = cls._generate_id(exploration_id, thread_id, message_id)
         return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
 
     @classmethod
-    def get_messages(cls, thread_id):
+    def get_messages(cls, exploration_id, thread_id):
         """Returns an array of messages in the thread.
 
         Does not include the deleted entries.
         """
+        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
         return cls.get_all().filter(
-            cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+            cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_most_recent_message(cls, thread_id):
+    def get_most_recent_message(cls, exploration_id, thread_id):
+        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
         return cls.get_all().filter(
-            cls.thread_id == thread_id).order(-cls.last_updated).get()
+            cls.thread_id == full_thread_id).order(-cls.last_updated).get()
 
     @classmethod
-    def get_message_count(cls, thread_id):
+    def get_message_count(cls, exploration_id, thread_id):
         """Returns the number of messages in the thread.
 
         Includes the deleted entries.
         """
+        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
         return cls.get_all(include_deleted_entities=True).filter(
-            cls.thread_id == thread_id).count()
+            cls.thread_id == full_thread_id).count()
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
