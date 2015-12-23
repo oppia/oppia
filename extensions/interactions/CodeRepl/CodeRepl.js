@@ -146,3 +146,156 @@ oppia.directive('oppiaShortResponseCodeRepl', [
     };
   }
 ]);
+
+oppia.factory('codeReplNormalizationService', [function() {
+  var removeLeadingWhitespace = function(str) {
+    return str.replace(/^\s+/g, '');
+  };
+  var removeTrailingWhitespace = function(str) {
+    return str.replace(/\s+$/g, '');
+  };
+  return {
+    getNormalizedCode: function(codeString) {
+      /*
+       * Normalizes a code string (which is assumed not to contain tab
+       * characters). In particular:
+       *
+       * - Strips out lines that start with '#' (comments), possibly preceded by
+       *     whitespace.
+       * - Trims trailing whitespace on each line.
+       * - Removes blank newlines.
+       * - Make the indentation level four spaces.
+       */
+      // TODO(sll): Augment this function to strip out comments that occur at the
+      // end of a line. However, be careful with lines where '#' is contained in
+      // quotes or the character is escaped.
+      var FOUR_SPACES = '    ';
+      // Maps the number of spaces at the beginning of a line to an int specifying
+      // the desired indentation level.
+      var numSpaceToDesiredIndentLevel = {
+          0: 0,
+      };
+
+      var codeLines = removeTrailingWhitespace(codeString).split('\n');
+      var normalizedCodeLines = [];
+      codeLines.forEach(function(line) {
+        if (removeLeadingWhitespace(line).startsWith('#')) {
+          return;
+        }
+        line = removeTrailingWhitespace(line);
+        if (!line) {
+          return;
+        }
+
+        var numSpaces = line.length - removeLeadingWhitespace(line).length;
+
+        var maxNumSpaces = Object.keys(numSpaceToDesiredIndentLevel).reduce(
+          function(max, key) {
+            return Math.max(key, max);
+          }, -Infinity);
+        if (numSpaces > maxNumSpaces) {
+          // Add a new indentation level
+          numSpaceToDesiredIndentLevel[numSpaces] =
+            Object.keys(numSpaceToDesiredIndentLevel).length;
+        }
+
+        // This is set when the indentation level of the current line does not
+        // start a new scope, and also does not match any previous indentation
+        // level. This case is actually invalid, but for now, we take the
+        // largest indentation level that is less than this one.
+        // TODO(sll): Bad indentation should result in an error nearer the
+        // source.
+        var isShortfallLine =
+          !numSpaceToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
+          numSpaces < maxNumSpaces;
+
+        // Clear all existing indentation levels to the right of this one.
+        for (var key in numSpaceToDesiredIndentLevel) {
+          if (key > numSpaces) {
+            delete numSpaceToDesiredIndentLevel[key];
+          }
+        }
+
+        if (isShortfallLine) {
+          numSpaces = Object.keys(numSpaceToDesiredIndentLevel).reduce(
+            function(max, key) {
+              return Math.max(numSpaceToDesiredIndentLevel[key], max);
+            }, -Infinity);
+        }
+
+        var normalizedLine = '';
+        for (var i = 0; i < numSpaceToDesiredIndentLevel[numSpaces]; i++) {
+          normalizedLine += FOUR_SPACES;
+        }
+        normalizedLine += removeLeadingWhitespace(line);
+        normalizedCodeLines.push(normalizedLine);
+      });
+      return normalizedCodeLines.join('\n');
+    },
+    // A very naive approach to 'normalizing' the code is to strip out all
+    // comments and whitespace. This normalization currently assumes Python.
+    normalizePythonCode: function(code) {
+      // TODO(sll): This does not correctly handle the case where '#' is
+      // within quotes, or where it is escaped.
+      // remove comments
+      var strippedCode = code.replace(/#.*/g, '');
+      // remove whitespace
+      return strippedCode.replace(/\s+/g, '');
+    }
+  };
+}]);
+
+oppia.factory('codeReplRulesService', [
+    '$filter', 'codeReplNormalizationService',
+    function($filter, codeReplNormalizationService) {
+  return {
+    CodeEquals: function(answer, inputs) {
+      var normalizedCode =
+        codeReplNormalizationService.getNormalizedCode(answer.code);
+      var normalizedExpectedCode =
+        codeReplNormalizationService.getNormalizedCode(inputs.x);
+      return normalizedCode == normalizedExpectedCode;
+    },
+    CodeContains: function(answer, inputs) {
+      var normalizedCode =
+        codeReplNormalizationService.getNormalizedCode(answer.code);
+      var normalizedSnippet =
+        codeReplNormalizationService.getNormalizedCode(inputs.x);
+      return normalizedCode.indexOf(normalizedSnippet) != -1;
+    },
+    CodeDoesNotContain: function(answer, inputs) {
+      var normalizedCode =
+        codeReplNormalizationService.getNormalizedCode(answer.code);
+      var normalizedSnippet =
+        codeReplNormalizationService.getNormalizedCode(inputs.x);
+      return normalizedCode.indexOf(normalizedSnippet) == -1;
+    },
+    OutputEquals: function(answer, inputs) {
+      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+      var normalizedExpectedOutput =
+        $filter('normalizeWhitespace')(inputs.x);
+      return normalizedOutput == normalizedExpectedOutput;
+    },
+    ResultsInError: function(answer, inputs) {
+      return !!(answer.error.trim());
+    },
+    ErrorContains: function(answer, inputs) {
+      var normalizedError = $filter('normalizeWhitespace')(answer.error);
+      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedError.indexOf(normalizedSnippet) != -1;
+    },
+    FuzzyMatches: function(answer, inputs) {
+      // TODO(bhenning): This is where a third party library could be used to
+      // intelligently normalize and compare different submissions of code.
+      // Also, this should return a value between 0 and 1 depending on how
+      // closely it matches the training data, rather than doing a crisp
+      // comparison on stripped code.
+
+      var code = codeReplNormalizationService.normalizePythonCode(answer.code);
+      return inputs.training_data.some(function(possibility) {
+        return codeReplNormalizationService.normalizePythonCode(
+          possibility.code) == code;
+      });
+    }
+  };
+}]);
