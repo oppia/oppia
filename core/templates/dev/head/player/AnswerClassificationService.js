@@ -109,7 +109,7 @@ oppia.factory('answerClassificationService', [
         var params = (isInEditorMode) ? {} : learnerParamsService.getAllParams();
 
         $http.post(classifyUrl, {
-          old_state: oldState,
+          old_state: oldState.toBackendDict(),
           params: params,
           answer: answer
         }).success(function(result) {

@@ -13,15 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that stores data about the exploration blob needed for
- * the learner view.
+ * @fileoverview Factory for creating new frontend instances of Exploration
+ * domain objects.
  *
  * @author sean@seanlip.org (Sean Lip)
  */
 
-oppia.factory('Exploration', [
+oppia.factory('ExplorationObjectFactory', [
     'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-    function(INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
+    'StateObjectFactory',
+    function(
+      INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory) {
 
   function Exploration(
       initStateName, paramChanges, paramSpecs, skinCustomizations, states,
@@ -30,8 +32,13 @@ oppia.factory('Exploration', [
     this.paramChanges = paramChanges;
     this.paramSpecs = paramSpecs;
     this.skinCustomizations = skinCustomizations;
-    this.states = states;
     this.title = title;
+
+    this.states = [];
+    for (var stateName in states) {
+      this.states[stateName] = StateObjectFactory.create(
+        stateName, states[stateName]);
+    }
   }
 
   // Instance methods
@@ -80,11 +87,11 @@ oppia.factory('Exploration', [
   };
 
   Exploration.prototype.getGadgetPanelsContents = function() {
-    return angular.copy(this.skinCustomizations.panels_contents);
+    return this.skinCustomizations.panels_contents;
   };
 
   Exploration.prototype.getState = function(stateName) {
-    return angular.copy(this.states[stateName]);
+    return this.states[stateName];
   };
 
   Exploration.prototype.getInitialState = function() {
@@ -93,14 +100,14 @@ oppia.factory('Exploration', [
 
   // Static class methods. Note that "this" is not available in
   // static contexts.
-  Exploration.create = function(explorationData) {
+  Exploration.create = function(explorationDict) {
     return new Exploration(
-      explorationData.init_state_name,
-      explorationData.param_changes,
-      explorationData.param_specs,
-      explorationData.skin_customizations,
-      explorationData.states,
-      explorationData.title);
+      explorationDict.init_state_name,
+      explorationDict.param_changes,
+      explorationDict.param_specs,
+      explorationDict.skin_customizations,
+      explorationDict.states,
+      explorationDict.title);
   };
 
   return Exploration;
