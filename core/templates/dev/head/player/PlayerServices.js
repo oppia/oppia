@@ -275,7 +275,7 @@ oppia.factory('oppiaPlayerService', [
       _explorationTags = data.summaries[0].tags;
       _currentRatings = data.summaries[0].ratings;
       _explorationContributorUsernames = data.summaries[0].contributor_names;
-      _explorationLastUpdatedMsec = data.summaries[0].last_updated;
+      _explorationLastUpdatedMsec = data.summaries[0].last_updated_msec;
       deferredContributors.resolve(data);
     });
 

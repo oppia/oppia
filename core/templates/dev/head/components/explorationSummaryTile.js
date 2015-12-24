@@ -42,7 +42,7 @@ oppia.directive('explorationSummaryTile', [function() {
       function($scope, oppiaDatetimeFormatter, ratingComputationService) {
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-            $scope.getLastUpdatedMsec())
+            $scope.getLastUpdatedMsec());
         };
 
         $scope.getAverageRating = function() {
