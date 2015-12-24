@@ -149,6 +149,9 @@ oppia.directive('oppiaShortResponseCodeRepl', [
 
 oppia.factory('codeReplNormalizationService', [function() {
   var removeLeadingWhitespace = function(str) {
+    console.log('in-function');
+    console.log(str);
+    console.log(str.replace);
     return str.replace(/^\s+/g, '');
   };
   var removeTrailingWhitespace = function(str) {
@@ -182,6 +185,11 @@ oppia.factory('codeReplNormalizationService', [function() {
       var normalizedCodeLines = [];
       codeLines.forEach(function(line) {
         console.log('b');
+        console.log(removeLeadingWhitespace);
+        console.log(line);
+        console.log(removeLeadingWhitespace(line));
+        console.log(removeLeadingWhitespace(line).startsWith);
+        console.log(removeLeadingWhitespace(line).startsWith('#'));
         if (removeLeadingWhitespace(line).startsWith('#')) {
           return;
         }
