@@ -501,9 +501,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             })
 
             # Trigger close event.
-            threadlist = feedback_services.get_threadlist(exp_id)
-            thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
+            threadlist = feedback_services.get_all_threads(exp_id, False)
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id'])
+            feedback_services.create_message(exp_id, thread_id, 'author', 
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text') 
             self.process_and_flush_pending_tasks()
 
@@ -536,9 +537,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             })
 
             # Trigger close event.
-            threadlist = feedback_services.get_threadlist(exp_id)
-            thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
+            threadlist = feedback_services.get_all_threads(exp_id, False)
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id'])
+            feedback_services.create_message(exp_id, thread_id, 'author', 
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text') 
             self.process_and_flush_pending_tasks()
 
@@ -550,9 +552,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             })
 
             # Trigger reopen event.
-            threadlist = feedback_services.get_threadlist(exp_id)
-            thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
+            threadlist = feedback_services.get_all_threads(exp_id, False) 
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id'])
+            feedback_services.create_message(exp_id, thread_id, 'author', 
                 feedback_models.STATUS_CHOICES_OPEN, None, 'some text') 
             self.process_and_flush_pending_tasks()
             
@@ -585,9 +588,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             })
 
             # Trigger close event.
-            threadlist = feedback_services.get_threadlist(exp_id)
-            thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
+            threadlist = feedback_services.get_all_threads(exp_id, False)
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id'])
+            feedback_services.create_message(exp_id, thread_id, 'author', 
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text') 
             self.process_and_flush_pending_tasks()
 
@@ -599,9 +603,10 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             })
 
             # Trigger thread status change event.
-            threadlist = feedback_services.get_threadlist(exp_id)
-            thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(thread_id, 'author', 
+            threadlist = feedback_services.get_all_threads(exp_id, False)
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id'])
+            feedback_services.create_message( exp_id, thread_id, 'author', 
                 feedback_models.STATUS_CHOICES_IGNORED, None, 'some text') 
             self.process_and_flush_pending_tasks()
             

@@ -2852,8 +2852,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     THREAD_ID1 = '1111'
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
+    USER_EMAIL = 'user@123.com'
+    EDITOR_EMAIL = 'editor@123.com'
     USERNAME = 'user123'
+    EDITOR_USERNAME = 'editor123'
     COMMIT_MESSAGE = 'commit message'
+    EMPTY_COMMIT_MESSAGE = ' '
 
     def _generate_thread_id(self, exp_id):
         return self.THREAD_ID1
@@ -2869,46 +2873,86 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
             self.USERNAME, self.COMMIT_MESSAGE))
 
-    def _get_username_(self, user_ids):
-        return [self.USERNAME]
-
     def setUp(self):
         super(SuggestionActionUnitTests, self).setUp()
+        self.USER_ID = self.get_user_id_from_email(self.USER_EMAIL)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_services.get_or_create_user(self.USER_ID, self.USER_EMAIL)
+        user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
+        self.signup(self.USER_EMAIL, self.USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         with self.swap(feedback_models.FeedbackThreadModel, 
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, 'author_id', 3, 'state_name', {'old_content': {}})
+                self.EXP_ID1, self.USER_ID, 3, 'state_name', {'old_content': {}})
             feedback_services.create_suggestion(
-                self.EXP_ID2, 'author_id', 3, 'state_name', {'old_content': {}})           
+                self.EXP_ID2, self.USER_ID, 3, 'state_name', {'old_content': {}})           
 
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid', 
                        self._return_true):
             with self.swap(exp_services, 'update_exploration',
                            self._check_commit_message):
-                with self.swap(user_services, 'get_human_readable_user_ids',
-                               self. _get_username_):
-                    exp_services.accept_suggestion(
-                        'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID1,
-                        self.COMMIT_MESSAGE)
+                exp_services.accept_suggestion(
+                    self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID1,
+                    self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
-            '.'.join([self.EXP_ID1, self.THREAD_ID1]))
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID1, self.THREAD_ID1))
+        thread_messages = feedback_services.get_messages(
+            self.EXP_ID1, self.THREAD_ID1)
+        last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
+        self.assertEqual(last_message['text'], 'Suggestion accepted.')
 
     def test_accept_suggestion_invalid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',
                        self._return_false):
-            with self.assertRaisesRegexp(Exception, 'Suggestion Invalid'):
+            with self.assertRaisesRegexp(
+                    Exception,
+                    'Invalid suggestion: The state for which it was made '
+                    'has been removed/renamed.'):
                 exp_services.accept_suggestion(
-                    'user_id', 'change_list', self.THREAD_ID1, self.EXP_ID2,
-                    self.COMMIT_MESSAGE)
+                     self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2,
+                     self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
-            '.'.join([self.EXP_ID2, self.THREAD_ID1]))
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID2, self.THREAD_ID1))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
-    def test_reject_suggestion(self):
-        exp_services.reject_suggestion(self.THREAD_ID1, self.EXP_ID2)
+    def test_accept_suggestion_empty_commit_message(self):
+        with self.assertRaisesRegexp(Exception, 
+                                     'Commit message cannot be empty.'):
+            exp_services.accept_suggestion(
+                     self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2, 
+                     self.EMPTY_COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
-            '.'.join([self.EXP_ID2, self.THREAD_ID1]))
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID2, self.THREAD_ID1))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
+
+    def test_accept_suggestion_actioned_suggestion(self):
+        exception_message = 'Suggestion has already been accepted/rejected'
+        with self.swap(exp_services, '_is_suggestion_handled',
+                       self._return_true):
+            with self.assertRaisesRegexp(Exception, exception_message):
+                exp_services.accept_suggestion(
+                     self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2,
+                     self.COMMIT_MESSAGE)
+
+    def test_reject_suggestion(self):
+        exp_services.reject_suggestion(
+            self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2)
+        thread = feedback_models.FeedbackThreadModel.get(
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID2, self.THREAD_ID1))
         self.assertEqual(thread.status,
                          feedback_models.STATUS_CHOICES_IGNORED)
+
+    def test_reject_actioned_suggestion(self):
+        exception_message = 'Suggestion has already been accepted/rejected'
+        with self.swap(exp_services, '_is_suggestion_handled',
+                       self._return_true):
+            with self.assertRaisesRegexp(Exception, exception_message):
+                exp_services.reject_suggestion(
+                    self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2)

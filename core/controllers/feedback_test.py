@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
@@ -27,7 +28,7 @@ import feconf
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated']
+    'full_thread_id', 'subject', 'last_updated']
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on', 'exploration_id', 'message_id',
     'text', 'updated_status', 'updated_subject']
@@ -82,9 +83,10 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         }, response_dict['threads'][0])
 
         # Non-logged-in users can see individual messages.
-        first_thread_id = response_dict['threads'][0]['thread_id']
+        first_thread_id = response_dict['threads'][0]['full_thread_id']
         thread_url = '%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, first_thread_id)
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, 
+            feedback_services.get_thread_id_from_full_thread_id(first_thread_id))
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
         self.assertDictContainsSubset({
@@ -117,9 +119,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackThreadIntegrationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)       
+ 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
@@ -152,7 +158,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX,
             self.EXP_ID,
-            threadlist[0]['thread_id'])
+            feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id']))
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
         self.assertDictContainsSubset({
@@ -207,11 +214,12 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         threadlist = response_dict['threads']
         self.assertEqual(len(threadlist), 1)
-        thread_id = threadlist[0]['thread_id']
+        thread_id = threadlist[0]['full_thread_id']
 
         # Then, create a new message in that thread.
         thread_url = '%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID,
+            feedback_services.get_thread_id_from_full_thread_id(thread_id))
         self.post_json(thread_url, {
             'updated_status': None,
             'updated_subject': None,
@@ -247,8 +255,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         NEW_EXP_ID = 'new_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             NEW_EXP_ID, 'A title', 'A category')
-        exp_services.save_new_exploration(self.EDITOR_ID, exploration)
-        rights_manager.publish_exploration(self.EDITOR_ID, NEW_EXP_ID)
+        exp_services.save_new_exploration(self.editor_id, exploration)
+        rights_manager.publish_exploration(self.editor_id, NEW_EXP_ID)
 
         response = self.testapp.get('/create/%s' % NEW_EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -268,7 +276,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json('%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, NEW_EXP_ID,
-            threadlist[0]['thread_id']))
+            feedback_services.get_thread_id_from_full_thread_id(
+                threadlist[0]['full_thread_id'])))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
@@ -287,9 +296,10 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         # Get the thread id.
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        thread_id = response_dict['threads'][0]['thread_id']
+        thread_id = response_dict['threads'][0]['full_thread_id']
         thread_url = '%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, thread_id)
+            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, 
+            feedback_services.get_thread_id_from_full_thread_id(thread_id))
 
         def _get_username(n):
             return 'editor%s' % n
@@ -336,3 +346,280 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['messages'][num + 1]['text'],
                 'New Message %s' % num)
+
+
+class SuggestionsIntegrationTests(test_utils.GenericTestBase):
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super(SuggestionsIntegrationTests, self).setUp()
+
+        # Register users.
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)       
+
+        # Load exploration 0.
+        exp_services.delete_demo(self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
+
+        # Login and create exploration and suggestions.        
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Create exploration.
+        self.EXP_ID = 'eid'
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id,
+            title='Exploration for suggestions',
+            category='This is just a test category',
+            objective='Test a suggestion.')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        init_state = exploration.states[exploration.init_state_name]
+        init_interaction = init_state.interaction
+        init_interaction.default_outcome.dest = exploration.init_state_name
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
+        exp_services._save_exploration(self.editor_id, exploration, '', [])
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.editor_id, self.EXP_ID, self.owner_id,
+            rights_manager.ROLE_EDITOR)
+
+        # Create suggestions.
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 3,
+                'state_name': u'State A',
+                'suggestion_content': {
+                    'type': 'text', 'value': u'new accepted suggestion for state A'},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 1,
+                'state_name': u'State 2',
+                'suggestion_content': {
+                    'type': 'text', 'value': 'some new value'},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'State 3',
+                'suggestion_content': {'type': 'text', 'value': ''},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'State A',
+                'suggestion_content': {'type': 'text', 'value': ' '},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 1,
+                'state_name': u'State 2',
+                'suggestion_content': {'type': 'text', 'value': '#!$%'},
+            }, csrf_token)
+        self.post_json(
+            '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
+                'exploration_version': 2,
+                'state_name': u'State 3',
+                'suggestion_content': {'type': 'text', 'value': u'Ֆݓॵক'},
+            }, csrf_token)
+        self.logout()
+
+    def _return_true(self, thread_id, exploration_id):
+        return True
+
+    def _return_false(self, thread_id, exploration_id):
+        return False
+
+    def _return_null(self,  *args):
+        return None
+        
+    def test_create_and_fetch_suggestions(self):
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/create/%s' % self.EXP_ID))
+
+       # Create a thread without suggestions.
+        self.post_json( 
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
+                'state_name': None,
+                'subject': u'New Thread ¡unicode!',
+                'text': 'Message 0'}, csrf_token)     
+
+        # Get a list of open threads without suggestions. 
+        response_dict = self.get_json( 
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID,
+                'open', 'false'))  
+        self.assertEqual(len(response_dict['threads']), 1)       
+ 
+        # Get a list of all threads with suggestions. 
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+        threads = response_dict['threads']
+        self.assertEqual(len(threads), 6)
+
+        # Get a suggestion.
+        full_thread_id =  threads[0]['full_thread_id']
+        thread_id = feedback_services.get_thread_id_from_full_thread_id(
+            full_thread_id)
+        response_dict = self.get_json(
+            '%s/%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID,
+                          thread_id))
+        self.assertEqual(
+            response_dict['suggestion']['id'], full_thread_id)
+ 
+        # Get a list of all threads without suggestions. 
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'false'))
+        threads = response_dict['threads']
+        self.assertEqual(len(threads), 1)
+
+        # Test invalid list type in GET request. We are using testapp.get()
+        # here because get_json() with expect_errors=True does not work as
+        # expected. Please look at the doc string for get_json() for details.
+        response_dict = self.testapp.get(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'invalid', 'true'),
+            status=400, expect_errors=True)
+        self.assertEqual(response_dict.status_int, 400)
+
+        # Pass invalid value for has_suggestion. 
+        response_dict = self.testapp.get(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed', 'invalid'),
+            status=400, expect_errors=True)
+        self.assertEqual(response_dict.status_int, 400)
+
+    def _accept_suggestion(self, thread_id, method_to_call, csrf_token,
+                           expect_errors=False, expected_status_int=200):
+        with self.swap(exp_domain.Exploration, '_verify_all_states_reachable',
+                       self._return_null):
+            with self.swap(exp_domain.Exploration, '_verify_no_dead_ends',
+                           self._return_null):
+                return self.put_json(
+                    '%s/%s/%s' % (feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
+                                  feedback_services.get_thread_id_from_full_thread_id(
+                                      thread_id)), 
+                    {'action': u'accept', 'commit_message': 'message'}, 
+                    csrf_token, expect_errors=expect_errors, 
+                    expected_status_int=expected_status_int)
+
+    def _reject_suggestion(self, thread_id, method_to_call, csrf_token,
+                           expect_errors=False, expected_status_int=200):
+        with self.swap(rights_manager.Actor, 'can_edit',
+                       method_to_call):
+            return self.put_json(
+                '%s/%s/%s' % (feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
+                              feedback_services.get_thread_id_from_full_thread_id(
+                                  thread_id)), 
+                {'action': u'reject'}, csrf_token, expect_errors=expect_errors,
+                expected_status_int=expected_status_int)
+    
+    def test_actions_related_to_suggestions(self):
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/create/%s' % self.EXP_ID))
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+        threads = response_dict['threads']
+        thread_id_for_accepted_suggestion = threads[0]['full_thread_id']
+        thread_id_for_rejected_suggestion = threads[1]['full_thread_id']
+        thread_id_for_unsuccessful_accept = threads[2]['full_thread_id']
+
+        # Accept a suggestion.
+        self._accept_suggestion(
+            thread_id_for_accepted_suggestion, self._return_true, csrf_token)
+        updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            updated_exploration.states['State A'].content[0].to_dict(),
+            {'type': 'text', 'value': u'new accepted suggestion for state A'})
+
+        # Reject a suggestion.
+        self._reject_suggestion(
+            thread_id_for_rejected_suggestion, self._return_true, csrf_token)
+
+        # Get a list of closed threads with suggestion. 
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed', 'true'))
+        self.assertEqual(len(response_dict['threads']), 2)
+
+        # Pass invalid action in the URL.
+        with self.swap(rights_manager.Actor, 'can_edit',
+                       self._return_true):
+            response_dict = self.put_json(
+                '%s/%s/%s' % (feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
+                              feedback_services.get_thread_id_from_full_thread_id(
+                                  thread_id_for_rejected_suggestion)),
+                {'action': u'invalid'}, csrf_token, expect_errors=True,
+                expected_status_int=400)
+        self.assertIn('Invalid action.', response_dict['error'])
+
+        # Editor tries to accept rejected suggestion.
+        exception_msg = 'Suggestion has already been accepted/rejected.'
+        response_dict = self._accept_suggestion(
+            thread_id_for_rejected_suggestion, self._return_true, csrf_token,
+            expect_errors=True, expected_status_int=500)
+        self.assertIn(exception_msg, response_dict['error'])
+
+        # Editor tries to reject accepted suggestion.
+        response_dict = self._reject_suggestion(
+            thread_id_for_rejected_suggestion, self._return_true, csrf_token,
+            expect_errors=True, expected_status_int=500)
+        self.assertIn(exception_msg, response_dict['error'])
+        self.logout()
+
+        # Different editor tries to accept rejected suggestion.
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/create/%s' % self.EXP_ID))
+        response_dict = self._accept_suggestion(
+            thread_id_for_rejected_suggestion, self._return_true, csrf_token,
+            expect_errors=True, expected_status_int=500)
+        self.assertIn(exception_msg, response_dict['error'])
+
+        # Different editor tries to reject accepted suggestion.
+        response_dict = self._reject_suggestion(
+            thread_id_for_rejected_suggestion, self._return_true, csrf_token,
+            expect_errors=True, expected_status_int=500)
+        self.assertIn(exception_msg, response_dict['error'])
+        self.logout()
+
+        # User(non editor) tries to accept a suggestion.
+        self.login(self.VIEWER_EMAIL)
+        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+        response_dict = self._accept_suggestion(
+            thread_id_for_unsuccessful_accept, self._return_false, csrf_token,
+            expect_errors=True, expected_status_int=401)
+        self.assertIn(
+            'You do not have the credentials to edit this exploration.',
+            response_dict['error'])
+        
+        # Get a list of all closed threads with suggestion. 
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'closed', 'true'))
+        threads = response_dict['threads']
+        self.assertEqual(len(threads), 2)
+        
+        # Get a list of all open threads with suggestion. 
+        response_dict = self.get_json(
+            '%s/%s?list_type=%s&has_suggestion=%s' % ( 
+            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'open', 'true'))
+        threads = response_dict['threads']
+        self.assertEqual(len(threads), 4)

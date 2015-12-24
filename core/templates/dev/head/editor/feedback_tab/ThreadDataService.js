@@ -50,7 +50,8 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchMessages = function(threadId) {
-    $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+    $http.get(
+        _THREAD_HANDLER_PREFIX + threadId).success(function(data) {
       for (var i = 0; i < _data.threadList.length; i++) {
         if (_data.threadList[i].thread_id === threadId) {
           _data.threadList[i].messages = data.messages;

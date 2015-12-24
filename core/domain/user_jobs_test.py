@@ -299,9 +299,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_1_ID, None, self.EDITOR_ID, FEEDBACK_THREAD_SUBJECT,
                 'text')
-            thread_id = (
-                feedback_services.get_threadlist(EXP_1_ID)[0]['thread_id'])
-            message = feedback_services.get_messages(thread_id)[0]
+            full_thread_id = feedback_services.get_all_threads(
+                EXP_1_ID, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
+            message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
 
             # User creates another exploration.
             self.save_new_valid_exploration(
@@ -366,9 +368,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = (
-                feedback_services.get_threadlist(EXP_ID)[0]['thread_id'])
-            message = feedback_services.get_messages(thread_id)[0]
+            full_thread_id = feedback_services.get_all_threads(
+                EXP_ID, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
+
+            message = feedback_services.get_messages(
+                EXP_ID, thread_id)[0]
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -434,9 +440,12 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = (
-                feedback_services.get_threadlist(EXP_ID)[0]['thread_id'])
-            message = feedback_services.get_messages(thread_id)[0]
+            full_thread_id = feedback_services.get_all_threads(
+                EXP_ID, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
+            message = feedback_services.get_messages(
+                EXP_ID, thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
@@ -673,10 +682,13 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
-            thread_id = feedback_services.get_threadlist(
-                self.EXP_ID_1)[0]['thread_id']
+            full_thread_id = feedback_services.get_all_threads(
+                self.EXP_ID_1, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
             feedback_services.create_message(
-                thread_id, self.user_c_id, None, None, 'more text')
+                 self.EXP_ID_1, thread_id, self.user_c_id, None, None,
+                 'more text')
 
         self._run_one_off_job()
 
@@ -689,9 +701,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(user_c_subscriptions_model.activity_ids, [])
         self.assertEqual(
-            user_b_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_b_subscriptions_model.feedback_thread_ids, [full_thread_id])
         self.assertEqual(
-            user_c_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_c_subscriptions_model.feedback_thread_ids, [full_thread_id])
 
     def test_exploration_subscription(self):
         with self.swap(
