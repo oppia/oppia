@@ -59,9 +59,9 @@ oppia.controller('ExplorationHistory', [
   $scope.clearAllCheckboxes = function() {
     angular.forEach($scope.versionCheckboxArray, function(versionCheckbox) {
       versionCheckbox.selected = false;
-    }); 
+    });
   };
-  
+
   // Compares the two selected versions and displays the comparison results.
   $scope.compareSelectedVersions = function() {
     if ($scope.selectedVersionsArray.length === 2) {
@@ -79,7 +79,7 @@ oppia.controller('ExplorationHistory', [
     if (!checkbox.checked && selectedVersionsArrayPos !== -1) {
       $scope.selectedVersionsArray.splice(selectedVersionsArrayPos, 1);
     }
-    
+
     if ($scope.selectedVersionsArray.length === 2) {
       // Disable version count prompt if two checkboxes are selected.
       $scope.versionCountPrompt = '';
@@ -112,9 +112,9 @@ oppia.controller('ExplorationHistory', [
        */
       $scope.compareVersions = {};
       $scope.compareVersionMetadata = {};
-      
+
       // Contains the IDs of the versions selected for comparison. Should contain a maximum of two elements.
-      $scope.selectedVersionsArray = []; 
+      $scope.selectedVersionsArray = [];
 
       $scope.hideHistoryGraph = true;
 
@@ -123,7 +123,7 @@ oppia.controller('ExplorationHistory', [
 
       $scope.compareVersionsButtonIsHidden = $scope.comparisonsAreDisabled;
 
-      $scope.versionCountPrompt = "Please select any 2.";  
+      $scope.versionCountPrompt = "Please select any 2.";
 
       $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
         explorationSnapshots = response.data.snapshots;
@@ -146,8 +146,8 @@ oppia.controller('ExplorationHistory', [
             selected: false
           });
         }
-        $rootScope.loadingMessage = ''; 
-      }); 
+        $rootScope.loadingMessage = '';
+      });
 
     });
   };
@@ -451,7 +451,6 @@ oppia.controller('ExplorationHistory', [
 
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
-            warningsData.clear();
           };
         }
       ]
