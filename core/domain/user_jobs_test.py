@@ -300,9 +300,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 EXP_1_ID, None, self.EDITOR_ID, FEEDBACK_THREAD_SUBJECT,
                 'text')
             full_thread_id = feedback_services.get_all_threads(
-                EXP_1_ID, False)[0]['thread_id']
-            thread_id = feedback_services.get_exp_id_thread_id_list(
-                full_thread_id)[1]
+                EXP_1_ID, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
             message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
 
             # User creates another exploration.
@@ -369,9 +369,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
             full_thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0]['thread_id']
-            thread_id = feedback_services.get_exp_id_thread_id_list(
-                full_thread_id)[1]
+                EXP_ID, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
 
             message = feedback_services.get_messages(
                 EXP_ID, thread_id)[0]
@@ -441,9 +441,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
             full_thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0]['thread_id']
-            thread_id = feedback_services.get_exp_id_thread_id_list(
-                full_thread_id)[1]
+                EXP_ID, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
             message = feedback_services.get_messages(
                 EXP_ID, thread_id)[0]
 
@@ -683,9 +683,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
             full_thread_id = feedback_services.get_all_threads(
-                self.EXP_ID_1, False)[0]['thread_id']
-            thread_id = feedback_services.get_exp_id_thread_id_list(
-                full_thread_id)[1]
+                self.EXP_ID_1, False)[0]['full_thread_id']
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                full_thread_id)
             feedback_services.create_message(
                  self.EXP_ID_1, thread_id, self.user_c_id, None, None,
                  'more text')

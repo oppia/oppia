@@ -40,7 +40,7 @@ def _get_thread_dict_from_model_instance(thread):
         'status': thread.status,
         'subject': thread.subject,
         'summary': thread.summary,
-        'thread_id': thread.id}
+        'full_thread_id': thread.id}
 
 
 def _create_models_for_thread_and_first_message(
@@ -78,12 +78,14 @@ def create_thread(
         exploration_id, state_name, original_author_id, subject, text, False)
 
 
-def get_exp_id_thread_id_list(full_thread_id):
-    return full_thread_id.split('.')
+def get_exp_id_from_full_thread_id(full_thread_id):
+    return full_thread_id.split('.')[0]
+
+def get_thread_id_from_full_thread_id(full_thread_id):
+    return full_thread_id.split('.')[1]
 
 
 def _get_message_dict(message_instance):
-    print message_instance.author_id
     return {
         'author_username': (
             user_services.get_username(message_instance.author_id)

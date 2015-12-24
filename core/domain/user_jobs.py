@@ -201,8 +201,8 @@ class RecentUpdatesMRJobManager(
         for exp_model in tracked_exp_models_for_feedback:
             threads = feedback_services.get_all_threads(exp_model.id, False)
             for thread in threads:
-                if thread['thread_id'] not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(thread['thread_id'])
+                if thread['full_thread_id'] not in feedback_thread_ids_list:
+                    feedback_thread_ids_list.append(thread['full_thread_id'])
 
         # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
@@ -216,13 +216,13 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            exp_id_thread_id_list = feedback_services.get_exp_id_thread_id_list(
+            exp_id = feedback_services.get_exp_id_from_full_thread_id(
                 feedback_thread_id)
-            exp_id = exp_id_thread_id_list[0]
-            thead_id = exp_id_thread_id_list[1]
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                feedback_thread_id)
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
-                    exp_id, thead_id))
+                    exp_id, thread_id))
 
             yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
