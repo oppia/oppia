@@ -20,7 +20,7 @@
  */
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
-// separate collectionDataService implementation which returns a local copy of
+// separate CollectionDataService implementation which returns a local copy of
 // the collection instead. This file should not be included on the page in that
 // scenario.
 oppia.factory('CollectionDataService', [
