@@ -116,7 +116,7 @@
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom" tooltip-append-to-body="true" ng-click="selectFeedbackTab()">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
@@ -141,9 +141,9 @@
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish to Gallery">&#xE2C3;</i>
-          <span class="hidden-sm hidden-xs">Publish to Gallery</span>
+          <span class="oppia-save-publish-button-label">Publish to Gallery</span>
         </button>
       </div>
     </li>
@@ -154,14 +154,14 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
-              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Draft">&#xE161;</i>
-              <span class="hidden-sm hidden-xs">Save Draft</span>
+              <span class="oppia-save-publish-button-label">Save Draft</span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
-              <i class="material-icons md-18 md-dark visible-sm visible-xs oppia-save-publish-button-icon"
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish Changes">&#xE2C3;</i>
-              <span class="hidden-sm hidden-xs">Publish Changes</span>
+              <span class="oppia-save-publish-button-label">Publish Changes</span>
             </span>
             <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
           </span>
@@ -213,23 +213,6 @@
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/deleteExploration">
-      <div class="modal-header">
-        <h3>Delete Exploration</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          Really delete this exploration? <strong>This action cannot be reversed.</strong>
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
-      </div>
-    </script>
-
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">
         <h3>
@@ -241,7 +224,7 @@
         <p>
           <span ng-if="isExplorationPrivate">(Optional)</span>
           Please enter a brief description of what you have changed:
-          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input"></textarea>
+          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
         </p>
 
         <div ng-if="explorationChangesExist">
@@ -316,7 +299,7 @@
       </div>
     </script>
 
-    <div class="container-fluid" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
+    <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
@@ -402,6 +385,7 @@
   {% include 'components/gadget_panel.html' %}
   {% include 'components/response_header.html' %}
   {% include 'components/outcome_editor.html' %}
+  {% include 'components/fallback_editor.html' %}
   {% include 'components/param_changes_editor.html' %}
   {% include 'components/profile_link.html' %}
   {% include 'components/visualizations.html' %}
@@ -423,6 +407,7 @@
     {{ include_js_file('components/gadgetPanel.js') }}
     {{ include_js_file('components/responseHeader.js') }}
     {{ include_js_file('components/outcomeEditor.js') }}
+    {{ include_js_file('components/fallbackEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('services/explorationContextService.js') }}
     {{ include_js_file('services/explorationServices.js') }}
@@ -440,13 +425,16 @@
     {{ include_js_file('editor/SidebarStateName.js') }}
     {{ include_js_file('editor/StateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
+    {{ include_js_file('editor/StateFallbacks.js') }}
     {{ include_js_file('editor/StateResponses.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/GadgetValidationService.js') }}
     {{ include_js_file('editor/GadgetEditor.js') }}
     {{ include_js_file('editor/StateInteraction.js') }}
+    {{ include_js_file('player/AnswerClassificationService.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
+    {{ include_js_file('player/PlayerTranscriptService.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
     {{ include_js_file('components/answerGroupEditor.js') }}

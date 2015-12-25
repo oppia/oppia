@@ -1,32 +1,40 @@
 <link rel="stylesheet" type="text/css" href="/extensions/interactions/EndExploration/static/css/EndExploration.css">
 
 <script type="text/ng-template" id="interaction/EndExploration">
-  <div ng-if="recommendedExplorationIds.length > 0">
-    Other explorations you might enjoy:
-    <div style="color: red;" ng-repeat="expId in invalidExpIds" ng-if="isInEditorPreviewMode">
+  <div ng-if="recommendedExplorationIds.length > 0 || (isInEditorPage && invalidExpIds.length > 0)">
+    <span ng-if="!collectionId">Other explorations you might enjoy:</span>
+    <span ng-if="collectionId">Continue &#39;<[collectionTitle]>&#39;:</span>
+    <div style="color: red;" ng-repeat="expId in invalidExpIds">
       <strong>Error:</strong> no published exploration found with ID '<[expId]>'
     </div>
+
     <div layout="row" layout-wrap>
-      <md-card class="oppia-end-exploration-recommendation-card" ng-repeat="expId in recommendedExplorationIds track by $index">
-        <a ng-href="/explore/<[expId]>" target="<[isIframed ? '_blank' : '_self']>" ng-if="recommendedExplorationSummaries[$index]">
-          <img class="oppia-end-exploration-recommendation-image" ng-src="<[recommendedExplorationSummaries[$index].thumbnail_image_url]>">
-          <div class="oppia-end-exploration-recommendation-title">
-            <[recommendedExplorationSummaries[$index].title]>
-          </div>
-        </a>
-      </md-card>
+      <div ng-repeat="expId in recommendedExplorationIds track by $index">
+        <exploration-summary-tile ng-if="recommendedExplorationSummaries[$index]"
+                                  collection-id="collectionId"
+                                  exploration-id="expId"
+                                  exploration-title="recommendedExplorationSummaries[$index].title"
+                                  last-updated-msec="recommendedExplorationSummaries[$index].last_updated"
+                                  objective="recommendedExplorationSummaries[$index].objective"
+                                  category=" recommendedExplorationSummaries[$index].category"
+                                  ratings="recommendedExplorationSummaries[$index].ratings"
+                                  thumbnail-icon-url="recommendedExplorationSummaries[$index].thumbnail_icon_url"
+                                  thumbnail-bg-color="recommendedExplorationSummaries[$index].thumbnail_bg_color"
+                                  ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
+        </exploration-summary-tile>
+      </div>
     </div>
   </div>
 
-  <div ng-if="!isIframed">
-    <a href="/" ng-if="!isInEditorPreviewMode">
+  <div ng-if="!isIframed && !isInEditorPreviewMode && recommendedExplorationIds.length === 0 && (!isInEditorPage || invalidExpIds.length === 0)">
+    <a ng-href="/collection/<[collectionId]>" ng-if="collectionId">
       <md-button class="md-button-success">
-        Return to gallery
+        Return to <[collectionTitle]>
       </md-button>
     </a>
-    <a href="#/gui" ng-if="isInEditorPreviewMode">
-      <md-button class="md-button-success">
-        Return to editor
+    <a href="/">
+      <md-button class="md-button-success" ng-if="!collectionId">
+        Return to gallery
       </md-button>
     </a>
   </div>

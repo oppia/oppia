@@ -45,7 +45,7 @@ oppia.controller('ExplorationSettings', [
 
   $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-  var GALLERY_PAGE_URL = '/gallery';
+  var MY_EXPLORATIONS_PAGE_URL = '/my_explorations';
   var EXPLORE_PAGE_PREFIX = '/explore/';
 
   $scope.getExplorePageUrl = function() {
@@ -147,11 +147,15 @@ oppia.controller('ExplorationSettings', [
     explorationAdvancedFeaturesService.areParametersEnabled);
   $scope.areGadgetsEnabled = (
     explorationAdvancedFeaturesService.areGadgetsEnabled);
+  $scope.areFallbacksEnabled = (
+    explorationAdvancedFeaturesService.areFallbacksEnabled);
 
   $scope.enableParameters = (
     explorationAdvancedFeaturesService.enableParameters);
   $scope.enableGadgets = (
     explorationAdvancedFeaturesService.enableGadgets);
+  $scope.enableFallbacks = (
+    explorationAdvancedFeaturesService.enableFallbacks);
 
   /********************************************
   * Methods for rights management.
@@ -238,21 +242,75 @@ oppia.controller('ExplorationSettings', [
         deleteUrl += ('?role=' + role);
       }
       $http['delete'](deleteUrl).success(function(data) {
-        $window.location = GALLERY_PAGE_URL;
+        $window.location = MY_EXPLORATIONS_PAGE_URL;
       });
     });
   };
 
-  $scope.publicizeExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_publicized: true});
+  var openModalForModeratorAction = function(action) {
+    warningsData.clear();
+
+    $http.get('/moderatorhandler/email_draft/' + action).then(function(response) {
+      // If the draft email body is empty, email functionality will not be
+      // exposed to the mdoerator.
+      var draftEmailBody = response.data.draft_email_body;
+
+      $modal.open({
+        templateUrl: 'modals/takeModeratorAction',
+        backdrop: true,
+        resolve: {
+          draftEmailBody: function() {
+            return draftEmailBody;
+          }
+        },
+        controller: [
+            '$scope', '$modalInstance', 'draftEmailBody',
+            function($scope, $modalInstance, draftEmailBody) {
+          $scope.action = action;
+          $scope.willEmailBeSent = Boolean(draftEmailBody);
+          $scope.emailBody = draftEmailBody;
+
+          if ($scope.willEmailBeSent) {
+            $scope.EMAIL_BODY_SCHEMA = {
+              type: 'unicode',
+              ui_config: {
+                rows: 20
+              }
+            };
+          }
+
+          $scope.reallyTakeAction = function() {
+            $modalInstance.close({
+              emailBody: $scope.emailBody
+            });
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }]
+      }).result.then(function(result) {
+        explorationRightsService.saveModeratorChangeToBackend(
+          action, result.emailBody);
+      });
+    });
   };
 
-  $scope.unpublicizeExploration = function() {
+  $scope.unpublishExplorationAsModerator = function() {
+    openModalForModeratorAction('unpublish_exploration');
+  };
+
+  $scope.publicizeExplorationAsModerator = function() {
+    openModalForModeratorAction('publicize_exploration');
+  };
+
+  $scope.unpublicizeExplorationAsModerator = function() {
+    // TODO(sll): Migrate this and deleteExplorationAsModerator to the
+    // 'moderator action' path, and implement an option for different actions
+    // saying whether emails should be sent for these, or not. At present,
+    // we don't expect to send an email when an exploration is unpublicized.
     explorationRightsService.saveChangeToBackend({is_publicized: false});
-  };
-
-  $scope.unpublishExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_public: false});
   };
 
   $scope.isExplorationLockedForEditing = function() {

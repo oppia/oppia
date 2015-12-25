@@ -41,17 +41,11 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.string_classifier.load_examples(self._EXAMPLES_TRAIN)
 
     def _validate_instance(self, string_classifier):
-        self.assertEquals('_alpha' in dir(self.string_classifier), True)
-        self.assertEquals('_beta' in dir(self.string_classifier), True)
-        self.assertEquals(
-            '_prediction_threshold' in
-            dir(self.string_classifier), True)
-        self.assertEquals(
-            '_training_iterations' in
-            dir(self.string_classifier), True)
-        self.assertEquals(
-            '_prediction_iterations' in
-            dir(self.string_classifier), True)
+        self.assertIn('_alpha', dir(self.string_classifier))
+        self.assertIn('_beta', dir(self.string_classifier))
+        self.assertIn('_prediction_threshold', dir(self.string_classifier))
+        self.assertIn('_training_iterations', dir(self.string_classifier))
+        self.assertIn('_prediction_iterations', dir(self.string_classifier))
 
         for d in xrange(self.string_classifier._num_docs):
             self.assertEquals(
@@ -211,7 +205,18 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
             self.string_classifier._get_prediction_report_for_doc(-1))
         self.assertEquals(prediction_report['prediction_label_id'], 1)
 
-    def test_training(self):
+    def test_predict_label_for_doc(self):
+        """This test ensures that the predictor is predicting the labels that
+        are provided (in this case, 'food', 'pets', and the generic label
+        '_default'). This test does not cover prediction accuracy, so
+        _DEFAULT_MIN_DOCS_TO_PREDICT and _DEFAULT_MIN_LABELS_TO_PREDICT have
+        been set to zero. This allows the predictor to predict on smaller data
+        sets, which is useful for testing purposes. Setting the above constants
+        to zero is not recommended in a serving system.
+        """
+        self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
+        self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
+
         doc_ids = self.string_classifier.add_examples_for_predicting(
             self._EXAMPLES_TEST)
         predicted_label = self.string_classifier.predict_label_for_doc(

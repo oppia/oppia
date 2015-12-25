@@ -1,0 +1,13 @@
+<script type="text/ng-template" id="inline/collection_node_list_directive">
+  <exploration-summary-tile ng-repeat="collection_node in getCollectionNodes()"
+                            collection-id="getCollectionId()"
+                            exploration-id="collection_node.exploration.id"
+                            exploration-title="collection_node.exploration.title"
+                            last-updated-msec="collection_node.exploration.last_updated_msec"
+                            objective="collection_node.exploration.objective"
+                            category="collection_node.exploration.category"
+                            ratings="collection_node.exploration.ratings"
+                            thumbnail-icon-url="collection_node.exploration.thumbnail_icon_url"
+                            thumbnail-bg-color="collection_node.exploration.thumbnail_bg_color">
+  </exploration-summary-tile>
+</script>

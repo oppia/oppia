@@ -45,13 +45,13 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
     if (areAnyChoicesEmpty) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the choices are nonempty.'
+        message: 'Please ensure the choices are nonempty.'
       });
     }
     if (areAnyChoicesDuplicated) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'please ensure the choices are unique.'
+        message: 'Please ensure the choices are unique.'
       });
     }
 
@@ -67,7 +67,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
           } else {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
-              message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+              message: 'Please ensure rule ' + String(j + 1) + ' in group ' +
                 String(i + 1) + ' is not equaling the same multiple choice ' +
                 'option as another rule.'
             });
@@ -75,7 +75,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
           if (ruleSpecs[j].inputs.x >= numChoices) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
-              message: 'please ensure rule ' + String(j + 1) + ' in group ' +
+              message: 'Please ensure rule ' + String(j + 1) + ' in group ' +
                 String(i + 1) + ' refers to a valid choice.'
             });
           }
@@ -93,7 +93,7 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
-            'please clarify the default outcome so it is less confusing to ' +
+            'Please clarify the default outcome so it is less confusing to ' +
             'the user.')
         });
       }

@@ -403,9 +403,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $scope.isDiscardInProgress = true;
         changeListService.discardAllChanges();
         $rootScope.$broadcast('initExplorationPage', function() {
-          // The $apply() is needed to call all the exploration field $watch()
-          // methods before flipping isDiscardInProgress.
-          $scope.$apply();
           $scope.lastSaveOrDiscardAction = 'discard';
           $scope.isDiscardInProgress = false;
         });
@@ -631,6 +628,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                   'Confirmed unclassified answers'),
                 content: 'Content',
                 default_outcome: 'Default outcome',
+                fallbacks: 'Fallbacks',
                 name: 'Card name',
                 param_changes: 'Parameter changes',
                 widget_customization_args: 'Interaction customizations',
@@ -652,7 +650,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               // TODO(sll): Implement this fully. Currently there is no sorting.
               $scope.ORDERED_STATE_PROPERTIES = [
                 'name', 'param_changes', 'content', 'widget_id',
-                'widget_customization_args', 'answer_groups', 'default_outcome'
+                'widget_customization_args', 'answer_groups',
+                'default_outcome', 'fallbacks'
               ];
 
               $scope.explorationChangesExist = !$.isEmptyObject(

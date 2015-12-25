@@ -123,8 +123,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
-            'customization_arg_specs', 'is_trainable', 'is_terminal',
-            'is_linear', 'rule_descriptions', 'instructions', 'needs_summary',
+            'customization_arg_specs', 'is_trainable',
+            'is_string_classifier_trainable', 'is_terminal', 'is_linear',
+            'rule_descriptions', 'instructions', 'needs_summary',
             'default_outcome_heading'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
@@ -169,8 +170,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # In this directory there should only be a config .py file, an
             # html file, a JS file, a validator.js file,  a directory named
             # 'static' that contains (at least) a .png thumbnail file,
-            # (optionally) a JS test spec file, (optionally) a
-            # stats_response.html file and (optionally) a protractor.js file.
+            # (optionally) a JS test spec file, (optionally) a JS test spec
+            # file for rules, (optionally) a stats_response.html file and
+            # (optionally) a protractor.js file.
             dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
@@ -185,6 +187,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir, '%sSpec.js' % interaction_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir, '%sRulesServiceSpec.js' % interaction_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass

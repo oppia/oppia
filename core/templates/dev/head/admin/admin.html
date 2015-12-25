@@ -41,6 +41,22 @@
       </button>
     </div>
 
+    <br>
+
+    <h3>Reload a single collection</h3>
+    <div class="container" style="margin-left: 0;">
+      {% for collection in demo_collections %}
+        <div class="row protractor-test-reload-collection-row">
+          <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
+            {{collection[1]}}
+          </span>
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <button type="button" class="btn btn-default protractor-test-reload-collection-button" ng-click="reloadCollection({{collection[0]}})">
+              Reload
+            </button>
+          </span>
+        </div>
+      {% endfor %}
     <h3>Jobs</h3>
 
     <h4>Current time: {{human_readable_current_time}}</h4>
@@ -223,7 +239,7 @@
 
     {% if DEV_MODE %}
       <div class="oppia-dev-mode">
-        Development Mode
+        Dev Mode
       </div>
     {% endif %}
 

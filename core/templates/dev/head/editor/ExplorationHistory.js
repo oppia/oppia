@@ -35,23 +35,68 @@ oppia.controller('ExplorationHistory', [
    * whose values are objects containing data of that revision (that is to be
    * displayed) with the keys 'committerId', 'createdOn', 'commitMessage', and
    * 'versionNumber'. It contains a maximum of 30 versions.
-   * snapshotOrderArray is an array of the version numbers of the revisions to
+   * versionCheckboxArray is an array of the version numbers of the revisions to
    * be displayed on the page, in the order they are displayed in.
    * nodesData is an object whose keys are nodeIds (assigned in version
    * comparison), and whose values are an object containing 'newestStateName',
    * 'originalStateName' and 'stateProperty'.
    */
+
   $scope.explorationVersionMetadata = null;
-  $scope.snapshotOrderArray = [];
+  $scope.versionCheckboxArray = [];
   var explorationSnapshots = null;
   var versionTreeParents = null;
   var nodesData = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
+    $scope.clearAllCheckboxes();
     if (data.forceRefresh || $scope.explorationVersionMetadata === null) {
       $scope.refreshVersionHistory();
     }
   });
+
+  // Uncheck all checkboxes when page is refreshed
+  $scope.clearAllCheckboxes = function() {
+    angular.forEach($scope.versionCheckboxArray, function(versionCheckbox) {
+      versionCheckbox.selected = false;
+    });
+  };
+
+  // Compares the two selected versions and displays the comparison results.
+  $scope.compareSelectedVersions = function() {
+    if ($scope.selectedVersionsArray.length === 2) {
+      $scope.changeCompareVersion();
+      $scope.showHistoryGraph();
+    }
+  };
+  // Changes the checkbox selection and provides an appropriate user prompt.
+  $scope.changeSelectedVersions = function(evt, versionNumber) {
+    var checkbox = evt.target;
+    var selectedVersionsArrayPos = $scope.selectedVersionsArray.indexOf(versionNumber);
+    if (checkbox.checked && selectedVersionsArrayPos === -1) {
+      $scope.selectedVersionsArray.push(versionNumber);
+    }
+    if (!checkbox.checked && selectedVersionsArrayPos !== -1) {
+      $scope.selectedVersionsArray.splice(selectedVersionsArrayPos, 1);
+    }
+
+    if ($scope.selectedVersionsArray.length === 2) {
+      // Disable version count prompt if two checkboxes are selected.
+      $scope.versionCountPrompt = '';
+    }
+    else if (!$scope.comparisonsAreDisabled) {
+
+      $scope.hideHistoryGraph = true;
+      $scope.compareVersionsButtonIsHidden = false;
+
+      if ($scope.selectedVersionsArray.length === 0) {
+        $scope.versionCountPrompt = "Please select any two.";
+      }
+      else if ($scope.selectedVersionsArray.length === 1) {
+        $scope.versionCountPrompt = "Please select one more.";
+      }
+    }
+  };
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
@@ -59,9 +104,6 @@ oppia.controller('ExplorationHistory', [
     explorationData.getData().then(function(data) {
       var currentVersion = data.version;
       /**
-       * $scope.compareVersions is an object with keys 'selectedVersion1' and
-       * 'selectedVersion2', whose values are the version numbers of the
-       * compared versions selected on the left and right radio buttons.
        * $scope.compareVersionMetadata is an object with keys 'earlierVersion' and
        * 'laterVersion' whose values are the metadata of the compared versions,
        * containing 'committerId', 'createdOn', 'commitMessage', and 'versionNumber'.
@@ -71,16 +113,25 @@ oppia.controller('ExplorationHistory', [
       $scope.compareVersions = {};
       $scope.compareVersionMetadata = {};
 
+      // Contains the IDs of the versions selected for comparison. Should contain a maximum of two elements.
+      $scope.selectedVersionsArray = [];
+
       $scope.hideHistoryGraph = true;
-      $scope.hideCompareVersionsButton = false;
+
+      // Disable all comparisons if there are less than two revisions in total.
+      $scope.comparisonsAreDisabled = (currentVersion < 2);
+
+      $scope.compareVersionsButtonIsHidden = $scope.comparisonsAreDisabled;
+
+      $scope.versionCountPrompt = "Please select any 2.";
 
       $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
         explorationSnapshots = response.data.snapshots;
         versionsTreeService.init(explorationSnapshots);
 
-        // Re-populate snapshotOrderArray and explorationVersionMetadata when
+        // Re-populate versionCheckboxArray and explorationVersionMetadata when
         // history is refreshed.
-        $scope.snapshotOrderArray = [];
+        $scope.versionCheckboxArray = [];
         $scope.explorationVersionMetadata = {};
         for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
           $scope.explorationVersionMetadata[explorationSnapshots[i].version_number] = {
@@ -90,11 +141,14 @@ oppia.controller('ExplorationHistory', [
             'commitMessage': explorationSnapshots[i].commit_message,
             'versionNumber': explorationSnapshots[i].version_number
           };
-          $scope.snapshotOrderArray.push(explorationSnapshots[i].version_number);
+          $scope.versionCheckboxArray.push({
+            vnum: explorationSnapshots[i].version_number,
+            selected: false
+          });
         }
-
         $rootScope.loadingMessage = '';
       });
+
     });
   };
 
@@ -120,112 +174,108 @@ oppia.controller('ExplorationHistory', [
 
   // Function to set compared version metadata, download YAML and generate
   // diff graph and legend when selection is changed
-  $scope.changeCompareVersion = function(versionNumber, changedVersion) {
+  $scope.changeCompareVersion = function() {
     $scope.diffGraphData = null;
 
-    if ($scope.compareVersions.selectedVersion1 !== undefined &&
-        $scope.compareVersions.selectedVersion2 !== undefined) {
-      var earlierComparedVersion = Math.min($scope.compareVersions.selectedVersion1,
-        $scope.compareVersions.selectedVersion2);
-      var laterComparedVersion = Math.max($scope.compareVersions.selectedVersion1,
-        $scope.compareVersions.selectedVersion2);
-      $scope.compareVersionMetadata.earlierVersion =
-        $scope.explorationVersionMetadata[earlierComparedVersion];
-      $scope.compareVersionMetadata.laterVersion =
-        $scope.explorationVersionMetadata[laterComparedVersion];
+    var earlierComparedVersion = Math.min($scope.selectedVersionsArray[0], $scope.selectedVersionsArray[1]);
+    var laterComparedVersion = Math.max($scope.selectedVersionsArray[0], $scope.selectedVersionsArray[1]);
 
-      compareVersionsService.getDiffGraphData(earlierComparedVersion,
-          laterComparedVersion).then(function(response) {
-        $log.info('Retrieved version comparison data');
-        $log.info(response);
+    $scope.compareVersionMetadata.earlierVersion =
+      $scope.explorationVersionMetadata[earlierComparedVersion];
+    $scope.compareVersionMetadata.laterVersion =
+      $scope.explorationVersionMetadata[laterComparedVersion];
 
-        var STATE_PROPERTY_ADDED = 'added';
-        var STATE_PROPERTY_DELETED = 'deleted';
-        var STATE_PROPERTY_CHANGED = 'changed';
-        var STATE_PROPERTY_UNCHANGED = 'unchanged';
-        _stateTypeUsed[NODE_TYPE_ADDED] = false;
-        _stateTypeUsed[NODE_TYPE_DELETED] = false;
-        _stateTypeUsed[NODE_TYPE_CHANGED] = false;
-        _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
-        _stateTypeUsed[NODE_TYPE_RENAMED] = false;
-        _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
+    compareVersionsService.getDiffGraphData(earlierComparedVersion,
+        laterComparedVersion).then(function(response) {
+      $log.info('Retrieved version comparison data');
+      $log.info(response);
 
-        var diffGraphNodes = {};
-        $scope.diffGraphSecondaryLabels = {};
-        $scope.diffGraphNodeColors = {};
+      var STATE_PROPERTY_ADDED = 'added';
+      var STATE_PROPERTY_DELETED = 'deleted';
+      var STATE_PROPERTY_CHANGED = 'changed';
+      var STATE_PROPERTY_UNCHANGED = 'unchanged';
+      _stateTypeUsed[NODE_TYPE_ADDED] = false;
+      _stateTypeUsed[NODE_TYPE_DELETED] = false;
+      _stateTypeUsed[NODE_TYPE_CHANGED] = false;
+      _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
+      _stateTypeUsed[NODE_TYPE_RENAMED] = false;
+      _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
 
-        nodesData = response.nodes;
-        for (var nodeId in nodesData) {
-          if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
+      var diffGraphNodes = {};
+      $scope.diffGraphSecondaryLabels = {};
+      $scope.diffGraphNodeColors = {};
+
+      nodesData = response.nodes;
+      for (var nodeId in nodesData) {
+        if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
+          diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+          $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
+          _stateTypeUsed[NODE_TYPE_ADDED] = true;
+        } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_DELETED) {
+          diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+          $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
+          _stateTypeUsed[NODE_TYPE_DELETED] = true;
+        } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_CHANGED) {
+          diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+          $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
+          if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
+            $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+              nodesData[nodeId].originalStateName + ')';
             diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
-            _stateTypeUsed[NODE_TYPE_ADDED] = true;
-          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_DELETED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
-            _stateTypeUsed[NODE_TYPE_DELETED] = true;
-          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_CHANGED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
-            if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
-              $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-                nodesData[nodeId].originalStateName + ')';
-              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-              _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
-            } else {
-              _stateTypeUsed[NODE_TYPE_CHANGED] = true;
-            }
-          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_UNCHANGED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
-            if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
-              $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-                nodesData[nodeId].originalStateName + ')';
-              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-              $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
-              _stateTypeUsed[NODE_TYPE_RENAMED] = true;
-            } else {
-              _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
-            }
+            _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
           } else {
-            throw new Error('Invalid state property.');
+            _stateTypeUsed[NODE_TYPE_CHANGED] = true;
+          }
+        } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_UNCHANGED) {
+          diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+          $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
+          if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
+            $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+              nodesData[nodeId].originalStateName + ')';
+            diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
+            _stateTypeUsed[NODE_TYPE_RENAMED] = true;
+          } else {
+            _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
+          }
+        } else {
+          throw new Error('Invalid state property.');
+        }
+      }
+
+      $scope.v1InitStateId = response.v1InitStateId;
+
+      $scope.diffGraphData = {
+        'nodes': diffGraphNodes,
+        'links': response.links,
+        'initStateId': response.v2InitStateId,
+        'finalStateIds': response.finalStateIds
+      };
+
+      // Generate the legend graph
+      $scope.legendGraph = {
+        'nodes': {},
+        'links': []
+      };
+      var _lastUsedStateType = null;
+      for (var stateProperty in _stateTypeUsed) {
+        if (_stateTypeUsed[stateProperty]) {
+          $scope.legendGraph.nodes[stateProperty] = stateProperty;
+          if (_lastUsedStateType) {
+            $scope.legendGraph.links.push({
+              'source': _lastUsedStateType,
+              'target': stateProperty,
+              'linkProperty': 'hidden'
+            });
+          }
+          _lastUsedStateType = stateProperty;
+          if (!$scope.legendGraph.hasOwnProperty('initStateId')) {
+            $scope.legendGraph.initStateId = stateProperty;
           }
         }
-
-        $scope.v1InitStateId = response.v1InitStateId;
-
-        $scope.diffGraphData = {
-          'nodes': diffGraphNodes,
-          'links': response.links,
-          'initStateId': response.v2InitStateId,
-          'finalStateIds': response.finalStateIds
-        };
-
-        // Generate the legend graph
-        $scope.legendGraph = {
-          'nodes': {},
-          'links': []
-        };
-        var _lastUsedStateType = null;
-        for (var stateProperty in _stateTypeUsed) {
-          if (_stateTypeUsed[stateProperty]) {
-            $scope.legendGraph.nodes[stateProperty] = stateProperty;
-            if (_lastUsedStateType) {
-              $scope.legendGraph.links.push({
-                'source': _lastUsedStateType,
-                'target': stateProperty,
-                'linkProperty': 'hidden'
-              });
-            }
-            _lastUsedStateType = stateProperty;
-            if (!$scope.legendGraph.hasOwnProperty('initStateId')) {
-              $scope.legendGraph.initStateId = stateProperty;
-            }
-          }
-        }
-        $scope.legendGraph.finalStateIds = [_lastUsedStateType];
-      });
-    }
+      }
+      $scope.legendGraph.finalStateIds = [_lastUsedStateType];
+    });
   };
 
   $scope.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
@@ -252,11 +302,16 @@ oppia.controller('ExplorationHistory', [
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
     return (
-      $scope.compareVersions &&
-      $scope.compareVersions.hasOwnProperty('selectedVersion1') &&
-      $scope.compareVersions.hasOwnProperty('selectedVersion2'));
+      $scope.compareVersions && $scope.selectedVersionsArray.length === 2);
   };
 
+  // Check if other checkboxes should be disabled once two are selected.
+  $scope.isCheckboxDisabled = function(versionNumber) {
+    if ($scope.selectedVersionsArray.length === 2) {
+      return ($scope.selectedVersionsArray.indexOf(versionNumber) == -1);
+    }
+    return false;
+  };
   // Downloads the zip file for an exploration.
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     // Note that this opens (and then immediately closes) a new tab. If we do
@@ -267,7 +322,7 @@ oppia.controller('ExplorationHistory', [
   // Functions to show history state graph
   $scope.showHistoryGraph = function() {
     $scope.hideHistoryGraph = false;
-    $scope.hideCompareVersionsButton = true;
+    $scope.compareVersionsButtonIsHidden = true;
   };
 
   // Functions to show modal of history diff of a state
@@ -396,7 +451,6 @@ oppia.controller('ExplorationHistory', [
 
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
-            warningsData.clear();
           };
         }
       ]

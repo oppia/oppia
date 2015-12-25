@@ -161,6 +161,12 @@
                             </a>
                             <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                                  <strong>{{username}}</strong>
+                                </a>
+                              </li>
+                              <hr class="oppia-top-right-menu-item-separator">
+                              <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
                                   My Explorations
                                 </a>
@@ -191,6 +197,7 @@
                                   </a>
                                 </li>
                               {% endif %}
+                              <hr class="oppia-top-right-menu-item-separator">
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
                               </li>
@@ -238,17 +245,27 @@
         </div>
       </div>
 
-    {% if DEV_MODE %}
-      <div class="oppia-dev-mode">
-        Development Mode
-      </div>
-    {% endif %}
+      {% if DEV_MODE %}
+        <div class="oppia-dev-mode">
+          Dev Mode
+        </div>
+      {% endif %}
 
+      {% if SITE_FEEDBACK_FORM_URL %}
+        <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
+           class="oppia-site-feedback oppia-transition-200">
+          <i class="material-icons md-18" style="vertical-align: middle;">&#xE87F;</i>
+            Site Feedback
+          </i>
+        </a>
+      {% endif %}
     {% endif %}
 
     {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
+    {% include 'components/exploration_summary_tile.html' %}
+    {% include 'components/ratings.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -264,6 +281,8 @@
       {{ include_js_file('/expressions/evaluator.js') }}
       {{ include_js_file('/expressions/parser.js') }}
       {{ include_js_file('components/objectEditor.js') }}
+      {{ include_js_file('components/ratings.js')}}
+      {{ include_js_file('components/explorationSummaryTile.js') }}
       {{ OBJECT_EDITORS_JS }}
     </script>
 

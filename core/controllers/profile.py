@@ -18,6 +18,7 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import exp_services
 from core.domain import user_services
 import feconf
 import utils
@@ -42,8 +43,10 @@ def require_user_id_else_redirect_to_homepage(handler):
     return test_login
 
 
-class ViewProfilePage(base.BaseHandler):
-    """The (view-only) profile page."""
+class ProfilePage(base.BaseHandler):
+    """The world-viewable profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'profile'
 
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
@@ -51,16 +54,61 @@ class ViewProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
+
         if not user_settings:
             raise self.PageNotFoundException
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
-            'user_username': username,
-            'user_bio': user_settings.user_bio,
-            'user_pic_data_url': user_settings.profile_picture_data_url
+            'PROFILE_USERNAME': username,
         })
         self.render_template('profile/profile.html')
+
+
+class ProfileHandler(base.BaseHandler):
+    """Provides data for the profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'profile'
+
+    def get(self, username):
+        """Handles GET requests."""
+        if not username:
+            raise self.PageNotFoundException
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if not user_settings:
+            raise self.PageNotFoundException
+
+        created_exploration_summary_dicts = []
+        edited_exploration_summary_dicts = []
+
+        user_contributions = user_services.get_user_contributions(
+            user_settings.user_id)
+        if user_contributions:
+            created_exploration_summary_dicts = (
+                exp_services.get_displayable_exp_summary_dicts_matching_ids(
+                    user_contributions.created_exploration_ids,
+                    user_settings.user_id))
+            edited_exploration_summary_dicts = (
+                exp_services.get_displayable_exp_summary_dicts_matching_ids(
+                    user_contributions.edited_exploration_ids,
+                    user_settings.user_id))
+
+        self.values.update({
+            'user_bio': user_settings.user_bio,
+            'subject_interests': user_settings.subject_interests,
+            'first_contribution_msec': (
+                user_settings.first_contribution_msec
+                if user_settings.first_contribution_msec else None),
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'user_impact_score':user_services.get_user_impact_score(
+                user_settings.user_id),
+            'created_exploration_summary_dicts': (
+                created_exploration_summary_dicts),
+            'edited_exploration_summary_dicts': (
+                edited_exploration_summary_dicts)
+        })
+        self.render_json(self.values)
 
 
 class PreferencesPage(base.BaseHandler):
@@ -96,6 +144,7 @@ class PreferencesHandler(base.BaseHandler):
             'preferred_language_codes': user_settings.preferred_language_codes,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
+            'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': user_services.get_email_preferences(
                 self.user_id)['can_receive_email_updates'],
         })
@@ -109,6 +158,8 @@ class PreferencesHandler(base.BaseHandler):
 
         if update_type == 'user_bio':
             user_services.update_user_bio(self.user_id, data)
+        elif update_type == 'subject_interests':
+            user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'profile_picture_data_url':
@@ -118,6 +169,8 @@ class PreferencesHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
+
+        self.render_json({})
 
 
 class ProfilePictureHandler(base.BaseHandler):

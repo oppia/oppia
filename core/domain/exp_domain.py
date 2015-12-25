@@ -29,7 +29,6 @@ import logging
 import re
 import string
 
-from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
@@ -55,6 +54,7 @@ STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
+STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 # These two properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -182,6 +182,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+        STATE_PROPERTY_INTERACTION_FALLBACKS,
         STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (
@@ -527,7 +528,11 @@ class AnswerGroup(object):
         self.outcome = outcome
 
     def validate(self, obj_type, exp_param_specs_dict):
-        # Rule validation.
+        """Rule validation.
+
+        Verifies that all rule classes are valid, and that the AnswerGroup only
+        has one fuzzy rule.
+        """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
@@ -538,7 +543,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
+        seen_fuzzy_rule = False
         for rule_spec in self.rule_specs:
+            rule_class = None
             try:
                 rule_class = next(
                     r for r in all_rule_classes
@@ -546,12 +553,26 @@ class AnswerGroup(object):
             except StopIteration:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
+            if rule_class.__name__ == rule_domain.FUZZY_RULE_TYPE:
+                if seen_fuzzy_rule:
+                    raise utils.ValidationError(
+                        'AnswerGroups can only have one fuzzy rule.')
+                seen_fuzzy_rule = True
 
             rule_spec.validate(
                 rule_domain.get_param_list(rule_class.description),
                 exp_param_specs_dict)
 
         self.outcome.validate()
+
+    def get_fuzzy_rule_index(self):
+        """Will return the answer group's fuzzy rule index, or None if it
+        doesn't exist.
+        """
+        for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
+            if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                return rule_spec_index
+        return None
 
 
 class TriggerInstance(object):
@@ -690,15 +711,25 @@ class InteractionInstance(object):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
-    def get_all_outcomes(self):
-        """Returns a list of all outcomes of this interaction, taking into
-        consideration every answer group and the default outcome.
+    def get_all_non_fallback_outcomes(self):
+        """Returns a list of all non-fallback outcomes of this interaction, i.e.
+        every answer group and the default outcome.
         """
         outcomes = []
         for answer_group in self.answer_groups:
             outcomes.append(answer_group.outcome)
         if self.default_outcome is not None:
             outcomes.append(self.default_outcome)
+        return outcomes
+
+    def get_all_outcomes(self):
+        """Returns a list of all outcomes of this interaction, taking into
+        consideration every answer group, the default outcome, and every
+        fallback.
+        """
+        outcomes = self.get_all_non_fallback_outcomes()
+        for fallback in self.fallbacks:
+            outcomes.append(fallback.outcome)
         return outcomes
 
     def validate(self, exp_param_specs_dict):
@@ -1516,7 +1547,25 @@ class Exploration(object):
                 for param_change in group.outcome.param_changes:
                     if param_change.name not in self.param_specs:
                         raise utils.ValidationError(
-                            'The parameter %s was used in a rule, but it '
+                            'The parameter %s was used in an answer group, '
+                            'but it does not exist in this exploration'
+                            % param_change.name)
+
+        # Check that all fallbacks are valid.
+        for state in self.states.values():
+            interaction = state.interaction
+
+            for fallback in interaction.fallbacks:
+                # Check fallback destinations.
+                if fallback.outcome.dest not in all_state_names:
+                    raise utils.ValidationError(
+                        'The fallback destination %s is not a valid state.'
+                        % fallback.outcome.dest)
+
+                for param_change in fallback.outcome.param_changes:
+                    if param_change.name not in self.param_specs:
+                        raise utils.ValidationError(
+                            'The parameter %s was used in a fallback, but it '
                             'does not exist in this exploration'
                             % param_change.name)
 
@@ -1598,7 +1647,9 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that all states can reach a terminal state."""
+        """Verifies that all states can reach a terminal state without using
+        fallbacks.
+        """
         # This queue stores state names.
         processed_queue = []
         curr_queue = []
@@ -1619,7 +1670,8 @@ class Exploration(object):
             for (state_name, state) in self.states.iteritems():
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
-                    all_outcomes = state.interaction.get_all_outcomes()
+                    all_outcomes = (
+                        state.interaction.get_all_non_fallback_outcomes())
                     for outcome in all_outcomes:
                         if outcome.dest == curr_state_name:
                             curr_queue.append(state_name)
@@ -2293,8 +2345,8 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content, title=None,
-            category=None):
+    def _migrate_to_latest_yaml_version(
+            cls, yaml_content, title=None, category=None):
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -2366,14 +2418,13 @@ class Exploration(object):
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version <=
+        if (initial_schema_version <=
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Expecting a title and category to be provided for an '
-                'exploration encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version >= 10, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
@@ -2386,14 +2437,13 @@ class Exploration(object):
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version >
+        if (initial_schema_version >
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'No title or category need to be provided for an exploration '
-                'encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version <= 9, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
@@ -2410,7 +2460,8 @@ class Exploration(object):
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
-        necessary information to represent the exploration."""
+        necessary information to represent the exploration.
+        """
         return copy.deepcopy({
             'id': self.id,
             'title': self.title,
@@ -2432,7 +2483,8 @@ class Exploration(object):
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the
-        learner view."""
+        learner view.
+        """
         return {
             'init_state_name': self.init_state_name,
             'param_changes': self.param_change_dicts,
@@ -2468,7 +2520,8 @@ class ExplorationSummary(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, tags, ratings, status,
                  community_owned, owner_ids, editor_ids,
-                 viewer_ids, version, exploration_model_created_on,
+                 viewer_ids, contributor_ids, version,
+                 exploration_model_created_on,
                  exploration_model_last_updated):
         """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing frequency counts. Note
@@ -2494,6 +2547,7 @@ class ExplorationSummary(object):
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
+        self.contributor_ids = contributor_ids
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated

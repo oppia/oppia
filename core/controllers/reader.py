@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the Oppia learner view."""
+"""Controllers for the Oppia exploration learner view."""
 
 __author__ = 'Sean Lip'
 
 import logging
 
 from core.controllers import base
+from core.domain import classifier_services
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
@@ -95,6 +98,133 @@ def require_playable(handler):
     return test_can_play
 
 
+def classify_hard_rule(state, params, input_type, normalized_answer, fs):
+    """Find the first hard rule that matches."""
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        ored_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+        best_rule_spec = None
+        for (rule_spec_index, rule_spec) in enumerate(
+                answer_group.rule_specs):
+            if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
+                evaluated_truth_value = rule_domain.evaluate_rule(
+                    rule_spec, input_type, params, normalized_answer, fs)
+                if evaluated_truth_value > ored_truth_value:
+                    ored_truth_value = evaluated_truth_value
+                    best_rule_spec_index = rule_spec_index
+                    best_rule_spec = rule_spec
+        if ored_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+            best_matched_truth_value = ored_truth_value
+            best_matched_answer_group = answer_group
+            best_matched_answer_group_index = answer_group_index
+            best_matched_rule_spec_index = best_rule_spec_index
+            return {
+                'outcome': best_matched_answer_group.outcome.to_dict(),
+                'answer_group_index': best_matched_answer_group_index,
+                'classification_certainty': best_matched_truth_value,
+                'rule_spec_index': best_matched_rule_spec_index,
+            }
+
+    return None
+
+
+def classify_soft_rule(state, params, input_type, normalized_answer, fs):
+    """Find the maximum soft rule that matches. This is done by ORing
+    (maximizing) all truth values of all rules over all answer groups. The
+    group with the highest truth value is considered the best match.
+    """
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
+        if fuzzy_rule_spec_index is not None:
+            fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
+        else:
+            fuzzy_rule_spec = None
+        if fuzzy_rule_spec is not None:
+            evaluated_truth_value = rule_domain.evaluate_rule(
+                fuzzy_rule_spec, input_type, params, normalized_answer, fs)
+            if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+                best_matched_truth_value = evaluated_truth_value
+                best_matched_rule_spec = fuzzy_rule_spec
+                best_matched_rule_spec_index = fuzzy_rule_spec_index
+                best_matched_answer_group = answer_group
+                best_matched_answer_group_index = answer_group_index
+                return {
+                    'outcome': best_matched_answer_group.outcome.to_dict(),
+                    'answer_group_index': best_matched_answer_group_index,
+                    'classification_certainty': best_matched_truth_value,
+                    'rule_spec_index': best_matched_rule_spec_index,
+                }
+
+    return None
+
+
+def classify_string_classifier_rule(
+    state, params, input_type, normalized_answer, fs):
+    """Run the classifier if no prediction has been made yet. Currently this
+    is behind a development flag.
+    """
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec = None
+    best_matched_rule_spec_index = None
+    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+
+    sc = classifier_services.StringClassifier()
+    training_examples = [[doc, []] for doc in
+        state.interaction.confirmed_unclassified_answers]
+    for (answer_group_index, answer_group) in enumerate(
+        state.interaction.answer_groups):
+        fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
+        if fuzzy_rule_spec_index is not None:
+            fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
+        else:
+            fuzzy_rule_spec = None
+        if fuzzy_rule_spec is not None:
+            training_examples.extend(
+                [[doc, [str(answer_group_index)]] for doc in
+                fuzzy_rule_spec.inputs['training_data']])
+    if len(training_examples) > 0:
+        sc.load_examples(training_examples)
+        doc_ids = sc.add_examples_for_predicting([normalized_answer])
+        predicted_label = sc.predict_label_for_doc(doc_ids[0])
+        if (predicted_label !=
+                classifier_services.StringClassifier.DEFAULT_LABEL):
+            predicted_answer_group_index = int(predicted_label)
+            predicted_answer_group = state.interaction.answer_groups[
+                predicted_answer_group_index]
+            best_matched_truth_value = rule_domain.CERTAIN_TRUE_VALUE
+            for rule_spec in answer_group.rule_specs:
+                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                    best_matched_rule_spec = fuzzy_rule_spec
+                    best_matched_rule_spec_index = fuzzy_rule_spec_index
+                    break
+            best_matched_answer_group = predicted_answer_group
+            best_matched_answer_group_index = predicted_answer_group_index
+            return {
+                'outcome': best_matched_answer_group.outcome.to_dict(),
+                'answer_group_index': best_matched_answer_group_index,
+                'classification_certainty': best_matched_truth_value,
+                'rule_spec_index': best_matched_rule_spec_index,
+            }
+        else:
+            return None
+
+    return None
+
+
 # TODO(bhenning): Add more tests for classification, such as testing multiple
 # rule specs over multiple answer groups and making sure the best match over all
 # those rules is picked.
@@ -104,8 +234,6 @@ def classify(exp_id, state, answer, params):
     first rule best satisfied by the answer. Returns a dict with the following
     keys:
         'outcome': A dict representing the outcome of the answer group matched.
-        'rule_spec_string': A descriptive string representation of the rule
-            matched.
         'answer_group_index': An index into the answer groups list indicating
             which one was selected as the group which this answer belongs to.
             This is equal to the number of answer groups if the default outcome
@@ -115,58 +243,42 @@ def classify(exp_id, state, answer, params):
             the chosen answer group. A certainty of 1 means it is the best
             possible match. A certainty of 0 means it is matched to the default
             outcome.
+        'rule_spec_index': An index into the rule specs list of the matched
+            answer group which was selected that indicates which rule spec was
+            matched. This is equal to 0 if the default outcome is selected.
     When the default rule is matched, outcome is the default_outcome of the
-    state's interaction and the rule_spec_string is just 'Default.'
+    state's interaction.
     """
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
 
-    # Find the first group that satisfactorily matches the given answer. This is
-    # done by ORing (maximizing) all truth values of all rules over all answer
-    # groups. The group with the highest truth value is considered the best
-    # match.
-    best_matched_answer_group = None
-    best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec = None
-    best_matched_truth_value = 0.0
-    for (i, answer_group) in enumerate(state.interaction.answer_groups):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exp_id))
-        input_type = interaction_instance.answer_type
-        ored_truth_value = 0.0
-        best_rule_spec = None
-        for rule_spec in answer_group.rule_specs:
-            evaluated_truth_value = rule_domain.evaluate_rule(
-                rule_spec, input_type, params, normalized_answer, fs)
-            if evaluated_truth_value > ored_truth_value:
-                ored_truth_value = evaluated_truth_value
-                best_rule_spec = rule_spec
-        if ored_truth_value > best_matched_truth_value:
-            best_matched_truth_value = ored_truth_value
-            best_matched_rule_spec = best_rule_spec
-            best_matched_answer_group = answer_group
-            best_matched_answer_group_index = i
+    fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
+    input_type = interaction_instance.answer_type
+
+    response = classify_hard_rule(
+        state, params, input_type, normalized_answer, fs)
+    if response is None:
+        response = classify_soft_rule(
+            state, params, input_type, normalized_answer, fs)
+    if (interaction_instance.is_string_classifier_trainable and
+        feconf.ENABLE_STRING_CLASSIFIER and response is None):
+        response = classify_string_classifier_rule(
+            state, params, input_type, normalized_answer, fs)
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
     # resulting in the outcome of the answer being the default outcome of the
     # state.
-    if (best_matched_truth_value >=
+    if (response is not None and response['classification_certainty'] >=
             feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
-        return {
-            'outcome': best_matched_answer_group.outcome.to_dict(),
-            'rule_spec_string': (
-                best_matched_rule_spec.stringify_classified_rule()),
-            'answer_group_index': best_matched_answer_group_index,
-            'classification_certainty': best_matched_truth_value
-        }
+        return response
     elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
-            'rule_spec_string': exp_domain.DEFAULT_RULESPEC_STR,
             'answer_group_index': len(state.interaction.answer_groups),
-            'classification_certainty': 0.0
+            'classification_certainty': 0.0,
+            'rule_spec_index': 0
         }
 
     raise Exception('Something has seriously gone wrong with the exploration. '
@@ -179,31 +291,30 @@ class ExplorationPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'player'
 
-    def _make_first_letter_uppercase(self, s):
-        """Converts the first letter of a string to its uppercase equivalent,
-        and returns the result.
-        """
-        # This guards against empty strings.
-        if s:
-            return s[0].upper() + s[1:]
-        else:
-            return s
-
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
-        version = self.request.get('v')
-        if not version:
-            # The default value for a missing parameter seems to be ''.
-            version = None
-        else:
-            version = int(version)
+        version_str = self.request.get('v')
+        version = int(version_str) if version_str else None
+
+        # Note: this is an optional argument and will be None when the
+        # exploration is being played outside the context of a collection.
+        collection_id = self.request.get('collection_id')
 
         try:
             exploration = exp_services.get_exploration_by_id(
                 exploration_id, version=version)
         except Exception as e:
             raise self.PageNotFoundException(e)
+
+        collection_title = None
+        if collection_id:
+            try:
+                collection = collection_services.get_collection_by_id(
+                    collection_id)
+                collection_title = collection.title
+            except Exception as e:
+                raise self.PageNotFoundException(e)
 
         version = exploration.version
 
@@ -247,6 +358,8 @@ class ExplorationPage(base.BaseHandler):
                 dependencies_html),
             'exploration_title': exploration.title,
             'exploration_version': version,
+            'collection_id': collection_id,
+            'collection_title': collection_title,
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'iframed': is_iframed,
             'interaction_templates': jinja2.utils.Markup(
@@ -256,8 +369,7 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_name': exploration.title,
             # Note that this overwrites the value in base.py.
-            'meta_description': self._make_first_letter_uppercase(
-                exploration.objective),
+            'meta_description': utils.capitalize_string(exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_templates': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_templates(
@@ -289,22 +401,16 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        info_card_color = (
-            feconf.CATEGORIES_TO_COLORS[exploration.category] if
-            exploration.category in feconf.CATEGORIES_TO_COLORS else
-            feconf.DEFAULT_COLOR)
-
         self.values.update({
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'info_card_image_url': (
-                '/images/gallery/exploration_background_%s_large.png' %
-                info_card_color),
+            'info_card_image_url': utils.get_info_card_url_for_category(
+                exploration.category),
             'is_logged_in': bool(self.user_id),
-            'session_id': utils.generate_random_string(24),
+            'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
         })
         self.render_json(self.values)
@@ -325,12 +431,22 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
-        rule_spec_string = self.payload.get('rule_spec_string')
+        # The answer group and rule spec indexes, which will be used to get
+        # the rule spec string.
+        answer_group_index = self.payload.get('answer_group_index')
+        rule_spec_index = self.payload.get('rule_spec_index')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
-        exp_param_specs = exploration.param_specs
+
         old_interaction = exploration.states[old_state_name].interaction
+
+        if answer_group_index == len(old_interaction.answer_groups):
+            rule_spec_string = exp_domain.DEFAULT_RULESPEC_STR
+        else:
+            rule_spec_string = (
+                old_interaction.answer_groups[answer_group_index].rule_specs[
+                    rule_spec_index].stringify_classified_rule())
 
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -371,10 +487,11 @@ class StateHitEventHandler(base.BaseHandler):
 class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding classification result, which is a dict containing
-    two keys:
+    three keys:
         'outcome': A dict representing the outcome of the answer group matched.
-        'rule_spec_string': A descriptive string representation of the rule
-            matched.
+        'answer_group_index': The index of the matched answer group.
+        'rule_spec_index': The index of the matched rule spec in the matched
+            answer group.
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -442,6 +559,12 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id):
         """Handles POST requests."""
+
+        # This will be None if the exploration is not being played within the
+        # context of a collection.
+        collection_id = self.payload.get('collection_id')
+        user_id = self.user_id
+
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
@@ -450,6 +573,10 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+
+        if user_id and collection_id:
+            collection_services.record_played_exploration_in_collection_context(
+                user_id, collection_id, exploration_id)
 
 
 class ExplorationMaybeLeaveHandler(base.BaseHandler):
@@ -507,14 +634,29 @@ class RatingHandler(base.BaseHandler):
 
 
 class RecommendationsHandler(base.BaseHandler):
-    """Provides recommendations to be displayed at the end of explorations."""
+    """Provides recommendations to be displayed at the end of explorations.
+    Which explorations are provided depends on whether the exploration was
+    played within the context of a collection and whether the user is logged in.
+    If both are true, then the explorations are suggested from the collection,
+    if there are upcoming explorations for the learner to complete.
+    """
 
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
-        self.values.update({
-            'recommended_exp_ids': (
+        collection_id = self.request.get('collection_id')
+
+        recommended_exp_ids = []
+        if self.user_id and collection_id:
+            recommended_exp_ids = (
+                collection_services.get_next_exploration_ids_to_complete_by_user(
+                    self.user_id, collection_id))
+        else:
+            recommended_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
                     exploration_id))
+
+        self.values.update({
+            'recommended_exp_ids': recommended_exp_ids
         })
         self.render_json(self.values)

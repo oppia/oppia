@@ -61,7 +61,7 @@ oppia.factory('responsesService', [
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
   var _activeAnswerGroupIndex = null;
-  var _activeRuleIndex = null;
+  var _activeRuleIndex = -1;
   var _answerGroups = null;
   var _defaultOutcome = null;
   var _confirmedUnclassifiedAnswers = null;
@@ -448,8 +448,8 @@ oppia.controller('StateResponses', [
                 answer, stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento));
 
-            answerClassificationService.getMatchingEditorClassificationResult(
-              _explorationId, _state, answer).success(
+            answerClassificationService.getMatchingClassificationResult(
+              _explorationId, _state, answer, true).success(
                   function(classificationResult) {
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
@@ -463,12 +463,15 @@ oppia.controller('StateResponses', [
                 $scope.trainingDataFeedback = feedback;
                 $scope.trainingDataOutcomeDest = dest;
 
-                if (classificationResult.rule_spec_string !== DEFAULT_RULE_NAME &&
-                    classificationResult.rule_spec_string !== FUZZY_RULE_TYPE) {
+                var answerGroupIndex = classificationResult.answerGroupIndex;
+                var ruleSpecIndex = classificationResult.ruleSpecIndex;
+                if (answerGroupIndex !== _state.interaction.answer_groups.length &&
+                    _state.interaction.answer_groups[answerGroupIndex].rule_specs[
+                      ruleSpecIndex].rule_type !== FUZZY_RULE_TYPE) {
                   $scope.classification.answerGroupIndex = -1;
                 } else {
                   $scope.classification.answerGroupIndex = (
-                    classificationResult.answer_group_index);
+                    classificationResult.answerGroupIndex);
                 }
               });
           };
@@ -551,36 +554,24 @@ oppia.controller('StateResponses', [
     });
   };
 
-  $scope.isDraggingActiveAnswerGroup = null;
-
+  // When the page is scrolled so that the top of the page is above the browser
+  // viewport, there are some bugs in the positioning of the helper. This is a
+  // bug in jQueryUI that has not been fixed yet. For more details, see
+  // http://stackoverflow.com/q/5791886
   $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
     handle: '.oppia-rule-sort-handle',
     items: '.oppia-sortable-rule-block',
+    revert: 100,
     tolerance: 'pointer',
     start: function(e, ui) {
       $rootScope.$broadcast('externalSave');
-      $scope.$apply();
+      $scope.changeActiveAnswerGroupIndex(-1);
       ui.placeholder.height(ui.item.height());
-
-      // This maintains the current open/close state of the answer group. If an
-      // closed answer group is dragged, keep it closed. If the dragged group is
-      // open, keep it open.
-      $scope.isDraggingActiveAnswerGroup = (
-        ui.item.index() == responsesService.getActiveAnswerGroupIndex());
     },
     stop: function(e, ui) {
       responsesService.save($scope.answerGroups, $scope.defaultOutcome);
-
-      // If the active group is being dragged, make sure its index is changed to
-      // the answer group's new location.
-      if ($scope.isDraggingActiveAnswerGroup) {
-        $scope.changeActiveAnswerGroupIndex(ui.item.index());
-        $scope.isDraggingActiveAnswerGroup = null;
-      }
-      $scope.$apply();
-      $rootScope.$broadcast('externalSave');
     }
   };
 

@@ -19,7 +19,7 @@
   mode.
 */
 html, body {
-  background: url('/images/general/background.png') no-repeat center center fixed;
+  background: url('/images/general/background.jpg') no-repeat center center fixed;
   background-color: #eee;
   color: rgba(0,0,0,0.87);
   font-family: 'Roboto', Arial, sans-serif;
@@ -124,19 +124,70 @@ html, body {
   max-width: 1084px;
 }
 
+.conversation-skin-help-card {
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
+  min-height: 50px;
+  opacity: 1;
+  padding: 12px;
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  text-align: left;
+  transition: all 350ms;
+  z-index: 500;
+}
+.conversation-skin-help-card.ng-enter,
+.conversation-skin-help-card.ng-leave-active {
+  opacity: 0;
+  transform: translateX(200px);
+}
+.conversation-skin-help-card .conversation-skin-oppia-avatar {
+  top: 12px;
+}
+.conversation-skin-help-card-content {
+  width: 270px;
+}
+.conversation-skin-close-help-card-button {
+  background: none;
+  border: 0;
+  color: #000;
+  cursor: pointer;
+  height: 24px;
+  opacity: 0.5;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 24px;
+  z-index: 200;
+}
+
 .conversation-skin-main-tutor-card,
 .conversation-skin-future-tutor-card {
   background: #fff;
   border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
-  max-width: 472px;
   padding-top: 20px;
   position: relative;
   right: 0;
   text-align: left;
-  width: 472px;
+  width: 560px;
   z-index: 1;
+}
+
+.conversation-skin-main-tutor-card.conversation-skin-left-card,
+.conversation-skin-future-tutor-card.conversation-skin-left-card {
+  float: left;
+  margin-left: 0;
+  margin-right: 0;
+  width: 472px;
+}
+
+.conversation-skin-main-tutor-card.animate-card-width {
+  -webkit-transition: width 500ms;
+  transition: width 500ms;
 }
 
 .conversation-skin-future-tutor-card {
@@ -158,14 +209,21 @@ html, body {
 
 .conversation-skin-tutor-card-top-content,
 .conversation-skin-oppia-feedback-content,
-.conversation-skin-learner-answer-content {
+.conversation-skin-learner-answer-content,
+.conversation-skin-help-card-content {
   border-radius: 2px;
   display: inline-block;
-  margin-bottom: 12px;
+  max-width: 100%;
   position: relative;
   text-align: left;
 }
-.conversation-skin-tutor-card-top-content {
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  margin-bottom: 12px;
+}
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-help-card-content {
   padding: 12px;
 }
 .conversation-skin-oppia-feedback-content,
@@ -173,7 +231,8 @@ html, body {
   padding: 8px 12px;
 }
 .conversation-skin-tutor-card-top-content,
-.conversation-skin-oppia-feedback-content {
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
   background-color: rgba(224,242,241,1);
 }
 .conversation-skin-learner-answer-content {
@@ -181,7 +240,8 @@ html, body {
   border-bottom-right-radius: 0;
 }
 .conversation-skin-tutor-card-top-content,
-.conversation-skin-oppia-feedback-content {
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
   border-top-left-radius: 0;
 }
 .conversation-skin-learner-answer-container {
@@ -194,7 +254,8 @@ html, body {
   background-color: rgba(224,242,241,0.4);
 }
 .conversation-skin-tutor-card-top-content::before,
-.conversation-skin-oppia-feedback-content::before {
+.conversation-skin-oppia-feedback-content::before,
+.conversation-skin-help-card-content::before {
   content: " ";
   left: -8px;
   border-left: 8px solid transparent;
@@ -301,15 +362,19 @@ html, body {
 }
 
 div.conversation-skin-supplemental-card {
-  background-color: #fff;
-  box-shadow: none;
-  border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
-  padding: 8px;
-  position: absolute;
+  position: relative;
   right: 0;
   width: 600px;
+}
+
+.conversation-skin-supplemental-interaction-container {
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: none;
+  margin-bottom: 8px;
+  padding: 8px;
 }
 
 .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
@@ -319,26 +384,14 @@ div.conversation-skin-supplemental-card {
   right: inherit;
 }
 
-.conversation-skin-supplemental-card-overlay {
-  background: #eee;
-  height: 100%;
-  left: 0;
-  opacity: 0.5;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 3;
-}
-
 .conversation-skin-final-ratings {
   padding-top: 20px;
   text-align: center;
 }
 
-.conversation-skin-left-card {
-  float: left;
-  margin-left: 0;
-  margin-right: 16px;
+.conversation-skin-left-card .conversation-skin-oppia-avatar,
+.conversation-skin-left-card .conversation-skin-user-avatar {
+  display: none;
 }
 
 .conversation-skin-card-switcher {
@@ -414,6 +467,11 @@ div.conversation-skin-supplemental-card {
   div.conversation-skin-supplemental-card,
   .conversation-skin-main-tutor-card {
     width: 100%;
+  }
+
+  .conversation-skin-help-card {
+    right: 4px;
+    top: 4px;
   }
 
   .conversation-skin-user-avatar,

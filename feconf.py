@@ -35,6 +35,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -68,7 +69,7 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
-GALLERY_PAGE_SIZE = 10
+GALLERY_PAGE_SIZE = 24
 
 # The default number of commits to show on a page in the exploration history
 # tab.
@@ -155,6 +156,44 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 CAN_SEND_EMAILS_TO_USERS = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
+# Whether to require an email to be sent, following a moderator action.
+REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
+
+EMAIL_INTENT_SIGNUP = 'signup'
+EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
+EMAIL_INTENT_MARKETING = 'marketing'
+EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
+EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
+EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
+
+MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
+MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
+DEFAULT_SALUTATION_HTML_FN = (
+    lambda recipient_username: 'Hi %s,' % recipient_username)
+DEFAULT_SIGNOFF_HTML_FN = (
+    lambda sender_username: 'Thanks!<br>%s (Oppia moderator)' % sender_username)
+
+VALID_MODERATOR_ACTIONS = {
+    MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
+        'email_config': 'publicize_exploration_email_html_body',
+        'email_subject_fn': (
+            lambda exp_title: (
+                'Your Oppia exploration "%s" has been featured!' % exp_title)),
+        'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
+        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
+        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
+    },
+    MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
+        'email_config': 'unpublish_exploration_email_html_body',
+        'email_subject_fn': (
+            lambda exp_title: (
+                'Your Oppia exploration "%s" has been unpublished' % exp_title)
+        ),
+        'email_intent': 'unpublish_exploration',
+        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
+        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
+    },
+}
 
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
@@ -218,10 +257,14 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'LogicProof',
         'NumericInput',
         'SetInput',
+        'MathExpressionInput',
     ]
 }, {
     'name': 'Programming',
-    'interaction_ids': ['CodeRepl'],
+    'interaction_ids': [
+        'CodeRepl',
+        'PencilCodeEditor',
+    ],
 }, {
     'name': 'Music',
     'interaction_ids': [
@@ -273,11 +316,13 @@ DEMO_EXPLORATIONS = [
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
 ]
 
-DEMO_COLLECTIONS = [
-    'welcome_to_collections.yaml'
-]
+DEMO_COLLECTIONS = {
+    u'0': 'welcome_to_collections.yaml'
+}
 
 # TODO(sll): Add all other URLs here.
+COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
+COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -316,10 +361,6 @@ NAV_MODE_SIGNUP = 'signup'
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
-EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
-EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
-EVENT_TYPE_COLLECTION_CHANGE = 'collection_change'
-EVENT_TYPE_COLLECTION_STATUS_CHANGE = 'collection_status_change'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 # The values for these event types should be left as-is for backwards
@@ -342,6 +383,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+ENABLE_STRING_CLASSIFIER = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -363,9 +405,19 @@ COLOR_SHARKFIN = 'sharkfin'
 # Science
 COLOR_GUNMETAL = 'gunmetal'
 DEFAULT_COLOR = COLOR_TEAL
+DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
+
+COLORS_TO_HEX_VALUES = {
+    COLOR_TEAL: '#05a69a',
+    COLOR_SALMON: '#f35f55',
+    COLOR_SUNNYSIDE: '#f7a541',
+    COLOR_SHARKFIN: '#058ca6',
+    COLOR_GUNMETAL: '#607d8b',
+}
 
 # List of supported default categories. For now, each category has
-# a specific color associated with it.
+# a specific color associated with it. Each category also has a thumbnail icon
+# whose filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
     'Architecture': COLOR_SUNNYSIDE,
     'Art': COLOR_SUNNYSIDE,
@@ -487,3 +539,4 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
+SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

@@ -61,11 +61,22 @@ oppia.config(['$interpolateProvider', '$httpProvider',
           }
           return config;
         },
-        responseError: function(response) {
-          $log.error(response.data);
-          warningsData.addWarning(
-            response.data.error || 'Error communicating with server.');
-          return $q.reject(response);
+        responseError: function(rejection) {
+          // A rejection status of -1 seems to indicate (it's hard to find
+          // documentation) that the response has not completed,
+          // which can occur if the user navigates away from the page
+          // while the response is pending, This should not be considered
+          // an error.
+          if (rejection.status !== -1) {
+            $log.error(rejection.data);
+
+            var warningMessage = 'Error communicating with server.';
+            if (rejection.data && rejection.data.error) {
+              warningMessage = rejection.data.error;
+            }
+            warningsData.addWarning(warningMessage);
+          }
+          return $q.reject(rejection);
         }
       };
     }
@@ -116,14 +127,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
       exception.message,
       String(exception.stack)
     ].join('\n');
-
-    // Ignore errors due to cancelling child animations in the state graph.
-    // TODO(sll): Remove this when we upgrade Angular to a version that fixes
-    // the following bug: https://github.com/angular/angular.js/issues/4548
-    if (messageAndSourceAndStackTrace.indexOf('ngRepeatAction') !== -1 &&
-        messageAndSourceAndStackTrace.indexOf('angular-animate') !== -1) {
-      return;
-    }
 
     // Catch all errors, to guard against infinite recursive loops.
     try {
@@ -194,6 +197,11 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
         // The replace function removes 'seconds' from the time returned.
         return date.toLocaleTimeString().replace(/:\d\d /, ' ');
       }
+      return date.toLocaleDateString();
+    },
+    // Returns just the date.
+    getLocaleDateString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
       return date.toLocaleDateString();
     }
   };

@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
@@ -200,7 +201,10 @@ urls = [
         galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
     get_redirect_route(
-        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
+        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
+    get_redirect_route(
+        r'/profilehandler/data/<username>', profile.ProfileHandler,
+        'profile_handler'),
     get_redirect_route(
         r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
@@ -224,8 +228,8 @@ urls = [
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
-        r'/moderatorhandler/user_services',
-        moderator.UserServiceHandler, 'moderator_user_service_handler'),
+        r'/moderatorhandler/email_draft/<action>',
+        moderator.EmailDraftHandler, 'moderator_action_email_draft'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
@@ -296,6 +300,10 @@ urls = [
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler, 'exploration_rights_handler'),
     get_redirect_route(
+        r'/createhandler/moderatorrights/<exploration_id>',
+        editor.ExplorationModeratorRightsHandler,
+        'exploration_moderator_rights_handler'),
+    get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
@@ -339,6 +347,13 @@ urls = [
         r'%s/<exploration_id>' %
             feconf.SUGGESTION_LIST_URL_PREFIX,
         feedback.SuggestionListHandler, 'suggestion_list_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
+        collection_viewer.CollectionPage, 'collection_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
+        collection_viewer.CollectionDataHandler, 'collection_data_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

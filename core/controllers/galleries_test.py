@@ -18,11 +18,13 @@ __author__ = 'Sean Lip'
 
 from core.controllers import galleries
 from core.domain import config_services
-from core.domain import exp_jobs
+from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
+import os
+import utils
 
 
 CAN_EDIT_STR = 'can_edit'
@@ -80,8 +82,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # This is not necessary, but serves as additional check that
         # the migration job works well and gives correct galleries.
         self.process_and_flush_pending_tasks()
-        job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
-        exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
+        job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
+        exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
         self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self.count_jobs_in_taskqueue(), 0)
@@ -224,3 +226,20 @@ class GalleryPageTest(test_utils.GenericTestBase):
         response.mustcontain('Upload Exploration')
 
         self.logout()
+
+
+class CategoryConfigTest(test_utils.GenericTestBase):
+
+    def test_thumbnail_icons_exist_for_each_category(self):
+        all_categories = feconf.CATEGORIES_TO_COLORS.keys()
+
+        # Test that an icon exists for each default category.
+        for category in all_categories:
+            utils.get_file_contents(os.path.join(
+                'static', 'images', 'gallery', 'thumbnails',
+                '%s.svg' % category.replace(' ', '')))
+
+        # Test that the default icon exists.
+        utils.get_file_contents(os.path.join(
+            'static', 'images', 'gallery', 'thumbnails',
+            '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))

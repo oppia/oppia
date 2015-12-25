@@ -16,13 +16,19 @@
 
 __author__ = 'Sean Lip'
 
+import os
+
 from core.controllers import reader
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import param_domain
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -49,6 +55,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -87,9 +94,19 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_published_explorations_are_visible_to_anyone(self):
+    def test_published_explorations_are_visible_to_logged_out_users(self):
         rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
 
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+
+    def test_published_explorations_are_visible_to_logged_in_users(self):
+        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -192,6 +209,127 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         # is persisted to the backend.
         self.submit_and_compare(
             'a' * 1000500, 'Sorry, nope, we didn\'t get it', '')
+
+
+class ReaderClassifyTests(test_utils.GenericTestBase):
+    """Test reader.classify using the sample explorations.
+
+    Since the end to end tests cover correct classification,
+    ReaderClassifyTests is only checking which of the hard/soft/classifier
+    rules is classified on input.
+    """
+
+    def setUp(self):
+        super(ReaderClassifyTests, self).setUp()
+        self._init_classify_inputs('16')
+
+    def _init_classify_inputs(self, exploration_id):
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content,
+            'Testing String Classifier', 'Test',
+            exploration_id, assets_list)
+
+        self.EXP_ID = exploration_id
+        self.EXP_STATE = (
+            exp_services.get_exploration_by_id(exploration_id).states['Home'])
+
+    def _get_classiying_rule_type(self, answer):
+        string_classifier_predict = (
+            classifier_services.StringClassifier.predict_label_for_doc)
+        string_classifier_predict_counter = test_utils.CallCounter(
+            string_classifier_predict)
+
+        with self.swap(
+                classifier_services.StringClassifier,
+            'predict_label_for_doc', string_classifier_predict_counter):
+            response = reader.classify(
+                self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
+
+        answer_group_index = response['answer_group_index']
+        rule_spec_index = response['rule_spec_index']
+        answer_groups = self.EXP_STATE.interaction.answer_groups
+        if answer_group_index == len(answer_groups):
+            return 'default'
+
+        answer_group = answer_groups[answer_group_index]
+        if answer_group.get_fuzzy_rule_index() == rule_spec_index:
+            return (
+                'soft'
+                if string_classifier_predict_counter.times_called == 0
+                else 'classifier')
+        return 'hard'
+
+    def test_hard_rule_classification(self):
+        """All of these responses are classified by the hard classifier.
+
+        Note: Any response beginning with 'hardrule' will result in
+        reader.classify selecting a hard rule.
+        """
+        self.assertEquals(
+            self._get_classiying_rule_type('permutations'),
+            'hard')
+        self.assertEquals(
+            self._get_classiying_rule_type('hardrule0'),
+            'hard')
+        self.assertEquals(
+            self._get_classiying_rule_type('hardrule3'),
+            'hard')
+        self.assertEquals(
+            self._get_classiying_rule_type('hardrule1254'),
+            'hard')
+        self.assertEquals(
+            self._get_classiying_rule_type('exit'),
+            'hard')
+
+    def test_soft_rule_classification(self):
+        """All these responses trigger the soft classifier."""
+        self.assertEquals(
+            self._get_classiying_rule_type('Combination 3 x 2 x 1'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('bcse combinations'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('Because the answer is 3!'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('3 balls time two time one'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('try all possible combinations'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('rby, ryb, bry, byr, ybr, yrb'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('I dunno!'),
+            'soft')
+        self.assertEquals(
+            self._get_classiying_rule_type('I guessed.'),
+            'soft')
+
+    def test_string_classifier_classification(self):
+        """All these responses trigger the string classifier."""
+        with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
+            self.assertEquals(
+                self._get_classiying_rule_type(
+                    'it\'s a permutation of 3 elements'),
+                'classifier')
+            self.assertEquals(
+                self._get_classiying_rule_type(
+                    'There are 3 options for the first ball, and 2 for the '
+                    'remaining two. So 3*2=6.'),
+                'classifier')
+            self.assertEquals(
+                self._get_classiying_rule_type('abc acb bac bca cbb cba'),
+                'classifier')
+            self.assertEquals(
+                self._get_classiying_rule_type('dunno, just guessed'),
+                'classifier')
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
