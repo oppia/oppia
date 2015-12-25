@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StateTransitionService and associated services.
+ * @fileoverview Unit tests for ExpressionInterpolationService.
  *
  * @author sll@google.com (Sean Lip)
  */
