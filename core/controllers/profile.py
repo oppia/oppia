@@ -192,9 +192,11 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.PageNotFoundException
+
         user_settings = user_services.get_user_settings(user_id)
         self.values.update({
-            'profile_picture_data_url_for_username': user_settings.profile_picture_data_url
+            'profile_picture_data_url_for_username': (
+                user_settings.profile_picture_data_url)
         })
         self.render_json(self.values)
 
