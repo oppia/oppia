@@ -26,7 +26,6 @@
 
   <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
     <progress-dots num-dots="numProgressDots"
-                   current-dot-index="$parent.activeCardIndex"
                    class="conversation-skin-progress-dots"
                    ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
@@ -74,8 +73,7 @@
               <div ng-if="!$last || !exploration.isInteractionInline(activeCard.stateName)">
                 <answer-feedback-pair data="responsePair"
                                       profile-picture="profilePicture"
-                                      oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                                      active-card-index="activeCardIndex">
+                                      oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
                 </answer-feedback-pair>
               </div>
             </div>
@@ -85,8 +83,7 @@
           <div class="conversation-skin-tutor-card-bottom-section" ng-if="exploration.isInteractionInline(activeCard.stateName) && activeCard.answerFeedbackPairs.length > 0">
             <answer-feedback-pair data="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1]"
                                   profile-picture="profilePicture"
-                                  oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                                  active-card-index="activeCardIndex">
+                                  oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
             </answer-feedback-pair>
           </div>
 
