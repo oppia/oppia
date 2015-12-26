@@ -515,7 +515,10 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
     templateUrl: 'components/feedback',
     controller: [
         '$scope', '$element', '$http', '$timeout', 'focusService', 'warningsData',
-        function($scope, $element, $http, $timeout, focusService, warningsData) {
+        'playerPositionService',
+        function(
+          $scope, $element, $http, $timeout, focusService, warningsData,
+          playerPositionService) {
       $scope.feedbackText = '';
       $scope.isSubmitterAnonymized = false;
       $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
@@ -579,7 +582,7 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
             subject: '(Feedback from a learner)',
             feedback: $scope.feedbackText,
             include_author: !$scope.isSubmitterAnonymized && $scope.isLoggedIn,
-            state_name: getTriggerElt().attr('state-name')
+            state_name: playerPositionService.getCurrentStateName()
           });
         }
 
