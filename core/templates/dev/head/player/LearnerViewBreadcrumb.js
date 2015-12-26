@@ -19,24 +19,48 @@
  */
 
 oppia.controller('LearnerViewBreadcrumb', [
-  '$scope', '$modal', function($scope, $modal) {
+  '$scope', '$modal', '$http', '$log', 'explorationContextService',
+  function($scope, $modal, $http, $log, explorationContextService) {
+    var explorationId = explorationContextService.getExplorationId();
+    var expInfo = null;
+
     $scope.showInformationCard = function() {
+      if (expInfo) {
+        openInformationCardModal();
+      } else {
+        $http.get('/explorationsummarieshandler/data', {
+          params: {
+            stringified_exp_ids: JSON.stringify([explorationId])
+          }
+        }).success(function(data) {
+          expInfo = data.summaries[0];
+          openInformationCardModal();
+        }).error(function(data) {
+          $log.error(
+            'Information card failed to load for exploration ' + explorationId);
+        });
+      }
+    };
+
+    var openInformationCardModal = function() {
       $modal.open({
         animation: true,
         templateUrl: 'modal/informationCard',
         windowClass: 'oppia-modal-information-card',
+        resolve: {
+          expInfo: function() {
+            return expInfo;
+          }
+        },
         controller: [
-          '$scope', '$http', '$window', '$modal', '$modalInstance',
-          'oppiaHtmlEscaper', 'embedExplorationButtonService',
-          'oppiaDatetimeFormatter', 'ratingComputationService',
-          'explorationContextService',
-          function($scope, $http, $window, $modal, $modalInstance,
-                   oppiaHtmlEscaper, embedExplorationButtonService,
-                   oppiaDatetimeFormatter, ratingComputationService,
-                   explorationContextService) {
-
+          '$scope', '$window', '$modalInstance', 'oppiaHtmlEscaper',
+          'embedExplorationButtonService', 'oppiaDatetimeFormatter',
+          'ratingComputationService', 'expInfo',
+          function($scope, $window, $modalInstance, oppiaHtmlEscaper,
+                   embedExplorationButtonService, oppiaDatetimeFormatter,
+                   ratingComputationService, expInfo) {
             var getExplorationTagsSummary = function(arrayOfTags) {
-              var tagsToShow =[];
+              var tagsToShow = [];
               var tagsInTooltip = [];
               var MAX_CHARS_TO_SHOW = 45;
 
@@ -62,43 +86,25 @@ oppia.controller('LearnerViewBreadcrumb', [
                 millisSinceEpoch);
             };
 
-            var explorationId = explorationContextService.getExplorationId();
-            $scope.serverName = (
-              $window.location.protocol + '//' + $window.location.host);
-            $scope.hasInfoCardLoaded = false;
-            $scope.hasInfoCardFailedToLoad = false;
+            $scope.averageRating = ratingComputationService.computeAverageRating(
+              expInfo.ratings) || 'Unrated';
+            $scope.contributorNames = expInfo.contributor_names;
             $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
               GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+            $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
+            $scope.explorationTitle = expInfo.title;
+            $scope.infoCardBackgroundCss = {
+              'background-color': expInfo.thumbnail_bg_color
+            };
+            $scope.infoCardBackgroundImageUrl = expInfo.thumbnail_icon_url;
+            $scope.lastUpdatedString = getLastUpdatedString(
+              expInfo.last_updated_msec);
+            $scope.numViews = expInfo.num_views;
+            $scope.objective = expInfo.objective;
+            $scope.serverName = (
+              $window.location.protocol + '//' + $window.location.host);
             $scope.showEmbedExplorationModal = (
               embedExplorationButtonService.showModal);
-
-            $http({
-              method: 'GET',
-              url: '/explorationsummarieshandler/data',
-              params: {
-                stringified_exp_ids: JSON.stringify([explorationId])
-              }
-            }).success(function(data) {
-              var expInfo = data.summaries[0];
-
-              $scope.averageRating = ratingComputationService.computeAverageRating(
-                expInfo.ratings) || 'Unrated';
-              $scope.contributorNames = expInfo.contributor_names;
-              $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
-              $scope.explorationTitle = expInfo.title;
-              $scope.infoCardBackgroundCss = {
-                'background-color': expInfo.thumbnail_bg_color
-              };
-              $scope.infoCardBackgroundImageUrl = expInfo.thumbnail_icon_url;
-              $scope.lastUpdatedString = getLastUpdatedString(
-                expInfo.last_updated_msec);
-              $scope.numViews = expInfo.num_views;
-              $scope.objective = expInfo.objective;
-
-              $scope.hasInfoCardLoaded = true;
-            }).error(function(data) {
-              $scope.hasInfoCardFailedToLoad = true;
-            });
 
             $scope.cancel = function() {
               $modalInstance.dismiss();

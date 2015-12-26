@@ -5,7 +5,7 @@
       <h2 class="oppia-info-card-title"><[explorationTitle]></h2>
     </div>
 
-    <div ng-if="!loadingInfoCardData" class="oppia-info-card-content">
+    <div class="oppia-info-card-content">
       <p ng-if="objective">
         <[objective | truncateAndCapitalize: 95]>
       </p>
@@ -106,12 +106,6 @@
           </ul>
         </div>
       </div>
-    </div>
-    <div ng-if="!hasInfoCardLoaded" class="oppia-info-card-content">
-      <h3 ng-if="!hasInfoCardFailedToLoad">Loading...</h3>
-      <h3 ng-if="hasInfoCardFailedToLoad">
-        Oops, something went wrong. Could not load data.
-      </h3>
     </div>
     <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
       <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
