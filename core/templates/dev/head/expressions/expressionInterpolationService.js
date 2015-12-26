@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for exploration state transition used in reader and
- * editor.
+ * @fileoverview Service for interpolating expressions.
  *
  * @author kashida@google.com (Koji Ashida)
  */
@@ -99,117 +98,6 @@ oppia.factory('expressionInterpolationService', [
       }
 
       return allParams.sort();
-    }
-  };
-}]);
-
-// Produces information necessary to render a particular state. Note that this
-// service is memoryless -- all calls to it are independent of each other.
-oppia.factory('stateTransitionService', [
-    'learnerParamsService', 'expressionInterpolationService',
-    function(learnerParamsService, expressionInterpolationService) {
-  var randomFromArray = function(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-  };
-
-  // Evaluate feedback.
-  var makeFeedback = function(feedbacks, envs) {
-    var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
-    return expressionInterpolationService.processHtml(feedbackHtml, envs);
-  };
-
-  // Evaluate parameters. Returns null if any evaluation fails.
-  var makeParams = function(oldParams, paramChanges, envs) {
-    var newParams = angular.copy(oldParams);
-    if (paramChanges.every(function(pc) {
-      if (pc.generator_id === 'Copier') {
-        if (!pc.customization_args.parse_with_jinja) {
-          newParams[pc.name] = pc.customization_args.value;
-        } else {
-          var paramValue = expressionInterpolationService.processUnicode(
-            pc.customization_args.value, [newParams].concat(envs));
-          if (paramValue === null) {
-            return false;
-          }
-          newParams[pc.name] = paramValue;
-        }
-      } else {
-        // RandomSelector.
-        newParams[pc.name] = randomFromArray(
-          pc.customization_args.list_of_values);
-      }
-      return true;
-    })) {
-      // All parameters were evaluated successfully.
-      return newParams;
-    }
-    // Evaluation of some parameter failed.
-    return null;
-  };
-
-  // Evaluate question string.
-  var makeQuestion = function(newState, envs) {
-    return expressionInterpolationService.processHtml(
-      newState.content[0].value, envs);
-  };
-
-  return {
-    getInitStateData: function(expParamSpecs, expParamChanges, initState) {
-      var baseParams = {};
-      for (var paramName in expParamSpecs) {
-        // TODO(sll): This assumes all parameters are of type UnicodeString.
-        // We should generalize this to other default values for different
-        // types of parameters.
-        baseParams[paramName] = '';
-      }
-
-      var newParams = makeParams(
-        baseParams, expParamChanges.concat(initState.param_changes),
-        [baseParams]);
-      if (newParams === null) {
-        return null;
-      }
-
-      var question = makeQuestion(initState, [newParams]);
-      if (question === null) {
-        return null;
-      }
-
-      // All succeeded. Return all the results.
-      return {
-        params: newParams,
-        question_html: question
-      }
-    },
-    // Returns null when failed to evaluate.
-    getNextStateData: function(outcome, newState, answer) {
-      var oldParams = learnerParamsService.getAllParams();
-      oldParams.answer = answer;
-      var feedback = makeFeedback(outcome.feedback, [oldParams]);
-      if (feedback === null) {
-        return null;
-      }
-
-      var newParams = (
-        newState ? makeParams(
-          oldParams, newState.param_changes, [oldParams]) : oldParams);
-      if (newParams === null) {
-        return null;
-      }
-
-      var question = makeQuestion(newState, [newParams, {answer: 'answer'}]);
-      if (question === null) {
-        return null;
-      }
-
-      // All succeeded. Return all the results.
-      // TODO(sll): Remove the 'answer' key from newParams.
-      newParams.answer = answer;
-      return {
-        params: newParams,
-        feedback_html: feedback,
-        question_html: question
-      };
     }
   };
 }]);
