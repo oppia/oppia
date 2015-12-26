@@ -182,7 +182,7 @@ oppia.factory('codeReplNormalizationService', [function() {
       var codeLines = removeTrailingWhitespace(codeString).split('\n');
       var normalizedCodeLines = [];
       codeLines.forEach(function(line) {
-        if (removeLeadingWhitespace(line).startsWith('#')) {
+        if (removeLeadingWhitespace(line).indexOf('#') === 0) {
           return;
         }
         line = removeTrailingWhitespace(line);
