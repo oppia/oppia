@@ -111,6 +111,7 @@ var openEditor = function(explorationId) {
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
+  browser.waitForAngular();
 };
 
 // Takes the user from an exploration editor to its player.
