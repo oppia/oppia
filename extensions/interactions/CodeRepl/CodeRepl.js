@@ -175,7 +175,7 @@ oppia.factory('codeReplNormalizationService', [function() {
       var FOUR_SPACES = '    ';
       // Maps the number of spaces at the beginning of a line to an int specifying
       // the desired indentation level.
-      var numSpaceToDesiredIndentLevel = {
+      var numSpacesToDesiredIndentLevel = {
           0: 0,
       };
 
@@ -192,14 +192,11 @@ oppia.factory('codeReplNormalizationService', [function() {
 
         var numSpaces = line.length - removeLeadingWhitespace(line).length;
 
-        var maxNumSpaces = Object.keys(numSpaceToDesiredIndentLevel).reduce(
-          function(max, key) {
-            return Math.max(key, max);
-          }, -Infinity);
+        var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
+        var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
         if (numSpaces > maxNumSpaces) {
           // Add a new indentation level
-          numSpaceToDesiredIndentLevel[numSpaces] =
-            Object.keys(numSpaceToDesiredIndentLevel).length;
+          numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
         }
 
         // This is set when the indentation level of the current line does not
@@ -209,25 +206,25 @@ oppia.factory('codeReplNormalizationService', [function() {
         // TODO(sll): Bad indentation should result in an error nearer the
         // source.
         var isShortfallLine =
-          !numSpaceToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
+          !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
           numSpaces < maxNumSpaces;
 
         // Clear all existing indentation levels to the right of this one.
-        for (var key in numSpaceToDesiredIndentLevel) {
-          if (key > numSpaces) {
-            delete numSpaceToDesiredIndentLevel[key];
+        for (var indentLength in numSpacesToDesiredIndentLevel) {
+          if (Number(indentLength) > numSpaces) {
+            delete numSpacesToDesiredIndentLevel[indentLength];
           }
         }
 
         if (isShortfallLine) {
-          numSpaces = Object.keys(numSpaceToDesiredIndentLevel).reduce(
-            function(max, key) {
-              return Math.max(numSpaceToDesiredIndentLevel[key], max);
-            }, -Infinity);
+          var existingIndentLevels = existingNumSpaces.map(function(indentLength) {
+            return numSpacesToDesiredIndentLevel[indentLength];
+          });
+          numSpaces = Math.max.apply(null, existingIndentLevels);
         }
 
         var normalizedLine = '';
-        for (var i = 0; i < numSpaceToDesiredIndentLevel[numSpaces]; i++) {
+        for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
           normalizedLine += FOUR_SPACES;
         }
         normalizedLine += removeLeadingWhitespace(line);
@@ -286,19 +283,6 @@ oppia.factory('codeReplRulesService', [
       var normalizedError = $filter('normalizeWhitespace')(answer.error);
       var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
       return normalizedError.indexOf(normalizedSnippet) != -1;
-    },
-    FuzzyMatches: function(answer, inputs) {
-      // TODO(bhenning): This is where a third party library could be used to
-      // intelligently normalize and compare different submissions of code.
-      // Also, this should return a value between 0 and 1 depending on how
-      // closely it matches the training data, rather than doing a crisp
-      // comparison on stripped code.
-
-      var code = codeReplNormalizationService.normalizePythonCode(answer.code);
-      return inputs.training_data.some(function(possibility) {
-        return codeReplNormalizationService.normalizePythonCode(
-          possibility.code) == code;
-      });
     }
   };
 }]);
