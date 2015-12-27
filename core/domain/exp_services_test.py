@@ -22,7 +22,6 @@ import os
 import StringIO
 import zipfile
 
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -188,9 +187,6 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
-    def _summaries_to_ids(self, exp_summaries):
-        return sorted([exp_summary.id for exp_summary in exp_summaries])
-
     def _create_search_query(self, terms, categories, languages):
         query = ' '.join(terms)
         if categories:
@@ -203,9 +199,9 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summaries_with_no_query(self):
         # An empty query should return all explorations.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(''))
-        self.assertEqual(self._summaries_to_ids(exp_summaries), [
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(''))
+        self.assertEqual(sorted(exp_ids), [
             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
         ]);
@@ -219,11 +215,9 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_5)
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_6)
 
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(''))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_2, self.EXP_ID_4])
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(''))
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_4])
 
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_2)
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID_4)
@@ -231,73 +225,61 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         # If no explorations are loaded, a blank query should not get any
         # explorations.
         self.assertEqual(
-            exp_services.get_exploration_summaries_matching_query(''),
+            exp_services.get_exploration_ids_matching_query(''),
             ([], None))
 
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query([], ['Architecture'], [])))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_0, self.EXP_ID_1])
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Search for explorations in Finnish.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query([], [], ['fi'])))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_1, self.EXP_ID_5])
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_1, self.EXP_ID_5])
 
         # Search for Finnish explorations in the 'Architecture' category.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query([], ['Architecture'], ['fi'])))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries), [self.EXP_ID_1])
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_1])
 
         # Search for explorations containing 'Oppia'.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query(['Oppia'], [], [])))
         self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
+            sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
 
         # Search for explorations containing 'Oppia' and 'Introduce'.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query(['Oppia', 'Introduce'], [], [])))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_2, self.EXP_ID_3])
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3])
 
         # Search for explorations containing 'England' in English.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query(['England'], [], ['en'])))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries), [self.EXP_ID_0])
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_0])
 
         # Search for explorations containing 'in'.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query(['in'], [], [])))
         self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
+            sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
 
         # Search for explorations containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
-        (exp_summaries, search_cursor) = (
-            exp_services.get_exploration_summaries_matching_query(
+        (exp_ids, search_cursor) = (
+            exp_services.get_exploration_ids_matching_query(
                 self._create_search_query(
                     ['in'], ['Architecture', 'Welcome'], [])))
-        self.assertEqual(
-            self._summaries_to_ids(exp_summaries),
-            [self.EXP_ID_0, self.EXP_ID_3])
+        self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 
     def test_exploration_summaries_pagination_in_filled_gallery(self):
         # Ensure the maximum number of explorations that can fit on the gallery
@@ -310,28 +292,28 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids = []
 
             # Page 1: 3 initial explorations.
-            (exp_summaries, search_cursor) = (
-                exp_services.get_exploration_summaries_matching_query(
+            (exp_ids, search_cursor) = (
+                exp_services.get_exploration_ids_matching_query(
                     '', None))
-            self.assertEqual(len(exp_summaries), 3)
+            self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_cursor)
-            found_exp_ids += self._summaries_to_ids(exp_summaries)
+            found_exp_ids += exp_ids
 
             # Page 2: 3 more explorations.
-            (exp_summaries, search_cursor) = (
-                exp_services.get_exploration_summaries_matching_query(
+            (exp_ids, search_cursor) = (
+                exp_services.get_exploration_ids_matching_query(
                     '', search_cursor))
-            self.assertEqual(len(exp_summaries), 3)
+            self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_cursor)
-            found_exp_ids += self._summaries_to_ids(exp_summaries)
+            found_exp_ids += exp_ids
 
             # Page 3: 1 final exploration.
-            (exp_summaries, search_cursor) = (
-                exp_services.get_exploration_summaries_matching_query(
+            (exp_ids, search_cursor) = (
+                exp_services.get_exploration_ids_matching_query(
                     '', search_cursor))
-            self.assertEqual(len(exp_summaries), 1)
+            self.assertEqual(len(exp_ids), 1)
             self.assertIsNone(search_cursor)
-            found_exp_ids += self._summaries_to_ids(exp_summaries)
+            found_exp_ids += exp_ids
 
             # Validate all explorations were seen.
             self.assertEqual(sorted(found_exp_ids), [
@@ -486,8 +468,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.save_new_exploration(self.OWNER_ID, exploration)
 
     def test_save_and_retrieve_exploration(self):
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.OWNER_ID)
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
@@ -505,8 +486,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
 
     def test_save_and_retrieve_exploration_summary(self):
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.OWNER_ID)
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
 
         # Change param spec.
         exp_services.update_exploration(
@@ -1323,12 +1303,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     def test_get_last_updated_by_human_ms(self):
         original_timestamp = utils.get_current_time_in_millisecs()
 
-        v1_exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             self.EXP_ID, self.OWNER_ID, end_state_name='End')
 
         timestamp_after_first_edit = utils.get_current_time_in_millisecs()
 
-        v2_exploration = exp_services.update_exploration(
+        exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [{
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
@@ -2092,8 +2072,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
         # Have Albert create a new exploration.
-        exploration_1 = self.save_new_valid_exploration(
-            self.EXP_ID_1, self.ALBERT_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.ALBERT_ID)
         # Have Albert update that exploration.
         exp_services.update_exploration(
             self.ALBERT_ID, self.EXP_ID_1, [{
@@ -2185,40 +2164,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_ID_3, self.ALBERT_ID)
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_3)
         exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_3)
-
-    def test_get_displayable_exp_summary_dicts_matching_ids(self):
-        # A list of exp_id's are passed in:
-        # EXP_ID_1 -- private exploration
-        # EXP_ID_2 -- pubished exploration
-        # EXP_ID_3 -- deleted exploration
-        # Should only return [EXP_ID_2]
-
-        displayable_summaries = (
-            exp_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3], self.ALBERT_ID))
-
-        self.assertEqual(len(displayable_summaries), 1)
-        self.assertEqual(
-            displayable_summaries[0]['id'], self.EXP_ID_2)
-        self.assertEqual(
-            displayable_summaries[0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
-        self.assertEqual(
-            displayable_summaries[0]['community_owned'], False)
-        self.assertEqual(
-            displayable_summaries[0]['is_editable'], True)
-        self.assertEqual(
-            displayable_summaries[0]['language_code'],
-            feconf.DEFAULT_LANGUAGE_CODE)
-        self.assertEqual(
-            displayable_summaries[0]['category'], 'A category')
-        self.assertEqual(
-            displayable_summaries[0]['ratings'], feconf.get_empty_ratings())
-        self.assertEqual(
-            displayable_summaries[0]['title'], 'Exploration 2 Albert title')
-        self.assertEqual(
-            displayable_summaries[0]['objective'], 'An objective')
-        self.assertIn('last_updated_msec', displayable_summaries[0])
 
     def test_get_non_private_exploration_summaries(self):
 

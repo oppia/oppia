@@ -24,7 +24,7 @@ oppia.directive('collectionNodeListDirective', [function() {
     restrict: 'E',
     scope: {
       getCollectionId: '&collectionId',
-      getCollectionNodes: '&collectionNodes',
+      getCollectionNodes: '&collectionNodes'
     },
     templateUrl: 'inline/collection_node_list_directive'
   };
