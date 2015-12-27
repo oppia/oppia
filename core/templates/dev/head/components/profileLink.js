@@ -38,10 +38,10 @@ oppia.directive('profileLinkImage', [function() {
   return {
     restrict: 'E',
     scope: {
-      username: '&',
+      username: '&'
     },
     templateUrl: 'components/profileLinkImage',
-    controller: ['$scope', '$http', '$q', function($scope, $http, $q) {
+    controller: ['$scope', '$http', function($scope, $http) {
       var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
 
       $scope.isUsernameLinkable = function(username) {

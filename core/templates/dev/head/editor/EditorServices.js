@@ -1589,7 +1589,8 @@ oppia.factory('explorationWarningsService', [
     //     'target', and 'isFallback'
     // - allowFallbackEdges: a boolean specifying whether to treat fallback
     //     edges as valid edges for the purposes of this computation.
-    var _getUnreachableNodeNames = function(initNodeIds, nodes, edges, allowFallbackEdges) {
+    var _getUnreachableNodeNames = function(
+        initNodeIds, nodes, edges, allowFallbackEdges) {
       var queue = initNodeIds;
       var seen = {};
       for (var i = 0; i < initNodeIds.length; i++) {
