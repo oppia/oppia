@@ -22,7 +22,7 @@ oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that maintains the current set of parameters for the learner.
-oppia.factory('learnerParamsService', ['$log', function($log) {
+oppia.factory('learnerParamsService', [function() {
   var _paramDict = {};
 
   return {
@@ -65,13 +65,13 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$q', '$log', 'learnerParamsService',
+    '$http', '$rootScope', '$q', 'learnerParamsService',
     'warningsData', 'answerClassificationService', 'explorationContextService',
     'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
     'playerTranscriptService', 'ExplorationObjectFactory',
     'expressionInterpolationService', 'StatsReportingService',
     function(
-      $http, $rootScope, $q, $log, learnerParamsService,
+      $http, $rootScope, $q, learnerParamsService,
       warningsData, answerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
@@ -79,20 +79,11 @@ oppia.factory('oppiaPlayerService', [
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (
     explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-  var _infoCardImageUrl = null;
-  var _explorationObjective = null;
-  var _explorationTags = [];
-  var _explorationContributorUsernames = [];
-  var _explorationLastUpdatedMsec = null;
-  var _viewersCount = null;
-  var _currentRatings = {};
-
-  var version = GLOBALS.explorationVersion;
   var _isLoggedIn = GLOBALS.userIsLoggedIn;
-  var exploration = null;
-
-  learnerParamsService.init({});
   var answerIsBeingProcessed = false;
+
+  var exploration = null;
+  var version = GLOBALS.explorationVersion;
 
   var randomFromArray = function(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
@@ -175,39 +166,6 @@ oppia.factory('oppiaPlayerService', [
     successCallback(exploration, questionHtml, startingParams);
   };
 
-  var _loadInitialInformationCardData = function() {
-    // TODO(sll): move this and the summary handlers into a separate
-    // exp_metadata.py controller.
-    var infoCardStatisticsUrl = '/createhandler/statistics/' +  _explorationId + '/all';
-
-    var deferredContributors = $q.defer();
-    var deferredStatistics = $q.defer();
-
-    $http({
-      method: 'GET',
-      url: '/explorationsummarieshandler/data',
-      params: {
-        stringified_exp_ids: JSON.stringify([_explorationId])
-      }
-    }).success(function(data) {
-      _explorationObjective = data.summaries[0].objective;
-      _explorationTags = data.summaries[0].tags;
-      _currentRatings = data.summaries[0].ratings;
-      _explorationContributorUsernames = data.summaries[0].contributor_names;
-      _explorationLastUpdatedMsec = data.summaries[0].last_updated;
-      deferredContributors.resolve(data);
-    });
-
-    // This is needed to get statistics of the exploration.
-    $http.get(infoCardStatisticsUrl).success(function(data) {
-      _viewersCount = data.num_starts;
-      deferredStatistics.resolve(_viewersCount);
-    });
-
-    return $q.all([
-      deferredStatistics.promise, deferredContributors.promise]);
-  };
-
   return {
     // This should only be used in editor preview mode.
     populateExploration: function(explorationData) {
@@ -249,7 +207,6 @@ oppia.factory('oppiaPlayerService', [
           (version ? '?v=' + version : ''));
         $http.get(explorationDataUrl).success(function(data) {
           exploration = ExplorationObjectFactory.create(data.exploration);
-          _infoCardImageUrl = data.info_card_image_url;
           version = data.version;
 
           StatsReportingService.initSession(
@@ -257,24 +214,12 @@ oppia.factory('oppiaPlayerService', [
             GLOBALS.collectionId);
 
           _loadInitialState(successCallback);
-          _loadInitialInformationCardData();
           $rootScope.$broadcast('playerServiceInitialized');
         });
       }
     },
     getExplorationId: function() {
       return _explorationId;
-    },
-    getInformationCardData: function() {
-      return {
-        currentRatings: _currentRatings,
-        explorationTags: _explorationTags,
-        infoCardImageUrl: _infoCardImageUrl,
-        explorationObjective: _explorationObjective,
-        explorationLastUpdatedMsec: _explorationLastUpdatedMsec,
-        explorationContributorUsernames : _explorationContributorUsernames,
-        viewersCount: _viewersCount
-      };
     },
     getExplorationTitle: function() {
       return exploration.title;
@@ -433,9 +378,6 @@ oppia.factory('oppiaPlayerService', [
     },
     getOppiaAvatarImageUrl: function() {
       return '/images/avatar/oppia_black_72px.png';
-    },
-    getInfoCardDataPromise: function() {
-      return _loadInitialInformationCardData();
     }
   };
 }]);
@@ -605,78 +547,5 @@ oppia.directive('feedbackPopup', ['oppiaPlayerService', function(oppiaPlayerServ
         });
       };
     }]
-  };
-}]);
-
-
-oppia.controller('InformationCard', ['$scope', '$modal', function($scope, $modal) {
-  $scope.showInformationCard = function() {
-    var modalInstance = $modal.open({
-      animation: true,
-      templateUrl: 'popover/informationCard',
-      windowClass: 'oppia-modal-information-card',
-      controller: [
-         '$scope', '$http', '$modal', '$modalInstance', 'oppiaPlayerService',
-         'ratingService','oppiaHtmlEscaper', 'embedExplorationButtonService',
-         'oppiaDatetimeFormatter', 'ratingComputationService',
-         function ($scope, $http, $modal, $modalInstance, oppiaPlayerService,
-                   ratingService, oppiaHtmlEscaper, embedExplorationButtonService,
-                   oppiaDatetimeFormatter, ratingComputationService) {
-
-        var _informationCardData = oppiaPlayerService.getInformationCardData();
-        $scope.serverName = window.location.protocol + '//' + window.location.host;
-        $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
-          GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
-        $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
-
-        // TODO(Barnabas) refactor getExplorationId() and getExplorationTitle()
-        // to return promises.
-        $scope.explorationId = oppiaPlayerService.getExplorationId();
-        $scope.explorationCardTitle = oppiaPlayerService.getExplorationTitle();
-        $scope.infoCardBackgroundImageCss = {
-          'background-image': 'url('+ _informationCardData.infoCardImageUrl + ')'
-        };
-        $scope.explorationRatings = ratingComputationService.computeAverageRating(
-          _informationCardData.currentRatings) || 'Unrated';
-
-        var _explorationTagsSummary = function(arrayOfTags) {
-          var _tagsToBeShown =[];
-          var _tagsInTooltip = [];
-          for (var i = 0; i < arrayOfTags.length; i++) {
-            if ((_tagsToBeShown.toString() + arrayOfTags[i]).length < 45) {
-              _tagsToBeShown.push(arrayOfTags[i]);
-            } else {
-              _tagsInTooltip.push(arrayOfTags[i]);
-            }
-          };
-          return {
-            tagsToBeShown: _tagsToBeShown,
-            tagsInTooltip: _tagsInTooltip
-          };
-        };
-        $scope.explorationTags = _explorationTagsSummary(
-          _informationCardData.explorationTags);
-        $scope.explorationDescription = _informationCardData.explorationObjective;
-        $scope.explorationContributorUsernames = _informationCardData.explorationContributorUsernames;
-        $scope.explorationLastUpdatedMsec = _informationCardData.explorationLastUpdatedMsec;
-        $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
-        };
-        $scope.viewersCount = _informationCardData.viewersCount;
-        $scope.loadingInfoCardData = true;
-        $scope.failedLoadingData = false;
-        oppiaPlayerService.getInfoCardDataPromise().then(function(data) {
-          $scope.loadingInfoCardData = false;
-        }, function() {
-          $scope.failedLoadingData = true;
-        });
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss();
-        };
-      }]
-    });
-
-    modalInstance.result.then(function () {}, function () {});
   };
 }]);

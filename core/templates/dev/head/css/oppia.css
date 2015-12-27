@@ -2407,6 +2407,14 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
 }
 
+.oppia-info-card-bg-image {
+  left: 50%;
+  margin-right: -50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .oppia-info-card-logo-thumbnail {
   background-position: center;
   background-repeat: no-repeat;

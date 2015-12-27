@@ -163,6 +163,27 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             'last_updated': last_updated,
         }
 
+    @classmethod
+    def get_views_multi(cls, exploration_ids):
+        """Given a list of exploration ids, returns a list of view counts
+        for the explorations therein.
+        """
+        entity_ids = [stats_models.ExplorationAnnotationsModel.get_entity_id(
+            exploration_id, VERSION_ALL) for exploration_id in exploration_ids]
+        mr_models = stats_models.ExplorationAnnotationsModel.get_multi(
+            entity_ids)
+        realtime_model_ids = [
+            cls.get_active_realtime_layer_id(exploration_id)
+            for exploration_id in exploration_ids]
+        realtime_models = cls._get_realtime_datastore_class().get_multi(
+            realtime_model_ids)
+
+        return [
+            (mr_models[i].num_starts if mr_models[i] is not None else 0) +
+            (realtime_models[i].num_starts
+                if realtime_models[i] is not None else 0)
+            for i in range(len(exploration_ids))]
+
 
 class StatisticsMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):

@@ -126,14 +126,10 @@
             </span>
           </li>
 
-          <li ng-if="getNumViews()">
+          <li class="pull-right">
             <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top">
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
-          </li>
-
-          <li class="updated pull-right">
-            <[getLastUpdatedDatetime()]>
           </li>
         </ul>
       </div>
