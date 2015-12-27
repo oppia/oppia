@@ -29,7 +29,6 @@ var forms = require('../protractor_utils/forms.js');
 
 describe('Gallery view', function() {
   it('should display private, published and featured explorations', function() {
-
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_BUSINESS = 'Business';

@@ -55,5 +55,5 @@ describe('CodeRepl interaction', function() {
       expect(elt.html()).toContain('code-repl-input-box');
       expect(elt.html()).toContain('runCode(code)');
     });
-   });
+  });
 });

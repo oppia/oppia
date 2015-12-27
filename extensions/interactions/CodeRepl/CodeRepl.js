@@ -25,7 +25,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/CodeRepl',
-      controller:  ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.languageWithValue);
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
@@ -59,7 +59,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             editor.refresh();
           }, 200);
 
-          editor.on('change', function(instance, change) {
+          editor.on('change', function() {
             $scope.code = editor.getValue();
           });
 
@@ -76,7 +76,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           timeoutMsg: function() {
             $scope.sendResponse('', 'timeout');
           },
-          execLimit: 10000,
+          execLimit: 10000
         });
 
         $scope.runCode = function(codeInput) {
@@ -89,7 +89,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           // Evaluate the program asynchronously using Skulpt.
           Sk.misceval.asyncToPromise(function() {
             Sk.importMainWithBody('<stdin>', false, fullCode, true);
-          }).then(function(res) {
+          }).then(function() {
             // Finished evaluating.
             $scope.sendResponse('', '');
           }, function(err) {
@@ -122,14 +122,17 @@ oppia.directive('oppiaResponseCodeRepl', [
       restrict: 'E',
       scope: {},
       templateUrl: 'response/CodeRepl',
-      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      controller: [
+        '$scope', '$attrs', 'focusService',
+        function($scope, $attrs, focusService) {
+          $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
-        if ($scope.answer.error) {
-          $scope.errorFocusLabel = focusService.generateFocusLabel();
-          focusService.setFocus($scope.errorFocusLabel);
+          if ($scope.answer.error) {
+            $scope.errorFocusLabel = focusService.generateFocusLabel();
+            focusService.setFocus($scope.errorFocusLabel);
+          }
         }
-      }]
+      ]
     };
   }
 ]);

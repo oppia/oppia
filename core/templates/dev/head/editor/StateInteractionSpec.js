@@ -19,9 +19,7 @@
  */
 
 describe('State Interaction controller', function() {
-
   describe('StateInteraction', function() {
-
     beforeEach(function() {
       module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the
@@ -85,7 +83,7 @@ describe('State Interaction controller', function() {
             }]
           },
           param_changes: []
-        },
+        }
       });
 
       var stateEditorCtrl = $controller('StateEditor', {
@@ -118,7 +116,8 @@ describe('State Interaction controller', function() {
       });
     }));
 
-    it('should keep non-empty content when setting a terminal interaction', function() {
+    it('should keep non-empty content when setting a terminal interaction',
+        function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
 
@@ -132,11 +131,14 @@ describe('State Interaction controller', function() {
       siis.displayed = 'TerminalInteraction';
       scope.onCustomizationModalSavePostHook();
 
-      expect(ess.getState('First State').content[0].value).toEqual('First State Content');
-      expect(ess.getState('First State').interaction.id).toEqual('TerminalInteraction');
+      expect(ess.getState('First State').content[0].value).toEqual(
+        'First State Content');
+      expect(ess.getState('First State').interaction.id).toEqual(
+        'TerminalInteraction');
     });
 
-    it('should change to default text when adding a terminal interaction', function() {
+    it('should change to default text when adding a terminal interaction',
+        function() {
       ecs.setActiveStateName('End State');
       scope.initStateEditor();
 
@@ -151,11 +153,14 @@ describe('State Interaction controller', function() {
       scope.onCustomizationModalSavePostHook();
 
       expect(state.content[0].value).toEqual('');
-      expect(ess.getState('End State').content[0].value).toEqual('Congratulations, you have finished!');
-      expect(ess.getState('End State').interaction.id).toEqual('TerminalInteraction');
+      expect(ess.getState('End State').content[0].value).toEqual(
+        'Congratulations, you have finished!');
+      expect(ess.getState('End State').interaction.id).toEqual(
+        'TerminalInteraction');
     });
 
-    it('should not default text when adding a non-terminal interaction', function() {
+    it('should not default text when adding a non-terminal interaction',
+        function() {
       ecs.setActiveStateName('End State');
       scope.initStateEditor();
 

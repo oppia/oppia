@@ -19,7 +19,6 @@
  */
 
 describe('Sidebar state name controller', function() {
-
   describe('SidebarStateName', function() {
     var scope, filter, ctrl, ecs, fs, ess;
 
@@ -27,8 +26,8 @@ describe('Sidebar state name controller', function() {
       module('oppia');
     });
 
-    beforeEach(inject(function($rootScope, $q, $filter, $controller, $injector) {
-
+    beforeEach(inject(function(
+        $rootScope, $q, $filter, $controller, $injector) {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;
@@ -157,7 +156,7 @@ describe('Sidebar state name controller', function() {
       expect(ecs.getActiveStateName()).toEqual('Fifth State');
     });
 
-    it('should check that states can be named variations of \'END\'', function() {
+    it('should allow state names to be variations of \'END\'', function() {
       ecs.setActiveStateName('First State');
       scope.initStateNameEditor();
 

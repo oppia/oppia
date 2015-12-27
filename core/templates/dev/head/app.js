@@ -42,9 +42,11 @@ oppia.config(['$interpolateProvider', '$httpProvider',
   $interpolateProvider.endSymbol(']>');
 
   $httpProvider.defaults.headers.post = {
-    'Content-Type': 'application/x-www-form-urlencoded'};
+    'Content-Type': 'application/x-www-form-urlencoded'
+  };
   $httpProvider.defaults.headers.put = {
-    'Content-Type': 'application/x-www-form-urlencoded'};
+    'Content-Type': 'application/x-www-form-urlencoded'
+  };
 
   $httpProvider.interceptors.push([
     '$q', '$log', 'warningsData', function($q, $log, warningsData) {
@@ -88,24 +90,25 @@ oppia.config(['$provide', function($provide) {
     var _originalError = $delegate.error;
 
     if (window.GLOBALS && !window.GLOBALS.DEV_MODE) {
-      $delegate.log = function(message) { };
-      $delegate.info = function(message) { };
+      $delegate.log = function() {};
+      $delegate.info = function() {};
       // TODO(sll): Send errors (and maybe warnings) to the backend.
-      $delegate.warn = function(message) { };
+      $delegate.warn = function() { };
       $delegate.error = function(message) {
         if (String(message).indexOf('$digest already in progress') === -1) {
           _originalError(message);
         }
       };
-      $delegate.error.logs = [];  // This keeps angular-mocks happy (in tests).
+      // This keeps angular-mocks happy (in tests).
+      $delegate.error.logs = [];
     }
 
     return $delegate;
   }]);
 }]);
 
-//Returns true if the user is on a mobile device.
-//See here: http://stackoverflow.com/a/14301832/5020618
+// Returns true if the user is on a mobile device.
+// See: http://stackoverflow.com/a/14301832/5020618
 oppia.factory('deviceInfoService', ['$window', function($window) {
   return {
     isMobileDevice: function() {
@@ -123,6 +126,7 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   return function(exception, cause) {
     var messageAndSourceAndStackTrace = [
       '',
+      'Cause: ' + cause,
       'Source: ' + window.location.href,
       exception.message,
       String(exception.stack)
@@ -137,14 +141,16 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
         url: '/frontend_errors',
         data: $.param({
           csrf_token: GLOBALS.csrf_token,
-          payload: JSON.stringify({error: messageAndSourceAndStackTrace}),
+          payload: JSON.stringify({
+            error: messageAndSourceAndStackTrace
+          }),
           source: document.URL
         }, true),
         contentType: 'application/x-www-form-urlencoded',
         dataType: 'text',
         async: true
       });
-    } catch(loggingError) {
+    } catch (loggingError) {
       $log.warn('Error logging failed.');
     }
 
@@ -176,7 +182,7 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
     escapedStrToUnescapedStr: function(value) {
       return String(value)
                   .replace(/&quot;/g, '"')
-                  .replace(/&#39;/g, "'")
+                  .replace(/&#39;/g, '\'')
                   .replace(/&lt;/g, '<')
                   .replace(/&gt;/g, '>')
                   .replace(/&amp;/g, '&');
@@ -215,8 +221,9 @@ oppia.factory('validatorsService', [
     /**
      * Checks whether an entity name is valid, and displays a warning message
      * if it isn't.
-     * @param {string} input The input to be checked.
-     * @param {boolean} showWarnings Whether to show warnings in the butterbar.
+     * @param {string} input - The input to be checked.
+     * @param {boolean} showWarnings - Whether to show warnings in the
+     *   butterbar.
      * @return {boolean} True if the entity name is valid, false otherwise.
      */
     isValidEntityName: function(input, showWarnings) {
@@ -269,7 +276,7 @@ oppia.factory('validatorsService', [
       }
       return true;
     }
-  }
+  };
 }]);
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
@@ -279,42 +286,44 @@ oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 // Note: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
 // page.
 oppia.factory('focusService', [
-    '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-    function($rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS) {
-  var _nextLabelToFocusOn = null;
-  return {
-    clearFocus: function() {
-      this.setFocus(LABEL_FOR_CLEARING_FOCUS);
-    },
-    setFocus: function(name) {
-      if (_nextLabelToFocusOn) {
-        return;
-      }
+  '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
+  function($rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS) {
+    var _nextLabelToFocusOn = null;
+    return {
+      clearFocus: function() {
+        this.setFocus(LABEL_FOR_CLEARING_FOCUS);
+      },
+      setFocus: function(name) {
+        if (_nextLabelToFocusOn) {
+          return;
+        }
 
-      _nextLabelToFocusOn = name;
-      $timeout(function() {
-        $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
-        _nextLabelToFocusOn = null;
-      });
-    },
-    setFocusIfOnDesktop: function(newFocusLabel) {
-      if (!deviceInfoService.isMobileDevice()) {
-        this.setFocus(newFocusLabel);
+        _nextLabelToFocusOn = name;
+        $timeout(function() {
+          $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
+          _nextLabelToFocusOn = null;
+        });
+      },
+      setFocusIfOnDesktop: function(newFocusLabel) {
+        if (!deviceInfoService.isMobileDevice()) {
+          this.setFocus(newFocusLabel);
+        }
+      },
+      // Generates a random string (to be used as a focus label).
+      generateFocusLabel: function() {
+        return Math.random().toString(36).slice(2);
       }
-    },
-    // Generates a random string (to be used as a focus label).
-    generateFocusLabel: function() {
-      return Math.random().toString(36).slice(2);
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
   return {
     getUrlParams: function() {
       var params = {};
-      var parts = $window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+      var parts = $window.location.href.replace(
+          /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         params[key] = value;
       });
       return params;
@@ -337,7 +346,7 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
 }]);
 
 // Service for debouncing function calls.
-oppia.factory('oppiaDebouncer', ['$log', function($log) {
+oppia.factory('oppiaDebouncer', [function() {
   return {
     // Returns a function that will not be triggered as long as it continues to
     // be invoked. The function only gets executed after it stops being called
@@ -361,7 +370,7 @@ oppia.factory('oppiaDebouncer', ['$log', function($log) {
             args = null;
           }
         }
-      }
+      };
 
       return function() {
         context = this;

@@ -53,7 +53,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             left: regionArea[0][0] * image.width(),
             top: regionArea[0][1] * image.height(),
             width: (regionArea[1][0] - regionArea[0][0]) * image.width(),
-            height: (regionArea[1][1] - regionArea[0][1]) * image.height(),
+            height: (regionArea[1][1] - regionArea[0][1]) * image.height()
           };
         };
         $scope.getRegionDisplay = function(label) {
@@ -79,7 +79,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           }
         };
-        $scope.onClickImage = function(event) {
+        $scope.onClickImage = function() {
           $scope.$parent.submitAnswer({
             clickPosition: [$scope.mouseX, $scope.mouseY],
             clickedRegions: $scope.currentlyHoveredRegions
@@ -90,24 +90,22 @@ oppia.directive('oppiaInteractiveImageClickInput', [
   }
 ]);
 
-oppia.directive('oppiaResponseImageClickInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'response/ImageClickInput',
-      controller: [
-          '$scope', '$attrs', 'oppiaHtmlEscaper',
-          function($scope, $attrs, oppiaHtmlEscaper) {
-        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+oppia.directive('oppiaResponseImageClickInput', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'response/ImageClickInput',
+    controller: [
+        '$scope', '$attrs', 'oppiaHtmlEscaper',
+        function($scope, $attrs, oppiaHtmlEscaper) {
+      var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
-        $scope.clickRegionLabel = '(Clicks on ' + (
-          _answer.clickedRegions.length > 0 ?
-          '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
-      }]
-    };
-  }
-]);
+      $scope.clickRegionLabel = '(Clicks on ' + (
+        _answer.clickedRegions.length > 0 ?
+        '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+    }]
+  };
+}]);
 
 oppia.directive('oppiaShortResponseImageClickInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {

@@ -25,9 +25,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/PencilCodeEditor',
-      controller: ['$scope', '$attrs', '$element', '$timeout', 'focusService',
+      controller: [
+          '$scope', '$attrs', '$element', '$timeout', 'focusService',
           function($scope, $attrs, $element, $timeout, focusService) {
-
         $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.initialCodeWithValue);
 
@@ -141,7 +141,8 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
       scope: {},
       templateUrl: 'response/PencilCodeEditor',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer).code;
+        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.answer).code;
       }]
     };
   }
@@ -154,7 +155,8 @@ oppia.directive('oppiaShortResponsePencilCodeEditor', [
       scope: {},
       templateUrl: 'shortResponse/PencilCodeEditor',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer).code;
+        $scope.answerCode = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.answer).code;
       }]
     };
   }

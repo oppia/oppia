@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the learner view breadcrumb section of the navbar.
+ * @fileoverview Controllers for the learner view breadcrumb section of the
+ * navbar.
  *
  * @author sean@seanlip.org (Sean Lip)
  */
@@ -35,7 +36,7 @@ oppia.controller('LearnerViewBreadcrumb', [
         }).success(function(data) {
           expInfo = data.summaries[0];
           openInformationCardModal();
-        }).error(function(data) {
+        }).error(function() {
           $log.error(
             'Information card failed to load for exploration ' + explorationId);
         });
@@ -86,11 +87,13 @@ oppia.controller('LearnerViewBreadcrumb', [
                 millisSinceEpoch);
             };
 
-            $scope.averageRating = ratingComputationService.computeAverageRating(
-              expInfo.ratings) || 'Unrated';
+            $scope.averageRating = (
+              ratingComputationService.computeAverageRating(expInfo.ratings) ||
+              'Unrated');
             $scope.contributorNames = expInfo.contributor_names;
-            $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
-              GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+            $scope.escapedTwitterText = (
+              oppiaHtmlEscaper.unescapedStrToEscapedStr(
+                GLOBALS.SHARING_OPTIONS_TWITTER_TEXT));
             $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
             $scope.explorationTitle = expInfo.title;
             $scope.infoCardBackgroundCss = {
