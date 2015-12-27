@@ -37,32 +37,30 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           refreshMap();
         });
 
-        $scope.mapMarkers = [];
-
         // This is required in order to avoid the following bug:
         //   http://stackoverflow.com/questions/18769287
         var refreshMap = function() {
           $timeout(function() {
             google.maps.event.trigger($scope.map, 'resize');
             $scope.map.setCenter({lat: coords[0], lng: coords[1]});
+            $scope.marker = new google.maps.Marker({
+              map: $scope.map,
+              draggable: true,
+              position: $scope.map.getCenter()
+            });
           }, 100);
         };
 
         var coords = $scope.coords || [0, 0];
-        var zoom_level = parseInt($scope.zoom, 10) || 0;
+        var zoomLevel = parseInt($scope.zoom, 10) || 0;
         $scope.mapOptions = {
           center: new google.maps.LatLng(coords[0], coords[1]),
-          zoom: zoom_level,
+          zoom: zoomLevel,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
 
-        $scope.registerClick = function($event, $params) {
-          var ll = $params[0].latLng;
-          $scope.mapMarkers.push(new google.maps.Marker({
-            map: $scope.map,
-            position: ll
-          }));
-
+        $scope.submitAnswer = function() {
+          var ll = $scope.marker.getPosition();
           $scope.$parent.submitAnswer(
             [ll.lat(), ll.lng()], interactiveMapRulesService);
         };
