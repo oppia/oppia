@@ -5,9 +5,9 @@
       property. It works as of Angular 1.4.7. See
       http://stackoverflow.com/a/18644490.
     -->
-    <div ng-if="(threadData.threadList | filter:{suggestion_id:''}).length > 0">
+    <div ng-if="threadData.suggestionThreads.length > 0">
       <h2>Suggestions from Learners</h2>
-      <thread-table threads="threadData.threadList | filter:{suggestion_id:''}"
+      <thread-table threads="threadData.suggestionThreads"
                     on-click-row="setActiveThread">
       </thread-table>
       <hr>
@@ -25,11 +25,11 @@
 
     <div style="clear: both;"></div>
 
-    <div ng-if="threadData.threadList.length === 0">
+    <div ng-if="threadData.feedbackThreads.length === 0">
       <em>No feedback has been given for this exploration yet.</em>
     </div>
 
-    <thread-table threads="threadData.threadList | filter:{suggestion_id:'!'}"
+    <thread-table threads="threadData.feedbackThreads"
                   on-click-row="setActiveThread">
     </thread-table>
 
@@ -187,7 +187,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!(activeThread.suggestion.status == 'new')">Reject</button>
-    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!(activeThread.suggestion.status == 'new')">Accept</button>
+    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!suggestionValid()">Reject</button>
+    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!suggestionValid()">Accept</button>
   </div>
 </script>

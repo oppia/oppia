@@ -31,18 +31,24 @@ oppia.factory('threadDataService', [
   // objects, each representing threads. The 'messages' key of this object
   // is updated lazily.
   var _data = {
-    threadList: []
+    feedbackThreads: [],
+    suggestionThreads: []
   };
 
   var _fetchThreads = function(successCallback) {
-    // UI test code: http://pastebin.com/DhL4fGnm
     var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
     var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-      params: {type: 'open'}
+      params: {list_type: 'all', has_suggestion: true}
     });
 
     $q.all([fPromise, sPromise]).then(function(res) {
-      _data.threadList = [].concat(res[0].data.threads, res[1].data.threads);
+      _data.feedbackThreads = res[0].data.threads;
+      _data.suggestionThreads = res[1].data.threads;
+      // Later requests will use only the thread_id, not full_thread_id
+      _data.feedbackThreads.concat(_data.suggestionThreads).map(function(val) {
+        val.thread_id = val.full_thread_id.substring(
+          val.full_thread_id.indexOf(".") + 1, val.full_thread_id.length);
+      });
       if (successCallback) {
         successCallback();
       }
@@ -50,11 +56,12 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchMessages = function(threadId) {
-    $http.get(
-        _THREAD_HANDLER_PREFIX + threadId).success(function(data) {
-      for (var i = 0; i < _data.threadList.length; i++) {
-        if (_data.threadList[i].thread_id === threadId) {
-          _data.threadList[i].messages = data.messages;
+    $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+      var combined = _data.feedbackThreads.concat(_data.suggestionThreads);
+      for (var i = 0; i < combined.length; i++) {
+        if (combined[i].thread_id === threadId) {
+          combined[i].messages = data.messages;
+          combined[i].suggestion = data.suggestion;
           break;
         }
       }
@@ -83,11 +90,12 @@ oppia.factory('threadDataService', [
     },
     addNewMessage: function(threadId, newMessage, newStatus, successCallback, errorCallback) {
       var url = _THREAD_HANDLER_PREFIX + threadId;
+      var combined = _data.feedbackThreads.concat(_data.suggestionThreads);
       var thread = null;
 
-      for (var i = 0; i < _data.threadList.length; i++) {
-        if (_data.threadList[i].thread_id === threadId) {
-          thread = _data.threadList[i];
+      for (var i = 0; i < combined.length; i++) {
+        if (combined[i].thread_id === threadId) {
+          thread = combined[i];
           thread.status = newStatus;
           break;
         }
@@ -117,10 +125,11 @@ oppia.factory('threadDataService', [
         }
       });
     },
-    resolveSuggestion: function(thread_id, action) {
-      $http.put(_SUGGESTION_ACTION_HANDLER_URL + thread_id, {
-        action: action
-      });
+    resolveSuggestion: function(threadId, action, onSuccess, onFailure) {
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
+        action: action,
+        commit_message: 'Suggestion accepted.'
+      }).then(onSuccess, onFailure);
     }
   };
 }]);

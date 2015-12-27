@@ -96,15 +96,17 @@ oppia.controller('FeedbackTab', [
       backdrop: true,
       size: 'lg',
       resolve: {
-        suggestion: function() {
-          return $scope.activeThread.suggestion;
+        activeThread: function() {
+          return $scope.activeThread;
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'suggestion',
-        function($scope, $modalInstance, suggestion) {
-        $scope.oldContent = suggestion.state_content.old_content;
-        $scope.newContent = suggestion.state_content.new_content;
+        '$scope', '$modalInstance', 'activeThread', 'explorationData',
+        function($scope, $modalInstance, activeThread, explorationData) {
+        var suggestion = activeThread.suggestion;
+        var states = explorationData.data.states;
+        $scope.oldContent = states[suggestion.state_name].content[0].value;
+        $scope.newContent = suggestion.state_content.value;
 
         $scope.acceptSuggestion = function() {
           $modalInstance.close({
@@ -121,20 +123,28 @@ oppia.controller('FeedbackTab', [
         $scope.cancelReview = function() {
           $modalInstance.dismiss('cancel');
         };
+
+        $scope.suggestionValid = function() {
+          return (activeThread.status === 'open' &&
+            explorationData.data.version === suggestion.exploration_version);
+        }
       }]
     }).result.then(function(result) {
       threadDataService.resolveSuggestion(
-        $scope.activeThread.suggestion.suggestion.id, result.action);
-      // Update the status of the feedback thread.
-      var msg, status;
-      if (result.action === 'accept') {
-        msg = 'Suggestion accepted.';
-        status = 'fixed';
-      } else {
-        msg = 'Suggestion rejected.';
-        status = 'not_actionable';
-      }
-      $scope.addNewMessage($scope.activeThread.thread_id, msg, status);
+        $scope.activeThread.suggestion.id, result.action, function(res) {
+          // Update the status of the feedback thread.
+          var msg, status;
+          if (result.action === 'accept') {
+            msg = 'Suggestion accepted.';
+            status = 'fixed';
+          } else {
+            msg = 'Suggestion rejected.';
+            status = 'not_actionable';
+          }
+          $scope.addNewMessage($scope.activeThread.thread_id, msg, status);
+        }, function(res) {
+          console.log("Error resolving suggestion");
+        });
     });
   };
 
@@ -160,9 +170,11 @@ oppia.controller('FeedbackTab', [
   $scope.setActiveThread = function(threadId) {
     threadDataService.fetchMessages(threadId);
 
-    for (var i = 0; i < $scope.threadData.threadList.length; i++) {
-      if ($scope.threadData.threadList[i].thread_id === threadId) {
-        $scope.activeThread = $scope.threadData.threadList[i];
+    var combined = [].concat(
+      $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
+    for (var i = 0; i < combined.length; i++) {
+      if (combined[i].thread_id === threadId) {
+        $scope.activeThread = combined[i];
         break;
       }
     }
