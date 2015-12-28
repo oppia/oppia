@@ -201,12 +201,9 @@
     </div>
   </div>
 
-  <div ng-if="isOnTerminalCard() && !isIframed && isCurrentCardAtEndOfTranscript() && (recommendedExplorationSummaries.length > 0 || (isInEditorPage && invalidExpIds.length > 0))"
+  <div ng-if="isOnTerminalCard() && !isIframed && isCurrentCardAtEndOfTranscript() && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
       <span style="color: #eee;">Suggested next:</span>
-      <div style="color: red;" ng-repeat="expId in invalidExpIds">
-        <strong>Error:</strong> no published exploration found with ID '<[expId]>'
-      </div>
 
       <div class="oppia-gallery-tiles-container" style="padding-top: 10px;">
         <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
