@@ -279,6 +279,12 @@ oppia.factory('oppiaPlayerService', [
     getExplorationTitle: function() {
       return exploration.title;
     },
+    getExplorationVersion: function() {
+      return version;
+    },
+    getStateContent: function(stateName) {
+      return exploration.getState(stateName).content;
+    },
     getInteractionHtml: function(stateName, labelForFocusTarget) {
       return oppiaExplorationHtmlFormatterService.getInteractionHtml(
         exploration.getInteractionId(stateName),
@@ -488,6 +494,46 @@ oppia.controller('LearnerLocalNav', [
   });
 
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
+  $scope.showLearnerSuggestionModal = function() {
+    $modal.open({
+      templateUrl: 'modals/learnerViewSuggestion',
+      backdrop: true,
+      resolve: {},
+      controller: [
+        '$scope', '$modalInstance', 'playerPositionService',
+        'oppiaPlayerService',
+        function($scope, $modalInstance, playerPositionService,
+                 oppiaPlayerService) {
+          var stateName = playerPositionService.getCurrentStateName();
+          $scope.initContent = oppiaPlayerService.getStateContent(stateName)[0].value;
+          $scope.suggestionContent = $scope.initContent;
+
+          $scope.cancelSuggestion = function() {
+            $modalInstance.dismiss('cancel');
+          };
+
+          $scope.submitSuggestion = function() {
+            $modalInstance.close({
+              data: {
+                id: oppiaPlayerService.getExplorationId(),
+                version: oppiaPlayerService.getExplorationVersion(),
+                stateName: stateName,
+                suggestionContent: $scope.suggestionContent
+              }
+            });
+          };
+        }]
+    }).result.then(function(result) {
+      $http.post('/suggestionhandler/' + result.data.id, {
+        exploration_version: result.data.version,
+        state_name: result.data.stateName,
+        suggestion_content: {
+          type: 'text',
+          value: result.data.suggestionContent
+        }
+      });
+    });
+  };
 
   $scope.submitUserRating = function(ratingValue) {
     $scope.userRating = ratingValue;

@@ -121,7 +121,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    PAGE_NAME_FOR_CSRF = 'player'
 
     @base.require_user
     def post(self, exploration_id):

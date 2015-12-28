@@ -40,15 +40,35 @@
           <span class="glyphicon glyphicon-comment"></span>
         </a>
       </li>
-      {% if can_edit %}
-        <li>
+      <li>
+        {% if can_edit %}
           <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
             <span class="glyphicon glyphicon-pencil"></span>
           </a>
-        </li>
-      {% endif %}
+        {% elif username %}
+          <a ng-click="showLearnerSuggestionModal()" tooltip="Suggest Edit" tooltip-placement="bottom" target="_blank">
+            <span class="glyphicon glyphicon-pencil"></span>
+          </a>
+        {% endif %}
+      </li>
     </ul>
   </div>
+  <script type="text/ng-template" id="modals/learnerViewSuggestion">
+    <div class="modal-header">
+      <h3>Make a Suggestion</h3>
+    </div>
+
+    <div class="modal-body">
+      <text-angular-rte html-content="suggestionContent"></text-angular-rte>
+      <br />
+      <p>Press 'Submit' to send your changes to the exploration author for review.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
+      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="initContent==suggestionContent">Submit</button>
+    </div>
+  </script>
 {% endblock local_top_nav_options %}
 
 {% block content %}
