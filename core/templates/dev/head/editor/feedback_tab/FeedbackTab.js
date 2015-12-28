@@ -131,17 +131,10 @@ oppia.controller('FeedbackTab', [
       }]
     }).result.then(function(result) {
       threadDataService.resolveSuggestion(
-        $scope.activeThread.suggestion.id, result.action, function(res) {
-          // Update the status of the feedback thread.
-          var msg, status;
-          if (result.action === 'accept') {
-            msg = 'Suggestion accepted.';
-            status = 'fixed';
-          } else {
-            msg = 'Suggestion rejected.';
-            status = 'not_actionable';
-          }
-          $scope.addNewMessage($scope.activeThread.thread_id, msg, status);
+        $scope.activeThread.thread_id, result.action, function(res) {
+          threadDataService.fetchThreads(function() {
+            $scope.setActiveThread($scope.activeThread.thread_id);
+          });
         }, function(res) {
           console.log("Error resolving suggestion");
         });

@@ -1500,7 +1500,7 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
              suggestion_author_userid, exploration_id, change_list, 
              full_commit_message)
         feedback_services.create_message(
-            exploration_id, thread_id, suggestion_author_userid, None, None,
+            exploration_id, thread_id, editor_id, None, None,
             'Suggestion accepted.') 
         thread = (feedback_models.FeedbackThreadModel.
             get_by_exp_and_thread_id(exploration_id, thread_id))

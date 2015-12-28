@@ -128,8 +128,8 @@ oppia.factory('threadDataService', [
     resolveSuggestion: function(threadId, action, onSuccess, onFailure) {
       $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
         action: action,
-        commit_message: 'Suggestion accepted.'
-      }).then(onSuccess, onFailure);
+        commit_message: 'Suggestion ok.'
+      }).success(onSuccess).error(onFailure);
     }
   };
 }]);
