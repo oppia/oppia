@@ -16,11 +16,12 @@
 
 __author__ = 'Sean Lip'
 
+import json
 import logging
+import random
 
 from core.controllers import base
 from core.domain import classifier_services
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -37,11 +38,14 @@ from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
 from core.domain import skins_services
+from core.domain import summary_services
 import feconf
 import utils
 
 import jinja2
 
+
+MAX_SYSTEM_RECOMMENDATIONS = 4
 
 SHARING_OPTIONS = config_domain.ConfigProperty(
     'sharing_options', {
@@ -102,14 +106,12 @@ def classify_hard_rule(state, params, input_type, normalized_answer, fs):
     """Find the first hard rule that matches."""
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec = None
     best_matched_rule_spec_index = None
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
     for (answer_group_index, answer_group) in enumerate(
             state.interaction.answer_groups):
         ored_truth_value = rule_domain.CERTAIN_FALSE_VALUE
-        best_rule_spec = None
         for (rule_spec_index, rule_spec) in enumerate(
                 answer_group.rule_specs):
             if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
@@ -118,7 +120,6 @@ def classify_hard_rule(state, params, input_type, normalized_answer, fs):
                 if evaluated_truth_value > ored_truth_value:
                     ored_truth_value = evaluated_truth_value
                     best_rule_spec_index = rule_spec_index
-                    best_rule_spec = rule_spec
         if ored_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
             best_matched_truth_value = ored_truth_value
             best_matched_answer_group = answer_group
@@ -141,7 +142,6 @@ def classify_soft_rule(state, params, input_type, normalized_answer, fs):
     """
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec = None
     best_matched_rule_spec_index = None
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
@@ -157,7 +157,6 @@ def classify_soft_rule(state, params, input_type, normalized_answer, fs):
                 fuzzy_rule_spec, input_type, params, normalized_answer, fs)
             if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
                 best_matched_truth_value = evaluated_truth_value
-                best_matched_rule_spec = fuzzy_rule_spec
                 best_matched_rule_spec_index = fuzzy_rule_spec_index
                 best_matched_answer_group = answer_group
                 best_matched_answer_group_index = answer_group_index
@@ -178,7 +177,6 @@ def classify_string_classifier_rule(
     """
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec = None
     best_matched_rule_spec_index = None
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
@@ -208,7 +206,6 @@ def classify_string_classifier_rule(
             best_matched_truth_value = rule_domain.CERTAIN_TRUE_VALUE
             for rule_spec in answer_group.rule_specs:
                 if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
-                    best_matched_rule_spec = fuzzy_rule_spec
                     best_matched_rule_spec_index = fuzzy_rule_spec_index
                     break
             best_matched_answer_group = predicted_answer_group
@@ -645,18 +642,36 @@ class RecommendationsHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
+        include_system_recommendations = self.request.get(
+            'include_system_recommendations')
+        try:
+            author_recommended_exp_ids = json.loads(self.request.get(
+                'stringified_author_recommended_ids'))
+        except Exception:
+            raise self.PageNotFoundException
 
-        recommended_exp_ids = []
+        auto_recommended_exp_ids = []
         if self.user_id and collection_id:
-            recommended_exp_ids = (
+            next_exp_ids_in_collection = (
                 collection_services.get_next_exploration_ids_to_complete_by_user(
                     self.user_id, collection_id))
-        else:
-            recommended_exp_ids = (
+            auto_recommended_exp_ids = list(
+                set(next_exp_ids_in_collection) -
+                set(author_recommended_exp_ids))
+        elif include_system_recommendations:
+            system_chosen_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
                     exploration_id))
+            filtered_exp_ids = list(
+                set(system_chosen_exp_ids) -
+                set(author_recommended_exp_ids))
+            auto_recommended_exp_ids = random.sample(
+                filtered_exp_ids,
+                min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
         self.values.update({
-            'recommended_exp_ids': recommended_exp_ids
+            'summaries': (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    author_recommended_exp_ids + auto_recommended_exp_ids)),
         })
         self.render_json(self.values)
