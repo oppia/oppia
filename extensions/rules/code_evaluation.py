@@ -44,7 +44,3 @@ class ResultsInError(base.CodeEvaluationRule):
 class ErrorContains(base.CodeEvaluationRule):
     description = (
         'has error message that contains {{x|UnicodeString}}')
-
-
-class FuzzyMatches(base.CodeEvaluationRule):
-    description = 'is similar to {{training_data|ListOfCodeEvaluation}}'
