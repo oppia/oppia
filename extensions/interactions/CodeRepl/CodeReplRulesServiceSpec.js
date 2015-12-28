@@ -90,6 +90,26 @@ describe('Code Normalization', function() {
       'z'
     );
   });
+
+  it('should handle shortfall lines', function() {
+    expect(crns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij\n' +
+      '              ppppp\n' +
+      '      x\n' +
+      '  abc\n' +
+      '    bcd\n' +
+      '  cde'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij\n' +
+      '        ppppp\n' +
+      '    x\n' +
+      'abc\n' +
+      '    bcd\n' +
+      'cde'
+    );
+  });
 });
 
 describe('Code REPL rules service', function() {

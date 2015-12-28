@@ -217,10 +217,8 @@ oppia.factory('codeReplNormalizationService', [function() {
         }
 
         if (isShortfallLine) {
-          var existingIndentLevels = existingNumSpaces.map(function(indentLength) {
-            return numSpacesToDesiredIndentLevel[indentLength];
-          });
-          numSpaces = Math.max.apply(null, existingIndentLevels);
+          existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
+          numSpaces = Math.max.apply(null, existingNumSpaces);
         }
 
         var normalizedLine = '';
@@ -231,16 +229,6 @@ oppia.factory('codeReplNormalizationService', [function() {
         normalizedCodeLines.push(normalizedLine);
       });
       return normalizedCodeLines.join('\n');
-    },
-    // A very naive approach to 'normalizing' the code is to strip out all
-    // comments and whitespace. This normalization currently assumes Python.
-    normalizePythonCode: function(code) {
-      // TODO(sll): This does not correctly handle the case where '#' is
-      // within quotes, or where it is escaped.
-      // remove comments
-      var strippedCode = code.replace(/#.*/g, '');
-      // remove whitespace
-      return strippedCode.replace(/\s+/g, '');
     }
   };
 }]);
