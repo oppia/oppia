@@ -34,7 +34,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     var exceedsIsomorphismVerticesLimit = false;
 
     if (customizationArgs.graph.value.vertices.length > VERTICES_LIMIT) {
-      exceedsVerticeLimit = true;
+      exceedsVerticesLimit = true;
     }
 
     if (!customizationArgs.graph.value.isWeighted &&
