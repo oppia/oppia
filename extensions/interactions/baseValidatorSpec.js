@@ -296,19 +296,6 @@ describe('Interaction validator', function() {
       warnings = validator(currentState, customizationArguments, [], null);
       expect(warnings).toEqual([]);
     });
-
-    it('should have warnings for more than 8 recommendations', function() {
-      customizationArguments.recommendedExplorationIds.value = [
-        'ExpID0', 'ExpID1', 'ExpID2', 'ExpID3',
-        'ExpID4', 'ExpID5', 'ExpID6', 'ExpID7',
-        'ExpID8'
-      ];
-      var warnings = validator(currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'At most 8 explorations can be recommended.'
-      }]);
-    });
   });
 
   describe('oppiaInteractiveGraphInputValidator', function() {
