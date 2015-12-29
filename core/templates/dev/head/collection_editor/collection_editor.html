@@ -31,8 +31,15 @@
       <p>title: <[collection.title]></p>
       <p>category: <[collection.category]></p>
       <p>objective: <[collection.objective]></p>
+
+      <!-- List of acquired and pre-requisite skills !-->
+      <h1>Skills</h1>
+      <collection-skills-list-directive collection-skills="collectionSkills">
+      </collection-skills-list-directive>
     </div>
   </div>
+
+  {% include 'collection_editor/collection_skills_list_directive.html' %}
 {% endblock content %}
 
 
@@ -40,6 +47,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
+    {{ include_js_file('collection_editor/CollectionSkillsListDirective.js') }}
     {{ include_js_file('domain/collection/CollectionDataService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>

@@ -25,7 +25,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionDataService', 'warnin
 	function($scope, collectionDataService, warningsData){
 
   $scope.collection = null;
-  $scope.collectionId = '';
+  $scope.collectionSkills = null;
   $scope.isCollectionLoaded = false;
 
   // Get the id of the collection to be loaded
@@ -41,6 +41,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionDataService', 'warnin
   collectionDataService.loadCollection($scope.collectionId).then(
     function(collection) {
       $scope.collection = collection;
+      $scope.collectionSkills = collection.skills;
       $scope.isCollectionLoaded = true;
     }, function(error, collectionId) {
       // TODO(mgowano): Handle not being able to load the collection.
