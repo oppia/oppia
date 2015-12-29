@@ -20,7 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveCodeRepl', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'codeReplRulesService',
+  function(oppiaHtmlEscaper, codeReplRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -102,14 +103,14 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         $scope.sendResponse = function(evaluation, err) {
           $scope.evaluation = (evaluation || '');
           $scope.err = (err || '');
-          $scope.$parent.$parent.submitAnswer({
+          $scope.$parent.submitAnswer({
             // Replace tabs with 2 spaces.
             // TODO(sll): Change the default Python indentation to 4 spaces.
             code: $scope.code.replace(/\t/g, '  ') || '',
             output: $scope.output,
             evaluation: $scope.evaluation,
             error: $scope.err
-          });
+          }, codeReplRulesService);
         };
       }]
     };
@@ -149,3 +150,45 @@ oppia.directive('oppiaShortResponseCodeRepl', [
     };
   }
 ]);
+
+oppia.factory('codeReplRulesService', [
+    '$filter', 'codeNormalizationService',
+    function($filter, codeNormalizationService) {
+  return {
+    CodeEquals: function(answer, inputs) {
+      var normalizedCode =
+        codeNormalizationService.getNormalizedCode(answer.code);
+      var normalizedExpectedCode =
+        codeNormalizationService.getNormalizedCode(inputs.x);
+      return normalizedCode == normalizedExpectedCode;
+    },
+    CodeContains: function(answer, inputs) {
+      var normalizedCode =
+        codeNormalizationService.getNormalizedCode(answer.code);
+      var normalizedSnippet =
+        codeNormalizationService.getNormalizedCode(inputs.x);
+      return normalizedCode.indexOf(normalizedSnippet) != -1;
+    },
+    CodeDoesNotContain: function(answer, inputs) {
+      var normalizedCode =
+        codeNormalizationService.getNormalizedCode(answer.code);
+      var normalizedSnippet =
+        codeNormalizationService.getNormalizedCode(inputs.x);
+      return normalizedCode.indexOf(normalizedSnippet) == -1;
+    },
+    OutputEquals: function(answer, inputs) {
+      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+      var normalizedExpectedOutput =
+        $filter('normalizeWhitespace')(inputs.x);
+      return normalizedOutput == normalizedExpectedOutput;
+    },
+    ResultsInError: function(answer, inputs) {
+      return !!(answer.error.trim());
+    },
+    ErrorContains: function(answer, inputs) {
+      var normalizedError = $filter('normalizeWhitespace')(answer.error);
+      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedError.indexOf(normalizedSnippet) != -1;
+    }
+  };
+}]);
