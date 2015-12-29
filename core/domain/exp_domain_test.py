@@ -344,6 +344,42 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'destination ABC is not a valid'):
             exploration.validate()
 
+        # Restore a valid exploration.
+        init_state = exploration.states[exploration.init_state_name]
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        # Ensure an answer group with two fuzzy rules is invalid
+        init_state.interaction.answer_groups.append(
+            exp_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': exploration.init_state_name,
+                    'feedback': ['Feedback'],
+                    'param_changes': [],
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'training_data': ['Test']
+                    },
+                    'rule_type': 'FuzzyMatches'
+                }, {
+                    'inputs': {
+                        'training_data': ['Test']
+                    },
+                    'rule_type': 'FuzzyMatches'
+                }]
+            })
+        )
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'AnswerGroups can only have one fuzzy rule.'):
+            exploration.validate()
+
+        # Restore a valid exploration.
+        init_state.interaction.answer_groups.pop()
+        exploration.validate()
+
         # Ensure an invalid destination can also be detected for answer groups.
         # Note: The state must keep its default_outcome, otherwise it will
         # trigger a validation error for non-terminal states needing to have a
@@ -1040,14 +1076,12 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
                 'exp4', 'State1:\n(\nInvalid yaml')
 
         with self.assertRaisesRegexp(
-                Exception, 'Expecting a title and category to be provided '
-                'for an exploration encoded in the YAML version:'):
+                Exception, 'Expected a YAML version >= 10, received: 9'):
             exp_domain.Exploration.from_yaml(
                 'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
-                Exception, 'No title or category need to be provided for an '
-                'exploration encoded in the YAML version:'):
+                Exception, 'Expected a YAML version <= 9'):
             exp_domain.Exploration.from_untitled_yaml(
                 'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
 

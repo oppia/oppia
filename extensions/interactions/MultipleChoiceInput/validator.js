@@ -87,9 +87,11 @@ oppia.filter('oppiaInteractiveMultipleChoiceInputValidator', [
       baseInteractionValidationService.getAnswerGroupWarnings(
         answerGroups, stateName));
 
-    // Only require a default rule if some choices have not been taken care of by rules.
+    // Only require a default rule if some choices have not been taken care of
+    // by rules.
     if (selectedEqualsChoices.length < numChoices) {
-      if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+      if (!defaultOutcome ||
+          $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
         warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (

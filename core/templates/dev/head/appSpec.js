@@ -29,7 +29,9 @@ describe('Validators service', function() {
     }));
 
     it('should correctly validate entity names', function() {
-      GLOBALS = {INVALID_NAME_CHARS: 'xyz'};
+      GLOBALS = {
+        INVALID_NAME_CHARS: 'xyz'
+      };
 
       expect(vs.isValidEntityName('b')).toBe(true);
       expect(vs.isValidEntityName('b   ')).toBe(true);
@@ -64,7 +66,8 @@ describe('HTML escaper', function() {
       ohe = $injector.get('oppiaHtmlEscaper');
     }));
 
-    it('should correctly translate between escaped and unescaped strings', function() {
+    it('should correctly translate between escaped and unescaped strings',
+        function() {
       var strs = ['abc', 'a&b<html>', '&&&&&'];
       for (var i = 0; i < strs.length; i++) {
         expect(ohe.escapedStrToUnescapedStr(
@@ -73,7 +76,9 @@ describe('HTML escaper', function() {
     });
 
     it('should correctly escape and unescape JSON', function() {
-      var objs = [{'a': 'b'}, ['a', 'b'], 2, true, 'abc'];
+      var objs = [{
+        a: 'b'
+      }, ['a', 'b'], 2, true, 'abc'];
       for (var i = 0; i < objs.length; i++) {
         expect(ohe.escapedJsonToObj(
           ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
@@ -90,7 +95,7 @@ describe('Datetime Formatter', function() {
     var NOW_MILLIS = 1416563100000;
     var YESTERDAY_MILLIS = NOW_MILLIS - 24 * 60 * 60 * 1000;
     var df = null;
-    var oldDate = Date;
+    var OldDate = Date;
 
     beforeEach(inject(function($injector) {
       df = $injector.get('oppiaDatetimeFormatter');
@@ -99,51 +104,159 @@ describe('Datetime Formatter', function() {
       // doesn't seem to be a good way to set the timezone locale directly.)
       spyOn(window, 'Date').andCallFake(function(optionalMillisSinceEpoch) {
         if (optionalMillisSinceEpoch) {
-          return new oldDate(optionalMillisSinceEpoch);
+          return new OldDate(optionalMillisSinceEpoch);
         } else {
-          return new oldDate(NOW_MILLIS);
+          return new OldDate(NOW_MILLIS);
         }
       });
     }));
 
     it('should show only the time for a datetime occurring today', function() {
-      // In any timezone, 10 minutes before xx:45:00 should still fall within the
-      // same date as xx:45:00 in getLocaleAbbreviateDatetimeString().
+      // In any timezone, 10 minutes before xx:45:00 should still fall within
+      // the same date as xx:45:00 in getLocaleAbbreviateDatetimeString().
       expect(df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS - 10 * 60 * 1000)).not.toBe('11/21/2014');
       expect(df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
     });
 
-    it('should show only the date for a datetime occurring before today', function() {
+    it('should show only the date for a datetime occurring before today',
+        function() {
       // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
       // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
       // Also have into account different locales where the order of time/date
       // formatting is different. This should hold true in
       // getLocaleAbbreviateDatetimeString()
-      expect(['11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014']).toContain(
+      expect([
+        '11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014'
+      ]).toContain(
         df.getLocaleAbbreviatedDatetimeString(
           NOW_MILLIS - 72 * 60 * 60 * 1000));
     });
 
     it('should show the date even for a datetime occurring today', function() {
-      // In any timezone, 10 minutes before xx:45:00 should still fall within the
-      // same date as xx:45:00 in getLocaleDateString(). The date should always
-      // be shown as '11/21/2014'
+      // In any timezone, 10 minutes before xx:45:00 should still fall within
+      // the same date as xx:45:00 in getLocaleDateString(). The date should
+      // always be shown as '11/21/2014'
       expect(df.getLocaleDateString(
         NOW_MILLIS - 10 * 60 * 1000)).toBe('11/21/2014');
       expect(df.getLocaleDateString(
         NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
     });
 
-    it('should show only the date for a datetime occurring before today', function() {
+    it('should show only the date for a datetime occurring before today',
+        function() {
       // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
       // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
       // Also have into account different locales where the order of time/date
-      // formatting is different. This should hold true in getLocaleDateString().
-      expect(['11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014']).toContain(
-        df.getLocaleDateString(
-          NOW_MILLIS - 72 * 60 * 60 * 1000));
+      // formatting is different. This should hold true in
+      // getLocaleDateString().
+      expect([
+        '11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014'
+      ]).toContain(df.getLocaleDateString(NOW_MILLIS - 72 * 60 * 60 * 1000));
     });
+
+    it('should correctly indicate recency', function() {
+      // 1 second ago is recent.
+      expect(df.isRecent(NOW_MILLIS - 1)).toBe(true);
+      // 72 hours ago is recent.
+      expect(df.isRecent(NOW_MILLIS - 72 * 60 * 60 * 1000)).toBe(true);
+      // 8 days ago is not recent.
+      expect(df.isRecent(NOW_MILLIS - 8 * 24 * 60 * 60 * 1000)).toBe(false);
+    });
+  });
+});
+
+describe('Code Normalization', function() {
+  beforeEach(module('oppia'));
+
+  var cns = null;
+  beforeEach(inject(function($injector) {
+    cns = $injector.get('codeNormalizationService');
+  }));
+
+  it('should not modify contents of code', function() {
+    expect(cns.getNormalizedCode(
+      'def x():\n' +
+      '    y = 345'
+    )).toBe(
+      'def x():\n' +
+      '    y = 345'
+    );
+  });
+
+  it('should convert indentation to 4 spaces, remove trailing whitespace ' +
+      'and empty lines', function() {
+    expect(cns.getNormalizedCode(
+      'def x():         \n' +
+      '    \n' +
+      '  y = 345\n' +
+      '            \n' +
+      '       '
+    )).toBe(
+      'def x():\n' +
+      '    y = 345'
+    );
+  });
+
+  it('should remove full-line comments, but not comments in the middle ' +
+     'of a line', function() {
+    expect(cns.getNormalizedCode(
+      '# This is a comment.\n' +
+      '  # This is a comment with some spaces before it.\n' +
+      'def x():         # And a comment with some code before it.\n' +
+      '  y = \'#String with hashes#\''
+    )).toBe(
+      'def x():         # And a comment with some code before it.\n' +
+      '    y = \'#String with hashes#\''
+    );
+  });
+
+  it('should handle complex indentation', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij\n' +
+      '              ppppp\n' +
+      'x\n' +
+      '  abc\n' +
+      '  abc\n' +
+      '    bcd\n' +
+      '  cde\n' +
+      '              xxxxx\n' +
+      '  y\n' +
+      ' z'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij\n' +
+      '        ppppp\n' +
+      'x\n' +
+      '    abc\n' +
+      '    abc\n' +
+      '        bcd\n' +
+      '    cde\n' +
+      '        xxxxx\n' +
+      '    y\n' +
+      'z'
+    );
+  });
+
+  it('should handle shortfall lines', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij\n' +
+      '              ppppp\n' +
+      '      x\n' +
+      '  abc\n' +
+      '    bcd\n' +
+      '  cde'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij\n' +
+      '        ppppp\n' +
+      '    x\n' +
+      'abc\n' +
+      '    bcd\n' +
+      'cde'
+    );
   });
 });

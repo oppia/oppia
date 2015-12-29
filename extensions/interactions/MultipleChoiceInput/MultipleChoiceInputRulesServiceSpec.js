@@ -27,7 +27,11 @@ describe('Multiple choice input rules service', function() {
   }));
 
   it('should have a correct \'equals\' rule', function() {
-    expect(mcirs.Equals(3, {x: 3})).toBe(true);
-    expect(mcirs.Equals(3, {x: 4})).toBe(false);
+    expect(mcirs.Equals(3, {
+      x: 3
+    })).toBe(true);
+    expect(mcirs.Equals(3, {
+      x: 4
+    })).toBe(false);
   });
 });

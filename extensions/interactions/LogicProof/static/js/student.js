@@ -994,12 +994,16 @@ var logicProofStudent = (function() {
   *          }
   */
   var buildProof = function(proofString, questionInstance) {
-    if (proofString.slice(-1) === '\n') {
-      proofString = proofString.slice(0, proofString.length - 1);
-    }
     var lineStrings = proofString.split('\n');
+    // Ignore blank lines at the end
+    var lastLineNum = lineStrings.length - 1;
+    while (lastLineNum > 0 &&
+        lineStrings[lastLineNum].replace(/ /g, '').length === 0) {
+      lastLineNum--;
+    }
+
     var builtLines = [];
-    for (var i = 0; i < lineStrings.length; i++) {
+    for (var i = 0; i <= lastLineNum; i++) {
       try {
         builtLines.push(
           buildLine(

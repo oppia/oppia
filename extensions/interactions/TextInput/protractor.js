@@ -27,7 +27,8 @@ var customizeInteraction = function(elem, placeholderText, heightOfBox) {
   ).setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = function(elem, placeholderText, heightOfBox) {
+var expectInteractionDetailsToMatch = function(
+    elem, placeholderText, heightOfBox) {
   expect(
     elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);

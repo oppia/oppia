@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -21,7 +20,7 @@ oppia.directive('logicErrorCategoryEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'LogicErrorCategory';
       };
@@ -30,7 +29,7 @@ oppia.directive('logicErrorCategoryEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope, $attrs) {
+    controller: function($scope) {
       $scope.alwaysEditable = true;
       $scope.errorCategories = [{
         name: 'parsing',
@@ -67,9 +66,9 @@ oppia.directive('logicErrorCategoryEditor', [
         }
       }
 
-      $scope.$watch('localValue.category', function(oldValue, newValue) {
+      $scope.$watch('localValue.category', function() {
         $scope.$parent.value = $scope.localValue.category.name;
-      })
+      });
     }
   };
 }]);

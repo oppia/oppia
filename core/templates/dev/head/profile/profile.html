@@ -40,7 +40,7 @@
         <div class="col-lg-9 col-md-9 col-sm-9">
           <h2 class="oppia-profile-username"><strong>{{PROFILE_USERNAME}}</strong></h2>
           <p>
-            <span ng-if="userBio"><[userBio]></span>
+            <span ng-if="userBio" style="white-space: pre-wrap;"><[userBio]></span>
             <span ng-if="!userBio">
               <em>This user has not supplied a bio yet.</em>
             </span>
@@ -71,7 +71,7 @@
     <md-card ng-cloak class="oppia-profile-tabs">
       <md-content>
         <md-tabs md-dynamic-height md-border-bottom>
-          <md-tab label="Statistics">
+          <md-tab label="Impact">
             <md-content class="oppia-profile-tabs-content">
               <div class="oppia-stat-big-container big-top-container">
                 <div ng-repeat="stat in userDisplayedStatistics" class="oppia-stat-container-top">
@@ -96,7 +96,8 @@
                     category="expl.category"
                     ratings="expl.ratings"
                     thumbnail-icon-url="expl.thumbnail_icon_url"
-                    thumbnail-bg-color="expl.thumbnail_bg_color">
+                    thumbnail-bg-color="expl.thumbnail_bg_color"
+                    num-views="expl.num_views">
                 </exploration-summary-tile>
               </div>
               <div ng-if="userCreatedExplorations.length === 0">
@@ -115,7 +116,8 @@
                     category="expl.category"
                     ratings="expl.ratings"
                     thumbnail-icon-url="expl.thumbnail_icon_url"
-                    thumbnail-bg-color="expl.thumbnail_bg_color">
+                    thumbnail-bg-color="expl.thumbnail_bg_color"
+                    num-views="expl.num_views">
                 </exploration-summary-tile>
               </div>
               <div ng-if="userEditedExplorations.length === 0">

@@ -20,7 +20,7 @@ oppia.directive('graphEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'Graph';
       };
@@ -29,7 +29,7 @@ oppia.directive('graphEditor', [
     restrict: 'E',
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function($scope, $element, $attrs) {
+    controller: function($scope) {
       $scope.alwaysEditable = true;
     }
   };

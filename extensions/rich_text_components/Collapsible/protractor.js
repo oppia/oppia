@@ -32,8 +32,10 @@ var customizeComponent = function(modal, heading, contentInstructions) {
   contentInstructions(richTextEditor);
 };
 
-var expectComponentDetailsToMatch = function(elem, heading, contentInstructions) {
-  headerElement = elem.element(by.css('.protractor-test-collapsible-heading'))
+var expectComponentDetailsToMatch = function(
+    elem, heading, contentInstructions) {
+  var headerElement = elem.element(by.css(
+    '.protractor-test-collapsible-heading'));
   expect(headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   headerElement.click();
