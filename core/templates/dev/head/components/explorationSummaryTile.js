@@ -28,7 +28,8 @@ oppia.directive('explorationSummaryTile', [function() {
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getNumViews: '&numViews',
       getObjective: '&objective',
-      getStarRating: '&starRating',
+      getCategory: '&category',
+      getRatings: '&ratings',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
       // If this is not null, the new exploration opens in a new window when
@@ -37,17 +38,29 @@ oppia.directive('explorationSummaryTile', [function() {
     },
     templateUrl: 'summaryTile/exploration',
     controller: [
-      '$scope', 'oppiaDatetimeFormatter',
-      function($scope, oppiaDatetimeFormatter) {
-        $scope.lastUpdatedDatetime = (
-          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-            $scope.getLastUpdatedMsec()));
+      '$scope', 'oppiaDatetimeFormatter', 'ratingComputationService',
+      function($scope, oppiaDatetimeFormatter, ratingComputationService) {
+        $scope.getAverageRating = function() {
+          return ratingComputationService.computeAverageRating(
+            $scope.getRatings());
+        };
 
-        $scope.explorationLink = '/explore/' + $scope.getExplorationId();
-        if ($scope.getCollectionId()) {
-          $scope.explorationLink += (
-            '?collection_id=' + $scope.getCollectionId());
-        }
+        $scope.getLastUpdatedDatetime = function() {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            $scope.getLastUpdatedMsec());
+        };
+
+        $scope.wasRecentlyUpdated = function() {
+          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
+        };
+
+        $scope.getExplorationLink = function() {
+          var result = '/explore/' + $scope.getExplorationId();
+          if ($scope.getCollectionId()) {
+            result += ('?collection_id=' + $scope.getCollectionId());
+          }
+          return result;
+        };
       }
     ]
   };

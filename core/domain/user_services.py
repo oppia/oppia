@@ -317,6 +317,25 @@ def update_user_bio(user_id, user_bio):
 
 
 def update_subject_interests(user_id, subject_interests):
+    if not isinstance(subject_interests, list):
+        raise utils.ValidationError('Expected subject_interests to be a list.')
+    else:
+        for interest in subject_interests:
+            if not isinstance(interest, basestring):
+                raise utils.ValidationError(
+                    'Expected each subject interest to be a string.')
+            elif not interest:
+                raise utils.ValidationError(
+                    'Expected each subject interest to be non-empty.')
+            elif not re.match(feconf.TAG_REGEX, interest):
+                raise utils.ValidationError(
+                    'Expected each subject interest to consist only of '
+                    'lowercase alphabetic characters and spaces.')
+
+    if len(set(subject_interests)) != len(subject_interests):
+        raise utils.ValidationError(
+            'Expected each subject interest to be distinct.')
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.subject_interests = subject_interests
     _save_user_settings(user_settings)
@@ -527,3 +546,14 @@ def _save_user_contributions(user_contributions):
         created_exploration_ids=user_contributions.created_exploration_ids,
         edited_exploration_ids=user_contributions.edited_exploration_ids,
     ).put()
+    
+    
+def get_user_impact_score(user_id):
+    """Returns user impact score associated with user_id"""
+    
+    model = user_models.UserStatsModel.get(user_id, strict=False)
+    
+    if model:
+        return model.impact_score
+    else:
+        return 0

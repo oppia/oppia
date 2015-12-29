@@ -18,7 +18,6 @@
 
 oppia.factory('baseInteractionValidationService', [
     '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
-
   return {
     // 'argNames' is an array of top-level customization argument names (such as
     // 'chocies') used to verify the basic structure of the input customization
@@ -74,5 +73,5 @@ oppia.factory('baseInteractionValidationService', [
         this.getAnswerGroupWarnings(answerGroups, stateName).concat(
           this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));
     }
-  }
+  };
 }]);

@@ -20,7 +20,6 @@
  */
 
 describe('State Editor controller', function() {
-
   describe('StateEditor', function() {
     var scope, ctrl, ecs, cls, ess;
 
@@ -103,7 +102,10 @@ describe('State Editor controller', function() {
       });
 
       scope.getContent = function(contentString) {
-        return [{type: 'text', value: contentString}];
+        return [{
+          type: 'text',
+          value: contentString
+        }];
       };
 
       ctrl = $controller('StateEditor', {
@@ -222,7 +224,7 @@ describe('State Editor controller', function() {
       siis.savedMemento = 'TextInput';
 
       ess.init({
-        'State': {
+        State: {
           content: [{
             type: 'text',
             value: 'State Content'
@@ -261,12 +263,15 @@ describe('State Editor controller', function() {
 
       ecs.setActiveStateName('State');
 
-      $httpBackend.when('GET', '/createhandler/training_data/0/State')
-        .respond({'unhandled_answers': [{
-            'value': 'answer1', 'count': 2
-          }, {
-            'value': 'answer2', 'count': 1
-          }]});
+      $httpBackend.when('GET', '/createhandler/training_data/0/State').respond({
+        unhandled_answers: [{
+          value: 'answer1',
+          count: 2
+        }, {
+          value: 'answer2',
+          count: 1
+        }]
+      });
     }));
 
     afterEach(function() {
@@ -283,14 +288,15 @@ describe('State Editor controller', function() {
       expect(tds.getTrainingDataCounts()).toEqual([2, 1]);
 
       // Ensure it handles receiving no unhandled answers correctly.
-      $httpBackend.expect('GET', '/createhandler/training_data/0/State')
-        .respond({'unhandled_answers': []});
+      $httpBackend.expect(
+        'GET', '/createhandler/training_data/0/State').respond({
+          unhandled_answers: []
+        });
 
       tds.initializeTrainingData('0', 'State');
       $httpBackend.flush();
       expect(tds.getTrainingDataAnswers()).toEqual([]);
       expect(tds.getTrainingDataCounts()).toEqual([]);
-
     });
 
     it('should be able to train answer groups and the default response',

@@ -66,7 +66,9 @@ describe('Logic Proof rules service', function() {
   });
 
   it('should have a correct \'not correct by category\' rule', function() {
-    var RULE_INPUT = {c: 'typing'};
+    var RULE_INPUT = {
+      c: 'typing'
+    };
     expect(lprs.NotCorrectByCategory(CORRECT_EXAMPLE, RULE_INPUT)).toBe(false);
     expect(lprs.NotCorrectByCategory(
       INCORRECT_EXAMPLE_PARSING, RULE_INPUT)).toBe(false);

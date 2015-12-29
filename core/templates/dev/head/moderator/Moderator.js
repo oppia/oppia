@@ -21,16 +21,6 @@
 oppia.controller('Moderator', [
     '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
     function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
-  $scope.submitUserEmailRequest = function(username) {
-    $scope.username = username;
-    $scope.lastSubmittedUsername = username;
-    $http.post(
-      '/moderatorhandler/user_services', {username: username}
-    ).success(function(data) {
-      $scope.userEmail = data.user_email;
-    });
-  };
-
   $scope.getDatetimeAsString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
@@ -66,7 +56,8 @@ oppia.controller('Moderator', [
       var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
       for (var expId in explorationIdsToExplorationData) {
         if (!$scope.explorationData.hasOwnProperty(expId)) {
-          $scope.explorationData[expId] = explorationIdsToExplorationData[expId];
+          $scope.explorationData[expId] = (
+            explorationIdsToExplorationData[expId]);
         }
       }
 
@@ -81,7 +72,6 @@ oppia.controller('Moderator', [
   };
 
   $scope.loadMoreCommits();
-
 
   $scope.recentFeedbackMessagesCursor = null;
   $scope.reachedEndOfFeedbackMessages = false;

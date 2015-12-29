@@ -47,14 +47,14 @@ class EmailRightsTest(test_utils.GenericTestBase):
 
         # These are given in the order of user_ids_to_test.
         expected_validation_results = {
-            email_models.INTENT_SIGNUP: (True, False, False, False),
-            email_models.INTENT_DAILY_BATCH: (True, False, False, False),
-            email_models.INTENT_MARKETING: (False, True, False, False),
-            email_models.INTENT_PUBLICIZE_EXPLORATION: (
+            feconf.EMAIL_INTENT_SIGNUP: (True, False, False, False),
+            feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
+            feconf.EMAIL_INTENT_MARKETING: (False, True, False, False),
+            feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
                 False, True, True, False),
-            email_models.INTENT_UNPUBLISH_EXPLORATION: (
+            feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
                 False, True, True, False),
-            email_models.INTENT_DELETE_EXPLORATION: (
+            feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
                 False, True, True, False),
         }
 
@@ -135,7 +135,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME
             }, csrf_token=csrf_token)
@@ -165,7 +165,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME
             }, csrf_token=csrf_token)
@@ -211,7 +211,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME
             }, csrf_token=csrf_token)
@@ -255,7 +255,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME
             }, csrf_token=csrf_token)
@@ -285,7 +285,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME
             }, csrf_token=csrf_token)
@@ -318,7 +318,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME
             }, csrf_token=csrf_token)
@@ -350,7 +350,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            response_dict = self.post_json(feconf.SIGNUP_DATA_URL, {
+            self.post_json(feconf.SIGNUP_DATA_URL, {
                 'agreed_to_terms': True,
                 'username': 'BadUsername!!!'
             },
@@ -417,7 +417,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 sent_email_model.sender_email,
                 'Email Sender <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, email_models.INTENT_SIGNUP)
+                sent_email_model.intent, feconf.EMAIL_INTENT_SIGNUP)
             self.assertEqual(
                 sent_email_model.subject, 'Welcome!')
             self.assertEqual(

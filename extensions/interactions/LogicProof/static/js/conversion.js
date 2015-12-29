@@ -20,7 +20,7 @@
 
 var logicProofConversion = (function() {
 
-  // NOTE: these must all be single characters
+  // NOTE: the 'old' values must all be single characters
   var REPLACEMENT_PAIRS = [{
     old: '&',
     new: '\u2227'
@@ -36,6 +36,9 @@ var logicProofConversion = (function() {
   }, {
     old: '^',
     new: '\u2227'
+  }, {
+    old: '\u0009',
+    new: '  '
   }];
 
   var convertToLogicCharacters = function(oldString) {

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * Directive for the MultipleChoiceInput interaction.
  *
@@ -21,7 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMultipleChoiceInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'multipleChoiceInputRulesService',
+  function(oppiaHtmlEscaper, multipleChoiceInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -33,7 +33,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
 
         $scope.submitAnswer = function(answer) {
           answer = parseInt(answer, 10);
-          $scope.$parent.$parent.submitAnswer(answer);
+          $scope.$parent.submitAnswer(answer, multipleChoiceInputRulesService);
         };
       }]
     };
@@ -71,3 +71,11 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
     };
   }
 ]);
+
+oppia.factory('multipleChoiceInputRulesService', [function() {
+  return {
+    Equals: function(answer, inputs) {
+      return answer === inputs.x;
+    }
+  };
+}]);

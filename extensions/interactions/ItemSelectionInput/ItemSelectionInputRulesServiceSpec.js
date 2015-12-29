@@ -27,7 +27,9 @@ describe('Item Selection rules service', function() {
   }));
 
   it('should have a correct \'equals\' rule', function() {
-    var RULE_INPUT = {x: ['ab', 'c', 'e']};
+    var RULE_INPUT = {
+      x: ['ab', 'c', 'e']
+    };
     expect(isirs.Equals(['ab', 'c', 'e'], RULE_INPUT)).toBe(true);
     expect(isirs.Equals(['ab', 'c', 'c', 'e'], RULE_INPUT)).toBe(true);
     expect(isirs.Equals(['c', 'e', 'ab'], RULE_INPUT)).toBe(true);
@@ -38,14 +40,18 @@ describe('Item Selection rules service', function() {
   });
 
   it('should have a correct \'contains at least one of\' rule', function() {
-    var RULE_INPUT = {x: ['a']};
+    var RULE_INPUT = {
+      x: ['a']
+    };
     expect(isirs.ContainsAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);
     expect(isirs.ContainsAtLeastOneOf([' ', 'a'], RULE_INPUT)).toBe(true);
     expect(isirs.ContainsAtLeastOneOf(['a'], RULE_INPUT)).toBe(true);
     expect(isirs.ContainsAtLeastOneOf(['c'], RULE_INPUT)).toBe(false);
     expect(isirs.ContainsAtLeastOneOf([], RULE_INPUT)).toBe(false);
 
-    RULE_INPUT = {x: ['a', 'b']};
+    RULE_INPUT = {
+      x: ['a', 'b']
+    };
     expect(isirs.ContainsAtLeastOneOf(['a', 'b', '10'], RULE_INPUT)).toBe(true);
     expect(isirs.ContainsAtLeastOneOf(['a', '10'], RULE_INPUT)).toBe(true);
     expect(isirs.ContainsAtLeastOneOf(['a'], RULE_INPUT)).toBe(true);
@@ -54,7 +60,9 @@ describe('Item Selection rules service', function() {
 
   it('should have a correct \'does not contain at least one of\' rule',
       function() {
-    var RULE_INPUT = {x: ['a', 'b', 'c']};
+    var RULE_INPUT = {
+      x: ['a', 'b', 'c']
+    };
     expect(isirs.DoesNotContainAtLeastOneOf(['d'], RULE_INPUT)).toBe(true);
     expect(isirs.DoesNotContainAtLeastOneOf([], RULE_INPUT)).toBe(true);
     expect(isirs.DoesNotContainAtLeastOneOf(['a', 'b'], RULE_INPUT)).toBe(true);

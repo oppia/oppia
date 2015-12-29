@@ -22,11 +22,15 @@
 var general = require('./general.js');
 var forms = require('./forms.js');
 
-// 'propertyName' is the name of the property as given in the left-hand column.
-// 'objectType' is the type of the property, e.g. 'Unicode' or 'List'.
-// 'editingInstructions' is  a function that is sent an editor for the
-// objectType which it can then act on, for example by adding elements to a list.
-var editConfigProperty = function(propertyName, objectType, editingInstructions) {
+// Args:
+// - 'propertyName' is the name of the property as given in the left-hand
+//     column.
+// - 'objectType' is the type of the property, e.g. 'Unicode' or 'List'.
+// - 'editingInstructions' is  a function that is sent an editor for the
+//     objectType which it can then act on, for example by adding elements to a
+//     list.
+var editConfigProperty = function(
+    propertyName, objectType, editingInstructions) {
   general.waitForSystem();
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(by.css('.protractor-test-config-property')).
@@ -53,7 +57,8 @@ var editConfigProperty = function(propertyName, objectType, editingInstructions)
   });
 };
 
-// The name should be as given in the admin page (including '.yaml' if necessary).
+// The name should be as given in the admin page (including '.yaml' if
+// necessary).
 var reloadExploration = function(name) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(by.css('.protractor-test-reload-exploration-row')).

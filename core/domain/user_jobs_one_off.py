@@ -29,7 +29,7 @@ import utils
 
 
 class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for creating and populating UserContributionsModels for 
+    """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
     @classmethod
@@ -39,10 +39,9 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
-            split_id = item.id.rsplit('-')
             yield (item.committer_id, {
-                'version_string': split_id[1],
-                'exploration_id': split_id[0]
+                'exploration_id': item.get_unversioned_instance_id(),
+                'version_string': item.get_version_string(),
             })
 
     @staticmethod
@@ -62,11 +61,11 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
             user_services.update_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
-        else:        
+        else:
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
-      
+
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job for subscribing users to explorations, collections, and
@@ -192,8 +191,13 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         exp_id = item.get_unversioned_instance_id()
-        exp_first_published_msec = rights_manager.get_exploration_rights(
-            exp_id).first_published_msec
+
+        exp_rights = rights_manager.get_exploration_rights(
+            exp_id, strict=False)
+        if exp_rights is None:
+            return
+
+        exp_first_published_msec = exp_rights.first_published_msec
         # First contribution time in msec is only set from contributions to
         # explorations that are currently published.
         if not rights_manager.is_exploration_private(exp_id):

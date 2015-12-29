@@ -34,7 +34,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services._create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'user@example.com')
 
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
@@ -44,7 +44,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services._create_user('fakeUser', 'email@email.com')
+        user_services._create_user('fakeUser', 'user@example.com')
         self.assertEquals(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
@@ -53,20 +53,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services._create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services._create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services._create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'user@example.com')
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
@@ -95,7 +95,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_email_from_username(self):
         user_id = 'someUser'
         username = 'username'
-        user_email = 'email@email.com'
+        user_email = 'user@example.com'
 
         user_services._create_user(user_id, user_email)
         user_services.set_username(user_id, username)
@@ -116,7 +116,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_user_id_from_username(self):
         user_id = 'someUser'
         username = 'username'
-        user_email = 'email@email.com'
+        user_email = 'user@example.com'
 
         user_services._create_user(user_id, user_email)
         user_services.set_username(user_id, username)
@@ -396,3 +396,54 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # unpublished.
         self.assertIsNotNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
+
+
+class SubjectInterestsUnitTests(test_utils.GenericTestBase):
+    """Test the update_subject_interests method."""
+
+    def setUp(self):
+        super(SubjectInterestsUnitTests, self).setUp()
+        self.user_id = 'someUser'
+        self.username = 'username'
+        self.user_email = 'user@example.com'
+
+        user_services._create_user(self.user_id, self.user_email)
+        user_services.set_username(self.user_id, self.username)
+
+    def test_invalid_subject_interests_are_not_accepted(self):
+        with self.assertRaisesRegexp(utils.ValidationError, 'to be a list'):
+            user_services.update_subject_interests(self.user_id, 'not a list')
+
+        with self.assertRaisesRegexp(utils.ValidationError, 'to be a string'):
+            user_services.update_subject_interests(self.user_id, [1, 2, 3])
+
+        with self.assertRaisesRegexp(utils.ValidationError, 'to be non-empty'):
+            user_services.update_subject_interests(self.user_id, ['', 'ab'])
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'to consist only of lowercase alphabetic characters and '
+                'spaces'):
+            user_services.update_subject_interests(self.user_id, ['!'])
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'to consist only of lowercase alphabetic characters and '
+                'spaces'):
+            user_services.update_subject_interests(
+                self.user_id, ['has-hyphens'])
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'to consist only of lowercase alphabetic characters and '
+                'spaces'):
+            user_services.update_subject_interests(
+                self.user_id, ['HasCapitalLetters'])
+
+        with self.assertRaisesRegexp(utils.ValidationError, 'to be distinct'):
+            user_services.update_subject_interests(self.user_id, ['a', 'a'])
+
+        # The following cases are all valid.
+        user_services.update_subject_interests(self.user_id, [])
+        user_services.update_subject_interests(
+            self.user_id, ['singleword', 'has spaces'])

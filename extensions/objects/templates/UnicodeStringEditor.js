@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -21,7 +20,7 @@ oppia.directive('unicodeStringEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'UnicodeString';
       };
@@ -30,11 +29,11 @@ oppia.directive('unicodeStringEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
+    controller: function($scope) {
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
       $scope.largeInput = false;
 
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
+      $scope.$watch('$parent.initArgs', function(newValue) {
         $scope.largeInput = false;
         if (newValue && newValue.largeInput) {
           $scope.largeInput = newValue.largeInput;
@@ -43,12 +42,14 @@ oppia.directive('unicodeStringEditor', [
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: $scope.$parent.value || ''};
+      $scope.$watch('$parent.value', function() {
+        $scope.localValue = {
+          label: $scope.$parent.value || ''
+        };
       }, true);
 
       if ($scope.alwaysEditable) {
-        $scope.$watch('localValue.label', function(newValue, oldValue) {
+        $scope.$watch('localValue.label', function(newValue) {
           $scope.$parent.value = newValue;
         });
       } else {
@@ -61,7 +62,9 @@ oppia.directive('unicodeStringEditor', [
         };
 
         $scope.replaceValue = function(newValue) {
-          $scope.localValue = {label: newValue};
+          $scope.localValue = {
+            label: newValue
+          };
           $scope.$parent.value = newValue;
           $scope.closeEditor();
         };
@@ -69,7 +72,8 @@ oppia.directive('unicodeStringEditor', [
         $scope.$on('externalSave', function() {
           if ($scope.active) {
             $scope.replaceValue($scope.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced value.
+            // The $scope.$apply() call is needed to propagate the replaced
+            // value.
             $scope.$apply();
           }
         });

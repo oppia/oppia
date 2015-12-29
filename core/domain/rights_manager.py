@@ -194,7 +194,8 @@ def _update_exploration_summary(activity_rights):
 
 def _update_collection_summary(activity_rights):
     from core.domain import collection_services
-    collection_services.update_collection_summary(activity_rights.id)
+    collection_services.update_collection_summary(
+        activity_rights.id, None)
 
 
 def _update_activity_summary(activity_type, activity_rights):

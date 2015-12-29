@@ -359,3 +359,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
+
+            views_for_all_exps = ModifiedStatisticsAggregator.get_views_multi([
+                exp_id_1, exp_id_2])
+            self.assertEqual(views_for_all_exps, [3, 2])

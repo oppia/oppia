@@ -528,7 +528,11 @@ class AnswerGroup(object):
         self.outcome = outcome
 
     def validate(self, obj_type, exp_param_specs_dict):
-        # Rule validation.
+        """Rule validation.
+
+        Verifies that all rule classes are valid, and that the AnswerGroup only
+        has one fuzzy rule.
+        """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
@@ -539,7 +543,9 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
+        seen_fuzzy_rule = False
         for rule_spec in self.rule_specs:
+            rule_class = None
             try:
                 rule_class = next(
                     r for r in all_rule_classes
@@ -547,12 +553,26 @@ class AnswerGroup(object):
             except StopIteration:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
+            if rule_class.__name__ == rule_domain.FUZZY_RULE_TYPE:
+                if seen_fuzzy_rule:
+                    raise utils.ValidationError(
+                        'AnswerGroups can only have one fuzzy rule.')
+                seen_fuzzy_rule = True
 
             rule_spec.validate(
                 rule_domain.get_param_list(rule_class.description),
                 exp_param_specs_dict)
 
         self.outcome.validate()
+
+    def get_fuzzy_rule_index(self):
+        """Will return the answer group's fuzzy rule index, or None if it
+        doesn't exist.
+        """
+        for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
+            if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                return rule_spec_index
+        return None
 
 
 class TriggerInstance(object):
@@ -2325,8 +2345,8 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content, title=None,
-            category=None):
+    def _migrate_to_latest_yaml_version(
+            cls, yaml_content, title=None, category=None):
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -2398,14 +2418,13 @@ class Exploration(object):
         """
         migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version <=
+        if (initial_schema_version <=
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Expecting a title and category to be provided for an '
-                'exploration encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version >= 10, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
@@ -2418,14 +2437,13 @@ class Exploration(object):
         migration_result = cls._migrate_to_latest_yaml_version(
             yaml_content, title, category)
         exploration_dict = migration_result[0]
-        initital_schema_version = migration_result[1]
+        initial_schema_version = migration_result[1]
 
-        if (initital_schema_version >
+        if (initial_schema_version >
                 cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'No title or category need to be provided for an exploration '
-                'encoded in the YAML version: %d' % (
-                    exploration_dict['schema_version']))
+                'Expected a YAML version <= 9, received: %d' % (
+                    initial_schema_version))
 
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)

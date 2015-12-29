@@ -151,10 +151,11 @@ oppia.filter('isOutcomeConfusing', [function() {
   };
 }]);
 
-// Filter that changes {{...}} tags into the corresponding parameter input values.
-// Note that this returns an HTML string to accommodate the case of multiple-choice
-// input and image-click input.
-oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
+// Filter that changes {{...}} tags into the corresponding parameter input
+// values. Note that this returns an HTML string to accommodate the case of
+// multiple-choice input and image-click input.
+oppia.filter('parameterizeRuleDescription', [
+    'INTERACTION_SPECS', function(INTERACTION_SPECS) {
   return function(rule, interactionId, choices) {
     if (!rule) {
       return '';
@@ -192,7 +193,8 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
+      // Special case for MultipleChoiceInput, ImageClickInput, and
+      // ItemSelectionInput.
       if (choices) {
         if (varType === 'SetOfHtmlString') {
           replacementText = '[';
@@ -228,12 +230,14 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
         var longitude = inputs[varName][1] || 0.0;
         replacementText = '(';
         replacementText += (
-          inputs[varName][0] >= 0.0
-          ? latitude.toFixed(2) + '°N' : -latitude.toFixed(2) + '°S');
+          inputs[varName][0] >= 0.0 ?
+          latitude.toFixed(2) + '°N' :
+          -latitude.toFixed(2) + '°S');
         replacementText += ', ';
         replacementText += (
-          inputs[varName][1] >= 0.0
-          ? longitude.toFixed(2) + '°E' : -longitude.toFixed(2) + '°W');
+          inputs[varName][1] >= 0.0 ?
+          longitude.toFixed(2) + '°E' :
+          -longitude.toFixed(2) + '°W');
         replacementText += ')';
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + inputs[varName] + '"';
@@ -339,7 +343,7 @@ oppia.filter('summarizeDefaultOutcome', [
       summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
     }
     return summary;
-  }
+  };
 }]);
 
 // Filter that summarizes a large number to a decimal followed by
@@ -347,36 +351,43 @@ oppia.filter('summarizeDefaultOutcome', [
 // becomes 167.7K.
 // Users of this filter should ensure that the input is a non-negative number.
 oppia.filter('summarizeNonnegativeNumber', [function() {
-  return function (input) {
-    input = Number(input)
-    // Nine Zeroes for Billions
-    return input >= 1.0e+9
-    // Example 146008788788 becomes 146.0B
-    ? (input / 1.0e+9).toFixed(1) + 'B'
-
-    // Six Zeroes for Millions
-    : input >= 1.0e+6
-    // Example 146008788 becomes 146.0M
-    ? (input / 1.0e+6).toFixed(1) + 'M'
-
-    // Three Zeroes for Thousands
-    : input >= 1.0e+3
-    // Example 146008 becomes 146.0K
-    ? (input / 1.0e+3).toFixed(1) + 'K'
-    // For small number it should return number as it is
-    // Example 12 becomes 12
-    : input;
+  return function(input) {
+    input = Number(input);
+    // Nine zeros for billions (e.g. 146008788788 --> 146.0B).
+    // Six zeros for millions (e.g. 146008788 --> 146.0M).
+    // Three zeros for thousands (e.g. 146008 --> 146.0K).
+    // No change for small numbers (e.g. 12 --> 12).
+    return (
+      input >= 1.0e+9 ? (input / 1.0e+9).toFixed(1) + 'B' :
+      input >= 1.0e+6 ? (input / 1.0e+6).toFixed(1) + 'M' :
+      input >= 1.0e+3 ? (input / 1.0e+3).toFixed(1) + 'K' :
+      input);
   };
 }]);
 
+// Note that this filter does not truncate at the middle of a word.
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {
-    input = input.trim();
-    if(input.length > maxNumberOfCharacters) {
-      input = input.substring(0, maxNumberOfCharacters) + '...';
+    var words = input.trim().match(/\S+/g);
+
+    // Capitalize the first word and add it to the result.
+    var result = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+
+    // Add the remaining words to the result until the character limit is
+    // reached.
+    for (var i = 1; i < words.length; i++) {
+      if (!maxNumberOfCharacters ||
+          result.length + 1 + words[i].length <= maxNumberOfCharacters) {
+        result += ' ';
+        result += words[i];
+      } else {
+        result += '...';
+        break;
+      }
     }
-    return input.charAt(0).toUpperCase() + input.slice(1);
-  }
+
+    return result;
+  };
 }]);
 
 oppia.filter('removeDuplicatesInArray', [function() {

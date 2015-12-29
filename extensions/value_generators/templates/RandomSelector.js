@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-oppia.directive('randomSelector', function($compile, warningsData) {
+oppia.directive('randomSelector', ['$compile', function($compile) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return '/value_generator_handler/' + scope.generatorId;
       };
@@ -24,14 +23,14 @@ oppia.directive('randomSelector', function($compile, warningsData) {
     restrict: 'E',
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function($scope, $attrs) {
+    controller: function($scope) {
       $scope.SCHEMA = {
-        'type': 'list',
-        'items': {
-          'type': 'unicode',
+        type: 'list',
+        items: {
+          type: 'unicode'
         },
-        'ui_config': {
-          'add_element_text': 'Add New Choice'
+        ui_config: {
+          add_element_text: 'Add New Choice'
         }
       };
 
@@ -40,4 +39,4 @@ oppia.directive('randomSelector', function($compile, warningsData) {
       }
     }
   };
-});
+}]);
