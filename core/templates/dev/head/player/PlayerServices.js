@@ -531,6 +531,17 @@ oppia.controller('LearnerLocalNav', [
           type: 'text',
           value: result.data.suggestionContent
         }
+      }).success(function(res) {
+        $modal.open({
+          templateUrl: 'modals/learnerSuggestionSubmitted',
+          backdrop: true,
+          resolve: {},
+          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.close = function() {
+              $modalInstance.dismiss();
+            };
+          }]
+        });
       });
     });
   };
