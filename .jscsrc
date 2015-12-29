@@ -4,7 +4,10 @@
 {
     "preset": "google",
     "excludeFiles": [
-        "third_party/**"
+        "third_party/**",
+        "core/templates/dev/head/expressions/parser.js",
+        "core/templates/prod/**",
+        "core/tests/protractor.conf.js"
     ],
     "fileExtensions": [".js"],
     "extract": ["*.html"],
@@ -141,12 +144,15 @@
     "requireSpacesInNamedFunctionExpression": {
         "beforeOpeningCurlyBrace": true
     },
-    "safeContextKeyword": ["that"],
+    "safeContextKeyword": ["that", "context", "textAngular"],
     "validateCommentPosition": {
         "position": "above"
     },
     "validateIndentation": 2,
     "validateLineBreaks": "LF",
     "validateParameterSeparator": ", ",
-    "validateQuoteMarks": "'"
+    "validateQuoteMarks": {
+      "mark": "'",
+      "escape": true
+    }
 }

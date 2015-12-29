@@ -36,109 +36,115 @@ var _zlib = require('zlib');
 var host = 'http://en.wikipedia.org';
 
 var forPage = function(path, handler) {
-    console.error('downloading: ' + path);
-    try {
-        _http.request(
-            host + path,
-            function(res) {
-                var stream = res.headers['content-encoding'] == 'gzip' ?
-                    res.pipe(_zlib.createGunzip()) : res;
-                var data = '';
-                stream.setEncoding('utf8');
-                stream.on('data', function (chunk) { data += chunk; });
-                stream.on('error', function (err) {
-                    console.error('stream err: ' + path);
-                });
-                stream.on('end', function() {
-                    handler(data);
-                });
-            }).end();
-    } catch (e) {
-      console.error('err on: ' + path);
-      console.error(e);
-    }
+  console.error('downloading: ' + path);
+  try {
+    _http.request(
+      host + path,
+      function(res) {
+        var stream = res.headers['content-encoding'] == 'gzip' ?
+            res.pipe(_zlib.createGunzip()) : res;
+        var data = '';
+        stream.setEncoding('utf8');
+        stream.on('data', function(chunk) {
+          data += chunk;
+        });
+        stream.on('error', function(err) {
+          console.error('stream err: ' + path + ' ' + err);
+        });
+        stream.on('end', function() {
+          handler(data);
+        });
+      }).end();
+  } catch (e) {
+    console.error('err on: ' + path);
+    console.error(e);
+  }
 };
 
 var forCity = function(path, country) {
-    forPage(path, function(page) {
-        // Looking for the title tag, e.g.
-        // <title>CityName - Wikipedia, the free encyclopedia</title>
-        var title_re = /\<\s*title\s*\>\s*([^\-]*)/.exec(page)
-        var title = title_re ? title_re[1].trim() : '[FAILED]';
+  forPage(path, function(page) {
+    // Looking for the title tag, e.g.
+    // <title>CityName - Wikipedia, the free encyclopedia</title>
+    var titleRegex = /\<\s*title\s*\>\s*([^\-]*)/.exec(page);
+    var title = titleRegex ? titleRegex[1].trim() : '[FAILED]';
 
-        // Looknig for an element with "geo" class, e.g.
-        // <span class="geo">12.345; 98.765</span>
-        var coords_re = /class\=\"geo\"[^\>]*\>\s*([\d\.]+)[\;\s]+([\d\.]+)/.exec(page)
-        var coords = coords_re ? coords_re[1] + ',' + coords_re[2] : '[FAILED]';
+    // Looknig for an element with "geo" class, e.g.
+    // <span class="geo">12.345; 98.765</span>
+    var coordsRegex = (
+      /class\=\"geo\"[^\>]*\>\s*([\d\.]+)[\;\s]+([\d\.]+)/.exec(page));
+    var coords = (
+      coordsRegex ? coordsRegex[1] + ',' + coordsRegex[2] : '[FAILED]');
 
-        var row = [path.replace('/wiki/', ''), title];
-        if (country !== undefined) {
-          row.push(country);
-        }
-        row.push(coords);
-        console.log(row.join('\t'));
-    });
+    var row = [path.replace('/wiki/', ''), title];
+    if (country !== undefined) {
+      row.push(country);
+    }
+    row.push(coords);
+    console.log(row.join('\t'));
+  });
 };
 var forCities = function() {
-    _fs.readFileSync('/dev/stdin').toString().split('\n').forEach(function(line) {
-        var cols = line.split('\t');
-        if (cols.length != 2) {
-          return;
-        }
-        //forCity(cols[0], cols[1]);
-        forCity(cols[0]);
-    });
+  _fs.readFileSync('/dev/stdin').toString().split('\n').forEach(function(line) {
+    var cols = line.split('\t');
+    if (cols.length != 2) {
+      return;
+    }
+    //forCity(cols[0], cols[1]);
+    forCity(cols[0]);
+  });
 };
 //forCities();
 
 var forCityList = function(path) {
-    forPage(path, function(page) {
-        // Looking for the title tag, e.g.
-        // <title>List of cities in CountryName - Wikipedia, the free encyclopedia</title>
-        var country_re = /\<\s*title\s*\>List of cities in ([^\-]*)/.exec(page)
-        var country = country_re ? country_re[1].trim() : '[FAILED]';
+  forPage(path, function(page) {
+    // Looking for the title tag, e.g.
+    // <title>List of cities in CountryName - Wikipedia, the free encyclopedia</title>
+    var countryRegex = /\<\s*title\s*\>List of cities in ([^\-]*)/.exec(page);
+    var country = countryRegex ? countryRegex[1].trim() : '[FAILED]';
 
-        // Looking for table entries of the form:
-        // <td><a href="/wiki/CityName" title="CityName">CityName</a></td>
-        var re = /\<td\><a\s+href\=\"([^\"]+)\"\s+title\=/g;
-        var match;
-        var count = 0;
-        while (match = re.exec(page)) {
-            //forCity(match[1], country);
-            console.log(match[1] + '\t' + country);
-            count++;
-        }
-        console.log('[COUNTRY] ' + path + '(' + country + '): ' + (count ? count : '[FAILED]'));
-    });
+    // Looking for table entries of the form:
+    // <td><a href="/wiki/CityName" title="CityName">CityName</a></td>
+    var re = /\<td\><a\s+href\=\"([^\"]+)\"\s+title\=/g;
+    var match;
+    var count = 0;
+    while (match = re.exec(page)) {
+      //forCity(match[1], country);
+      console.log(match[1] + '\t' + country);
+      count++;
+    }
+    console.log(
+      '[COUNTRY] ' + path + '(' + country + '): ' +
+      (count ? count : '[FAILED]'));
+  });
 };
 
 var forCountryList = function(path) {
   forPage(path, function(page) {
-      // Looking for elements of the form:
-      // <a href="/wiki/List_of_cities_in_CountryName" title="List of cities in CountryName">
-      var re = /<a\s+href\=\"([^\"]+)\"\s+title\=\"List of cities in /g;
-      var match;
-      while (match = re.exec(page)) {
-          //forCityList(match[1]);
-          console.log(match[1]);
-      }
+    // Looking for elements of the form:
+    // <a href="/wiki/List_of_cities_in_CountryName" title="List of cities in CountryName">
+    var re = /<a\s+href\=\"([^\"]+)\"\s+title\=\"List of cities in /g;
+    var match;
+    while (match = re.exec(page)) {
+      //forCityList(match[1]);
+      console.log(match[1]);
+    }
   });
 };
 //forCountryList('/wiki/Lists_of_cities_by_country');
 
 var forCapitalList = function(path) {
-    forPage(path, function(page) {
-        // Looking for table rows first.
-        page.split('<tr>').forEach(function(section) {
-            // Looking for table entries of the form:
-            // <td><a href="/wiki/CityName" title="CityName">
-            var re = /<td><a\s+href="([^"]+)"\s+title="([^"]+)">/.exec(section);
-            if (!re) {
-              return;
-            }
-            forCity(re[1]);
-            //console.log(re[1] + '\t' + re[2]);
-        });
+  forPage(path, function(page) {
+    // Looking for table rows first.
+    page.split('<tr>').forEach(function(section) {
+      // Looking for table entries of the form:
+      // <td><a href="/wiki/CityName" title="CityName">
+      var re = /<td><a\s+href="([^"]+)"\s+title="([^"]+)">/.exec(section);
+      if (!re) {
+        return;
+      }
+      forCity(re[1]);
+      //console.log(re[1] + '\t' + re[2]);
     });
+  });
 };
 forCapitalList('/wiki/List_of_national_capitals_in_alphabetical_order');

@@ -18,18 +18,20 @@
  */
 
 oppia.filter('oppiaInteractiveLogicProofValidator', [
-    'baseInteractionValidationService', function(baseInteractionValidationService) {
-  // Returns a list of warnings.
-  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+  'baseInteractionValidationService',
+  function(baseInteractionValidationService) {
+    // Returns a list of warnings.
+    return function(stateName, customizationArgs, answerGroups) {
+      var warningsList = [];
 
-    warningsList = warningsList.concat(
-      baseInteractionValidationService.getAnswerGroupWarnings(
-        answerGroups, stateName));
+      warningsList = warningsList.concat(
+        baseInteractionValidationService.getAnswerGroupWarnings(
+          answerGroups, stateName));
 
-    // We do not require a default rule for this interaction, since the
-    // feedback is mostly provided from within the interaction itself.
+      // We do not require a default rule for this interaction, since the
+      // feedback is mostly provided from within the interaction itself.
 
-    return warningsList;
-  };
-}]);
+      return warningsList;
+    };
+  }
+]);

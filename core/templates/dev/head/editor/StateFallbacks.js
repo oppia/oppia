@@ -19,177 +19,180 @@
  */
 
 oppia.controller('StateFallbacks', [
-    '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
-    'warningsData', 'INTERACTION_SPECS', 'stateFallbacksService',
-    'explorationStatesService', 'stateInteractionIdService',
-    function(
+  '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
+  'warningsData', 'INTERACTION_SPECS', 'stateFallbacksService',
+  'explorationStatesService', 'stateInteractionIdService',
+  function(
       $scope, $rootScope, $modal, $filter, editorContextService,
       warningsData, INTERACTION_SPECS, stateFallbacksService,
       explorationStatesService, stateInteractionIdService) {
-  $scope.editorContextService = editorContextService;
-  $scope.stateFallbacksService = stateFallbacksService;
-  $scope.activeFallbackIndex = null;
-
-  $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    stateFallbacksService.init(
-      $scope.stateName, stateData.interaction.fallbacks,
-      stateData.interaction, 'fallbacks');
-
+    $scope.editorContextService = editorContextService;
+    $scope.stateFallbacksService = stateFallbacksService;
     $scope.activeFallbackIndex = null;
-  });
 
-  $scope.getFallbackSummary = function(fallback) {
-    var numSubmits = fallback.trigger.customization_args.num_submits.value;
-    var fallbackDescription = (
-      '[' + numSubmits +
-      ' unsuccessful attempt' + (numSubmits !== 1 ? 's' : '') + '] ');
-    var feedbackAsPlainText = (
-      fallback.outcome.feedback.length ?
-      $filter('convertToPlainText')(fallback.outcome.feedback[0]) :
-      '');
-    return fallbackDescription + feedbackAsPlainText;
-  };
+    $scope.$on('stateEditorInitialized', function(evt, stateData) {
+      stateFallbacksService.init(
+        $scope.stateName, stateData.interaction.fallbacks,
+        stateData.interaction, 'fallbacks');
 
-  $scope.changeActiveFallbackIndex = function(newIndex) {
-    // If the current fallback is being clicked on again, close it.
-    if (newIndex === $scope.activeFallbackIndex) {
       $scope.activeFallbackIndex = null;
-    } else {
-      $scope.activeFallbackIndex = newIndex;
-    }
-  };
+    });
 
-  // This returns false if the current interaction ID is null.
-  $scope.isCurrentInteractionLinear = function() {
-    var interactionId = stateInteractionIdService.savedMemento;
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-  };
+    $scope.getFallbackSummary = function(fallback) {
+      var numSubmits = fallback.trigger.customization_args.num_submits.value;
+      var fallbackDescription = (
+        '[' + numSubmits +
+        ' unsuccessful attempt' + (numSubmits !== 1 ? 's' : '') + '] ');
+      var feedbackAsPlainText = (
+        fallback.outcome.feedback.length ?
+        $filter('convertToPlainText')(fallback.outcome.feedback[0]) :
+        '');
+      return fallbackDescription + feedbackAsPlainText;
+    };
 
-  $scope.openAddFallbackModal = function() {
-    warningsData.clear();
-    $rootScope.$broadcast('externalSave');
+    $scope.changeActiveFallbackIndex = function(newIndex) {
+      // If the current fallback is being clicked on again, close it.
+      if (newIndex === $scope.activeFallbackIndex) {
+        $scope.activeFallbackIndex = null;
+      } else {
+        $scope.activeFallbackIndex = newIndex;
+      }
+    };
 
-    $modal.open({
-      templateUrl: 'modals/addFallback',
-      backdrop: true,
-      controller: [
+    // This returns false if the current interaction ID is null.
+    $scope.isCurrentInteractionLinear = function() {
+      var interactionId = stateInteractionIdService.savedMemento;
+      return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    };
+
+    $scope.openAddFallbackModal = function() {
+      warningsData.clear();
+      $rootScope.$broadcast('externalSave');
+
+      $modal.open({
+        templateUrl: 'modals/addFallback',
+        backdrop: true,
+        controller: [
           '$scope', '$modalInstance', 'editorContextService',
           function($scope, $modalInstance, editorContextService) {
+            $scope.INT_FORM_SCHEMA = {
+              type: 'int',
+              ui_config: {},
+              validators: [{
+                id: 'is_at_least',
+                min_value: 1
+              }]
+            };
 
-        $scope.INT_FORM_SCHEMA = {
-          type: 'int',
-          ui_config: {},
-          validators: [{
-            id: 'is_at_least',
-            min_value: 1
-          }]
-        };
-
-        $scope.tmpFallback = {
-          trigger: {
-            trigger_type: 'NthResubmission',
-            customization_args: {
-              num_submits: {
-                value: 3
+            $scope.tmpFallback = {
+              trigger: {
+                trigger_type: 'NthResubmission',
+                customization_args: {
+                  num_submits: {
+                    value: 3
+                  }
+                }
+              },
+              outcome: {
+                dest: editorContextService.getActiveStateName(),
+                feedback: [''],
+                param_changes: []
               }
-            }
-          },
-          outcome: {
-            dest: editorContextService.getActiveStateName(),
-            feedback: [''],
-            param_changes: []
+            };
+
+            $scope.isSelfLoopWithNoFeedback = function(outcome) {
+              var hasFeedback = outcome.feedback.some(function(feedbackPiece) {
+                return Boolean(feedbackPiece);
+              });
+
+              return (
+                outcome.dest === editorContextService.getActiveStateName() &&
+                !hasFeedback);
+            };
+
+            $scope.addFallbackForm = {};
+
+            $scope.saveFallback = function() {
+              $scope.$broadcast('saveOutcomeFeedbackDetails');
+              $scope.$broadcast('saveOutcomeDestDetails');
+              // Close the modal and save it afterwards.
+              $modalInstance.close({
+                fallback: angular.copy($scope.tmpFallback)
+              });
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
           }
-        };
+        ]
+      }).result.then(function(result) {
+        stateFallbacksService.displayed.push(result.fallback);
+        saveFallbacksChanges();
+      });
+    };
 
-        $scope.isSelfLoopWithNoFeedback = function(outcome) {
-          var hasFeedback = outcome.feedback.some(function(feedbackPiece) {
-            return Boolean(feedbackPiece);
-          });
+    // When the page is scrolled so that the top of the page is above the
+    // browser viewport, there are some bugs in the positioning of the helper.
+    // This is a bug in jQueryUI that has not been fixed yet. For more details,
+    // see http://stackoverflow.com/q/5791886
+    $scope.FALLBACK_LIST_SORTABLE_OPTIONS = {
+      axis: 'y',
+      cursor: 'move',
+      handle: '.oppia-fallback-sort-handle',
+      items: '.oppia-sortable-fallback',
+      revert: 100,
+      tolerance: 'pointer',
+      start: function(e, ui) {
+        $rootScope.$broadcast('externalSave');
+        $scope.activeFallbackIndex = null;
+        ui.placeholder.height(ui.item.height());
+      },
+      stop: function() {
+        saveFallbacksChanges();
+      }
+    };
 
-          return (
-            outcome.dest === editorContextService.getActiveStateName() &&
-            !hasFeedback);
-        };
+    $scope.deleteFallback = function(index, evt) {
+      // Prevent clicking on the delete button from also toggling the display
+      // state of the answer group.
+      evt.stopPropagation();
 
-        $scope.addFallbackForm = {};
+      warningsData.clear();
+      $modal.open({
+        templateUrl: 'modals/deleteFallback',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.reallyDelete = function() {
+              $modalInstance.close();
+            };
 
-        $scope.saveFallback = function(reopen) {
-          $scope.$broadcast('saveOutcomeFeedbackDetails');
-          $scope.$broadcast('saveOutcomeDestDetails');
-          // Close the modal and save it afterwards.
-          $modalInstance.close({
-            fallback: angular.copy($scope.tmpFallback)
-          });
-        };
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }
+        ]
+      }).result.then(function() {
+        stateFallbacksService.displayed.splice(index, 1);
+        saveFallbacksChanges();
+      });
+    };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    }).result.then(function(result) {
-      stateFallbacksService.displayed.push(result.fallback);
+    $scope.onComponentSave = function() {
       saveFallbacksChanges();
-    });
-  };
+    };
 
-  // When the page is scrolled so that the top of the page is above the browser
-  // viewport, there are some bugs in the positioning of the helper. This is a
-  // bug in jQueryUI that has not been fixed yet. For more details, see
-  // http://stackoverflow.com/q/5791886
-  $scope.FALLBACK_LIST_SORTABLE_OPTIONS = {
-    axis: 'y',
-    cursor: 'move',
-    handle: '.oppia-fallback-sort-handle',
-    items: '.oppia-sortable-fallback',
-    revert: 100,
-    tolerance: 'pointer',
-    start: function(e, ui) {
-      $rootScope.$broadcast('externalSave');
-      $scope.activeFallbackIndex = null;
-      ui.placeholder.height(ui.item.height());
-    },
-    stop: function(e, ui) {
-      saveFallbacksChanges();
-    }
-  };
+    var saveFallbacksChanges = function() {
+      stateFallbacksService.saveDisplayedValue();
 
-  $scope.deleteFallback = function(index, evt) {
-    // Prevent clicking on the delete button from also toggling the display
-    // state of the answer group.
-    evt.stopPropagation();
-
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/deleteFallback',
-      backdrop: true,
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.reallyDelete = function() {
-          $modalInstance.close();
-        };
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    }).result.then(function() {
-      stateFallbacksService.displayed.splice(index, 1);
-      saveFallbacksChanges();
-    });
-  };
-
-  $scope.onComponentSave = function() {
-    saveFallbacksChanges();
-  };
-
-  var saveFallbacksChanges = function() {
-    stateFallbacksService.saveDisplayedValue();
-
-    var activeStateName = editorContextService.getActiveStateName();
-    var _stateDict = explorationStatesService.getState(activeStateName);
-    _stateDict.interaction.fallbacks = angular.copy(
-      stateFallbacksService.savedMemento);
-    explorationStatesService.setState(activeStateName, _stateDict);
-  };
-}]);
+      var activeStateName = editorContextService.getActiveStateName();
+      var _stateDict = explorationStatesService.getState(activeStateName);
+      _stateDict.interaction.fallbacks = angular.copy(
+        stateFallbacksService.savedMemento);
+      explorationStatesService.setState(activeStateName, _stateDict);
+    };
+  }
+]);

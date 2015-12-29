@@ -81,6 +81,9 @@ install_node_module jasmine-spec-reporter 2.2.2
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update
 
+#build so as to have minified js and css
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+
 if ( nc -vz localhost 8181 ); then
   echo ""
   echo "  There is already a server running on localhost:8181."

@@ -111,14 +111,14 @@ class RuleFunctionUnitTests(test_utils.GenericTestBase):
 
     def test_get_description_strings_for_obj_type(self):
         rule_descriptions = rule_domain.get_description_strings_for_obj_type(
-            'UnicodeString')
+            'Real')
         self.assertEqual(rule_descriptions, {
-            'CaseSensitiveEquals': (
-                'is equal to {{x|UnicodeString}}, taking case into account'),
-            'Contains': 'contains {{x|UnicodeString}}',
-            'Equals': 'is equal to {{x|UnicodeString}}',
-            'MatchesBase64EncodedFile': (
-                'has same content as the file located at '
-                '{{filepath|UnicodeString}}'),
-            'StartsWith': 'starts with {{x|UnicodeString}}',
+            'Equals': 'is equal to {{x|Real}}',
+            'IsLessThan': 'is less than {{x|Real}}',
+            'IsGreaterThan': 'is greater than {{x|Real}}',
+            'IsLessThanOrEqualTo': 'is less than or equal to {{x|Real}}',
+            'IsGreaterThanOrEqualTo': 'is greater than or equal to {{x|Real}}',
+            'IsInclusivelyBetween': (
+                'is between {{a|Real}} and {{b|Real}}, inclusive'),
+            'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
         })

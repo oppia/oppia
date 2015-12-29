@@ -10,6 +10,12 @@
     GLOBALS.PROFILE_USERNAME = JSON.parse(
       '{{PROFILE_USERNAME|js_string}}');
   </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -25,45 +31,109 @@
 
 {% block content %}
   <div class="oppia-profile-container" ng-controller="Profile">
-    <div class="container">
+    <md-card class="oppia-profile-top-card">
       <div class="row">
-        <div class="form-group">
-          <div class="col-lg-2 col-md-3 col-sm-3">
-            <img ng-src="<[profilePictureDataUrl]>"
-                 class="img-thumbnail oppia-profile-picture-fullsize">
-          </div>
-          <div class="col-lg-8 col-md-7 col-sm-7">
-            <h1 class="oppia-profile-username"><strong>{{PROFILE_USERNAME}}</strong></h1>
-            <p>
-              <span ng-if="userBio"><[userBio]></span>
-              <span ng-if="!userBio">
-                <em>This user has not supplied a bio yet.</em>
+        <div class="col-lg-3 col-md-3 col-sm-3">
+          <img ng-src="<[profilePictureDataUrl]>"
+               class="oppia-profile-picture-fullsize">
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-9">
+          <h2 class="oppia-profile-username"><strong>{{PROFILE_USERNAME}}</strong></h2>
+          <p>
+            <span ng-if="userBio" style="white-space: pre-wrap;"><[userBio]></span>
+            <span ng-if="!userBio">
+              <em>This user has not supplied a bio yet.</em>
+            </span>
+          </p>
+
+          <p class="oppia-profile-subject-interest-container">
+            Interests:
+            <span ng-if="subjectInterests.length > 0">
+              <span ng-repeat="interest in subjectInterests track by $index">
+                <span class="oppia-profile-subject-interest">
+                  <[interest]>
+                </span>
               </span>
-            </p>
-            <br>
-            <p>
-              <span ng-if="subjectInterests">
-                Subject Interests: <[subjectInterests]></span>
-              <span ng-if="!subjectInterests">
-                Subject Interests: <em>none specified</em>
-              </span>
-            </p>
-            <p>
-              <span ng-if="firstContributionMsec">
-                Contributing since
-                <[getLocaleDateString(firstContributionMsec)]>
-              </span>
-            </p>
-          </div>
+            </span>
+            <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
+              <em>none specified</em>
+            </span>
+          </p>
+
+          <p class="oppia-profile-first-contributed" ng-if="firstContributionMsec">
+            Contributing since:
+            <[getLocaleDateString(firstContributionMsec)]>
+          </p>
         </div>
       </div>
-    </div>
+    </md-card>
+
+    <md-card ng-cloak class="oppia-profile-tabs">
+      <md-content>
+        <md-tabs md-dynamic-height md-border-bottom>
+          <md-tab label="Impact">
+            <md-content class="oppia-profile-tabs-content">
+              <div class="oppia-stat-big-container big-top-container">
+                <div ng-repeat="stat in userDisplayedStatistics" class="oppia-stat-container-top">
+                  <span class="oppia-big-number" popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+                    <[stat.value || 0]>
+                  </span>
+                  <span>
+                    <[stat.title]>
+                  </span>
+                </div>
+              </div>
+            </md-content>
+          </md-tab>
+          <md-tab label="Created Explorations">
+            <md-content class="oppia-profile-tabs-content">
+              <div class="oppia-profile-explorations-container">
+                <exploration-summary-tile ng-repeat="expl in userCreatedExplorations"
+                    exploration-id="expl.id"
+                    exploration-title="expl.title"
+                    last-updated-msec="expl.last_updated_msec"
+                    objective="expl.objective"
+                    category="expl.category"
+                    ratings="expl.ratings"
+                    thumbnail-icon-url="expl.thumbnail_icon_url"
+                    thumbnail-bg-color="expl.thumbnail_bg_color"
+                    num-views="expl.num_views">
+                </exploration-summary-tile>
+              </div>
+              <div ng-if="userCreatedExplorations.length === 0">
+                <em>This user hasn't created any explorations yet.</em>
+              </div>
+            </md-content>
+          </md-tab>
+          <md-tab label="Edited Explorations">
+            <md-content class="oppia-profile-tabs-content">
+              <div class="oppia-profile-explorations-container">
+                <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
+                    exploration-id="expl.id"
+                    exploration-title="expl.title"
+                    last-updated-msec="expl.last_updated_msec"
+                    objective="expl.objective"
+                    category="expl.category"
+                    ratings="expl.ratings"
+                    thumbnail-icon-url="expl.thumbnail_icon_url"
+                    thumbnail-bg-color="expl.thumbnail_bg_color"
+                    num-views="expl.num_views">
+                </exploration-summary-tile>
+              </div>
+              <div ng-if="userEditedExplorations.length === 0">
+                <em>This user hasn't edited any explorations yet.</em>
+              </div>
+            </md-content>
+          </md-tab>
+        </md-tabs>
+      </md-content>
+    </md-card>
   </div>
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('/profile/Profile.js') }}
+    {{ include_js_file('profile/Profile.js') }}
   </script>
 {% endblock footer_js %}

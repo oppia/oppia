@@ -16,10 +16,8 @@
 
 __author__ = 'yanamal@google.com (Yana Malysheva)'
 
-import logging
-
 from core.controllers import base
-from core.domain import user_services
+from core.domain import email_manager
 
 
 class ModeratorPage(base.BaseHandler):
@@ -33,19 +31,13 @@ class ModeratorPage(base.BaseHandler):
         self.render_template('moderator/moderator.html')
 
 
-class UserServiceHandler(base.BaseHandler):
-    """Provide data for the moderator page"""
-
-    PAGE_NAME_FOR_CSRF = 'moderator_page'
+class EmailDraftHandler(base.BaseHandler):
+    """Provide default email templates for moderator emails."""
 
     @base.require_moderator
-    def post(self):
-        """Handles POST requests."""
-        username = self.payload.get('username')
-        logging.info(
-            '[MODERATOR] %s requested email corresponding to username %s' %
-            (self.user_id, username))
-
+    def get(self, action):
+        """Handles GET requests."""
         self.render_json({
-            'user_email': user_services.get_email_from_username(username),
+            'draft_email_body': (
+                email_manager.get_draft_moderator_action_email(action)),
         })

@@ -36,7 +36,6 @@ oppia.directive('responseHeader', [function() {
       function(
           $scope, editabilityService, editorContextService, routerService,
           PLACEHOLDER_OUTCOME_DEST) {
-
         $scope.editabilityService = editabilityService;
 
         $scope.isOutcomeLooping = function() {

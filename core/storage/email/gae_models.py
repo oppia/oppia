@@ -26,14 +26,6 @@ import utils
 from google.appengine.ext import ndb
 
 
-INTENT_SIGNUP = 'signup'
-INTENT_DAILY_BATCH = 'daily_batch'
-INTENT_MARKETING = 'marketing'
-INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
-INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-INTENT_DELETE_EXPLORATION = 'delete_exploration'
-
-
 class SentEmailModel(base_models.BaseModel):
     """Records the content and metadata of an email sent from Oppia.
 
@@ -55,12 +47,12 @@ class SentEmailModel(base_models.BaseModel):
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
     intent = ndb.StringProperty(required=True, indexed=True, choices=[
-        INTENT_SIGNUP,
-        INTENT_MARKETING,
-        INTENT_DAILY_BATCH,
-        INTENT_PUBLICIZE_EXPLORATION,
-        INTENT_UNPUBLISH_EXPLORATION,
-        INTENT_DELETE_EXPLORATION,
+        feconf.EMAIL_INTENT_SIGNUP,
+        feconf.EMAIL_INTENT_MARKETING,
+        feconf.EMAIL_INTENT_DAILY_BATCH,
+        feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION,
+        feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
+        feconf.EMAIL_INTENT_DELETE_EXPLORATION,
     ])
     # The subject line of the email.
     subject = ndb.TextProperty(required=True)

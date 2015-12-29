@@ -26,7 +26,8 @@ oppia.directive('oppiaNoninteractiveMath', [
       scope: {},
       templateUrl: 'richTextComponent/Math',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.rawLatex = oppiaHtmlEscaper.escapedJsonToObj($attrs.rawLatexWithValue);
+        $scope.rawLatex = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.rawLatexWithValue);
       }]
     };
   }

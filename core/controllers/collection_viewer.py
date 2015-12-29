@@ -122,12 +122,14 @@ class CollectionDataHandler(base.BaseHandler):
             collection_node['exploration'] = {
                 'id': collection_node['exploration_id'],
                 'title': summary.title if summary else None,
+                'category': summary.category if summary else None,
                 'objective': summary.objective if summary else None,
+                'ratings': summary.ratings if summary else None,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     summary.exploration_model_last_updated
                 ) if summary else None,
-                # TODO(sll): Replace these with per-category thumbnails.
-                'thumbnail_icon_url': '/images/gallery/default_thumbnail_icon.svg',
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    summary.category),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
                     summary.category),
             }

@@ -33,7 +33,8 @@ from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_jobs_continuous
 from core.platform import models
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(exp_models, user_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 import feconf
@@ -677,7 +678,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         completion events."""
         with self.swap(stats_jobs_continuous.StatisticsAggregator,
                     'get_statistics', self._mock_get_statistics):
-            job_id = ModifiedUserImpactAggregator.start_computation()
+            ModifiedUserImpactAggregator.start_computation()
             self.process_and_flush_pending_tasks()
 
     def _run_exp_impact_calculation_and_assert_equals(
@@ -818,6 +819,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
+        exp_model = exp_models.ExplorationModel.get(self.EXP_ID_1)
 
         # Use mock impact scores to verify that map only yields when
         # the impact score > 0.
@@ -825,20 +827,20 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         with self.swap(user_jobs_continuous.UserImpactMRJobManager,
                 '_get_exp_impact_score',
                 self._mock_get_zero_impact_score):
-            results = self.impact_mr_job_manager.map(self.exploration)
+            results = self.impact_mr_job_manager.map(exp_model)
             with self.assertRaises(StopIteration):
                 next(results)
         with self.swap(user_jobs_continuous.UserImpactMRJobManager,
                 '_get_exp_impact_score',
                 self._mock_get_below_zero_impact_score):
-            results = self.impact_mr_job_manager.map(self.exploration)
+            results = self.impact_mr_job_manager.map(exp_model)
             with self.assertRaises(StopIteration):
                 next(results)
         # Should yield one result when impact score > 0.
         with self.swap(user_jobs_continuous.UserImpactMRJobManager,
                 '_get_exp_impact_score',
                 self._mock_get_positive_impact_score):
-            results = self.impact_mr_job_manager.map(self.exploration)
+            results = self.impact_mr_job_manager.map(exp_model)
             next(results)
             with self.assertRaises(StopIteration):
                 next(results)

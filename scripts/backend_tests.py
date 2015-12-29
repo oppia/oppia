@@ -28,10 +28,6 @@ import subprocess
 import threading
 import time
 
-# DEVELOPERS: Please change this number accordingly when new tests are added
-# or removed.
-EXPECTED_TEST_COUNT = 652
-
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
@@ -311,11 +307,6 @@ def main():
     print ''
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
-    elif (parsed_args.test_path is None and parsed_args.test_target is None
-            and total_count != EXPECTED_TEST_COUNT):
-        raise Exception(
-            'ERROR: Expected %s tests to be run, not %s.' %
-            (EXPECTED_TEST_COUNT, total_count))
     else:
         print 'Ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',

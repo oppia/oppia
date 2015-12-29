@@ -237,42 +237,6 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     return result
 
 
-def get_displayable_exploration_summary_dicts_matching_ids(
-    exploration_ids, user_id):
-    """Given a list of exploration ids, filters the list for 
-    explorations that are currently non-private and not deleted, 
-    and returns a list of dicts of the corresponding exploration summaries.
-    """
-    displayable_exploration_summaries = []
-    exploration_summaries = get_exploration_summaries_matching_ids(
-        exploration_ids)
-
-    for exploration_summary in exploration_summaries:
-        if exploration_summary and exploration_summary.status != (
-            rights_manager.ACTIVITY_STATUS_PRIVATE):
-            displayable_exploration_summaries.append({
-                'id': exploration_summary.id,
-                'status': exploration_summary.status,
-                'community_owned': exploration_summary.community_owned,
-                'last_updated_msec': (
-                    utils.get_time_in_millisecs(
-                        exploration_summary.exploration_model_last_updated
-                    )),
-                'is_editable': (
-                    is_exp_summary_editable(exploration_summary, user_id)),
-                'language_code': exploration_summary.language_code,
-                'category': exploration_summary.category,
-                'ratings': exploration_summary.ratings,
-                'title': exploration_summary.title,
-                'objective': exploration_summary.objective,
-                'thumbnail_image_url': (
-                    exploration_summary.thumbnail_image_url
-                )
-            })
-
-    return displayable_exploration_summaries
-
-
 def get_new_exploration_id():
     """Returns a new exploration id."""
     return exp_models.ExplorationModel.get_new_id('')
@@ -338,9 +302,9 @@ def get_exploration_summaries_matching_ids(exp_ids):
         for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
-def get_exploration_summaries_matching_query(query_string, cursor=None):
-    """Returns a list with all exploration summary domain objects matching the
-    given search query string, as well as a search cursor for future fetches.
+def get_exploration_ids_matching_query(query_string, cursor=None):
+    """Returns a list with all exploration ids matching the given search query
+    string, as well as a search cursor for future fetches.
 
     This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
     at least that many, otherwise it returns all remaining results. (If this
@@ -348,11 +312,12 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
     a search cursor.
     """
     MAX_ITERATIONS = 10
-    summary_models = []
+    returned_exploration_ids = []
     search_cursor = cursor
 
     for i in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+            returned_exploration_ids)
 
         exp_ids, search_cursor = search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -361,11 +326,11 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
         for ind, model in enumerate(
                 exp_models.ExpSummaryModel.get_multi(exp_ids)):
             if model is not None:
-                summary_models.append(model)
+                returned_exploration_ids.append(exp_ids[ind])
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(returned_exploration_ids) == feconf.GALLERY_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -373,16 +338,13 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_exploration_ids) < feconf.GALLERY_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return ([
-        get_exploration_summary_from_model(summary_model)
-        for summary_model in summary_models
-    ], search_cursor)
+    return (returned_exploration_ids, search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -1006,7 +968,7 @@ def update_exploration(
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
-    
+
     if not rights_manager.is_exploration_private(exploration.id):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
@@ -1165,11 +1127,30 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, title, category, exploration_id,
         assets_list):
+    """Note that the title and category will be ignored if the YAML
+    schema version is greater than
+    exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION,
+    since in that case there will already be a title and category present in
+    the YAML schema.
+    """
     if assets_list is None:
         assets_list = []
 
-    exploration = exp_domain.Exploration.from_untitled_yaml(
-        exploration_id, title, category, yaml_content)
+    yaml_dict = utils.dict_from_yaml(yaml_content)
+    if 'schema_version' not in yaml_dict:
+        raise Exception('Invalid YAML file: missing schema version')
+    exp_schema_version = yaml_dict['schema_version']
+
+    if (exp_schema_version <=
+            exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+        # The schema of the YAML file for older explorations did not include
+        # a title and a category; these need to be manually specified.
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            exploration_id, title, category, yaml_content)
+    else:
+        exploration = exp_domain.Exploration.from_yaml(
+            exploration_id, yaml_content)
+
     commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
@@ -1305,7 +1286,6 @@ def _get_search_rank(exp_id):
     # negative ranks are disallowed in the Search API.
     _DEFAULT_RANK = 20
 
-    exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
     summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (
