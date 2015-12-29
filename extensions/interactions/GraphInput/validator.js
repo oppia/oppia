@@ -73,7 +73,7 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
             message: (
-              'The rule ' + String(j + 1) +
+              'The graph used in the rule ' + String(j + 1) +
               ' in group ' + String(i + 1) + ' is invalid.')
           });
         }
