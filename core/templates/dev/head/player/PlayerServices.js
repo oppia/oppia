@@ -494,19 +494,25 @@ oppia.controller('LearnerLocalNav', [
   });
 
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
+
   $scope.showLearnerSuggestionModal = function() {
     $modal.open({
       templateUrl: 'modals/learnerViewSuggestion',
       backdrop: true,
       resolve: {},
       controller: [
-        '$scope', '$modalInstance', 'playerPositionService',
+        '$scope', '$modalInstance', '$timeout', 'playerPositionService',
         'oppiaPlayerService',
-        function($scope, $modalInstance, playerPositionService,
+        function($scope, $modalInstance, $timeout, playerPositionService,
                  oppiaPlayerService) {
           var stateName = playerPositionService.getCurrentStateName();
           $scope.initContent = oppiaPlayerService.getStateContent(stateName)[0].value;
           $scope.suggestionContent = $scope.initContent;
+          $scope.showEditor = false;
+          // Rte initially displays content unrendered for a split second
+          $timeout(function() {
+            $scope.showEditor = true;
+          }, 500);
 
           $scope.cancelSuggestion = function() {
             $modalInstance.dismiss('cancel');
