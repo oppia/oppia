@@ -21,11 +21,11 @@
 oppia.controller('FeedbackTab', [
     '$scope', '$http', '$modal', '$timeout', '$rootScope', 'warningsData',
     'oppiaDatetimeFormatter', 'threadStatusDisplayService',
-    'threadDataService',
+    'threadDataService', 'explorationStatesService', 'explorationData',
     function(
       $scope, $http, $modal, $timeout, $rootScope, warningsData,
       oppiaDatetimeFormatter, threadStatusDisplayService,
-      threadDataService) {
+      threadDataService, explorationStatesService, explorationData) {
 
   $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
   $scope.threadData = threadDataService.data;
@@ -107,12 +107,14 @@ oppia.controller('FeedbackTab', [
         var states = explorationData.data.states;
         $scope.oldContent = states[suggestion.state_name].content[0].value;
         $scope.newContent = suggestion.state_content.value;
-        $scope.commitMessage = '';
+        $scope.commitMessage = {
+          value: ''
+        };
 
         $scope.acceptSuggestion = function() {
           $modalInstance.close({
             action: 'accept',
-            commitMsg: $scope.commitMessage
+            commitMsg: $scope.commitMessage.value
           });
         };
 
@@ -138,6 +140,15 @@ oppia.controller('FeedbackTab', [
           threadDataService.fetchThreads(function() {
             $scope.setActiveThread($scope.activeThread.thread_id);
           });
+          // Immediately update editor to reflect accepted suggestion.
+          if(result.action === 'accept') {
+            var suggestion = $scope.activeThread.suggestion;
+            var stateName = suggestion.state_name;
+            var state = angular.copy(explorationData.data.states[stateName]);
+            state.content[0].value = suggestion.state_content.value;
+            explorationStatesService.setState(stateName, state);
+            $rootScope.$broadcast('refreshStateEditor');
+          }
         }, function(res) {
           console.log("Error resolving suggestion");
         });

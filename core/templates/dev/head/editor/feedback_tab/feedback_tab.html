@@ -184,8 +184,8 @@
       </div>
     </section>
     <div style="margin-top: 20px; margin-left: 10px;" ng-if="suggestionValid()">
-      Commit Message:
-      <input type="text" ng-model="commitMessage" style="width: 100%">
+      Commit Message (required if accepting):
+      <input type="text" ng-model="commitMessage.value" style="width: 100%">
     </div>
   </div>
 
@@ -196,6 +196,6 @@
     </div>
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
     <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!suggestionValid()">Reject</button>
-    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!suggestionValid()">Accept</button>
+    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!suggestionValid() || commitMessage.value.length == 0">Accept</button>
   </div>
 </script>
