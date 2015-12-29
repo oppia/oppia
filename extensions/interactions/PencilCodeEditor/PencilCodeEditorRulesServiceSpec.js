@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Graph Input rules.
+ * @fileoverview Unit tests for Pencil Code Editor rules.
  *
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
