@@ -18,12 +18,12 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
-describe('Code REPL rules service', function() {
+describe('Pencil Code Editor rules service', function() {
   beforeEach(module('oppia'));
 
-  var crrs = null;
+  var pcers = null;
   beforeEach(inject(function($injector) {
-    crrs = $injector.get('codeReplRulesService');
+    pcers = $injector.get('pencilCodeEditorRulesService');
   }));
 
   describe('\'equals\' rule', function() {
@@ -36,7 +36,7 @@ describe('Code REPL rules service', function() {
     };
 
     it('should accept the same code', function() {
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x():\n' +
           '    y = \'ab    c\'\n' +
@@ -47,7 +47,7 @@ describe('Code REPL rules service', function() {
 
     it('should remove extra newlines and trailing whitespace', function() {
       // Extra newline with spaces
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x():\n' +
           '    y = \'ab    c\'\n' +
@@ -57,7 +57,7 @@ describe('Code REPL rules service', function() {
       }, RULE_INPUT)).toBe(true);
 
       // Extra trailing whitespace on first line
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x():        \n' +
           '    y = \'ab    c\'\n' +
@@ -66,7 +66,7 @@ describe('Code REPL rules service', function() {
       }, RULE_INPUT)).toBe(true);
 
       // Tab character
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x(): \t\n' +
           '    y = \'ab    c\'\n' +
@@ -76,7 +76,7 @@ describe('Code REPL rules service', function() {
     });
 
     it('should not change spaces at the start of a line', function() {
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x():\n' +
           '  y = \'ab    c\'\n' +
@@ -86,7 +86,7 @@ describe('Code REPL rules service', function() {
     });
 
     it('should detect missing newlines', function() {
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x():' +
           '    y = \'ab    c\'\n' +
@@ -96,7 +96,7 @@ describe('Code REPL rules service', function() {
     });
 
     it('should compare spaces inside quotes', function() {
-      expect(crrs.CodeEquals({
+      expect(pcers.CodeEquals({
         code: (
           'def x():' +
           '    y = \'ab c\'\n' +
@@ -112,17 +112,17 @@ describe('Code REPL rules service', function() {
     };
 
     it('should check if answer contains some code', function() {
-      expect(crrs.CodeContains({
+      expect(pcers.CodeContains({
         code: (
           'def x():\n' +
           '    y = \'ab c\'\n' +
           '    return x'
         )
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.CodeContains({
+      expect(pcers.CodeContains({
         code: '    def x():\n'
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.CodeContains({
+      expect(pcers.CodeContains({
         code: 'print 0'
       }, RULE_INPUT)).toBe(false);
     });
@@ -134,17 +134,17 @@ describe('Code REPL rules service', function() {
     };
 
     it('should check if answer contains some code', function() {
-      expect(crrs.CodeDoesNotContain({
+      expect(pcers.CodeDoesNotContain({
         code: (
           'def x():\n' +
           '    y = \'ab c\'\n' +
           '    return x'
         )
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.CodeDoesNotContain({
+      expect(pcers.CodeDoesNotContain({
         code: '    def x():\n'
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.CodeDoesNotContain({
+      expect(pcers.CodeDoesNotContain({
         code: 'print 0'
       }, RULE_INPUT)).toBe(true);
     });
@@ -156,16 +156,16 @@ describe('Code REPL rules service', function() {
     };
 
     it('should compare normalized output', function() {
-      expect(crrs.OutputEquals({
+      expect(pcers.OutputEquals({
         output: '1'
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.OutputEquals({
+      expect(pcers.OutputEquals({
         output: '\n1\n'
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.OutputEquals({
+      expect(pcers.OutputEquals({
         output: ''
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.OutputEquals({
+      expect(pcers.OutputEquals({
         output: 'bad output'
       }, RULE_INPUT)).toBe(false);
     });
@@ -175,13 +175,13 @@ describe('Code REPL rules service', function() {
     var RULE_INPUT = null;
 
     it('should check if error is not empty', function() {
-      expect(crrs.ResultsInError({
+      expect(pcers.ResultsInError({
         error: ''
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.ResultsInError({
+      expect(pcers.ResultsInError({
         error: ' \t\n'
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.ResultsInError({
+      expect(pcers.ResultsInError({
         error: 'bad output'
       }, RULE_INPUT)).toBe(true);
     });
@@ -193,22 +193,22 @@ describe('Code REPL rules service', function() {
     };
 
     it('should check if error message appears', function() {
-      expect(crrs.ErrorContains({
+      expect(pcers.ErrorContains({
         error: 'bad'
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.ErrorContains({
+      expect(pcers.ErrorContains({
         error: '  bad  '
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.ErrorContains({
+      expect(pcers.ErrorContains({
         error: 'not bad'
       }, RULE_INPUT)).toBe(true);
-      expect(crrs.ErrorContains({
+      expect(pcers.ErrorContains({
         error: 'error'
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.ErrorContains({
+      expect(pcers.ErrorContains({
         error: 'b a d'
       }, RULE_INPUT)).toBe(false);
-      expect(crrs.ErrorContains({
+      expect(pcers.ErrorContains({
         error: ''
       }, RULE_INPUT)).toBe(false);
     });
