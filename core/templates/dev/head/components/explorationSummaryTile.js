@@ -45,6 +45,15 @@ oppia.directive('explorationSummaryTile', [function() {
             $scope.getRatings());
         };
 
+        $scope.getLastUpdatedDatetime = function() {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            $scope.getLastUpdatedMsec());
+        };
+
+        $scope.wasRecentlyUpdated = function() {
+          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
+        };
+
         $scope.getExplorationLink = function() {
           var result = '/explore/' + $scope.getExplorationId();
           if ($scope.getCollectionId()) {

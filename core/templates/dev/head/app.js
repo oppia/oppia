@@ -209,6 +209,11 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
     getLocaleDateString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleDateString();
+    },
+    // Returns whether the date is at most one week before the current date.
+    isRecent: function(millisSinceEpoch) {
+      var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
+      return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
     }
   };
 }]);
