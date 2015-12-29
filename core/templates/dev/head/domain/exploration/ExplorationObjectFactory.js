@@ -47,6 +47,17 @@ oppia.factory('ExplorationObjectFactory', [
         INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
     };
 
+    Exploration.prototype.getAuthorRecommendedExpIds = function(stateName) {
+      if (!this.isStateTerminal(stateName)) {
+        throw Error(
+          'Tried to get recommendations for a non-terminal state: ' +
+          stateName);
+      }
+
+      return this.getInteractionCustomizationArgs(
+        stateName).recommendedExplorationIds.value;
+    };
+
     Exploration.prototype.getInteraction = function(stateName) {
       return this.states[stateName].interaction;
     };
