@@ -85,6 +85,10 @@
     padding: 12px;
   }
 
+  .oppia-exploration-summary-tile .rating-disabled {
+    opacity: 0.5;
+  }
+
   .oppia-exploration-summary-tile .metrics {
     height: 30px;
     margin: 0 12px;
@@ -128,7 +132,7 @@
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
-            <span class="protractor-test-exp-summary-tile-rating">
+            <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
               <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
               </span>
               <span ng-if="getAverageRating()">

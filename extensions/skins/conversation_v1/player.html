@@ -189,14 +189,14 @@
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()"
        class="conversation-skin-final-ratings">
 
-    <div style="margin-bottom: 20px;">
+    <div style="color: #eee; margin-bottom: 20px;">
       Learned something new? How would you rate this exploration?
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-from-value rating-value="userRating"
                          is-editable="true"
                          on-edit="submitUserRating"
-                         style="letter-spacing: 10px; color: #fff;">
+                         style="letter-spacing: 10px; color: #eee;">
       </rating-from-value>
     </div>
   </div>
