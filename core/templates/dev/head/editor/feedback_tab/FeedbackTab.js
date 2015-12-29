@@ -107,10 +107,12 @@ oppia.controller('FeedbackTab', [
         var states = explorationData.data.states;
         $scope.oldContent = states[suggestion.state_name].content[0].value;
         $scope.newContent = suggestion.state_content.value;
+        $scope.commitMessage = '';
 
         $scope.acceptSuggestion = function() {
           $modalInstance.close({
-            action: 'accept'
+            action: 'accept',
+            commitMsg: $scope.commitMessage
           });
         };
 
@@ -131,7 +133,8 @@ oppia.controller('FeedbackTab', [
       }]
     }).result.then(function(result) {
       threadDataService.resolveSuggestion(
-        $scope.activeThread.thread_id, result.action, function(res) {
+        $scope.activeThread.thread_id, result.action, result.commitMsg,
+        function(res) {
           threadDataService.fetchThreads(function() {
             $scope.setActiveThread($scope.activeThread.thread_id);
           });

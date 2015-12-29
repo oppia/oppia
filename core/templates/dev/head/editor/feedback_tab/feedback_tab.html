@@ -173,19 +173,27 @@
       <div class="oppia-suggestion-review-panel-container" style="float: left;">
         <strong>Current:</strong>
         <div class="oppia-suggestion-review-panel">
-          <span angular-html-bind="oldContent"></span>
+          <div angular-html-bind="oldContent"></div>
         </div>
       </div>
       <div class="oppia-suggestion-review-panel-container" style="float: right;">
         <strong>Suggested:</strong>
         <div class="oppia-suggestion-review-panel">
-          <span angular-html-bind="newContent"></span>
+          <div angular-html-bind="newContent"></div>
         </div>
       </div>
     </section>
+    <div style="margin-top: 20px; margin-left: 10px;" ng-if="suggestionValid()">
+      Commit Message:
+      <input type="text" ng-model="commitMessage" style="width: 100%">
+    </div>
   </div>
 
   <div class="modal-footer">
+    <div ng-if="!suggestionValid()" style="text-align: right; width: 100%; color: red;">
+      This suggestion has already been accepted/rejected,
+      or was made for an outdated version of this exploration.
+    </div>
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
     <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!suggestionValid()">Reject</button>
     <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!suggestionValid()">Accept</button>

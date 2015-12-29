@@ -125,11 +125,15 @@ oppia.factory('threadDataService', [
         }
       });
     },
-    resolveSuggestion: function(threadId, action, onSuccess, onFailure) {
-      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
-        action: action,
-        commit_message: 'Suggestion ok.'
-      }).success(onSuccess).error(onFailure);
+    resolveSuggestion: function(threadId, action, commitMsg, onSuccess, onFailure) {
+      var payload = {
+        action: action
+      };
+      if (commitMsg) {
+        payload.commit_message = commitMsg;
+      }
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL+threadId, payload).success(
+        onSuccess).error(onFailure);
     }
   };
 }]);
