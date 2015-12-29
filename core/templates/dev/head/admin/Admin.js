@@ -219,7 +219,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     $http.post($scope.adminHandlerUrl, {
       action: 'reload_collection',
       collection_id: String(collectionId)
-    }).success(function(data) {
+    }).success(function() {
       $scope.message = 'Data reloaded successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;

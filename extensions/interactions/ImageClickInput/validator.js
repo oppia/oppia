@@ -44,8 +44,11 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       });
     }
 
-    for (var i = 0; i < customizationArgs.imageAndRegions.value.labeledRegions.length; i++) {
-      var regionLabel = customizationArgs.imageAndRegions.value.labeledRegions[i].label;
+    for (var i = 0;
+         i < customizationArgs.imageAndRegions.value.labeledRegions.length;
+         i++) {
+      var regionLabel = (
+        customizationArgs.imageAndRegions.value.labeledRegions[i].label);
 
       var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
       if (regionLabel.trim().length === 0) {
@@ -53,7 +56,9 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
         warningsList.push({
           type: WARNING_TYPES.CRITICAL,
-          message: 'The image region strings should consist of characters from [A-Za-z0-9].'
+          message: (
+            'The image region strings should consist of characters from ' +
+            '[A-Za-z0-9].')
         });
       } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
         areAnyRegionStringsDuplicated = true;
@@ -97,7 +102,8 @@ oppia.filter('oppiaInteractiveImageClickInputValidator', [
       }
     }
 
-    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+    if (!defaultOutcome ||
+        $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: (

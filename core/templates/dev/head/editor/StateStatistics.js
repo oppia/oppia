@@ -20,73 +20,76 @@
  */
 
 oppia.controller('StateStatistics', [
-    '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
-    'explorationStatesService', 'trainingDataService',
-    'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
-    'trainingModalService', 'INTERACTION_SPECS',
-    function($rootScope, $scope, $modal, explorationData, editorContextService,
+  '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
+  'explorationStatesService', 'trainingDataService',
+  'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
+  'trainingModalService', 'INTERACTION_SPECS',
+  function(
+      $rootScope, $scope, $modal, explorationData, editorContextService,
       explorationStatesService, trainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
       trainingModalService, INTERACTION_SPECS) {
-  $scope.unresolvedAnswersList = [];
-  $scope.isInteractionTrainable = false;
+    $scope.unresolvedAnswersList = [];
+    $scope.isInteractionTrainable = false;
 
-  $scope.initStateStatistics = function(data) {
-    // Do not show unresolved answers if the interaction has only one possible
-    // answer.
-    $scope.unresolvedAnswers = (
-      (data.interaction.id && !INTERACTION_SPECS[data.interaction.id].is_linear) ?
-      data.unresolved_answers : {});
-    $scope.generateUnresolvedAnswersList();
+    $scope.initStateStatistics = function(data) {
+      // Do not show unresolved answers if the interaction has only one possible
+      // answer.
+      $scope.unresolvedAnswers = (
+        (data.interaction.id &&
+         !INTERACTION_SPECS[data.interaction.id].is_linear) ?
+        data.unresolved_answers : {});
+      $scope.generateUnresolvedAnswersList();
 
-    $scope.isInteractionTrainable = (
-      data.interaction.id &&
-      INTERACTION_SPECS[data.interaction.id].is_trainable);
+      $scope.isInteractionTrainable = (
+        data.interaction.id &&
+        INTERACTION_SPECS[data.interaction.id].is_trainable);
 
-    $scope.trainingDataButtonContentsList = [];
-
-    $rootScope.$on('updatedTrainingData', function() {
       $scope.trainingDataButtonContentsList = [];
 
-      var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
-      var trainingDataCounts = trainingDataService.getTrainingDataCounts();
-      for (var i = 0; i < trainingDataAnswers.length; i++) {
-        var answerHtml = (
-          oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-            trainingDataAnswers[i], data.interaction.id,
-            stateCustomizationArgsService.savedMemento));
-        $scope.trainingDataButtonContentsList.push({
-          'answerHtml': answerHtml,
-          'count': trainingDataCounts[i]
+      $rootScope.$on('updatedTrainingData', function() {
+        $scope.trainingDataButtonContentsList = [];
+
+        var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
+        var trainingDataCounts = trainingDataService.getTrainingDataCounts();
+        for (var i = 0; i < trainingDataAnswers.length; i++) {
+          var answerHtml = (
+            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+              trainingDataAnswers[i], data.interaction.id,
+              stateCustomizationArgsService.savedMemento));
+          $scope.trainingDataButtonContentsList.push({
+            answerHtml: answerHtml,
+            count: trainingDataCounts[i]
+          });
+        }
+      });
+    };
+
+    $scope.$on('refreshStateEditor', function() {
+      $scope.stateName = editorContextService.getActiveStateName();
+      var stateData = explorationStatesService.getState($scope.stateName);
+      $scope.initStateStatistics(stateData);
+    });
+
+    $scope.generateUnresolvedAnswersList = function() {
+      $scope.unresolvedAnswersList = [];
+      for (var answerItem in $scope.unresolvedAnswers) {
+        $scope.unresolvedAnswersList.push({
+          answer: answerItem,
+          count: $scope.unresolvedAnswers[answerItem]
         });
       }
-    });
-  };
+    };
 
-  $scope.$on('refreshStateEditor', function(evt) {
-    $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = explorationStatesService.getState($scope.stateName);
-    $scope.initStateStatistics(stateData);
-  });
+    $scope.deleteUnresolvedAnswer = function(answer) {
+      $scope.unresolvedAnswers[answer] = 0;
+      explorationData.resolveAnswers($scope.stateName, [answer]);
+      $scope.generateUnresolvedAnswersList();
+    };
 
-  $scope.generateUnresolvedAnswersList = function() {
-    $scope.unresolvedAnswersList = [];
-    for (var answerItem in $scope.unresolvedAnswers) {
-      $scope.unresolvedAnswersList.push({
-        'answer': answerItem,
-        'count': $scope.unresolvedAnswers[answerItem]
-      });
-    }
-  };
-
-  $scope.deleteUnresolvedAnswer = function(answer) {
-    $scope.unresolvedAnswers[answer] = 0;
-    explorationData.resolveAnswers($scope.stateName, [answer]);
-    $scope.generateUnresolvedAnswersList();
-  };
-
-  $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
-    return trainingModalService.openTrainUnresolvedAnswerModal(
-      trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
-  };
-}]);
+    $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
+      return trainingModalService.openTrainUnresolvedAnswerModal(
+        trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
+    };
+  }
+]);

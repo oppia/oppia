@@ -148,15 +148,12 @@ oppia.directive('ratingFromFrequencies', [
       ratingFrequencies: '&'
     },
     templateUrl: 'rating/fromFrequencies',
-    controller: [
-      '$scope', 'ratingVisibilityService',
-      function($scope, ratingVisibilityService) {
-        $scope.computeAverageRating = (
-          ratingComputationService.computeAverageRating);
+    controller: ['$scope', function($scope) {
+      $scope.computeAverageRating = (
+        ratingComputationService.computeAverageRating);
 
-        $scope.ratingValue = $scope.computeAverageRating(
-          $scope.ratingFrequencies());
-      }
-    ]
+      $scope.ratingValue = $scope.computeAverageRating(
+        $scope.ratingFrequencies());
+    }]
   };
 }]);

@@ -19,8 +19,11 @@
  */
 
 oppia.controller('Profile', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'ratingVisibilityService',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter, ratingVisibilityService) {
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  'ratingVisibilityService',
+  function(
+      $scope, $http, $rootScope, oppiaDatetimeFormatter,
+      ratingVisibilityService) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
@@ -40,8 +43,8 @@ oppia.controller('Profile', [
         title: 'User Impact Score',
         value: data.user_impact_score,
         helpText: (
-          'A rough measure of the impact of explorations created by this user. ' +
-          'Better ratings and more playthroughs improve this score.')
+          'A rough measure of the impact of explorations created by this ' +
+          'user. Better ratings and more playthroughs improve this score.')
       }, {
         title: 'Created Explorations',
         value: data.created_exploration_summary_dicts.length
@@ -59,5 +62,3 @@ oppia.controller('Profile', [
     });
   }
 ]);
-
-

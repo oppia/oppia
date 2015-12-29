@@ -37,14 +37,17 @@ oppia.filter('oppiaInteractiveContinueValidator', [
     if (answerGroups.length > 0) {
       warningsList.push({
         type: WARNING_TYPES.CRITICAL,
-        message: 'Only the default outcome is necessary for a continue interaction.'
+        message: (
+          'Only the default outcome is necessary for a continue interaction.')
       });
     }
 
-    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+    if (!defaultOutcome ||
+        $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do after the button is clicked.'
+        message: (
+          'Please specify what Oppia should do after the button is clicked.')
       });
     }
 

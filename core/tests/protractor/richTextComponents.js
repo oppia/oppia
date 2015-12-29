@@ -28,7 +28,7 @@ var player = require('../protractor_utils/player.js');
 describe('rich-text components', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');
-    users.login('user11@example.com')
+    users.login('user11@example.com');
 
     workflow.createExploration('RTE components', 'maths');
 
@@ -50,7 +50,7 @@ describe('rich-text components', function() {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-    })
+    });
 
     editor.navigateToPreviewTab();
 

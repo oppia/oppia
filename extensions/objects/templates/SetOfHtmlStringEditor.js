@@ -20,7 +20,7 @@ oppia.directive('setOfHtmlStringEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'SetOfHtmlString';
       };
@@ -29,7 +29,7 @@ oppia.directive('setOfHtmlStringEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
+    controller: function($scope) {
       $scope.SCHEMA = {
         type: 'list',
         items: {

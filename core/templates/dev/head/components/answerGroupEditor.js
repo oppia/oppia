@@ -38,7 +38,6 @@ oppia.directive('answerGroupEditor', [function() {
           $scope, stateInteractionIdService, responsesService,
           editorContextService, warningsData, INTERACTION_SPECS,
           FUZZY_RULE_TYPE) {
-
         $scope.rulesMemento = null;
 
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();

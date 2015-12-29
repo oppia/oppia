@@ -132,8 +132,8 @@ html, body {
   opacity: 1;
   padding: 12px;
   position: absolute;
-  right: -12px;
-  top: -12px;
+  right: 12px;
+  bottom: 12px;
   text-align: left;
   transition: all 350ms;
   z-index: 500;
@@ -385,7 +385,11 @@ div.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-final-ratings {
-  padding-top: 20px;
+  text-align: center;
+}
+
+.conversation-skin-final-recommendations {
+  margin-top: 50px;
   text-align: center;
 }
 

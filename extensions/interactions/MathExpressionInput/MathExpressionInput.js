@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * Directive for the MathExpressionInput interaction.
  *
@@ -28,10 +27,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       scope: {},
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
-        '$scope', '$attrs', '$timeout', '$element',
-        'LABEL_FOR_CLEARING_FOCUS', function(
-            $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS) {
-
+        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
+        function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
           var guppyInstance = new Guppy(guppyDivElt, {});
           var guppyDivId = guppyInstance.editor.id;
@@ -119,7 +116,7 @@ oppia.directive('oppiaShortResponseMathExpressionInput', [
 
 oppia.factory('mathExpressionInputRulesService', [function() {
   return {
-    'IsMathematicallyEquivalentTo': function(answer, inputs) {
+    IsMathematicallyEquivalentTo: function(answer, inputs) {
       return (
         MathExpression.fromText(answer.ascii).equals(
           MathExpression.fromText(inputs.x)));

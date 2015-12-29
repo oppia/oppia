@@ -19,14 +19,16 @@
  */
 
 oppia.factory('warningsData', ['$log', function($log) {
-  var warningsData = {warnings: []};
+  var warningsData = {
+    warnings: []
+  };
   // This is to prevent infinite loops.
   var MAX_TOTAL_WARNINGS = 100;
   var warningsSoFar = 0;
 
   /**
    * Adds a warning message to the butterbar.
-   * @param {string} warning The warning message to display.
+   * @param {string} warning - The warning message to display.
    */
   warningsData.addWarning = function(warning) {
     $log.error(warning);
@@ -49,7 +51,7 @@ oppia.factory('warningsData', ['$log', function($log) {
 
   /**
    * Deletes the warning at a given index.
-   * @param {int} index The index of the warning to delete.
+   * @param {int} index - The index of the warning to delete.
    */
   warningsData.deleteWarning = function(index) {
     warningsData.warnings.splice(index, 1);

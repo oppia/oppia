@@ -40,14 +40,18 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'ratingComputationService',
       function($scope, oppiaDatetimeFormatter, ratingComputationService) {
-        $scope.getLastUpdatedDatetime = function() {
-          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-            $scope.getLastUpdatedMsec())
-        };
-
         $scope.getAverageRating = function() {
           return ratingComputationService.computeAverageRating(
             $scope.getRatings());
+        };
+
+        $scope.getLastUpdatedDatetime = function() {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            $scope.getLastUpdatedMsec());
+        };
+
+        $scope.wasRecentlyUpdated = function() {
+          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
         };
 
         $scope.getExplorationLink = function() {

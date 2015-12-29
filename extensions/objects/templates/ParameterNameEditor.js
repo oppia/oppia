@@ -12,56 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // NOTE TO DEVELOPERS: This editor requires explorationParamSpecsService to be
 // available in the context in which it is used.
 
 oppia.directive('parameterNameEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'ParameterName';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: [
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'ParameterName';
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: [
         '$scope', '$attrs', 'explorationParamSpecsService',
         function($scope, $attrs, explorationParamSpecsService) {
+          $scope.availableParamNames = Object.keys(
+            explorationParamSpecsService.savedMemento);
 
-      $scope.availableParamNames = Object.keys(
-        explorationParamSpecsService.savedMemento);
+          if ($scope.availableParamNames.length === 0) {
+            $scope.localValue = null;
+          } else {
+            $scope.localValue = $scope.availableParamNames[0];
+          }
 
-      if ($scope.availableParamNames.length === 0) {
-        $scope.localValue = null;
-      } else {
-        $scope.localValue = $scope.availableParamNames[0];
-      }
+          $scope.validate = function() {
+            return ($scope.availableParamNames.length === 0) ? false : true;
+          };
 
-      $scope.validate = function() {
-        return ($scope.availableParamNames.length === 0) ? false : true;
-      };
+          $scope.SCHEMA = {
+            type: 'unicode',
+            choices: $scope.availableParamNames
+          };
 
-      $scope.SCHEMA = {
-        type: 'unicode',
-        choices: $scope.availableParamNames
-      };
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
+          $scope.$watch('$parent.value', function(newValue) {
+            if (newValue) {
+              $scope.localValue = newValue;
+            }
+          }, true);
 
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        if (newValue) {
-          $scope.localValue = newValue;
+          $scope.$watch('localValue', function(newValue) {
+            $scope.$parent.value = newValue;
+          });
         }
-      }, true);
-
-      $scope.$watch('localValue', function(newValue, oldValue) {
-        $scope.$parent.value = newValue;
-      });
-    }]
-  };
-}]);
+      ]
+    };
+  }
+]);
