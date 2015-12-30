@@ -66,8 +66,8 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
               ruleSpec.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
-              message: 'The graph used in the rule ' + (i + 1) +
-                       ' in group ' + (j + 1) +
+              message: 'The graph used in the rule ' + (j + 1) +
+                       ' in group ' + (i + 1) +
                        ' exceeds supported maximum number of vertices of ' +
                         ISOMORPHISM_VERTICES_LIMIT + ' for isomorphism check.'
             });
@@ -76,8 +76,8 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
           if (ruleSpec.inputs.g.vertices.length > VERTICES_LIMIT) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,
-              message: 'The graph used in the rule ' + (i + 1) +
-                       ' in group ' + (j + 1) +
+              message: 'The graph used in the rule ' + (j + 1) +
+                       ' in group ' + (i + 1) +
                        ' exceeds supported maximum number of vertices of ' +
                         VERTICES_LIMIT + '.'
             });
