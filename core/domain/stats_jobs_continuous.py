@@ -172,9 +172,9 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_id, VERSION_ALL) for exploration_id in exploration_ids]
         mr_models = stats_models.ExplorationAnnotationsModel.get_multi(
             entity_ids)
-        realtime_model_ids = [
-            cls.get_active_realtime_layer_id(exploration_id)
-            for exploration_id in exploration_ids]
+
+        realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
+            exploration_ids)
         realtime_models = cls._get_realtime_datastore_class().get_multi(
             realtime_model_ids)
 
