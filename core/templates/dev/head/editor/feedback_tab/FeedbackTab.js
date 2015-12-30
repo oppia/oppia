@@ -91,6 +91,15 @@ oppia.controller('FeedbackTab', [
     });
   };
 
+  $scope.isSuggestionValid = function() {
+    return ($scope.activeThread.status === 'open' &&
+      explorationData.data.version === $scope.activeThread.suggestion.exploration_version);
+  };
+
+  $scope.viewSuggestionBtnType = function () {
+    return ($scope.isSuggestionValid() ? 'primary' : 'default');
+  };
+
   // TODO(Allan): Implement ability to edit suggestions before applying.
   $scope.showSuggestionModal = function() {
     $modal.open({
@@ -98,17 +107,23 @@ oppia.controller('FeedbackTab', [
       backdrop: true,
       size: 'lg',
       resolve: {
-        activeThread: function() {
-          return $scope.activeThread;
+        isSuggestionValid: function() {
+          return $scope.isSuggestionValid;
+        },
+        stateContent: function() {
+          var states = explorationData.data.states;
+          var stateName = $scope.activeThread.suggestion.state_name;
+          return {
+            oldContent: states[stateName].content[0].value,
+            newContent: $scope.activeThread.suggestion.state_content.value
+          };
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'activeThread', 'explorationData',
-        function($scope, $modalInstance, activeThread, explorationData) {
-        var suggestion = activeThread.suggestion;
-        var states = explorationData.data.states;
-        $scope.oldContent = states[suggestion.state_name].content[0].value;
-        $scope.newContent = suggestion.state_content.value;
+        '$scope', '$modalInstance', 'isSuggestionValid', 'stateContent',
+        function($scope, $modalInstance, isSuggestionValid, stateContent) {
+        $scope.oldContent = stateContent.oldContent;
+        $scope.newContent = stateContent.newContent;
         $scope.commitMessage = '';
 
         $scope.acceptSuggestion = function() {
@@ -128,10 +143,7 @@ oppia.controller('FeedbackTab', [
           $modalInstance.dismiss();
         };
 
-        $scope.isSuggestionValid = function() {
-          return (activeThread.status === 'open' &&
-            explorationData.data.version === suggestion.exploration_version);
-        }
+        $scope.isSuggestionValid = isSuggestionValid;
       }]
     }).result.then(function(result) {
       threadDataService.resolveSuggestion(

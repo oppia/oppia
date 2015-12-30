@@ -10,7 +10,7 @@
       <thread-table threads="threadData.suggestionThreads"
                     on-click-row="setActiveThread">
       </thread-table>
-      <hr>
+      <br>
     </div>
 
     <div class="pull-right">
@@ -93,7 +93,7 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <div style="white-space: pre-wrap;"><[m.text]></div>
-                  <button class="btn btn-primary" ng-if="activeThread.suggestion && $index==0" ng-click="showSuggestionModal()">
+                  <button class="btn btn-<[viewSuggestionBtnType()]>" style="margin-top: 6px; margin-bottom: 6px" ng-show="activeThread.suggestion && $index==0" ng-click="showSuggestionModal()">
                     View Suggestion
                   </button>
                 </div>
@@ -190,7 +190,7 @@
   </div>
 
   <div class="modal-footer">
-    <div ng-show="!isSuggestionValid()" style="text-align: right; width: 100%; color: red;">
+    <div ng-show="!isSuggestionValid()" style="text-align: right; width: 100%; color: red; margin-bottom: 10px;">
       This suggestion has already been accepted/rejected,
       or was made for an outdated version of this exploration.
     </div>
