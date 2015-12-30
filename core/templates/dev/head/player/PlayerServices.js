@@ -282,8 +282,8 @@ oppia.factory('oppiaPlayerService', [
     getExplorationVersion: function() {
       return version;
     },
-    getStateContent: function(stateName) {
-      return exploration.getState(stateName).content;
+    getStateContentHtml: function(stateName) {
+      return exploration.getContentHtml(stateName);
     },
     getInteractionHtml: function(stateName, labelForFocusTarget) {
       return oppiaExplorationHtmlFormatterService.getInteractionHtml(
@@ -506,7 +506,7 @@ oppia.controller('LearnerLocalNav', [
         function($scope, $modalInstance, $timeout, playerPositionService,
                  oppiaPlayerService) {
           var stateName = playerPositionService.getCurrentStateName();
-          $scope.initContent = oppiaPlayerService.getStateContent(stateName)[0].value;
+          $scope.initContent = oppiaPlayerService.getStateContentHtml(stateName);
           $scope.suggestionContent = $scope.initContent;
           $scope.showEditor = false;
           // Rte initially displays content unrendered for a split second
