@@ -27,6 +27,8 @@ oppia.controller('FeedbackTab', [
       oppiaDatetimeFormatter, threadStatusDisplayService,
       threadDataService, explorationStatesService, explorationData) {
 
+  var ACTION_ACCEPT_SUGGESTION = 'accept';
+  var ACTION_REJECT_SUGGESTION = 'reject';
   $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
   $scope.threadData = threadDataService.data;
   $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
@@ -111,22 +113,22 @@ oppia.controller('FeedbackTab', [
 
         $scope.acceptSuggestion = function() {
           $modalInstance.close({
-            action: 'accept',
+            action: ACTION_ACCEPT_SUGGESTION,
             commitMsg: $scope.commitMessage
           });
         };
 
         $scope.rejectSuggestion = function() {
           $modalInstance.close({
-            action: 'reject'
+            action: ACTION_REJECT_SUGGESTION
           });
         };
 
         $scope.cancelReview = function() {
-          $modalInstance.dismiss('cancel');
+          $modalInstance.dismiss();
         };
 
-        $scope.suggestionValid = function() {
+        $scope.isSuggestionValid = function() {
           return (activeThread.status === 'open' &&
             explorationData.data.version === suggestion.exploration_version);
         }
@@ -139,7 +141,7 @@ oppia.controller('FeedbackTab', [
             $scope.setActiveThread($scope.activeThread.thread_id);
           });
           // Immediately update editor to reflect accepted suggestion.
-          if(result.action === 'accept') {
+          if (result.action === ACTION_ACCEPT_SUGGESTION) {
             var suggestion = $scope.activeThread.suggestion;
             var stateName = suggestion.state_name;
             var state = angular.copy(explorationData.data.states[stateName]);
@@ -148,7 +150,7 @@ oppia.controller('FeedbackTab', [
             $rootScope.$broadcast('refreshStateEditor');
           }
         }, function(res) {
-          console.log("Error resolving suggestion");
+          console.log('Error resolving suggestion');
         });
     });
   };

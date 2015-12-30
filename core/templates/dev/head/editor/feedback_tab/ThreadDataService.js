@@ -47,7 +47,7 @@ oppia.factory('threadDataService', [
       // Later requests will use only the thread_id, not full_thread_id
       _data.feedbackThreads.concat(_data.suggestionThreads).map(function(val) {
         val.thread_id = val.full_thread_id.substring(
-          val.full_thread_id.indexOf(".") + 1, val.full_thread_id.length);
+          val.full_thread_id.indexOf('.') + 1, val.full_thread_id.length);
       });
       if (successCallback) {
         successCallback();
@@ -132,7 +132,7 @@ oppia.factory('threadDataService', [
       if (commitMsg) {
         payload.commit_message = commitMsg;
       }
-      $http.put(_SUGGESTION_ACTION_HANDLER_URL+threadId, payload).success(
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).success(
         onSuccess).error(onFailure);
     }
   };

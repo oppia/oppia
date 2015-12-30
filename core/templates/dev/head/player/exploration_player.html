@@ -46,7 +46,7 @@
             <span class="glyphicon glyphicon-pencil"></span>
           </a>
         {% elif username %}
-          <a ng-click="showLearnerSuggestionModal()" tooltip="Suggest Edit" tooltip-placement="bottom" target="_blank">
+          <a ng-click="showLearnerSuggestionModal()" tooltip="Suggest a Change" tooltip-placement="bottom" target="_blank">
             <span class="glyphicon glyphicon-pencil"></span>
           </a>
         {% endif %}
@@ -70,18 +70,20 @@
   </script>
   <script type="text/ng-template" id="modals/learnerViewSuggestion">
     <div class="modal-header">
-      <h3>Make a Suggestion</h3>
+      <h3>Suggest a Change</h3>
     </div>
 
     <div class="modal-body">
       <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
-      <br />
+      <br>
       <p>Press 'Submit' to send your changes to the exploration author for review.</p>
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="initContent==suggestionContent">Submit</button>
+      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="initContent == suggestionContent">
+        Submit Suggestion
+      </button>
     </div>
   </script>
 {% endblock local_top_nav_options %}

@@ -183,19 +183,19 @@
         </div>
       </div>
     </section>
-    <div style="margin-top: 20px; margin-left: 10px;" ng-show="suggestionValid()">
+    <div style="margin-top: 20px; margin-left: 10px;" ng-show="isSuggestionValid()">
       Commit Message (required if accepting):
       <input type="text" ng-model="commitMessage" style="width: 100%">
     </div>
   </div>
 
   <div class="modal-footer">
-    <div ng-show="!suggestionValid()" style="text-align: right; width: 100%; color: red;">
+    <div ng-show="!isSuggestionValid()" style="text-align: right; width: 100%; color: red;">
       This suggestion has already been accepted/rejected,
       or was made for an outdated version of this exploration.
     </div>
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!suggestionValid()">Reject</button>
-    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!suggestionValid() || commitMessage.length == 0">Accept</button>
+    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!isSuggestionValid()">Reject</button>
+    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!isSuggestionValid() || commitMessage.length == 0">Accept</button>
   </div>
 </script>
