@@ -30,11 +30,12 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
     baseInteractionValidationService.requireCustomizationArguments(
       customizationArgs, ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
 
-    var exceedsVerticesLimit = false;
-    var exceedsIsomorphismVerticesLimit = false;
-
     if (customizationArgs.graph.value.vertices.length > VERTICES_LIMIT) {
-      exceedsVerticesLimit = true;
+      warningsList.push({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The graph used in customization exceeds supported ' +
+                 'maximum number of vertices of ' + VERTICES_LIMIT + '.'
+      });
     }
 
     if (!customizationArgs.graph.value.isWeighted &&
@@ -63,40 +64,34 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
         try {
           if (ruleSpec.rule_type === 'IsIsomorphicTo' &&
               ruleSpec.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
-            exceedsIsomorphismVerticesLimit = true;
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'The graph used in the rule ' + (i + 1) +
+                       ' in group ' + (j + 1) +
+                       ' exceeds supported maximum number of vertices of ' +
+                        ISOMORPHISM_VERTICES_LIMIT + ' for isomorphism check.'
+            });
           }
 
           if (ruleSpec.inputs.g.vertices.length > VERTICES_LIMIT) {
-            exceedsVerticesLimit = true;
+            warningsList.push({
+              type: WARNING_TYPES.CRITICAL,
+              message: 'The graph used in the rule ' + (i + 1) +
+                       ' in group ' + (j + 1) +
+                       ' exceeds supported maximum number of vertices of ' +
+                        VERTICES_LIMIT + '.'
+            });
           }
         } catch (e) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
             message: (
-              'The graph used in the rule ' + String(j + 1) +
-              ' in group ' + String(i + 1) + ' is invalid.')
+              'The rule ' + (j + 1) +
+              ' in group ' + (i + 1) + ' is invalid.')
           });
         }
       }
     }
-
-    if (exceedsIsomorphismVerticesLimit) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Note that only graphs with at most ' +
-                  String(ISOMORPHISM_VERTICES_LIMIT) +
-                  ' nodes are supported for isomorphism check.'
-      });
-    }
-
-    if (exceedsVerticesLimit) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Note that only graphs with at most ' +
-                  String(VERTICES_LIMIT) + ' nodes are supported.'
-      });
-    }
-
     return warningsList;
   };
 }]);
