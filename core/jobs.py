@@ -822,7 +822,7 @@ class BaseContinuousComputationManager(object):
             cls._get_active_realtime_index(), entity_id)
 
     @classmethod
-    def get_multi_active_realtime_layer_id(cls, entity_ids):
+    def get_multi_active_realtime_layer_ids(cls, entity_ids):
         """Returns a list of IDs of elements in the currently active realtime
         datastore layer corresponding to the given entity ids.
         """

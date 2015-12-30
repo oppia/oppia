@@ -69,7 +69,7 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the gallery
 # page.
-GALLERY_PAGE_SIZE = 24
+GALLERY_PAGE_SIZE = 20
 
 # The default number of commits to show on a page in the exploration history
 # tab.
