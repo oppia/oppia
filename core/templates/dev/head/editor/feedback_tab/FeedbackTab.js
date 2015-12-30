@@ -107,14 +107,12 @@ oppia.controller('FeedbackTab', [
         var states = explorationData.data.states;
         $scope.oldContent = states[suggestion.state_name].content[0].value;
         $scope.newContent = suggestion.state_content.value;
-        $scope.commitMessage = {
-          value: ''
-        };
+        $scope.commitMessage = '';
 
         $scope.acceptSuggestion = function() {
           $modalInstance.close({
             action: 'accept',
-            commitMsg: $scope.commitMessage.value
+            commitMsg: $scope.commitMessage
           });
         };
 
