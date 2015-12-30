@@ -240,7 +240,7 @@ oppia.directive('paramChangesEditor', [function() {
             $scope.$apply();
             ui.placeholder.height(ui.item.height());
           },
-          stop: function(e, ui) {
+          stop: function() {
             // This ensures that any new parameter names that have been added
             // before the swap are added to the list of possible names in the
             // select2 dropdowns. Otherwise, after the swap, the dropdowns may

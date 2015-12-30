@@ -403,9 +403,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $scope.isDiscardInProgress = true;
         changeListService.discardAllChanges();
         $rootScope.$broadcast('initExplorationPage', function() {
-          // The $apply() is needed to call all the exploration field $watch()
-          // methods before flipping isDiscardInProgress.
-          $scope.$apply();
           $scope.lastSaveOrDiscardAction = 'discard';
           $scope.isDiscardInProgress = false;
         });

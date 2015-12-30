@@ -77,7 +77,6 @@ describe('Full exploration editor', function() {
 
     workflow.createExploration('sums', 'maths');
     general.getExplorationIdFromEditor().then(function(explorationId) {
-
       // Check discarding of changes
       editor.setStateName('card1');
       editor.expectStateNamesToBe(['card1']);

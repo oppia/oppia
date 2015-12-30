@@ -1,31 +1,24 @@
+var argv = require('yargs').argv;
+var isMinificationNeeded = (argv.minify == 'True');
+var generatedJs = 'third_party/generated/dev/js/third_party.js';
+if (isMinificationNeeded) {
+  generatedJs = 'third_party/generated/prod/js/third_party.min.js';
+};
+
 module.exports = function(config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
       'core/tests/karma-globals.js',
+      // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
+      // are not bundled, they will be treated separately.
       'third_party/static/jquery-2.1.1/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.4.7/angular.js',
-      'third_party/static/angularjs-1.4.7/angular-animate.js',
-      'third_party/static/angularjs-1.4.7/angular-aria.js',
-      'third_party/static/angularjs-1.4.7/angular-resource.js',
-      'third_party/static/angularjs-1.4.7/angular-sanitize.js',
       'third_party/static/angularjs-1.4.7/angular-mocks.js',
-      'third_party/static/ui-bootstrap-0.13.4/ui-bootstrap-tpls-0.13.4.js',
-      'third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js',
-      'third_party/static/ui-utils-0.1.1/ui-utils.js',
-      'third_party/static/ui-map-0.5.0/ui-map.js',
-      'third_party/static/ui-sortable-0.12.6/src/sortable.js',
-      'third_party/static/bower-material-0.6.0-rc1/angular-material.js',
-      'third_party/static/hammer-js-2.0.4/hammer.js',
-      'third_party/static/ng-joyride-0.1.11/ng-joyride.js',
-      'third_party/static/nginfinitescroll-1.0.0/ng-infinite-scroll.min.js',
-      'third_party/static/ng-img-crop-0.3.2/compile/minified/ng-img-crop.js',
-      'third_party/static/textAngular-1.3.7/src/textAngular.js',
-      'third_party/static/textAngular-1.3.7/src/textAngularSetup.js',
-      // 'third_party/static/textAngular-1.3.7/src/textAngular-sanitize.js',
-      'third_party/static/textAngular-1.3.7/dist/textAngular-rangy.min.js',
+      'third_party/static/math-expressions-762ffd/build/math-expressions.js',
+      generatedJs,
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -80,7 +73,11 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
-      reporters: [{type: 'html'}, {type: 'json'}],
+      reporters: [{
+        type: 'html'
+      }, {
+        type: 'json'
+      }],
       subdir: '.',
       dir: '../karma_coverage_reports/'
     },

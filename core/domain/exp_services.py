@@ -35,6 +35,7 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
@@ -149,7 +150,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.version,
+        exp_summary_model.contributor_ids, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
@@ -301,9 +302,9 @@ def get_exploration_summaries_matching_ids(exp_ids):
         for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
-def get_exploration_summaries_matching_query(query_string, cursor=None):
-    """Returns a list with all exploration summary domain objects matching the
-    given search query string, as well as a search cursor for future fetches.
+def get_exploration_ids_matching_query(query_string, cursor=None):
+    """Returns a list with all exploration ids matching the given search query
+    string, as well as a search cursor for future fetches.
 
     This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
     at least that many, otherwise it returns all remaining results. (If this
@@ -311,11 +312,12 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
     a search cursor.
     """
     MAX_ITERATIONS = 10
-    summary_models = []
+    returned_exploration_ids = []
     search_cursor = cursor
 
     for i in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+            returned_exploration_ids)
 
         exp_ids, search_cursor = search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -324,11 +326,11 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
         for ind, model in enumerate(
                 exp_models.ExpSummaryModel.get_multi(exp_ids)):
             if model is not None:
-                summary_models.append(model)
+                returned_exploration_ids.append(exp_ids[ind])
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(returned_exploration_ids) == feconf.GALLERY_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -336,16 +338,13 @@ def get_exploration_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_exploration_ids) < feconf.GALLERY_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return ([
-        get_exploration_summary_from_model(summary_model)
-        for summary_model in summary_models
-    ], search_cursor)
+    return (returned_exploration_ids, search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -840,7 +839,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
-    create_exploration_summary(exploration.id)
+    create_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -851,6 +850,8 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+    user_services.add_created_exploration_id(committer_id, exploration.id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -926,6 +927,21 @@ def _get_last_updated_by_human_ms(exp_id):
     return last_human_update_ms
 
 
+def publish_exploration_and_update_user_profiles(committer_id, exp_id):
+    """Publishes the exploration with publish_exploration() function in
+    rights_manager.py, as well as updates first_contribution_msec.
+
+    It is the responsibility of the caller to check that the exploration is
+    valid prior to publication.
+    """
+    rights_manager.publish_exploration(committer_id, exp_id)
+    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contributor_ids = get_exploration_summary_by_id(exp_id).contributor_ids
+    for contributor in contributor_ids:
+        user_services.update_first_contribution_msec_if_not_set(
+            contributor, contribution_time_msec)
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
@@ -949,36 +965,54 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
-
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id)
+    update_exploration_summary(exploration.id, committer_id)
+    user_services.add_edited_exploration_id(committer_id, exploration.id)
+
+    if not rights_manager.is_exploration_private(exploration.id):
+        user_services.update_first_contribution_msec_if_not_set(
+            committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_exploration_summary(exploration_id):
+def create_exploration_summary(exploration_id, contributor_id_to_add):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(exploration_id):
+def update_exploration_summary(exploration_id, contributor_id_to_add):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration, contributor_id_to_add):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it.
+    domain object and return it. contributor_id_to_add will be added to
+    the list of contributors for the exploration if the argument is not
+    None and if the id is not a system id.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
     exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        contributor_ids = old_exp_summary.contributor_ids or []
     else:
         ratings = feconf.get_empty_ratings()
+        contributor_ids = []
+
+    # Update the contributor id list if necessary (contributors
+    # defined as humans who have made a positive (i.e. not just
+    # a revert) change to an exploration's content).
+    if (contributor_id_to_add is not None and
+                contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
+            if contributor_id_to_add not in contributor_ids:
+                contributor_ids.append(contributor_id_to_add)
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -989,11 +1023,11 @@ def compute_summary_of_exploration(exploration):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated)
+        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated)
 
     return exp_summary
-
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
@@ -1012,6 +1046,7 @@ def save_exploration_summary(exp_summary):
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
+        contributor_ids=exp_summary.contributor_ids,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
@@ -1060,7 +1095,9 @@ def revert_exploration(
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
 
-    update_exploration_summary(exploration_id)
+    # Update the exploration summary, but since this is just a revert do
+    # not add the committer of the revert to the list of contributors.
+    update_exploration_summary(exploration_id, None)
 
 
 # Creation and deletion methods.
@@ -1090,11 +1127,30 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, title, category, exploration_id,
         assets_list):
+    """Note that the title and category will be ignored if the YAML
+    schema version is greater than
+    exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION,
+    since in that case there will already be a title and category present in
+    the YAML schema.
+    """
     if assets_list is None:
         assets_list = []
 
-    exploration = exp_domain.Exploration.from_untitled_yaml(
-        exploration_id, title, category, yaml_content)
+    yaml_dict = utils.dict_from_yaml(yaml_content)
+    if 'schema_version' not in yaml_dict:
+        raise Exception('Invalid YAML file: missing schema version')
+    exp_schema_version = yaml_dict['schema_version']
+
+    if (exp_schema_version <=
+            exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+        # The schema of the YAML file for older explorations did not include
+        # a title and a category; these need to be manually specified.
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            exploration_id, title, category, yaml_content)
+    else:
+        exploration = exp_domain.Exploration.from_yaml(
+            exploration_id, yaml_content)
+
     commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
@@ -1148,7 +1204,7 @@ def load_demo(exploration_id):
         feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
         exploration_id, assets_list)
 
-    rights_manager.publish_exploration(
+    publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
 
     index_explorations_given_ids([exploration_id])
@@ -1230,7 +1286,6 @@ def _get_search_rank(exp_id):
     # negative ranks are disallowed in the Search API.
     _DEFAULT_RANK = 20
 
-    exploration = get_exploration_by_id(exp_id)
     rights = rights_manager.get_exploration_rights(exp_id)
     summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (

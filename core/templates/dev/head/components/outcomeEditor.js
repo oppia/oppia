@@ -29,9 +29,7 @@ oppia.directive('outcomeEditor', [function() {
     },
     templateUrl: 'components/outcomeEditor',
     controller: [
-      '$scope', 'editorContextService', 'routerService',
-      function($scope, editorContextService, routerService) {
-
+      '$scope', 'editorContextService', function($scope, editorContextService) {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;

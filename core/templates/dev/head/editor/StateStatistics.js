@@ -20,50 +20,52 @@
  */
 
 oppia.controller('StateStatistics', [
-    '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
-    'explorationStatesService', 'trainingDataService',
-    'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
-    'trainingModalService', 'INTERACTION_SPECS',
-    function($rootScope, $scope, $modal, explorationData, editorContextService,
+  '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
+  'explorationStatesService', 'trainingDataService',
+  'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
+  'trainingModalService', 'INTERACTION_SPECS',
+  function(
+      $rootScope, $scope, $modal, explorationData, editorContextService,
       explorationStatesService, trainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
       trainingModalService, INTERACTION_SPECS) {
-  $scope.isInteractionTrainable = false;
+    $scope.isInteractionTrainable = false;
 
-  $scope.initStateStatistics = function(data) {
-    $scope.isInteractionTrainable = (
-      data.interaction.id &&
-      INTERACTION_SPECS[data.interaction.id].is_trainable);
+    $scope.initStateStatistics = function(data) {
+      $scope.isInteractionTrainable = (
+        data.interaction.id &&
+        INTERACTION_SPECS[data.interaction.id].is_trainable);
 
-    $scope.trainingDataButtonContentsList = [];
-
-    $rootScope.$on('updatedTrainingData', function() {
       $scope.trainingDataButtonContentsList = [];
 
-      var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
-      var trainingDataFrequencies = (
-        trainingDataService.getTrainingDataFrequencies());
-      for (var i = 0; i < trainingDataAnswers.length; i++) {
-        var answerHtml = (
-          oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-            trainingDataAnswers[i], data.interaction.id,
-            stateCustomizationArgsService.savedMemento));
-        $scope.trainingDataButtonContentsList.push({
-          'answerHtml': answerHtml,
-          'frequency': trainingDataFrequencies[i]
-        });
-      }
+      $rootScope.$on('updatedTrainingData', function() {
+        $scope.trainingDataButtonContentsList = [];
+
+        var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
+        var trainingDataFrequencies = (
+          trainingDataService.getTrainingDataFrequencies());
+        for (var i = 0; i < trainingDataAnswers.length; i++) {
+          var answerHtml = (
+            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+              trainingDataAnswers[i], data.interaction.id,
+              stateCustomizationArgsService.savedMemento));
+          $scope.trainingDataButtonContentsList.push({
+            answerHtml: answerHtml,
+            frequency: trainingDataFrequencies[i]
+          });
+        }
+      });
+    };
+
+    $scope.$on('refreshStateEditor', function() {
+      $scope.stateName = editorContextService.getActiveStateName();
+      var stateData = explorationStatesService.getState($scope.stateName);
+      $scope.initStateStatistics(stateData);
     });
-  };
 
-  $scope.$on('refreshStateEditor', function(evt) {
-    $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = explorationStatesService.getState($scope.stateName);
-    $scope.initStateStatistics(stateData);
-  });
-
-  $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
-    return trainingModalService.openTrainUnresolvedAnswerModal(
-      trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
-  };
-}]);
+    $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
+      return trainingModalService.openTrainUnresolvedAnswerModal(
+        trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
+    };
+  }
+]);

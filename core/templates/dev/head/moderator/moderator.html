@@ -16,25 +16,7 @@
 {% block content %}
   <div ng-controller="Moderator">
     <div class="oppia-content">
-      <h3>Email a user</h3>
-      <div class="oppia-gallery-frame">
-        <form ng-submit="submitUserEmailRequest(username)">
-          <div>
-            Username:
-            <input type="text" ng-model="username">
-          </div>
-          <button type="submit">Get Email</button>
-        </form>
-      </div>
-      <div ng-show="lastSubmittedUsername && !userEmail">
-        <strong>No such user</strong>
-      </div>
-      <div>
-        <[userEmail]>
-      </div>
-    </div>
-
-    <div class="oppia-content">
+      <br>
       <tabset>
         <tab heading="Recent Commits" active>
           <h3>Recent Commits (all non-private explorations)</h3>

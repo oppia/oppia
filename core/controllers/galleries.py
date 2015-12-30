@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
@@ -109,28 +110,13 @@ class GalleryHandler(base.BaseHandler):
 
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
-        exp_summaries_list, search_cursor = (
-            exp_services.get_exploration_summaries_matching_query(
+        exp_ids, search_cursor = (
+            exp_services.get_exploration_ids_matching_query(
                 query_string, cursor=search_cursor))
 
-        # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
-        # individual lookups. Note that this will depend on user_id.
-        explorations_list = [{
-            'id': exp_summary.id,
-            'title': exp_summary.title,
-            'category': exp_summary.category,
-            'objective': exp_summary.objective,
-            'language_code': exp_summary.language_code,
-            'last_updated': utils.get_time_in_millisecs(
-                exp_summary.exploration_model_last_updated),
-            'status': exp_summary.status,
-            'community_owned': exp_summary.community_owned,
-            'thumbnail_image_url': exp_summary.thumbnail_image_url,
-            'is_editable': exp_services.is_exp_summary_editable(
-                exp_summary,
-                user_id=self.user_id),
-            'ratings': exp_summary.ratings
-        } for exp_summary in exp_summaries_list]
+        explorations_list = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                exp_ids))
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -247,21 +233,9 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 isinstance(exp_id, basestring) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
-        exp_summaries = exp_services.get_exploration_summaries_matching_ids(
-            exp_ids)
-
         self.values.update({
-            'summaries': [(None if exp_summary is None else {
-                'id': exp_summary.id,
-                'title': exp_summary.title,
-                'category': exp_summary.category,
-                'objective': exp_summary.objective,
-                'language_code': exp_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    exp_summary.exploration_model_last_updated),
-                'status': exp_summary.status,
-                'community_owned': exp_summary.community_owned,
-                'thumbnail_image_url': exp_summary.thumbnail_image_url,
-            }) for exp_summary in exp_summaries]
+            'summaries': (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids))
         })
         self.render_json(self.values)

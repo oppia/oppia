@@ -25,7 +25,7 @@ class EndExploration(base.BaseInteraction):
     containing it.
     """
 
-    name = 'End Conversation'
+    name = 'End Exploration'
     description = (
         'Ends the exploration, and suggests recommendations for explorations '
         'to try next.')
@@ -38,9 +38,9 @@ class EndExploration(base.BaseInteraction):
     _customization_arg_specs = [{
         'name': 'recommendedExplorationIds',
         'description': (
-            'IDs of explorations to recommend to the learner (maximum of 8). '
-            '(The ID of an exploration is the string of characters appearing '
-            'after \'/explore/\' in the URL bar.)'),
+            'IDs of explorations to recommend to the learner (at most 3 are '
+            'shown). The ID of an exploration is the string of characters '
+            'appearing after \'/explore/\' in the URL bar.'),
         'schema': {
             'type': 'list',
             'items': {

@@ -663,6 +663,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
+        self.assertEqual(retrieved_collection_summary.contributor_ids, [self.OWNER_ID])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
@@ -955,7 +956,13 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
     """Test methods relating to collection snapshots."""
 
+    SECOND_USERNAME = 'abc123'
+    SECOND_EMAIL = 'abc123@gmail.com'
+
     def test_get_collection_snapshots_metadata(self):
+        self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
+        self.second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
+
         v1_collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
 
@@ -1039,7 +1046,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         # Using the old version of the collection should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
             collection_services._save_collection(
-                'committer_id_2', v1_collection, '',
+                self.second_committer_id, v1_collection, '',
                 _get_collection_change_list('title', ''))
 
         # Another person modifies the collection.
@@ -1049,7 +1056,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             'new_value': 'New title'
         }]
         collection_services.update_collection(
-            'committer_id_2', self.COLLECTION_ID, new_change_list,
+            self.second_committer_id, self.COLLECTION_ID, new_change_list,
             'Second commit.')
 
         snapshots_metadata = (
@@ -1077,7 +1084,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         }, snapshots_metadata[1])
         self.assertDictContainsSubset({
             'commit_cmds': new_change_list,
-            'committer_id': 'committer_id_2',
+            'committer_id': self.second_committer_id,
             'commit_message': 'Second commit.',
             'commit_type': 'edit',
             'version_number': 3,
@@ -1349,7 +1356,7 @@ class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
         self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[0])
+            self.COMMIT_ALBERT_PUBLISH_COLLECTION_2, commit_dicts[-1])
 
     def test_paging(self):
         all_commits, cursor, more = (
@@ -1626,6 +1633,39 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             collection_summary, user_id=self.EDITOR_ID))
         self.assertFalse(collection_services.is_collection_summary_editable(
             collection_summary, user_id=self.VIEWER_ID))
+
+    def test_contributor_ids(self):
+        # Sign up two users.
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        # Have Albert create a collection.
+        collection = self.save_new_valid_collection(
+            self.COLLECTION_ID, self.ALBERT_ID)
+        # Have Bob edit the collection.
+        changelist_cmds = [{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }]
+        collection_services.update_collection(
+            self.BOB_ID, self.COLLECTION_ID, changelist_cmds,
+            'Changed title to Bob title.')
+        # Albert adds an owner and an editor.
+        rights_manager.assign_role_for_collection(
+            self.ALBERT_ID, self.COLLECTION_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
+        rights_manager.assign_role_for_collection(
+            self.ALBERT_ID, self.COLLECTION_ID, self.EDITOR_ID,
+            rights_manager.ROLE_EDITOR)
+        # Verify that only Albert and Bob are listed as contributors for the
+        # collection.
+        collection_summary = collection_services.get_collection_summary_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(
+            collection_summary.contributor_ids,
+            [self.ALBERT_ID, self.BOB_ID])
 
 
 class CollectionSummaryGetTests(CollectionServicesUnitTests):

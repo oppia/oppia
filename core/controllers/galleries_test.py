@@ -23,6 +23,8 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
+import os
+import utils
 
 
 CAN_EDIT_STR = 'can_edit'
@@ -224,3 +226,20 @@ class GalleryPageTest(test_utils.GenericTestBase):
         response.mustcontain('Upload Exploration')
 
         self.logout()
+
+
+class CategoryConfigTest(test_utils.GenericTestBase):
+
+    def test_thumbnail_icons_exist_for_each_category(self):
+        all_categories = feconf.CATEGORIES_TO_COLORS.keys()
+
+        # Test that an icon exists for each default category.
+        for category in all_categories:
+            utils.get_file_contents(os.path.join(
+                'static', 'images', 'gallery', 'thumbnails',
+                '%s.svg' % category.replace(' ', '')))
+
+        # Test that the default icon exists.
+        utils.get_file_contents(os.path.join(
+            'static', 'images', 'gallery', 'thumbnails',
+            '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))

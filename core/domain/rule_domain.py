@@ -146,7 +146,8 @@ class Rule(object):
     def _evaluate(self, subject):
         """Returns a normalized value between 0 and 1 indicating the truth value
         of the evaluation, where 1.0 is certainly true and 0.0 is certainly
-        false. This is to be implemented in overridden classes.
+        false. This is to be implemented in overridden classes, or implemented
+        in the frontend.
         """
         raise NotImplementedError
 

@@ -20,29 +20,47 @@
 
 oppia.directive('explorationSummaryTile', [function() {
   return {
-    // This will display a star-rating based on the given data. The attributes
-    // passed in are as follows:
-    //  - isEditable: true or false; whether the rating is user-editable.
-    //  - onEdit: should be supplied iff isEditable is true, and be a function
-    //    that will be supplied with the new rating when the rating is changed.
-    //  - ratingValue: an integer 1-5 giving the rating
     restrict: 'E',
     scope: {
-      getId: '&explorationId',
+      getCollectionId: '&collectionId',
+      getExplorationId: '&explorationId',
+      getExplorationTitle: '&explorationTitle',
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getNumViews: '&numViews',
       getObjective: '&objective',
-      getStarRating: '&starRating',
-      getThumbnailImageUrl: '&thumbnailImageUrl',
-      getTitle: '&title'
+      getCategory: '&category',
+      getRatings: '&ratings',
+      getThumbnailIconUrl: '&thumbnailIconUrl',
+      getThumbnailBgColor: '&thumbnailBgColor',
+      // If this is not null, the new exploration opens in a new window when
+      // the summary tile is clicked.
+      openInNewWindow: '@openInNewWindow'
     },
     templateUrl: 'summaryTile/exploration',
     controller: [
-      '$scope', 'oppiaDatetimeFormatter',
-      function($scope, oppiaDatetimeFormatter) {
-        $scope.lastUpdatedDatetime = (
-          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-            $scope.getLastUpdatedMsec()));
+      '$scope', 'oppiaDatetimeFormatter', 'ratingComputationService',
+      function($scope, oppiaDatetimeFormatter, ratingComputationService) {
+        $scope.getAverageRating = function() {
+          return ratingComputationService.computeAverageRating(
+            $scope.getRatings());
+        };
+
+        $scope.getLastUpdatedDatetime = function() {
+          return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            $scope.getLastUpdatedMsec());
+        };
+
+        $scope.wasRecentlyUpdated = function() {
+          return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
+        };
+
+        $scope.getExplorationLink = function() {
+          var result = '/explore/' + $scope.getExplorationId();
+          if ($scope.getCollectionId()) {
+            result += ('?collection_id=' + $scope.getCollectionId());
+          }
+          return result;
+        };
       }
     ]
   };

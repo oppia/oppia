@@ -18,53 +18,63 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
-describe('Answer classifiation service', function() {
+describe('Answer classification service', function() {
   beforeEach(module('oppia'));
 
-  var acs, $httpBackend, successHandler, failHandler, $rootScope;
+  var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
+  var HARD_RULE_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
   beforeEach(inject(function($injector) {
     acs = $injector.get('answerClassificationService');
+    sof = $injector.get('StateObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    HARD_RULE_CLASSIFICATION = $injector.get('HARD_RULE_CLASSIFICATION');
+    DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+      'DEFAULT_OUTCOME_CLASSIFICATION');
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+
+    state = sof.create('stateName', {
+      content: [{
+        type: 'text',
+        value: 'content'
+      }],
+      interaction: {
+        answer_groups: [{
+          outcome: 'outcome 1',
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }, {
+          outcome: 'outcome 2',
+          rule_specs: [{
+            inputs: {
+              x: 5
+            },
+            rule_type: 'Equals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'NotEquals'
+          }]
+        }],
+        default_outcome: 'default'
+      },
+      param_changes: []
+    });
   }));
 
   var explorationId = 'exploration';
 
-  var state = {
-    interaction: {
-      answer_groups: [{
-        outcome: 'outcome 1',
-        rule_specs: [{
-          inputs: {
-            x: 10
-          },
-          rule_type: 'Equals'
-        }]
-      }, {
-        outcome: 'outcome 2',
-        rule_specs: [{
-          inputs: {
-            x: 5
-          },
-          rule_type: 'Equals'
-        }, {
-          inputs: {
-            x: 7
-          },
-          rule_type: 'NotEquals'
-        }]
-      }],
-      default_outcome: 'default'
-    }
-  };
-
   var rules = {
-    'Equals': function(answer, inputs) {
+    Equals: function(answer, inputs) {
       return inputs.x === answer;
     },
-    'NotEquals': function(answer, inputs) {
+    NotEquals: function(answer, inputs) {
       return inputs.x != answer;
     }
   };
@@ -74,12 +84,14 @@ describe('Answer classifiation service', function() {
     var backendClassifiedOutcome = {
       outcome: 'outcome',
       answer_group_index: 0,
-      rule_spec_index: 0
+      rule_spec_index: 0,
+      classification_categorization: HARD_RULE_CLASSIFICATION,
     };
     var expectedClassificationResult = {
       outcome: 'outcome',
       answerGroupIndex: 0,
-      ruleSpecIndex: 0
+      ruleSpecIndex: 0,
+      classificationCategorization: HARD_RULE_CLASSIFICATION,
     };
     $httpBackend.expectPOST(
       '/explorehandler/classify/' + explorationId).respond(
@@ -103,7 +115,8 @@ describe('Answer classifiation service', function() {
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 1',
       answerGroupIndex: 0,
-      ruleSpecIndex: 0
+      ruleSpecIndex: 0,
+      classificationCategorization: HARD_RULE_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -113,7 +126,8 @@ describe('Answer classifiation service', function() {
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 2',
       answerGroupIndex: 1,
-      ruleSpecIndex: 0
+      ruleSpecIndex: 0,
+      classificationCategorization: HARD_RULE_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -123,7 +137,8 @@ describe('Answer classifiation service', function() {
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'outcome 2',
       answerGroupIndex: 1,
-      ruleSpecIndex: 1
+      ruleSpecIndex: 1,
+      classificationCategorization: HARD_RULE_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
   });
@@ -135,7 +150,8 @@ describe('Answer classifiation service', function() {
     expect(successHandler).toHaveBeenCalledWith({
       outcome: 'default',
       answerGroupIndex: 2,
-      ruleSpecIndex: 0
+      ruleSpecIndex: 0,
+      classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
   });

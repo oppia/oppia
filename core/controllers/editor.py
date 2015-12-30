@@ -24,6 +24,7 @@ import logging
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
+from core.domain import email_manager
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -435,7 +436,7 @@ class ExplorationRightsHandler(EditorHandler):
                 except utils.ValidationError as e:
                     raise self.InvalidInputException(e)
 
-                rights_manager.publish_exploration(
+                exp_services.publish_exploration_and_update_user_profiles(
                     self.user_id, exploration_id)
                 exp_services.index_explorations_given_ids([exploration_id])
             else:
@@ -479,6 +480,68 @@ class ExplorationRightsHandler(EditorHandler):
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict()
+        })
+
+
+class ExplorationModeratorRightsHandler(EditorHandler):
+    """Handles management of exploration rights by moderators."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_moderator
+    def put(self, exploration_id):
+        """Updates the publication status of the given exploration, and sends
+        an email to all its owners.
+        """
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        action = self.payload.get('action')
+        email_body = self.payload.get('email_body')
+        version = self.payload.get('version')
+        _require_valid_version(version, exploration.version)
+
+        if action not in feconf.VALID_MODERATOR_ACTIONS:
+            raise self.InvalidInputException('Invalid moderator action.')
+
+        # If moderator emails can be sent, check that all the prerequisites are
+        # satisfied, otherwise do nothing.
+        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            if not email_body:
+                raise self.InvalidInputException(
+                    'Moderator actions should include an email to the '
+                    'recipient.')
+            email_manager.require_moderator_email_prereqs_are_satisfied(action)
+
+        # Perform the moderator action.
+        if action == 'unpublish_exploration':
+            rights_manager.unpublish_exploration(
+                self.user_id, exploration_id)
+            exp_services.delete_documents_from_search_index([
+                exploration_id])
+        elif action == 'publicize_exploration':
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
+            rights_manager.publicize_exploration(
+                self.user_id, exploration_id)
+        else:
+            raise self.InvalidInputException(
+                'No change was made to this exploration.')
+
+        exp_rights = rights_manager.get_exploration_rights(exploration_id)
+
+        # If moderator emails can be sent, send an email to the all owners of
+        # the exploration notifying them of the change.
+        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            for owner_id in exp_rights.owner_ids:
+                email_manager.send_moderator_action_email(
+                    self.user_id, owner_id,
+                    feconf.VALID_MODERATOR_ACTIONS[action]['email_intent'],
+                    exploration.title, email_body)
+
+        self.render_json({
+            'rights': exp_rights.to_dict(),
         })
 
 
