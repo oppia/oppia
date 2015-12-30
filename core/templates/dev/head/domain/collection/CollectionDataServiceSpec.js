@@ -69,7 +69,7 @@ describe('Collection Data Service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   });
 
-  it("should load a cached collection after fetching it from the backend",
+  it('should load a cached collection after fetching it from the backend',
       function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -90,7 +90,7 @@ describe('Collection Data Service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   });
 
-  it("should use the rejection handler if the backend request failed",
+  it('should use the rejection handler if the backend request failed',
       function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -141,5 +141,4 @@ describe('Collection Data Service', function() {
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
   });
-
 });

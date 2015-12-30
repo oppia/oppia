@@ -43,6 +43,9 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.
+
+        Note: contributor_ids field populated by
+        ExpSummariesContributorsOneOffJob.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -51,15 +54,45 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(exploration_model):
         if not exploration_model.deleted:
-            exp_services.create_exploration_summary(exploration_model.id)
+            exp_services.create_exploration_summary(
+                exploration_model.id, None)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
         pass
 
 
+class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that finds the user ids of the contributors
+    (defined as any human who has made a 'positive' -- i.e.
+    non-revert-- commit) for each exploration.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def map(item):
+        _COMMIT_TYPE_REVERT = 'revert'
+        if (item.commit_type != _COMMIT_TYPE_REVERT and
+                    item.committer_id not in feconf.SYSTEM_USER_IDS):
+                exp_id = item.get_unversioned_instance_id()
+                yield (exp_id, item.committer_id)
+
+    @staticmethod
+    def reduce(exp_id, committer_id_list):
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
+        if exp_summary_model is None:
+            return
+
+        exp_summary_model.contributor_ids = list(set(committer_id_list))
+        exp_summary_model.put()
+
+
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job that finds first published datetime for all explorations."""
+    """One-off job that finds first published time in milliseconds for all
+    explorations.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -68,13 +101,17 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-            snapshot_id = item.id
             yield (
-                snapshot_id[:snapshot_id.rfind('-')],
+                item.get_unversioned_instance_id(),
                 utils.get_time_in_millisecs(item.created_on))
 
     @staticmethod
     def reduce(exp_id, stringified_commit_times_msecs):
+        exploration_rights = rights_manager.get_exploration_rights(
+            exp_id, strict=False)
+        if exploration_rights is None:
+            return
+
         commit_times_msecs = [
             ast.literal_eval(commit_time_string) for
             commit_time_string in stringified_commit_times_msecs]

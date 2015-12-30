@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -21,7 +20,7 @@ oppia.directive('codeStringEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'CodeString';
       };
@@ -30,7 +29,7 @@ oppia.directive('codeStringEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
+    controller: function($scope) {
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
 
       $scope.getWarningText = function() {
@@ -42,11 +41,13 @@ oppia.directive('codeStringEditor', [
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: $scope.$parent.value || ''};
+      $scope.$watch('$parent.value', function() {
+        $scope.localValue = {
+          label: $scope.$parent.value || ''
+        };
       }, true);
 
-      $scope.$watch('localValue.label', function(newValue, oldValue) {
+      $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = newValue;
       });
     }

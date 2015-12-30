@@ -44,18 +44,12 @@ describe('Gadget editor', function() {
     // Setup a parameter for the ScoreBar to follow.
     editor.addParameterChange('coconuts', 3000);
 
-    editor.addGadget(
-      'ScoreBar', // type
-      'Coconut Surplus', // name
-      '9000', // maxValue
-      'coconuts' // parameter to follow
-    );
+    // The arguments here represent: type, name, maxValue, parameter to follow.
+    editor.addGadget('ScoreBar', 'Coconut Surplus', '9000', 'coconuts');
 
+    // The arguments here represent: type, short_description, name.
     editor.expectGadgetListNameToMatch(
-      'ScoreBar', // type
-      'Score Bar', // short_description
-      'Coconut Surplus' // name
-    );
+      'ScoreBar', 'Score Bar', 'Coconut Surplus');
 
     editor.saveChanges();
     general.moveToPlayer();
@@ -71,7 +65,7 @@ describe('Gadget editor', function() {
   });
 
   it('should allow configuration of visibility settings, and properly ' +
-      'render as visible or invisible as expected per state.' , function() {
+      'render as visible or invisible as expected per state.', function() {
     users.createUser('gadgetuser2@example.com', 'gadgetuser2');
     users.login('gadgetuser2@example.com');
 
@@ -79,13 +73,15 @@ describe('Gadget editor', function() {
 
     // Setup the first state.
     editor.setStateName('first');
-    editor.setContent(forms.toRichText('gadget visibility end-to-end test card 1.'));
+    editor.setContent(forms.toRichText(
+      'gadget visibility end-to-end test card 1.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'second', true);
 
     // Setup the second state
     editor.moveToState('second');
-    editor.setContent(forms.toRichText('gadget visibility end-to-end test card 2.'));
+    editor.setContent(forms.toRichText(
+      'gadget visibility end-to-end test card 2.'));
     editor.setInteraction('Continue');
     editor.setDefaultOutcome(null, 'final card', true);
 
@@ -101,12 +97,8 @@ describe('Gadget editor', function() {
     // Add a parameter for the ScoreBar to follow.
     editor.addParameterChange('coconuts', 3000);
 
-    editor.addGadget(
-      'ScoreBar', // type
-      'CoconutSurplus', // name
-      '9000', // maxValue
-      'coconuts' // parameter to follow
-    );
+    // The arguments here represent: type, name, maxValue, parameter to follow.
+    editor.addGadget('ScoreBar', 'CoconutSurplus', '9000', 'coconuts');
 
     // Edit visibility
     editor.openGadgetEditorModal('CoconutSurplus');
@@ -126,7 +118,6 @@ describe('Gadget editor', function() {
 
     player.expectVisibleGadget('ScoreBar');
     users.logout();
-
   });
 
   // This test inspects within the editor view since gadget names only exist
@@ -150,24 +141,16 @@ describe('Gadget editor', function() {
     // Add a parameter for the ScoreBar to follow.
     editor.addParameterChange('coconuts', 3000);
 
-    editor.addGadget(
-      'ScoreBar', // type
-      'CoconutSurplus', // name
-      '9000', // maxValue
-      'coconuts' // parameter to follow
-    );
+    // The arguments here represent: type, name, maxValue, parameter to follow.
+    editor.addGadget('ScoreBar', 'CoconutSurplus', '9000', 'coconuts');
 
     editor.renameGadget('CoconutSurplus', 'SuperCoconuts');
 
+    // The arguments here represent: type, short_description, name.
     editor.expectGadgetListNameToMatch(
-      'ScoreBar', // type
-      'Score Bar', // short_description
-      'SuperCoconuts' // name
-    );
+      'ScoreBar', 'Score Bar', 'SuperCoconuts');
 
     editor.deleteGadget('SuperCoconuts');
-    editor.expectGadgetWithNameDoesNotExist('SuperCoconuts');
-
+    editor.expectGadgetWithTypeDoesNotExist('SuperCoconuts');
   });
-
 });

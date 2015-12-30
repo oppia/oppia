@@ -35,9 +35,9 @@ import utils
 from google.appengine.ext import ndb
 
 # Counts contributions from all versions.
-_VERSION_ALL = 'all'
+VERSION_ALL = 'all'
 # Indicates that no version has been specified.
-_VERSION_NONE = 'none'
+VERSION_NONE = 'none'
 # This date represents the date we stopped using StateCounterModel.
 # This is here because StateCounterModel did not explicitly record
 # a start event. It only used the hit count for the start state.
@@ -167,6 +167,27 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             'last_updated': last_updated,
         }
 
+    @classmethod
+    def get_views_multi(cls, exploration_ids):
+        """Given a list of exploration ids, returns a list of view counts
+        for the explorations therein.
+        """
+        entity_ids = [stats_models.ExplorationAnnotationsModel.get_entity_id(
+            exploration_id, VERSION_ALL) for exploration_id in exploration_ids]
+        mr_models = stats_models.ExplorationAnnotationsModel.get_multi(
+            entity_ids)
+
+        realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
+            exploration_ids)
+        realtime_models = cls._get_realtime_datastore_class().get_multi(
+            realtime_model_ids)
+
+        return [
+            (mr_models[i].num_starts if mr_models[i] is not None else 0) +
+            (realtime_models[i].num_starts
+                if realtime_models[i] is not None else 0)
+            for i in range(len(exploration_ids))]
+
 
 class StatisticsMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
@@ -203,18 +224,18 @@ class StatisticsMRJobManager(
                 value = {
                     'type': StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING,
                     'exploration_id': exploration_id,
-                    'version': _VERSION_NONE,
+                    'version': VERSION_NONE,
                     'state_name': state_name,
                     'first_entry_count': item.first_entry_count,
                     'subsequent_entries_count': item.subsequent_entries_count,
                     'resolved_answer_count': item.resolved_answer_count,
                     'active_answer_count': item.active_answer_count}
                 yield (
-                    '%s:%s' % (exploration_id, _VERSION_NONE),
+                    '%s:%s' % (exploration_id, VERSION_NONE),
                     value)
-                yield ('%s:%s' % (exploration_id, _VERSION_ALL), value)
+                yield ('%s:%s' % (exploration_id, VERSION_ALL), value)
             else:
-                version = _VERSION_NONE
+                version = VERSION_NONE
                 if item.exploration_version is not None:
                     version = str(item.exploration_version)
 
@@ -228,14 +249,14 @@ class StatisticsMRJobManager(
                     'version': version}
 
                 yield ('%s:%s' % (item.exploration_id, version), value)
-                yield ('%s:%s' % (item.exploration_id, _VERSION_ALL), value)
+                yield ('%s:%s' % (item.exploration_id, VERSION_ALL), value)
 
     @staticmethod
     def reduce(key, stringified_values):
         exploration = None
         exp_id, version = key.split(':')
         try:
-            if version == _VERSION_NONE:
+            if version == VERSION_NONE:
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
                 # Rewind to the last commit before the transition from
@@ -246,7 +267,7 @@ class StatisticsMRJobManager(
                     current_version -= 1
                     exploration = exp_models.ExplorationModel.get_version(
                         exp_id, current_version)
-            elif version == _VERSION_ALL:
+            elif version == VERSION_ALL:
                 exploration = exp_services.get_exploration_by_id(exp_id)
             else:
                 exploration = exp_services.get_exploration_by_id(

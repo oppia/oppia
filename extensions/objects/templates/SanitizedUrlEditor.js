@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // This directive is based on the unicodeStringEditor one.
 
 oppia.directive('sanitizedUrlEditor', [
@@ -20,7 +19,7 @@ oppia.directive('sanitizedUrlEditor', [
     function($compile, OBJECT_EDITOR_URL_PREFIX, warningsData) {
   // Editable URL directive.
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'SanitizedUrl';
       };
@@ -29,16 +28,18 @@ oppia.directive('sanitizedUrlEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
+    controller: function($scope) {
+      $scope.$watch('$parent.initArgs', function(newValue) {
         $scope.largeInput = false;
         if (newValue && newValue.largeInput) {
           $scope.largeInput = newValue.largeInput;
         }
       });
 
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: String(newValue) || ''};
+      $scope.$watch('$parent.value', function(newValue) {
+        $scope.localValue = {
+          label: String(newValue) || ''
+        };
       }, true);
 
       $scope.getWarningText = function() {
@@ -52,22 +53,25 @@ oppia.directive('sanitizedUrlEditor', [
 
       $scope.alwaysEditable = true;
 
-      $scope.$watch('localValue.label', function(newValue, oldValue) {
-        if (newValue.indexOf('http://') === 0 || newValue.indexOf('https://') === 0) {
+      $scope.$watch('localValue.label', function(newValue) {
+        if (newValue.indexOf('http://') === 0 ||
+            newValue.indexOf('https://') === 0) {
           $scope.$parent.value = encodeURI(newValue);
         }
       });
 
       $scope.$on('externalSave', function() {
         var currentValue = String($scope.localValue.label);
-        if (currentValue.indexOf('http://') !== 0 && currentValue.indexOf('https://') !== 0) {
+        if (currentValue.indexOf('http://') !== 0 &&
+            currentValue.indexOf('https://') !== 0) {
           warningsData.addWarning(
               'Please enter a URL that starts with http:// or https://. ' +
               'Your changes to the URL were not saved.');
         } else {
           if ($scope.active) {
             $scope.replaceValue(currentValue);
-            // The $scope.$apply() call is needed to propagate the replaced value.
+            // The $scope.$apply() call is needed to propagate the replaced
+            // value.
             $scope.$apply();
           }
         }

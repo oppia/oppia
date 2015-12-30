@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for creating text and image links to a user's 
+ * @fileoverview Directives for creating text and image links to a user's
  * profile page.
  *
  * @author raine@stanford.edu (Raine Hoover)
@@ -34,39 +34,31 @@ oppia.directive('profileLinkText', [function() {
   };
 }]);
 
-oppia.directive('profileLinkImage', [function() { 
+oppia.directive('profileLinkImage', [function() {
   return {
     restrict: 'E',
     scope: {
-      username: '&',
+      username: '&'
     },
     templateUrl: 'components/profileLinkImage',
-    controller: ['$scope', '$http', '$q', function($scope, $http, $q) {
+    controller: ['$scope', '$http', function($scope, $http) {
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
+
       $scope.isUsernameLinkable = function(username) {
         return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
       };
 
-      $scope.profileImageUrl = '/preferenceshandler/profile_picture_by_username/' + $scope.username();
-      var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
+      $scope.profileImageUrl = (
+        '/preferenceshandler/profile_picture_by_username/' + $scope.username());
       $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
       // Returns a promise for the user profile picture, or the default image if
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
-      var getUserProfileImage = function(profileImageUrl) {
-        var deferred = $q.defer();
-        $http.get(profileImageUrl).success(function(data) {
-          var profilePictureDataUrl = data.profile_picture_data_url;
-          if (profilePictureDataUrl) {
-            deferred.resolve(profilePictureDataUrl);
-          } else {
-            deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
-          }
-        });
-        return deferred.promise;
-      };
-      getUserProfileImage($scope.profileImageUrl).then(function(result) {
-        $scope.profilePicture = result;
+      $http.get($scope.profileImageUrl).success(function(data) {
+        $scope.profilePicture = (
+          data.profile_picture_data_url_for_username ||
+          DEFAULT_PROFILE_IMAGE_PATH);
       });
     }]
   };

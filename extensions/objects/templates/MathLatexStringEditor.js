@@ -12,62 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
 oppia.directive('mathLatexStringEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-    function($compile, OBJECT_EDITOR_URL_PREFIX) {
-  return {
-    link: function(scope, element, attrs) {
-      scope.getTemplateUrl = function() {
-        return OBJECT_EDITOR_URL_PREFIX + 'MathLatexString';
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: true,
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
-      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: $scope.$parent.value || ''};
-      }, true);
-
-      if ($scope.alwaysEditable) {
-        $scope.$watch('localValue.label', function(newValue, oldValue) {
-          $scope.$parent.value = newValue;
-        });
-      } else {
-        $scope.openEditor = function() {
-          $scope.active = true;
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
+  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return OBJECT_EDITOR_URL_PREFIX + 'MathLatexString';
         };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: true,
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: function($scope) {
+        $scope.alwaysEditable = $scope.$parent.alwaysEditable;
 
-        $scope.closeEditor = function() {
-          $scope.active = false;
-        };
+        // Reset the component each time the value changes (e.g. if this is part
+        // of an editable list).
+        $scope.$watch('$parent.value', function() {
+          $scope.localValue = {
+            label: $scope.$parent.value || ''
+          };
+        }, true);
 
-        $scope.replaceValue = function(newValue) {
-          $scope.localValue = {label: newValue};
-          $scope.$parent.value = newValue;
+        if ($scope.alwaysEditable) {
+          $scope.$watch('localValue.label', function(newValue) {
+            $scope.$parent.value = newValue;
+          });
+        } else {
+          $scope.openEditor = function() {
+            $scope.active = true;
+          };
+
+          $scope.closeEditor = function() {
+            $scope.active = false;
+          };
+
+          $scope.replaceValue = function(newValue) {
+            $scope.localValue = {
+              label: newValue
+            };
+            $scope.$parent.value = newValue;
+            $scope.closeEditor();
+          };
+
+          $scope.$on('externalSave', function() {
+            if ($scope.active) {
+              $scope.replaceValue($scope.localValue.label);
+              // The $scope.$apply() call is needed to propagate the replaced
+              // value.
+              $scope.$apply();
+            }
+          });
+
           $scope.closeEditor();
-        };
-
-        $scope.$on('externalSave', function() {
-          if ($scope.active) {
-            $scope.replaceValue($scope.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced value.
-            $scope.$apply();
-          }
-        });
-
-        $scope.closeEditor();
+        }
       }
-    }
-  };
-}]);
+    };
+  }
+]);

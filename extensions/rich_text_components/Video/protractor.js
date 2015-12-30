@@ -21,7 +21,8 @@
 
 var objects = require('../../objects/protractor.js');
 
-var customizeComponent = function(modal, youtubeId, startTime, endTime, ifAutoplay) {
+var customizeComponent = function(
+    modal, youtubeId, startTime, endTime, ifAutoplay) {
   objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(youtubeId);

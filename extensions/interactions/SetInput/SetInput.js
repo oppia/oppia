@@ -19,49 +19,48 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaInteractiveSetInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'interaction/SetInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.schema = {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          ui_config: {
-            add_element_text: 'Add item'
-          }
-        };
+oppia.directive('oppiaInteractiveSetInput', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'interaction/SetInput',
+    controller: ['$scope', '$attrs', 'setInputRulesService', function(
+        $scope, $attrs, setInputRulesService) {
+      $scope.schema = {
+        type: 'list',
+        items: {
+          type: 'unicode'
+        },
+        ui_config: {
+          add_element_text: 'Add item'
+        }
+      };
 
-        $scope.answer = [];
+      $scope.answer = [];
 
-        var hasDuplicates = function(answer) {
-          for (var i = 0; i < answer.length; i++) {
-            for (var j = 0; j < i; j++) {
-              if (angular.equals(answer[i], answer[j], true)) {
-                return true;
-              }
+      var hasDuplicates = function(answer) {
+        for (var i = 0; i < answer.length; i++) {
+          for (var j = 0; j < i; j++) {
+            if (angular.equals(answer[i], answer[j], true)) {
+              return true;
             }
           }
-          return false;
         }
+        return false;
+      };
 
-        $scope.submitAnswer = function(answer) {
-          if (hasDuplicates(answer)) {
-            $scope.errorMessage = (
-              'Oops, it looks like your set has duplicates!');
-          } else {
-            $scope.errorMessage = '';
-            $scope.$parent.$parent.submitAnswer(answer);
-          }
-        };
-      }]
-    };
-  }
-]);
+      $scope.submitAnswer = function(answer) {
+        if (hasDuplicates(answer)) {
+          $scope.errorMessage = (
+            'Oops, it looks like your set has duplicates!');
+        } else {
+          $scope.errorMessage = '';
+          $scope.$parent.submitAnswer(answer, setInputRulesService);
+        }
+      };
+    }]
+  };
+}]);
 
 oppia.directive('oppiaResponseSetInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
@@ -90,3 +89,43 @@ oppia.directive('oppiaShortResponseSetInput', [
     };
   }
 ]);
+
+oppia.factory('setInputRulesService', [function() {
+  return {
+    Equals: function(answer, inputs) {
+      return answer.length == inputs.x.length && inputs.x.every(function(val) {
+        return answer.indexOf(val) >= 0;
+      });
+    },
+    IsSubsetOf: function(answer, inputs) {
+      return answer.length < inputs.x.length && answer.every(function(val) {
+        return inputs.x.indexOf(val) >= 0;
+      });
+    },
+    IsSupersetOf: function(answer, inputs) {
+      return answer.length > inputs.x.length && inputs.x.every(function(val) {
+        return answer.indexOf(val) >= 0;
+      });
+    },
+    HasElementsIn: function(answer, inputs) {
+      return inputs.x.some(function(val) {
+        return answer.indexOf(val) >= 0;
+      });
+    },
+    HasElementsNotIn: function(answer, inputs) {
+      return answer.some(function(val) {
+        return inputs.x.indexOf(val) == -1;
+      });
+    },
+    OmitsElementsIn: function(answer, inputs) {
+      return inputs.x.some(function(val) {
+        return answer.indexOf(val) == -1;
+      });
+    },
+    IsDisjointFrom: function(answer, inputs) {
+      return inputs.x.every(function(val) {
+        return answer.indexOf(val) == -1;
+      });
+    }
+  };
+}]);

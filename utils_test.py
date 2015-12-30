@@ -187,3 +187,15 @@ class UtilsTests(test_utils.GenericTestBase):
 
         s = utils.capitalize_string('2be')
         self.assertEqual(s, '2be')
+
+    def test_get_thumbnail_icon_url_for_category(self):
+        self.assertEqual(
+            utils.get_thumbnail_icon_url_for_category('Architecture'),
+            '/images/gallery/thumbnails/Architecture.svg')
+        self.assertEqual(
+            utils.get_thumbnail_icon_url_for_category('Life Skills'),
+            '/images/gallery/thumbnails/LifeSkills.svg')
+        self.assertEqual(
+            utils.get_thumbnail_icon_url_for_category('Nonexistent'),
+            '/images/gallery/thumbnails/Lightbulb.svg')
+

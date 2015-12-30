@@ -19,7 +19,7 @@
   mode.
 */
 html, body {
-  background: url('/images/general/background.png') no-repeat center center fixed;
+  background: url('/images/general/background.jpg') no-repeat center center fixed;
   background-color: #eee;
   color: rgba(0,0,0,0.87);
   font-family: 'Roboto', Arial, sans-serif;
@@ -132,8 +132,8 @@ html, body {
   opacity: 1;
   padding: 12px;
   position: absolute;
-  right: -12px;
-  top: -12px;
+  right: 12px;
+  bottom: 12px;
   text-align: left;
   transition: all 350ms;
   z-index: 500;
@@ -362,15 +362,19 @@ html, body {
 }
 
 div.conversation-skin-supplemental-card {
-  background-color: #fff;
-  box-shadow: none;
-  border-radius: 2px;
   left: 0;
   margin: 44px auto 60px auto;
-  padding: 8px;
   position: relative;
   right: 0;
   width: 600px;
+}
+
+.conversation-skin-supplemental-interaction-container {
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: none;
+  margin-bottom: 8px;
+  padding: 8px;
 }
 
 .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
@@ -381,7 +385,11 @@ div.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-final-ratings {
-  padding-top: 20px;
+  text-align: center;
+}
+
+.conversation-skin-final-recommendations {
+  margin-top: 50px;
   text-align: center;
 }
 

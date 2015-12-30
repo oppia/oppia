@@ -30,27 +30,32 @@ var _ejs = require('ejs');
 var _fs = require('fs');
 
 if (process.argv.length != 3) {
-    console.error('need one argument for the template file name.');
-    process.exit(-1);
+  console.error('need one argument for the template file name.');
+  process.exit(-1);
 }
-var template_filename = process.argv[2];
+var templateFilename = process.argv[2];
 
 var cities = [];
 _fs.readFileSync('/dev/stdin').toString().split('\n').forEach(function(line) {
-    if (!line.trim()) { return; }
-    var items = line.split('\t');
-    if (items.length != 3) {
-        console.error('malformed line: ' + line);
-        return;
-    }
-    var coords = items[2].split(',');
-    cities.push({
-        id: items[0].trim().replace(/[^a-zA-Z0-9]/g, ''),
-        name: items[1].trim(),
-        lat: Number(coords[0]),
-        lng: Number(coords[1])
-    });
+  if (!line.trim()) {
+    return;
+  }
+  var items = line.split('\t');
+  if (items.length != 3) {
+    console.error('malformed line: ' + line);
+    return;
+  }
+  var coords = items[2].split(',');
+  cities.push({
+    id: items[0].trim().replace(/[^a-zA-Z0-9]/g, ''),
+    name: items[1].trim(),
+    lat: Number(coords[0]),
+    lng: Number(coords[1])
+  });
 });
 
 console.log(_ejs.render(
-        _fs.readFileSync(template_filename).toString(), {cities: cities}));
+  _fs.readFileSync(templateFilename).toString(), {
+    cities: cities
+  }
+));

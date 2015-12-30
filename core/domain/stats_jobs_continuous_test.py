@@ -125,7 +125,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             output_model = (
                 stats_jobs_continuous.StatisticsAggregator.get_statistics(
-                    exp_id, stats_jobs_continuous._VERSION_NONE))
+                    exp_id, stats_jobs_continuous.VERSION_NONE))
             state_hit_counts = output_model['state_hit_counts']
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
@@ -136,7 +136,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             state_hit_counts = (
                 stats_jobs_continuous.StatisticsAggregator.get_statistics(
                     exp_id,
-                    stats_jobs_continuous._VERSION_ALL)['state_hit_counts'])
+                    stats_jobs_continuous.VERSION_ALL)['state_hit_counts'])
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
             self.assertEqual(
@@ -327,14 +327,14 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_1, 'all')
+                exp_id_1, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 2,
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_2, 'all')
+                exp_id_2, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 1,
                 'complete_exploration_count': 0,
@@ -347,20 +347,23 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self._record_start(exp_id_2, exp_version, state_2_1, 'session3')
             self.process_and_flush_pending_tasks()
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_1, 'all')
+                exp_id_1, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 3,
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_2, 'all')
+                exp_id_2, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 2,
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
 
+            views_for_all_exps = ModifiedStatisticsAggregator.get_views_multi([
+                exp_id_1, exp_id_2])
+            self.assertEqual(views_for_all_exps, [3, 2])
 
 class ModifiedInteractionAnswerSummariesAggregator(
         stats_jobs_continuous.StatisticsAggregator):

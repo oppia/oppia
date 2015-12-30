@@ -104,19 +104,136 @@ body {
   width: 100%;
 }
 
-/* Special settings for world-viewable profile page*/
-.oppia-profile-container {
+.oppia-profile-container, .oppia-dashboard-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 60px;
   margin-bottom: 30px;
 }
 
+.oppia-profile-top-card {
+  background-color: #fff;
+  margin: 0 0 24px 0;
+  padding: 24px;
+}
+
+.oppia-profile-subject-interest-container {
+  font-weight: bold;
+  margin-top: 16px;
+}
+
+.oppia-profile-subject-interest {
+  background-color: rgba(0, 150, 136, 0.85);
+  border-radius: .25em;
+  color: #fff;
+  display: inline;
+  font-size: 0.75em;
+  line-height: 1;
+  margin: 0 2px;
+  padding: .3em .35em .3em .5em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.oppia-profile-no-interests-text {
+  color: #888;
+  font-weight: normal;
+}
+
 .oppia-profile-picture-fullsize {
-  height: 180px;
-  width: 180px;
+  /* This maintains the aspect ratio of the picture. */
+  border-radius: 4px;
+  height: auto;
+  margin-bottom: 12px;
+  max-width: 180px;
+  width: 100%;
 }
 
 .oppia-profile-username {
-  margin-top: 15px;
+  margin-top: 4px;
+}
+
+.oppia-profile-first-contributed {
+  color: #888;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 16px;
+}
+
+.oppia-profile-tabs {
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+.oppia-profile-tabs-content {
+  padding: 24px 24px 48px 24px;
+}
+
+.oppia-profile-tabs md-content h1:first-child {
+  margin-top: 0;
+}
+
+.oppia-profile-tabs md-tab {
+  background-color: #009688;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.oppia-profile-tabs md-tabs.md-default-theme md-tab:focus {
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.oppia-profile-tabs md-tabs-ink-bar {
+  background: #0D47A1 !important;
+  /* Without this, the ink bar does not show up on initial load. */
+  /* TODO(sll): Find a better fix for this. The current fix has an
+    ink bar that is too large on small-width screens.
+  */
+  display: block !important;
+  height: 6px;
+  width: 266px;
+}
+
+.oppia-profile-tabs md-tab-label {
+  color: #ffffff;
+}
+
+.oppia-stat-container-top {
+  display: inline-block;
+  width: 30%;
+}
+
+.oppia-stat-big-container {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-stat-container-top span {
+  display: block;
+}
+
+.oppia-stat-container-top .oppia-big-number {
+  font-size: 48px;
+}
+
+.oppia-profile-explorations-container {
+  margin: 0 auto;
+  width: 644px;
+}
+
+@media (max-width: 656px) {
+  .oppia-profile-explorations-container {
+    width: 428px;
+  }
+}
+
+@media (max-width: 460px) {
+  .oppia-profile-explorations-container {
+    width: 208px;
+  }
 }
 
 /*
@@ -247,6 +364,7 @@ textarea {
   bottom: 40px;
   color: white;
   left: 0;
+  opacity: 0.7;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
@@ -546,6 +664,11 @@ textarea {
   display: block;
 }
 
+.oppia-top-right-menu-item-separator {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
 .oppia-share-dropdown-menu {
   min-width: 30px;
   width: 46px;
@@ -680,6 +803,18 @@ textarea {
   }
 }
 
+.oppia-gallery-loading-results-message {
+  background-color: #888;
+  bottom: 0;
+  color: white;
+  height: 30px;
+  opacity: 0.9;
+  padding-top: 5px;
+  text-align: center;
+  width: 100%;
+  z-index: 50;
+}
+
 @media (max-width: 768px) {
   .oppia-navbar-add-exploration-button {
     display: none;
@@ -706,7 +841,7 @@ textarea {
 }
 
 .oppia-gallery-tiles-introduction {
-  font-size: 1.4em;
+  font-size: 1.6em;
   padding-top: 40px;
   padding-bottom: 40px;
 }
@@ -715,10 +850,30 @@ textarea {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  max-width: 800px;
+  width: 844px;
   min-height: 500px;
   padding-bottom: 25px;
   padding-top: 56px;
+}
+
+/* Ensure that the gallery tiles remain centered. Note that these values would
+   need to be updated if the gallery tiles are changed. */
+@media (max-width: 844px) {
+  .oppia-gallery-tiles-container {
+    width: 632px;
+  }
+}
+
+@media (max-width: 632px) {
+  .oppia-gallery-tiles-container {
+    width: 420px;
+  }
+}
+
+@media (max-width: 420px) {
+  .oppia-gallery-tiles-container {
+    width: 208px;
+  }
 }
 
 md-card.oppia-gallery-tile {
@@ -820,8 +975,6 @@ md-card.oppia-gallery-tile {
 .oppia-create-exploration-label {
   margin-top: 5px;
 }
-
-
 
 .carousel-indicators {
   margin-bottom: 120px;
@@ -1097,7 +1250,6 @@ pre.oppia-pre-wrapped-text {
 /* Styles for the collections learner view */
 
 .oppia-collection-player-tiles-container {
-  background-color: #eee;
   height: 100%;
   margin-top: 60px;
   margin-left: auto;
@@ -1107,73 +1259,20 @@ pre.oppia-pre-wrapped-text {
   padding-bottom: 25px;
   position: relative;
 }
-
-md-card.oppia-collection-player-tile {
-  background-color: #fff;
-  color: #888;
-  height: 120px;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  width: 100%;
-}
-
-.oppia-collection-player-tile:hover {
-  background-color: #f9f9f9;
-}
-
-.oppia-collection-player-tile-container-link {
-  height: 100%;
-  width: 100%;
-}
-
-.oppia-collection-player-tile-image-container {
-  height: 120px;
-  left: 0;
-  top: 0;
-  width: 120px;
-  position: absolute;
+.oppia-collection-player-tiles-container .oppia-page-heading {
+  color: #fff;
 }
 
 .oppia-collection-player-tile-section {
   margin-bottom: 24px;
 }
 
-/* This centers the image horizontally and vertically. */
-.oppia-collection-player-tile-image {
-  height: 120px;
-  width: 120px;
-}
-
-.oppia-collection-player-tile-contents {
-  height: 100%;
-  padding: 23px 58px;
-  width: 100%;
-}
-
-.oppia-collection-player-tile-details {
-  padding-left: 100px;
-  padding-top: 5px;
-  margin-bottom: 8px;
-}
-.oppia-collection-player-tile-title {
-  color: #333;
-  font-weight: bold;
-}
 .oppia-collection-player-small-text {
+  color: #fff;
   font-style: italic;
   font-size: 1em;
   margin-top: 12px;
   margin-bottom: 6px;
-}
-
-@media (max-width: 365px) {
-  .oppia-collection-player-tile-image-container {
-    display: none;
-  }
-  .oppia-collection-player-tile-details {
-    padding-left: 0;
-  }
 }
 
 /* Styles for the statistics page. */
@@ -2121,14 +2220,6 @@ div#ng-curtain {
   margin-bottom: 10px;
 }
 
-.oppia-dashboard-container {
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 60px;
-  margin-bottom: 30px;
-}
-
 .oppia-notifications-dashboard-card {
   padding: 15px 40px;
 }
@@ -2326,6 +2417,14 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 12px 0;
   padding: 0;
   position: absolute;
+}
+
+.oppia-info-card-bg-image {
+  left: 50%;
+  margin-right: -50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .oppia-info-card-logo-thumbnail {
