@@ -803,6 +803,18 @@ textarea {
   }
 }
 
+.oppia-gallery-loading-results-message {
+  background-color: #888;
+  bottom: 0;
+  color: white;
+  height: 30px;
+  opacity: 0.9;
+  padding-top: 5px;
+  text-align: center;
+  width: 100%;
+  z-index: 50;
+}
+
 @media (max-width: 768px) {
   .oppia-navbar-add-exploration-button {
     display: none;
