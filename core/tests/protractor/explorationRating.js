@@ -60,7 +60,7 @@ describe('Gallery view', function() {
     }
 
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToBeHidden(EXPLORATION_RATINGTEST);
+    gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@example.com';
     var username = 'Display';

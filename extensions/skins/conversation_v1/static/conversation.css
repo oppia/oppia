@@ -385,7 +385,11 @@ div.conversation-skin-supplemental-card {
 }
 
 .conversation-skin-final-ratings {
-  padding-top: 20px;
+  text-align: center;
+}
+
+.conversation-skin-final-recommendations {
+  margin-top: 50px;
   text-align: center;
 }
 

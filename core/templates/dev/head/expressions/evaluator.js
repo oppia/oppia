@@ -354,27 +354,29 @@ oppia.factory('expressionEvaluatorService', [
         verifyNumArgs(args, 2);
         return Boolean(args[0] || args[1]);
       },
-      if: function(args) {
+      // Note that removing quotation marks from this key causes issues with
+      // minification (when running the deployment scripts).
+      'if': function(args) {
         // TODO(kashida): Make this short-circuit.
         verifyNumArgs(args, 3);
         return args[0] ? args[1] : args[2];
       },
-      floor: function(args) {
+      'floor': function(args) {
         verifyNumArgs(args, 1);
         var numericArgs = _coerceAllArgsToNumber(args);
         return Math.floor(numericArgs[0]);
       },
-      pow: function(args) {
+      'pow': function(args) {
         verifyNumArgs(args, 2);
         var numericArgs = _coerceAllArgsToNumber(args);
         return Math.pow(args[0], args[1]);
       },
-      log: function(args) {
+      'log': function(args) {
         verifyNumArgs(args, 2);
         var numericArgs = _coerceAllArgsToNumber(args);
         return Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
       },
-      abs: function(args) {
+      'abs': function(args) {
         verifyNumArgs(args, 1);
         var numericArgs = _coerceAllArgsToNumber(args);
         return Math.abs(numericArgs[0]);

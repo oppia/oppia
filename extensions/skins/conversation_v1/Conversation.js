@@ -168,13 +168,14 @@ oppia.directive('conversationSkin', [function() {
       'oppiaPlayerService', 'urlService', 'focusService', 'ratingService',
       'windowDimensionsService', 'playerTranscriptService',
       'learnerParamsService', 'playerPositionService',
+      'explorationRecommendationsService',
       function(
           $scope, $timeout, $rootScope, $window, messengerService,
           oppiaPlayerService, urlService, focusService, ratingService,
           windowDimensionsService, playerTranscriptService,
-          learnerParamsService, playerPositionService) {
+          learnerParamsService, playerPositionService,
+          explorationRecommendationsService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
-
         // The exploration domain object.
         $scope.exploration = null;
 
@@ -194,6 +195,7 @@ oppia.directive('conversationSkin', [function() {
         $scope.isIframed = urlService.isIframed();
         $rootScope.loadingMessage = 'Loading';
         $scope.hasFullyLoaded = false;
+        $scope.recommendedExplorationSummaries = [];
 
         $scope.OPPIA_AVATAR_IMAGE_URL = '/images/avatar/oppia_black_72px.png';
 
@@ -402,6 +404,14 @@ oppia.directive('conversationSkin', [function() {
             playerPositionService.setActiveCardIndex(
               $scope.numProgressDots - 1);
           }
+
+          if ($scope.exploration.isStateTerminal(stateName)) {
+            explorationRecommendationsService.getRecommendedSummaryDicts(
+              $scope.exploration.getAuthorRecommendedExpIds(stateName),
+              function(summaries) {
+                $scope.recommendedExplorationSummaries = summaries;
+              });
+          }
         };
 
         $scope.toggleShowPreviousResponses = function() {
@@ -411,6 +421,7 @@ oppia.directive('conversationSkin', [function() {
         $scope.initializePage = function() {
           $scope.waitingForOppiaFeedback = false;
           hasInteractedAtLeastOnce = false;
+          $scope.recommendedExplorationSummaries = [];
 
           playerPositionService.init(_navigateToActiveCard);
           oppiaPlayerService.init(function(exploration, initHtml, newParams) {
@@ -659,6 +670,9 @@ oppia.directive('conversationSkin', [function() {
         ratingService.init(function(userRating) {
           $scope.userRating = userRating;
         });
+
+        $scope.collectionId = GLOBALS.collectionId;
+        $scope.collectionTitle = GLOBALS.collectionTitle;
       }
     ]
   };
@@ -689,9 +703,11 @@ oppia.directive('answerFeedbackPair', [function() {
         $scope.getAnswerHtml = function() {
           var interaction = oppiaPlayerService.getInteraction(
             playerPositionService.getCurrentStateName());
-          return oppiaExplorationHtmlFormatterService.getAnswerHtml(
-            $scope.data.learnerAnswer, interaction.id,
-            interaction.customization_args);
+          if ($scope.data) {
+            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              $scope.data.learnerAnswer, interaction.id,
+              interaction.customization_args);
+          }
         };
 
         // Returns a HTML string representing a short summary of the answer, or
@@ -700,7 +716,7 @@ oppia.directive('answerFeedbackPair', [function() {
           var interaction = oppiaPlayerService.getInteraction(
             playerPositionService.getCurrentStateName());
           var shortAnswerHtml = '';
-          if (interaction.id &&
+          if ($scope.data && interaction.id &&
               INTERACTION_SPECS[interaction.id].needs_summary) {
             shortAnswerHtml = (
               oppiaExplorationHtmlFormatterService.getShortAnswerHtml(

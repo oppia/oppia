@@ -3,6 +3,55 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.1.1 (29 Dec 2015)
+--------------------
+Learner page:
+- Fix #1084: redo the display of recommendations at the end of an exploration.
+- When the learner submits feedback, automatically append the current state name to the feedback.
+- Fix #714: add an e2e test for exploration ratings.
+- Move the help card to the bottom right of the supplemental interaction.
+- Do not animate the initial display of an exploration, even if its first state includes a supplemental interaction.
+
+Gallery page:
+- In the gallery tiles, show the number of views an exploration has received.
+- Unify the backend methods that compute data for the summary tiles.
+- Show a badge that indicates if an exploration has recently been updated.
+- Fix a bug that caused a backend error to be raised when new-style YAML versions of explorations are uploaded.
+- Fix a bug that caused the exploration summary tile data in the gallery to not update correctly when the search query is changed.
+- Update the icon used to denote the Mathematics category.
+
+Profile page:
+- Fix #1248: correctly display multi-paragraph bios in the Profile page.
+- Change heading of statistics tab from 'Statistics' to 'Impact'.
+
+Interactions:
+- GraphInput: add a heuristic pre-check for graph isomorphism before performing the full calculation.
+- LogicProof: add inline feedback, and improve the handling of tab characters and blank lines.
+- For the following interactions, migrate the rule evaluation logic to the frontend: CodeRepl, GraphInput, InteractiveMap, MultipleChoiceInput, PencilCodeEditor and TextInput.
+
+Rich-text components:
+- VideoMp4: fix a Chrome bug that caused HTML5 video requests to sometimes forever remain in the 'pending' state.
+
+Editor page:
+- Fix #1259: autofocus on the commit message textarea when the Publish Exploration modal is opened.
+
+Other pages:
+- Remove the email feature from the moderator page.
+
+Infrastructure:
+- Incorporate the string classifier into the backend classification logic.
+- Lint all the JavaScript files in the codebase.
+- Refactor PlayerServices.js, breaking it down into separate services with distinct responsibilities.
+- Create frontend domain objects for Explorations and States.
+- Add tests for the third-party manifest file.
+- Remove the backend test count.
+- Fix #1272: generate minified files before launching the Protractor tests.
+- When running the karma tests, do so for both minified and unminified JS files.
+
+Other:
+- Add gitter badge to README.md.
+
+
 v2.1.0 (7 Dec 2015)
 -------------------
 Learner page:

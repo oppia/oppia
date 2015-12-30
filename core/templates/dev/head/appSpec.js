@@ -155,5 +155,108 @@ describe('Datetime Formatter', function() {
         '11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014'
       ]).toContain(df.getLocaleDateString(NOW_MILLIS - 72 * 60 * 60 * 1000));
     });
+
+    it('should correctly indicate recency', function() {
+      // 1 second ago is recent.
+      expect(df.isRecent(NOW_MILLIS - 1)).toBe(true);
+      // 72 hours ago is recent.
+      expect(df.isRecent(NOW_MILLIS - 72 * 60 * 60 * 1000)).toBe(true);
+      // 8 days ago is not recent.
+      expect(df.isRecent(NOW_MILLIS - 8 * 24 * 60 * 60 * 1000)).toBe(false);
+    });
+  });
+});
+
+describe('Code Normalization', function() {
+  beforeEach(module('oppia'));
+
+  var cns = null;
+  beforeEach(inject(function($injector) {
+    cns = $injector.get('codeNormalizationService');
+  }));
+
+  it('should not modify contents of code', function() {
+    expect(cns.getNormalizedCode(
+      'def x():\n' +
+      '    y = 345'
+    )).toBe(
+      'def x():\n' +
+      '    y = 345'
+    );
+  });
+
+  it('should convert indentation to 4 spaces, remove trailing whitespace ' +
+      'and empty lines', function() {
+    expect(cns.getNormalizedCode(
+      'def x():         \n' +
+      '    \n' +
+      '  y = 345\n' +
+      '            \n' +
+      '       '
+    )).toBe(
+      'def x():\n' +
+      '    y = 345'
+    );
+  });
+
+  it('should remove full-line comments, but not comments in the middle ' +
+     'of a line', function() {
+    expect(cns.getNormalizedCode(
+      '# This is a comment.\n' +
+      '  # This is a comment with some spaces before it.\n' +
+      'def x():         # And a comment with some code before it.\n' +
+      '  y = \'#String with hashes#\''
+    )).toBe(
+      'def x():         # And a comment with some code before it.\n' +
+      '    y = \'#String with hashes#\''
+    );
+  });
+
+  it('should handle complex indentation', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij\n' +
+      '              ppppp\n' +
+      'x\n' +
+      '  abc\n' +
+      '  abc\n' +
+      '    bcd\n' +
+      '  cde\n' +
+      '              xxxxx\n' +
+      '  y\n' +
+      ' z'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij\n' +
+      '        ppppp\n' +
+      'x\n' +
+      '    abc\n' +
+      '    abc\n' +
+      '        bcd\n' +
+      '    cde\n' +
+      '        xxxxx\n' +
+      '    y\n' +
+      'z'
+    );
+  });
+
+  it('should handle shortfall lines', function() {
+    expect(cns.getNormalizedCode(
+      'abcdefg\n' +
+      '    hij\n' +
+      '              ppppp\n' +
+      '      x\n' +
+      '  abc\n' +
+      '    bcd\n' +
+      '  cde'
+    )).toBe(
+      'abcdefg\n' +
+      '    hij\n' +
+      '        ppppp\n' +
+      '    x\n' +
+      'abc\n' +
+      '    bcd\n' +
+      'cde'
+    );
   });
 });

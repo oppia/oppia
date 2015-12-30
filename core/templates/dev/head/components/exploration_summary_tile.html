@@ -85,6 +85,10 @@
     padding: 12px;
   }
 
+  .oppia-exploration-summary-tile .rating-disabled {
+    opacity: 0.5;
+  }
+
   .oppia-exploration-summary-tile .metrics {
     height: 30px;
     margin: 0 12px;
@@ -101,6 +105,15 @@
     font-size: 1.1em;
     margin-right: 2px;
     vertical-align: initial;
+  }
+
+  .oppia-exploration-summary-tile .recently-updated {
+    background-color: rgb(19,105,193);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95em;
+    font-weight: bold;
+    padding: 2px 8px;
   }
 </style>
 
@@ -119,17 +132,31 @@
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
-            <span ng-if="getAverageRating()" class="protractor-test-exp-summary-tile-rating">
+            <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
               <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
               </span>
-              <[getAverageRating() | number:1]>
+              <span ng-if="getAverageRating()">
+                <[getAverageRating() | number:1]>
+              </span>
+              <span ng-if="!getAverageRating()">
+                N/A
+              </span>
             </span>
           </li>
 
-          <li class="pull-right">
+          <li>
             <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top">
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
+          </li>
+
+          <li>
+            <span ng-if="!wasRecentlyUpdated()">
+              <[getLastUpdatedDatetime()]>
+            </span>
+            <span ng-if="wasRecentlyUpdated()" class="recently-updated">
+              UPDATED
+            </span>
           </li>
         </ul>
       </div>
