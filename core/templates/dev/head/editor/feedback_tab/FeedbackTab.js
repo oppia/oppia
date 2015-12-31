@@ -22,10 +22,12 @@ oppia.controller('FeedbackTab', [
     '$scope', '$http', '$modal', '$timeout', '$rootScope', 'warningsData',
     'oppiaDatetimeFormatter', 'threadStatusDisplayService',
     'threadDataService', 'explorationStatesService', 'explorationData',
+    'changeListService',
     function(
       $scope, $http, $modal, $timeout, $rootScope, warningsData,
       oppiaDatetimeFormatter, threadStatusDisplayService,
-      threadDataService, explorationStatesService, explorationData) {
+      threadDataService, explorationStatesService, explorationData,
+      changeListService) {
 
   var ACTION_ACCEPT_SUGGESTION = 'accept';
   var ACTION_REJECT_SUGGESTION = 'reject';
@@ -96,8 +98,13 @@ oppia.controller('FeedbackTab', [
       explorationData.data.version === $scope.activeThread.suggestion.exploration_version);
   };
 
+  $scope.hasUnsavedChanges = function() {
+    return (changeListService.getChangeList().length > 0);
+  };
+
   $scope.viewSuggestionBtnType = function () {
-    return ($scope.isSuggestionValid() ? 'primary' : 'default');
+    return ($scope.isSuggestionValid() && !$scope.hasUnsavedChanges()
+            ? 'primary' : 'default');
   };
 
   // TODO(Allan): Implement ability to edit suggestions before applying.
@@ -107,8 +114,11 @@ oppia.controller('FeedbackTab', [
       backdrop: true,
       size: 'lg',
       resolve: {
-        isSuggestionValid: function() {
-          return $scope.isSuggestionValid;
+        suggestionInfo: function() {
+          return {
+            isSuggestionValid: $scope.isSuggestionValid(),
+            hasUnsavedChanges: $scope.hasUnsavedChanges()
+          };
         },
         stateContent: function() {
           var states = explorationData.data.states;
@@ -120,8 +130,19 @@ oppia.controller('FeedbackTab', [
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'isSuggestionValid', 'stateContent',
-        function($scope, $modalInstance, isSuggestionValid, stateContent) {
+        '$scope', '$modalInstance', 'suggestionInfo', 'stateContent',
+        function($scope, $modalInstance, suggestionInfo, stateContent) {
+        var ACTION_INVALID_MSG = 'This suggestion has already been ' +
+          'acted upon, or was made for an outdated version '  +
+          'of this exploration.';
+        var UNSAVED_CHANGES_MSG = 'You have unsaved changes to this ' +
+          'exploration. Please save your changes before acting on ' +
+          'a suggestion.';
+        $scope.canActOnSuggestion = (
+          suggestionInfo.isSuggestionValid && !suggestionInfo.hasUnsavedChanges
+        );
+        $scope.errorMessage = suggestionInfo.isSuggestionValid
+          ? UNSAVED_CHANGES_MSG : ACTION_INVALID_MSG;
         $scope.oldContent = stateContent.oldContent;
         $scope.newContent = stateContent.newContent;
         $scope.commitMessage = '';
@@ -142,8 +163,6 @@ oppia.controller('FeedbackTab', [
         $scope.cancelReview = function() {
           $modalInstance.dismiss();
         };
-
-        $scope.isSuggestionValid = isSuggestionValid;
       }]
     }).result.then(function(result) {
       threadDataService.resolveSuggestion(
