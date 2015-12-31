@@ -175,8 +175,9 @@ oppia.controller('FeedbackTab', [
           if (result.action === ACTION_ACCEPT_SUGGESTION) {
             var suggestion = $scope.activeThread.suggestion;
             var stateName = suggestion.state_name;
-            var state = angular.copy(explorationData.data.states[stateName]);
+            var state = explorationData.data.states[stateName];
             state.content[0].value = suggestion.state_content.value;
+            explorationData.data.version += 1;
             explorationStatesService.setState(stateName, state);
             $rootScope.$broadcast('refreshStateEditor');
           }
