@@ -76,28 +76,31 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
 
-# Note that numpy needs to be built after downloading. If you are having
+# Checking if pip is installed. If you are having
 # trouble, please ensure that you have pip installed (see "Installing Oppia"
 # on the Oppia developers' wiki page).
+echo Checking if pip is installed on the local machine
+if ! type pip > /dev/null 2>&1 ; then
+    echo ""
+    echo "  Pip is required to install Oppia dependencies, but pip wasn't found"
+    echo "  on your local machine."
+    echo ""
+    echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
+
+    if [ "${OS}" == "Darwin" ] ; then
+      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
+    else
+      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+    fi
+
+    # If pip is not installed, quit.
+    exit 1
+fi
+
+# Note that numpy needs to be built after downloading.
 echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
-
-  if ! type pip > /dev/null 2>&1 ; then
-      echo ""
-      echo "  Numpy is required for Oppia to operate properly, but pip wasn't found"
-      echo "  on your local machine."
-      echo ""
-      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
-
-      if [ "${OS}" == "Darwin" ] ; then
-        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
-      else
-        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
-      fi
-
-      exit 1
-  fi
 
   pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
@@ -105,22 +108,6 @@ fi
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
   echo Installing Pylint
-
-  if ! type pip > /dev/null 2>&1 ; then
-      echo ""
-      echo "  Pylint is required for the Oppia workflow, but pip wasn't found"
-      echo "  on your local machine."
-      echo ""
-      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
-
-      if [ "${OS}" == "Darwin" ] ; then
-        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
-      else
-        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
-      fi
-
-      exit 1
-  fi
 
   pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
 fi

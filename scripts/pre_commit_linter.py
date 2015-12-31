@@ -57,11 +57,11 @@ _PARSER.add_argument(
     help='path to the directory with files to be linted',
     action='store')
 
-PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
 
 _PYLINT_PATH = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'pylint-1.5.2')
+    _PARENT_DIR, 'oppia_tools', 'pylint-1.5.2')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -69,7 +69,7 @@ if not os.path.exists(_PYLINT_PATH):
     sys.exit(1)
 
 sys.path.append(_PYLINT_PATH)
-from pylint import epylint as lint
+from pylint import epylint
 
 
 def _get_changed_filenames():
@@ -129,8 +129,9 @@ def _get_all_files_in_directory(dir_path):
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
-    """Prints a list of lint errors in changed JavaScript files.
+def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
+    """Prints a list of lint errors in the given input_dir, or in all changed
+    JavaScript files if input_dir is not specified.
 
     Args:
     - node_path: str. Path to the node binary.
@@ -139,21 +140,13 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
     """
 
     print '----------------------------------------'
-    if input_dir:
-        if os.path.isfile(input_dir):
-            all_files = [input_dir]
-        else:
-            all_files = _get_all_files_in_directory(input_dir)
-    else:
-        all_files = _get_changed_filenames()
 
     start_time = time.time()
     num_files_with_errors = 0
 
-    files_to_lint = filter(_is_javascript_file, all_files)
     num_js_files = len(files_to_lint)
     if not files_to_lint:
-        print 'There are no JavaScript files to lint. Exiting.'
+        print 'There are no JavaScript files to lint.'
         print '----------------------------------------'
         return
 
@@ -186,8 +179,9 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir):
             num_js_files, time.time() - start_time)
 
 
-def _lint_py_files(config_pylint, input_dir):
-    """Prints a list of lint errors in changed Python files.
+def _lint_py_files(config_pylint, files_to_lint):
+    """Prints a list of lint errors in the given input_dir, or in all changed
+    Python files if input_dir is not specified.
 
     Args:
     - config_pylint: str. Path to the .pylintrc file.
@@ -196,21 +190,12 @@ def _lint_py_files(config_pylint, input_dir):
 
     print '----------------------------------------'
 
-    if input_dir:
-        if os.path.isfile(input_dir):
-            all_files = [input_dir]
-        else:
-            all_files = _get_all_files_in_directory(input_dir)
-    else:
-        all_files = _get_changed_filenames()
-
     start_time = time.time()
     num_files_with_errors = 0
 
-    files_to_lint = filter(_is_python_file, all_files)
     num_py_files = len(files_to_lint)
     if not files_to_lint:
-        print 'There are no Python files to lint. Exiting.'
+        print 'There are no Python files to lint.'
         print '----------------------------------------'
         return
 
@@ -219,7 +204,7 @@ def _lint_py_files(config_pylint, input_dir):
             ind + 1, num_py_files, filename)
 
         proc_args = '%s %s' % (filename, config_pylint)
-        (stdout, stderr) = lint.py_run(proc_args, return_std=True)
+        (stdout, stderr) = epylint.py_run(proc_args, return_std=True)
 
         print stdout.read()
 
@@ -262,11 +247,22 @@ def _pre_commit_linter():
     jscs_path = os.path.join(
         parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
 
+    if input_dir:
+        if os.path.isfile(input_dir):
+            all_files = [input_dir]
+        else:
+            all_files = _get_all_files_in_directory(input_dir)
+    else:
+        all_files = _get_changed_filenames()
+
+    js_files_to_lint = filter(_is_javascript_file, all_files)
+    py_files_to_lint = filter(_is_python_file, all_files)
+
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
             print ''
             print 'Starting jscs linter...'
-            _lint_js_files(node_path, jscs_path, config_jscsrc, input_dir)
+            _lint_js_files(node_path, jscs_path, config_jscsrc, js_files_to_lint)
         else:
             print ''
             print 'ERROR    Please run start.sh first to install node-jscs '
@@ -275,7 +271,7 @@ def _pre_commit_linter():
         # Pylint
         print ''
         print 'Starting Pylint...'
-        _lint_py_files(config_pylint, input_dir)
+        _lint_py_files(config_pylint, py_files_to_lint)
     else:
         print ''
         print 'ERROR    Please run this script from the oppia root directory.'
