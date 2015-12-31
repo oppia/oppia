@@ -299,7 +299,7 @@ describe('Interaction validator', function() {
   });
 
   describe('oppiaInteractiveGraphInputValidator', function() {
-    var validator, customizationArguments;
+    var validator, customizationArguments, answerGroups;
 
     beforeEach(function() {
       validator = filter('oppiaInteractiveGraphInputValidator');
@@ -318,6 +318,23 @@ describe('Interaction validator', function() {
           value: false
         }
       };
+      var ruleSpecs = [{
+        inputs: {
+          g: {
+            vertices: new Array(10)
+          }
+        },
+        rule_type: 'IsIsomorphicTo'
+      }, {
+        inputs: {
+          g: {
+            vertices: new Array(10)
+          }
+        },
+        rule_type: 'IsIsomorphicTo'
+      }];
+      var answerGroup = createAnswerGroup(goodOutcomeDest, ruleSpecs);
+      answerGroups = [answerGroup, angular.copy(answerGroup)];
     });
 
     it('should be able to perform basic validation', function() {
@@ -334,15 +351,39 @@ describe('Interaction validator', function() {
         'graph, canEditEdgeWeight, canEditVertexLabel');
     });
 
-    it('should expect no more than 50 vertices in the graph customization ' +
-        'argument', function() {
+    it('The graph used in customization exceeds supported maximum number of ' +
+       'vertices of 50.', function() {
       customizationArguments.graph.value.vertices = new Array(51);
       var warnings = validator(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'Note that only graphs with at most 50 nodes are supported.'
+        message: 'The graph used in customization exceeds supported maximum ' +
+                 'number of vertices of 50.'
+      }]);
+    });
+
+    it('The graph used in the rule x in group y exceeds supported maximum ' +
+        'number of vertices of 10 for isomorphism check.', function() {
+      answerGroups[0].rule_specs[0].inputs.g.vertices = new Array(11);
+      answerGroups[0].rule_specs[1].inputs.g.vertices = new Array(11);
+      answerGroups[1].rule_specs[0].inputs.g.vertices = new Array(11);
+      var warnings = validator(
+        currentState, customizationArguments, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The graph used in the rule 1 in group 1 exceeds supported ' +
+                 'maximum number of vertices of 10 for isomorphism check.'
+      }, {
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The graph used in the rule 2 in group 1 exceeds supported ' +
+                 'maximum number of vertices of 10 for isomorphism check.'
+      }, {
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The graph used in the rule 1 in group 2 exceeds supported ' +
+                 'maximum number of vertices of 10 for isomorphism check.'
       }]);
     });
 
