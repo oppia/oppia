@@ -101,3 +101,26 @@ if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
 
   pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
+
+echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
+  echo Installing numpy
+
+  if ! type pip > /dev/null 2>&1 ; then
+      echo ""
+      echo "  Pylint is required for the Oppia workflow, but pip wasn't found"
+      echo "  on your local machine."
+      echo ""
+      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
+
+      if [ "${OS}" == "Darwin" ] ; then
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
+      else
+        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+      fi
+
+      exit 1
+  fi
+
+  pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
+fi
