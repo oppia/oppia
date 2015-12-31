@@ -44,11 +44,12 @@ Note that the root folder MUST be named 'oppia'.
 
 __author__ = "Barnabas Makonda(barnabasmakonda@gmail.com)"
 
-import sys
-import time
+
 import argparse
 import os
 import subprocess
+import sys
+import time
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -98,7 +99,7 @@ def _is_javascript_file(filename):
 
 
 def _is_python_file(filename):
-    """heck if the input filename represents a Python file.
+    """Check if the input filename represents a Python file.
 
     Args:
     - filename: str. The name of the file to be checked.
@@ -205,7 +206,7 @@ def _lint_py_files(config_pylint, input_dir):
 
     start_time = time.time()
     num_files_with_errors = 0
-    
+
     files_to_lint = filter(_is_python_file, all_files)
     num_py_files = len(files_to_lint)
     if not files_to_lint:

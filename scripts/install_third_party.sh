@@ -104,7 +104,7 @@ fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
-  echo Installing numpy
+  echo Installing Pylint
 
   if ! type pip > /dev/null 2>&1 ; then
       echo ""
