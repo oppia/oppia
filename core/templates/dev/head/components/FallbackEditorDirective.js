@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for the fallback editor.
+ * @fileoverview Directive for the fallback editor.
  *
  * @author sean@seanlip.org (Sean Lip)
  */

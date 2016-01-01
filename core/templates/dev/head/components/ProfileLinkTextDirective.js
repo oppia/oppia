@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for creating a list of collection nodes which link to
- * playing the exploration in each node.
+ * @fileoverview Directives for creating text links to a user's profile page.
  *
- * @author henning.benmax@google.com (Ben Henning)
+ * @author raine@stanford.edu (Raine Hoover)
  */
 
-oppia.directive('collectionNodeList', [function() {
+oppia.directive('profileLinkText', [function() {
   return {
     restrict: 'E',
     scope: {
-      getCollectionId: '&collectionId',
-      getCollectionNodes: '&collectionNodes'
+      username: '&'
     },
-    templateUrl: 'inline/collection_node_list_directive'
+    templateUrl: 'components/profileLinkText',
+    controller: ['$scope', function($scope) {
+      $scope.isUsernameLinkable = function(username) {
+        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
+      };
+    }]
   };
 }]);

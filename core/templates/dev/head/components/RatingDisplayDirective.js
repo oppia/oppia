@@ -13,29 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tools for displaying and awarding ratings.
+ * @fileoverview Directive for displaying summary rating information.
  *
  * @author Jacob Davis
  */
 
-// A service that maintains a record of which state in the exploration is
-// currently active.
-oppia.factory('ratingVisibilityService', [function() {
-  return {
-    areRatingsShown: function(ratingFrequencies) {
-      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
-
-      var totalNumber = 0;
-      for (var value in ratingFrequencies) {
-        totalNumber += ratingFrequencies[value];
-      }
-
-      return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
-    }
-  };
-}]);
-
-oppia.directive('ratingFromValue', [function() {
+oppia.directive('ratingDisplay', [function() {
   return {
     // This will display a star-rating based on the given data. The attributes
     // passed in are as follows:
@@ -49,7 +32,7 @@ oppia.directive('ratingFromValue', [function() {
       onEdit: '=',
       ratingValue: '='
     },
-    templateUrl: 'rating/fromValue',
+    templateUrl: 'components/ratingSummary',
     controller: ['$scope', function($scope) {
       var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
@@ -109,51 +92,6 @@ oppia.directive('ratingFromValue', [function() {
       $scope.getCursorStyle = function() {
         return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
       };
-    }]
-  };
-}]);
-
-oppia.factory('ratingComputationService', [
-    'ratingVisibilityService', function(ratingVisibilityService) {
-  return {
-    computeAverageRating: function(ratingFrequencies) {
-      if (!ratingVisibilityService.areRatingsShown(ratingFrequencies)) {
-        return undefined;
-      } else {
-        var totalNumber = 0;
-        var totalValue = 0.0;
-        for (var value in ratingFrequencies) {
-          totalValue += value * ratingFrequencies[value];
-          totalNumber += ratingFrequencies[value];
-        }
-
-        if (totalNumber === 0) {
-          return undefined;
-        }
-
-        return totalValue / totalNumber;
-      }
-    }
-  };
-}]);
-
-oppia.directive('ratingFromFrequencies', [
-    'ratingComputationService', function(ratingComputationService) {
-  return {
-    restrict: 'E',
-    scope: {
-      // A dictionary with keys '1' to '5' giving the number of times each
-      // rating has been awarded; from this the average rating will be computed
-      // and displayed.
-      ratingFrequencies: '&'
-    },
-    templateUrl: 'rating/fromFrequencies',
-    controller: ['$scope', function($scope) {
-      $scope.computeAverageRating = (
-        ratingComputationService.computeAverageRating);
-
-      $scope.ratingValue = $scope.computeAverageRating(
-        $scope.ratingFrequencies());
     }]
   };
 }]);

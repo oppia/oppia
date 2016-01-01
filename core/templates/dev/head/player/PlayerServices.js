@@ -417,10 +417,10 @@ oppia.factory('ratingService', [
 
 oppia.controller('LearnerLocalNav', [
   '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
-  'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
+  'oppiaPlayerService', 'ExplorationEmbedButtonService', 'ratingService',
   function(
       $scope, $http, $modal, oppiaHtmlEscaper,
-      oppiaPlayerService, embedExplorationButtonService, ratingService) {
+      oppiaPlayerService, ExplorationEmbedButtonService, ratingService) {
     $scope.explorationId = oppiaPlayerService.getExplorationId();
     $scope.serverName = window.location.protocol + '//' + window.location.host;
     $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
@@ -433,7 +433,7 @@ oppia.controller('LearnerLocalNav', [
       $scope.userRating = ratingService.getUserRating();
     });
 
-    $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
+    $scope.showEmbedExplorationModal = ExplorationEmbedButtonService.showModal;
 
     $scope.submitUserRating = function(ratingValue) {
       $scope.userRating = ratingValue;

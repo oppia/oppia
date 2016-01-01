@@ -13,21 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for gadget panels.
+ * @fileoverview Directives for gadgets.
  *
  * @author anuzis@google.com (Michael Anuzis)
  */
-
-oppia.directive('oppiaGadgetPanel', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      panelContents: '&',
-      currentStateName: '&'
-    },
-    templateUrl: 'components/gadgetPanel'
-  };
-});
 
 oppia.directive('oppiaGadget', function() {
   return {

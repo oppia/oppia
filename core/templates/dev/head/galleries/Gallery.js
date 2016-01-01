@@ -136,11 +136,11 @@ oppia.factory('searchService', [
 
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-  'createExplorationButtonService', 'oppiaDatetimeFormatter', 'oppiaDebouncer',
+  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter', 'oppiaDebouncer',
   'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      createExplorationButtonService, oppiaDatetimeFormatter, oppiaDebouncer,
+      ExplorationCreationButtonService, oppiaDatetimeFormatter, oppiaDebouncer,
       urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService) {
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
@@ -176,15 +176,8 @@ oppia.controller('Gallery', [
     $rootScope.loadingMessage = 'Loading';
 
     $scope.showCreateExplorationModal = function() {
-      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
-    };
-
-    $scope.showSplashVideoModal = function() {
-      $modal.open({
-        templateUrl: 'modals/splashVideo',
-        size: 'lg',
-        windowClass: 'oppia-gallery-modal'
-      });
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
     };
 
     $scope.currentUserIsModerator = false;
@@ -253,10 +246,10 @@ oppia.controller('Gallery', [
 
 oppia.controller('SearchBar', [
   '$scope', '$rootScope', 'searchService', 'oppiaDebouncer',
-  'createExplorationButtonService', 'urlService', 'CATEGORY_LIST',
+  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
   function(
       $scope, $rootScope, searchService, oppiaDebouncer,
-      createExplorationButtonService, urlService, CATEGORY_LIST) {
+      ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
@@ -382,10 +375,10 @@ oppia.controller('SearchBar', [
     );
 
     $scope.showCreateExplorationModal = function() {
-      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showCreateExplorationModal(CATEGORY_LIST);
     };
     $scope.showUploadExplorationModal = function() {
-      createExplorationButtonService.showUploadExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showUploadExplorationModal(CATEGORY_LIST);
     };
   }
 ]);

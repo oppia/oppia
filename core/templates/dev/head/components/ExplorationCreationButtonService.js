@@ -19,7 +19,7 @@
  */
 
 // Service for the create/upload exploration buttons and modals.
-oppia.factory('createExplorationButtonService', [
+oppia.factory('ExplorationCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope',
   'validatorsService', 'warningsData', 'focusService',
   function(

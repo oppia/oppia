@@ -38,10 +38,10 @@ oppia.directive('explorationSummaryTile', [function() {
     },
     templateUrl: 'summaryTile/exploration',
     controller: [
-      '$scope', 'oppiaDatetimeFormatter', 'ratingComputationService',
-      function($scope, oppiaDatetimeFormatter, ratingComputationService) {
+      '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
+      function($scope, oppiaDatetimeFormatter, RatingComputationService) {
         $scope.getAverageRating = function() {
-          return ratingComputationService.computeAverageRating(
+          return RatingComputationService.computeAverageRating(
             $scope.getRatings());
         };
 

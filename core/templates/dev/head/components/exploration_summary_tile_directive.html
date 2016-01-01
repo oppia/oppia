@@ -1,3 +1,50 @@
+<script type="text/ng-template" id="summaryTile/exploration">
+  <md-card class="oppia-exploration-summary-tile">
+    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+      <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
+        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
+        <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
+      </div>
+
+      <div>
+        <div class="objective protractor-test-exp-summary-tile-objective">
+          <[getObjective() | truncateAndCapitalize: 45]>
+          <span ng-if="!getObjective()">No objective specified.</span>
+        </div>
+        <ul layout="row" class="metrics" layout-align="space-between center">
+          <li>
+            <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
+              <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
+              </span>
+              <span ng-if="getAverageRating()">
+                <[getAverageRating() | number:1]>
+              </span>
+              <span ng-if="!getAverageRating()">
+                N/A
+              </span>
+            </span>
+          </li>
+
+          <li>
+            <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top">
+            </span>
+            <[getNumViews() | summarizeNonnegativeNumber]>
+          </li>
+
+          <li>
+            <span ng-if="!wasRecentlyUpdated()">
+              <[getLastUpdatedDatetime()]>
+            </span>
+            <span ng-if="wasRecentlyUpdated()" class="recently-updated">
+              UPDATED
+            </span>
+          </li>
+        </ul>
+      </div>
+    </a>
+  </md-card>
+</script>
+
 <style>
   .oppia-exploration-summary-tile {
     background-color: #fff;
@@ -116,50 +163,3 @@
     padding: 5px 8px 4px 8px;
   }
 </style>
-
-<script type="text/ng-template" id="summaryTile/exploration">
-  <md-card class="oppia-exploration-summary-tile">
-    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-      <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
-        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
-      </div>
-
-      <div>
-        <div class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 45]>
-          <span ng-if="!getObjective()">No objective specified.</span>
-        </div>
-        <ul layout="row" class="metrics" layout-align="space-between center">
-          <li>
-            <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
-              <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top">
-              </span>
-              <span ng-if="getAverageRating()">
-                <[getAverageRating() | number:1]>
-              </span>
-              <span ng-if="!getAverageRating()">
-                N/A
-              </span>
-            </span>
-          </li>
-
-          <li>
-            <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top">
-            </span>
-            <[getNumViews() | summarizeNonnegativeNumber]>
-          </li>
-
-          <li>
-            <span ng-if="!wasRecentlyUpdated()">
-              <[getLastUpdatedDatetime()]>
-            </span>
-            <span ng-if="wasRecentlyUpdated()" class="recently-updated">
-              UPDATED
-            </span>
-          </li>
-        </ul>
-      </div>
-    </a>
-  </md-card>
-</script>

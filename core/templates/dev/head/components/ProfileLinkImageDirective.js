@@ -13,26 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for creating text and image links to a user's
- * profile page.
+ * @fileoverview Directive for creating image links to a user's profile page.
  *
  * @author raine@stanford.edu (Raine Hoover)
  */
-
-oppia.directive('profileLinkText', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      username: '&'
-    },
-    templateUrl: 'components/profileLinkText',
-    controller: ['$scope', function($scope) {
-      $scope.isUsernameLinkable = function(username) {
-        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
-      };
-    }]
-  };
-}]);
 
 oppia.directive('profileLinkImage', [function() {
   return {

@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for creating a list of collection nodes which link to
- * playing the exploration in each node.
+ * @fileoverview Directive for gadget panels.
  *
- * @author henning.benmax@google.com (Ben Henning)
+ * @author anuzis@google.com (Michael Anuzis)
  */
 
-oppia.directive('collectionNodeList', [function() {
+oppia.directive('oppiaGadgetPanel', function() {
   return {
     restrict: 'E',
     scope: {
-      getCollectionId: '&collectionId',
-      getCollectionNodes: '&collectionNodes'
+      panelContents: '&',
+      currentStateName: '&'
     },
-    templateUrl: 'inline/collection_node_list_directive'
+    templateUrl: 'components/gadgetPanel'
   };
-}]);
+});

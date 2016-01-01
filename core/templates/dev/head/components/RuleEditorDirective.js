@@ -18,87 +18,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('ruleTypeSelector', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      localValue: '=',
-      onSelectionChange: '&'
-    },
-    template: '<input type="hidden">',
-    controller: [
-      '$scope', '$element', '$rootScope', '$filter',
-      'stateInteractionIdService', 'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
-      function(
-          $scope, $element, $rootScope, $filter,
-          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
-        var choices = [];
-        var numberOfRuleTypes = 0;
-
-        var ruleTypesToDescriptions = INTERACTION_SPECS[
-          stateInteractionIdService.savedMemento].rule_descriptions;
-        for (var ruleType in ruleTypesToDescriptions) {
-          if (ruleType == FUZZY_RULE_TYPE) {
-            continue;
-          }
-          numberOfRuleTypes++;
-          choices.push({
-            id: ruleType,
-            text: $filter('replaceInputsWithEllipses')(
-              ruleTypesToDescriptions[ruleType])
-          });
-        }
-
-        // TODO(bhenning): The order of choices should be meaningful. E.g.,
-        // having "is equal to" for most interactions first makes sense. They
-        // should ideally be ordered based on likelihood of being used.
-        choices.sort(function(a, b) {
-          if (a.text < b.text) {
-            return -1;
-          } else if (a.text > b.text) {
-            return 1;
-          } else {
-            return 0;
-          }
-        });
-
-        // Select the first choice by default.
-        if (!$scope.localValue) {
-          $scope.localValue = choices[0].id;
-          $scope.onSelectionChange()($scope.localValue);
-        }
-
-        var select2Node = $element[0].firstChild;
-        $(select2Node).select2({
-          allowClear: false,
-          data: choices,
-          // Suppress the search box.
-          minimumResultsForSearch: -1,
-          width: '350px',
-          formatSelection: function(object) {
-            return $filter('truncateAtFirstEllipsis')(object.text);
-          }
-        });
-
-        // Initialize the dropdown.
-        $(select2Node).select2('val', $scope.localValue);
-
-        // Update $scope.localValue when the selection changes.
-        $(select2Node).on('change', function(e) {
-          $scope.localValue = e.val;
-          // This is needed to actually update the localValue in the containing
-          // scope.
-          $scope.$apply();
-          $scope.onSelectionChange()(e.val);
-          // This is needed to propagate the change and display input fields for
-          // parameterizing the rule.
-          $scope.$apply();
-        });
-      }
-    ]
-  };
-}]);
-
 // This directive controls an editor for selecting the type and input parameters
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
@@ -289,39 +208,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.init();
-      }
-    ]
-  };
-}]);
-
-oppia.directive('fuzzyRulePanel', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      onTrainingDataDeletion: '&',
-      ruleInputs: '='
-    },
-    templateUrl: 'rules/fuzzyRulePanel',
-    controller: [
-      '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
-      'stateInteractionIdService', 'stateCustomizationArgsService',
-      'trainingModalService',
-      function($scope, $modal, oppiaExplorationHtmlFormatterService,
-          stateInteractionIdService, stateCustomizationArgsService,
-          trainingModalService) {
-        $scope.trainingDataHtmlList = [];
-        var trainingData = $scope.ruleInputs.training_data;
-        for (var i = 0; i < trainingData.length; i++) {
-          $scope.trainingDataHtmlList.push(
-            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-              trainingData[i], stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento));
-        }
-
-        $scope.openRetrainAnswerModal = function(trainingDataIndex) {
-          trainingModalService.openTrainUnresolvedAnswerModal(
-            trainingData[trainingDataIndex], false);
-        };
       }
     ]
   };

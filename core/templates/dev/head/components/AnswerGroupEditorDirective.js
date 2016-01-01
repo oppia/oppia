@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for the answer group, feedback, and outcome editors.
+ * @fileoverview Directive for the answer group editor.
  *
  * @author bhenning@google.com (Ben Henning)
  */

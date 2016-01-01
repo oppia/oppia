@@ -20,19 +20,12 @@
 
 oppia.controller('Profile', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'ratingVisibilityService',
-  function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      ratingVisibilityService) {
+  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
     $scope.getLocaleDateString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleDateString(millisSinceEpoch);
-    };
-
-    $scope.areRatingsShown = function(ratingFrequencies) {
-      return ratingVisibilityService.areRatingsShown(ratingFrequencies);
     };
 
     $rootScope.loadingMessage = 'Loading';
