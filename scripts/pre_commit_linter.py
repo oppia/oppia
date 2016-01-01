@@ -42,9 +42,6 @@ CUSTOMIZATION OPTIONS
 Note that the root folder MUST be named 'oppia'.
  """
 
-__author__ = "Barnabas Makonda(barnabasmakonda@gmail.com)"
-
-
 import argparse
 import os
 import subprocess
@@ -68,8 +65,11 @@ if not os.path.exists(_PYLINT_PATH):
     print '         and its dependencies.'
     sys.exit(1)
 
-sys.path.append(_PYLINT_PATH)
-from pylint import epylint
+sys.path.insert(0, _PYLINT_PATH)
+from pylint import lint  # pylint: disable=wrong-import-position
+
+# Allows Python linter to import files in the oppia/ folder.
+sys.path.insert(0, os.getcwd())
 
 
 def _get_changed_filenames():
@@ -97,7 +97,7 @@ def _get_all_files_in_directory(dir_path):
         a list of files in directory and subdirectories.
     """
     files_in_directory = []
-    for _dir, sub_dirs, files in os.walk(dir_path):
+    for _dir, _, files in os.walk(dir_path):
         for file_name in files:
             files_in_directory.append(
                 os.path.relpath(os.path.join(_dir, file_name), os.getcwd()))
@@ -167,7 +167,7 @@ def _lint_py_files(config_pylint, files_to_lint):
     print '----------------------------------------'
 
     start_time = time.time()
-    num_files_with_errors = 0
+    are_there_errors = False
 
     num_py_files = len(files_to_lint)
     if not files_to_lint:
@@ -175,22 +175,19 @@ def _lint_py_files(config_pylint, files_to_lint):
         print '----------------------------------------'
         return
 
-    for ind, filename in enumerate(files_to_lint):
-        print 'Linting file %d/%d: %s ...' % (
-            ind + 1, num_py_files, filename)
+    print 'Linting %d files' % num_py_files
 
-        proc_args = '%s %s' % (filename, config_pylint)
-        (stdout, stderr) = epylint.py_run(proc_args, return_std=True)
-
-        print stdout.read()
-
-        if stderr:
-            num_files_with_errors += 1
+    try:
+        # This prints output to the console.
+        lint.Run(files_to_lint + [config_pylint])
+    except SystemExit as e:
+        if str(e) != '0':
+            are_there_errors = True
 
     print '----------------------------------------'
 
-    if num_files_with_errors:
-        print 'FAILED    %s Python files' % num_files_with_errors
+    if are_there_errors:
+        print 'FAILED    Python linting failed'
     else:
         print 'SUCCESS   %s Python files linted (%.1f secs)' % (
             num_py_files, time.time() - start_time)
@@ -231,10 +228,10 @@ def _pre_commit_linter():
     else:
         all_files = _get_changed_filenames()
 
-    js_files_to_lint = filter(lambda filename: filename.endswith('.js'),
-                              all_files)
-    py_files_to_lint = filter(lambda filename: filename.endswith('.py'),
-                              all_files)
+    js_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.js')]
+    py_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.py')]
 
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):

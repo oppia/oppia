@@ -14,9 +14,9 @@
 
 """Controllers for the admin view."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import logging
+
+import jinja2
 
 from core import counters
 from core import jobs
@@ -32,11 +32,10 @@ from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
 
-import jinja2
+current_user_services = models.Registry.import_current_user_services()
 
 
 def require_super_admin(handler):

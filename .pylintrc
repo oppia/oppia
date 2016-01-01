@@ -27,4 +27,4 @@ indent-string='    '
 
 [MESSAGES CONTROL]
 
-disable=E1002,E1101,W0232,W1201
+disable=locally-disabled,locally-enabled,logging-not-lazy
