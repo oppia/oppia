@@ -86,30 +86,6 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _is_javascript_file(filename):
-    """Check if the input filename represents a JavaScript file.
-
-    Args:
-    - filename: str. The name of the file to be checked.
-
-    Returns:
-      bool: True if the filename ends in ".js", and false otherwise.
-    """
-    return filename.endswith('.js')
-
-
-def _is_python_file(filename):
-    """Check if the input filename represents a Python file.
-
-    Args:
-    - filename: str. The name of the file to be checked.
-
-    Returns:
-      bool: True if the filename ends in ".py", and false otherwise
-    """
-    return filename.endswith('.py')
-
-
 def _get_all_files_in_directory(dir_path):
     """Recursively collects all files in directory and
     subdirectories of specified path.
@@ -255,8 +231,8 @@ def _pre_commit_linter():
     else:
         all_files = _get_changed_filenames()
 
-    js_files_to_lint = filter(_is_javascript_file, all_files)
-    py_files_to_lint = filter(_is_python_file, all_files)
+    js_files_to_lint = filter(lambda filename: filename.endswith('.js'), all_files)
+    py_files_to_lint = filter(lambda filename: filename.endswith('.py'), all_files)
 
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
