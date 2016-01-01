@@ -193,17 +193,22 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
 
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
-oppia.factory('oppiaDatetimeFormatter', [function() {
+oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
   return {
     // Returns just the time if the local datetime representation has the
-    // same date as the current date. Otherwise, returns just the date.
+    // same date as the current date. Otherwise, returns just the date if the
+    // local datetime representation has the same year as the current date.
+    // Otherwise, returns the full date (with the year abbreviated).
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() == new Date().toLocaleDateString()) {
         // The replace function removes 'seconds' from the time returned.
         return date.toLocaleTimeString().replace(/:\d\d /, ' ');
+      } else if (date.getFullYear() == new Date().getFullYear()) {
+        return $filter('date')(date, 'MMM d');
+      } else {
+        return $filter('date')(date, 'shortDate');
       }
-      return date.toLocaleDateString();
     },
     // Returns just the date.
     getLocaleDateString: function(millisSinceEpoch) {
