@@ -38,44 +38,42 @@ describe('retrieving threads service', function() {
     var mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example feedback',
+        subject: 'Feedback from a learner',
         summary: null,
-        threadId: 'abc1'
+        full_thread_id: expId + '.' + 'abc1'
       },
       {
         last_updated: 1441870501231.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example feedback',
+        subject: 'Feedback from a learner',
         summary: null,
-        threadId: 'abc2'
+        full_thread_id: expId + '.' + 'abc2'
       }
     ];
 
     var mockOpenSuggestionThreads = [
       {
         last_updated: 1441870501232.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example suggestion',
+        subject: 'Suggestion from a learner',
         summary: null,
-        threadId: 'abc3',
-        suggestion_id: '1'
+        full_thread_id: expId + '.' + 'abc3',
       },
       {
         last_updated: 1441870501233.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example suggestion',
+        subject: 'Suggestion from a learner',
         summary: null,
-        threadId: 'abc4',
-        suggestion_id: '2'
+        full_thread_id: expId + '.' + 'abc4',
       }
     ];
 
@@ -83,18 +81,29 @@ describe('retrieving threads service', function() {
       threads: mockFeedbackThreads
     });
 
-    httpBackend.whenGET('/suggestionlisthandler/' + expId + '?type=open').respond({
+    httpBackend.whenGET('/suggestionlisthandler/' + expId +
+        '?has_suggestion=true&list_type=all').respond({
       threads: mockOpenSuggestionThreads
     });
 
     threadDataService.fetchThreads();
     httpBackend.flush();
 
+    // ThreadDataService will modify the data it receives like so.
+    mockFeedbackThreads.concat(mockOpenSuggestionThreads).map(
+      function(element, index) {
+      var fullThreadId = element.full_thread_id;
+      element.thread_id = fullThreadId.substring(
+          fullThreadId.indexOf('.') + 1, fullThreadId.length);
+    });
+
     for (var i = 0; i < mockFeedbackThreads.length; i++) {
-      expect(threadDataService.data.threadList).toContain(mockFeedbackThreads[i]);
+      expect(threadDataService.data.feedbackThreads).toContain(
+          mockFeedbackThreads[i]);
     }
     for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
-      expect(threadDataService.data.threadList).toContain(mockOpenSuggestionThreads[i]);
+      expect(threadDataService.data.suggestionThreads).toContain(
+          mockOpenSuggestionThreads[i]);
     }
   });
 });
