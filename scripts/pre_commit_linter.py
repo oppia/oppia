@@ -231,14 +231,17 @@ def _pre_commit_linter():
     else:
         all_files = _get_changed_filenames()
 
-    js_files_to_lint = filter(lambda filename: filename.endswith('.js'), all_files)
-    py_files_to_lint = filter(lambda filename: filename.endswith('.py'), all_files)
+    js_files_to_lint = filter(lambda filename: filename.endswith('.js'),
+                              all_files)
+    py_files_to_lint = filter(lambda filename: filename.endswith('.py'),
+                              all_files)
 
     if os.getcwd().endswith('oppia'):
         if os.path.exists(jscs_path):
             print ''
             print 'Starting jscs linter...'
-            _lint_js_files(node_path, jscs_path, config_jscsrc, js_files_to_lint)
+            _lint_js_files(node_path, jscs_path, config_jscsrc,
+                           js_files_to_lint)
         else:
             print ''
             print 'ERROR    Please run start.sh first to install node-jscs '
