@@ -14,8 +14,6 @@
 
 """Tests for the profile page."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
@@ -168,14 +166,14 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # The email update preference should be whatever the setting in feconf
         # is.
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
-                user_services.get_email_preferences(self.EDITOR_ID),
+                user_services.get_email_preferences(editor_id),
                 {'can_receive_email_updates': True})
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
-                user_services.get_email_preferences(self.EDITOR_ID),
+                user_services.get_email_preferences(editor_id),
                 {'can_receive_email_updates': False})
 
     def test_user_allowing_emails_on_signup(self):
@@ -189,14 +187,14 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             csrf_token=csrf_token)
 
         # The email update preference should be True in all cases.
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
-                user_services.get_email_preferences(self.EDITOR_ID),
+                user_services.get_email_preferences(editor_id),
                 {'can_receive_email_updates': True})
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
-                user_services.get_email_preferences(self.EDITOR_ID),
+                user_services.get_email_preferences(editor_id),
                 {'can_receive_email_updates': True})
 
     def test_user_disallowing_emails_on_signup(self):
@@ -210,14 +208,14 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             csrf_token=csrf_token)
 
         # The email update preference should be False in all cases.
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
-                user_services.get_email_preferences(self.EDITOR_ID),
+                user_services.get_email_preferences(editor_id),
                 {'can_receive_email_updates': False})
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
-                user_services.get_email_preferences(self.EDITOR_ID),
+                user_services.get_email_preferences(editor_id),
                 {'can_receive_email_updates': False})
 
 
@@ -306,7 +304,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Test the contribution time shows up correctly as None.
         self.signup(self.EMAIL, self.USERNAME)
         self.login(self.EMAIL)
-        self.user_id = self.get_user_id_from_email(self.EMAIL)
+        user_id = self.get_user_id_from_email(self.EMAIL)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertIsNone(response_dict['first_contribution_msec'])
@@ -314,7 +312,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Update the first_contribution_msec to the current time in milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
         user_services.update_first_contribution_msec_if_not_set(
-            self.user_id, first_time_in_msecs)
+            user_id, first_time_in_msecs)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
         response_dict = self.get_json(
@@ -327,7 +325,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
         user_services.update_first_contribution_msec_if_not_set(
-            self.user_id, second_time_in_msecs)
+            user_id, second_time_in_msecs)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
@@ -350,47 +348,47 @@ class UserContributionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
         self.assertEqual(
-            response_dict['created_exploration_summary_dicts'], [])
+            response_dict['created_exp_summary_dicts'], [])
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'], [])
+            response_dict['edited_exp_summary_dicts'], [])
 
     def test_created(self):
         # Check that the profile page for a user who has created
         # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.user_a_id, end_state_name='End')
-        rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
+            self.EXP_ID_1, user_a_id, end_state_name='End')
+        rights_manager.publish_exploration(user_a_id, self.EXP_ID_1)
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
 
         self.assertEqual(len(
-            response_dict['created_exploration_summary_dicts']), 1)
+            response_dict['created_exp_summary_dicts']), 1)
         self.assertEqual(len(
-            response_dict['edited_exploration_summary_dicts']), 1)
+            response_dict['edited_exp_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['created_exploration_summary_dicts'][0]['id'],
+            response_dict['created_exp_summary_dicts'][0]['id'],
             self.EXP_ID_1)
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'][0]['id'],
+            response_dict['edited_exp_summary_dicts'][0]['id'],
             self.EXP_ID_1)
 
     def test_edited(self):
         # Check that the profile page for a user who has created
         # a single exploration shows 0 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
         self.signup(self.EMAIL_B, self.USERNAME_B)
-        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+        user_b_id = self.get_user_id_from_email(self.EMAIL_B)
 
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.user_a_id, end_state_name='End')
-        rights_manager.publish_exploration(self.user_a_id, self.EXP_ID_1)
+            self.EXP_ID_1, user_a_id, end_state_name='End')
+        rights_manager.publish_exploration(user_a_id, self.EXP_ID_1)
 
-        exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [{
+        exp_services.update_exploration(user_b_id, self.EXP_ID_1, [{
             'cmd': 'edit_exploration_property',
             'property_name': 'objective',
             'new_value': 'the objective'
@@ -399,12 +397,12 @@ class UserContributionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
         self.assertEqual(len(
-            response_dict['created_exploration_summary_dicts']), 0)
+            response_dict['created_exp_summary_dicts']), 0)
         self.assertEqual(len(
-            response_dict['edited_exploration_summary_dicts']), 1)
+            response_dict['edited_exp_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'][0]['id'],
+            response_dict['edited_exp_summary_dicts'][0]['id'],
             self.EXP_ID_1)
         self.assertEqual(
-            response_dict['edited_exploration_summary_dicts'][0]['objective'],
+            response_dict['edited_exp_summary_dicts'][0]['objective'],
             'the objective')

@@ -70,6 +70,15 @@ from pylint import lint  # pylint: disable=wrong-import-position
 
 # Allows Python linter to import files in the oppia/ folder.
 sys.path.insert(0, os.getcwd())
+sys.path.insert(0, os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+    'google_appengine', 'lib', 'webapp2-2.3'))
+sys.path.insert(0, os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+    'google_appengine'))
+sys.path.insert(0, os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'))
+sys.path.insert(0, os.path.join('third_party', 'gae-pipeline-1.9.17.0'))
 
 
 def _get_changed_filenames():

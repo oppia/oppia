@@ -316,7 +316,7 @@ urls = [
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event/<exploration_id>',
+        r'/createhandler/started_tutorial_event',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
 
     get_redirect_route(

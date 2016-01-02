@@ -14,8 +14,6 @@
 
 """Controllers for the moderator page."""
 
-__author__ = 'yanamal@google.com (Yana Malysheva)'
-
 from core.controllers import base
 from core.domain import email_manager
 

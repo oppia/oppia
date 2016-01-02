@@ -40,13 +40,13 @@ oppia.controller('Profile', [
           'user. Better ratings and more playthroughs improve this score.')
       }, {
         title: 'Created Explorations',
-        value: data.created_exploration_summary_dicts.length
+        value: data.created_exp_summary_dicts.length
       }, {
         title: 'Edited Explorations',
-        value: data.edited_exploration_summary_dicts.length
+        value: data.edited_exp_summary_dicts.length
       }];
-      $scope.userCreatedExplorations = data.created_exploration_summary_dicts;
-      $scope.userEditedExplorations = data.edited_exploration_summary_dicts;
+      $scope.userCreatedExplorations = data.created_exp_summary_dicts;
+      $scope.userEditedExplorations = data.edited_exp_summary_dicts;
       $scope.subjectInterests = data.subject_interests;
       $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (

@@ -14,8 +14,6 @@
 
 """Controllers for the gallery pages."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import json
 import logging
 
@@ -26,11 +24,12 @@ from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
+import feconf
+import utils
+
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
-import feconf
-import utils
 
 SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     'splash_page_youtube_video_id', {'type': 'unicode'},
@@ -91,11 +90,8 @@ class GalleryPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
-            'LANGUAGE_CODES_AND_NAMES': [{
-                'code': lc['code'],
-                'name': utils.get_short_language_description(
-                    lc['description']),
-            } for lc in feconf.ALL_LANGUAGE_CODES],
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
         })
         self.render_template('galleries/gallery.html')
 
@@ -192,23 +188,6 @@ class UploadExploration(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'This server does not allow file uploads.')
-
-
-class RecentCommitsHandler(base.BaseHandler):
-    """Returns a list of recent commits."""
-
-    def get(self):
-        """Handles GET requests."""
-        urlsafe_start_cursor = self.request.get('cursor')
-        all_commits, new_urlsafe_start_cursor, more = (
-            exp_services.get_next_page_of_all_non_private_commits(
-                urlsafe_start_cursor=urlsafe_start_cursor))
-        all_commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.render_json({
-            'results': all_commit_dicts,
-            'cursor': new_urlsafe_start_cursor,
-            'more': more,
-        })
 
 
 class GalleryRedirectPage(base.BaseHandler):

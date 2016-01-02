@@ -483,10 +483,18 @@ class TestBase(unittest.TestCase):
 
         Example usage:
 
-        import math
-        with self.swap(math, "sqrt", lambda x: 42):
-            print math.sqrt(16.0) # prints 42
-        print math.sqrt(16.0) # prints 4 as expected.
+            import math
+            with self.swap(math, 'sqrt', lambda x: 42):
+                print math.sqrt(16.0)  # prints 42
+            print math.sqrt(16.0)  # prints 4 as expected.
+
+        Note that this does not work directly for classmethods. In this case,
+        you will need to import the 'types' module, as follows:
+
+            import types
+            with self.swap(
+                SomePythonClass, 'some_classmethod',
+                types.MethodType(new_classmethod, SomePythonClass)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This

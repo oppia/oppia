@@ -363,17 +363,6 @@ def vfs_normpath(path):
     return path or dot
 
 
-def get_short_language_description(full_language_description):
-    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
-    the corresponding short description.
-    """
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
 def require_valid_name(name, name_type):
     """Generic name validation.
 
@@ -435,3 +424,21 @@ def get_thumbnail_icon_url_for_category(category):
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
     return '/images/gallery/thumbnails/%s.svg' % icon_name.replace(' ', '')
+
+
+def _get_short_language_description(full_language_description):
+    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
+    the corresponding short description.
+    """
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
+
+
+def get_all_language_codes_and_names():
+    return [{
+        'code': lc['code'],
+        'name': _get_short_language_description(lc['description']),
+    } for lc in feconf.ALL_LANGUAGE_CODES]

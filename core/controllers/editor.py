@@ -16,10 +16,10 @@
 
 """Controllers for the editor view."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import imghdr
 import logging
+
+import jinja2
 
 from core.controllers import base
 from core.domain import config_domain
@@ -39,11 +39,10 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
 
-import jinja2
+current_user_services = models.Registry.import_current_user_services()
 
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
@@ -301,8 +300,7 @@ class ExplorationHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
             'show_state_editor_tutorial_on_load': (
-                self.user_id and not
-                self.user_has_started_state_editor_tutorial),
+                self.user_id and not self.has_seen_editor_tutorial),
             'skin_customizations': exploration.skin_instance.to_dict()[
                 'skin_customizations'],
             'states': states,
@@ -570,6 +568,8 @@ class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
     explicitly trained to respond to be an exploration author.
     """
+    NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
+
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -599,15 +599,13 @@ class UntrainedAnswersHandler(EditorHandler):
         # normalization calls in this function will not work correctly on those
         # strings. Once this happens, this handler should also be tested.
 
-        NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
-
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
-            NUMBER_OF_TOP_ANSWERS_PER_RULE)
+            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
         unhandled_answers = []
@@ -682,8 +680,8 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-                self.render_json(exp_services.export_states_to_yaml(
-                    exploration_id, version=version, width=width))
+            self.render_json(exp_services.export_states_to_yaml(
+                exploration_id, version=version, width=width))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -932,6 +930,6 @@ class ChangeListSummaryHandler(EditorHandler):
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
-    def post(self, exploration_id):
+    def post(self):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)

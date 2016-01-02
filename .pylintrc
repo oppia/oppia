@@ -13,8 +13,14 @@ function-rgx=^[_a-z][a-z0-9_]*$
 # Regular expression which should only match correct method names
 method-rgx=^([_a-z][a-z0-9_]*|__[a-z0-9]+__)$
 
+# Regular expression which should only match correct constant names
+const-rgx=^(([A-Z_][A-Z0-9_]*)|(__.*__)|([a-z_]+_models)|([a-z_]+_services))$
+
 # Good variable names which should always be accepted, separated by a comma
-good-names=e,_,f,p,fs,id,setUp,tearDown,longMessage
+good-names=e,_,f,p,fs,id,sc,setUp,tearDown,longMessage,maxDiff
+
+# Regex for dummy variables (to prevent 'unused argument' errors)
+dummy-variables-rgx=_|unused_*
 
 [DESIGN]
 
@@ -25,6 +31,25 @@ min-public-methods=0
 
 indent-string='    '
 
+[SIMILARITIES]
+
+ignore-imports=yes
+
 [MESSAGES CONTROL]
 
-disable=locally-disabled,locally-enabled,logging-not-lazy
+# TODO(sll): Re-enable the following checks:
+#    arguments-differ
+#    broad-except
+#    fixme
+#    missing-docstring
+#    no-member
+#    no-self-use
+#    redefined-variable-type
+#    too-many-branches
+#    too-many-instance-attributes
+#    too-many-lines
+#    too-many-locals
+#    too-many-statements
+# and fix those issues.
+
+disable=locally-disabled,locally-enabled,logging-not-lazy,arguments-differ,broad-except,fixme,missing-docstring,no-member,no-self-use,redefined-variable-type,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-statements

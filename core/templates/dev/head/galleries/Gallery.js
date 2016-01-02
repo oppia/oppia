@@ -136,12 +136,14 @@ oppia.factory('searchService', [
 
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter', 'oppiaDebouncer',
-  'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService',
+  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
+  'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
+  'searchService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      ExplorationCreationButtonService, oppiaDatetimeFormatter, oppiaDebouncer,
-      urlService, GALLERY_DATA_URL, CATEGORY_LIST, searchService) {
+      ExplorationCreationButtonService, oppiaDatetimeFormatter,
+      oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
+      searchService) {
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
@@ -375,10 +377,12 @@ oppia.controller('SearchBar', [
     );
 
     $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
     };
     $scope.showUploadExplorationModal = function() {
-      ExplorationCreationButtonService.showUploadExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showUploadExplorationModal(
+        CATEGORY_LIST);
     };
   }
 ]);

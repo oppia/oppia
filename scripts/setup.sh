@@ -199,7 +199,7 @@ export PYTHON_CMD
 echo "Generating list of installed node modules..."
 NPM_INSTALLED_MODULES="$($NPM_CMD list)"
 export NPM_INSTALLED_MODULES
-echo "done."
+echo "Generation completed."
 
 install_node_module() {
   # Usage: install_node_module [module_name] [module_version]
