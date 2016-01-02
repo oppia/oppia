@@ -233,6 +233,70 @@ def is_collection_summary_editable(collection_summary, user_id=None):
         or collection_summary.community_owned)
 
 
+def get_learner_collection_dict_by_id(
+        collection_id, user_id, strict=True, version=None):
+    """Creates and returns a dictionary representation of a collection given by
+    the provided collection ID. This dictionary contains extra information
+    along with the dict returned by collection_domain.Collection.to_dict()
+    which includes useful data for the collection learner view. The information
+    includes progress in the collection, information about explorations
+    referenced within the collection, and a slightly nicer data structure for
+    frontend work.
+    """
+    collection = get_collection_by_id(
+        collection_id, strict=strict, version=version)
+
+    exp_ids = collection.exploration_ids
+    exp_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+    exp_summaries_dict = {
+        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+    }
+
+    # TODO(bhenning): Users should not be recommended explorations they
+    # have completed outside the context of a collection.
+    next_exploration_ids = None
+    completed_exploration_ids = None
+    if user_id:
+        completed_exploration_ids = get_completed_exploration_ids(
+            user_id, collection_id)
+        next_exploration_ids = collection.get_next_exploration_ids(
+            completed_exploration_ids)
+    else:
+        # If the user is not logged in or they have not completed any of
+        # the explorations yet within the context of this collection,
+        # recommend the initial explorations.
+        next_exploration_ids = collection.init_exploration_ids
+        completed_exploration_ids = []
+
+    collection_dict = collection.to_dict()
+    collection_dict['next_exploration_ids'] = next_exploration_ids
+    collection_dict['completed_exploration_ids'] = (
+        completed_exploration_ids)
+    collection_dict['version'] = collection.version
+
+    # Insert an 'exploration' dict into each collection node, where the
+    # dict includes meta information about the exploration (ID and title).
+    for collection_node in collection_dict['nodes']:
+        summary = exp_summaries_dict.get(collection_node['exploration_id'])
+        collection_node['exploration'] = {
+            'id': collection_node['exploration_id'],
+            'title': summary.title if summary else None,
+            'category': summary.category if summary else None,
+            'objective': summary.objective if summary else None,
+            'ratings': summary.ratings if summary else None,
+            'last_updated_msec': utils.get_time_in_millisecs(
+                summary.exploration_model_last_updated
+            ) if summary else None,
+            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                summary.category),
+            'thumbnail_bg_color': utils.get_hex_color_for_category(
+                summary.category),
+        }
+
+    return collection_dict
+
+
 # Query methods.
 def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.
@@ -417,11 +481,14 @@ def apply_change_list(collection_id, change_list):
                         collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if change.property_name == 'title':
+                if (change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_TITLE):
                     collection.update_title(change.new_value)
-                elif change.property_name == 'category':
+                elif (change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_CATEGORY):
                     collection.update_category(change.new_value)
-                elif change.property_name == 'objective':
+                elif (change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
             elif (change.cmd ==
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):

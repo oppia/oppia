@@ -34,8 +34,8 @@ import logging
 
 class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
-    CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
-    CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+    CAN_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'true\');'
+    CANNOT_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'false\');'
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
@@ -84,7 +84,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX, self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
-     
+
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
