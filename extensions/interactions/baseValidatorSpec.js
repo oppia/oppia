@@ -235,69 +235,6 @@ describe('Interaction validator', function() {
     });
   });
 
-  describe('oppiaInteractiveEndExplorationValidator', function() {
-    var validator, customizationArguments;
-
-    beforeEach(function() {
-      validator = filter('oppiaInteractiveEndExplorationValidator');
-      customizationArguments = {
-        recommendedExplorationIds: {
-          value: ['ExpID0', 'ExpID1', 'ExpID2']
-        }
-      };
-    });
-
-    it('should not have warnings for no answer groups or no default outcome',
-        function() {
-      var warnings = validator(currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([]);
-    });
-
-    it('should have warnings for any answer groups or default outcome',
-        function() {
-      var answerGroups = [
-        createAnswerGroup(goodOutcomeDest),
-        createAnswerGroup(goodOutcomeFeedback),
-        createAnswerGroup(badOutcome)
-      ];
-      var warnings = validator(
-        currentState, customizationArguments, answerGroups, badOutcome);
-      expect(warnings).toEqual([{
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please make sure end exploration interactions do not ' +
-            'have any answer groups.')
-        }, {
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please make sure end exploration interactions do not ' +
-            'have a default outcome.')
-        }
-      ]);
-    });
-
-    it('should throw for missing recommendations argument', function() {
-      expect(function() {
-        validator(currentState, {}, [], null);
-      }).toThrow(
-        'Expected customization arguments to have property: ' +
-          'recommendedExplorationIds');
-    });
-
-    it('should not have warnings for 0 or 8 recommendations', function() {
-      customizationArguments.recommendedExplorationIds.value = [];
-      var warnings = validator(currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([]);
-
-      customizationArguments.recommendedExplorationIds.value = [
-        'ExpID0', 'ExpID1', 'ExpID2', 'ExpID3',
-        'ExpID4', 'ExpID5', 'ExpID6', 'ExpID7'
-      ];
-      warnings = validator(currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([]);
-    });
-  });
-
   describe('oppiaInteractiveImageClickInputValidator', function() {
     var validator, customizationArguments;
 
