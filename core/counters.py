@@ -16,8 +16,6 @@
 
 """Services for performance counters."""
 
-__author__ = 'Sean Lip'
-
 
 class PerfCounter(object):
     """Generic in-process numeric counter; not aggregated across instances."""

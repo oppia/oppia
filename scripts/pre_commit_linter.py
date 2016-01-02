@@ -79,6 +79,8 @@ sys.path.insert(0, os.path.join(
 sys.path.insert(0, os.path.join(
     _PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'))
 sys.path.insert(0, os.path.join('third_party', 'gae-pipeline-1.9.17.0'))
+sys.path.insert(0, os.path.join('third_party', 'bleach-1.2.2'))
+sys.path.insert(0, os.path.join('third_party', 'gae-mapreduce-1.9.17.0'))
 
 
 def _get_changed_filenames():
@@ -115,13 +117,16 @@ def _get_all_files_in_directory(dir_path):
 
 
 def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
-    """Prints a list of lint errors in the given input_dir, or in all changed
-    JavaScript files if input_dir is not specified.
+    """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
     - node_path: str. Path to the node binary.
     - jscs_path: str. Path to the JSCS binary.
-    - input_dir: str. Path to the folder to be linted (optional).
+    - config_jscsrc: str. Configuration args for the call to the JSCS binary.
+    - files_to_lint: list of str. A list of filepaths to lint.
+
+    Returns:
+    - a string summarizing the results.
     """
 
     print '----------------------------------------'
@@ -133,7 +138,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     if not files_to_lint:
         print 'There are no JavaScript files to lint.'
         print '----------------------------------------'
-        return
+        return ''
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
 
@@ -158,19 +163,21 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     print '----------------------------------------'
 
     if num_files_with_errors:
-        print 'FAILED    %s JavaScript files' % num_files_with_errors
+        return 'FAILED    %s JavaScript files' % num_files_with_errors
     else:
-        print 'SUCCESS   %s JavaScript files linted (%.1f secs)' % (
+        return 'SUCCESS   %s JavaScript files linted (%.1f secs)' % (
             num_js_files, time.time() - start_time)
 
 
 def _lint_py_files(config_pylint, files_to_lint):
-    """Prints a list of lint errors in the given input_dir, or in all changed
-    Python files if input_dir is not specified.
+    """Prints a list of lint errors in the given list of Python files.
 
     Args:
     - config_pylint: str. Path to the .pylintrc file.
-    - input_dir: str. Path to the folder to be linted (optional).
+    - files_to_lint: list of str. A list of filepaths to lint.
+
+    Returns:
+    - a string summarizing the results.
     """
 
     print '----------------------------------------'
@@ -182,9 +189,9 @@ def _lint_py_files(config_pylint, files_to_lint):
     if not files_to_lint:
         print 'There are no Python files to lint.'
         print '----------------------------------------'
-        return
+        return ''
 
-    print 'Linting %d files' % num_py_files
+    print 'Linting %d files\n' % num_py_files
 
     try:
         # This prints output to the console.
@@ -196,9 +203,9 @@ def _lint_py_files(config_pylint, files_to_lint):
     print '----------------------------------------'
 
     if are_there_errors:
-        print 'FAILED    Python linting failed'
+        return 'FAILED    Python linting failed'
     else:
-        print 'SUCCESS   %s Python files linted (%.1f secs)' % (
+        return 'SUCCESS   %s Python files linted (%.1f secs)' % (
             num_py_files, time.time() - start_time)
 
 
@@ -207,12 +214,16 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass JSCS binary path
     """
+    if not os.getcwd().endswith('oppia'):
+        print ''
+        print 'ERROR    Please run this script from the oppia root directory.'
+
     parsed_args = _PARSER.parse_args()
-    input_dir = parsed_args.path
-    if input_dir:
-        input_dir = os.path.join(os.getcwd(), parsed_args.path)
-        if not os.path.exists(input_dir):
-            print 'Could not locate directory %s. Exiting.' % input_dir
+    input_path = parsed_args.path
+    if input_path:
+        input_path = os.path.join(os.getcwd(), parsed_args.path)
+        if not os.path.exists(input_path):
+            print 'Could not locate file or directory %s. Exiting.' % input_path
             print '----------------------------------------'
             sys.exit(0)
 
@@ -229,11 +240,16 @@ def _pre_commit_linter():
     jscs_path = os.path.join(
         parent_dir, 'node_modules', 'jscs', 'bin', 'jscs')
 
-    if input_dir:
-        if os.path.isfile(input_dir):
-            all_files = [input_dir]
+    if not os.path.exists(jscs_path):
+        print ''
+        print 'ERROR    Please run start.sh first to install node-jscs '
+        print '         and its dependencies.'
+
+    if input_path:
+        if os.path.isfile(input_path):
+            all_files = [input_path]
         else:
-            all_files = _get_all_files_in_directory(input_dir)
+            all_files = _get_all_files_in_directory(input_path)
     else:
         all_files = _get_changed_filenames()
 
@@ -242,25 +258,16 @@ def _pre_commit_linter():
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
 
-    if os.getcwd().endswith('oppia'):
-        if os.path.exists(jscs_path):
-            print ''
-            print 'Starting jscs linter...'
-            _lint_js_files(node_path, jscs_path, config_jscsrc,
-                           js_files_to_lint)
-        else:
-            print ''
-            print 'ERROR    Please run start.sh first to install node-jscs '
-            print '         and its dependencies.'
+    summary_messages = []
+    print '\nStarting jscs linter...'
+    summary_messages.append(_lint_js_files(
+        node_path, jscs_path, config_jscsrc, js_files_to_lint))
+    print '\nStarting pylint...'
+    summary_messages.append(_lint_py_files(
+        config_pylint, py_files_to_lint))
 
-        # Pylint
-        print ''
-        print 'Starting Pylint...'
-        _lint_py_files(config_pylint, py_files_to_lint)
-    else:
-        print ''
-        print 'ERROR    Please run this script from the oppia root directory.'
-
+    print '\n'.join(summary_messages)
+    print ''
 
 if __name__ == '__main__':
     _pre_commit_linter()

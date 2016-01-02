@@ -182,7 +182,7 @@ oppia.factory('codeReplRulesService', [
         $filter('normalizeWhitespace')(inputs.x);
       return normalizedOutput == normalizedExpectedOutput;
     },
-    ResultsInError: function(answer, inputs) {
+    ResultsInError: function(answer) {
       return !!(answer.error.trim());
     },
     ErrorContains: function(answer, inputs) {

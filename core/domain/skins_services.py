@@ -16,8 +16,6 @@
 
 """Provides services for HTML skins for the reader view."""
 
-__author__ = 'Sean Lip'
-
 import copy
 import inspect
 

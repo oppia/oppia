@@ -16,8 +16,6 @@
 
 """Rules for ClickOnImage objects."""
 
-__author__ = 'Zhan Xiong Chin'
-
 from extensions.rules import base
 
 

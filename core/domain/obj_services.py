@@ -14,8 +14,6 @@
 
 """Service methods for typed instances."""
 
-__author__ = 'Sean Lip'
-
 import copy
 import inspect
 
@@ -68,7 +66,7 @@ def get_all_object_editor_js_templates():
     object_editors_js = ''
 
     all_object_classes = Registry.get_all_object_classes()
-    for obj_type, obj_cls in all_object_classes.iteritems():
+    for obj_cls in all_object_classes.values():
         if obj_cls.has_editor_js_template():
             object_editors_js += obj_cls.get_editor_js_template()
 

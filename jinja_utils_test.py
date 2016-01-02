@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
+# pylint: disable=relative-import
 
 from core.tests import test_utils
 import jinja_utils
@@ -35,11 +35,11 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             ('', '\\"\\"'),
             (None, 'null'),
             (['a', {'b': 'c', 'd': ['e', None]}],
-                '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
+             '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
         ]
 
         for tup in expected_values:
-            self.assertEqual(jinja_utils.JinjaConfig.FILTERS['js_string'](
+            self.assertEqual(jinja_utils.JINJA_FILTERS['js_string'](
                 tup[0]), tup[1])
 
     def test_parse_string(self):

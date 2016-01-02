@@ -241,7 +241,7 @@ def main():
     task_execution_failed = False
     try:
         _execute_tasks(tasks)
-    except:
+    except Exception:
         task_execution_failed = True
 
     for task in tasks:
@@ -273,7 +273,7 @@ def main():
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
-                    '([0-9]+) failures',
+                '([0-9]+) failures',
                 str(task.exception))
 
             try:

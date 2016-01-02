@@ -147,6 +147,19 @@ class StringClassifier(object):
         self._alpha = self._DEFAULT_ALPHA
         self._beta = self._DEFAULT_BETA
 
+        # These should be initialized in load_examples() or from_dict().
+        self._b_dl = None
+        self._c_dl = None
+        self._c_l = None
+        self._c_lw = None
+        self._l_dp = None
+        self._w_dp = None
+        self._label_to_id = None
+        self._word_to_id = None
+        self._num_docs = None
+        self._num_labels = None
+        self._num_words = None
+
         self._training_iterations = self._DEFAULT_TRAINING_ITERATIONS
         self._prediction_iterations = self._DEFAULT_PREDICTION_ITERATIONS
 
@@ -262,11 +275,10 @@ class StringClassifier(object):
         """Returns a list of label probabilities for a given doc, indexed by
         label id.
         """
-        unnormalized_label_probabilities = (
+        unnormalized_label_probs = (
             self._c_dl[d] + (self._b_dl[d] * self._alpha))
         label_probabilities = (
-            unnormalized_label_probabilities /
-            unnormalized_label_probabilities.sum())
+            unnormalized_label_probs / unnormalized_label_probs.sum())
         return label_probabilities
 
     def _get_prediction_report_for_doc(self, d):
@@ -339,8 +351,8 @@ class StringClassifier(object):
         """Runs Gibbs sampling for "iterations" number of times on the provided
         docs.
         """
-        for i in xrange(iterations):
-            statez = self._run_gibbs_sampling(doc_ids)
+        for _ in xrange(iterations):
+            self._run_gibbs_sampling(doc_ids)
 
     def _add_examples(self, examples, iterations):
         """Adds examples to the internal state of the classifier, assigns
@@ -357,7 +369,9 @@ class StringClassifier(object):
         last_num_words = self._num_words
 
         # Increments _num_labels with any new labels
-        [map(self._get_label_id, labels) for labels in labels_list]
+        for labels in labels_list:
+            for label in labels:
+                self._get_label_id(label)
         self._num_docs += len(docs)
 
         self._b_dl = numpy.concatenate(
@@ -412,8 +426,8 @@ class StringClassifier(object):
         """
         all_labels = self._label_to_id.keys()
         return self._add_examples(
-            zip(prediction_examples, [copy.deepcopy(all_labels) for _ in
-                prediction_examples]),
+            zip(prediction_examples, [
+                copy.deepcopy(all_labels) for _ in prediction_examples]),
             self._prediction_iterations)
 
     def load_examples(self, examples):

@@ -15,44 +15,43 @@
 """Jinja-related utilities."""
 
 import copy
+import json
 import logging
 import os
 import math
 
-import feconf
 import jinja2
 from jinja2 import meta
-import json
+
+import feconf  # pylint: disable=relative-import
 
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
+def _js_string_filter(value):
+    """Converts a value to a JSON string for use in JavaScript code."""
+    string = json.dumps(value)
 
-class JinjaConfig(object):
-    """Contains Jinja configuration properties."""
+    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
+                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
-    def _js_string_filter(value):
-        """Converts a value to a JSON string for use in JavaScript code."""
-        string = json.dumps(value)
+    for replacement in replacements:
+        string = string.replace(replacement[0], replacement[1])
+    return jinja2.utils.Markup(string)
 
-        replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
-                        ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
-                        ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
-        for replacement in replacements:
-            string = string.replace(replacement[0], replacement[1])
-        return jinja2.utils.Markup(string)
+def _log2_floor_filter(value):
+    """Returns the logarithm base 2 of the given value, rounded down."""
+    return int(math.log(value, 2))
 
-    def _log2_floor_filter(value):
-        """Returns the logarithm base 2 of the given value, rounded down."""
-        return int(math.log(value, 2))
 
-    FILTERS = {
-        'is_list': lambda x: isinstance(x, list),
-        'is_dict': lambda x: isinstance(x, dict),
-        'js_string': _js_string_filter,
-        'log2_floor': _log2_floor_filter,
-    }
+JINJA_FILTERS = {
+    'is_list': lambda x: isinstance(x, list),
+    'is_dict': lambda x: isinstance(x, dict),
+    'js_string': _js_string_filter,
+    'log2_floor': _log2_floor_filter,
+}
 
 
 def get_jinja_env(dir_path):
@@ -82,7 +81,7 @@ def get_jinja_env(dir_path):
 
     env.globals['include_js_file'] = include_js_file
     env.globals['include_skins_js_file'] = include_skins_js_file
-    env.filters.update(JinjaConfig.FILTERS)
+    env.filters.update(JINJA_FILTERS)
     return env
 
 
@@ -99,7 +98,7 @@ def parse_string(string, params, autoescape=True):
     """
     env = jinja2.Environment(autoescape=autoescape)
 
-    env.filters.update(JinjaConfig.FILTERS)
+    env.filters.update(JINJA_FILTERS)
     try:
         parsed_string = env.parse(string)
     except Exception:

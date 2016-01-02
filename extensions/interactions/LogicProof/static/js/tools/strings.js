@@ -1,3 +1,17 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 var DEFAULT_VOCABULARY = {
   from: ['from'],
   and: ['and'],
@@ -260,7 +274,7 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'R\u2227S',
   variables: '',
   error: [
-    'Should this be \'From {{R}} and {{S}} we have {{R\u2227S}}\'?' ,
+    'Should this be \'From {{R}} and {{S}} we have {{R\u2227S}}\'?',
     'To prove {{R\u2227S}} you need to have shown {{S}} as well.'
   ]
 }, {
@@ -271,7 +285,8 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   variables: '',
   error: [
     'Should this be \'From {{R}} and {{S}} we have {{R\u2227S}}\'?',
-    '{{R\u2227S}} means that {{R}} and {{S}} are both true, so you also need to have shown {{S}}.'
+    '{{R\u2227S}} means that {{R}} and {{S}} are both true, so you also ' +
+    'need to have shown {{S}}.'
   ]
 }, {
   name: 'and_introduce_e3',
@@ -300,10 +315,11 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   antecedents: '',
   results: 'R',
   variables: '',
-  error: ['If you want to reach a contradiction from {{~R}} and so conclude {{R}} then you\'ll need to start from the law of the excluded middle \'We know {{R\u2228~R}}\'.']
+  error: [
+  'If you want to reach a contradiction from {{~R}} and so conclude {{R}} ' +
+  'then you\'ll need to start from the law of the excluded middle \'We know ' +
+  '{{R\u2228~R}}\'.']
 }];
-
-
 
 var DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
   name: 'first_line_indented',
@@ -312,7 +328,9 @@ var DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
 }, {
   name: 'illegal_indent',
   occurs: 'indentation(n)>indentation(n-1) \u2227 ~is_scope_creator(n-1)',
-  message: ['Indents should only occur after lines of the form \'If..\' or \'Given...\'.']
+  message: [
+    'Indents should only occur after lines of the form \'If..\' or ' +
+    '\'Given...\'.']
 }, {
   name: 'double_indent',
   occurs: 'indentation(n)>indentation(n-1)+1 \u2227 is_scope_creator(n-1)',
@@ -320,59 +338,139 @@ var DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
 }, {
   name: 'missing_indent_given',
   occurs: 'template(n-1)=\'given\' \u2227 indentation(n)<=indentation(n-1)',
-  message: ['After \'{{text(n-1)}}\' the following lines in which you reason using the variable {{variable(n-1)}} should be indented. Then stop indenting once you reach a statement of the form \'\u2200x.....\' in which the {{variable(n-1)}} no longer occurs.']
+  message: [
+    'After \'{{text(n-1)}}\' the following lines in which you reason using ' +
+    'the variable {{variable(n-1)}} should be indented. Then stop indenting ' +
+    'once you reach a statement of the form \'\u2200x.....\' in which the ' +
+    '{{variable(n-1)}} no longer occurs.']
 }, {
   name: 'missing_indent_assumption',
-  occurs: 'template(n-1)=\'assumption\' \u2227 indentation(n)<=indentation(n-1)',
-  message: ['After \'{{text(n-1)}}\' the following lines in which you reason under the assumption of {{result(n-1)}} should be indented. Once you have proved some statement p assuming {{result(n-1)}} then you can write an unindented line \'Hence {{result(n-1)}}=>p\'. Alternatively you can simply stop indenting if you no longer wish to use the assumption of  {{result(n-1)}}.']
+  occurs: (
+    'template(n-1)=\'assumption\' \u2227 indentation(n)<=indentation(n-1)'),
+  message: [
+    'After \'{{text(n-1)}}\' the following lines in which you reason under ' +
+    'the assumption of {{result(n-1)}} should be indented. Once you have ' +
+    'proved some statement p assuming {{result(n-1)}} then you can write an ' +
+    'unindented line \'Hence {{result(n-1)}}=>p\'. Alternatively you can ' +
+    'simply stop indenting if you no longer wish to use the assumption of ' +
+    '{{result(n-1)}}.']
 }, {
   name: 'missing_deindent_forall_0',
-  occurs: 'template(n)=\'for_all_introduce\' \u2227 (indentation(n)=indentation(n-1) \u2227 indentation(n-1)=0)',
-  message: ['To prove {{result(n)}} you need to start by writing \'Given {{variable(n)}}\' and then start indenting your lines until you manage to prove {{entry(1,antecedents(n))}}. After this you can write this line (which should not be indented).']
+  occurs: (
+    'template(n)=\'for_all_introduce\' \u2227 ' +
+    '(indentation(n)=indentation(n-1) \u2227 indentation(n-1)=0)'),
+  message: [
+    'To prove {{result(n)}} you need to start by writing ' +
+    '\'Given {{variable(n)}}\' and then start indenting your lines until ' +
+    'you manage to prove {{entry(1,antecedents(n))}}. After this you can ' +
+    'write this line (which should not be indented).']
 }, {
   name: 'incorrect_deindent_forall',
-  occurs: 'template(n) = \'for_all_introduce\' \u2227 template(scoper(n-1))!= \'given\'',
-  message: ['We are still working under the assumption of {{result(scoper(n-1))}} and must stop doing so (for example by moving to a statement of the form {{result(scoper(n-1))}}=>p) before we can leave the scope of {{variable(n)}} and introduce a for-all quantifier.']
+  occurs: (
+    'template(n) = \'for_all_introduce\' \u2227 ' +
+    'template(scoper(n-1))!= \'given\''),
+  message: [
+    'We are still working under the assumption of {{result(scoper(n-1))}} ' +
+    'and must stop doing so (for example by moving to a statement of the ' +
+    'form {{result(scoper(n-1))}}=>p) before we can leave the scope of ' +
+    '{{variable(n)}} and introduce a for-all quantifier.']
 }, {
   name: 'missing_deindent_for_all_1',
-  occurs: 'template(n)=\'for_all_introduce\' \u2227 indentation(n)=indentation(n-1) \u2227 indentation(n-1)=1',
-  message: ['This line should no longer being indented (because we are no longer within the scope of {{variable(n)}}).']
+  occurs: (
+    'template(n)=\'for_all_introduce\' \u2227 ' +
+    'indentation(n)=indentation(n-1) \u2227 indentation(n-1)=1'),
+  message: [
+    'This line should no longer being indented (because we are no longer ' +
+    'within the scope of {{variable(n)}}).']
 }, {
   name: 'missing_deindent_for_all_2',
-  occurs: 'template(n)=\'for_all_introduce\' \u2227 indentation(n)=indentation(n-1) \u2227 indentation(n-1)>1',
-  message: ['This line should be indented one step less than the previous line (because it is no longer in the scope of {{variable(n)}}).']
+  occurs: (
+    'template(n)=\'for_all_introduce\' \u2227 ' +
+    'indentation(n)=indentation(n-1) \u2227 indentation(n-1)>1'),
+  message: [
+    'This line should be indented one step less than the previous line ' +
+    '(because it is no longer in the scope of {{variable(n)}}).']
 }, {
   name: 'double_deindent_forall',
-  occurs: 'template(n)=\'for_all_introduce\' \u2227 indentation(n)<indentation(n-1)-1',
-  message: ['We only reduce the level of indentation by one here; we are just leaving the scope of \'{{text(scoper(n-1))}}\'.']
+  occurs: (
+    'template(n)=\'for_all_introduce\' \u2227 ' +
+    'indentation(n)<indentation(n-1)-1'),
+  message: [
+    'We only reduce the level of indentation by one here; we are just ' +
+    'leaving the scope of \'{{text(scoper(n-1))}}\'.']
 }, {
   name: 'missing_deindent_implies_0',
-  occurs: 'template(n)=\'implies_introduce\' \u2227 (indentation(n)=indentation(n-1) \u2227 indentation(n)=0)',
-  message: ['To prove {{result(n)}} you need to start by writing \'If {{element(\'R\',n)}}\', then give a chain of reasoning (which should be indented) that ends with {{element(\'S\',n)}}. After that you can put this line (which should not be indented).']
+  occurs: (
+    'template(n)=\'implies_introduce\' \u2227 ' +
+    '(indentation(n)=indentation(n-1) \u2227 indentation(n)=0)'),
+  message: [
+    'To prove {{result(n)}} you need to start by writing ' +
+    '\'If {{element(\'R\',n)}}\', then give a chain of reasoning (which ' +
+    'should be indented) that ends with {{element(\'S\',n)}}. After that ' +
+    'you can put this line (which should not be indented).']
 }, {
   name: 'missing_deindent_not_0',
-  occurs: 'template(n)=\'not_introduce\' \u2227 (indentation(n)=indentation(n-1) \u2227 indentation(n)=0)',
-  message: ['To prove {{result(n)}} you need to start by writing \'If {{element(\'R\',n)}}\' and then give a chain of reasoning (on indented lines) that ends with a contradiction. After that you are allowed to write this line (unindented).']
+  occurs: (
+    'template(n)=\'not_introduce\' \u2227 ' +
+    '(indentation(n)=indentation(n-1) \u2227 indentation(n)=0)'),
+  message: [
+    'To prove {{result(n)}} you need to start by writing ' +
+    '\'If {{element(\'R\',n)}}\' and then give a chain of reasoning (on ' +
+    'indented lines) that ends with a contradiction. After that you are ' +
+    'allowed to write this line (unindented).']
 }, {
   name: 'incorrect_deindent',
-  occurs: '(template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\') \u2227 template(scoper(n-1))!=\'assumption\'',
-  message: ['You are still working withing the scope of \'{{text(scoper(n-1))}}\' and you need to stop doing so (typically be introducing a forall statement) before you can drop the assumption of {{element(\'R\',n)}}. Alternatively you could try changing the order of your \'Given...\' and \'If...\' lines.']
+  occurs: (
+    '(template(n)=\'implies_introduce\' \u2228 ' +
+    'template(n)=\'not_introduce\') \u2227 ' +
+    'template(scoper(n-1))!=\'assumption\''),
+  message: [
+    'You are still working withing the scope of \'{{text(scoper(n-1))}}\' ' +
+    'and you need to stop doing so (typically be introducing a forall ' +
+    'statement) before you can drop the assumption of {{element(\'R\',n)}}. ' +
+    'Alternatively you could try changing the order of your \'Given...\' and ' +
+    '\'If...\' lines.']
 }, {
   name: 'missing_deindent_1',
-  occurs: '(template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\') \u2227 indentation(n)=indentation(n-1) \u2227 indentation(n-1)=1',
-  message: ['Stop indenting at this point, because the truth of this line does not rely on the assumption of {{element(\'R\',n)}}.']
+  occurs: (
+    '(template(n)=\'implies_introduce\' \u2228 ' +
+    'template(n)=\'not_introduce\') \u2227 ' +
+    'indentation(n)=indentation(n-1) \u2227 indentation(n-1)=1'),
+  message: [
+    'Stop indenting at this point, because the truth of this line does not ' +
+    'rely on the assumption of {{element(\'R\',n)}}.']
 }, {
   name: 'missing_deindent_2',
-  occurs: '(template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\') \u2227 indentation(n)=indentation(n-1) \u2227 indentation(n-1)>1',
-  message: ['When writing \'{{text(n)}}\' we reduce the level of indentation by one, to indicate that we are no longer making the assumption that {{element(\'R\',n)}}.']
+  occurs: (
+    '(template(n)=\'implies_introduce\' \u2228 ' +
+    'template(n)=\'not_introduce\') \u2227 ' +
+    'indentation(n)=indentation(n-1) \u2227 indentation(n-1)>1'),
+  message: [
+    'When writing \'{{text(n)}}\' we reduce the level of indentation by ' +
+    'one, to indicate that we are no longer making the assumption that ' +
+    '{{element(\'R\',n)}}.']
 }, {
   name: 'double_deindent_assumption',
-  occurs: '(template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\') \u2227 indentation(n)<indentation(n-1)-1 \u2227 template(scoper(scoper(n-1)))=\'assumption\'',
-  message: ['You should only de-indent once here; we are dropping the assumption of {{result(scoper(n-1))}} but not that of {{result(scoper(scoper(n-1)))}}.']
+  occurs: (
+    '(template(n)=\'implies_introduce\' \u2228 ' +
+    'template(n)=\'not_introduce\') \u2227 ' +
+    'indentation(n)<indentation(n-1)-1 \u2227 ' +
+    'template(scoper(scoper(n-1)))=\'assumption\''),
+  message: [
+    'You should only de-indent once here; we are dropping the assumption ' +
+    'of {{result(scoper(n-1))}} but not that of ' +
+    '{{result(scoper(scoper(n-1)))}}.']
 }, {
   name: 'double_deindent_given',
-  occurs: '(template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\') \u2227 indentation(n)<indentation(n-1)-1 \u2227 template(scoper(scoper(n-1)))=\'given\'',
-  message: ['Only deindent once here; we are dropping the assumption of {{result(scoper(n-1))}} but are still within the scope of \'{{text(scoper(scoper(n-1)))}}\'.']
+  occurs: (
+    '(template(n)=\'implies_introduce\' \u2228 ' +
+    'template(n)=\'not_introduce\') \u2227 ' +
+    'indentation(n)<indentation(n-1)-1 \u2227 ' +
+    'template(scoper(scoper(n-1)))=\'given\''),
+  message: [
+    'Only deindent once here; we are dropping the assumption of ' +
+    '{{result(scoper(n-1))}} but are still within the scope of ' +
+    '\'{{text(scoper(scoper(n-1)))}}\'.']
 }, {
   name: 'illegal_first_line',
   occurs: 'n=1 \u2227 (template(n)=\'for_all_introduce\' \u2228 template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\')',
@@ -473,8 +571,6 @@ var DEFAULT_TARGET_MISTAKE_STRINGS = [{
   message: ['We are trying to prove {{target()}} so it should be given by the final line of the proof.']
 }];
 
-
-
 var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
   LHS: 'variable(n)',
   RHS: 'entry(1, variables(n))',
@@ -497,11 +593,18 @@ var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
   description: 'The most recent line (including n) in whose scope line n is'
 }, {
   LHS: 'is_in_scope(k, n)',
-  RHS: '(~is_scope_creator(k) \u2227 indentation(n)>=indentation(k) \u2227 ~\u2203i<n.(i>k \u2227 indentation(i)<indentation(k))) \u2228 (indentation(n)>indentation(k) \u2227 ~\u2203i<=n.(i>k \u2227 indentation(i)<=indentation(k)))',
-  description: 'Whether the results and variables of line k<=n are accessible to line n'
+  RHS: (
+    '(~is_scope_creator(k) \u2227 indentation(n)>=indentation(k) \u2227 ' +
+    '~\u2203i<n.(i>k \u2227 indentation(i)<indentation(k))) \u2228 ' +
+    '(indentation(n)>indentation(k) \u2227 ~\u2203i<=n.(i>k \u2227 ' +
+    'indentation(i)<=indentation(k)))'),
+  description: (
+    'Whether the results and variables of line k<=n are accessible to line n')
 }, {
   LHS: 'is_initializer(n)',
-  RHS: 'template(n)=\'given\' \u2228 template(n)=\'for_all_eliminate\' \u2228 template(n)=\'exists_eliminate\' \u2228 template(n)=\'take\'',
+  RHS: (
+    'template(n)=\'given\' \u2228 template(n)=\'for_all_eliminate\' \u2228 ' +
+    'template(n)=\'exists_eliminate\' \u2228 template(n)=\'take\''),
   description: 'Whether line n initializes its variables'
 }, {
   LHS: 'initializes(x,n)',
@@ -510,14 +613,18 @@ var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
 }, {
   LHS: 'is_initialized(x, n)',
   RHS: 'x\u2208question_variables() \u2228 \u2203k<n.initializes(x,k)',
-  description: 'Whether variable x is initialized by line n (this does not mean it is legal to use, as it may be out of scope).'
+  description: (
+    'Whether variable x is initialized by line n (this does not mean it ' +
+    'is legal to use, as it may be out of scope).')
 }, {
   LHS: 'initializer(x, n)',
   RHS: 'max{k<n|initializes(x,k)}',
   description: 'The most recent line before n that initializes x'
 }, {
   LHS: 'is_accessible(x, n)',
-  RHS: 'x\u2208question_variables() \u2228 \u2203k<n.(initializes(x,k) \u2227 is_in_scope(k,n))',
+  RHS: (
+    'x\u2208question_variables() \u2228 \u2203k<n.(initializes(x,k) \u2227 ' +
+    'is_in_scope(k,n))'),
   description: 'Whether variable x is initialized and still available by line n'
 }, {
   LHS: 'is_arbitrary(x, n)',
@@ -526,14 +633,18 @@ var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
 }, {
   LHS: 'is_proven(R,n)',
   RHS: 'R\u2208assumptions() \u2228 \u2203k<n.R\u2208results(k)',
-  description: 'Whether there is a line before n that proves R (again, it may still be out of scope and thus unusable).'
+  description: (
+    'Whether there is a line before n that proves R (again, it may still be ' +
+    'out of scope and thus unusable).')
 }, {
   LHS: 'prover(R,n)',
   RHS: 'max{k<n|R\u2208results(k)}',
   description: 'The most recent line before n that proves R.'
 }, {
   LHS: 'is_available(R, n)',
-  RHS: 'R\u2208assumptions()\u2228\u2203k<n.(is_in_scope(k,n)\u2227R\u2208results(k))',
+  RHS: (
+    'R\u2208assumptions()\u2228\u2203k<n.(is_in_scope(k,n)\u2227' +
+    'R\u2208results(k))'),
   description: 'Whether R is available to use by line n'
 }, {
   LHS: 'yields_false(n)',
@@ -545,18 +656,39 @@ var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
   description: 'Whether line n assumes a contradiction has been proved'
 }, {
   LHS: 'yields_implication(R,S,m,n)',
-  RHS: 'm<n \u2227 indentation(n)>0 \u2227 (S\u2208results(n) \u2228 yields_false(n)) \u2227 template(m)=\'assumption\' \u2227 R\u2208results(m) \u2227 indentation(n)=indentation(m)+1 \u2227 ~\u2203i<n. (i>m \u2227 indentation(i)<=indentation(m))',
-  description: 'Whether line n is a proof of S under the assumption of R, made on line m'
+  RHS: (
+    'm<n \u2227 indentation(n)>0 \u2227 (S\u2208results(n) \u2228 ' +
+    'yields_false(n)) \u2227 template(m)=\'assumption\' \u2227 ' +
+    'R\u2208results(m) \u2227 indentation(n)=indentation(m)+1 \u2227 ' +
+    '~\u2203i<n. (i>m \u2227 indentation(i)<=indentation(m))'),
+  description: (
+    'Whether line n is a proof of S under the assumption of R, made on line m')
 }, {
   LHS: 'yields_implies_false(R,m,n)',
-  RHS: 'm<n \u2227 indentation(n)>0 \u2227 (yields_false(n)) \u2227 template(m)=\'assumption\' \u2227 R\u2208results(m) \u2227 indentation(n)=indentation(m)+1 \u2227 ~\u2203i<n. (i>m \u2227 indentation(i)<=indentation(m))',
-  description: 'Whether line n is a proof of contradiction under the assumption of R, made on line m'
+  RHS: (
+    'm<n \u2227 indentation(n)>0 \u2227 (yields_false(n)) \u2227 ' +
+    'template(m)=\'assumption\' \u2227 R\u2208results(m) \u2227 ' +
+    'indentation(n)=indentation(m)+1 \u2227 ~\u2203i<n. (i>m \u2227 ' +
+    'indentation(i)<=indentation(m))'),
+  description: (
+    'Whether line n is a proof of contradiction under the assumption of R, ' +
+    'made on line m')
 }, {
   LHS: 'is_available_implication(A,B,n)',
-  RHS: '\u2203j<n.\u2203i<j.(yields_implication(A,B,i,j) \u2227 (~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 indentation(i)<=indentation(n))',
-  description: 'Whether there is a proof of B under the assumption of A available at line n'
+  RHS: (
+    '\u2203j<n.\u2203i<j.(yields_implication(A,B,i,j) \u2227 ' +
+    '(~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 ' +
+    'indentation(i)<=indentation(n))'),
+  description: (
+    'Whether there is a proof of B under the assumption of A available at ' +
+    'line n')
 }, {
   LHS: 'is_available_implies_false(A,n)',
-  RHS: '\u2203j<n.\u2203i<j.(yields_implies_false(A,i,j) \u2227 (~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 indentation(i)<=indentation(n))',
-  description: 'Whether there is a proof of contradiction under the assumption of A available at line n'
+  RHS: (
+    '\u2203j<n.\u2203i<j.(yields_implies_false(A,i,j) \u2227 ' +
+    '(~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 ' +
+    'indentation(i)<=indentation(n))'),
+  description: (
+    'Whether there is a proof of contradiction under the assumption of A ' +
+    'available at line n')
 }];

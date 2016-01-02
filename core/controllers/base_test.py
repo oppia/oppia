@@ -52,7 +52,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
-        for route in main.urls:
+        for route in main.URLS:
             # This was needed for the Django tests to pass (at the time we had
             # a Django branch of the codebase).
             if isinstance(route, tuple):

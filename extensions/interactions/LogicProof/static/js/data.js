@@ -1,11 +1,26 @@
-var logicProofData = (function() {
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+var logicProofData = (function() {
   var BASE_VOCABULARY = {
     from: ['from'],
     and: ['and'],
     have: ['we have', 'we know', 'have'],
     hence: ['hence', 'so', 'thus', 'thence', 'whence'],
-    whichever: ['and whichever is true', 'and either way', 'and in either case'],
+    whichever: [
+      'and whichever is true', 'and either way', 'and in either case'
+    ],
     arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
@@ -24,12 +39,17 @@ var logicProofData = (function() {
     arbitrarily_many: false
   };
 
-  // NOTE: by default and & or must be binary
-  // NOTE: we are not yet using the display keys from the kinds (we are using symbol keys from the list of operators)
+  // NOTE: By default, 'and' & 'or' must be binary.
+  // NOTE: We are not yet using the display keys from the kinds (we are using
+  // symbol keys from the list of operators).
   var BASE_STUDENT_LANGUAGE = {
     types: {
-      boolean: {quantifiable: false},
-      element: {quantifiable: true}
+      boolean: {
+        quantifiable: false
+      },
+      element: {
+        quantifiable: true
+      }
     },
     kinds: {
       binary_connective: {
@@ -46,7 +66,7 @@ var logicProofData = (function() {
       unary_connective: {
         matchable: false,
         display: [{
-          format: 'name',
+          format: 'name'
         }, {
           format: 'argument_index',
           content: 0
@@ -54,7 +74,7 @@ var logicProofData = (function() {
       },
       quantifier: {
         matchable: false,
-        display:[{
+        display: [{
           format: 'name'
         }, {
           format: 'dummy_index',
@@ -65,7 +85,8 @@ var logicProofData = (function() {
         }, {
           format: 'argument_index',
           conent: 0
-        }]},
+        }]
+      },
       binary_function: {
         matchable: false,
         display: [{
@@ -313,15 +334,25 @@ var logicProofData = (function() {
 
   var BASE_CONTROL_LANGUAGE = {
     types: {
-      'boolean': {quantifiable: false},
-      // used for line numbers & indentation
-      'integer': {quantifiable: true},
-      // used for line.template
-      'string': {quantifiable: false},
-      // used for matchings, target
-      'formula': {quantifiable: true},
-      // used for antecedents, results & assumptions
-      'set_of_formulas': {quantifiable: false}
+      boolean: {
+        quantifiable: false
+      },
+      // Used for line numbers & indentation.
+      integer: {
+        quantifiable: true
+      },
+      // Used for line.template.
+      string: {
+        quantifiable: false
+      },
+      // Used for matchings, target.
+      formula: {
+        quantifiable: true
+      },
+      // Used for antecedents, results & assumptions.
+      set_of_formulas: {
+        quantifiable: false
+      }
     },
 
     kinds: {
@@ -331,9 +362,10 @@ var logicProofData = (function() {
       bounded_quantifier: {},
       binary_relation: {},
       binary_function: {},
-      // NOTE: new prefix_functions will be explicitely added by making definitions, and from
-      // these definitions their types will be known. Thus it is not necessary for their kinds to have typing
-      // rules (and such typing rules would in any case have to be inconveniently long).
+      // NOTE: new prefix_functions will be explicitely added by making
+      // definitions, and from these definitions their types will be known.
+      // Thus it is not necessary for their kinds to have typing rules (and
+      // such typing rules would in any case have to be inconveniently long).
       prefix_function: {},
       ranged_function: {},
       constant: {
@@ -342,7 +374,7 @@ var logicProofData = (function() {
           arguments: [],
           dummies: [],
           output: 'integer'
-        },{
+        }, {
           arguments: [],
           dummies: [],
           output: 'string'
@@ -354,19 +386,19 @@ var logicProofData = (function() {
           arguments: [],
           dummies: [],
           output: 'integer'
-        },{
+        }, {
           arguments: [],
           dummies: [],
           output: 'string'
-        },{
+        }, {
           arguments: [],
           dummies: [],
-          output: 'formula',
-        },{
+          output: 'formula'
+        }, {
           arguments: [],
           dummies: [],
           output: 'set_of_formulas'
-        },{
+        }, {
           arguments: [],
           dummies: [],
           output: 'boolean'
@@ -542,7 +574,8 @@ var logicProofData = (function() {
       bounded_for_all: {
         kind: 'bounded_quantifier',
         typing: [{
-          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN], // first argument is the bounding
+          // The first argument is the bounding.
+          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN],
           dummies: [SINGLE_INTEGER],
           output: 'boolean'
         }, {
@@ -559,13 +592,14 @@ var logicProofData = (function() {
           dummies: [SINGLE_INTEGER],
           output: 'boolean'
         }, {
-          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN], // first argument is the bounding
+          // The first argument is the bounding.
+          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN],
           dummies: [SINGLE_FORMULA],
           output: 'boolean'
         }],
         symbols: ['\u2203', '.']
       },
-      // has form min{n<m|A(n)}, A(n) is the argument and n the dummy, or
+      // This has form min{n<m|A(n)}, A(n) is the argument and n the dummy, or
       // alteratively min{p∈antecedents(n)|B(p)} which will return the first
       // element of set_of_formulas antecedents(n) satisfying B.
       min: {
@@ -689,16 +723,17 @@ var logicProofData = (function() {
           arguments: [SINGLE_BOOLEAN, SINGLE_INTEGER, SINGLE_INTEGER],
           dummies: [],
           output: 'integer'
-        },{
+        }, {
           arguments: [SINGLE_BOOLEAN, SINGLE_STRING, SINGLE_STRING],
           dummies: [],
           output: 'string'
-        },{
+        }, {
           arguments: [SINGLE_BOOLEAN, SINGLE_FORMULA, SINGLE_FORMULA],
           dummies: [],
           output: 'formula'
-        },{
-          arguments: [SINGLE_BOOLEAN, SINGLE_SET_OF_FORMULAS, SINGLE_SET_OF_FORMULAS],
+        }, {
+          arguments: [
+            SINGLE_BOOLEAN, SINGLE_SET_OF_FORMULAS, SINGLE_SET_OF_FORMULAS],
           dummies: [],
           output: 'set_of_formulas'
         }]
@@ -723,23 +758,27 @@ var logicProofData = (function() {
   };
 
   var BASE_GENERAL_MESSAGES = {
-    'odd_number_spaces': {
+    odd_number_spaces: {
       templates: [[{
         isFixed: true,
-        content: 'An indentation is indicated by a double space at the start of the line, but this line starts with an odd number of spaces.'
+        content: (
+          'An indentation is indicated by a double space at the start of ' +
+          'the line, but this line starts with an odd number of spaces.')
       }]],
       parameters: {},
       category: 'parsing'
     },
-    'unmatched_line': {
+    unmatched_line: {
       templates: [[{
         isFixed: true,
-        content: 'This line could not be identified as valid - please check the list of possible lines.'
+        content: (
+          'This line could not be identified as valid - please check the ' +
+          'list of possible lines.')
       }]],
       parameters: {},
       category: 'parsing'
     },
-    'wrong_kind_in_line': {
+    wrong_kind_in_line: {
       templates: [[{
         isFixed: true,
         content: 'In a line of this form, your '
@@ -757,15 +796,19 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'expression': {format: 'expression'},
-        'expected_kind': {format: 'string'}
+        expression: {
+          format: 'expression'
+        },
+        expected_kind: {
+          format: 'string'
+        }
       },
       category: 'typing'
     },
-    'unspecified_mistake': {
+    unspecified_mistake: {
       templates: [[{
         isFixed: true,
-        content: 'This line contains a mistake in its ',
+        content: 'This line contains a mistake in its '
       }, {
         isFixed: false,
         content: 'section'
@@ -780,12 +823,16 @@ var logicProofData = (function() {
         content: ').'
       }]],
       parameters: {
-        'section': {format: 'string'},
-        'entry': {format: 'string'}
+        section: {
+          format: 'string'
+        },
+        entry: {
+          format: 'string'
+        }
       },
       category: 'mistake'
     },
-    'illegal_symbol': {
+    illegal_symbol: {
       templates: [[{
         isFixed: true,
         content: 'The symbol '
@@ -797,11 +844,13 @@ var logicProofData = (function() {
         content: ' was not recognised.'
       }]],
       parameters: {
-        'symbol': {format: 'string'}
+        symbol: {
+          format: 'string'
+        }
       },
       category: 'parsing'
     },
-    'blank_line': {
+    blank_line: {
       templates: [[{
         isFixed: true,
         content: 'This line is blank.'
@@ -809,7 +858,7 @@ var logicProofData = (function() {
       parameters: {},
       category: 'parsing'
     },
-    'unidentified_word': {
+    unidentified_word: {
       templates: [[{
         isFixed: true,
         content: 'We could not identify \''
@@ -818,14 +867,18 @@ var logicProofData = (function() {
         content: 'word'
       }, {
         isFixed: true,
-        content: '\'; please make sure you are using vocabulary from the given list, and don\'t have two consecutive expressions.'
+        content: (
+          '\'; please make sure you are using vocabulary from the ' +
+          'given list, and don\'t have two consecutive expressions.')
       }]],
       parameters: {
-        'word': {format: 'string'}
+        word: {
+          format: 'string'
+        }
       },
       category: 'parsing'
     },
-    'unidentified_words': {
+    unidentified_words: {
       templates: [[{
         isFixed: true,
         content: 'We could not identify either of \''
@@ -840,15 +893,21 @@ var logicProofData = (function() {
         content: 'word2'
       }, {
         isFixed: true,
-        content: '\' as words; please make sure you are using vocabulary from the given list, and don\'t have two consecutive expressions.'
+        content: (
+          '\' as words; please make sure you are using vocabulary from the ' +
+          'given list, and don\'t have two consecutive expressions.')
       }]],
       parameters: {
-        'word1': {format: 'string'},
-        'word2': {format: 'string'}
+        word1: {
+          format: 'string'
+        },
+        word2: {
+          format: 'string'
+        }
       },
       category: 'parsing'
     },
-    'consecutive_expressions': {
+    consecutive_expressions: {
       templates: [[{
         isFixed: true,
         content: 'This line has two expressions in a row ('
@@ -866,12 +925,16 @@ var logicProofData = (function() {
         content: ') which is not allowed.'
       }]],
       parameters: {
-        'word1': {format: 'string'},
-        'word2': {format: 'string'}
+        word1: {
+          format: 'string'
+        },
+        word2: {
+          format: 'string'
+        }
       },
       category: 'parsing'
     },
-    'unidentified_phrase_starting_at': {
+    unidentified_phrase_starting_at: {
       templates: [[{
         isFixed: true,
         content: 'The phrase starting \''
@@ -880,14 +943,18 @@ var logicProofData = (function() {
         content: 'word'
       }, {
         isFixed: true,
-        content: '\' could not be identified; please make sure you are only using phrases from the given list of vocabulary.'
+        content: (
+          '\' could not be identified; please make sure you are only ' +
+          'using phrases from the given list of vocabulary.')
       }]],
       parameters: {
-        'word': {format: 'string'}
+        word: {
+          format: 'string'
+        }
       },
       category: 'formattting'
     },
-    'forbidden_word': {
+    forbidden_word: {
       templates: [[{
         isFixed: true,
         content: 'The name \''
@@ -899,11 +966,13 @@ var logicProofData = (function() {
         content: '\' is reserved for vocabulary and so cannot be used here.'
       }]],
       parameters: {
-        'word': {format: 'string'}
+        word: {
+          format: 'string'
+        }
       },
       category: 'parsing'
     },
-    'not_enough_inputs': {
+    not_enough_inputs: {
       templates: [[{
         isFixed: false,
         content: 'operator'
@@ -924,13 +993,19 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'num_needed': {format: 'string'},
-        'input_category': {format: 'string'},
-        'operator': {format: 'string'}
+        num_needed: {
+          format: 'string'
+        },
+        input_category: {
+          format: 'string'
+        },
+        operator: {
+          format: 'string'
+        }
       },
       category: 'typing'
     },
-    'wrong_num_inputs': {
+    wrong_num_inputs: {
       templates: [[{
         isFixed: false,
         content: 'operator'
@@ -951,19 +1026,25 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'num_needed': {format: 'string'},
-        'input_category': {format: 'string'},
-        'operator': {format: 'string'}
+        num_needed: {
+          format: 'string'
+        },
+        input_category: {
+          format: 'string'
+        },
+        operator: {
+          format: 'string'
+        }
       },
       category: 'typing'
     },
-    'wrong_kind': {
+    wrong_kind: {
       templates: [[{
         isFixed: false,
         content: 'operator'
       }, {
         isFixed: true,
-        content: ' is supposed to be a ',
+        content: ' is supposed to be a '
       }, {
         isFixed: false,
         content: 'expected_kind'
@@ -972,19 +1053,25 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'operator': {format: 'string'},
-        'expected_kind': {format: 'string'},
-        'actual_kind': {format: 'string'}
+        operator: {
+          format: 'string'
+        },
+        expected_kind: {
+          format: 'string'
+        },
+        actual_kind: {
+          format: 'string'
+        }
       },
       category: 'typing'
     },
-    'wrong_type': {
+    wrong_type: {
       templates: [[{
         isFixed: false,
         content: 'operator'
       }, {
         isFixed: true,
-        content: ' yields a ',
+        content: ' yields a '
       }, {
         isFixed: false,
         content: 'actual_type'
@@ -999,13 +1086,19 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'operator': {format: 'string'},
-        'expected_type': {format: 'string'},
-        'actual_type': {format: 'string'}
+        operator: {
+          format: 'string'
+        },
+        expected_type: {
+          format: 'string'
+        },
+        actual_type: {
+          format: 'string'
+        }
       },
       category: 'typing'
     },
-    'duplicate_dummy_name': {
+    duplicate_dummy_name: {
       templates: [[{
         isFixed: true,
         content: 'The name \''
@@ -1023,12 +1116,16 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'dummy': {format: 'expression'},
-        'expression': {format: 'expression'}
+        dummy: {
+          format: 'expression'
+        },
+        expression: {
+          format: 'expression'
+        }
       },
       category: 'typing'
     },
-    'dummy_not_variable': {
+    dummy_not_variable: {
       templates: [[{
         isFixed: true,
         content: 'You can only quantify over variables, not  '
@@ -1040,12 +1137,16 @@ var logicProofData = (function() {
         content: '.'
       }]],
       parameters: {
-        'dummy': {format: 'expression'},
-        'expression': {format: 'expression'}
+        dummy: {
+          format: 'expression'
+        },
+        expression: {
+          format: 'expression'
+        }
       },
       category: 'typing'
     },
-    'unknown_operator': {
+    unknown_operator: {
       templates: [[{
         isFixed: true,
         content: 'The operator '
@@ -1057,22 +1158,27 @@ var logicProofData = (function() {
         content: ' could not be identified.'
       }]],
       parameters: {
-        'operator': {format: 'string'}
+        operator: {
+          format: 'string'
+        }
       },
       category: 'typing'
     },
-    'too_many_parsings': {
+    too_many_parsings: {
       templates: [[{
         isFixed: true,
-        content: 'This can be parsed in too many different ways - try using fewer words, especially single-character words.'
+        content: (
+          'This can be parsed in too many different ways - try using fewer ' +
+          'words, especially single-character words.')
       }]],
       parameters: {},
       category: 'parsing'
     },
-    'too_many_typings': {
+    too_many_typings: {
       templates: [[{
         isFixed: true,
-        content: 'This has too many possible typings - try using fewer variables.'
+        content: (
+          'This has too many possible typings - try using fewer variables.')
       }]],
       parameters: {}
     },

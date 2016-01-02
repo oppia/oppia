@@ -16,8 +16,6 @@
 
 """Tests for long running jobs and continuous computations."""
 
-__author__ = 'Sean Lip'
-
 import ast
 
 from core import jobs

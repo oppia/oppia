@@ -27,12 +27,12 @@ var customizeInteraction = function(elem, placeholderText, heightOfBox) {
   ).setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = function(
-    elem, placeholderText, heightOfBox) {
+var expectInteractionDetailsToMatch = function(elem) {
+  // TODO (Jacob) add checks for the placeholder text and the height of the
+  // textbox.
   expect(
     elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);
-  // TODO (Jacob) add checks for the placeholder text and box height
 };
 
 var submitAnswer = function(elem, answer) {

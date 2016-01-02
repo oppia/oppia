@@ -16,8 +16,6 @@
 
 """Tests for the base interaction specification."""
 
-__author__ = 'Sean Lip'
-
 import os
 import re
 import string
@@ -40,6 +38,12 @@ IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
 # Expected dimensions for an interaction thumbnail PNG image.
 INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
+TEXT_INPUT_ID = 'TextInput'
+
+_INTERACTION_CONFIG_SCHEMA = [
+    ('name', basestring), ('display_mode', basestring),
+    ('description', basestring), ('_customization_arg_specs', list),
+    ('is_terminal', bool), ('needs_summary', bool)]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -68,9 +72,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
-    def _is_alphanumeric_string(self, string):
+    def _is_alphanumeric_string(self, input_string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
+        return bool(re.compile("^[a-zA-Z0-9_]+$").match(input_string))
 
     def _validate_customization_arg_specs(self, customization_args):
         for ca_spec in customization_args:
@@ -102,18 +106,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
-    def _listdir_omit_ignored(self, dir):
-        """List all files and directories within 'dir', omitting the ones whose
-        name ends in one of the IGNORED_FILE_SUFFIXES."""
-        names = os.listdir(dir)
+    def _listdir_omit_ignored(self, directory):
+        """List all files and directories within 'directory', omitting the ones
+        whose name ends in one of the IGNORED_FILE_SUFFIXES.
+        """
+        names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
             names = [name for name in names if not name.endswith(suffix)]
         return names
 
     def test_interaction_properties(self):
         """Test the standard properties of interactions."""
-
-        TEXT_INPUT_ID = 'TextInput'
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
             TEXT_INPUT_ID)
@@ -149,11 +152,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""
-
-        _INTERACTION_CONFIG_SCHEMA = [
-            ('name', basestring), ('display_mode', basestring),
-            ('description', basestring), ('_customization_arg_specs', list),
-            ('is_terminal', bool), ('needs_summary', bool)]
 
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -229,9 +227,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(png_file))
             with open(png_file, 'rb') as f:
                 img_data = f.read()
-                w, h = struct.unpack('>LL', img_data[16:24])
-                self.assertEqual(int(w), INTERACTION_THUMBNAIL_WIDTH_PX)
-                self.assertEqual(int(h), INTERACTION_THUMBNAIL_HEIGHT_PX)
+                width, height = struct.unpack('>LL', img_data[16:24])
+                self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
+                self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
@@ -241,13 +239,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
             self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
+            directive_prefix = '<script type="text/ng-template"'
             self.assertIn(
-                '<script type="text/ng-template" id="interaction/%s"' %
-                    interaction_id,
+                '%s id="interaction/%s"' % (directive_prefix, interaction_id),
                 html_file_content)
             self.assertIn(
-                '<script type="text/ng-template" id="response/%s"' %
-                    interaction_id,
+                '%s id="response/%s"' % (directive_prefix, interaction_id),
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
@@ -283,7 +280,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     interaction.answer_type)
 
             self._validate_customization_arg_specs(
-                interaction._customization_arg_specs)
+                interaction._customization_arg_specs)  # pylint: disable=protected-access
 
             self._validate_dependencies(interaction.dependency_ids)
 

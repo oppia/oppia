@@ -16,8 +16,6 @@
 
 """Tests for classification of NonnegativeInts."""
 
-__author__ = 'Sean Lip'
-
 from core.tests import test_utils
 from extensions.rules import nonnegative_int
 

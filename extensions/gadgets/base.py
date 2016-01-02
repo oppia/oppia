@@ -16,8 +16,6 @@
 
 """Base class for defining gadgets."""
 
-__author__ = 'Michael Anuzis'
-
 import copy
 import os
 

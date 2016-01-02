@@ -16,12 +16,12 @@
 
 """Classes corresponding to skins for the learner view."""
 
-__author__ = 'Sean Lip'
+import jinja2
 
 import feconf
 import jinja_utils
 import utils
-import jinja2
+
 
 DEFAULT_ENTRY_POINT_PATH = 'player.html'
 

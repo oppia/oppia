@@ -16,9 +16,6 @@
 
 """Rules for MusicPhrase objects."""
 
-__author__ = 'Michael Wagner'
-
-from core.domain import rule_domain
 from extensions.rules import base
 
 
