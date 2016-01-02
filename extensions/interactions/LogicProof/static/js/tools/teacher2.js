@@ -128,32 +128,34 @@ var logicProofTeacher2 = (function() {
     }
   };
 
- /**
-  * @param nameString: The name of the template, provided by the teacher
-  *        Multiple templates can have the same name. These names are then
-  *        available to refer to in the MistakeTable.
-  * @param readerViewString: A string from the teacher that describes what lines
-  *        of this form should look like when the student writes them.
-  * @param antecedentsString: A string from the teacher describing the
-  *        antecedents a line of this form should have. These can then be
-  *        referred to in the MistakeTable to check, for example, that every
-  *        antecedent needed was proved on an earlier line.
-  * @param resultsString: Similar
-  * @param variablesString: Similar
-  * @param errorStrings: If this LineTemplate is an instance of an incorrect
-  *        deduction then the teacher supplies a list of possible critiques to
-  *        show to the student. They are supplied as strings which here will
-  *        be converted into LineMessages.
-  * @param language: A Language object, giving the student's language.
-  * @param vocabulary: A Vocabulary object giving the phrases that can be used
-  *        within lines (so here within the readerViewString)
-  * @result A LineTemplate object.
-  * @raises If the strings cannot be parsed, or the expressions in them are
-  *         incorrectly typed, or they contain words reserved for use in
-  *         phrases, or there is a an expression (generally in the results,
-  *         antecendents or variables) that it will not be possible to deduce
-  *         from what the student is required to write.
-  */
+  /**
+   * @param {string} nameString - The name of the template, provided by the
+   *        teacher.Multiple templates can have the same name. These names are
+   *        then available to refer to in the MistakeTable.
+   * @param {string} readerViewString - A string from the teacher that describes
+   *        what lines of this form should look like when the student writes
+   *        them.
+   * @param {string} antecedentsString - A string from the teacher describing
+   *        the antecedents a line of this form should have. These can then be
+   *        referred to in the MistakeTable to check, for example, that every
+   *        antecedent needed was proved on an earlier line.
+   * @param {string} resultsString - Similar
+   * @param {string} variablesString - Similar
+   * @param {Array.<String>} errorStrings - If this LineTemplate is an instance
+   *        of an incorrect deduction then the teacher supplies a list of
+   *        possible critiques to show to the student. They are supplied as
+   *        strings which here will be converted into LineMessages.
+   * @param {Language} language - A Language object, giving the student's
+   *        language.
+   * @param {Vocabulary} vocabulary - A Vocabulary object giving the phrases
+   *        that can be used within lines (so here within the readerViewString)
+   * @return {LineTemplate}
+   * @throws If the strings cannot be parsed, or the expressions in them are
+   *         incorrectly typed, or they contain words reserved for use in
+   *         phrases, or there is a an expression (generally in the results,
+   *         antecendents or variables) that it will not be possible to deduce
+   *         from what the student is required to write.
+   */
   var buildLineTemplate = function(nameString, readerViewString,
       antecedentsString, resultsString, variablesString, errorStrings,
       language, vocabulary) {
@@ -179,7 +181,7 @@ var logicProofTeacher2 = (function() {
     } catch (err) {
       throw new logicProofShared.UserError('unparseable', {
         field: 'results'
-      })
+      });
     }
     try {
       var variables = logicProofParser.parse(
@@ -187,7 +189,7 @@ var logicProofTeacher2 = (function() {
     } catch (err) {
       throw new logicProofShared.UserError('unparseable', {
         field: 'variables'
-      })
+      });
     }
     var errors = [];
     for (var i = 0; i < errorStrings.length; i++) {
@@ -296,22 +298,21 @@ var logicProofTeacher2 = (function() {
     };
   };
 
- /**
-  * @param stringTable: an array of dictionaries of the form {
-  *          name: a string from the teacher giving the name
-  *          reader_view: likewise
-  *          antecedents: likewise
-  *          results: likewise
-  *          variables: likewise
-  *          error: an array of strings
-  *        }
-  * @param language: a Language object
-  * @param vocabulary: a Vocabulary object
-  * @param errorDictionary: used to render errors if they occur
-  * @result An array of LineTemplates
-  * @raises If any line makes an error in buildLineTemplate() then we throw an
-  *         array of the error messages for each line (blank if a line is fine).
-  */
+  /**
+   * @param {Array} stringTable - an array of dictionaries of the form {
+   *          name: a string from the teacher giving the name
+   *          reader_view: likewise
+   *          antecedents: likewise
+   *          results: likewise
+   *          variables: likewise
+   *          error: an array of strings
+   *        }
+   * @param {Vocabulary} vocabulary - a Vocabulary object
+   * @return {Array.<LineTemplate>} An array of LineTemplates
+   * @throws If any line makes an error in buildLineTemplate() then we throw an
+   *         array of the error messages for each line (blank if a line is
+   *         fine).
+   */
   var buildLineTemplateTable = function(stringTable, vocabulary) {
     var table = [];
     var failed = false;
@@ -345,19 +346,22 @@ var logicProofTeacher2 = (function() {
     for (var i = 0; i < table.length; i++) {
       output.push(
         displayLineTemplate(
-          table[i], logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary));
+          table[i],
+          logicProofData.BASE_STUDENT_LANGUAGE.operators,
+          vocabulary));
     }
     return output;
   };
 
-
   // MISTAKE TABLE
 
   /**
-   * @param mistakeEntry: a MistakeEntry object (but with Expressions in place
-   *        of TypedExpressions) which we are to check and assign types to.
-   * @param language: a Language object giving the control language
-   * @returns a proper MistakeEntry object, with TypedExpressions.
+   * @param {MistakeEntry variation} mistakeEntry - a MistakeEntry object (but
+   *        with Expressions in place of TypedExpressions) which we are to
+   *        check and assign types to.
+   * @param {Language} language - a Language object giving the control language.
+   * @return {MistakeEntry} a proper MistakeEntry object, with
+   *         TypedExpressions.
    * @throws if the mistake entry contains incorrect typings.
    */
   var validateAndTypeMistakeEntry = function(mistakeEntry, language) {
@@ -405,17 +409,18 @@ var logicProofTeacher2 = (function() {
   };
 
   /**
-   * @param nameString: A string provided by the teacher giving the name of the
-   *        entry; this is not used for anything but is convenient for the
-   *        teacher when writing the table.
-   * @param occursString: A string from the teacher that represents an
-   *        expression in the control language determining whether the mistake
-   *        has been made by the student.
-   * @param messageString: An array of string written by the teacher, each of
-   *        which represents a possible message to give the student if they
-   *        make the mistake in question.
-   * @param controlLanguage: A Language object giving the control language (that
-   *        which is used to write formulas describing when mistakes occur).
+   * @param {string} nameString - A string provided by the teacher giving the
+   *        name of the entry; this is not used for anything but is convenient
+   *        for the teacher when writing the table.
+   * @param {string} occursString - A string from the teacher that represents
+   *        an expression in the control language determining whether the
+   *        mistake has been made by the student.
+   * @param {Array.<string>} messageStrings - An array of string written by the
+   *        teacher, each of which represents a possible message to give the
+   *        student if they make the mistake in question.
+   * @param {Language} controlLanguage - A Language object giving the control
+   *        language (that which is used to write formulas describing when
+   *        mistakes occur).
    * @returns {MistakeEntry}
    * @throws If the inputs are unparseable or badly typed.
    */
@@ -472,15 +477,16 @@ var logicProofTeacher2 = (function() {
   };
 
   /**
-   * @param name: the name of the section (e.g. layout, target)
-   * @param entryStrings: an array of dictionaries of the form: {
+   * @param {string} name - the name of the section (e.g. layout, target)
+   * @param {Array.<object>} entryStrings - an array of dictionaries of the
+   *        form: {
    *          name: name string,
    *          occurs: occurs string,
    *          message: an array of message strings
    *        }
-   * @param errorDictionary: used to render errors if they occur
-   * @returns {MistakeSection}
-   * @raises an array of error messages, one per entry.
+   * @param {Array} controlFunctions
+   * @return {MistakeSection}
+   * @throws an array of error messages, one per entry.
    */
   var buildMistakeSection = function(name, entryStrings, controlFunctions) {
     var controlLanguage = angular.copy(logicProofData.BASE_CONTROL_LANGUAGE);
@@ -543,13 +549,13 @@ var logicProofTeacher2 = (function() {
   // CONTROL FUNCTIONS
 
   /**
-   * @param formulaLHS: an Expression representing the left-hand-side of the
-   *        definition of a formula - e.g. f(n,m).
-   * @param formulaRHS: an Expression representing the right-hand-side of such a
-   *        definition - e.g. n + g(m).
-   * @param language: a Language object representing the control language (the
-   *        one used to describe when a student has made a mistake) including
-   *        all of the previously-defined control functions.
+   * @param {Expression} formulaLHS - an Expression representing the
+   *        left-hand-side of the definition of a formula - e.g. f(n,m).
+   * @param {Expression} formulaRHS - an Expression representing the
+   *        right-hand-side of such a definition - e.g. n + g(m).
+   * @param {Language} language - a Language object representing the control
+   *        language (the one used to describe when a student has made a
+   *        mistake) including all of the previously-defined control functions.
    * @returns {Object} with the following keys:
    *   - typing: a length-1 array of the TypingRule that the function being
    *       defined has been deduced to have.
@@ -650,15 +656,16 @@ var logicProofTeacher2 = (function() {
   };
 
   /**
-   * @param LHSstring: a string from the teacher representing the left-hand-side
-   *        of the function definition.
-   * @param RHSstring: likewise for the right-hand-side.
-   * @param descriptionString: a description of what the function is supposed to
-   *        mean; this is not used by the code but is convenient for the user.
-   * @param a Language object representing the language used to write
-   *        descriptions of mistakes, and also functions such as these that help
-   *        to describe mistakes.
-   * @return a dictionary {
+   * @param {string} LHSstring - a string from the teacher representing the
+   *        left-hand-side of the function definition.
+   * @param {string} RHSstring - likewise for the right-hand-side.
+   * @param {string} descriptionString - a description of what the function is
+   *        supposed to mean; this is not used by the code but is convenient
+   *        for the user.
+   * @param {Language} controlLanguage - a Language object representing the
+   *        language used to write descriptions of mistakes, and also functions
+   *        such as these that help to describe mistakes.
+   * @return {object} a dictionary {
    *            name: the name of the function, deduced from the LHSstring
    *            variables: the free variables in the function definition,
    *              deduced from the LHSstring.
@@ -667,7 +674,7 @@ var logicProofTeacher2 = (function() {
    *              with types added
    *            description: the descriptionString
    *          }
-   * @raises If the input cannot be parsed, or is incorrect as in
+   * @throws If the input cannot be parsed, or is incorrect as in
    *         validateAndTypeControlFunction().
    */
   var buildControlFunction = function(
@@ -700,8 +707,9 @@ var logicProofTeacher2 = (function() {
   };
 
   /**
-   * @param controlFunction: a dictionary such as buildControlFunction() returns
-   * @param operators: the operators key from the control language
+   * @param {object} controlFunction - a dictionary such as
+   *        buildControlFunction() returns
+   * @param {object} operators - the operators key from the control language
    * @return {
    *   LHS: the left-hand side of the formula
    *   RHS: the right-hand side
@@ -727,13 +735,15 @@ var logicProofTeacher2 = (function() {
    * We got through the list of control functions in turn, validating them and
    * adding them to to the list of operators and model; if one fails validation
    * we abort.
-   * @paran controlFunctionStrings: an array of dictionaries of the form {
+   * @param {Array.<object>} controlFunctionStrings - an array of dictionaries
+   *        of the form {
    *          LHS: string representing the function LHS,
    *          RHS: string representing the function RHS,
    *          description: string describing the function
    *        }
-   * @return an array of dictionaries of the kind buildControlFunction returns
-   * @raises the first Error found in the table, with an additonal key 'line'
+   * @return {Array.<object>} an array of dictionaries of the kind
+   *         buildControlFunction returns
+   * @throws the first Error found in the table, with an additonal key 'line'
    *         that gives the number of the line in the table where this error
    *         occurred.
    */

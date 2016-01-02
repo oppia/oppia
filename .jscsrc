@@ -77,8 +77,7 @@
         "checkReturnTypes": true,
         "checkRedundantReturns": true,
         "requireReturnTypes": true,
-        "checkRedundantAccess": true,
-        "requireDescriptionCompleteSentence": true
+        "checkRedundantAccess": true
     },
     "maximumLineLength": 80,
     "requireAnonymousFunctions": true,

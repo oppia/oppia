@@ -38,9 +38,9 @@ var logicProofStudent = (function() {
     evaluation_rules: {
       and: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          for (var i = 0; i < arguments.length; i++) {
-            if (!arguments[i]) {
+        evaluateExpression: function(args) {
+          for (var i = 0; i < args.length; i++) {
+            if (!args[i]) {
               return false;
             }
           }
@@ -49,9 +49,9 @@ var logicProofStudent = (function() {
       },
       or: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          for (var i = 0; i < arguments.length; i++) {
-            if (arguments[i]) {
+        evaluateExpression: function(args) {
+          for (var i = 0; i < args.length; i++) {
+            if (args[i]) {
               return true;
             }
           }
@@ -60,107 +60,105 @@ var logicProofStudent = (function() {
       },
       not: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return !arguments[0];
+        evaluateExpression: function(args) {
+          return !args[0];
         }
       },
       implies: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return !arguments[0] || arguments[1];
+        evaluateExpression: function(args) {
+          return !args[0] || args[1];
         }
       },
       iff: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return (
-            (arguments[0] && arguments[1]) ||
-            (!arguments[0] && !arguments[1]));
+        evaluateExpression: function(args) {
+          return (args[0] && args[1]) || (!args[0] && !args[1]);
         }
       },
       equals: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types) {
           return (types[0] === 'formula') ?
             logicProofShared.checkExpressionsAreEqual(
-              arguments[0], arguments[1]) :
-            (arguments[0].type === 'set_of_formulas') ?
+              args[0], args[1]) :
+            (args[0].type === 'set_of_formulas') ?
               logicProofShared.checkSetsOfExpressionsAreEqual(
-                arguments[0], arguments[1]) :
-              (arguments[0] === arguments[1]);
+                args[0], args[1]) :
+              (args[0] === args[1]);
         }
       },
       not_equals: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types) {
           return (types[0] === 'formula') ?
             !logicProofShared.checkExpressionsAreEqual(
-              arguments[0], arguments[1]) :
-            (arguments[0].type === 'set_of_formulas') ?
+              args[0], args[1]) :
+            (args[0].type === 'set_of_formulas') ?
               !logicProofShared.checkSetsOfExpressionsAreEqual(
-                arguments[0], arguments[1]) :
-              (arguments[0] !== arguments[1]);
+                args[0], args[1]) :
+              (args[0] !== args[1]);
         }
       },
       less_than: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return (arguments[0] < arguments[1]);
+        evaluateExpression: function(args) {
+          return (args[0] < args[1]);
         }
       },
       less_than_or_equals: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return (arguments[0] <= arguments[1]);
+        evaluateExpression: function(args) {
+          return (args[0] <= args[1]);
         }
       },
       greater_than: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return (arguments[0] > arguments[1]);
+        evaluateExpression: function(args) {
+          return (args[0] > args[1]);
         }
       },
       greater_than_or_equals: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return (arguments[0] >= arguments[1]);
+        evaluateExpression: function(args) {
+          return (args[0] >= args[1]);
         }
       },
       is_in: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args) {
           return logicProofShared.checkExpressionIsInSet(
-            arguments[0], arguments[1]);
+            args[0], args[1]);
         }
       },
       addition: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return arguments[0] + arguments[1];
+        evaluateExpression: function(args) {
+          return args[0] + args[1];
         }
       },
       subtraction: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return arguments[0] - arguments[1];
+        evaluateExpression: function(args) {
+          return args[0] - args[1];
         }
       },
       multiplication: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return arguments[0] * arguments[1];
+        evaluateExpression: function(args) {
+          return args[0] * args[1];
         }
       },
       division: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return arguments[0] / arguments[1];
+        evaluateExpression: function(args) {
+          return args[0] / args[1];
         }
       },
       exponentiation: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return arguments[0] ^ arguments[1];
+        evaluateExpression: function(args) {
+          return args[0] ^ args[1];
         }
       },
       bounded_for_all: {
@@ -333,8 +331,8 @@ var logicProofStudent = (function() {
       // from 1.
       indentation: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+        evaluateExpression: function(args, types, evaluationParameters) {
+          var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -343,8 +341,8 @@ var logicProofStudent = (function() {
       },
       template: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+        evaluateExpression: function(args, types, evaluationParameters) {
+          var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -354,8 +352,8 @@ var logicProofStudent = (function() {
       antecedents: {
         // NOTE: assumes antecedents are given as formulas, not integers
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+        evaluateExpression: function(args, types, evaluationParameters) {
+          var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -368,8 +366,8 @@ var logicProofStudent = (function() {
       },
       results: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+        evaluateExpression: function(args, types, evaluationParameters) {
+          var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -378,8 +376,8 @@ var logicProofStudent = (function() {
       },
       variables: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+        evaluateExpression: function(args, types, evaluationParameters) {
+          var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -388,8 +386,8 @@ var logicProofStudent = (function() {
       },
       text: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+        evaluateExpression: function(args, types, evaluationParameters) {
+          var line = evaluationParameters.proof.lines[args[0] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -398,11 +396,11 @@ var logicProofStudent = (function() {
       },
       element: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types, evaluationParameters) {
           // The name of the element is provided as a string such as \'R\', so
           // we must strip the quotes.
-          var element = arguments[0].substr(1, arguments[0].length - 2);
-          var line = evaluationParameters.proof.lines[arguments[1] - 1];
+          var element = args[0].substr(1, args[0].length - 2);
+          var line = evaluationParameters.proof.lines[args[1] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -415,25 +413,25 @@ var logicProofStudent = (function() {
       },
       num_lines: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types, evaluationParameters) {
           return evaluationParameters.proof.lines.length;
         }
       },
       assumptions: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types, evaluationParameters) {
           return evaluationParameters.assumptions;
         }
       },
       target: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types, evaluationParameters) {
           return evaluationParameters.target;
         }
       },
       question_variables: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args, types, evaluationParameters) {
           var names = logicProofShared.getOperatorsFromExpressionArray(
             evaluationParameters.assumptions.concat(
               [evaluationParameters.target]), ['variable']);
@@ -444,7 +442,7 @@ var logicProofStudent = (function() {
             result.push({
               top_kind_name: 'variable',
               top_operator_name: names[i],
-              arguments: [],
+              args: [],
               dummies: []
             });
           }
@@ -453,8 +451,8 @@ var logicProofStudent = (function() {
       },
       entry: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          var result = arguments[1][arguments[0] - 1];
+        evaluateExpression: function(args) {
+          var result = args[1][args[0] - 1];
           if (result === undefined) {
             throw new Error('evaluation failed');
           }
@@ -465,16 +463,16 @@ var logicProofStudent = (function() {
       'if': {
         // jscs:enable disallowQuotedKeysInObjects
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
-          return arguments[0] ? arguments[1] : arguments[2];
+        evaluateExpression: function(args) {
+          return args[0] ? args[1] : args[2];
         }
       },
       substitute: {
         format: 'bottom_up',
-        evaluateExpression: function(arguments, types, evaluationParameters) {
+        evaluateExpression: function(args) {
           var substitutions = {};
-          substitutions[arguments[1].top_operator_name] = arguments[2];
-          return substituteIntoExpression(arguments[0], substitutions);
+          substitutions[args[1].top_operator_name] = args[2];
+          return substituteIntoExpression(args[0], substitutions);
         }
       }
     }
@@ -555,9 +553,9 @@ var logicProofStudent = (function() {
    * Only variables in the template can be matched to arbitrary expressions in
    * the expression; e.g. r∨s is not an instance of p∧q because ∧ is not a
    * variable and so needs to be matched exactly.
-   * @param expression: an Expression, which is to be matched
-   * @param template: the Expression against which we will match
-   * @param oldMatchings: variables potentially in the template whose
+   * @param {Expression} expression - an Expression, which is to be matched
+   * @param {Expression} template - the Expression against which we will match
+   * @param {object} oldMatchings - variables potentially in the template whose
    *        corresponding sub-expressions in the expression we have previously
    *        identified.
    * @return {Object} a dictionary extending oldElements, that for new
@@ -708,13 +706,16 @@ var logicProofStudent = (function() {
   };
 
   /**
-   * @param messages: an array of LineMessages, each of which describes the
-   *        mistake the student has made by writing this sort of line.
-   * @param name: the name of the LineTemplate from which the messages come.
+   * @param {Array.<LineMessages>} messages - an array of LineMessages, each of
+   *        which describes the mistake the student has made by writing this
+   *        sort of line.
+   * @param {string} templateName - the name of the LineTemplate from which the
+   *        messages come.
    * @param {object} matchings - a {string: Expression} dictionary deduced from
    *        comparing the line the student actually wrote to the LineTemplate
    *        provided by the techer of which it is an instance.
-   * @param operators: from the student Language and used for display purposes.
+   * @param {object} operators - from the student Language and used for display
+   *        purposes.
    * @throws This function throws a logicProofShared.UserError (with the
    *         'pre-rendered' code) that contains an array of strings describing
    *         the error, one of which will be chosen later to show to the
@@ -754,7 +755,7 @@ var logicProofStudent = (function() {
    *        in the protoLine.
    * @throws If the line is not an instance of the template.
    */
-  var matchLineToTemplate = function(protoLine, template, vocabulary) {
+  var matchLineToTemplate = function(protoLine, template) {
     // These witness that the protoLine is an instance of the template. For
     // example if the protoLine is 'we know A∧B' and the template is 'we know
     // p' then matchings would end up as {p: A∧B}.
@@ -843,12 +844,12 @@ var logicProofStudent = (function() {
   /**
    * This function is run on each line as the student types it, to make sure the
    * line is of a known type. It does not check for more sophisticated errors.
-   * @param lineString: one of the lines written by the student
-   * @param lineTemplates: as for buildLine()
-   * @param language: as for buildLine()
-   * @param vocabulary: as for buildLine()
-   * @param generalMessages: a dictionary of GeneralMessages, used to render
-   *          errors into human-readable messages.
+   * @param {string} lineString - one of the lines written by the student
+   * @param {Array.<LineTemplate>} lineTemplates - as for buildLine()
+   * @param {Language} language - as for buildLine()
+   * @param {object} vocabulary - as for buildLine()
+   * @param {object} generalMessages - a dictionary of GeneralMessages, used to
+   *         render errors into human-readable messages.
    * @throws If the line cannot be identified, {
    *           message: a string describing the problem
    *         }
@@ -921,9 +922,10 @@ var logicProofStudent = (function() {
 
   /**
    * @param {string} lineString - a line of text written by the student
-   * @param {array} lineTemplates - an array of LineTemplates written by the
-   *        teacher, that describe the sorts of lines a student might write; we
-   *        try to find one of which the given line is an instance.
+   * @param {Array.<LineTemplate>} lineTemplates - an array of LineTemplates
+   *        written by the teacher, that describe the sorts of lines a student
+   *        might write; we try to find one of which the given line is an
+   *        instance.
    * @param {Language} language - the student language (a Language object)
    * @param {object} vocabulary - the phrases available for the student to use.
    *        It is a dictionary with entries like

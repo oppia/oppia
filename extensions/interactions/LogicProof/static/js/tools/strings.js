@@ -473,102 +473,217 @@ var DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
     '\'{{text(scoper(scoper(n-1)))}}\'.']
 }, {
   name: 'illegal_first_line',
-  occurs: 'n=1 \u2227 (template(n)=\'for_all_introduce\' \u2228 template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\')',
+  occurs: (
+    'n=1 \u2227 (template(n)=\'for_all_introduce\' \u2228 ' +
+    'template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\')'),
   message: ['You can\'t have this as the first line of your proof']
 }];
 
 var DEFAULT_VARIABLE_MISTAKE_STRINGS = [{
   name: 'unspecified_variable',
-  occurs: '~is_initializer(n) \u2227 \u2203x\u2208variables(n).~is_initialized(x,n)',
-  message: ['You haven\'t said where {{variable(n)}} comes from; if you want it to be arbitrary then add a preceding line saying \'Given {{variable(n)}}\'; alternatively you might want to take a particular {{variable(n)}} witnessing some existential formula.']
+  occurs: (
+    '~is_initializer(n) \u2227 \u2203x\u2208variables(n).~is_initialized(x,n)'),
+  message: [
+    'You haven\'t said where {{variable(n)}} comes from; if you want it to ' +
+    'be arbitrary then add a preceding line saying \'Given ' +
+    '{{variable(n)}}\'; alternatively you might want to take a particular ' +
+    '{{variable(n)}} witnessing some existential formula.']
 }, {
   name: 'inaccessible_variable',
-  occurs: '~is_initializer(n) \u2227 template(n)!= \'for_all_introduce\' \u2227 \u2203x\u2208variables(n).~is_accessible(x,n)',
-  message: ['The variable {{variable(n)}} was only specified within the scope of \'{{text(scoper2(initializer(variable(n),n)))}}\' in line {{scoper2(initializer(variable(n),n))}}, and so can only be used there. If you want it as an arbitrary variable again then write \'Given {{variable(n)}}\'.']
+  occurs: (
+    '~is_initializer(n) \u2227 template(n)!= \'for_all_introduce\' \u2227 ' +
+    '\u2203x\u2208variables(n).~is_accessible(x,n)'),
+  message: [
+    'The variable {{variable(n)}} was only specified within the scope of ' +
+    '\'{{text(scoper2(initializer(variable(n),n)))}}\' in line ' +
+    '{{scoper2(initializer(variable(n),n))}}, and so can only be used ' +
+    'there. If you want it as an arbitrary variable again then write ' +
+    '\'Given {{variable(n)}}\'.']
 }, {
   name: 'incorrect_variable_forall',
-  occurs: 'template(n)=\'for_all_introduce\' \u2227 variable(n)!=variable(scoper(n-1))',
-  message: ['We originally took {{variable(scoper(n-1))}} as our arbitrary variable so this, rather than {{variable(n)}}, needs to be the one that we quantify out over.']
+  occurs: (
+    'template(n)=\'for_all_introduce\' \u2227 ' +
+    'variable(n)!=variable(scoper(n-1))'),
+  message: [
+    'We originally took {{variable(scoper(n-1))}} as our arbitrary variable ' +
+    'so this, rather than {{variable(n)}}, needs to be the one that we ' +
+    'quantify out over.']
 }, {
   name: 'arbitrary_variable_clash',
   occurs: 'template(n)=\'given\' \u2227 is_accessible(variable(n),n)',
-  message: ['The variable {{variable(n)}} is already in use; chose a new variable to work with instead.']
+  message: [
+    'The variable {{variable(n)}} is already in use; chose a new variable ' +
+    'to work with instead.']
 }, {
   name: 'variable_clash',
-  occurs: 'template(n)=\'exists_eliminate\' \u2227 is_accessible(variable(n),n)',
-  message: ['You just know that there is some {{variable(n)}} such that {{result(n)}}; you can\'t assume that it is the {{variable(n)}} we were previously discussing. Try using an entirely new variable in place of {{variable(n)}}.']
+  occurs: (
+    'template(n)=\'exists_eliminate\' \u2227 is_accessible(variable(n),n)'),
+  message: [
+    'You just know that there is some {{variable(n)}} such that ' +
+    '{{result(n)}}; you can\'t assume that it is the {{variable(n)}} we ' +
+    'were previously discussing. Try using an entirely new variable in ' +
+    'place of {{variable(n)}}.']
 }];
 
 var DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'missing_antecedent',
   occurs: '\u2203A\u2208antecedents(n).~is_proven(A,n)',
-  message: ['This line uses {{min{A\u2208antecedents(n)|~is_proven(A,n)}}}, so you need to have an earlier line proving that {{min{A\u2208antecedents(n)|~is_proven(A,n)}}} is true.']
+  message: [
+    'This line uses {{min{A\u2208antecedents(n)|~is_proven(A,n)}}}, so you ' +
+    'need to have an earlier line proving that ' +
+    '{{min{A\u2208antecedents(n)|~is_proven(A,n)}}} is true.']
 }, {
   name: 'inaccessible_antecedent',
   occurs: '\u2203A\u2208antecedents(n).~is_available(A,n)',
-  message: ['You are using here that {{min{A\u2208antecedents(n)|~is_available(A,n)}}}, which was only proved within the context of \'{{text(scoper(prover(min{A\u2208antecedents(n)|~is_available(A,n)},n)))}}\' and so is no longer available to you.']
+  message: [
+    'You are using here that ' +
+    '{{min{A\u2208antecedents(n)|~is_available(A,n)}}}, which was only ' +
+    'proved within the context of ' +
+    '\'{{text(scoper(prover(min{A\u2208antecedents(n)|~is_available(A,n)},' +
+      'n)))}}\' ' +
+    'and so is no longer available to you.']
 }, {
   name: 'missing_false',
   occurs: 'needs_false(n) \u2227 ~\u2203k<n.yields_false(k)',
-  message: ['This line assumes you have already proved a contradiction, which is not the case.']
+  message: [
+    'This line assumes you have already proved a contradiction, which is ' +
+    'not the case.']
 }, {
   name: 'inaccessible_false',
-  occurs: 'needs_false(n) \u2227 ~\u2203k<n.(yields_false(k) \u2227 is_in_scope(k, n))',
-  message: ['It is true that you proved a contradiction in line {{max{k<n|yields_false(k)}}} but this line is no longer available to you.']
+  occurs: (
+    'needs_false(n) \u2227 ~\u2203k<n.(yields_false(k) \u2227 ' +
+    'is_in_scope(k, n))'),
+  message: [
+    'It is true that you proved a contradiction in line ' +
+    '{{max{k<n|yields_false(k)}}} but this line is no longer available to you.']
 }, {
   name: 'for_all_incorrect_conclusion',
-  occurs: 'template(n)=\'for_all_introduce\' \u2227 ~substitute(element(\'p\',n),element(\'x\',n), element(\'a\',n))\u2208results(n-1)',
-  message: ['To conclude this you need to have shown {{substitute(element(\'p\',n),element(\'x\',n),element(\'a\',n))}} on the immediately preceding line.']
+  occurs: (
+    'template(n)=\'for_all_introduce\' \u2227 ' +
+    '~substitute(element(\'p\',n),element(\'x\',n), ' +
+      'element(\'a\',n))\u2208results(n-1)'),
+  message: [
+    'To conclude this you need to have shown ' +
+    '{{substitute(element(\'p\',n),element(\'x\',n),element(\'a\',n))}} ' +
+    'on the immediately preceding line.']
 }, {
   name: 'implies_incorrect_conclusion',
-  occurs: 'template(n)=\'implies_introduce\' \u2227 ~element(\'S\',n)\u2208results(n-1)',
-  message: ['To deduce \'{{result(n)}}\' you need to have proved {{element(\'S\',n)}} in the immediately preceding line (under the assumption of {{element(\'R\',n)}}).']
+  occurs: (
+    'template(n)=\'implies_introduce\' \u2227 ' +
+    '~element(\'S\',n)\u2208results(n-1)'),
+  message: [
+    'To deduce \'{{result(n)}}\' you need to have proved ' +
+    '{{element(\'S\',n)}} in the immediately preceding line (under the ' +
+    'assumption of {{element(\'R\',n)}}).']
 }, {
   name: 'implies_incorrect_assumption',
-  occurs: 'template(n)=\'implies_introduce\' \u2227 element(\'R\',n)!=result(scoper(n-1))',
-  message: ['You started with the assumption of {{result(scoper(n-1))}} not {{element(\'R\',n)}}, so you must conclude \'Hence {{result(scoper(n-1))}}=>{{element(\'S\',n)}}\'.']
+  occurs: (
+    'template(n)=\'implies_introduce\' \u2227 ' +
+    'element(\'R\',n)!=result(scoper(n-1))'),
+  message: [
+    'You started with the assumption of {{result(scoper(n-1))}} not ' +
+    '{{element(\'R\',n)}}, so you must conclude \'Hence ' +
+    '{{result(scoper(n-1))}}=>{{element(\'S\',n)}}\'.']
 }, {
   name: 'not_incorrect_conclusion',
   occurs: 'template(n)=\'not_introduce\' \u2227 ~yields_false(n-1)',
-  message: ['To prove the statement {{result(n)}} you need to start by assuming {{element(\'R\',n)}} is true and prove a contradiction. Then write this line immediately afterwards.']
+  message: [
+    'To prove the statement {{result(n)}} you need to start by assuming ' +
+    '{{element(\'R\',n)}} is true and prove a contradiction. Then write ' +
+    'this line immediately afterwards.']
 }, {
   name: 'not_incorrect_assumption',
-  occurs: 'template(n)=\'not_introduce\' \u2227 element(\'R\',n)!=result(scoper(n-1))',
-  message: ['We started with the assumption of {{result(scoper(n-1))}}, so what we have in fact shown is ~{{result(scoper(n-1))}}.']
+  occurs: (
+    'template(n)=\'not_introduce\' \u2227 ' +
+    'element(\'R\',n)!=result(scoper(n-1))'),
+  message: [
+    'We started with the assumption of {{result(scoper(n-1))}}, so what we ' +
+    'have in fact shown is ~{{result(scoper(n-1))}}.']
 }, {
   name: 'or_missing_antecedent_both',
-  occurs: 'template(n)=\'or_eliminate\' \u2227 (~\u2203j<n.\u2203i<j.yields_implication(element(\'R\',n), element(\'T\',n) ,i,j)) \u2227 (~\u2203j<n.\u2203i<j.yields_implication(element(\'S\',n), element(\'T\',n) ,i,j))',
-  message: ['To conclude that {{element(\'T\',n)}} follows from {{entry(1,antecedents(n))}} you need to show that it follows if either {{element(\'R\',n)}} or {{element(\'S\',n)}} is true. Write \'If {{element(\'R\',n)}}\' and then give an (indented) series of lines that deduce {{element(\'T\',n)}} (or a contradiction) from {{element(\'R\',n)}}. Then separately write \'If {{element(\'S\',n)}}\' and prove {{element(\'T\',n)}} (or a contradiction) under this assumption.']
+  occurs: (
+    'template(n)=\'or_eliminate\' \u2227 ' +
+    '(~\u2203j<n.\u2203i<j.yields_implication(element(\'R\',n), ' +
+      'element(\'T\',n) ,i,j)) \u2227 ' +
+      '(~\u2203j<n.\u2203i<j.yields_implication(element(\'S\',n), ' +
+      'element(\'T\',n) ,i,j))'),
+  message: [
+    'To conclude that {{element(\'T\',n)}} follows from ' +
+    '{{entry(1,antecedents(n))}} you need to show that it follows if either ' +
+    '{{element(\'R\',n)}} or {{element(\'S\',n)}} is true. Write ' +
+    '\'If {{element(\'R\',n)}}\' and then give an (indented) series of lines ' +
+    'that deduce {{element(\'T\',n)}} (or a contradiction) from ' +
+    '{{element(\'R\',n)}}. Then separately write \'If {{element(\'S\',n)}}\' ' +
+    'and prove {{element(\'T\',n)}} (or a contradiction) under this ' +
+    'assumption.']
 }, {
   name: 'or_missing_antecedent_left',
-  occurs: 'template(n)=\'or_eliminate\' \u2227  ~\u2203j<n.\u2203i<j.yields_implication(element(\'R\',n), element(\'T\',n) ,i,j)',
-  message: ['You have proved that {{element(\'T\',n)}} follows if {{element(\'S\',n)}} holds; you need to also prove it follows if {{element(\'R\',n)}} holds.']
+  occurs: (
+    'template(n)=\'or_eliminate\' \u2227  ' +
+    '~\u2203j<n.\u2203i<j.yields_implication(' +
+      'element(\'R\',n), element(\'T\',n) ,i,j)'),
+  message: [
+    'You have proved that {{element(\'T\',n)}} follows if ' +
+    '{{element(\'S\',n)}} holds; you need to also prove it follows if ' +
+    '{{element(\'R\',n)}} holds.']
 }, {
   name: 'or_missing_antecedent_right',
-  occurs: 'template(n)=\'or_eliminate\' \u2227 ~\u2203j<n.\u2203i<j.yields_implication(element(\'S\',n), element(\'T\',n) ,i,j)',
-  message: ['You have proved that {{element(\'T\',n)}} follows if {{element(\'R\',n)}} holds; you need to also prove it follows if {{element(\'S\',n)}} holds.']
+  occurs: (
+    'template(n)=\'or_eliminate\' \u2227 ' +
+    '~\u2203j<n.\u2203i<j.yields_implication(' +
+      'element(\'S\',n), element(\'T\',n) ,i,j)'),
+  message: [
+    'You have proved that {{element(\'T\',n)}} follows if ' +
+    '{{element(\'R\',n)}} holds; you need to also prove it follows if ' +
+    '{{element(\'S\',n)}} holds.']
 }, {
   name: 'or_inaccessible_antecedent_left',
-  occurs: 'template(n)=\'or_eliminate\' \u2227 ~is_available_implication(element(\'R\',n),element(\'T\',n),n)',
-  message: ['You proved that if {{element(\'R\',n)}} then {{element(\'T\',n)}}, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implication(element(\'R\',n),element(\'T\',n),i,j)}))}}\', which we have since left.']
+  occurs: (
+    'template(n)=\'or_eliminate\' \u2227 ' +
+    '~is_available_implication(element(\'R\',n),element(\'T\',n),n)'),
+  message: [
+    'You proved that if {{element(\'R\',n)}} then {{element(\'T\',n)}}, ' +
+    'but this was in the context of ' +
+    '\'{{text(scoper(max{i<n|\u2203j<n.yields_implication(' +
+      'element(\'R\',n),element(\'T\',n),i,j)}))}}\', which we have since ' +
+    'left.']
 }, {
   name: 'or_inaccessible_antecedent_right',
-  occurs: 'template(n)=\'or_eliminate\' \u2227 ~is_available_implication(element(\'S\',n),element(\'T\',n),n)',
-  message: ['You proved that if {{element(\'S\',n)}} then {{element(\'T\',n)}}, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implication(element(\'S\',n),element(\'T\',n),i,j)}))}}\', which we have since left.']
+  occurs: (
+    'template(n)=\'or_eliminate\' \u2227 ' +
+    '~is_available_implication(element(\'S\',n),element(\'T\',n),n)'),
+  message: [
+    'You proved that if {{element(\'S\',n)}} then {{element(\'T\',n)}}, ' +
+    'but this was in the context of ' +
+    '\'{{text(scoper(max{i<n|\u2203j<n.yields_implication(' +
+      'element(\'S\',n),element(\'T\',n),i,j)}))}}\', ' +
+    'which we have since left.']
 }];
 
 var DEFAULT_TARGET_MISTAKE_STRINGS = [{
   name: 'last_line_indented_assumption',
-  occurs: 'n=num_lines()\u2227indentation(n)>0 \u2227 template(scoper(n))!=\'given\'',
-  message: ['The last line of a proof should not be indented; you need to prove that the given formulas holds just from the original assumptions, not the additional assumption of {{result(scoper(n))}}.']
+  occurs: (
+    'n=num_lines()\u2227indentation(n)>0 \u2227 template(scoper(n))!=\'given\''
+  ),
+  message: [
+    'The last line of a proof should not be indented; you need to prove ' +
+    'that the given formulas holds just from the original assumptions, not ' +
+    'the additional assumption of {{result(scoper(n))}}.']
 }, {
   name: 'last_line_indented_given',
-  occurs: 'n=num_lines() \u2227 indentation(n)>0 \u2227 template(scoper(n))=\'given\'',
-  message: ['The last line of a proof should not be indented; you should have ceased working within the scope of \'{{text(scoper(n))}}\' by this point, typically by introducing a forall statement.']
+  occurs: (
+    'n=num_lines() \u2227 indentation(n)>0 \u2227 ' +
+    'template(scoper(n))=\'given\''),
+  message: [
+    'The last line of a proof should not be indented; you should have ' +
+    'ceased working within the scope of \'{{text(scoper(n))}}\' by this ' +
+    'point, typically by introducing a forall statement.']
 }, {
   name: 'last_line_not_target',
   occurs: 'n=num_lines() \u2227 ~target()\u2208results(n)',
-  message: ['We are trying to prove {{target()}} so it should be given by the final line of the proof.']
+  message: [
+    'We are trying to prove {{target()}} so it should be given by the final ' +
+    'line of the proof.']
 }];
 
 var DEFAULT_CONTROL_FUNCTION_STRINGS = [{

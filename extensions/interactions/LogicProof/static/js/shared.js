@@ -84,11 +84,11 @@ var logicProofShared = (function() {
   };
 
   /**
-   * @param error: a UserError object
-   * @param errorDictionary: a dictionary keyed by error codes for each of which
-   *        it provides a description of possible ways to display the error to
-   *        the user, one of which will be chosen at random.
-   * @param language: the relevant Language
+   * @param {UserError} error - a UserError object
+   * @param {object} errorDictionary - a dictionary keyed by error codes for
+   *        each of which it provides a description of possible ways to display
+   *        the error to the user, one of which will be chosen at random.
+   * @param {Language} language - the relevant Language
    * @return {string} A string to show to the user describing what went wrong.
    */
   var renderError = function(error, errorDictionary, language) {
@@ -114,19 +114,25 @@ var logicProofShared = (function() {
   // DISPLAY
 
   /**
-   * @param expression: an Expression, which is to be displayed
-   * @param operators: provides the symbols keys of the operators so that we
-   *        we know e.g. 'for_all' should be displayed using '@'.
-   * @result A string representing the expression that can be shown to the user.
+   * @param {Expression} expression - an Expression, which is to be displayed
+   * @param {object} operators - provides the symbols keys of the operators so
+   *        that we we know e.g. 'for_all' should be displayed using '@'.
+   * @return {string} A string representing the expression that can be shown to
+   *        the user.
    */
   var displayExpression = function(expression, operators) {
     return displayExpressionHelper(expression, operators, 0);
   };
 
   /**
-   * As for displayExpression(), with the addition of:
-   * @param desirabilityOfBrackets used internally to determine whether to
-   *         surround the formula with brackets.
+   * Recursive helper for displayExpression().
+   *
+   * @param {Expression} expression - an Expression, which is to be displayed
+   * @param {object} operators - provides the symbols keys of the operators so
+   *        that we we know e.g. 'for_all' should be displayed using '@'.
+   * @param {int} desirabilityOfBrackets - used internally to determine whether
+   *        to surround the formula with brackets.
+   * @return {string} A string representing the expression.
    */
   var displayExpressionHelper = function(
       expression, operators, desirabilityOfBrackets) {
@@ -206,10 +212,10 @@ var logicProofShared = (function() {
    * This function checks whether the string contains any symbol that occurs
    * in a member of the symbols key for some operator (these will be
    * symbols such as ∀, =, <).
-   * @param string: contains the characters we check
-   * @param operators: a dictionary of Operator objects
-   * @param isTemplate: denotes that the string represents a line template
-   *        (which may have substitutions) and not just a line.
+   * @param {string} string - contains the characters we check
+   * @param {object} operators - a dictionary of Operator objects
+   * @param {boolean} isTemplate - denotes that the string represents a line
+   *        template (which may have substitutions) and not just a line.
    * @return {boolean} true or false
    */
   var containsLogicalCharacter = function(string, operators, isTemplate) {
@@ -245,11 +251,13 @@ var logicProofShared = (function() {
    * expression strings.
    *  e.g. 'from p and q we have p ∧ q' will be converted to ['from', 'p',
    *   'and', 'q', 'we', 'have', 'p∧q'].
-   * @param inputString: the string from which whitespace is to be stripped.
-   * @param operators: a dictionary of the Operator objects usable in the line
-   * @param isTemplate: denotes that the string represents a line template
-   *        (which may have substitutions) and not just a line.
-   * @return A non-empty array of words and expressions (as strings).
+   * @param {string} inputString - the string from which whitespace is to be
+   *        stripped.
+   * @param {object} operators - a dictionary of the Operator objects usable in
+   *        the line
+   * @param {boolean} isTemplate - denotes that the string represents a line
+   *        template (which may have substitutions) and not just a line.
+   * @return {Array} A non-empty array of words and expressions (as strings).
    * @throws if the line is blank or contains an unknown character.
    */
   var preParseLineString = function(inputString, operators, isTemplate) {
@@ -300,18 +308,18 @@ var logicProofShared = (function() {
   };
 
   /**
-   * @param inputString: written by the user - we will parse it.
-   * @param operators: the relevant operators, which are just needed for their
-   *        symbols so we can identify whether the symbols the user is using are
-   *        legitimate.
-   * @param vocabulary: a dictionary whose keys are phrases such as 'have'
-   *        whose entries are arrays of possible ways to write each phrase, for
-   *        example ['have', 'we have']. We will attempt to match sections of
-   *        the inputString to the ways of writing each phrase.
-   * @param isTemplate: if true, we parse the input as a LineTemplate; otherwise
-   *        we parse it as a Line.
-   * @return A LineTemplate.reader_view if isTemplate === true, and a ProtoLine
-   *         if isTemplate === false.
+   * @param {string} inputString - written by the user - we will parse it.
+   * @param {object} operators - the relevant operators, which are just needed
+   *        for their symbols so we can identify whether the symbols the user
+   *        is using are legitimate.
+   * @param {object} vocabulary - a dictionary whose keys are phrases such as
+   *        'have' whose entries are arrays of possible ways to write each
+   *        phrase, for example ['have', 'we have']. We will attempt to match
+   *        sections of the inputString to the ways of writing each phrase.
+   * @param {boolean} isTemplate - if true, we parse the input as a
+   *        LineTemplate; otherwise we parse it as a Line.
+   * @return {*} A LineTemplate.reader_view if isTemplate === true, and a
+   *         ProtoLine if isTemplate === false.
    * @throws If a section of the string cannot be identified as either a phrase
    *         or an expression then we throw an error that tries to best identify
    *         what the user intended and did wrong.
@@ -476,14 +484,14 @@ var logicProofShared = (function() {
   /**
    * This takes an array of TypingElements and converts it into an array of
    * types.
-   * @param types: an array of dictionaries of the form {
+   * @param {Array.<Object>} types - an array of dictionaries of the form {
    *               type: the name of an available type ('boolean' or 'element')
    *               arbitrarily_many: boolean
    *            }
    *          where at most one member can have 'arbitrarily_many' set to
    *          true, signifying that any number of arguments of this type
    *          can occur here.
-   * @param desiredLength: the number of entries we would like to have.
+   * @param {int} desiredLength - the number of entries we would like to have.
    * @returns {array} an array of types with the right number of entries,
    *          derived from 'types'.
    * @throws if this is not possible.
@@ -528,16 +536,16 @@ var logicProofShared = (function() {
   /**
    * This takes an (untyped) Expression, usually provided by the parser, and
    * returns a TypedExpression in which types have been added at each level.
-   * @param untypedExpression: the expression to be typed
-   * @param possibleTopTypes: an array of types that the expression as a whole
-   *         could have - each will be tried in turn.
-   * @param language: the relevant language
-   * @param newKindsPermitted: an array of kinds (e.g. 'variable', 'constant')
-   *        of which the user is allowed to create new operators. Any operator
-   *        with a kind not in this list and that does not already occur in the
-   *        language will cause an error.
-   * @param permitDuplicateDummyNames: if true the user can write e.g. ∀x.p even
-   *        if x is already in use; if false they cannot.
+   * @param {Expression} untypedExpression - the expression to be typed
+   * @param {Array} possibleTopTypes - an array of types that the expression as
+   *        a whole could have - each will be tried in turn.
+   * @param {Language} language - the relevant language
+   * @param {Array} newKindsPermitted - an array of kinds (e.g. 'variable',
+   *        'constant') of which the user is allowed to create new operators.
+   *        Any operator with a kind not in this list and that does not already
+   *        occur in the language will cause an error.
+   * @param {boolean} permitDuplicateDummyNames - if true the user can write
+   *        e.g. ∀x.p even if x is already in use; if false they cannot.
    * @return {array} An array of dictionaries of the form: {
    *           typedExpression: A TypedExpression
    *           operators: the given language.operatorss together with any new

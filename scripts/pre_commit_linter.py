@@ -54,33 +54,36 @@ _PARSER.add_argument(
     help='path to the directory with files to be linted',
     action='store')
 
+if not os.getcwd().endswith('oppia'):
+    print ''
+    print 'ERROR    Please run this script from the oppia root directory.'
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-
-_PYLINT_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'pylint-1.5.2')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.5.2')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
     print '         and its dependencies.'
     sys.exit(1)
 
-sys.path.insert(0, _PYLINT_PATH)
-from pylint import lint  # pylint: disable=wrong-import-position
+_PATHS_TO_INSERT = [
+    _PYLINT_PATH,
+    os.getcwd(),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        'google_appengine', 'lib', 'webapp2-2.3'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
+        'google_appengine'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
+    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
+    os.path.join('third_party', 'bleach-1.2.2'),
+    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
+]
+for path in _PATHS_TO_INSERT:
+    sys.path.insert(0, path)
 
-# Allows Python linter to import files in the oppia/ folder.
-sys.path.insert(0, os.getcwd())
-sys.path.insert(0, os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
-    'google_appengine', 'lib', 'webapp2-2.3'))
-sys.path.insert(0, os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
-    'google_appengine'))
-sys.path.insert(0, os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'))
-sys.path.insert(0, os.path.join('third_party', 'gae-pipeline-1.9.17.0'))
-sys.path.insert(0, os.path.join('third_party', 'bleach-1.2.2'))
-sys.path.insert(0, os.path.join('third_party', 'gae-mapreduce-1.9.17.0'))
+from pylint import lint  # pylint: disable=wrong-import-position
 
 
 def _get_changed_filenames():
@@ -214,10 +217,6 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass JSCS binary path
     """
-    if not os.getcwd().endswith('oppia'):
-        print ''
-        print 'ERROR    Please run this script from the oppia root directory.'
-
     parsed_args = _PARSER.parse_args()
     input_path = parsed_args.path
     if input_path:

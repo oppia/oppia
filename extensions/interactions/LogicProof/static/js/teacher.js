@@ -24,13 +24,12 @@ var logicProofTeacher = (function() {
    * A question is composed of the formulas the student may assume and the
    * formula she must prove; it will be different for each state in which the
    * interaction is used.
-   * @param assumptionsString: typed by the teacher to describe the assumptions
-   *        the student is allowed to make.
-   * @param targetString: typed by the teacher to describe what the student is
-   *        supposed to prove.
-   * @param language: A Language object in which expressions are written.
-   * @param vocabulary: A vocabulary object, the words from which the teacher is
-   *        not allowed to use as function names.
+   * @param {string} assumptionsString - typed by the teacher to describe the
+   *        assumptions the student is allowed to make.
+   * @param {string} targetString - typed by the teacher to describe what the
+   *        student is supposed to prove.
+   * @param {object} vocabulary - A vocabulary object, the words from which the
+   *        teacher is not allowed to use as function names.
    * @returns {
    *           operators: the operators occurring in the question including both
    *             ordinary ones (like ∧) and specific ones (like f).
@@ -198,7 +197,7 @@ var logicProofTeacher = (function() {
         content: ' has already been defined.'
       }]],
       parameters: {
-        'function': {
+        function: {
           format: 'string'
         }
       }
