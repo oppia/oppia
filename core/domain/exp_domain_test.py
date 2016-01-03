@@ -16,8 +16,6 @@
 
 """Tests for exploration domain objects and methods defined on them."""
 
-__author__ = 'Sean Lip'
-
 import os
 
 from core.domain import exp_domain
@@ -34,8 +32,7 @@ import utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = (
-"""author_notes: ''
+SAMPLE_YAML_CONTENT = ("""author_notes: ''
 blurb: ''
 category: Category
 init_state_name: %s
@@ -92,13 +89,12 @@ tags: []
 title: Title
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-SAMPLE_UNTITLED_YAML_CONTENT = (
-"""author_notes: ''
+SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
@@ -151,13 +147,12 @@ states_schema_version: %d
 tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION,
+    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
 
-SAMPLE_YAML_CONTENT_WITH_GADGETS = (
-"""author_notes: ''
+SAMPLE_YAML_CONTENT_WITH_GADGETS = ("""author_notes: ''
 blurb: ''
 category: Category
 init_state_name: %s
@@ -242,7 +237,7 @@ tags: []
 title: Title
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION,
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
@@ -282,19 +277,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state_name = ''
         exploration.states = {}
 
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'between 1 and 50 characters'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'between 1 and 50 characters')
 
         exploration.title = 'Hello #'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character #'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Invalid character #')
 
         exploration.title = 'Title'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'between 1 and 50 characters'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'between 1 and 50 characters')
 
         exploration.category = 'Category'
 
@@ -303,46 +294,39 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # sentinel for an invalid state name.
         bad_state = exp_domain.State.create_default_state('/')
         exploration.states = {'/': bad_state}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character / in a state name'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Invalid character / in a state name')
 
         new_state = exp_domain.State.create_default_state('ABC')
         new_state.update_interaction_id('TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'exploration has no states'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'exploration has no states')
         exploration.states = {'A string #': new_state}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character # in a state name'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Invalid character # in a state name')
         exploration.states = {'A string _': new_state}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character _ in a state name'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Invalid character _ in a state name')
 
         exploration.states = {'ABC': new_state}
 
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'has no initial state name'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'has no initial state name')
 
         exploration.init_state_name = 'initname'
 
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                r'There is no state in \[\'ABC\'\] corresponding to '
-                'the exploration\'s initial state name initname.'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration,
+            r'There is no state in \[\'ABC\'\] corresponding to '
+            'the exploration\'s initial state name initname.')
 
         # Test whether a default outcome to a non-existing state is invalid.
         exploration.states = {exploration.init_state_name: new_state}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'destination ABC is not a valid'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'destination ABC is not a valid')
 
         # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
@@ -371,10 +355,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }]
             })
         )
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'AnswerGroups can only have one fuzzy rule.'):
-            exploration.validate()
+
+        self._assert_validation_error(
+            exploration, 'AnswerGroups can only have one fuzzy rule.')
 
         # Restore a valid exploration.
         init_state.interaction.answer_groups.pop()
@@ -409,9 +392,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
         answer_group.outcome.dest = 'DEF'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'destination DEF is not a valid'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'destination DEF is not a valid')
 
         # Restore a valid exploration.
         exploration.states[exploration.init_state_name].update_interaction_id(
@@ -422,34 +404,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validate RuleSpec.
         rule_spec = answer_group.rule_specs[0]
         rule_spec.inputs = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'RuleSpec \'Contains\' is missing inputs'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'RuleSpec \'Contains\' is missing inputs')
 
         rule_spec.inputs = 'Inputs string'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected inputs to be a dict'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected inputs to be a dict')
 
         rule_spec.inputs = {'x': 'Test'}
         rule_spec.rule_type = 'FakeRuleType'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Unrecognized rule type'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Unrecognized rule type')
 
         rule_spec.inputs = {'x': 15}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-                Exception, 'Expected unicode string, received 15'):
+            Exception, 'Expected unicode string, received 15'
+            ):
             exploration.validate()
 
         rule_spec.inputs = {'x': '{{ExampleParam}}'}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'RuleSpec \'Contains\' has an input '
-                'with name \'x\' which refers to an unknown parameter within '
-                'the exploration: ExampleParam'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration,
+            'RuleSpec \'Contains\' has an input with name \'x\' which refers '
+            'to an unknown parameter within the exploration: ExampleParam')
 
         # Restore a valid exploration.
         exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
@@ -460,95 +437,75 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome = answer_group.outcome
         destination = exploration.init_state_name
         outcome.dest = None
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Every outcome should have a destination.'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Every outcome should have a destination.')
 
         # Try setting the outcome destination to something other than a string.
         outcome.dest = 15
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected outcome dest to be a string'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected outcome dest to be a string')
 
         outcome.dest = destination
         outcome.feedback = 'Feedback'
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected outcome feedback to be a list'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected outcome feedback to be a list')
 
         outcome.feedback = [15]
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected outcome feedback item to be a string'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected outcome feedback item to be a string')
 
         outcome.feedback = ['Feedback']
         exploration.validate()
 
         outcome.param_changes = 'Changes'
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected outcome param_changes to be a list'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected outcome param_changes to be a list')
 
         outcome.param_changes = []
         exploration.validate()
 
         # Validate InteractionInstance.
         interaction.id = 15
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected interaction id to be a string'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected interaction id to be a string')
 
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid interaction id'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Invalid interaction id')
 
         interaction.id = 'TextInput'
         exploration.validate()
 
         interaction.customization_args = []
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected customization args to be a dict'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected customization args to be a dict')
 
         interaction.customization_args = {15: ''}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid customization arg name'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Invalid customization arg name')
 
         interaction.customization_args = {'placeholder': ''}
         exploration.validate()
 
         interaction.answer_groups = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected answer groups to be a list'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected answer groups to be a list')
 
         interaction.answer_groups = answer_groups
         interaction.id = 'EndExploration'
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Terminal interactions must not have a default outcome.'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration,
+            'Terminal interactions must not have a default outcome.')
 
         interaction.id = 'TextInput'
         interaction.default_outcome = None
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Non-terminal interactions must have a default outcome.'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration,
+            'Non-terminal interactions must have a default outcome.')
 
         interaction.id = 'EndExploration'
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Terminal interactions must not have any answer groups.'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration,
+            'Terminal interactions must not have any answer groups.')
 
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
@@ -556,9 +513,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         interaction.fallbacks = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected fallbacks to be a list'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected fallbacks to be a list')
 
         # Restore a valid exploration.
         interaction.id = 'TextInput'
@@ -569,16 +525,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Validate AnswerGroup.
         answer_group.rule_specs = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected answer group rules to be a list'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected answer group rules to be a list')
 
         answer_group.rule_specs = []
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'There must be at least one rule for each answer group.'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration,
+            'There must be at least one rule for each answer group.')
 
         exploration.states = {
             exploration.init_state_name: exp_domain.State.create_default_state(
@@ -589,29 +542,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.language_code = 'fake_code'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid language_code'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'English'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid language_code'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'en'
         exploration.validate()
 
         exploration.param_specs = 'A string'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'param_specs to be a dict'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'param_specs to be a dict')
 
         exploration.param_specs = {
             '@': param_domain.ParamSpec.from_dict({
                 'obj_type': 'UnicodeString'
             })
         }
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Only parameter names with characters'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Only parameter names with characters')
 
         exploration.param_specs = {
             'notAParamSpec': param_domain.ParamSpec.from_dict(
@@ -645,9 +591,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'outcome': base_outcome,
         }])
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Unknown trigger type'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Unknown trigger type')
 
         with self.assertRaises(KeyError):
             init_state.update_interaction_fallbacks([{
@@ -729,59 +673,38 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.tags = 'this should be a list'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected \'tags\' to be a list'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Expected \'tags\' to be a list')
 
         exploration.tags = [123]
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'to be a string'):
-            exploration.validate()
-
+        self._assert_validation_error(exploration, 'to be a string')
         exploration.tags = ['abc', 123]
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'to be a string'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'to be a string')
 
         exploration.tags = ['']
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Tags should be non-empty'):
-            exploration.validate()
+        self._assert_validation_error(exploration, 'Tags should be non-empty')
 
         exploration.tags = ['123']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'should only contain lowercase letters and spaces'):
-            exploration.validate()
-
+        self._assert_validation_error(
+            exploration, 'should only contain lowercase letters and spaces')
         exploration.tags = ['ABC']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'should only contain lowercase letters and spaces'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'should only contain lowercase letters and spaces')
 
         exploration.tags = [' a b']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Tags should not start or end with whitespace'):
-            exploration.validate()
-
+        self._assert_validation_error(
+            exploration, 'Tags should not start or end with whitespace')
         exploration.tags = ['a b ']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Tags should not start or end with whitespace'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Tags should not start or end with whitespace')
 
         exploration.tags = ['a    b']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Adjacent whitespace in tags should be collapsed'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Adjacent whitespace in tags should be collapsed')
 
         exploration.tags = ['abc', 'abc']
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Some tags duplicate each other'):
-            exploration.validate()
+        self._assert_validation_error(
+            exploration, 'Some tags duplicate each other')
 
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
@@ -794,8 +717,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         invalid_gadget_instance = exp_domain.GadgetInstance(
             'bad_type', 'aUniqueGadgetName', [], {})
         with self.assertRaisesRegexp(
-                 utils.ValidationError,
-                 'Unknown gadget with type bad_type is not in the registry.'):
+            utils.ValidationError,
+            'Unknown gadget with type bad_type is not in the registry.'
+            ):
             invalid_gadget_instance.validate()
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
@@ -805,18 +729,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             # Force a GadgetInstance to require certain state names.
             gadget_instance.visible_in_states.extend(['DEF', 'GHI'])
 
-            with self.assertRaisesRegexp(
-                    utils.ValidationError,
-                    'Exploration missing required states: DEF, GHI'):
-                exploration.validate()
+            self._assert_validation_error(
+                exploration, 'Exploration missing required states: DEF, GHI')
 
             def_state = exp_domain.State.create_default_state('DEF')
             def_state.update_interaction_id('TextInput')
             exploration.states['DEF'] = def_state
-            with self.assertRaisesRegexp(
-                    utils.ValidationError,
-                    'Exploration missing required state: GHI'):
-                exploration.validate()
+            self._assert_validation_error(
+                exploration, 'Exploration missing required state: GHI')
 
             ghi_state = exp_domain.State.create_default_state('GHI')
             ghi_state.update_interaction_id('TextInput')
@@ -828,18 +748,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.add_gadget(TEST_GADGET_DICT, 'bottom')
             exploration.skin_instance.panel_contents_dict[
                 'bottom'][1].visible_in_states = ['GHI']
-            with self.assertRaisesRegexp(
-                    utils.ValidationError,
-                    'ATestGadget gadget instance name must be unique.'):
-                exploration.validate()
+            self._assert_validation_error(
+                exploration,
+                'ATestGadget gadget instance name must be unique.')
             exploration.skin_instance.panel_contents_dict['bottom'].pop()
 
             gadget_instance.visible_in_states.extend(['DEF'])
-            with self.assertRaisesRegexp(
-                    utils.ValidationError,
-                    'TestGadget specifies visibility repeatedly for state: '
-                    'DEF'):
-                exploration.validate()
+            self._assert_validation_error(
+                exploration,
+                'TestGadget specifies visibility repeatedly for state: DEF')
 
             # Remove duplicate state.
             gadget_instance.visible_in_states.pop()
@@ -848,14 +765,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.skin_instance.panel_contents_dict[
                 'non_existent_panel'] = []
 
-            with self.assertRaisesRegexp(
-                    utils.ValidationError,
-                    'non_existent_panel panel not found in skin '
-                    'conversation_v1'):
-                exploration.validate()
+            self._assert_validation_error(
+                exploration,
+                'non_existent_panel panel not found in skin conversation_v1')
 
     def test_gadget_name_validation(self):
         """Test that gadget naming conditions validate properly."""
+
         exploration = exp_domain.Exploration.from_yaml(
             'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
 
@@ -865,59 +781,50 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             gadget_instance.validate()
 
             gadget_instance.name = ''
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget name must not be an empty string.'):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance, 'Gadget name must not be an empty string.')
 
             gadget_instance.name = 0
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget name must be a string. Received type: int'):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance,
+                'Gadget name must be a string. Received type: int')
 
             gadget_instance.name = 'ASuperLongGadgetNameThatExceedsTheLimit'
-            max_length = exp_domain.GadgetInstance._MAX_GADGET_NAME_LENGTH
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'ASuperLongGadgetNameThatExceedsTheLimit gadget name'
-                     ' exceeds maximum length of %d' % max_length):
-                gadget_instance.validate()
+            max_length = exp_domain.GadgetInstance._MAX_GADGET_NAME_LENGTH  # pylint: disable=protected-access
+            self._assert_validation_error(
+                gadget_instance,
+                'ASuperLongGadgetNameThatExceedsTheLimit gadget name'
+                ' exceeds maximum length of %d' % max_length)
 
             gadget_instance.name = 'VERYGADGET!'
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget names must be alphanumeric. Spaces are allowed.'
-                     ' Received: VERYGADGET!'):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance,
+                'Gadget names must be alphanumeric. Spaces are allowed. '
+                'Received: VERYGADGET!')
 
             gadget_instance.name = 'Name with \t tab'
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget names must be alphanumeric. Spaces are allowed.'
-                     ' Received: Name with \t tab'):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance,
+                'Gadget names must be alphanumeric. Spaces are allowed. '
+                'Received: Name with \t tab')
 
             gadget_instance.name = 'Name with \n newline'
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget names must be alphanumeric. Spaces are allowed.'
-                     ' Received: Name with \n newline'):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance,
+                'Gadget names must be alphanumeric. Spaces are allowed. '
+                'Received: Name with \n newline')
 
             gadget_instance.name = 'Name with   3 space'
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget names must be alphanumeric. Spaces are allowed.'
-                     ' Received: Name with   3 space'):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance,
+                'Gadget names must be alphanumeric. Spaces are allowed. '
+                'Received: Name with   3 space')
 
             gadget_instance.name = ' untrim whitespace '
-            with self.assertRaisesRegexp(
-                     utils.ValidationError,
-                     'Gadget names must be alphanumeric. Spaces are allowed.'
-                     ' Received:  untrim whitespace '):
-                gadget_instance.validate()
+            self._assert_validation_error(
+                gadget_instance,
+                'Gadget names must be alphanumeric. Spaces are allowed. '
+                'Received:  untrim whitespace ')
 
             # Names with spaces and number should pass.
             gadget_instance.name = 'Space and 1'
@@ -953,7 +860,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'objective must be specified'):
+            utils.ValidationError, 'objective must be specified'
+            ):
             exploration.validate(strict=True)
 
         exploration.objective = 'An objective'
@@ -1030,11 +938,12 @@ class StateExportUnitTests(test_utils.GenericTestBase):
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
+    EXP_ID = 'An exploration_id'
+
     def test_yaml_import_and_export(self):
         """Test the from_yaml() and to_yaml() methods."""
-        EXP_ID = 'An exploration_id'
         exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+            self.EXP_ID, 'Title', 'Category')
         exploration.add_states(['New state'])
         self.assertEqual(len(exploration.states), 2)
 
@@ -1076,30 +985,28 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
                 'exp4', 'State1:\n(\nInvalid yaml')
 
         with self.assertRaisesRegexp(
-                Exception, 'Expected a YAML version >= 10, received: 9'):
+            Exception, 'Expected a YAML version >= 10, received: 9'
+            ):
             exp_domain.Exploration.from_yaml(
                 'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
-                Exception, 'Expected a YAML version <= 9'):
+            Exception, 'Expected a YAML version <= 9'
+            ):
             exp_domain.Exploration.from_untitled_yaml(
                 'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
 
     def test_yaml_import_and_export_without_gadgets(self):
         """Test from_yaml() and to_yaml() methods without gadgets."""
-
-        EXP_ID = 'An exploration_id'
         exploration_without_gadgets = exp_domain.Exploration.from_yaml(
-            EXP_ID, SAMPLE_YAML_CONTENT)
+            self.EXP_ID, SAMPLE_YAML_CONTENT)
         yaml_content = exploration_without_gadgets.to_yaml()
         self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
 
     def test_yaml_import_and_export_with_gadgets(self):
         """Test from_yaml() and to_yaml() methods including gadgets."""
-
-        EXP_ID = 'An exploration_id'
         exploration_with_gadgets = exp_domain.Exploration.from_yaml(
-            EXP_ID, SAMPLE_YAML_CONTENT_WITH_GADGETS)
+            self.EXP_ID, SAMPLE_YAML_CONTENT_WITH_GADGETS)
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
             generated_yaml = exploration_with_gadgets.to_yaml()
 
@@ -1115,41 +1022,41 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     """
     def test_correct_states_schema_conversion_methods_exist(self):
         """Test that the right states schema conversion methods exist."""
-        CURRENT_STATES_SCHEMA_VERSION = (
+        current_states_schema_version = (
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-        for i in range(CURRENT_STATES_SCHEMA_VERSION):
+        for version_num in range(current_states_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
-                '_convert_states_v%s_dict_to_v%s_dict' % (i, i + 1)))
+                '_convert_states_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
 
         self.assertFalse(hasattr(
             exp_domain.Exploration,
             '_convert_states_v%s_dict_to_v%s_dict' % (
-                CURRENT_STATES_SCHEMA_VERSION,
-                CURRENT_STATES_SCHEMA_VERSION + 1)))
+                current_states_schema_version,
+                current_states_schema_version + 1)))
 
     def test_correct_exploration_schema_conversion_methods_exist(self):
         """Test that the right exploration schema conversion methods exist."""
-        CURRENT_EXPLORATION_SCHEMA_VERSION = (
-            exp_domain.Exploration.CURRENT_EXPLORATION_SCHEMA_VERSION)
+        current_exp_schema_version = (
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        for i in range(1, CURRENT_EXPLORATION_SCHEMA_VERSION):
+        for version_num in range(1, current_exp_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
-                '_convert_v%s_dict_to_v%s_dict' % (i, i + 1)))
+                '_convert_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
 
         self.assertFalse(hasattr(
             exp_domain.Exploration,
             '_convert_v%s_dict_to_v%s_dict' % (
-                CURRENT_EXPLORATION_SCHEMA_VERSION,
-                CURRENT_EXPLORATION_SCHEMA_VERSION + 1)))
+                current_exp_schema_version, current_exp_schema_version + 1)))
 
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = (
-"""default_skin: conversation_v1
+    YAML_CONTENT_V1 = ("""default_skin: conversation_v1
 param_changes: []
 param_specs: {}
 schema_version: 1
@@ -1199,8 +1106,7 @@ states:
     widget_id: TextInput
 """)
 
-    YAML_CONTENT_V2 = (
-"""default_skin: conversation_v1
+    YAML_CONTENT_V2 = ("""default_skin: conversation_v1
 init_state_name: (untitled state)
 param_changes: []
 param_specs: {}
@@ -1251,8 +1157,7 @@ states:
       widget_id: TextInput
 """)
 
-    YAML_CONTENT_V3 = (
-"""author_notes: ''
+    YAML_CONTENT_V3 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1316,8 +1221,7 @@ states:
       widget_id: TextInput
 """)
 
-    YAML_CONTENT_V4 = (
-"""author_notes: ''
+    YAML_CONTENT_V4 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1379,8 +1283,7 @@ states:
     param_changes: []
 """)
 
-    YAML_CONTENT_V5 = (
-"""author_notes: ''
+    YAML_CONTENT_V5 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1444,8 +1347,7 @@ states:
 tags: []
 """)
 
-    YAML_CONTENT_V6 = (
-"""author_notes: ''
+    YAML_CONTENT_V6 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1531,8 +1433,7 @@ states_schema_version: 3
 tags: []
 """)
 
-    YAML_CONTENT_V7 = (
-"""author_notes: ''
+    YAML_CONTENT_V7 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1606,8 +1507,7 @@ states_schema_version: 4
 tags: []
 """)
 
-    YAML_CONTENT_V8 = (
-"""author_notes: ''
+    YAML_CONTENT_V8 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1681,8 +1581,7 @@ states_schema_version: 5
 tags: []
 """)
 
-    YAML_CONTENT_V9 = (
-"""author_notes: ''
+    YAML_CONTENT_V9 = ("""author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -1759,8 +1658,7 @@ states_schema_version: 6
 tags: []
 """)
 
-    YAML_CONTENT_V10 = (
-"""author_notes: ''
+    YAML_CONTENT_V10 = ("""author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -1906,12 +1804,12 @@ class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
     def test_convert_exploration_to_player_dict(self):
-        EXP_TITLE = 'Title'
-        SECOND_STATE_NAME = 'first state'
+        exp_title = 'Title'
+        second_state_name = 'first state'
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'eid', EXP_TITLE, 'Category')
-        exploration.add_states([SECOND_STATE_NAME])
+            'eid', exp_title, 'Category')
+        exploration.add_states([second_state_name])
 
         def _get_default_state_dict(content_str, dest_name):
             return {
@@ -1936,18 +1834,18 @@ class ConversionUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exploration.to_player_dict(), {
             'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'title': EXP_TITLE,
+            'title': exp_title,
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,
                     feconf.DEFAULT_INIT_STATE_NAME),
-                SECOND_STATE_NAME: _get_default_state_dict(
-                    '', SECOND_STATE_NAME),
+                second_state_name: _get_default_state_dict(
+                    '', second_state_name),
             },
             'param_changes': [],
             'param_specs': {},
             'skin_customizations': (
-                exp_domain.SkinInstance._get_default_skin_customizations(
+                exp_domain.SkinInstance._get_default_skin_customizations(  # pylint: disable=protected-access
                     feconf.DEFAULT_SKIN_ID)
             ),
         })
@@ -1963,7 +1861,8 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['first state'])
 
         with self.assertRaisesRegexp(
-                ValueError, 'Cannot delete initial state'):
+            ValueError, 'Cannot delete initial state'
+            ):
             exploration.delete_state(exploration.init_state_name)
 
         exploration.add_states(['second state'])
@@ -1976,8 +1875,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', 'Title', 'Category')
-        with self.assertRaises(KeyError):
-            exploration.states['invalid_state_name']
+        self.assertNotIn('invalid_state_name', exploration.states)
 
         self.assertEqual(len(exploration.states), 1)
 
@@ -2072,7 +1970,8 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
                 'bottom'][0].name, TEST_GADGET_DICT['gadget_name'])
 
             with self.assertRaisesRegexp(
-                    ValueError, 'Gadget NotARealGadget does not exist.'):
+                ValueError, 'Gadget NotARealGadget does not exist.'
+                ):
                 exploration.rename_gadget('NotARealGadget', 'ANewName')
 
             exploration.rename_gadget(
@@ -2090,7 +1989,8 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
             )
 
             with self.assertRaisesRegexp(
-                    ValueError, 'Duplicate gadget name: ANewName'):
+                ValueError, 'Duplicate gadget name: ANewName'
+                ):
                 exploration.rename_gadget('ATestGadget', 'ANewName')
 
             gadget_instance = exploration.get_gadget_instance_by_name(
@@ -2100,7 +2000,7 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
                 gadget_instance
             )
 
-            panel = exploration._get_panel_for_gadget('ANewName')
+            panel = exploration._get_panel_for_gadget('ANewName')  # pylint: disable=protected-access
             self.assertEqual(panel, 'bottom')
 
             exploration.delete_gadget('ANewName')
@@ -2108,7 +2008,8 @@ class GadgetOperationsUnitTests(test_utils.GenericTestBase):
             self.assertEqual(exploration.skin_instance.panel_contents_dict[
                 'bottom'], [])
             with self.assertRaisesRegexp(
-                    ValueError, 'Gadget ANewName does not exist.'):
+                ValueError, 'Gadget ANewName does not exist.'
+                ):
                 exploration.delete_gadget('ANewName')
 
 
@@ -2212,11 +2113,10 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
             'width_px',
             4600):
 
-            with self.assertRaisesRegexp(
-                    utils.ValidationError,
-                    'Size exceeded: bottom panel width of 4600 exceeds limit of '
-                    '350'):
-                exploration.validate()
+            self._assert_validation_error(
+                exploration,
+                'Size exceeded: bottom panel width of 4600 exceeds limit of '
+                '350')
 
         # Assert internal validation against CustomizationArgSpecs.
         test_gadget_instance.customization_args[
@@ -2228,8 +2128,9 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
                 ]
             )
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'TestGadget is limited to 3 tips, found 4.'):
+            utils.ValidationError,
+            'TestGadget is limited to 3 tips, found 4.'
+            ):
             test_gadget_instance.validate()
         test_gadget_instance.customization_args[
             'adviceObjects']['value'].pop()
@@ -2237,9 +2138,10 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
         # Assert that too many gadgets in a panel raise a ValidationError.
         panel_contents_dict['bottom'].append(test_gadget_instance)
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                '\'bottom\' panel expected at most 1 gadget, but 2 gadgets are '
-                'visible in state \'New state\'.'):
+            utils.ValidationError,
+            '\'bottom\' panel expected at most 1 gadget, but 2 gadgets are '
+            'visible in state \'New state\'.'
+            ):
             exploration.validate()
 
         # Assert that an error is raised when a gadget is not visible in any
@@ -2286,7 +2188,7 @@ class GadgetVisibilityInStatesUnitTests(test_utils.GenericTestBase):
             'exp1', SAMPLE_YAML_CONTENT_WITH_GADGETS)
 
         affected_gadget_instances = (
-            exploration._get_gadget_instances_visible_in_state('Second state'))
+            exploration._get_gadget_instances_visible_in_state('Second state'))  # pylint: disable=protected-access
 
         self.assertEqual(len(affected_gadget_instances), 1)
         self.assertEqual(affected_gadget_instances[0].name, 'ATestGadget')

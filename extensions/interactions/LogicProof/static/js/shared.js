@@ -19,7 +19,6 @@
  */
 
 var logicProofShared = (function() {
-
   // Used by parseLineString() to limit the number of possible parsings of a
   // line (or line template) considered.
   var MAX_NUM_PARSINGS_PERMITTED = 1000;
@@ -27,43 +26,45 @@ var logicProofShared = (function() {
   // typings of an expression considered.
   var MAX_NUM_TYPINGS_PERMITTED = 1000;
 
-  ////////////////// ERROR-HANDLING  //////////////////////////////////////////
+  // ERROR-HANDLING
 
   // UserErrors have codes that refer to entries in the errorDictionary (which
   // is either logicProofData.BASE_GENERAL_MESSAGES or
   // logicProofTeacher.TEACHER_ERROR_MESSAGES), from which a human-readable
   // message can be constructed.
-  function UserError(code, parameters) {
+  var UserError = function(code, parameters) {
     this.name = 'UserError';
     this.code = code;
     this.parameters = parameters || {};
-  }
+  };
 
   // These errors already have messages which are user-readable.
-  function PreRenderedUserError(messages, code) {
+  var PreRenderedUserError = function(messages, code) {
     this.name = 'PreRenderedUserError';
     this.messages = messages;
     this.code = code;
-  }
+  };
   // TODO (Jacob) Make these errors prototype from Error()
 
- /** Converts a message template into a string to show to the user.
-  * @param messageTemplate: a GeneralMessageTemplate object that determines how
-  * to build the string describing an error.
-  * @param parameterFormats: a dictionary of GeneralMessageParameters, which
-  *        specify the format of the parameter in question (e.g. 'string').
-  * @param parameters: a dictionary giving the values of the parameters for
-  *        this particular instance of the message.
-  * @param language: the relevant Language.
-  * @result a user-readable string.
-  */
-  var renderGeneralMessage = function(messageTemplate, parameterFormats, parameters, language) {
+  /** Converts a message template into a string to show to the user.
+   * @param messageTemplate: a GeneralMessageTemplate object that determines how
+   * to build the string describing an error.
+   * @param parameterFormats: a dictionary of GeneralMessageParameters, which
+   *        specify the format of the parameter in question (e.g. 'string').
+   * @param parameters: a dictionary giving the values of the parameters for
+   *        this particular instance of the message.
+   * @param language: the relevant Language.
+   * @result a user-readable string.
+   */
+  var renderGeneralMessage = function(
+      messageTemplate, parameterFormats, parameters, language) {
     var message = '';
     for (var i = 0; i < messageTemplate.length; i++) {
       if (messageTemplate[i].isFixed) {
         message += messageTemplate[i].content;
       } else {
-        var parameterFormat = parameterFormats[messageTemplate[i].content].format;
+        var parameterFormat = parameterFormats[
+          messageTemplate[i].content].format;
         var parameter = parameters[messageTemplate[i].content];
         switch (parameterFormat) {
           case 'string':
@@ -73,65 +74,76 @@ var logicProofShared = (function() {
             message += displayExpression(parameter, language.operators);
             break;
           default:
-            throw Error('Unknown format ' + parameterFormat + ' sent to renderGeneralMessage().');
+            throw Error(
+              'Unknown format ' + parameterFormat +
+              ' sent to renderGeneralMessage().');
         }
       }
     }
     return message;
   };
 
- /**
-  * @param error: a UserError object
-  * @param errorDictionary: a dictionary keyed by error codes for each of which
-  *        it provides a description of possible ways to display the error to
-  *        the user, one of which will be chosen at random.
-  * @param language: the relevant Language
-  * @result A string to show to the user describing what went wrong.
-  */
+  /**
+   * @param {UserError} error - a UserError object
+   * @param {object} errorDictionary - a dictionary keyed by error codes for
+   *        each of which it provides a description of possible ways to display
+   *        the error to the user, one of which will be chosen at random.
+   * @param {Language} language - the relevant Language
+   * @return {string} A string to show to the user describing what went wrong.
+   */
   var renderError = function(error, errorDictionary, language) {
     if (error.name === 'UserError') {
       if (!errorDictionary.hasOwnProperty(error.code)) {
-        throw new Error('Unknown error code ' + error.code + ' sent to renderError().');
+        throw new Error(
+          'Unknown error code ' + error.code + ' sent to renderError().');
       }
       var messageTemplates = errorDictionary[error.code].templates;
-      var messageTemplate = messageTemplates[Math.floor((Math.random()*messageTemplates.length))];
+      var messageTemplate = messageTemplates[
+        Math.floor((Math.random() * messageTemplates.length))];
       return renderGeneralMessage(
         messageTemplate, errorDictionary[error.code].parameters,
         error.parameters, language);
     } else if (error.name === 'PreRenderedUserError') {
-      return error.messages[Math.floor((Math.random()*error.messages.length))];
+      return error.messages[
+        Math.floor((Math.random() * error.messages.length))];
     } else {
       throw error;
     }
   };
 
-///////////////////  DISPLAY  /////////////////////////////////////////////////
+  // DISPLAY
 
- /**
-  * @param expression: an Expression, which is to be displayed
-  * @param operators: provides the symbols keys of the operators so that we
-  *        we know e.g. 'for_all' should be displayed using '@'.
-  * @result A string representing the expression that can be shown to the user.
-  */
+  /**
+   * @param {Expression} expression - an Expression, which is to be displayed
+   * @param {object} operators - provides the symbols keys of the operators so
+   *        that we we know e.g. 'for_all' should be displayed using '@'.
+   * @return {string} A string representing the expression that can be shown to
+   *        the user.
+   */
   var displayExpression = function(expression, operators) {
     return displayExpressionHelper(expression, operators, 0);
-  }
+  };
 
- /**
-  * As for displayExpression() with the addition of:
-  * @param desirabilityOfBrackets used internally to determine whether to
-  *        surround the formula with brackets.
-  */
-  var displayExpressionHelper = function(expression, operators, desirabilityOfBrackets) {
+  /**
+   * Recursive helper for displayExpression().
+   *
+   * @param {Expression} expression - an Expression, which is to be displayed
+   * @param {object} operators - provides the symbols keys of the operators so
+   *        that we we know e.g. 'for_all' should be displayed using '@'.
+   * @param {int} desirabilityOfBrackets - used internally to determine whether
+   *        to surround the formula with brackets.
+   * @return {string} A string representing the expression.
+   */
+  var displayExpressionHelper = function(
+      expression, operators, desirabilityOfBrackets) {
     var desirabilityOfBracketsBelow = (
         expression.top_kind_name === 'binary_connective' ||
         expression.top_kind_name === 'binary_relation' ||
-        expression.top_kind_name === 'binary_function') ?
-      2:
-      (expression.top_kind_name === 'unary_connective' ||
-        expression.top_kind_name === 'quantifier') ?
-        1:
-        0;
+        expression.top_kind_name === 'binary_function'
+      ) ? 2 : (
+        expression.top_kind_name === 'unary_connective' ||
+        expression.top_kind_name === 'quantifier'
+      ) ? 1 : 0;
     var processedArguments = [];
     var processedDummies = [];
     for (var i = 0; i < expression.arguments.length; i++) {
@@ -146,36 +158,42 @@ var logicProofShared = (function() {
     }
 
     var symbol = (!operators.hasOwnProperty(expression.top_operator_name)) ?
-      expression.top_operator_name:
+      expression.top_operator_name :
       (!operators[expression.top_operator_name].hasOwnProperty('symbols')) ?
-        expression.top_operator_name:
+        expression.top_operator_name :
         operators[expression.top_operator_name].symbols[0];
 
     if (expression.top_kind_name === 'binary_connective' ||
         expression.top_kind_name === 'binary_relation' ||
         expression.top_kind_name === 'binary_function') {
-      return (desirabilityOfBrackets > 0) ? '(' + processedArguments.join(symbol) + ')':
-        processedArguments.join(symbol);
+      return (
+        desirabilityOfBrackets > 0 ?
+        '(' + processedArguments.join(symbol) + ')' :
+        processedArguments.join(symbol));
     } else if (expression.top_kind_name === 'unary_connective') {
       var output = symbol + processedArguments[0];
-      return (desirabilityOfBrackets === 2) ? '(' + output + ')': output;
+      return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'quantifier') {
       var output = symbol + processedDummies[0] + '.' + processedArguments[0];
-      return (desirabilityOfBrackets === 2) ? '(' + output + ')': output;
+      return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'bounded_quantifier') {
       var output = symbol + processedArguments[0] + '.' + processedArguments[1];
-      return (desirabilityOfBrackets === 2) ? '(' + output + ')': output;
+      return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'prefix_relation' ||
         expression.top_kind_name === 'prefix_function') {
       return symbol + '(' + processedArguments.join(',') + ')';
     } else if (expression.top_kind_name === 'ranged_function') {
-      return symbol + '{' + processedArguments[0] + ' | ' + processedArguments[1] + '}';
+      return (
+        symbol + '{' + processedArguments[0] + ' | ' + processedArguments[1] +
+        '}');
     } else if (expression.top_kind_name === 'atom' ||
       expression.top_kind_name === 'constant' ||
       expression.top_kind_name === 'variable') {
       return symbol;
     } else {
-      throw Error('Unknown kind ' + expression.top_kind_name + ' sent to displayExpression()');
+      throw Error(
+        'Unknown kind ' + expression.top_kind_name +
+        ' sent to displayExpression()');
     }
   };
 
@@ -186,21 +204,20 @@ var logicProofShared = (function() {
         displayExpressionHelper(expressionArray[i], operators));
     }
     return processedArray.join(', ');
-  }
+  };
 
+  // PARSING
 
-///////////////////////////  PARSING  /////////////////////////////////////////
-
- /**
-  * This function checks whether the string contains any symbol that occurs
-  * in a member of the symbols key for some operator (these will be
-  * symbols such as ∀, =, <).
-  * @param string: contains the characters we check
-  * @param operators: a dictionary of Operator objects
-  * @param isTemplate: denotes that the string represents a line template (which
-  *        may have substitutions) and not just a line.
-  * @result true or false
-  */
+  /**
+   * This function checks whether the string contains any symbol that occurs
+   * in a member of the symbols key for some operator (these will be
+   * symbols such as ∀, =, <).
+   * @param {string} string - contains the characters we check
+   * @param {object} operators - a dictionary of Operator objects
+   * @param {boolean} isTemplate - denotes that the string represents a line
+   *        template (which may have substitutions) and not just a line.
+   * @return {boolean} true or false
+   */
   var containsLogicalCharacter = function(string, operators, isTemplate) {
     var GENERAL_LOGICAL_CHARACTERS = '(),';
     var TEMPLATE_LOGICAL_CHARACTERS = '[->]{|}';
@@ -208,7 +225,8 @@ var logicProofShared = (function() {
     if (containsCharacterFromArray(string, GENERAL_LOGICAL_CHARACTERS)) {
       return true;
     }
-    if (isTemplate && containsCharacterFromArray(string, TEMPLATE_LOGICAL_CHARACTERS)) {
+    if (isTemplate &&
+        containsCharacterFromArray(string, TEMPLATE_LOGICAL_CHARACTERS)) {
       return true;
     }
 
@@ -227,80 +245,87 @@ var logicProofShared = (function() {
     return false;
   };
 
- /**
-  * This function strips whitespace from within expressions, whilst using the
-  * whitespace between expressions to split a line into an array of word /
-  * expression strings.
-  * e.g. 'from p and q we have p ∧ q' will be converted to ['from', 'p',
-  *   'and', 'q', 'we', 'have', 'p∧q'].
-  * @param inputString: the string from which whitespace is to be stripped.
-  * @param operators: a dictionary of the Operator objects usable in the line
-  * @param isTemplate: denotes that the string represents a line template (which
-  *        may have substitutions) and not just a line.
-  * @result A non-empty array of words and expressions (as strings).
-  * @raises if the line is blank or contains an unknown character.
-  */
+  /**
+   * This function strips whitespace from within expressions, whilst using the
+   * whitespace between expressions to split a line into an array of word /
+   * expression strings.
+   *  e.g. 'from p and q we have p ∧ q' will be converted to ['from', 'p',
+   *   'and', 'q', 'we', 'have', 'p∧q'].
+   * @param {string} inputString - the string from which whitespace is to be
+   *        stripped.
+   * @param {object} operators - a dictionary of the Operator objects usable in
+   *        the line
+   * @param {boolean} isTemplate - denotes that the string represents a line
+   *        template (which may have substitutions) and not just a line.
+   * @return {Array} A non-empty array of words and expressions (as strings).
+   * @throws if the line is blank or contains an unknown character.
+   */
   var preParseLineString = function(inputString, operators, isTemplate) {
-
     // The logical characters that may occur at the start and end of a formula
     // respectively. The unicode characters are 'for all' and 'exists'.
     var POSSIBLE_START_CHARS = '({\u2200\u2203~';
     var POSSIBLE_END_CHARS = ')}]';
 
-    var POSSIBLE_NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _';
+    var POSSIBLE_NAME_CHARS = (
+      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _');
 
     var _absorbsSpacesToTheLeft = function(character) {
       return containsLogicalCharacter(character, operators, isTemplate) &&
         !containsCharacter(POSSIBLE_START_CHARS, character);
-    }
+    };
     var _absorbsSpacesToTheRight = function(character) {
       return (containsLogicalCharacter(character, operators, isTemplate) &&
         !containsCharacter(POSSIBLE_END_CHARS, character)) ||
         character === ' ';
-    }
+    };
     var _isLegalCharacter = function(character) {
       return containsCharacter(POSSIBLE_NAME_CHARS, character) ||
         containsLogicalCharacter(character, operators, isTemplate);
-    }
+    };
 
     var strippedString = '';
     for (var i = 0; i < inputString.length; i++) {
       if (!_isLegalCharacter(inputString[i])) {
-        throw new UserError('illegal_symbol', {symbol: inputString[i]});
+        throw new UserError('illegal_symbol', {
+          symbol: inputString[i]
+        });
       }
       // We keep all non-spaces, and all spaces that are absorbed neither by
       // characters to their left nor their right.
       if (inputString[i] !== ' ' ||
-          (i === 0 || !_absorbsSpacesToTheRight(strippedString[strippedString.length - 1])) &&
-          (i === inputString.length - 1 || !_absorbsSpacesToTheLeft(inputString[i + 1]))) {
+          (i === 0 || !_absorbsSpacesToTheRight(
+            strippedString[strippedString.length - 1])) &&
+          (i === inputString.length - 1 || !_absorbsSpacesToTheLeft(
+            inputString[i + 1]))) {
         strippedString += inputString[i];
       }
     }
 
     if (strippedString.replace(/ /g, '') === '') {
-      throw new UserError('blank_line', {})
+      throw new UserError('blank_line', {});
     }
     return strippedString.trim().split(' ');
   };
 
- /**
-  * @param inputString: written by the user - we will parse it.
-  * @param operators: the relevant operators, which are just needed for their
-  *        symbols so we can identify whether the symbols the user is using are
-  *        legitimate.
-  * @param vocabulary: a dictionary whose keys are phrases such as 'have'
-  *        whose entries are arrays of possible ways to write each phrase, for
-  *        example ['have', 'we have']. We will attempt to match sections of
-  *        the inputString to the ways of writing each phrase.
-  * @param isTemplate: if true, we parse the input as a LineTemplate; otherwise
-  *        we parse it as a Line.
-  * @result A LineTemplate.reader_view if isTemplate === true, and a ProtoLine if
-  *         isTemplate === false.
-  * @raises If a section of the string cannot be identified as either a phrase
-  *         or an expression then we throw an error that tries to best identify
-  *         what the user intended and did wrong.
-  */
-  var parseLineString = function(inputString, operators, vocabulary, isTemplate) {
+  /**
+   * @param {string} inputString - written by the user - we will parse it.
+   * @param {object} operators - the relevant operators, which are just needed
+   *        for their symbols so we can identify whether the symbols the user
+   *        is using are legitimate.
+   * @param {object} vocabulary - a dictionary whose keys are phrases such as
+   *        'have' whose entries are arrays of possible ways to write each
+   *        phrase, for example ['have', 'we have']. We will attempt to match
+   *        sections of the inputString to the ways of writing each phrase.
+   * @param {boolean} isTemplate - if true, we parse the input as a
+   *        LineTemplate; otherwise we parse it as a Line.
+   * @return {*} A LineTemplate.reader_view if isTemplate === true, and a
+   *         ProtoLine if isTemplate === false.
+   * @throws If a section of the string cannot be identified as either a phrase
+   *         or an expression then we throw an error that tries to best identify
+   *         what the user intended and did wrong.
+   */
+  var parseLineString = function(
+      inputString, operators, vocabulary, isTemplate) {
     var unparsedArray = preParseLineString(inputString, operators, isTemplate);
 
     // We compile all words occurring in the vocabulary, to help us identify
@@ -309,7 +334,8 @@ var logicProofShared = (function() {
     for (var key in vocabulary) {
       for (var i = 0; i < vocabulary[key].length; i++) {
         for (var j = 0; j < vocabulary[key][i].split(' ').length; j++) {
-          if (vocabularyWords.indexOf(vocabulary[key][i].split(' ')[j]) === -1) {
+          if (vocabularyWords.indexOf(
+                vocabulary[key][i].split(' ')[j]) === -1) {
             vocabularyWords.push(vocabulary[key][i].split(' ')[j]);
           }
         }
@@ -335,14 +361,17 @@ var logicProofShared = (function() {
       for (var j = i + 1; j <= unparsedArray.length; j++) {
         for (var key in vocabulary) {
           for (var k = 0; k < vocabulary[key].length; k++) {
-            if (unparsedArray.slice(i, j).join(' ').toLowerCase() === vocabulary[key][k]) {
+            if (unparsedArray.slice(i, j).join(' ').toLowerCase() ===
+                vocabulary[key][k]) {
               // We have identified the next (j-i)-many words together form a
               // phrase in the vocabulary dictionary.
               for (var l = 0; l < partiallyParsedArrays[i].length; l++) {
-                partiallyParsedArrays[j].push(partiallyParsedArrays[i][l].concat([{
-                  format: 'phrase',
-                  content: key
-                }]))
+                partiallyParsedArrays[j].push(
+                  partiallyParsedArrays[i][l].concat([{
+                    format: 'phrase',
+                    content: key
+                  }])
+                );
               }
             }
           }
@@ -359,25 +388,27 @@ var logicProofShared = (function() {
         // We attempt to parse this entry as an expression / expression template
         try {
           var expression = logicProofParser.parse(
-            unparsedArray[i], isTemplate ? 'expressionTemplate': 'expression')
+            unparsedArray[i], isTemplate ? 'expressionTemplate' : 'expression');
           for (var j = 0; j < partiallyParsedArrays[i].length; j++) {
-            // We do not allow a line to have two expressions in a row. This is to
-            // allow the identification of typos: For example if the user types
-            // 'fron p∧q ...' then otherwise we would think that both 'fron' and
-            // 'p∧q' are expressions. We also do not attempt to parse a word as an
-            // expression if it is a vocabulary word, to avoid masses of silly
-            // attempts to parse the line.
+            // We do not allow a line to have two expressions in a row. This is
+            // to allow the identification of typos: For example if the user
+            // types 'fron p∧q ...' then otherwise we would think that both
+            // 'fron' and 'p∧q' are expressions. We also do not attempt to
+            // parse a word as an expression if it is a vocabulary word, to
+            // avoid masses of silly attempts to parse the line.
             if (i === 0 ||
                 partiallyParsedArrays[i][j][
                   partiallyParsedArrays[i][j].length - 1
                 ].format === 'phrase') {
-              partiallyParsedArrays[i+1].push(partiallyParsedArrays[i][j].concat([{
-                format: 'expression',
-                content: expression
-              }]))
+              partiallyParsedArrays[i + 1].push(
+                partiallyParsedArrays[i][j].concat([{
+                  format: 'expression',
+                  content: expression
+                }])
+              );
             }
           }
-        } catch(err) {}
+        } catch (err) {}
       }
     }
 
@@ -392,7 +423,8 @@ var logicProofShared = (function() {
           break;
         }
       }
-      // We return a description of the problem, based on one of the best attempts.
+      // We return a description of the problem, based on one of the best
+      // attempts.
       // NOTE: This is not guaranteed to correctly identify the mistake the
       // user made. It could do with improvement based on user feedback.
       // containsLogicalCharacter is used to guess if something is an
@@ -403,51 +435,71 @@ var logicProofShared = (function() {
           bestAttempt[bestAttempt.length - 1].format === 'phrase') {
         var word = unparsedArray[numEntriesMatched];
         throw (vocabularyWords.indexOf(word) !== -1) ?
-          new UserError('unidentified_phrase_starting_at', {word: word}):
-          new UserError('unidentified_word', {word: word})
+          new UserError('unidentified_phrase_starting_at', {
+            word: word
+          }) :
+          new UserError('unidentified_word', {
+            word: word
+          });
       } else {
         var word1 = unparsedArray[numEntriesMatched - 1];
         var word2 = unparsedArray[numEntriesMatched];
         if (vocabularyWords.indexOf(word1) !== -1) {
-          throw new UserError('unidentified_phrase_starting_at', {word: word1});
+          throw new UserError('unidentified_phrase_starting_at', {
+            word: word1
+          });
         } else if (containsLogicalCharacter(word1, operators, isTemplate)) {
           throw (vocabularyWords.indexOf(word2) !== -1) ?
-            new UserError('unidentified_phrase_starting_at', {word: word2}):
-            (containsLogicalCharacter(word2, operators, isTemplate)) ?
-              new UserError('consecutive_expressions', {word1: word1, word2: word2}):
-              new UserError('unidentified_word', {word: word2})
+            new UserError('unidentified_phrase_starting_at', {
+              word: word2
+            }) :
+            containsLogicalCharacter(word2, operators, isTemplate) ?
+            new UserError('consecutive_expressions', {
+              word1: word1,
+              word2: word2
+            }) :
+            new UserError('unidentified_word', {
+              word: word2
+            });
         } else {
           throw (vocabularyWords.indexOf(word2) !== -1) ?
-            new UserError('unidentified_phrase_starting_at', {word: word2}):
-            (containsLogicalCharacter(word2, operators, isTemplate)) ?
-              new UserError('unidentified_word', {word: word1}):
-              new UserError('unidentified_words', {word1: word1, word2: word2});
+            new UserError('unidentified_phrase_starting_at', {
+              word: word2
+            }) :
+            containsLogicalCharacter(word2, operators, isTemplate) ?
+              new UserError('unidentified_word', {
+                word: word1
+              }) :
+              new UserError('unidentified_words', {
+                word1: word1,
+                word2: word2
+              });
         }
       }
     }
   };
 
-////////////////////  TYPING ASSIGNMENT ///////////////////////////////////////
+  // TYPING ASSIGNMENT
 
- /**
-  * This takes an array of TypingElements and converts it into an array of
-  * types.
-  * @param types: an array of dictionaries of the form {
-  *                 type: the name of an available type ('boolean' or 'element')
-  *                 arbitrarily_many: boolean
-  *               }
-  *               where at most one member can have 'arbitrarily_many' set to
-  *               true, signifying that any number of arguments of this type
-  *               can occur here.
-  * @param desiredLength: the number of entries we would like to have.
-  * @result: an array of types with the right number of entries, derived from
-  *          'types'.
-  * @raises if this is not possible.
-  */
+  /**
+   * This takes an array of TypingElements and converts it into an array of
+   * types.
+   * @param {Array.<Object>} types - an array of dictionaries of the form {
+   *               type: the name of an available type ('boolean' or 'element')
+   *               arbitrarily_many: boolean
+   *            }
+   *          where at most one member can have 'arbitrarily_many' set to
+   *          true, signifying that any number of arguments of this type
+   *          can occur here.
+   * @param {int} desiredLength - the number of entries we would like to have.
+   * @returns {array} an array of types with the right number of entries,
+   *          derived from 'types'.
+   * @throws if this is not possible.
+   */
   var instantiateTypingElementArray = function(types, desiredLength) {
     var listOfTypes = [];
     for (var i = 0; i < types.length; i++) {
-      listOfTypes.push(types[i].type)
+      listOfTypes.push(types[i].type);
       if (types[i].arbitrarily_many) {
         var indexWithArbitrarilyMany = i;
       }
@@ -456,7 +508,9 @@ var logicProofShared = (function() {
       if (types.length === desiredLength) {
         return listOfTypes;
       } else {
-        throw new UserError('wrong_num_inputs', {num_needed: desiredLength});
+        throw new UserError('wrong_num_inputs', {
+          num_needed: desiredLength
+        });
       }
     } else {
       var output = [];
@@ -472,37 +526,39 @@ var logicProofShared = (function() {
         }
         return output;
       } else {
-        throw new UserError('not_enough_inputs', {num_needed: desiredLength});
+        throw new UserError('not_enough_inputs', {
+          num_needed: desiredLength
+        });
       }
     }
   };
 
- /**
-  * This takes an (untyped) Expression, usually provided by the parser, and
-  * returns a TypedExpression in which types have been added at each level.
-  * @param untypedExpression: the expression to be typed
-  * @param possibleTopTypes: an array of types that the expression as a whole
-  *        could have - each will be tried in turn.
-  * @param language: the relevant language
-  * @param newKindsPermitted: an array of kinds (e.g. 'variable', 'constant')
-  *        of which the user is allowed to create new operators. Any operator
-  *        with a kind not in this list and that does not already occur in the
-  *        language will cause an error.
-  * @param permitDuplicateDummyNames: if true the user can write e.g. ∀x.p even
-  *        if x is already in use; if false they cannot.
-  * @result An array of dictionaries of the form: {
-  *           typedExpression: A TypedExpression
-  *           operators: the given language.operatorss together with any new
-  *             operators that occurred in the expression.
-  * @raises If a valid typing cannot be found this function will throw a
-  *         UserError. The parameters of this error will contain an additional
-  *         key 'amountTyped' that determines where the error occurred. e.g.
-  *         [1,2,0] would indicate that there was a problem at the 0th input
-  *         (dummy or argument) of the 2nd input of the 1st input of this
-  *         expression. We return the typing attempt for which this  value is
-  *         largest (in lexicographic ordering) as this is likely to be closest
-  *         to what the user intended.
-  */
+  /**
+   * This takes an (untyped) Expression, usually provided by the parser, and
+   * returns a TypedExpression in which types have been added at each level.
+   * @param {Expression} untypedExpression - the expression to be typed
+   * @param {Array} possibleTopTypes - an array of types that the expression as
+   *        a whole could have - each will be tried in turn.
+   * @param {Language} language - the relevant language
+   * @param {Array} newKindsPermitted - an array of kinds (e.g. 'variable',
+   *        'constant') of which the user is allowed to create new operators.
+   *        Any operator with a kind not in this list and that does not already
+   *        occur in the language will cause an error.
+   * @param {boolean} permitDuplicateDummyNames - if true the user can write
+   *        e.g. ∀x.p even if x is already in use; if false they cannot.
+   * @return {array} An array of dictionaries of the form: {
+   *           typedExpression: A TypedExpression
+   *           operators: the given language.operatorss together with any new
+   *             operators that occurred in the expression.
+   * @throws If a valid typing cannot be found this function will throw a
+   *         UserError. The parameters of this error will contain an additional
+   *         key 'amountTyped' that determines where the error occurred. e.g.
+   *         [1,2,0] would indicate that there was a problem at the 0th input
+   *         (dummy or argument) of the 2nd input of the 1st input of this
+   *         expression. We return the typing attempt for which this  value is
+   *         largest (in lexicographic ordering) as this is likely to be closest
+   *         to what the user intended.
+   */
   var assignTypesToExpression = function(untypedExpression, possibleTopTypes,
       language, newKindsPermitted, permitDuplicateDummyNames) {
     var operators = language.operators;
@@ -510,7 +566,6 @@ var logicProofShared = (function() {
     permitDuplicateDummyNames = permitDuplicateDummyNames || false;
 
     var _attemptTyping = function(topType, typingRule) {
-
       if (!operatorIsNew &&
           untypedExpression.top_kind_name !==
             operators[untypedExpression.top_operator_name].kind) {
@@ -530,12 +585,14 @@ var logicProofShared = (function() {
         });
       }
 
-      var _isNumber = function(n){
+      var _isNumber = function(n) {
         return !isNaN(parseFloat(n)) && isFinite(n);
-      }
-      var _isString = function(s){
-        return s[0] === '\'' && s[s.length-1] === '\''
-      }
+      };
+
+      var _isString = function(s) {
+        return s[0] === '\'' && s[s.length - 1] === '\'';
+      };
+
       if (language.types.hasOwnProperty('integer') &&
           _isNumber(untypedExpression.top_operator_name) &&
           untypedExpression.top_kind_name === 'constant' &&
@@ -545,7 +602,7 @@ var logicProofShared = (function() {
           expected_type: topType,
           actual_type: 'integer',
           amount_typed: []
-        })
+        });
       }
       if (language.types.hasOwnProperty('string') &&
           _isString(untypedExpression.top_operator_name) &&
@@ -556,16 +613,16 @@ var logicProofShared = (function() {
           expected_type: topType,
           actual_type: 'string',
           amount_typed: []
-        })
+        });
       }
 
       try {
         var argumentTypes = instantiateTypingElementArray(
           typingRule.arguments, untypedExpression.arguments.length);
       } catch (err) {
-        err.parameters['operator'] = untypedExpression.top_operator_name;
-        err.parameters['input_category'] = 'arguments';
-        err.parameters['amount_typed'] = [];
+        err.parameters.operator = untypedExpression.top_operator_name;
+        err.parameters.input_category = 'arguments';
+        err.parameters.amount_typed = [];
         throw err;
       }
 
@@ -573,9 +630,9 @@ var logicProofShared = (function() {
         var dummyTypes = instantiateTypingElementArray(
           typingRule.dummies, untypedExpression.dummies.length);
       } catch (err) {
-        err.parameters['operator'] = untypedExpression.top_operator_name;
-        err.parameters['input_category'] = 'dummies';
-        err.parameters['amount_typed'] = [];
+        err.parameters.operator = untypedExpression.top_operator_name;
+        err.parameters.input_category = 'dummies';
+        err.parameters.amount_typed = [];
         throw err;
       }
       var updatedOperators = {};
@@ -583,7 +640,6 @@ var logicProofShared = (function() {
         updatedOperators[key] = operators[key];
       }
       if (operatorIsNew) {
-
         var _decorateTypes = function(types) {
           decoratedTypes = [];
           for (var k = 0; k < types.length; k++) {
@@ -593,7 +649,7 @@ var logicProofShared = (function() {
             });
           }
           return decoratedTypes;
-        }
+        };
 
         updatedOperators[untypedExpression.top_operator_name] = {
           kind: untypedExpression.top_kind_name,
@@ -614,7 +670,7 @@ var logicProofShared = (function() {
             expression: untypedExpression,
             amount_typed: []
           });
-        } else if (untypedExpression.dummies[n].top_kind_name !== 'variable'){
+        } else if (untypedExpression.dummies[n].top_kind_name !== 'variable') {
           // The parser does not currently permit this to happen
           throw new UserError('dummy_not_variable', {
             dummy: untypedExpression.dummies[n],
@@ -638,20 +694,20 @@ var logicProofShared = (function() {
     if (!operators.hasOwnProperty(untypedExpression.top_operator_name)) {
       if (newKindsPermitted.indexOf(untypedExpression.top_kind_name) === -1) {
         throw new UserError('unknown_operator', {
-          operator: untypedExpression.top_operator_name, amount_typed: []
+          operator: untypedExpression.top_operator_name,
+          amount_typed: []
         });
       } else {
         operatorIsNew = true;
       }
     }
     var typingRules = (operatorIsNew) ?
-      language.kinds[untypedExpression.top_kind_name].typing:
+      language.kinds[untypedExpression.top_kind_name].typing :
       operators[untypedExpression.top_operator_name].typing;
 
     var results = [];
     for (var i = 0; i < possibleTopTypes.length; i++) {
       for (var j = 0; j < typingRules.length; j++) {
-
         try {
           var newAttempts = _attemptTyping(possibleTopTypes[i], typingRules[j]);
           for (var k = 0; k < newAttempts.length; k++) {
@@ -660,13 +716,17 @@ var logicProofShared = (function() {
               typedDummies.push(newAttempts[k].typedArray[l]);
               // These dummy variables should not be available outside this
               // part of the untypedExpression.
-              if (!operators.hasOwnProperty(untypedExpression.dummies[l].top_operator_name)) {
-                delete newAttempts[k].operators[untypedExpression.dummies[l].top_operator_name];
+              if (!operators.hasOwnProperty(
+                    untypedExpression.dummies[l].top_operator_name)) {
+                delete newAttempts[k].operators[
+                  untypedExpression.dummies[l].top_operator_name];
               }
             }
             var typedArguments = [];
             for (var l = untypedExpression.dummies.length;
-                l < untypedExpression.dummies.length + untypedExpression.arguments.length; l++) {
+                 l < untypedExpression.dummies.length +
+                     untypedExpression.arguments.length;
+                 l++) {
               typedArguments.push(newAttempts[k].typedArray[l]);
             }
 
@@ -702,19 +762,19 @@ var logicProofShared = (function() {
     }
   };
 
- /** Companion function to assignTypesToExpression, with the following
-  * modifications:
-  * @param untypedArray: an array of expressions to type
-  * @param topTypes: an array of types that the expressions in the array must
-  *        have (only one option for each).
-  * @numDummies: the number of elements in the array (from the start) that are
-  *              dummies rather than arguments.
-  * @result: {
-  *            typedArray: an array of TypedExpressions
-  *            operators: the updated list of operators
-  *          }
-  * @raises: as before
-  */
+  /** Companion function to assignTypesToExpression, with the following
+   * modifications:
+   * @param untypedArray: an array of expressions to type
+   *  @param topTypes: an array of types that the expressions in the array must
+   *        have (only one option for each).
+   * @numDummies: the number of elements in the array (from the start) that are
+   *              dummies rather than arguments.
+   * @result: {
+   *            typedArray: an array of TypedExpressions
+   *            operators: the updated list of operators
+   *          }
+   * @raises: as before
+   */
   var assignTypesToExpressionArray = function(untypedArray, topTypes, language,
       newKindsPermitted, isTemplate, numDummies) {
     newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
@@ -722,23 +782,22 @@ var logicProofShared = (function() {
     numDummies = numDummies || 0;
 
     var partiallyTypedArrays = [[[]]];
-    var partiallyUpdatedOperatorss = [[{}]];
+    var partiallyUpdatedOperators = [[{}]];
     for (var key in language.operators) {
-      partiallyUpdatedOperatorss[0][0][key] = language.operators[key];
+      partiallyUpdatedOperators[0][0][key] = language.operators[key];
     }
     for (var i = 1; i <= untypedArray.length; i++) {
       partiallyTypedArrays.push([]);
-      partiallyUpdatedOperatorss.push([]);
+      partiallyUpdatedOperators.push([]);
     }
 
     for (var i = 0; i < untypedArray.length; i++) {
-
-      // this will only happen in pathological cases
+      // This will only happen in pathological cases.
       if (partiallyTypedArrays[i].length > MAX_NUM_TYPINGS_PERMITTED) {
         throw new UserError('too_many_typings', {});
       }
 
-      for (var j = 0; j < partiallyTypedArrays[i].length ; j++) {
+      for (var j = 0; j < partiallyTypedArrays[i].length; j++) {
         // Dummies are always allowed to have previously unseen names
         var newKindsPermittedHere = (i < numDummies) ?
           newKindsPermitted.concat(['variable']) :
@@ -746,14 +805,15 @@ var logicProofShared = (function() {
         try {
           var newResults = assignTypesToExpression(
             untypedArray[i], [topTypes[i]], {
-              operators: partiallyUpdatedOperatorss[i][j],
+              operators: partiallyUpdatedOperators[i][j],
               kinds: language.kinds,
               types: language.types
             }, newKindsPermittedHere, isTemplate);
           for (var k = 0; k < newResults.length; k++) {
             partiallyTypedArrays[i + 1].push(
-              partiallyTypedArrays[i][j].concat([newResults[k].typedExpression]));
-            partiallyUpdatedOperatorss[i + 1].push(newResults[k].operators);
+              partiallyTypedArrays[i][j].concat([
+                newResults[k].typedExpression]));
+            partiallyUpdatedOperators[i + 1].push(newResults[k].operators);
           }
         } catch (err) {
           if (!err.hasOwnProperty('parameters')) {
@@ -770,24 +830,23 @@ var logicProofShared = (function() {
       }
     }
     var fullyTypedArrays = partiallyTypedArrays[untypedArray.length];
-    var fullyUpdatedOperatorss = partiallyUpdatedOperatorss[untypedArray.length];
+    var fullyUpdatedOperatorss = partiallyUpdatedOperators[
+    untypedArray.length];
     if (fullyTypedArrays.length > 0) {
       var result = [];
       for (var i = 0; i < fullyTypedArrays.length; i++) {
         result.push({
           typedArray: fullyTypedArrays[i],
           operators: fullyUpdatedOperatorss[i]
-        })
+        });
       }
       return result;
     } else {
-      throw bestAttemptSoFar
+      throw bestAttemptSoFar;
     }
   };
 
-
-
-//////////////////////////  UTILITIES /////////////////////////////////////////
+  // UTILITIES
 
   // Expressions with different dummy variables are considered different
   var checkExpressionsAreEqual = function(expression1, expression2) {
@@ -802,8 +861,10 @@ var logicProofShared = (function() {
         return false;
       }
     }
-    for (var i = 0; i < expression1.arguments.length + expression1.dummies.length; i++) {
-      if (!checkExpressionsAreEqual((expression1.arguments.concat(expression1.dummies))[i],
+    for (var i = 0;
+         i < expression1.arguments.length + expression1.dummies.length; i++) {
+      if (!checkExpressionsAreEqual(
+          (expression1.arguments.concat(expression1.dummies))[i],
           (expression2.arguments.concat(expression2.dummies))[i])) {
         return false;
       }
@@ -818,7 +879,7 @@ var logicProofShared = (function() {
       }
     }
     return false;
-  }
+  };
 
   var checkSetsOfExpressionsAreEqual = function(set1, set2) {
     for (var i = 0; i < set1.length; i++) {
@@ -832,7 +893,7 @@ var logicProofShared = (function() {
       }
     }
     return true;
-  }
+  };
 
   // Returns a list of all the names of operators in an expression. kinds is an
   // array specifying which kinds of operators to return; if it is not supplied
@@ -848,14 +909,13 @@ var logicProofShared = (function() {
   };
 
   var getOperatorsFromExpressionArray = function(array, kinds) {
-    kinds = kinds || false
+    kinds = kinds || false;
     var output = [];
     for (var i = 0; i < array.length; i++) {
       var newOutput = getOperatorsFromExpression(array[i], kinds);
       for (var j = 0; j < newOutput.length; j++) {
         if (output.indexOf(newOutput[j]) === -1) {
           output = output.concat([newOutput[j]]);
-
         }
       }
     }
@@ -866,7 +926,7 @@ var logicProofShared = (function() {
   // error if not found). Does not check for inconsistent typing.
   // NOTE: treats dummy variables like free ones.
   var seekTypeInExpression = function(expression, operator) {
-    return operator === expression.top_operator_name ? expression.type:
+    return operator === expression.top_operator_name ? expression.type :
       seekTypeInExpressionArray(
         expression.arguments.concat(expression.dummies), operator);
   };
@@ -877,11 +937,13 @@ var logicProofShared = (function() {
         return seekTypeInExpression(array[i], operator);
       } catch (err) {}
     }
-    throw UserError('unknown_typing_error', {expression: expression});
+    throw UserError('unknown_typing_error', {
+      expression: expression
+    });
   };
 
   // Returns whether LHS is larger than RHS in lexicographic ordering
-  var greaterThanInLex = function (LHS, RHS) {
+  var greaterThanInLex = function(LHS, RHS) {
     for (var i = 0; i < LHS.length; i++) {
       if (i >= RHS.length) {
         return true;
@@ -897,7 +959,7 @@ var logicProofShared = (function() {
   // Checks if the string contains the character
   var containsCharacter = function(string, character) {
     return (string.indexOf(character) !== -1);
-  }
+  };
 
   // Checks if the string contains some character from the array
   var containsCharacterFromArray = function(string, array) {
@@ -907,7 +969,7 @@ var logicProofShared = (function() {
       }
     }
     return false;
-  }
+  };
 
   return {
     UserError: UserError,

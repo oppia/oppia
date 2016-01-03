@@ -16,17 +16,16 @@
 
 """Models for Oppia statistics."""
 
-__author__ = 'Sean Lip'
-
 import datetime
 import logging
 
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 import utils
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 # TODO(bhenning): Everything is handler name submit; therefore, it is
 # pointless and should be removed.
@@ -91,7 +90,7 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         }])[0]
 
     @classmethod
-    def _get_entity_key(cls, exploration_id, entity_id):
+    def _get_entity_key(cls, unused_exploration_id, entity_id):
         return ndb.Key(cls._get_kind(), entity_id)
 
     @classmethod
@@ -172,13 +171,13 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     def get_new_event_entity_id(cls, exp_id, session_id):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
-                              utils.get_time_in_millisecs(timestamp),
-                              exp_id,
-                              session_id))
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               params, play_type, version=1):
+               params, play_type, unused_version=1):
         """Creates a new start exploration event."""
         # TODO(sll): Some events currently do not have an entity id that was
         # set using this method; it was randomly set instead due tg an error.
@@ -262,9 +261,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     def get_new_event_entity_id(cls, exp_id, session_id):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
-                              utils.get_time_in_millisecs(timestamp),
-                              exp_id,
-                              session_id))
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
@@ -346,9 +345,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     def get_new_event_entity_id(cls, exp_id, session_id):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
-                              utils.get_time_in_millisecs(timestamp),
-                              exp_id,
-                              session_id))
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
@@ -415,9 +414,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     def get_new_event_entity_id(cls, exp_id, session_id):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
-                              utils.get_time_in_millisecs(timestamp),
-                              exp_id,
-                              session_id))
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
 
     @classmethod
     def create(
@@ -463,7 +462,8 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def create(
-        cls, exp_id, version, num_starts, num_completions, state_hit_counts):
+            cls, exp_id, version, num_starts, num_completions,
+            state_hit_counts):
         """Creates a new ExplorationAnnotationsModel."""
         entity_id = cls.get_entity_id(exp_id, version)
         cls(
@@ -476,14 +476,14 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_versions(cls, exploration_id):
-        return [annotations.version for annotations in
-            cls.get_all().filter(
-                cls.exploration_id == exploration_id).fetch(
-                    feconf.DEFAULT_QUERY_LIMIT)]
+        return [
+            annotations.version for annotations in cls.get_all().filter(
+                cls.exploration_id == exploration_id
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
 
 def process_submitted_answer(
-        exploration_id, exploration_version, state_name,
+        exploration_id, unused_exploration_version, state_name,
         rule_spec_string, answer):
     """Adds an answer to the answer log for the rule it hits.
 
@@ -504,7 +504,6 @@ def process_submitted_answer(
         answer_log.put()
     except Exception as e:
         logging.error(e)
-        pass
 
 
 def resolve_answers(

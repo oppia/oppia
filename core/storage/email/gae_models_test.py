@@ -14,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
-
 import datetime
 
 from core.platform import models
-(email_models,) = models.Registry.import_models([models.NAMES.email])
 from core.tests import test_utils
 import feconf
+
+(email_models,) = models.Registry.import_models([models.NAMES.email])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):

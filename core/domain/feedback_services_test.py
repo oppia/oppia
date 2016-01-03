@@ -14,12 +14,11 @@
 
 """Tests for feedback-related services."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import feedback_services
 from core.platform import models
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 from core.tests import test_utils
+
+(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
@@ -27,17 +26,17 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_feedback_ids(self):
         """Test various conventions for thread and message ids."""
-        EXP_ID = '0'
+        exp_id = '0'
         feedback_services.create_thread(
-            EXP_ID, 'a_state_name', None, 'a subject', 'some text')
-        threadlist = feedback_services.get_threadlist(EXP_ID)
+            exp_id, 'a_state_name', None, 'a subject', 'some text')
+        threadlist = feedback_services.get_threadlist(exp_id)
         self.assertEqual(len(threadlist), 1)
         thread_id = threadlist[0]['thread_id']
         # The thread id should be prefixed with the exploration id and a full
         # stop.
-        self.assertTrue(thread_id.startswith('%s.' % EXP_ID))
+        self.assertTrue(thread_id.startswith('%s.' % exp_id))
         # The rest of the thread id should not have any full stops.
-        self.assertNotIn('.', thread_id[len(EXP_ID) + 1:])
+        self.assertNotIn('.', thread_id[len(exp_id) + 1:])
 
         messages = feedback_services.get_messages(threadlist[0]['thread_id'])
         self.assertEqual(len(messages), 1)
@@ -54,14 +53,15 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_create_message_fails_if_invalid_thread_id(self):
         with self.assertRaises(
-                feedback_models.FeedbackMessageModel.EntityNotFoundError):
+            feedback_models.FeedbackMessageModel.EntityNotFoundError
+            ):
             feedback_services.create_message(
                 'invalid_thread_id', 'user_id', None, None, 'Hello')
 
     def test_status_of_newly_created_thread_is_open(self):
-        EXP_ID = '0'
+        exp_id = '0'
         feedback_services.create_thread(
-            EXP_ID, 'a_state_name', None, 'a subject', 'some text')
-        threadlist = feedback_services.get_threadlist(EXP_ID)
+            exp_id, 'a_state_name', None, 'a subject', 'some text')
+        threadlist = feedback_services.get_threadlist(exp_id)
         thread_status = threadlist[0]['status']
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)

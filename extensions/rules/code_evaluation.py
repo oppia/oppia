@@ -16,8 +16,6 @@
 
 """Rules for CodeEvaluation objects."""
 
-__author__ = 'Koji Ashida'
-
 from extensions.rules import base
 
 

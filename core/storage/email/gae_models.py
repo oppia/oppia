@@ -16,14 +16,13 @@
 
 """Models for the content of sent emails."""
 
-__author__ = 'Sean Lip'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 import utils
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class SentEmailModel(base_models.BaseModel):
@@ -65,28 +64,18 @@ class SentEmailModel(base_models.BaseModel):
     def _generate_id(cls, intent):
         id_prefix = '%s.' % intent
 
-        MAX_RETRIES = 10
-        RAND_RANGE = 127 * 127
-        ID_LENGTH = 12
-
-        for i in range(MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(RAND_RANGE)), ID_LENGTH))
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 
         raise Exception(
             'The id generator for SentEmailModel is producing too many '
             'collisions.')
-
-    def _initial_put(self):
-        """Saves a model instance to the datastore.
-
-        This should only be used when the model instance is first created.
-        """
-        super(SentEmailModel, self).put()
 
     def put(self):
         """Once written, instances of this class should be read-only."""
@@ -103,4 +92,8 @@ class SentEmailModel(base_models.BaseModel):
             recipient_email=recipient_email, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
-        email_model_instance._initial_put()
+        # We only allow the model instance to be saved once, when it is
+        # first created. To do this, we bypass the instance's put() method,
+        # which raises an error, and use the put() method of its superclass
+        # instead.
+        super(SentEmailModel, email_model_instance).put()

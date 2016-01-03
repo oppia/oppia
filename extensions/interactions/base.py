@@ -34,8 +34,6 @@ dicts, each representing a customization arg -- viz.:
     }]
 """
 
-__author__ = 'Sean Lip'
-
 import copy
 import os
 
@@ -44,7 +42,6 @@ from core.domain import rule_domain
 from extensions import domain
 import feconf
 import jinja_utils
-import schema_utils
 import utils
 
 # Indicates that the learner view of the interaction should be displayed in the

@@ -16,15 +16,14 @@
 
 """Tests for event handling."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import event_services
 from core.platform import models
-taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 import feconf
 
 from google.appengine.ext import ndb
+
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class NumbersModel(ndb.Model):

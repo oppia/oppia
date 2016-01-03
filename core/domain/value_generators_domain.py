@@ -16,8 +16,6 @@
 
 """Classes relating to value generators."""
 
-__author__ = 'Sean Lip'
-
 import copy
 import inspect
 import os
@@ -80,13 +78,13 @@ class Registry(object):
 
         # Assemble all generators in
         # extensions/value_generators/models/generators.py.
-        VALUE_GENERATOR_PATHS = [os.path.join(
+        value_generator_paths = [os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'models')]
 
         # Crawl the directories and add new generator instances to the
         # registries.
         for loader, name, _ in pkgutil.iter_modules(
-                path=VALUE_GENERATOR_PATHS):
+                path=value_generator_paths):
             if name.endswith('_test'):
                 continue
             module = loader.find_module(name).load_module(name)

@@ -16,8 +16,6 @@
 
 """Commands that can be used to operate on exploration summaries."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
@@ -30,7 +28,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     explorations that are currently non-private and not deleted,
     and returns a list of dicts of the corresponding exploration summaries.
     """
-    displayable_exploration_summaries = []
+    displayable_exp_summaries = []
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
     view_counts = (
@@ -40,7 +38,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     for ind, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary and exploration_summary.status != (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            displayable_exploration_summaries.append({
+            displayable_exp_summaries.append({
                 'id': exploration_summary.id,
                 'title': exploration_summary.title,
                 'category': exploration_summary.category,
@@ -62,4 +60,4 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
                 'num_views': view_counts[ind],
             })
 
-    return displayable_exploration_summaries
+    return displayable_exp_summaries

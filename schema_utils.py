@@ -24,13 +24,11 @@ The objects that can be described by these schemas must be composable from the
 following Python types: bool, dict, float, int, list, unicode.
 """
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import numbers
 import urllib
 import urlparse
 
-from core.domain import html_cleaner
+from core.domain import html_cleaner  # pylint: disable=relative-import
 
 
 SCHEMA_KEY_ITEMS = 'items'
@@ -72,7 +70,7 @@ def normalize_against_schema(obj, schema):
         # Importing this at the top of the file causes a circular dependency.
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
-        from core.domain import obj_services
+        from core.domain import obj_services  # pylint: disable=relative-import
         obj_class = obj_services.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         normalized_obj = obj_class.normalize(obj)

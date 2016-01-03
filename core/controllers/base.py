@@ -252,7 +252,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user = current_user_services.get_current_user(self.request)
+        self.user = current_user_services.get_current_user()
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
         self.username = None
@@ -281,8 +281,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
-        self.is_super_admin = user_services.is_super_admin(
-            self.user_id, self.request)
+        self.is_super_admin = (
+            current_user_services.is_current_user_super_admin())
 
         self.values['is_moderator'] = self.is_moderator
         self.values['is_admin'] = self.is_admin

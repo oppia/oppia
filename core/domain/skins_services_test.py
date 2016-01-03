@@ -16,8 +16,6 @@
 
 """Tests for skin services."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import skins_services
 from core.tests import test_utils
 

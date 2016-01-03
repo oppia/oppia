@@ -30,7 +30,6 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -46,7 +45,7 @@ def require_super_admin(handler):
             self.redirect(
                 current_user_services.create_login_url(self.request.uri))
             return
-        if not user_services.is_super_admin(self.user_id, self.request):
+        if not current_user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application', self.user_id)
         return handler(self, **kwargs)

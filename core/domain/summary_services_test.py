@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rights_manager
@@ -55,49 +53,50 @@ class ExplorationDisplayableSummaries(
         - (9) Albert publishes EXP_ID_3
         - (10) Albert deletes EXP_ID_3
         """
-        super(exp_services_test.ExplorationServicesUnitTests, self).setUp()
+        super(ExplorationDisplayableSummaries, self).setUp()
 
-        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.save_new_valid_exploration(self.EXP_ID_1, self.ALBERT_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
         exp_services.update_exploration(
-            self.BOB_ID, self.EXP_ID_1, [{
+            self.bob_id, self.EXP_ID_1, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
 
-        self.save_new_valid_exploration(self.EXP_ID_2, self.ALBERT_ID)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
         exp_services.update_exploration(
-            self.ALBERT_ID, self.EXP_ID_1, [{
+            self.albert_id, self.EXP_ID_1, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             }], 'Changed title to Albert1 title.')
 
         exp_services.update_exploration(
-            self.ALBERT_ID, self.EXP_ID_2, [{
+            self.albert_id, self.EXP_ID_2, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
             }], 'Changed title to Albert2 title.')
 
-        exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
+        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
         with self.assertRaisesRegexp(
-                Exception, 'This exploration cannot be published'):
-            rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
+            Exception, 'This exploration cannot be published'
+            ):
+            rights_manager.publish_exploration(self.bob_id, self.EXP_ID_2)
 
-        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
 
-        self.save_new_valid_exploration(self.EXP_ID_3, self.ALBERT_ID)
-        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_3)
-        exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_3)
+        self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:

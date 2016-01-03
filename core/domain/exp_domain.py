@@ -21,8 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-__author__ = 'Sean Lip'
-
 import collections
 import copy
 import logging
@@ -38,6 +36,7 @@ from core.domain import skins_services
 from core.domain import trigger_registry
 import feconf
 import jinja_utils
+import schema_utils
 import utils
 
 
@@ -132,7 +131,7 @@ def _validate_customization_args_and_values(
 
     # Remove extra keys.
     extra_args = []
-    for (arg_name, arg_value) in customization_args.iteritems():
+    for arg_name in customization_args.keys():
         if not isinstance(arg_name, basestring):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
@@ -150,18 +149,11 @@ def _validate_customization_args_and_values(
             schema_utils.normalize_against_schema(
                 customization_args[ca_spec.name]['value'],
                 ca_spec.schema)
-        except Exception as e:
+        except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
             # involved. (If they are, can we get sample values for the state
             # context parameters?)
-            """
-            logging.error(
-                'Validation error for customization arg %s: value %s does not '
-                'match schema %s.' % (
-                    ca_spec.name,
-                    unicode(customization_args[ca_spec.name]['value']),
-                    ca_spec.schema))
-            """
+            pass
 
 
 class ExplorationChange(object):
@@ -322,7 +314,7 @@ class Content(object):
     def validate(self):
         # TODO(sll): Add HTML sanitization checking.
         # TODO(sll): Validate customization args for rich-text components.
-        if not self.type == 'text':
+        if self.type != 'text':
             raise utils.ValidationError('Invalid content type: %s' % self.type)
         if not isinstance(self.value, basestring):
             raise utils.ValidationError(
@@ -366,8 +358,8 @@ class RuleSpec(object):
         if self.rule_type == rule_domain.FUZZY_RULE_TYPE:
             return self.rule_type
         else:
-            param_list = [utils.to_ascii(val) for
-                         (key, val) in self.inputs.iteritems()]
+            param_list = [
+                utils.to_ascii(val) for val in self.inputs.values()]
             return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
     def validate(self, rule_params_list, exp_param_specs_dict):
@@ -955,11 +947,14 @@ class SkinInstance(object):
             if panel not in skin_customizations['panels_contents']:
                 self.panel_contents_dict[panel] = []
             else:
-                self.panel_contents_dict[panel] = [GadgetInstance(
-                    gdict['gadget_type'], gdict['gadget_name'],
-                    gdict['visible_in_states'], gdict['customization_args'])
-                for gdict in
-                skin_customizations['panels_contents'][panel]]
+                self.panel_contents_dict[panel] = [
+                    GadgetInstance(
+                        gdict['gadget_type'],
+                        gdict['gadget_name'],
+                        gdict['visible_in_states'],
+                        gdict['customization_args']
+                    ) for gdict in skin_customizations['panels_contents'][panel]
+                ]
 
     @property
     def skin(self):
@@ -986,7 +981,7 @@ class SkinInstance(object):
                 self.panel_contents_dict.iteritems()):
 
             # Validate existence of panels in the skin.
-            if not panel in self.skin.panels_properties:
+            if panel not in self.skin.panels_properties:
                 raise utils.ValidationError(
                     '%s panel not found in skin %s' % (
                         panel, self.skin_id)
@@ -1062,8 +1057,8 @@ class State(object):
         # Parameter changes associated with this state.
         self.param_changes = [param_domain.ParamChange(
             param_change.name, param_change.generator.id,
-            param_change.customization_args)
-            for param_change in param_changes]
+            param_change.customization_args
+        ) for param_change in param_changes]
         # The interaction instance associated with this state.
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
@@ -1432,7 +1427,7 @@ class Exploration(object):
                     'Tags should not start or end with whitespace, received '
                     ' \'%s\'' % tag)
 
-            if re.search('\s\s+', tag):
+            if re.search(r'\s\s+', tag):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
@@ -1834,7 +1829,7 @@ class Exploration(object):
         if old_gadget_name == new_gadget_name:
             return
 
-        GadgetInstance._validate_gadget_name(new_gadget_name)
+        GadgetInstance._validate_gadget_name(new_gadget_name)  # pylint: disable=protected-access
 
         gadget_instance = self.get_gadget_instance_by_name(old_gadget_name)
         gadget_instance.name = new_gadget_name
@@ -1956,7 +1951,7 @@ class Exploration(object):
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
-        _OLD_END_DEST = 'END'
+        old_end_dest = 'END'
 
         # Adds an explicit state called 'END' with an EndExploration to replace
         # links other states have to an implicit 'END' state. Otherwise, if no
@@ -1970,20 +1965,20 @@ class Exploration(object):
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in states_dict.iteritems():
-            if not has_end_state and state_name == _OLD_END_DEST:
+            if not has_end_state and state_name == old_end_dest:
                 has_end_state = True
 
             if not targets_end_state:
                 for handler in sdict['interaction']['handlers']:
                     for rule_spec in handler['rule_specs']:
-                        if rule_spec['dest'] == _OLD_END_DEST:
+                        if rule_spec['dest'] == old_end_dest:
                             targets_end_state = True
                             break
 
         # Ensure any explorations pointing to an END state has a valid END
         # state to end with (in case it expects an END state)
         if targets_end_state and not has_end_state:
-            states_dict[_OLD_END_DEST] = {
+            states_dict[old_end_dest] = {
                 'content': [{
                     'type': 'text',
                     'value': 'Congratulations, you have finished!'
@@ -2001,7 +1996,7 @@ class Exploration(object):
                             'definition': {
                                 'rule_type': 'default'
                             },
-                            'dest': _OLD_END_DEST,
+                            'dest': old_end_dest,
                             'feedback': [],
                             'param_changes': []
                         }]
@@ -2020,7 +2015,7 @@ class Exploration(object):
         Note that the states_dict being passed in is modified in-place.
         """
         # Ensure all states interactions have a triggers list.
-        for (state_name, sdict) in states_dict.iteritems():
+        for sdict in states_dict.values():
             interaction = sdict['interaction']
             if 'triggers' not in interaction:
                 interaction['triggers'] = []
@@ -2038,8 +2033,8 @@ class Exploration(object):
 
         Note that the states_dict being passed in is modified in-place.
         """
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             answer_groups = []
             default_outcome = None
             for handler in interaction['handlers']:
@@ -2102,8 +2097,8 @@ class Exploration(object):
 
             is_terminal = (
                 interaction_registry.Registry.get_interaction_by_id(
-                    interaction['id']).is_terminal
-                    if interaction['id'] is not None else False)
+                    interaction['id']
+                ).is_terminal if interaction['id'] is not None else False)
             if not is_terminal:
                 interaction['answer_groups'] = answer_groups
                 interaction['default_outcome'] = default_outcome
@@ -2123,8 +2118,8 @@ class Exploration(object):
         Note that the states_dict being passed in is modified in-place.
         """
         # Ensure all states interactions have a fallbacks list.
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             if 'triggers' in interaction:
                 del interaction['triggers']
             if 'fallbacks' not in interaction:
@@ -2138,8 +2133,8 @@ class Exploration(object):
         confirmed unclassified answers. Those are answers which are confirmed
         to be associated with the default outcome during classification.
         """
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             if 'confirmed_unclassified_answers' not in interaction:
                 interaction['confirmed_unclassified_answers'] = []
 
@@ -2150,8 +2145,8 @@ class Exploration(object):
         """Converts from version 6 to 7. Version 7 forces all CodeRepl
         interactions to use Python.
         """
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             if interaction['id'] == 'CodeRepl':
                 interaction['customization_args']['language']['value'] = (
                     'python')
@@ -2180,8 +2175,8 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 10
-    LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION = 9
+    CURRENT_EXP_SCHEMA_VERSION = 10
+    LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -2235,15 +2230,13 @@ class Exploration(object):
         exploration_dict['tags'] = exploration_dict['skill_tags']
         del exploration_dict['skill_tags']
 
-        _OLD_DEFAULT_SKIN_CUSTOMIZATIONS = {
+        exploration_dict['skin_customizations'] = {
             'panels_contents': {
                 'bottom': [],
                 'left': [],
                 'right': []
             }
         }
-        exploration_dict['skin_customizations'] = (
-            _OLD_DEFAULT_SKIN_CUSTOMIZATIONS)
 
         return exploration_dict
 
@@ -2360,10 +2353,10 @@ class Exploration(object):
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
         if not (1 <= exploration_schema_version
-                <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
+                <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
                 'Sorry, we can only process v1 to v%s YAML files at '
-                'present.' % cls.CURRENT_EXPLORATION_SCHEMA_VERSION)
+                'present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
@@ -2421,7 +2414,7 @@ class Exploration(object):
         initial_schema_version = migration_result[1]
 
         if (initial_schema_version <=
-                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+                cls.LAST_UNTITLED_SCHEMA_VERSION):
             raise Exception(
                 'Expected a YAML version >= 10, received: %d' % (
                     initial_schema_version))
@@ -2440,7 +2433,7 @@ class Exploration(object):
         initial_schema_version = migration_result[1]
 
         if (initial_schema_version >
-                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+                cls.LAST_UNTITLED_SCHEMA_VERSION):
             raise Exception(
                 'Expected a YAML version <= 9, received: %d' % (
                     initial_schema_version))
@@ -2450,7 +2443,7 @@ class Exploration(object):
 
     def to_yaml(self):
         exp_dict = self.to_dict()
-        exp_dict['schema_version'] = self.CURRENT_EXPLORATION_SCHEMA_VERSION
+        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
